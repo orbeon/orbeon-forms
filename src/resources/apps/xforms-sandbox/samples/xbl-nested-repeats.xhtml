@@ -13,9 +13,9 @@
 -->
 <html
         xmlns="http://www.w3.org/1999/xhtml"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -23,8 +23,8 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <head>
-        <xforms:model>
-            <xforms:instance id="sortedSections" xmlns="">
+        <xf:model>
+            <xf:instance id="sortedSections" xmlns="">
                 <fruits>
                     <fruit>
                         <color>green</color>
@@ -37,26 +37,26 @@
                         <color>yellow</color>
                     </fruit>
                 </fruits>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
 
         <xbl:xbl>
             <xbl:binding id="foo-component" element="fr|foo">
                 <xbl:template>
-                    <xforms:repeat ref="fruit" id="fruit-repeat">
-                        <xhtml:div>
+                    <xf:repeat ref="fruit" id="fruit-repeat">
+                        <xh:div>
                             <fr:bar id="my-bar"/>
-                        </xhtml:div>
-                    </xforms:repeat>
+                        </xh:div>
+                    </xf:repeat>
                 </xbl:template>
             </xbl:binding>
             <xbl:binding id="bar-component" element="fr|bar">
                 <xbl:template>
-                    <xforms:repeat ref="color" id="color-repeat">
-                        <xhtml:div>
-                            <xforms:output value="."/>
-                        </xhtml:div>
-                    </xforms:repeat>
+                    <xf:repeat ref="color" id="color-repeat">
+                        <xh:div>
+                            <xf:output value="."/>
+                        </xh:div>
+                    </xf:repeat>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>

@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import script.ServerScript
 
 /**
- * Extension xxforms:script action.
+ * Extension xxf:script action.
  */
 class XXFormsScriptAction extends XFormsAction {
 

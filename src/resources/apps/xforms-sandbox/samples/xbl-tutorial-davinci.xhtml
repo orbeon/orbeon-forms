@@ -12,24 +12,24 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <head>
         <title>XLB Tutorial fr:tutorial-davinci illustration</title>
-        <xforms:model>
-            <xforms:instance xxforms:exclude-result-prefixes="#all">
+        <xf:model>
+            <xf:instance xxf:exclude-result-prefixes="#all">
                 <instance xmlns="">
                     <first-name/>
                     <last-name/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind id="last-name-bind" ref="last-name"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind id="last-name-bind" ref="last-name"/>
+        </xf:model>
     </head>
     <body>
 
@@ -43,30 +43,30 @@
         <h2>Using &lt;fr:tutorial-davinci> component</h2>
 
         <fr:tutorial-davinci ref="first-name">
-            <xforms:label>First name: </xforms:label>
-            <xforms:hint>Please enter your first name</xforms:hint>
-            <xforms:alert/>
+            <xf:label>First name: </xf:label>
+            <xf:hint>Please enter your first name</xf:hint>
+            <xf:alert/>
         </fr:tutorial-davinci>
 
         <fr:tutorial-davinci bind="last-name-bind">
-            <xforms:label>Last name: </xforms:label>
-            <xforms:hint>Please enter your last name</xforms:hint>
-            <xforms:alert/>
+            <xf:label>Last name: </xf:label>
+            <xf:hint>Please enter your last name</xf:hint>
+            <xf:alert/>
         </fr:tutorial-davinci>
         
         <h2>Using plain inputs</h2>
 
-        <xforms:input ref="first-name">
-            <xforms:label>First name: </xforms:label>
-            <xforms:hint>Please enter your first name</xforms:hint>
-            <xforms:alert/>
-        </xforms:input>
+        <xf:input ref="first-name">
+            <xf:label>First name: </xf:label>
+            <xf:hint>Please enter your first name</xf:hint>
+            <xf:alert/>
+        </xf:input>
 
-        <xforms:input bind="last-name-bind">
-            <xforms:label>Last name: </xforms:label>
-            <xforms:hint>Please enter your last name</xforms:hint>
-            <xforms:alert/>
-        </xforms:input>
+        <xf:input bind="last-name-bind">
+            <xf:label>Last name: </xf:label>
+            <xf:hint>Please enter your last name</xf:hint>
+            <xf:alert/>
+        </xf:input>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 

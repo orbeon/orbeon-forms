@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Input with Boolean type</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Input with Boolean type</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <show>true</show>
                     <name/>
@@ -34,149 +34,149 @@
                     <boolean-dynamic-type/>
                     <boolean-repeat/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="itemset">
+            </xf:instance>
+            <xf:instance id="itemset">
                 <items>
                     <item>1</item>
                 </items>
-            </xforms:instance>
-            <xforms:bind ref="show" type="xs:boolean"/>
-            <xforms:bind ref="date" type="xs:date"/>
-            <xforms:bind ref="boolean-group" type="xs:boolean"/>
-            <xforms:bind ref="boolean-dynamic-type[../type = 'string']" type="xs:string"/>
-            <xforms:bind ref="boolean-dynamic-type[../type = 'boolean']" type="xs:boolean"/>
-            <xforms:bind ref="boolean-dynamic-type[../type = 'date']" type="xs:date"/>
-            <xforms:bind ref="boolean-dynamic-type[../type = 'time']" type="xs:time"/>
-            <xforms:bind ref="boolean-dynamic-type[../type = 'dateTime']" type="xs:dateTime"/>
-            <xforms:bind ref="boolean-repeat" type="xs:boolean"/>
-        </xforms:model>
-        <!--<xhtml:script type='text/javascript'  src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'/>-->
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+            <xf:bind ref="show" type="xs:boolean"/>
+            <xf:bind ref="date" type="xs:date"/>
+            <xf:bind ref="boolean-group" type="xs:boolean"/>
+            <xf:bind ref="boolean-dynamic-type[../type = 'string']" type="xs:string"/>
+            <xf:bind ref="boolean-dynamic-type[../type = 'boolean']" type="xs:boolean"/>
+            <xf:bind ref="boolean-dynamic-type[../type = 'date']" type="xs:date"/>
+            <xf:bind ref="boolean-dynamic-type[../type = 'time']" type="xs:time"/>
+            <xf:bind ref="boolean-dynamic-type[../type = 'dateTime']" type="xs:dateTime"/>
+            <xf:bind ref="boolean-repeat" type="xs:boolean"/>
+        </xf:model>
+        <!--<xh:script type='text/javascript'  src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'/>-->
+    </xh:head>
+    <xh:body>
 
 
-        <xforms:input ref="show">
-            <xforms:label>Show set of fields below</xforms:label>
-        </xforms:input>
+        <xf:input ref="show">
+            <xf:label>Show set of fields below</xf:label>
+        </xf:input>
 
-        <xhtml:br/>
+        <xh:br/>
 
-        <xforms:group ref=".[show = 'true']">
-            <xhtml:fieldset>
+        <xf:group ref=".[show = 'true']">
+            <xh:fieldset>
 
-                <xforms:input ref="name">
-                    <xforms:label>Name</xforms:label>
-                </xforms:input>
+                <xf:input ref="name">
+                    <xf:label>Name</xf:label>
+                </xf:input>
 
-                <xhtml:br/>
+                <xh:br/>
 
-                <xforms:input ref="date">
-                    <xforms:label>Date</xforms:label>
-                </xforms:input>
+                <xf:input ref="date">
+                    <xf:label>Date</xf:label>
+                </xf:input>
 
-                <xhtml:br/>
+                <xh:br/>
 
-                <xforms:input ref="boolean-group">
-                    <xforms:label>Name</xforms:label>
-                </xforms:input>
+                <xf:input ref="boolean-group">
+                    <xf:label>Name</xf:label>
+                </xf:input>
 
-                <xhtml:br/>
+                <xh:br/>
 
-                <xforms:input ref="boolean-group" appearance="minimal">
-                    <xforms:label>Name</xforms:label>
-                </xforms:input>
+                <xf:input ref="boolean-group" appearance="minimal">
+                    <xf:label>Name</xf:label>
+                </xf:input>
 
-                <xhtml:br/>
+                <xh:br/>
 
-                <xforms:input ref="boolean-group" appearance="compact">
-                    <xforms:label>Name</xforms:label>
-                </xforms:input>
+                <xf:input ref="boolean-group" appearance="compact">
+                    <xf:label>Name</xf:label>
+                </xf:input>
 
-                <xhtml:br/>
+                <xh:br/>
 
-                <xforms:input ref="boolean-group" appearance="full">
-                    <xforms:label>Name</xforms:label>
-                </xforms:input>
+                <xf:input ref="boolean-group" appearance="full">
+                    <xf:label>Name</xf:label>
+                </xf:input>
 
-            </xhtml:fieldset>
-        </xforms:group>
+            </xh:fieldset>
+        </xf:group>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Adding items to xforms:select/xforms:select1</xhtml:legend>
-            <xhtml:div>
-                <xforms:output ref="type">
-                    <xforms:label>Type: </xforms:label>
-                </xforms:output>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:select ref="select" appearance="full">
-                    <xforms:itemset ref="instance('itemset')/item">
-                        <xforms:label ref="."/>
-                        <xforms:value ref="."/>
-                    </xforms:itemset>
-                </xforms:select>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:select1 ref="select" appearance="full">
-                    <xforms:itemset ref="instance('itemset')/item">
-                        <xforms:label ref="."/>
-                        <xforms:value ref="."/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:trigger>
-                    <xforms:label>Add item</xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:insert ref="instance('itemset')/item"/>
-                        <xforms:setvalue ref="instance('itemset')/item[last()]" value=". + 1"/>
-                    </xforms:action>
-                </xforms:trigger>
-            </xhtml:div>
-        </xhtml:fieldset>
+        <xh:fieldset>
+            <xh:legend>Adding items to xf:select/xf:select1</xh:legend>
+            <xh:div>
+                <xf:output ref="type">
+                    <xf:label>Type: </xf:label>
+                </xf:output>
+            </xh:div>
+            <xh:div>
+                <xf:select ref="select" appearance="full">
+                    <xf:itemset ref="instance('itemset')/item">
+                        <xf:label ref="."/>
+                        <xf:value ref="."/>
+                    </xf:itemset>
+                </xf:select>
+            </xh:div>
+            <xh:div>
+                <xf:select1 ref="select" appearance="full">
+                    <xf:itemset ref="instance('itemset')/item">
+                        <xf:label ref="."/>
+                        <xf:value ref="."/>
+                    </xf:itemset>
+                </xf:select1>
+            </xh:div>
+            <xh:div>
+                <xf:trigger>
+                    <xf:label>Add item</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:insert ref="instance('itemset')/item"/>
+                        <xf:setvalue ref="instance('itemset')/item[last()]" value=". + 1"/>
+                    </xf:action>
+                </xf:trigger>
+            </xh:div>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Dynamic type change for xforms:input</xhtml:legend>
-            <xhtml:div>
-                <xforms:output ref="type">
-                    <xforms:label>Type: </xforms:label>
-                </xforms:output>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:trigger>
-                    <xforms:label>Change type</xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:setvalue ref="type" value="if (. = 'string') then 'boolean'
+        <xh:fieldset>
+            <xh:legend>Dynamic type change for xf:input</xh:legend>
+            <xh:div>
+                <xf:output ref="type">
+                    <xf:label>Type: </xf:label>
+                </xf:output>
+            </xh:div>
+            <xh:div>
+                <xf:trigger>
+                    <xf:label>Change type</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:setvalue ref="type" value="if (. = 'string') then 'boolean'
                             else if (. = 'boolean') then 'date'
                             else if (. = 'date') then 'time'
                             else if (. = 'time') then 'dateTime'
                             else if (. = 'dateTime') then ''
                             else 'string'"/>
-                        <xforms:rebuild/>
-                    </xforms:action>
-                </xforms:trigger>
-                <xforms:input ref="boolean-dynamic-type">
-                    <xforms:label>Name</xforms:label>
-                </xforms:input>
-            </xhtml:div>
-        </xhtml:fieldset>
+                        <xf:rebuild/>
+                    </xf:action>
+                </xf:trigger>
+                <xf:input ref="boolean-dynamic-type">
+                    <xf:label>Name</xf:label>
+                </xf:input>
+            </xh:div>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Checkbox in a repeat</xhtml:legend>
-            <xforms:trigger>
-                <xforms:label>Add</xforms:label>
-                <xforms:insert ev:event="DOMActivate" ref="boolean-repeat"/>
-            </xforms:trigger>
-            <xforms:repeat ref="boolean-repeat">
-                <xhtml:div>
-                    <xforms:input ref="." appearance="full">
-                        <xforms:label>Name</xforms:label>
-                    </xforms:input>
-                </xhtml:div>
-            </xforms:repeat>
-        </xhtml:fieldset>
+        <xh:fieldset>
+            <xh:legend>Checkbox in a repeat</xh:legend>
+            <xf:trigger>
+                <xf:label>Add</xf:label>
+                <xf:insert ev:event="DOMActivate" ref="boolean-repeat"/>
+            </xf:trigger>
+            <xf:repeat ref="boolean-repeat">
+                <xh:div>
+                    <xf:input ref="." appearance="full">
+                        <xf:label>Name</xf:label>
+                    </xf:input>
+                </xh:div>
+            </xf:repeat>
+        </xh:fieldset>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

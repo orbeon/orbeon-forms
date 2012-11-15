@@ -13,14 +13,13 @@
   -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:sql="http://orbeon.org/oxf/xml/sql"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Search instance -->
@@ -33,13 +32,13 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="config">
-            <xforms:submission xsl:version="2.0" method="get"
-                               resource="{{xxforms:property('oxf.fr.persistence.service.exist.uri')}}/{/*/app
+            <xf:submission xsl:version="2.0" method="get"
+                               resource="{{xxf:property('oxf.fr.persistence.service.exist.uri')}}/{/*/app
                                             }/?_howmany={/*/page-size}&amp;_start={/*/page-number}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
-                <xforms:insert ev:event="xforms-submit-done" ref="/*" origin="/*/*[1]"/>
+                <xf:insert ev:event="xforms-submit-done" ref="/*" origin="/*/*[1]"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
-            </xforms:submission>
+            </xf:submission>
         </p:input>
         <p:output name="data" id="submission"/>
     </p:processor>

@@ -21,7 +21,7 @@ import org.orbeon.saxon.om.{SequenceIterator, EmptyIterator}
 import org.orbeon.oxf.util.ScalaUtils._
 
 /**
- * Extension xxforms:cases($switch-id as xs:string) as xs:string* function.
+ * Extension xxf:cases($switch-id as xs:string) as xs:string* function.
  */
 class XXFormsCases extends XFormsFunction with FunctionSupport {
     override def iterate(xpathContext: XPathContext): SequenceIterator =

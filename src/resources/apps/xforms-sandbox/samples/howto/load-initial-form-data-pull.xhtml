@@ -1,27 +1,27 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events">
     <head>
         <title>Pull initial form data from a service</title>
-        <xforms:model>
+        <xf:model>
 
             <!-- User in which user data is collected -->
-            <xforms:instance id="user-data">
+            <xf:instance id="user-data">
                 <registration xmlns="">
                     <first-name/>
                     <last-name/>
                 </registration>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Load initial data from a service -->
-            <xforms:send ev:event="xforms-model-construct-done" submission="load-data-submission"/>
-            <xforms:submission id="load-data-submission"
+            <xf:send ev:event="xforms-model-construct-done" submission="load-data-submission"/>
+            <xf:submission id="load-data-submission"
                                method="get" serialization="none"
                                resource="http://github.com/orbeon/orbeon-forms/raw/master/src/resources/apps/xforms-sandbox/samples/howto/load-initial-form-data-pull-instance.xml"
                                replace="instance" instance="user-data"/>
 
-        </xforms:model>
+        </xf:model>
         <style type="text/css">
             .xforms-label { display: block; }
             fieldset { width: 15em; margin-top: 1em; }
@@ -30,12 +30,12 @@
     <body>
         <fieldset>
             <legend>Registration</legend>
-            <xforms:input ref="first-name">
-                <xforms:label>First name</xforms:label>
-            </xforms:input>
-            <xforms:input ref="last-name">
-                <xforms:label>Last name</xforms:label>
-            </xforms:input>
+            <xf:input ref="first-name">
+                <xf:label>First name</xf:label>
+            </xf:input>
+            <xf:input ref="last-name">
+                <xf:label>Last name</xf:label>
+            </xf:input>
         </fieldset>
     </body>
 </html>

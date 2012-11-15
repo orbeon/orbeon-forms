@@ -29,7 +29,7 @@ import XFormsBaseHandlerXHTML._
 import XFormsConstants._
 
 /**
- * Handle xforms:input.
+ * Handle xf:input.
  *
  * TODO: Subclasses per appearance.
  */
@@ -66,10 +66,10 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(repeating = false)
                 // NOTE: Put null label so that it is not output at all
                 itemset.addChildItem(Item(0, isMultiple, encode = false, attributes = null, label = null, value = "true"))
 
-                // NOTE: In the future, we may want to use other appearances provided by xforms:select
+                // NOTE: In the future, we may want to use other appearances provided by xf:select
     //            items.add(new XFormsSelect1Control.Item(false, Collections.EMPTY_LIST, "False", "false", 1));
 
-                // TODO: This delegation to xforms:select1 handler is error-prone, is there a better way?
+                // TODO: This delegation to xf:select1 handler is error-prone, is there a better way?
                 val select1Handler = new XFormsSelect1Handler {
                     override def getPrefixedId = XFormsInputHandler.this.getPrefixedId
                     override def getEffectiveId = XFormsInputHandler.this.getEffectiveId
@@ -93,14 +93,14 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(repeating = false)
                 }
             }
         } else {
-            // Create xhtml:span
+            // Create xh:span
             val xhtmlPrefix = handlerContext.findXHTMLPrefix
             val enclosingElementLocalname = "span"
             val enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname)
             val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
             val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false)
 
-            // Create xhtml:input
+            // Create xh:input
             if (! isStaticReadonly(inputControl)) {
                 // Regular read-write mode
 
@@ -133,7 +133,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(repeating = false)
                         // makes the minimal date picker fail on the client. We should be able to remove this.
                         appendAppearances(elementAnalysis, inputClasses)
 
-                        // Output xxforms:* extension attributes
+                        // Output xxf:* extension attributes
                         inputControl.addExtensionAttributes(reusableAttributes, XXFORMS_NAMESPACE_URI)
                     } else {
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "")

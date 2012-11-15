@@ -11,40 +11,40 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Activate Trigger From JavaScript</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Activate Trigger From JavaScript</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <number>1</number>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:trigger id="increment-trigger">
-                <xforms:label>Increment</xforms:label>
-                <xforms:setvalue ref="number" value=". + 1" ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:output ref="number"/>
-        </xhtml:p>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:trigger id="increment-trigger">
+                <xf:label>Increment</xf:label>
+                <xf:setvalue ref="number" value=". + 1" ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:output ref="number"/>
+        </xh:p>
+        <xh:script type="text/javascript">
             function pageLoaded() {
                 document.getElementById('increment-trigger').click();
             }
             YAHOO.util.Event.addListener(window, "load", pageLoaded);
-        </xhtml:script>
-        <xhtml:p>
-            <xhtml:button onclick="document.getElementById('increment-trigger').click()">Run trigger</xhtml:button>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        </xh:script>
+        <xh:p>
+            <xh:button onclick="document.getElementById('increment-trigger').click()">Run trigger</xh:button>
+        </xh:p>
+    </xh:body>
+</xh:html>

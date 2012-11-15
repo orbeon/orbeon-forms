@@ -12,9 +12,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -22,46 +22,46 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - Date picker</xhtml:title>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/date-picker/date-picker-unittest.js"/>
-        <xforms:model id="main-model">
+    <xh:head>
+        <xh:title>XBL - Date picker</xh:title>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/date-picker/date-picker-unittest.js"/>
+        <xf:model id="main-model">
 
-            <xforms:instance id="main-instance">
+            <xf:instance id="main-instance">
                 <instance>
                     <date-picker>2009-05-15</date-picker>
                     <input/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance/date-picker" type="xs:date"/>
+            </xf:instance>
+            <xf:bind ref="/instance/date-picker" type="xs:date"/>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             #xforms-form label { display: inline-block; width: 10em; }
             .xbl-fr-button .yui-button { margin-bottom: 1em }
             .xbl-fr-date-picker { margin-bottom: .5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
         <fr:button id="copy-to-input">
-            <xforms:label>Copy to input</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="input" value="../date-picker"/>
+            <xf:label>Copy to input</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="input" value="../date-picker"/>
         </fr:button>
         <fr:button id="copy-to-date-picker">
-            <xforms:label>Copy to date picker</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="date-picker" value="../input"/>
+            <xf:label>Copy to date picker</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="date-picker" value="../input"/>
         </fr:button>
-        <xhtml:div>
+        <xh:div>
             <fr:date-picker ref="date-picker" id="date-picker">
-                <xforms:label>Date picker:</xforms:label>
+                <xf:label>Date picker:</xf:label>
             </fr:date-picker>
-            <xforms:input ref="input" id="input">
-                <xforms:label>Source date:</xforms:label>
-            </xforms:input>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+            <xf:input ref="input" id="input">
+                <xf:label>Source date:</xf:label>
+            </xf:input>
+        </xh:div>
+    </xh:body>
+</xh:html>

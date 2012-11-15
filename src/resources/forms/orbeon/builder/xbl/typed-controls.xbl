@@ -14,13 +14,13 @@
 <!--
     This is the standard Form Builder standard controls library.
  -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl">
@@ -31,7 +31,7 @@
         <display-name lang="ru">Типизированные элементы</display-name>
     </metadata>
 
-    <xbl:binding id="fb-input-email" element="xforms|input">
+    <xbl:binding id="fb-input-email" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Email Address</display-name>
             <display-name lang="fr">Adresse email</display-name>
@@ -41,14 +41,14 @@
                 <large-icon>/apps/fr/style/images/silk/email.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:email"/>
+                <bind type="xf:email"/>
                 <view>
-                    <xforms:input id="" ref="" xmlns="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
-                    </xforms:input>
+                    <xf:input id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:input>
                 </view>
             </templates>
         </metadata>

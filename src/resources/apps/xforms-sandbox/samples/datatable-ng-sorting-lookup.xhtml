@@ -12,19 +12,19 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:f="http://orbeon.org/oxf/xml/formatting">
     <head>
         <title>REMSi - Create New Submission</title>
-        <xforms:model>
+        <xf:model>
             <!-- form instance -->
-            <xforms:instance id="attachmentForm-instance" xmlns="">
+            <xf:instance id="attachmentForm-instance" xmlns="">
                 <AttachmentForm>
                     <TIV/>
                     <appUser/>
@@ -45,10 +45,10 @@
                         </artifact>
                    </submission_artifact_backref>
                </AttachmentForm>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- artifact type drop-down -->
-            <xforms:instance id="artifactTypeList-instance" xmlns="">
+            <xf:instance id="artifactTypeList-instance" xmlns="">
             <results>
                 <artifactType>
                     <code>AOPR</code>
@@ -75,8 +75,8 @@
                     <hasArtifactTypeName>EP Curve</hasArtifactTypeName>
                 </artifactType>
             </results>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
     </head>
     <body>
     <h2>Sorting Datatable</h2>
@@ -87,7 +87,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat ref="instance('attachmentForm-instance')/submission_artifact_backref/artifact">
+                <xf:repeat ref="instance('attachmentForm-instance')/submission_artifact_backref/artifact">
                 <tr>
                     <td>
                         <!--
@@ -97,9 +97,9 @@
                             a for expression that loops over a single node to
                             simulate this variable
                             
-                            <xforms:var name="type" value="idArtifactType" />
+                            <xf:var name="type" value="idArtifactType" />
                         -->
-                        <xforms:output value="
+                        <xf:output value="
                             if (../idArtifactType='') 
                             then 'N/A' 
                             else 
@@ -107,7 +107,7 @@
                                 return instance('artifactTypeList-instance')/artifactType[code = $type]/hasArtifactTypeName" />
                     </td>
                 </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </tbody>
         </fr:datatable><br/>
     </body>

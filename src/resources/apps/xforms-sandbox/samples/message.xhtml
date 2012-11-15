@@ -11,33 +11,33 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Message</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Message</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <message>4: message from instance</message>
-            </xforms:instance>
-            <xforms:message ev:event="xforms-model-construct-done" level="modal">1: xforms-model-construct-done</xforms:message>
-            <xforms:message ev:event="xforms-ready" level="modal">2: xforms-ready</xforms:message>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group>
-            <xforms:trigger id="trigger-control">
-                <xforms:label>Show alert</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:message level="modal">3: Inline message</xforms:message>
-                    <xforms:message level="modal" ref="."/>
-                </xforms:action>
-            </xforms:trigger>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:message ev:event="xforms-model-construct-done" level="modal">1: xforms-model-construct-done</xf:message>
+            <xf:message ev:event="xforms-ready" level="modal">2: xforms-ready</xf:message>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:group>
+            <xf:trigger id="trigger-control">
+                <xf:label>Show alert</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:message level="modal">3: Inline message</xf:message>
+                    <xf:message level="modal" ref="."/>
+                </xf:action>
+            </xf:trigger>
+        </xf:group>
+    </xh:body>
+</xh:html>

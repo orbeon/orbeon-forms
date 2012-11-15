@@ -11,54 +11,54 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat Action</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Repeat Action</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <fruits>
                     <orange>bloody</orange>
                     <orange>valencia</orange>
                 </fruits>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="other">
+            <xf:instance id="other">
                 <value>New value</value>
-            </xforms:instance>
+            </xf:instance>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:input ref="instance('other')">
-            <xforms:label>New value:</xforms:label>
-        </xforms:input>
+        <xf:input ref="instance('other')">
+            <xf:label>New value:</xf:label>
+        </xf:input>
 
-        <xforms:repeat ref="orange" id="orange-repeat">
+        <xf:repeat ref="orange" id="orange-repeat">
             <div>
-                <xforms:group ref="instance('other')">
+                <xf:group ref="instance('other')">
 
-                    <xforms:trigger>
-                        <xforms:label>Set</xforms:label>
+                    <xf:trigger>
+                        <xf:label>Set</xf:label>
 
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="xxforms:context('orange-repeat')" value="instance('other')"/>
-                        </xforms:action>
+                        <xf:action ev:event="DOMActivate">
+                            <xf:setvalue ref="xxf:context('orange-repeat')" value="instance('other')"/>
+                        </xf:action>
 
-                    </xforms:trigger>
+                    </xf:trigger>
 
-                </xforms:group>
+                </xf:group>
 
-                <xforms:output value="."/>
+                <xf:output value="."/>
             </div>
-        </xforms:repeat>
+        </xf:repeat>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

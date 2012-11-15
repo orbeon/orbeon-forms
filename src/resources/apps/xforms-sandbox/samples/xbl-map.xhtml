@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,26 +21,26 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL Google Maps</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL Google Maps</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <auction>
                     <start-price>2</start-price>
                     <reserve-price>42</reserve-price>
                     <price-increment>1</price-increment>
                 </auction>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             <fr:map width="600" height="300"/>
             <fr:map width="600" height="300"/>
-        </xhtml:p>
+        </xh:p>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>
 

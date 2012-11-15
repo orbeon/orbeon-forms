@@ -11,35 +11,35 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Offline MIPS</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-online-and-succeed go-online-and-fail">
+    <xh:head>
+        <xh:title>Offline MIPS</xh:title>
+        <xf:model xxf:offline="true" id="main-model" xxf:external-events="go-online-and-succeed go-online-and-fail">
 
-            <xforms:action ev:event="go-online-and-succeed">
+            <xf:action ev:event="go-online-and-succeed">
                 <!-- Do nothing -->
-            </xforms:action>
+            </xf:action>
 
-            <xforms:action ev:event="go-online-and-fail">
-                <xforms:send submission="simulate-submission"/>
+            <xf:action ev:event="go-online-and-fail">
+                <xf:send submission="simulate-submission"/>
                 <!-- Do nothing -->
-            </xforms:action>
+            </xf:action>
 
-            <xforms:submission id="simulate-submission" method="post" action="/xforms-sandbox/service/identity" replace="instance">
-                <xforms:action ev:event="xforms-submit-error">
+            <xf:submission id="simulate-submission" method="post" action="/xforms-sandbox/service/identity" replace="instance">
+                <xf:action ev:event="xforms-submit-error">
                     <!-- Go back offline, as if the submission had failed -->
-                    <xxforms:offline/>
-                </xforms:action>
-            </xforms:submission>
+                    <xxf:offline/>
+                </xf:action>
+            </xf:submission>
 
-            <xforms:instance id="instance">
+            <xf:instance id="instance">
                 <instance>
                     <a/>
                     <b f="">
@@ -53,111 +53,111 @@
                     <f/>
                     <g/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance">
-                <xforms:bind ref="a" name="a" type="xs:integer" xxforms:offline="true"/>
-                <xforms:bind ref="b" name="b" relevant="$a = '42'" xxforms:offline="true"/>
-                <xforms:bind ref="c" name="c" constraint=". = $b" xxforms:offline="true"/>
-                <xforms:bind ref="d" name="d" required="$c = '42'" xxforms:offline="true"/>
-                <xforms:bind ref="e" name="e" readonly="$d = '42'" xxforms:offline="true"/>
-                <xforms:bind ref="f" name="f" calculate="xxforms:if($e = '42', 'Good', 'Could be better')" xxforms:offline="true"/>
-                <xforms:bind ref="g" name="g" constraint="matches(., '^\d\d\d\d-\d\d-\d\d$')" xxforms:offline="true"/>
-            </xforms:bind>
+            </xf:instance>
+            <xf:bind ref="/instance">
+                <xf:bind ref="a" name="a" type="xs:integer" xxf:offline="true"/>
+                <xf:bind ref="b" name="b" relevant="$a = '42'" xxf:offline="true"/>
+                <xf:bind ref="c" name="c" constraint=". = $b" xxf:offline="true"/>
+                <xf:bind ref="d" name="d" required="$c = '42'" xxf:offline="true"/>
+                <xf:bind ref="e" name="e" readonly="$d = '42'" xxf:offline="true"/>
+                <xf:bind ref="f" name="f" calculate="xxf:if($e = '42', 'Good', 'Could be better')" xxf:offline="true"/>
+                <xf:bind ref="g" name="g" constraint="matches(., '^\d\d\d\d-\d\d-\d\d$')" xxf:offline="true"/>
+            </xf:bind>
 
-            <xforms:instance id="ui">
+            <xf:instance id="ui">
                 <ui>
                     <offline>false</offline>
                 </ui>
-            </xforms:instance>
-            <xforms:action ev:event="xxforms-offline">
-                <xforms:message level="xxforms:log-info">Got xxforms-offline event</xforms:message>
-                <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
-            </xforms:action>
-            <xforms:action ev:event="xxforms-online">
-                <xforms:message level="xxforms:log-info">Got xxforms-online event</xforms:message>
-                <xforms:setvalue ref="instance('ui')/offline">false</xforms:setvalue>
-            </xforms:action>
+            </xf:instance>
+            <xf:action ev:event="xxforms-offline">
+                <xf:message level="xxf:log-info">Got xxforms-offline event</xf:message>
+                <xf:setvalue ref="instance('ui')/offline">true</xf:setvalue>
+            </xf:action>
+            <xf:action ev:event="xxforms-online">
+                <xf:message level="xxf:log-info">Got xxforms-online event</xf:message>
+                <xf:setvalue ref="instance('ui')/offline">false</xf:setvalue>
+            </xf:action>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-label { display: block; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:input id="type-control" ref="a" incremental="true">
-                <xforms:label>Must be integer</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input id="relevant-control" ref="b" incremental="true">
-                <xforms:label>Relevant if previous = 42</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:dd>
-            <xhtml:p>
-                <xforms:input id="relevant-inherited-element-control" ref="b/g/h" incremental="true">
-                    <xforms:label>Relevant if previous = 42 (inherited on element)</xforms:label>
-                </xforms:input>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:input id="relevant-inherited-attribute-control" ref="b/@f" incremental="true">
-                    <xforms:label>Relevant if previous = 42 (inherited on attribute)</xforms:label>
-                </xforms:input>
-            </xhtml:p>
-        </xhtml:dd>
-        <xhtml:p>
-            <xforms:input id="constraint-control" ref="c" incremental="true">
-                <xforms:label>Must be equal to previous</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input id="required-control" ref="d" incremental="true">
-                <xforms:label>Required if previous = 42</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input id="readonly-control" ref="e" incremental="true">
-                <xforms:label>Readonly if previous = 42</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="f" incremental="true">
-                <xforms:label>If previous is 42 "good" otherwise "could be better"</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="g" incremental="true">
-                <xforms:label>Valid if ISO data (2008-06-30)</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger ref=".[instance('ui')/offline = 'false']">
-                <xforms:label>Take offline</xforms:label>
-                <xxforms:offline ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
-                <xforms:label>Take online</xforms:label>
-                <xxforms:online ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
-                <xforms:label>Take online with error</xforms:label>
-                <xforms:action  ev:event="DOMActivate">
-                    <xxforms:online/>
-                    <xforms:send submission="simulate-submission"/>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
-                <xforms:label>Save to Gears</xforms:label>
-                <xxforms:offline-save ev:event="DOMActivate"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Show message when online</xforms:label>
-                <xforms:message level="modal" ev:event="DOMActivate">Hello, World!</xforms:message>
-            </xforms:trigger>
-        </xhtml:p>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:input id="type-control" ref="a" incremental="true">
+                <xf:label>Must be integer</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input id="relevant-control" ref="b" incremental="true">
+                <xf:label>Relevant if previous = 42</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:dd>
+            <xh:p>
+                <xf:input id="relevant-inherited-element-control" ref="b/g/h" incremental="true">
+                    <xf:label>Relevant if previous = 42 (inherited on element)</xf:label>
+                </xf:input>
+            </xh:p>
+            <xh:p>
+                <xf:input id="relevant-inherited-attribute-control" ref="b/@f" incremental="true">
+                    <xf:label>Relevant if previous = 42 (inherited on attribute)</xf:label>
+                </xf:input>
+            </xh:p>
+        </xh:dd>
+        <xh:p>
+            <xf:input id="constraint-control" ref="c" incremental="true">
+                <xf:label>Must be equal to previous</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input id="required-control" ref="d" incremental="true">
+                <xf:label>Required if previous = 42</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input id="readonly-control" ref="e" incremental="true">
+                <xf:label>Readonly if previous = 42</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="f" incremental="true">
+                <xf:label>If previous is 42 "good" otherwise "could be better"</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="g" incremental="true">
+                <xf:label>Valid if ISO data (2008-06-30)</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:trigger ref=".[instance('ui')/offline = 'false']">
+                <xf:label>Take offline</xf:label>
+                <xxf:offline ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:trigger ref=".[instance('ui')/offline = 'true']">
+                <xf:label>Take online</xf:label>
+                <xxf:online ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:trigger ref=".[instance('ui')/offline = 'true']">
+                <xf:label>Take online with error</xf:label>
+                <xf:action  ev:event="DOMActivate">
+                    <xxf:online/>
+                    <xf:send submission="simulate-submission"/>
+                </xf:action>
+            </xf:trigger>
+            <xf:trigger ref=".[instance('ui')/offline = 'true']">
+                <xf:label>Save to Gears</xf:label>
+                <xxf:offline-save ev:event="DOMActivate"/>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger appearance="minimal">
+                <xf:label>Show message when online</xf:label>
+                <xf:message level="modal" ev:event="DOMActivate">Hello, World!</xf:message>
+            </xf:trigger>
+        </xh:p>
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

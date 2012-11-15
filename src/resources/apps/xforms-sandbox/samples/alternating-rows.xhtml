@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Alternating Rows</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Alternating Rows</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <items xmlns="">
                     <item label="One" value="1"/>
                     <item label="Two" value="2"/>
@@ -33,46 +33,46 @@
                     <item label="Seven" value="7"/>
                     <item label="Eight" value="8"/>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Label</xhtml:th>
-                <xhtml:th>Value</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="item">
-                <xforms:group ref=".[count(preceding-sibling::item) mod 2 = 1]">
-                    <xhtml:tr style="background: red">
-                        <xhtml:td>
-                            <xforms:output value="@label"/>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:output value="@value"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xforms:group>
-                <xforms:group ref=".[count(preceding-sibling::item) mod 2 = 0]">
-                    <xhtml:tr style="background: white">
-                        <xhtml:td>
-                            <xforms:output value="@label"/>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:output value="@value"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xforms:group>
-            </xforms:repeat>
-            <xhtml:tr/>
-        </xhtml:table>
-        <xforms:trigger>
-            <xforms:label>Add line</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:insert ref="item" at="last()" position="after"/>
-                <xforms:setvalue ref="item[last()]/@label" value="'Don''t know!'"/>
-                <xforms:setvalue ref="item[last()]/@value" value="count(../../item)"/>
-            </xforms:action>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Label</xh:th>
+                <xh:th>Value</xh:th>
+            </xh:tr>
+            <xf:repeat ref="item">
+                <xf:group ref=".[count(preceding-sibling::item) mod 2 = 1]">
+                    <xh:tr style="background: red">
+                        <xh:td>
+                            <xf:output value="@label"/>
+                        </xh:td>
+                        <xh:td>
+                            <xf:output value="@value"/>
+                        </xh:td>
+                    </xh:tr>
+                </xf:group>
+                <xf:group ref=".[count(preceding-sibling::item) mod 2 = 0]">
+                    <xh:tr style="background: white">
+                        <xh:td>
+                            <xf:output value="@label"/>
+                        </xh:td>
+                        <xh:td>
+                            <xf:output value="@value"/>
+                        </xh:td>
+                    </xh:tr>
+                </xf:group>
+            </xf:repeat>
+            <xh:tr/>
+        </xh:table>
+        <xf:trigger>
+            <xf:label>Add line</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:insert ref="item" at="last()" position="after"/>
+                <xf:setvalue ref="item[last()]/@label" value="'Don''t know!'"/>
+                <xf:setvalue ref="item[last()]/@value" value="count(../../item)"/>
+            </xf:action>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

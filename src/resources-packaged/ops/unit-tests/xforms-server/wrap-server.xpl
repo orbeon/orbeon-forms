@@ -15,10 +15,10 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:saxon="http://saxon.sf.net/"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <p:param name="action" type="input"/>
     <p:param name="controls" type="input"/>
@@ -43,23 +43,23 @@
                 <!-- Create XHTML+XForms document -->
                 <xsl:template match="/">
 
-                    <xhtml:html>
-                        <xhtml:head>
+                    <xh:html>
+                        <xh:head>
                             <!-- Models -->
                             <xsl:apply-templates select="doc('input:models')/*/*"/>
-                        </xhtml:head>
-                        <xhtml:body>
+                        </xh:head>
+                        <xh:body>
                             <!-- Controls -->
                             <xsl:apply-templates select="doc('input:controls')/*/*"/>
-                        </xhtml:body>
-                    </xhtml:html>
+                        </xh:body>
+                    </xh:html>
                     
                 </xsl:template>
 
                 <!-- Copy instance content for matching instances -->
-                <xsl:template match="xforms:instance[@id = $instance-ids]">
+                <xsl:template match="xf:instance[@id = $instance-ids]">
                     <xsl:variable name="id" select="@id"/>
-                    <xsl:variable name="model-id" select="parent::xforms:model/@id"/>
+                    <xsl:variable name="model-id" select="parent::xf:model/@id"/>
 
                     <xsl:if test="not($model-id = $model-ids)">
                         <xsl:message terminate="yes">
@@ -95,15 +95,15 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:template match="/">
-                    <xxforms:event-request>
-                        <xxforms:uuid><xsl:value-of select="//xhtml:input[@name = '$uuid']/@value"/></xxforms:uuid>
-                        <xxforms:sequence>1</xxforms:sequence>
-                        <xxforms:static-state><xsl:value-of select="//xhtml:input[@name = '$static-state']/@value"/></xxforms:static-state>
-                        <xxforms:dynamic-state><xsl:value-of select="//xhtml:input[@name = '$dynamic-state']/@value"/></xxforms:dynamic-state>
-                        <xxforms:action>
+                    <xxf:event-request>
+                        <xxf:uuid><xsl:value-of select="//xh:input[@name = '$uuid']/@value"/></xxf:uuid>
+                        <xxf:sequence>1</xxf:sequence>
+                        <xxf:static-state><xsl:value-of select="//xh:input[@name = '$static-state']/@value"/></xxf:static-state>
+                        <xxf:dynamic-state><xsl:value-of select="//xh:input[@name = '$dynamic-state']/@value"/></xxf:dynamic-state>
+                        <xxf:action>
                             <xsl:copy-of select="doc('input:action')/*/*"/>
-                        </xxforms:action>
-                    </xxforms:event-request>
+                        </xxf:action>
+                    </xxf:event-request>
                 </xsl:template>
 
             </xsl:transform>

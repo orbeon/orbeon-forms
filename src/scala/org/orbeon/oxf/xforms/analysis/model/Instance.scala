@@ -59,7 +59,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
 
     // Don't allow more than one child element
     if (Dom4j.elements(element).size > 1)
-        throw new ValidationException("xforms:instance must contain at most one child element", extendedLocationData)
+        throw new ValidationException("xf:instance must contain at most one child element", extendedLocationData)
 
     private def getAttributeEncode(qName: QName) = Option(element.attributeValue(qName)) map (att ⇒ NetUtils.encodeHRRI(att.trim, true))
 
@@ -82,7 +82,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
 
     // Don't allow a blank src attribute
     if (useExternalContent && instanceSource == Some(""))
-        throw new ValidationException("xforms:instance must not specify a blank URL", extendedLocationData)
+        throw new ValidationException("xf:instance must not specify a blank URL", extendedLocationData)
 
     private def extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", element, "id", staticId)
 

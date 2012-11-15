@@ -12,22 +12,22 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms">
+      xmlns:xf="http://www.w3.org/2002/xforms">
     <head>
         <title>Hello World XForms</title>
-        <xforms:model>
-            <xforms:instance>
+        <xf:model>
+            <xf:instance>
                 <first-name xmlns=""/>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
     </head>
     <body>
         <p>
             Please enter your first name:
-            <xforms:input ref="/first-name" incremental="true"/>
+            <xf:input ref="/first-name" incremental="true"/>
         </p>
         <p>
-            <xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
+            <xf:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
         </p>
     </body>
 </html>

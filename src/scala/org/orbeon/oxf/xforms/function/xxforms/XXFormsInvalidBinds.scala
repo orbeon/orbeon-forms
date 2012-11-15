@@ -21,7 +21,7 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.StringValue
 
 /**
- * xxforms:invalid-binds()
+ * xxf:invalid-binds()
  */
 class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunction as addToPathMap returns something different
     

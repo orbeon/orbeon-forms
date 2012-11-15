@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handler for xforms:output[starts-with(@appearance, 'image/')].
+ * Handler for xf:output[starts-with(@appearance, 'image/')].
  */
 public class XFormsOutputImageHandler extends XFormsOutputHandler {
     @Override

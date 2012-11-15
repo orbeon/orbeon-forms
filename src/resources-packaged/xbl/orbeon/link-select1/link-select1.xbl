@@ -37,16 +37,16 @@
                 <large-icon>/apps/fr/style/images/silk/link.png</large-icon>
             </icon>
             <editors static-itemset="true"/>
-            <template xmlns:xforms="http://www.w3.org/2002/xforms">
+            <template xmlns:xf="http://www.w3.org/2002/xforms">
                  <fr:link-select1>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                     <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
+                     <xf:label ref=""/>
+                     <xf:hint ref=""/>
+                     <xf:help ref=""/>
+                     <xf:alert ref=""/>
+                     <xf:itemset ref="">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
                 </fr:link-select1>
             </template>
         </metadata>

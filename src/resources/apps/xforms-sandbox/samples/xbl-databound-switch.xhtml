@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,53 +21,53 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xf:model>
+            <xf:instance>
                 <value>case1</value>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
         <xbl:xbl>
             <xbl:binding id="bound-switch-component" element="fr|databound-switch">
                 <xbl:template>
 
-                    <xforms:switch xbl:attr="ref" id="my-switch">
+                    <xf:switch xbl:attr="ref" id="my-switch">
                         <!-- Toggle visible case upon initial display or value change -->
                         <!-- Here we assume that the case id matches the node value -->
-                        <xforms:toggle ev:event="xforms-value-changed xforms-enabled" ev:target="my-switch" case="{.}"/>
+                        <xf:toggle ev:event="xforms-value-changed xforms-enabled" ev:target="my-switch" case="{.}"/>
 
                         <!-- Include nested cases -->
-                        <xbl:content includes="fr|databound-switch > xforms|case"/>
-                    </xforms:switch>
+                        <xbl:content includes="fr|databound-switch > xf|case"/>
+                    </xf:switch>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
         <fr:databound-switch ref=".">
-            <xforms:case id="case1">
+            <xf:case id="case1">
                 Case 1
-            </xforms:case>
-            <xforms:case id="case2">
+            </xf:case>
+            <xf:case id="case2">
                 Case 2
-            </xforms:case>
+            </xf:case>
         </fr:databound-switch>
 
-        <xforms:select1 ref=".">
-            <xforms:label>Change</xforms:label>
-            <xforms:item>
-                <xforms:label>Case 1</xforms:label>
-                <xforms:value>case1</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Case 2</xforms:label>
-                <xforms:value>case2</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Case 3</xforms:label>
-                <xforms:value>case3</xforms:value>
-            </xforms:item>
-        </xforms:select1>
-    </xhtml:body>
-</xhtml:html>
+        <xf:select1 ref=".">
+            <xf:label>Change</xf:label>
+            <xf:item>
+                <xf:label>Case 1</xf:label>
+                <xf:value>case1</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>Case 2</xf:label>
+                <xf:value>case2</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>Case 3</xf:label>
+                <xf:value>case3</xf:value>
+            </xf:item>
+        </xf:select1>
+    </xh:body>
+</xh:html>

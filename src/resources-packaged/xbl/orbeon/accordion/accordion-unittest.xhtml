@@ -11,19 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Accordion</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Accordion</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <cost>123.45</cost>
                     <states>
@@ -44,138 +44,138 @@
                         </state>
                     </states>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="new-state">
+            </xf:instance>
+            <xf:instance id="new-state">
                 <state>
                     <abbreviation>AK</abbreviation>
                     <name>Alaska</name>
                     <population>686293</population>
                 </state>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/accordion/accordion-unittest.js"/>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/accordion/accordion-unittest.js"/>
+        <xh:style type="text/css">
             fieldset { float: left; margin-bottom: 1em; padding: 0 1em 0 0; }
             .xbl-fr-accordion { clear: both; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:fieldset>
-            <xhtml:legend>Accordion events</xhtml:legend>
-            <xhtml:ol>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:fieldset>
+            <xh:legend>Accordion events</xh:legend>
+            <xh:ol>
                 <!-- Backward compatibility events -->
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-all">
-                        <xforms:label>Open all (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-all">
-                        <xforms:label>Close all (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-third">
-                        <xforms:label>Open third (currency) section (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
-                            <xforms:property name="case-id" value="'my-case-currency'"/>
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-third">
-                        <xforms:label>Close third (currency) section (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
-                            <xforms:property name="case-id" value="'my-case-currency'"/>
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-states">
-                        <xforms:label>Open states (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
-                            <xforms:property name="case-id" value="'my-case-repeat'"/>
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-states">
-                        <xforms:label>Close states (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
-                            <xforms:property name="case-id" value="'my-case-repeat'"/>
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-all">
+                        <xf:label>Open all (legacy)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-all">
+                        <xf:label>Close all (legacy)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-third">
+                        <xf:label>Open third (currency) section (legacy)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
+                            <xf:property name="case-id" value="'my-case-currency'"/>
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-third">
+                        <xf:label>Close third (currency) section (legacy)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
+                            <xf:property name="case-id" value="'my-case-currency'"/>
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-states">
+                        <xf:label>Open states (legacy)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
+                            <xf:property name="case-id" value="'my-case-repeat'"/>
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-states">
+                        <xf:label>Close states (legacy)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
+                            <xf:property name="case-id" value="'my-case-repeat'"/>
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
                 <!-- New events -->
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-all-new">
-                        <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-show-all"/>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-all-new">
-                        <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-hide-all"/>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-third-new">
-                        <xforms:label>Open third section (currency)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-currency" name="fr-show"/>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-third-new">
-                        <xforms:label>Close third section (currency)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-currency" name="fr-hide"/>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-states-new">
-                        <xforms:label>Open states</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-repeat" name="fr-show"/>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-states-new">
-                        <xforms:label>Close states</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-repeat" name="fr-hide"/>
-                    </xforms:trigger>
-                </xhtml:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-all-new">
+                        <xf:label>Open all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-show-all"/>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-all-new">
+                        <xf:label>Close all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-hide-all"/>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-third-new">
+                        <xf:label>Open third section (currency)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-case-currency" name="fr-show"/>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-third-new">
+                        <xf:label>Close third section (currency)</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-case-currency" name="fr-hide"/>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-states-new">
+                        <xf:label>Open states</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-case-repeat" name="fr-show"/>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-states-new">
+                        <xf:label>Close states</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-case-repeat" name="fr-hide"/>
+                    </xf:trigger>
+                </xh:li>
 
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="add-state">
-                        <xforms:label>Add state</xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('instance')/states" ref="state" at="last()" position="after" origin="instance('new-state')"/>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="remove-state">
-                        <xforms:label>Remove state</xforms:label>
-                        <xforms:delete ev:event="DOMActivate" ref="instance('instance')/states/state[last()]"/>
-                    </xforms:trigger>
-                </xhtml:li>
-            </xhtml:ol>
-        </xhtml:fieldset>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="add-state">
+                        <xf:label>Add state</xf:label>
+                        <xf:insert ev:event="DOMActivate" context="instance('instance')/states" ref="state" at="last()" position="after" origin="instance('new-state')"/>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="remove-state">
+                        <xf:label>Remove state</xf:label>
+                        <xf:delete ev:event="DOMActivate" ref="instance('instance')/states/state[last()]"/>
+                    </xf:trigger>
+                </xh:li>
+            </xh:ol>
+        </xh:fieldset>
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
             <fr:case>
                 <fr:label>First section (lorem ipsum)</fr:label>
-                <xhtml:div>
+                <xh:div>
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eget nunc at felis pellentesque
                     consectetur malesuada mollis est. Sed ac dui a dui ultrices bibendum. In id nunc tortor, in porta
                     orci. Cras et eros odio, at fringilla neque. Mauris tincidunt pharetra tellus, eget molestie nisl
@@ -186,64 +186,64 @@
                     fermentum. Mauris eu nibh auctor velit imperdiet sagittis. Integer vel ornare tellus. Nulla
                     facilisi. Nullam eleifend dapibus enim a condimentum. Vestibulum porta lectus at enim iaculis
                     vehicula.
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="true">
                 <fr:label>Second section (XForms input)</fr:label>
-                <xforms:input ref="cost">
-                    <xforms:label>Cost</xforms:label>
-                </xforms:input>
+                <xf:input ref="cost">
+                    <xf:label>Cost</xf:label>
+                </xf:input>
             </fr:case>
             <fr:case id="my-case-currency">
                 <fr:label>Third section (currency)</fr:label>
                 <fr:currency ref="cost" id="cost">
-                    <xforms:label>Cost</xforms:label>
+                    <xf:label>Cost</xf:label>
                 </fr:currency>
             </fr:case>
             <fr:case>
                 <fr:label>Datatable</fr:label>
                 <fr:datatable id="my-datatable">
-                    <xhtml:thead>
-                        <xhtml:tr>
-                            <xhtml:th fr:sortable="true" fr:resizeable="true">Abbreviation</xhtml:th>
-                            <xhtml:th fr:sortable="true" fr:resizeable="true">Name</xhtml:th>
-                            <xhtml:th fr:sortable="true" fr:resizeable="true">Population</xhtml:th>
-                        </xhtml:tr>
-                    </xhtml:thead>
-                    <xhtml:tbody>
-                        <xhtml:tr repeat-ref="states/state">
-                            <xhtml:td>
-                                <xforms:output ref="abbreviation"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output ref="name"/>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:output ref="population"/>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:tbody>
+                    <xh:thead>
+                        <xh:tr>
+                            <xh:th fr:sortable="true" fr:resizeable="true">Abbreviation</xh:th>
+                            <xh:th fr:sortable="true" fr:resizeable="true">Name</xh:th>
+                            <xh:th fr:sortable="true" fr:resizeable="true">Population</xh:th>
+                        </xh:tr>
+                    </xh:thead>
+                    <xh:tbody>
+                        <xh:tr repeat-ref="states/state">
+                            <xh:td>
+                                <xf:output ref="abbreviation"/>
+                            </xh:td>
+                            <xh:td>
+                                <xf:output ref="name"/>
+                            </xh:td>
+                            <xh:td>
+                                <xf:output ref="population"/>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:tbody>
                 </fr:datatable>
             </fr:case>
-            <xforms:repeat ref="states/state">
+            <xf:repeat ref="states/state">
                 <fr:case id="my-case-repeat" selected="true">
                     <fr:label value="name"/>
-                    <xhtml:ul>
-                        <xhtml:li>
+                    <xh:ul>
+                        <xh:li>
                             Abbreviation:
-                            <xforms:output value="abbreviation"/>
-                        </xhtml:li>
-                        <xhtml:li>
+                            <xf:output value="abbreviation"/>
+                        </xh:li>
+                        <xh:li>
                             Population:
-                            <xforms:output value="population"/>
-                        </xhtml:li>
-                    </xhtml:ul>
+                            <xf:output value="population"/>
+                        </xh:li>
+                    </xh:ul>
                 </fr:case>
-            </xforms:repeat>
+            </xf:repeat>
         </fr:accordion>
 
 
-        <xhtml:h2>Accordion with open-closes-others option</xhtml:h2>
+        <xh:h2>Accordion with open-closes-others option</xh:h2>
         <fr:accordion open-closes-others="true" class="fr-accordion-lnf" id="open-closes-others-accordion">
             <fr:case>
                 <fr:label>First</fr:label>
@@ -255,5 +255,5 @@
             </fr:case>
         </fr:accordion>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

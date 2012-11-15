@@ -636,7 +636,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
                 // TODO: Temporary. Use XFormsModelSubmission to load instances instead
                 if (!NetUtils.urlHasProtocol(instanceResource) && containingDocument.getContainerType().equals("portlet"))
-                    throw new UnsupportedOperationException("<xforms:instance src=\"\"> with relative path within a portlet");
+                    throw new UnsupportedOperationException("<xf:instance src=\"\"> with relative path within a portlet");
 
                 // Use full resolved resource URL
                 // o absolute URL, e.g. http://example.org/instance.xml
@@ -751,7 +751,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                 // NOTE: contextStack.resetBindingContext(this) called in evaluateVariables()
                 binds.rebuild();
 
-                // Controls may have @bind or xxforms:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
+                // Controls may have @bind or xxf:bind() references, so we need to mark them as dirty. Will need dependencies for controls to fix this.
                 // TODO: Handle XPathDependencies
                 container().requireRefresh();
             }
@@ -853,7 +853,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
         if (invalidInstances != null) {
             // Gather events to dispatch, at most one per instance, and only if validity has changed
-            // NOTE: It is possible, with binds and the use of xxforms:instance(), that some instances in
+            // NOTE: It is possible, with binds and the use of xxf:instance(), that some instances in
             // invalidInstances do not belong to this model. Those instances won't get events with the dispatching
             // algorithm below.
             List<XFormsEvent> eventsToDispatch = new ArrayList<XFormsEvent>();
@@ -875,7 +875,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     }
 
     private void doRefresh() {
-        // This is called in response to dispatching xforms-refresh to this model, whether using the xforms:refresh
+        // This is called in response to dispatching xforms-refresh to this model, whether using the xf:refresh
         // action or by dispatching the event by hand.
 
         // NOTE: If the refresh flag is not set, we do not call synchronizeAndRefresh() because that would only have the

@@ -21,7 +21,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:upload.
+ * Handle xf:upload.
  */
 public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 

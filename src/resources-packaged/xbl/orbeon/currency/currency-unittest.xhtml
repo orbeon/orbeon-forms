@@ -11,19 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Currency</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Currency</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <empty/>
                     <value>1234</value>
@@ -40,131 +40,131 @@
                     <setfocus>3.1415</setfocus>
                     <large>12345678901234567890123</large>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
-            <xforms:bind ref="readonly" readonly="@is-readonly = 'true'"/>
-            <xforms:bind ref="required-empty | required-filled" required="true()"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="double" readonly="false()" calculate="for $value in ../value return if ($value castable as xs:decimal) then ../value * 2 else ''"/>
+            <xf:bind ref="readonly" readonly="@is-readonly = 'true'"/>
+            <xf:bind ref="required-empty | required-filled" required="true()"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xbl-fr-currency .xforms-label { display: inline-block; width: 10em; }
             .xbl-fr-currency { line-height: 2.5em; }
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             #large input { width: 18em }
-        </xhtml:style>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/currency/currency-unittest.js"/>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div>
+        </xh:style>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/currency/currency-unittest.js"/>
+    </xh:head>
+    <xh:body>
+        <xh:div>
             <fr:currency ref="empty" id="empty">
-                <xforms:label>Empty</xforms:label>
+                <xf:label>Empty</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="value" id="value">
-                <xforms:label>Value</xforms:label>
-                <xforms:help>Help</xforms:help>
+                <xf:label>Value</xf:label>
+                <xf:help>Help</xf:help>
             </fr:currency>
-            <xforms:output value="value" id="value-output"/>
-        </xhtml:div>
-        <xhtml:div>
+            <xf:output value="value" id="value-output"/>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="double" id="double">
-                <xforms:label>Double</xforms:label>
+                <xf:label>Double</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="currency" id="prefix-static" prefix="£">
-                <xforms:label>Static prefix</xforms:label>
+                <xf:label>Static prefix</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="currency" id="prefix-dynamic">
                 <fr:prefix ref="../prefix"/>
-                <xforms:label>Dynamic prefix</xforms:label>
+                <xf:label>Dynamic prefix</xf:label>
             </fr:currency>
-            <xforms:trigger id="change-prefix" appearance="minimal">
-                <xforms:label>Switch to CHF</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="prefix">CHF</xforms:setvalue>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
+            <xf:trigger id="change-prefix" appearance="minimal">
+                <xf:label>Switch to CHF</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="prefix">CHF</xf:setvalue>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="float" id="float-static" digits-after-decimal="3">
-                <xforms:label>Static digits count</xforms:label>
+                <xf:label>Static digits count</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="float" id="float-dynamic">
                 <fr:digits-after-decimal ref="../digits-after-decimal"/>
-                <xforms:label>Dynamic digits count</xforms:label>
+                <xf:label>Dynamic digits count</xf:label>
             </fr:currency>
-            <xforms:trigger id="change-digits" appearance="minimal">
-                <xforms:label>Switch to 2</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="digits-after-decimal">2</xforms:setvalue>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
+            <xf:trigger id="change-digits" appearance="minimal">
+                <xf:label>Switch to 2</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="digits-after-decimal">2</xf:setvalue>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="float" id="float-no-digits" digits-after-decimal="0">
-                <xforms:label>No digits after dec.</xforms:label>
+                <xf:label>No digits after dec.</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="readonly" id="readonly">
-                <xforms:label>Read-only</xforms:label>
+                <xf:label>Read-only</xf:label>
             </fr:currency>
-            <xforms:trigger id="set-readonly" appearance="minimal">
-                <xforms:label>Read-only</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="readonly/@is-readonly">true</xforms:setvalue>
-            </xforms:trigger>
+            <xf:trigger id="set-readonly" appearance="minimal">
+                <xf:label>Read-only</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="readonly/@is-readonly">true</xf:setvalue>
+            </xf:trigger>
             |
-            <xforms:trigger id="set-readwrite" appearance="minimal">
-                <xforms:label>Read-write</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="readonly/@is-readonly">false</xforms:setvalue>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
+            <xf:trigger id="set-readwrite" appearance="minimal">
+                <xf:label>Read-write</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="readonly/@is-readonly">false</xf:setvalue>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="no-prefix" id="no-prefix" prefix="">
-                <xforms:label>No prefix</xforms:label>
+                <xf:label>No prefix</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:repeat ref="repeat[@show = 'true']" id="repeat">
+        </xh:div>
+        <xh:div>
+            <xf:repeat ref="repeat[@show = 'true']" id="repeat">
                 <fr:currency ref="." id="in-repeat">
-                    <xforms:label>In repeat</xforms:label>
+                    <xf:label>In repeat</xf:label>
                 </fr:currency>
-            </xforms:repeat>
-            <xforms:trigger id="repeat-show-hide" appearance="minimal">
-                <xforms:label>Show/hide</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="repeat/@show" value="if (. = 'true') then 'false' else 'true'"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
+            </xf:repeat>
+            <xf:trigger id="repeat-show-hide" appearance="minimal">
+                <xf:label>Show/hide</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="repeat/@show" value="if (. = 'true') then 'false' else 'true'"/>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="required-empty" id="required-empty" prefix="">
-                <xforms:label>Required empty</xforms:label>
-                <xforms:alert>Value is required</xforms:alert>
+                <xf:label>Required empty</xf:label>
+                <xf:alert>Value is required</xf:alert>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="required-filled" id="required-filled" prefix="">
-                <xforms:label>Required filled</xforms:label>
-                <xforms:alert>Value is required</xforms:alert>
+                <xf:label>Required filled</xf:label>
+                <xf:alert>Value is required</xf:alert>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="setfocus" id="setfocus" prefix="">
-                <xforms:label>Setfocus</xforms:label>
+                <xf:label>Setfocus</xf:label>
             </fr:currency>
-            <xforms:trigger id="setfocus-trigger" appearance="minimal">
-                <xforms:label>Setfocus</xforms:label>
-                <xforms:setfocus ev:event="DOMActivate" control="setfocus"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
+            <xf:trigger id="setfocus-trigger" appearance="minimal">
+                <xf:label>Setfocus</xf:label>
+                <xf:setfocus ev:event="DOMActivate" control="setfocus"/>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="large" id="large">
-                <xforms:label>Large</xforms:label>
+                <xf:label>Large</xf:label>
             </fr:currency>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        </xh:div>
+    </xh:body>
+</xh:html>

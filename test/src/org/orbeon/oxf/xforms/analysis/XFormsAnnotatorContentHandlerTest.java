@@ -75,7 +75,7 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
         assertNull(metadata.getNamespaceMapping("schema-element"));
     }
 
-    // Test that xxforms:attribute elements with @id and @for were created for
+    // Test that xxf:attribute elements with @id and @for were created for
     @Test
     public void xxformsAttribute() {
 
@@ -85,8 +85,8 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
                 .annotateShadowTree(document, "", false);
         final DocumentWrapper documentWrapper = new DocumentWrapper(annotatedDocument, null, XPathCache.getGlobalConfiguration());
 
-        // Check there is an xxforms:attribute for "html" with correct name
-        List<Object> result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
+        // Check there is an xxf:attribute for "html" with correct name
+        List<Object> result = XPathCache.evaluate(documentWrapper, "//xxf:attribute[@for = 'html']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -94,8 +94,8 @@ public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
         assertTrue(XFormsUtils.getElementId(resultElement).trim().length() > 0);
         assertEquals("lang", resultElement.attributeValue(XFormsConstants.NAME_QNAME));
 
-        // Check there is an xxforms:attribute for "span" with correct name
-        result = XPathCache.evaluate(documentWrapper, "//xxforms:attribute[@for = 'span']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
+        // Check there is an xxf:attribute for "span" with correct name
+        result = XPathCache.evaluate(documentWrapper, "//xxf:attribute[@for = 'span']", XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING(), null, null, null, null, null);
 
         assertNotNull(result);
         assertEquals(1, result.size());

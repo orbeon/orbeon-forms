@@ -24,7 +24,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Handle xforms:select and xforms:select1.
+ * Handle xf:select and xf:select1.
  */
 public class XFormsSelectHandler extends XFormsControlLifecyleHandlerXML {
 	

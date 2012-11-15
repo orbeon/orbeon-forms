@@ -31,10 +31,10 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
 trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
-    // nested xforms:output controls. Check only under xforms:choices, xforms:item and xforms:itemset so that we
+    // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
     val hasStaticItemset = ! XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration).wrap(element),
-            "exists((xforms:choices | xforms:item | xforms:itemset)/(., .//xforms:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
+            "exists((xf:choices | xf:item | xf:itemset)/(., .//xf:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
 
     val isNorefresh = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
@@ -176,28 +176,28 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
                 element.getQName match {
 
-                    case ITEM_QNAME ⇒ // xforms:item
+                    case ITEM_QNAME ⇒ // xf:item
 
                         val labelElement = element.element(LABEL_QNAME)
                         if (labelElement eq null)
-                            throw new ValidationException("xforms:item must contain an xforms:label element.", ElementAnalysis.createLocationData(element))
+                            throw new ValidationException("xf:item must contain an xf:label element.", ElementAnalysis.createLocationData(element))
                         val containsHTML = Array(false)
                         val label = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, labelElement, isFull, containsHTML)
 
                         val valueElement = element.element(XFORMS_VALUE_QNAME)
                         if (valueElement eq null)
-                            throw new ValidationException("xforms:item must contain an xforms:value element.", ElementAnalysis.createLocationData(element))
+                            throw new ValidationException("xf:item must contain an xf:value element.", ElementAnalysis.createLocationData(element))
                         val value = XFormsUtils.getStaticChildElementValue(containerScope.fullPrefix, valueElement, false, null)
 
                         val attributes = SelectionControlUtil.getAttributes(element)
                         currentContainer.addChildItem(Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
                         position += 1
 
-                    case ITEMSET_QNAME ⇒ // xforms:itemset
+                    case ITEMSET_QNAME ⇒ // xf:itemset
 
-                        throw new ValidationException("xforms:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
+                        throw new ValidationException("xf:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
 
-                    case CHOICES_QNAME ⇒ // xforms:choices
+                    case CHOICES_QNAME ⇒ // xf:choices
 
                         val labelElement = element.element(LABEL_QNAME)
                         if (labelElement ne null) {
@@ -218,7 +218,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
             def endElement(element: Element): Unit =
                 if (element.getQName == CHOICES_QNAME) {
-                    // xforms:choices
+                    // xf:choices
                     val labelElement = element.element(LABEL_QNAME)
                     if (labelElement ne null)
                         currentContainer = currentContainer.parent

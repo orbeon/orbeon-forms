@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
- * Extension xxforms:show action.
+ * Extension xxf:show action.
  */
 public class XXFormsShowAction extends XFormsAction {
 
@@ -60,7 +60,7 @@ public class XXFormsShowAction extends XFormsAction {
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
                 if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("xxforms:show", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
+                    indentedLogger.logDebug("xxf:show", "dialog does not refer to an existing xxf:dialog element, ignoring action",
                             "dialog id", dialogStaticOrAbsoluteId);
             }
         }

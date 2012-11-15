@@ -24,7 +24,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xml.Dom4j
 
 /**
- * xxforms:element()
+ * xxf:element()
  */
 class XFormsElement extends XFormsFunction {
 

@@ -40,7 +40,7 @@ public class XFormsGroupFieldsetHandler extends XFormsGroupHandler {
         final ElementHandlerController controller = handlerContext.getController();
         final ContentHandler contentHandler = controller.getOutput();
 
-        // Output an xhtml:legend element if and only if there is an xforms:label element. This help with
+        // Output an xhtml:legend element if and only if there is an xf:label element. This help with
         // styling in particular.
         final boolean hasLabel = LHHASupport.hasLabel(containingDocument, getPrefixedId());
         if (hasLabel) {

@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Read-Only Copies</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:instance id="instance1">
+    <xh:head>
+        <xh:title>Read-Only Copies</xh:title>
+        <xf:model id="main-model">
+            <xf:instance id="instance1">
                 <equation xmlns="">
                     <screen>0</screen>
                     <screenbuffer/>
@@ -31,8 +31,8 @@
                     <memory>12</memory>
                     <result/>
                 </equation>
-            </xforms:instance>
-            <xforms:instance id="instance2" xxforms:readonly="true">
+            </xf:instance>
+            <xf:instance id="instance2" xxf:readonly="true">
                 <equation xmlns="">
                     <screen>0</screen>
                     <screenbuffer/>
@@ -41,36 +41,36 @@
                     <memory>12</memory>
                     <result/>
                 </equation>
-            </xforms:instance>
-            <xforms:instance id="instance3">
+            </xf:instance>
+            <xf:instance id="instance3">
                 <instance xmlns=""/>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Read-Write Source Value</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('instance1')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-            </xforms:action>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Read-Only Source Value</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('instance1')/third" value="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/first"/>
-            </xforms:action>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Read-Write Source Copy</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:insert ref="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-            </xforms:action>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Read-Only Source Copy</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:insert ref="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/second"/>
-            </xforms:action>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:trigger>
+            <xf:label>Read-Write Source Value</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="instance('instance1')/third" value="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+            </xf:action>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Read-Only Source Value</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="instance('instance1')/third" value="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/first"/>
+            </xf:action>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Read-Write Source Copy</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:insert ref="instance('instance3')" origin="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+            </xf:action>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Read-Only Source Copy</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:insert ref="instance('instance3')" origin="xxf:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/second"/>
+            </xf:action>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

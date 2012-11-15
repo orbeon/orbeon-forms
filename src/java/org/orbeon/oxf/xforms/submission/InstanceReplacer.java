@@ -87,7 +87,7 @@ public class InstanceReplacer extends BaseReplacer {
                     indentedLogger.logDebug("", "deserializing to read-only instance");
             }
         } catch (Exception e) {
-            throw new XFormsSubmissionException(submission, e, "xforms:submission: exception while reading XML response.", "processing instance replacement",
+            throw new XFormsSubmissionException(submission, e, "xf:submission: exception while reading XML response.", "processing instance replacement",
                     new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.PARSE_ERROR(), connectionResult));
         }
 

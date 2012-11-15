@@ -11,16 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Using YUI's datatable</title>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <record>
                         <AAA>1</AAA>
@@ -38,13 +38,13 @@
                         <CCC>ccc</CCC>
                     </record>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
-            <xforms:dispatch ev:event="xforms-ready" name="fr-datatable-set-index-in-current-page"
+            </xf:instance>
+            <xf:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xf:dispatch ev:event="xforms-ready" name="fr-datatable-set-index-in-current-page"
                 target="dt">
-                <xforms:property name="index" value="2"/>
-            </xforms:dispatch>
-        </xforms:model>
+                <xf:property name="index" value="2"/>
+            </xf:dispatch>
+        </xf:model>
     </head>
     <body>
 
@@ -60,19 +60,19 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat ref="record">
+                <xf:repeat ref="record">
                     <tr>
                         <td>
-                            <xforms:output ref="AAA"/>
+                            <xf:output ref="AAA"/>
                         </td>
                         <td>
-                            <xforms:output ref="BBB"/>
+                            <xf:output ref="BBB"/>
                         </td>
                         <td>
-                            <xforms:output ref="CCC"/>
+                            <xf:output ref="CCC"/>
                         </td>
                     </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </tbody>
         </fr:datatable>
 

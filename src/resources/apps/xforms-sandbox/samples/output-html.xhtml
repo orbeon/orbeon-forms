@@ -11,40 +11,40 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Output HTML Content</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Output HTML Content</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <node>&lt;i>Hello&lt;/i>, &lt;b>world!&lt;/b></node>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:repeat ref="node" id="nodes">
-            <xhtml:div>
-                <xhtml:div>
-                    <xforms:input id="input" ref="." incremental="true" style="width: 20em">
-                        <xforms:label>Text: </xforms:label>
-                    </xforms:input>
-                </xhtml:div>
-                <xhtml:div>
-                    HTML: <xforms:output ref="." appearance="xxforms:html"/>
-                </xhtml:div>
-            </xhtml:div>
-        </xforms:repeat>
-        <xforms:trigger>
-            <xforms:label>Add line</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:repeat ref="node" id="nodes">
+            <xh:div>
+                <xh:div>
+                    <xf:input id="input" ref="." incremental="true" style="width: 20em">
+                        <xf:label>Text: </xf:label>
+                    </xf:input>
+                </xh:div>
+                <xh:div>
+                    HTML: <xf:output ref="." appearance="xxf:html"/>
+                </xh:div>
+            </xh:div>
+        </xf:repeat>
+        <xf:trigger>
+            <xf:label>Add line</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

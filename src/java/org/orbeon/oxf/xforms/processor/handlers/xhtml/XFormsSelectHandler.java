@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 /**
- * xforms:select.
+ * xf:select.
  *
  * TODO: Subclasses per appearance.
  */

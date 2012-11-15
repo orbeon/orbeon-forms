@@ -90,7 +90,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
             // Configuration properties
             outputConfigurationProperties(helper, xhtmlPrefix, isVersionedResources);
 
-            // User-defined (with xxforms:script) and XForms scripts
+            // User-defined (with xxf:script) and XForms scripts
             final XFormsControl focusedControl = containingDocument.getControls().getFocusedControl();
             final String focusElementId = focusedControl != null ? focusedControl.getEffectiveId() : null;
             final List<XFormsContainingDocument.Message> messagesToRun = containingDocument.getMessagesToRun();
@@ -137,7 +137,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
             if (scriptsToRun != null || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
                 final StringBuilder sb = new StringBuilder("\nfunction xformsPageLoadedServer() { ");
 
-                // Initial xxforms:script executions if present
+                // Initial xxf:script executions if present
                 if (scriptsToRun != null) {
                     for (final XFormsContainingDocument.Script script: scriptsToRun) {
                         sb.append("ORBEON.xforms.server.Server.callUserScript(\"");
@@ -150,7 +150,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
                     }
                 }
 
-                // Initial xforms:message to run if present
+                // Initial xf:message to run if present
                 if (messagesToRun != null) {
                     boolean foundModalMessage = false;
                     for (final XFormsContainingDocument.Message message: messagesToRun) {

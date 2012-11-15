@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat Groups</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Repeat Groups</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <fruits>
                     <orange>bloody</orange>
                     <orange>valencia</orange>
@@ -33,31 +33,31 @@
                     <pear>williams</pear>
                     <pear>yellow</pear>
                 </fruits>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:h2>Without labels</xhtml:h2>
-        <xforms:repeat ref="*" id="fruit-repeat-1">
-            <xforms:group>
-                <xforms:output value="."/>
-            </xforms:group>
-        </xforms:repeat>
-        <xhtml:h2>With labels</xhtml:h2>
-        <xforms:repeat ref="*" id="fruit-repeat-2">
-            <xforms:group>
-                <xforms:label>Fruit: </xforms:label>
-                <xforms:output value="."/>
-            </xforms:group>
-        </xforms:repeat>
-        <xhtml:br/>
-        <xforms:trigger>
-            <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="*" at="index('fruit-repeat-1')"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Remove</xforms:label>
-            <xforms:delete ev:event="DOMActivate" ref="*" at="index('fruit-repeat-1')"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:h2>Without labels</xh:h2>
+        <xf:repeat ref="*" id="fruit-repeat-1">
+            <xf:group>
+                <xf:output value="."/>
+            </xf:group>
+        </xf:repeat>
+        <xh:h2>With labels</xh:h2>
+        <xf:repeat ref="*" id="fruit-repeat-2">
+            <xf:group>
+                <xf:label>Fruit: </xf:label>
+                <xf:output value="."/>
+            </xf:group>
+        </xf:repeat>
+        <xh:br/>
+        <xf:trigger>
+            <xf:label>Add</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="*" at="index('fruit-repeat-1')"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Remove</xf:label>
+            <xf:delete ev:event="DOMActivate" ref="*" at="index('fruit-repeat-1')"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

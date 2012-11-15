@@ -12,9 +12,9 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-         xmlns:xhtml="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xh="http://www.w3.org/1999/xhtml"
 
          datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
@@ -78,13 +78,13 @@
         <define name="xforms.instance">
             <element name="instance">
                 <optional>
-                    <attribute name="xxforms:readonly"/>
+                    <attribute name="xxf:readonly"/>
                 </optional>
                 <optional>
-                    <attribute name="xxforms:exclude-result-prefixes"/>
+                    <attribute name="xxf:exclude-result-prefixes"/>
                 </optional>
                 <optional>
-                    <attribute name="xxforms:cache"/>
+                    <attribute name="xxf:cache"/>
                 </optional>
                 <ref name="xforms.instance.attrib"/>
                 <ref name="xforms.instance.content"/>
@@ -92,9 +92,9 @@
         </define>
     </include>
 
-    <!-- Start with xhtml:html -->
+    <!-- Start with xh:html -->
     <start>
-        <element name="xhtml:html">
+        <element name="xh:html">
             <zeroOrMore>
                 <choice>
                     <attribute>
@@ -141,7 +141,7 @@
             <ref name="xforms.Actions"/>
             <ref name="xforms.model"/>
 
-            <!-- TODO: only allowed under xhtml:head -->
+            <!-- TODO: only allowed under xh:head -->
             <ref name="orbeon.xbl.xbl"/>
         </choice>
     </define>

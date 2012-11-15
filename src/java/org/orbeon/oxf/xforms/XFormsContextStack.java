@@ -538,8 +538,8 @@ public class XFormsContextStack {
 
                     // We set a new context item as the context into which other attributes must be evaluated. E.g.:
                     //
-                    // <xforms:select1 ref="type">
-                    //   <xforms:action ev:event="xforms-value-changed" if="context() = 'foobar'">
+                    // <xf:select1 ref="type">
+                    //   <xf:action ev:event="xforms-value-changed" if="context() = 'foobar'">
                     //
                     // In this case, you expect context() to be updated as follows.
                     //
@@ -574,7 +574,7 @@ public class XFormsContextStack {
     }
 
     /**
-     * Push an iteration of the current node-set. Used for example by xforms:repeat, xforms:bind, iterate.
+     * Push an iteration of the current node-set. Used for example by xf:repeat, xf:bind, iterate.
      *
      * @param currentPosition   1-based iteration index
      */
@@ -696,7 +696,7 @@ public class XFormsContextStack {
         final BindingContext parent = bindingContext.parent();
         if (parent == null)
             return false;
-        // We don't have a bound element, but the parent is bound to xforms:repeat
+        // We don't have a bound element, but the parent is bound to xf:repeat
         final Element bindingElement = bindingContext.getControlElement();
         final Element parentBindingElement = parent.getControlElement();
         return (bindingElement == null) && (parentBindingElement != null) && parentBindingElement.getName().equals("repeat");
@@ -723,13 +723,13 @@ public class XFormsContextStack {
             }
             currentBindingContext = currentBindingContext.parent();
         } while (currentBindingContext != null);
-        // It is required that there is an enclosing xforms:repeat
-        throw new ValidationException("Enclosing xforms:repeat not found.", this.head.locationData());
+        // It is required that there is an enclosing xf:repeat
+        throw new ValidationException("Enclosing xf:repeat not found.", this.head.locationData());
     }
 
     /**
-     * Obtain the single-node binding for an enclosing xforms:group, xforms:repeat, or xforms:switch. It takes one
-     * mandatory string parameter containing the id of an enclosing grouping XForms control. For xforms:repeat, the
+     * Obtain the single-node binding for an enclosing xf:group, xf:repeat, or xf:switch. It takes one
+     * mandatory string parameter containing the id of an enclosing grouping XForms control. For xf:repeat, the
      * context returned is the context of the current iteration.
      *
      * @param contextId  enclosing context id
@@ -776,8 +776,8 @@ public class XFormsContextStack {
             }
             currentBindingContext = currentBindingContext.parent();
         } while (currentBindingContext != null);
-        // It is required that there is an enclosing xforms:repeat
-        throw new ValidationException("No enclosing xforms:repeat found for id: " + repeatId, this.head.locationData());
+        // It is required that there is an enclosing xf:repeat
+        throw new ValidationException("No enclosing xf:repeat found for id: " + repeatId, this.head.locationData());
     }
 
     /**

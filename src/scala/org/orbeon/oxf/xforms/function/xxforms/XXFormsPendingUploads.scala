@@ -18,7 +18,7 @@ import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.Int64Value
 
 /**
- * xxforms:pending-uploads() as xs:integer
+ * xxf:pending-uploads() as xs:integer
  */
 class XXFormsPendingUploads extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext) =

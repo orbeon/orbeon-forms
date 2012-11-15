@@ -11,24 +11,24 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Rows of Radio Buttons and Checkboxes</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="form-instance">
+    <xh:head>
+        <xh:title>Rows of Radio Buttons and Checkboxes</xh:title>
+        <xf:model>
+            <xf:instance id="form-instance">
                 <form>
                     <select/>
                     <select1/>
                 </form>
-            </xforms:instance>
-            <xforms:instance id="items-instance">
+            </xf:instance>
+            <xf:instance id="items-instance">
                 <items>
                     <item label="One" value="1"/>
                     <item label="Two" value="2"/>
@@ -39,84 +39,84 @@
                     <item label="Seven" value="7"/>
                     <item label="Eight" value="8"/>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .controls .xforms-select span { width: 5em; display: -moz-inline-box; diplay: inline-block }
             .controls .xforms-select1 span { width: 5em; display: -moz-inline-box; diplay: inline-block }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:div class="controls">
-            <xhtml:h2>Single Selection</xhtml:h2>
+        <xh:div class="controls">
+            <xh:h2>Single Selection</xh:h2>
 
-            <xhtml:p>
+            <xh:p>
                 NOTE: This works just fine but in theory controls should show out-of-range conditions.
-            </xhtml:p>
+            </xh:p>
 
-            <xforms:group ref="select1">
-                <xforms:select1 ref="." appearance="full">
-                    <xforms:label/>
-                    <xforms:itemset ref="instance('items-instance')/item[position() ge 1 and position() le 3]">
-                        <xforms:label ref="@label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-                <xhtml:br/>
-                <xforms:select1 ref="." appearance="full">
-                    <xforms:label/>
-                    <xforms:itemset ref="instance('items-instance')/item[position() ge 4 and position() le 6]">
-                        <xforms:label ref="@label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-                <xhtml:br/>
-                <xforms:select1 ref="." appearance="full">
-                    <xforms:label/>
-                    <xforms:itemset ref="instance('items-instance')/item[position() ge 7 and position() le 9]">
-                        <xforms:label ref="@label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </xforms:group>
+            <xf:group ref="select1">
+                <xf:select1 ref="." appearance="full">
+                    <xf:label/>
+                    <xf:itemset ref="instance('items-instance')/item[position() ge 1 and position() le 3]">
+                        <xf:label ref="@label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:select1>
+                <xh:br/>
+                <xf:select1 ref="." appearance="full">
+                    <xf:label/>
+                    <xf:itemset ref="instance('items-instance')/item[position() ge 4 and position() le 6]">
+                        <xf:label ref="@label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:select1>
+                <xh:br/>
+                <xf:select1 ref="." appearance="full">
+                    <xf:label/>
+                    <xf:itemset ref="instance('items-instance')/item[position() ge 7 and position() le 9]">
+                        <xf:label ref="@label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:select1>
+            </xf:group>
 
-            <xhtml:h2>Multiple Selection</xhtml:h2>
+            <xh:h2>Multiple Selection</xh:h2>
 
-            <xhtml:p>
+            <xh:p>
                 NOTE: This doesn't work as selecting a value in a row clears values selected with other rows. Not sure
                 what's the correct behavior as per the spec, so we sent emails to the public-forms mailing-list W3C to
                 get some clarifications. The controls may also have to show out-of-range conditions.
-            </xhtml:p>
+            </xh:p>
 
-            <xforms:group ref="select">
-                <xforms:select ref="." appearance="full">
-                    <xforms:label/>
-                    <xforms:itemset ref="instance('items-instance')/item[position() ge 1 and position() le 3]">
-                        <xforms:label ref="@label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:select>
-                <xhtml:br/>
-                <xforms:select ref="." appearance="full">
-                    <xforms:label/>
-                    <xforms:itemset ref="instance('items-instance')/item[position() ge 4 and position() le 6]">
-                        <xforms:label ref="@label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:select>
-                <xhtml:br/>
-                <xforms:select ref="." appearance="full">
-                    <xforms:label/>
-                    <xforms:itemset ref="instance('items-instance')/item[position() ge 7 and position() le 9]">
-                        <xforms:label ref="@label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:select>
-            </xforms:group>
-        </xhtml:div>
+            <xf:group ref="select">
+                <xf:select ref="." appearance="full">
+                    <xf:label/>
+                    <xf:itemset ref="instance('items-instance')/item[position() ge 1 and position() le 3]">
+                        <xf:label ref="@label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:select>
+                <xh:br/>
+                <xf:select ref="." appearance="full">
+                    <xf:label/>
+                    <xf:itemset ref="instance('items-instance')/item[position() ge 4 and position() le 6]">
+                        <xf:label ref="@label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:select>
+                <xh:br/>
+                <xf:select ref="." appearance="full">
+                    <xf:label/>
+                    <xf:itemset ref="instance('items-instance')/item[position() ge 7 and position() le 9]">
+                        <xf:label ref="@label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:select>
+            </xf:group>
+        </xh:div>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

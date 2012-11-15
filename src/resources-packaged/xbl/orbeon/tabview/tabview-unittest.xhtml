@@ -11,19 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Tabview</xhtml:title>
-        <xforms:model id="my-model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Tabview</xh:title>
+        <xf:model id="my-model">
+            <xf:instance id="instance">
                 <instance>
                     <tab relevant="false" readonly="false" mip=""/>
                     <tab relevant="true" readonly="false" mip=""/>
@@ -32,54 +32,54 @@
                         <input/>
                     </tab>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="tab">
-                <xforms:bind ref="@mip" relevant="../@relevant = 'true'" readonly="../@readonly = 'true'"/>
-                <xforms:bind ref="@relevant | @readonly" type="xs:boolean"/>
-            </xforms:bind>
-            <xforms:submission id="sleep-5-seconds" method="post"
+            </xf:instance>
+            <xf:bind ref="tab">
+                <xf:bind ref="@mip" relevant="../@relevant = 'true'" readonly="../@readonly = 'true'"/>
+                <xf:bind ref="@relevant | @readonly" type="xs:boolean"/>
+            </xf:bind>
+            <xf:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" serialization="none" replace="none"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:fieldset>
-            <xhtml:legend>Set values in instance to define which tabs are relevant</xhtml:legend>
-            <xforms:repeat ref="tab" id="mips-repeat">
-                <xhtml:div>
-                    <xforms:output value="position()" id="index">
-                        <xforms:label>Tab </xforms:label>
-                    </xforms:output>:
-                    <xforms:input ref="@relevant" id="relevant">
-                        <xforms:label>Relevant</xforms:label>
-                    </xforms:input>
-                    <xforms:input ref="@readonly" id="readonly">
-                        <xforms:label>Read-only</xforms:label>
-                    </xforms:input>
-                </xhtml:div>
-            </xforms:repeat>
-        </xhtml:fieldset>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:fieldset>
+            <xh:legend>Set values in instance to define which tabs are relevant</xh:legend>
+            <xf:repeat ref="tab" id="mips-repeat">
+                <xh:div>
+                    <xf:output value="position()" id="index">
+                        <xf:label>Tab </xf:label>
+                    </xf:output>:
+                    <xf:input ref="@relevant" id="relevant">
+                        <xf:label>Relevant</xf:label>
+                    </xf:input>
+                    <xf:input ref="@readonly" id="readonly">
+                        <xf:label>Read-only</xf:label>
+                    </xf:input>
+                </xh:div>
+            </xf:repeat>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Switch to a tab by dispatching an event</xhtml:legend>
-            <xforms:repeat ref="tab" id="toggle-repeat">
-                <xforms:var name="position" value="position()"/>
+        <xh:fieldset>
+            <xh:legend>Switch to a tab by dispatching an event</xh:legend>
+            <xf:repeat ref="tab" id="toggle-repeat">
+                <xf:var name="position" value="position()"/>
                 <fr:button id="toggle">
-                    <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="tab-{$position}" name="fr-toggle"/>
+                    <xf:label>Toggle tab <xf:output value="$position"/></xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="tab-{$position}" name="fr-toggle"/>
                 </fr:button>
-            </xforms:repeat>
+            </xf:repeat>
             <fr:button id="focus1">
-                <xforms:label>Focus on input in 4th tab</xforms:label>
-                <xforms:setfocus ev:event="DOMActivate" control="my-input"/>
+                <xf:label>Focus on input in 4th tab</xf:label>
+                <xf:setfocus ev:event="DOMActivate" control="my-input"/>
             </fr:button>
             <fr:button id="focus2">
-                <xforms:label>Focus on 4th tab</xforms:label>
-                <xforms:setfocus ev:event="DOMActivate" control="tab-4"/>
+                <xf:label>Focus on 4th tab</xf:label>
+                <xf:setfocus ev:event="DOMActivate" control="tab-4"/>
             </fr:button>
-        </xhtml:fieldset>
+        </xh:fieldset>
 
         <fr:tabview id="tabview">
             <fr:tab ref="tab[1]/@mip" id="tab-1">
@@ -89,31 +89,31 @@
             <fr:tab ref="tab[2]/@mip" id="tab-2" class="my-class">
                 <fr:label>Second</fr:label>
                 Content of second tab.
-                <xforms:group ref="parent::tab">Tab changes context</xforms:group>
-                <xforms:group ref="tab">Tab keeps context</xforms:group>
+                <xf:group ref="parent::tab">Tab changes context</xf:group>
+                <xf:group ref="tab">Tab keeps context</xf:group>
             </fr:tab>
             <fr:tab ref="tab[3]/@mip" id="tab-3">
                 <fr:label>Third</fr:label>
-                <xforms:action ev:event="fr-select">
-                    <xforms:send submission="sleep-5-seconds"/>
-                    <xforms:toggle case="data-loaded"/>
-                </xforms:action>
-                <xforms:switch id="loading">
-                    <xforms:case id="data-loading">
-                        <xhtml:img src="/ops/images/yui/loading.gif" style="vertical-align: middle"/>
-                        <xhtml:span>Loading data...</xhtml:span>
-                    </xforms:case>
-                    <xforms:case id="data-loaded">
-                        <xhtml:img src="/apps/fr/style/images/silk/tick.png" style="vertical-align: middle"/>
-                        <xhtml:span>Data loaded.</xhtml:span>
-                    </xforms:case>
-                </xforms:switch>
+                <xf:action ev:event="fr-select">
+                    <xf:send submission="sleep-5-seconds"/>
+                    <xf:toggle case="data-loaded"/>
+                </xf:action>
+                <xf:switch id="loading">
+                    <xf:case id="data-loading">
+                        <xh:img src="/ops/images/yui/loading.gif" style="vertical-align: middle"/>
+                        <xh:span>Loading data...</xh:span>
+                    </xf:case>
+                    <xf:case id="data-loaded">
+                        <xh:img src="/apps/fr/style/images/silk/tick.png" style="vertical-align: middle"/>
+                        <xh:span>Data loaded.</xh:span>
+                    </xf:case>
+                </xf:switch>
             </fr:tab>
             <fr:tab ref="tab[4]/@mip" id="tab-4">
                 <fr:label>Fourth</fr:label>
                 Content of fourth tab.
-                <xforms:input ref="../input" id="my-input"/>
+                <xf:input ref="../input" id="my-input"/>
             </fr:tab>
         </fr:tabview>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

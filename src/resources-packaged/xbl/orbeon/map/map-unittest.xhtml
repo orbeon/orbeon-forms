@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,10 +21,10 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - Google Map</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL - Google Map</xh:title>
+        <xf:model id="main-model">
+            <xf:instance id="main-instance">
                 <map>
                     <street/>
                     <city/>
@@ -36,61 +36,61 @@
                     <!--<longitude>-122.25362777709961</longitude>-->
                     <!--<latitude>37.502372279912294</latitude>-->
                 </map>
-            </xforms:instance>
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:dispatch if="/map/longitude = '' and /map/latitude = ''" name="local-update-address" targetid="main-model"/>
-            </xforms:action>
-            <xforms:action ev:event="local-update-address">
+            </xf:instance>
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:dispatch if="/map/longitude = '' and /map/latitude = ''" name="local-update-address" targetid="main-model"/>
+            </xf:action>
+            <xf:action ev:event="local-update-address">
                 <!-- Reset address, so the component gets a value changed event, even if the address hasn't changed -->
-                <xforms:setvalue ref="/map/address"/>
-                <xforms:setvalue ref="/map/address" value="string-join((../street, ../street2, ../city, ../state, ../zip), ' ')"/>
-                <xforms:setvalue ref="/map/longitude"/>
-                <xforms:setvalue ref="/map/latitude"/>
-            </xforms:action>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:input ref="street">
-                <xforms:label>Street: </xforms:label>
-            </xforms:input>
-            <xforms:input ref="street2">
-                <xforms:label>Street line 2: </xforms:label>
-            </xforms:input>
-            <xforms:input ref="city">
-                <xforms:label>City: </xforms:label>
-            </xforms:input>
+                <xf:setvalue ref="/map/address"/>
+                <xf:setvalue ref="/map/address" value="string-join((../street, ../street2, ../city, ../state, ../zip), ' ')"/>
+                <xf:setvalue ref="/map/longitude"/>
+                <xf:setvalue ref="/map/latitude"/>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:input ref="street">
+                <xf:label>Street: </xf:label>
+            </xf:input>
+            <xf:input ref="street2">
+                <xf:label>Street line 2: </xf:label>
+            </xf:input>
+            <xf:input ref="city">
+                <xf:label>City: </xf:label>
+            </xf:input>
             <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
-                <xforms:label>State: </xforms:label>
-                <xforms:itemset ref="/states/state">
-                    <xforms:label ref="@name"/>
-                    <xforms:value ref="@abbreviation"/>
-                </xforms:itemset>
+                <xf:label>State: </xf:label>
+                <xf:itemset ref="/states/state">
+                    <xf:label ref="@name"/>
+                    <xf:value ref="@abbreviation"/>
+                </xf:itemset>
             </fr:databound-select1>
-            <xforms:input ref="zip">
-                <xforms:label>Zip: </xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Update map with this address</xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="local-update-address" targetid="main-model"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
+            <xf:input ref="zip">
+                <xf:label>Zip: </xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:trigger appearance="minimal">
+                <xf:label>Update map with this address</xf:label>
+                <xf:dispatch ev:event="DOMActivate" name="local-update-address" targetid="main-model"/>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
             <fr:map address-ref="address" id="unittest-map"
                     longitude-ref="longitude" latitude-ref="latitude"
                     style="width: 500px; height: 300px"/>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:output ref="latitude" id="map-latitude">
-                <xforms:label>Latitude: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:output ref="longitude" id="map-longitude">
-                <xforms:label>Longitude: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        </xh:p>
+        <xh:p>
+            <xf:output ref="latitude" id="map-latitude">
+                <xf:label>Latitude: </xf:label>
+            </xf:output>
+        </xh:p>
+        <xh:p>
+            <xf:output ref="longitude" id="map-longitude">
+                <xf:label>Longitude: </xf:label>
+            </xf:output>
+        </xh:p>
+    </xh:body>
+</xh:html>

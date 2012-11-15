@@ -30,7 +30,7 @@ class XBLTransformerTest extends TestCase with AssertionsForJUnit {
             ":root foo|a"                               → ".//foo:a",
             "*:root foo|a"                              → ".//foo:a",
             ":root > foo|a"                             → "./foo:a",
-            ":root > xforms|label, :root > xforms|help" → "./xforms:label|./xforms:help"
+            ":root > xf|label, :root > xf|help"         → "./xf:label|./xf:help"
             // NOTE: We can't support this as we would need current() (root() won't work from XBLTransformer)
             // ":root :root foo|a"                         → "current()//current()//foo:a"
         )

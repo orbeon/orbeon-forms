@@ -11,29 +11,29 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>How fast we can run the initialization code</xhtml:title>
-        <xforms:model id="main-model" xxforms:external-events="show-loaded">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>How fast we can run the initialization code</xh:title>
+        <xf:model id="main-model" xxf:external-events="show-loaded">
+            <xf:instance id="instance">
                 <instance/>
-            </xforms:instance>
-            <xforms:action ev:event="xforms-ready">
-                <xxforms:script>ORBEON.xforms.Document.dispatchEvent("main-model", "show-loaded");</xxforms:script>
-            </xforms:action>
-            <xforms:action ev:event="show-loaded">
-                <xforms:message level="modal">Page loaded</xforms:message>
-            </xforms:action>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:img src="../service/image-with-delay" alt="Orbeon logo"/>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:action ev:event="xforms-ready">
+                <xxf:script>ORBEON.xforms.Document.dispatchEvent("main-model", "show-loaded");</xxf:script>
+            </xf:action>
+            <xf:action ev:event="show-loaded">
+                <xf:message level="modal">Page loaded</xf:message>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:img src="../service/image-with-delay" alt="Orbeon logo"/>
+    </xh:body>
+</xh:html>

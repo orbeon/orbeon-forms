@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -32,15 +32,15 @@
     <xbl:binding id="fb-custom-xml" element="fb|custom-xml">
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xxforms:show dialog="dialog"/>
+                <xxf:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:resources>
             <xbl:style src="/xbl/fb/custom-xml/custom-xml.css"/>
         </xbl:resources>
         <xbl:implementation>
-            <xforms:model id="custom-xml-model">
-                <xforms:instance id="ui">
+            <xf:model id="custom-xml-model">
+                <xf:instance id="ui">
                     <ui valid="true">
                         <original-mode/>
                         <mode/>
@@ -48,108 +48,108 @@
                         <save-trigger/>
                         <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
                     </ui>
-                </xforms:instance>
+                </xf:instance>
 
                 <!-- Keep track of whether the XML entered by users is valid -->
-                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="@valid">false</xforms:setvalue>
-                <xforms:setvalue ev:event="xxforms-valid"   ev:observer="ui" ref="@valid">true</xforms:setvalue>
+                <xf:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="@valid">false</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-valid"   ev:observer="ui" ref="@valid">true</xf:setvalue>
 
-                <xforms:bind ref="xml" type="xxforms:xml"/>
-                <xforms:bind ref="xml" readonly="../mode = 'automatic'"/>
+                <xf:bind ref="xml" type="xxf:xml"/>
+                <xf:bind ref="xml" readonly="../mode = 'automatic'"/>
 
-                <xforms:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
-            </xforms:model>
+                <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
+            </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xforms:group appearance="xxforms:internal" id="container">
+            <xf:group appearance="xxf:internal" id="container">
 
-                <xforms:var name="form"           ><xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
-                <xforms:var name="resources"      ><xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
-                <xforms:var name="ui"             value="instance('ui')"/>
-                <xforms:var name="model"          value="$form/xhtml:head/xforms:model"/>
-                <xforms:var name="body"           value="$form/xhtml:body"/>
-                <xforms:var name="binds"          value="$model/xforms:bind[@id = 'fr-form-binds']"/>
-                <xforms:var name="metadata"       value="$model/xforms:instance[@id = 'fr-form-metadata']"/>
-                <xforms:var name="form-instance"  value="$model/xforms:instance[@id = 'fr-form-instance']"/>
+                <xf:var name="form"           ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+                <xf:var name="resources"      ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="ui"             value="instance('ui')"/>
+                <xf:var name="model"          value="$form/xh:head/xf:model"/>
+                <xf:var name="body"           value="$form/xh:body"/>
+                <xf:var name="binds"          value="$model/xf:bind[@id = 'fr-form-binds']"/>
+                <xf:var name="metadata"       value="$model/xf:instance[@id = 'fr-form-metadata']"/>
+                <xf:var name="form-instance"  value="$model/xf:instance[@id = 'fr-form-instance']"/>
 
                 <!-- On dialog open, figure out mode, serialized XML -->
-                <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xforms:setvalue ref="$ui/original-mode" value="if ($metadata/metadata/form-instance-mode = 'custom') then 'custom' else 'automatic'"/>
-                    <xforms:setvalue ref="$ui/mode" value="$ui/original-mode"/>
-                    <xforms:var name="instance-copy" value="xxforms:create-document()"/>
+                <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
+                    <xf:setvalue ref="$ui/original-mode" value="if ($metadata/metadata/form-instance-mode = 'custom') then 'custom' else 'automatic'"/>
+                    <xf:setvalue ref="$ui/mode" value="$ui/original-mode"/>
+                    <xf:var name="instance-copy" value="xxf:create-document()"/>
                     <!-- Use intermediary document to avoid unnecessary namespaces -->
-                    <xforms:insert context="$instance-copy" origin="$form-instance/*"/>
-                    <xforms:delete ref="$instance-copy//text()[normalize-space(.) = '']"/>
-                    <xforms:setvalue ref="$ui/xml" value="saxon:serialize($instance-copy, $ui/xsl:output)"/>
-                </xforms:action>
+                    <xf:insert context="$instance-copy" origin="$form-instance/*"/>
+                    <xf:delete ref="$instance-copy//text()[normalize-space(.) = '']"/>
+                    <xf:setvalue ref="$ui/xml" value="saxon:serialize($instance-copy, $ui/xsl:output)"/>
+                </xf:action>
 
                 <!-- When changing to automatic, regenerate the instance, and populate $ui/xml with the new XML -->
-                <xforms:action ev:event="xforms-select" ev:observer="mode-select1" if="event('xxforms:item-value') = 'automatic'">
-                    <xforms:setvalue ref="$ui/xml" value="saxon:serialize(dataModel:dataModelFromBinds($model), $ui/xsl:output)"/>
-                </xforms:action>
+                <xf:action ev:event="xforms-select" ev:observer="mode-select1" if="event('xxf:item-value') = 'automatic'">
+                    <xf:setvalue ref="$ui/xml" value="saxon:serialize(dataModel:dataModelFromBinds($model), $ui/xsl:output)"/>
+                </xf:action>
 
                 <!-- On close dialog -->
-                <xxforms:hide ev:event="DOMActivate" ev:observer="triggers" dialog="dialog"/>
-                <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $ui/@valid = 'true'">
+                <xxf:hide ev:event="DOMActivate" ev:observer="triggers" dialog="dialog"/>
+                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $ui/@valid = 'true'">
 
                     <!-- If mode has changed or mode is custom, parse the XML and replace in form -->
-                    <xforms:action if="$ui/mode != $ui/original-mode or $ui/mode = 'custom'">
-                        <xforms:delete ref="$form-instance/*"/>
-                        <xforms:insert context="$form-instance" origin="saxon:parse($ui/xml)"/>
-                    </xforms:action>
+                    <xf:action if="$ui/mode != $ui/original-mode or $ui/mode = 'custom'">
+                        <xf:delete ref="$form-instance/*"/>
+                        <xf:insert context="$form-instance" origin="saxon:parse($ui/xml)"/>
+                    </xf:action>
 
                     <!-- If mode has changed  -->
-                    <xforms:action if="$ui/mode != $ui/original-mode">
+                    <xf:action if="$ui/mode != $ui/original-mode">
                         <!-- Update binds depending on mode-->
-                        <xforms:action if="$ui/mode = 'custom'" type="xpath">
+                        <xf:action if="$ui/mode = 'custom'" type="xpath">
                             dataModel:updateBindsForCustom($model)
-                        </xforms:action>
-                        <xforms:action if="$ui/mode = 'automatic'" type="xpath">
+                        </xf:action>
+                        <xf:action if="$ui/mode = 'automatic'" type="xpath">
                             dataModel:updateBindsForAutomatic($model)
-                        </xforms:action>
+                        </xf:action>
 
                         <!-- Save mode in metadata -->
-                        <xforms:delete ref="$metadata/metadata/form-instance-mode"/>
-                        <xforms:insert context="$metadata/metadata" ref="*" origin="xxforms:element('form-instance-mode', $ui/mode/text())"/>
-                    </xforms:action>
-                </xforms:action>
+                        <xf:delete ref="$metadata/metadata/form-instance-mode"/>
+                        <xf:insert context="$metadata/metadata" ref="*" origin="xxf:element('form-instance-mode', $ui/mode/text())"/>
+                    </xf:action>
+                </xf:action>
 
-                <xxforms:dialog id="dialog" class="fb-custom-xml-dialog">
-                    <xforms:label ref="$resources/dialog-custom-xml/label"/>
+                <xxf:dialog id="dialog" class="fb-custom-xml-dialog">
+                    <xf:label ref="$resources/dialog-custom-xml/label"/>
                     <!-- Choose mode -->
-                    <xforms:select1 appearance="full" ref="$ui/mode" id="mode-select1">
-                        <xforms:label ref="$resources/dialog-custom-xml/mode-label"/>
-                        <xforms:item>
-                            <xforms:label ref="$resources/dialog-custom-xml/mode-automatic"/>
-                            <xforms:value>automatic</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label ref="$resources/dialog-custom-xml/mode-custom"/>
-                            <xforms:value>custom</xforms:value>
-                        </xforms:item>
-                    </xforms:select1>
+                    <xf:select1 appearance="full" ref="$ui/mode" id="mode-select1">
+                        <xf:label ref="$resources/dialog-custom-xml/mode-label"/>
+                        <xf:item>
+                            <xf:label ref="$resources/dialog-custom-xml/mode-automatic"/>
+                            <xf:value>automatic</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label ref="$resources/dialog-custom-xml/mode-custom"/>
+                            <xf:value>custom</xf:value>
+                        </xf:item>
+                    </xf:select1>
                     <!-- Edit XML -->
-                    <xhtml:div class="fb-xml-dialog-view">
+                    <xh:div class="fb-xml-dialog-view">
                         <fr:code-mirror ref="$ui/xml" id="instance-textarea" incremental="true">
-                            <xforms:alert ref="$resources/dialog-edit-source/source/alert"/>
+                            <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
                         </fr:code-mirror>
-                    </xhtml:div>
+                    </xh:div>
                     <!-- Buttons -->
-                    <xhtml:div class="fr-dialog-buttons">
-                        <xforms:group appearance="xxforms:internal" id="triggers">
-                            <xhtml:span>
-                                <xforms:trigger class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger" appearance="xxforms:primary">
-                                    <xforms:label ref="$resources/apply/label"/>
-                                </xforms:trigger>
-                                <xforms:output value="$resources/or/label"/>
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
-                                    <xforms:label ref="$resources/cancel/label"/>
-                                </xforms:trigger>
-                            </xhtml:span>
-                        </xforms:group>
-                    </xhtml:div>
-                </xxforms:dialog>
-            </xforms:group>
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group appearance="xxf:internal" id="triggers">
+                            <xh:span>
+                                <xf:trigger class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger" appearance="xxf:primary">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </xf:trigger>
+                                <xf:output value="$resources/or/label"/>
+                                <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xf:label ref="$resources/cancel/label"/>
+                                </xf:trigger>
+                            </xh:span>
+                        </xf:group>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:range.
+ * Handle xf:range.
  */
 public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 

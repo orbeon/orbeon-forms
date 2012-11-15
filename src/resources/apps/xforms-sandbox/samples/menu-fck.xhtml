@@ -11,26 +11,26 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Menu Widget</xhtml:title>
-        <xforms:model>
-            <xforms:setfocus ev:event="xforms-ready" control="select-control"/>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Menu Widget</xh:title>
+        <xf:model>
+            <xf:setfocus ev:event="xforms-ready" control="select-control"/>
+            <xf:instance id="instance">
                 <instance>
                     <select1>ar1</select1>
                     <select/>
                     <message/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="items">
+            </xf:instance>
+            <xf:instance id="items">
                 <items>
                     <item label="Encyclopedia" value="en1">
                         <item label="Science" value="sc1"/>
@@ -47,29 +47,29 @@
                         </item>
                     </item>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
             Selected values:
-            <xforms:output ref="select1"/>
-        </xhtml:p>
-         <!--<xforms:select1 ref="select1" appearance="xxforms:menu">-->
-            <!--<xforms:itemset ref="instance('items')//item">-->
-                <!--<xforms:label ref="@label"/>-->
-                <!--<xforms:value ref="@value"/>-->
-            <!--</xforms:itemset>-->
-        <!--</xforms:select1>-->
-        <xforms:select ref="select" appearance="full" id="select-control">
-            <xforms:item>
-                <xforms:label>Yes</xforms:label>
-                <xforms:value/>
-            </xforms:item>
-        </xforms:select>
-        <xhtml:p>
+            <xf:output ref="select1"/>
+        </xh:p>
+         <!--<xf:select1 ref="select1" appearance="xxf:menu">-->
+            <!--<xf:itemset ref="instance('items')//item">-->
+                <!--<xf:label ref="@label"/>-->
+                <!--<xf:value ref="@value"/>-->
+            <!--</xf:itemset>-->
+        <!--</xf:select1>-->
+        <xf:select ref="select" appearance="full" id="select-control">
+            <xf:item>
+                <xf:label>Yes</xf:label>
+                <xf:value/>
+            </xf:item>
+        </xf:select>
+        <xh:p>
             Then an HTML editor:
-        </xhtml:p>
-        <xforms:textarea ref="message" mediatype="text/html"/>
-    </xhtml:body>
-</xhtml:html>
+        </xh:p>
+        <xf:textarea ref="message" mediatype="text/html"/>
+    </xh:body>
+</xh:html>

@@ -24,7 +24,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * Handle xforms:repeat.
+ * Handle xf:repeat.
  */
 public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
 	
@@ -66,7 +66,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
                 try {
                     handlerContext.getController().repeatBody();
                 } catch (Exception e) {
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData(), "unrolling xforms:repeat control", repeatControl.element()));
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData(), "unrolling xf:repeat control", repeatControl.element()));
                 }
                 handlerContext.popRepeatContext();
                 

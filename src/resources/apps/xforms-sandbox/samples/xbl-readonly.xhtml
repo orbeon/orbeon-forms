@@ -11,112 +11,112 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL Component Inheriting Readonly</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL Component Inheriting Readonly</xh:title>
+        <xf:model id="main-model">
+            <xf:instance id="main-instance">
                 <values xmlns="">
                     <value1/>
                     <value2/>
                 </values>
-            </xforms:instance>
-            <xforms:bind ref="value1" readonly="../value2 = '42'"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="value1" readonly="../value2 = '42'"/>
+        </xf:model>
         <xbl:xbl>
             <xbl:binding id="fr-super-control-binding" element="fr|super-control">
                 <xbl:template>
-                    <xforms:model id="super-control-model">
-                        <xforms:instance id="super-control-instance">
+                    <xf:model id="super-control-model">
+                        <xf:instance id="super-control-instance">
                             <value/>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- NOTE: This doesn't work properly because the binds are not re-evaluated when just the outer readonly MIP changes -->
-                        <xforms:var name="ctx" context="xxforms:component-context()" xbl:attr="value=ref" as="node()*"/>
-                        <xforms:bind ref="." readonly="exforms:readonly($ctx)"/>
+                        <xf:var name="ctx" context="xxf:component-context()" xbl:attr="value=ref" as="node()*"/>
+                        <xf:bind ref="." readonly="exf:readonly($ctx)"/>
 
-                        <xforms:action ev:event="xforms-model-construct-done">
+                        <xf:action ev:event="xforms-model-construct-done">
 
-                            <xforms:message xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                                Result from xxforms:component-context(): <xforms:output value="string-join(for $i in $ctx return name($i), ' - ')"/>
-                            </xforms:message>
+                            <xf:message xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                                Result from xxf:component-context(): <xf:output value="string-join(for $i in $ctx return name($i), ' - ')"/>
+                            </xf:message>
 
-                        </xforms:action>
-                    </xforms:model>
+                        </xf:action>
+                    </xf:model>
 
-                    <xforms:group xbl:attr="ref bind" id="component-group">
-                        <xbl:content includes="xforms|label,xforms|help,xforms|hint"/>
+                    <xf:group xbl:attr="ref bind" id="component-group">
+                        <xbl:content includes="xf|label,xf|help,xf|hint"/>
 
-                        <xforms:var name="result" value="." as="node()?"/>
+                        <xf:var name="result" value="." as="node()?"/>
 
                         <!-- React to update to bound node -->
-                        <xforms:group ref="$result" appearance="xxforms:internal" id="component-result-group">
-                            <xforms:action ev:event="xforms-value-changed xforms-enabled">
-                                <xforms:setvalue model="super-control-model" ref="." value="$result"/>
-                            </xforms:action>
-                        </xforms:group>
+                        <xf:group ref="$result" appearance="xxf:internal" id="component-result-group">
+                            <xf:action ev:event="xforms-value-changed xforms-enabled">
+                                <xf:setvalue model="super-control-model" ref="." value="$result"/>
+                            </xf:action>
+                        </xf:group>
 
                         <!-- Local controls -->
-                        <xforms:group model="super-control-model" id="component-controls-group">
+                        <xf:group model="super-control-model" id="component-controls-group">
                             
-                            <xforms:input ref="."/>
+                            <xf:input ref="."/>
 
                             <!-- React to update to local controls -->
-                            <xforms:action ev:event="xforms-value-changed">
-                                <xforms:setvalue ref="$result" value="context()"/>
-                            </xforms:action>
-                        </xforms:group>
+                            <xf:action ev:event="xforms-value-changed">
+                                <xf:setvalue ref="$result" value="context()"/>
+                            </xf:action>
+                        </xf:group>
 
-                    </xforms:group>
+                    </xf:group>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             This example shows how you can use XBL to propagate the readonly property to a local control value. When
             changing value 2 to to "42", the two "Value 1" fields should become read-only.
-        </xhtml:p>
-        <xhtml:p>
+        </xh:p>
+        <xh:p>
             NOTE: This doesn't work properly yet!
-        </xhtml:p>
+        </xh:p>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
         <fr:super-control ref="value1" id="fr-super-control-1">
-            <xforms:label>Internal value 1: </xforms:label>
+            <xf:label>Internal value 1: </xf:label>
         </fr:super-control>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
         <fr:super-control ref="value2" id="fr-super-control-2">
-            <xforms:label>Internal value 2: </xforms:label>
+            <xf:label>Internal value 2: </xf:label>
         </fr:super-control>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:input ref="value1">
-            <xforms:label>External value 1: </xforms:label>
-        </xforms:input>
+        <xf:input ref="value1">
+            <xf:label>External value 1: </xf:label>
+        </xf:input>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:input ref="value2">
-            <xforms:label>External value 2: </xforms:label>
-        </xforms:input>
+        <xf:input ref="value2">
+            <xf:label>External value 2: </xf:label>
+        </xf:input>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

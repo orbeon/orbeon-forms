@@ -44,7 +44,7 @@ public class XFormsLoadAction extends XFormsAction {
             final String rawShowAttribute = actionInterpreter.resolveAVT(actionElement, "show");
             showAttribute = (rawShowAttribute == null) ? "replace" : rawShowAttribute;
             if (!("replace".equals(showAttribute) || "new".equals(showAttribute)))
-                throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
+                throw new OXFException("Invalid value for 'show' attribute on xf:load element: " + showAttribute);
         }
         final boolean doReplace = "replace".equals(showAttribute);
         final String target = actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_TARGET_QNAME);
@@ -82,7 +82,7 @@ public class XFormsLoadAction extends XFormsAction {
         } else {
             // "Either the single node binding attributes, pointing to a URI in the instance
             // data, or the linking attributes are required."
-            throw new OXFException("Missing 'resource' or 'ref' attribute on xforms:load element.");
+            throw new OXFException("Missing 'resource' or 'ref' attribute on xf:load element.");
         }
     }
 

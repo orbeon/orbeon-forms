@@ -15,8 +15,8 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
-          xmlns:xhtml="http://www.w3.org/1999/xhtml"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
+          xmlns:xf="http://www.w3.org/2002/xforms"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:saxon="http://saxon.sf.net/"
           xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
@@ -74,7 +74,7 @@
             <attachments xsl:version="2.0" xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
                 <xsl:variable name="data" select="/*" as="element()"/>
-                <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
+                <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xh:html)"/>
 
                 <!-- App and form -->
                 <xsl:variable name="app" select="doc('input:parameters')/*/app" as="xs:string"/>
@@ -82,22 +82,22 @@
 
                 <!--  NOTE: code below partially duplicated in persistence-model.xml but in XForms! -->
                 <xsl:variable name="attachment-controls" as="element()*"
-                              select="$xhtml/xhtml:body//(xforms:* | fr:*)[@bind and @class and p:has-class('fr-attachment')]"/>
+                              select="$xhtml/xh:body//(xf:* | fr:*)[@bind and @class and p:has-class('fr-attachment')]"/>
 
                 <!-- Find all binds with fb-attachment, or to which controls with fb-attachment are bound -->
-                <xsl:variable name="attachment-binds" as="element(xforms:bind)*"
-                              select="$xhtml/xhtml:head/xforms:model//xforms:bind[(@class and p:has-class('fr-attachment'))
+                <xsl:variable name="attachment-binds" as="element(xf:bind)*"
+                              select="$xhtml/xh:head/xf:model//xf:bind[(@class and p:has-class('fr-attachment'))
                                         or @id = $attachment-controls/@bind]"/>
 
                 <!-- Iterate over attachment controls while there is no submission error -->
                 <xsl:for-each select="1 to count($attachment-binds)">
 
-                        <xsl:variable name="bind" as="element(xforms:bind)"
-                                      select="($xhtml/xhtml:head/xforms:model//xforms:bind[(@class and p:has-class('fr-attachment'))
+                        <xsl:variable name="bind" as="element(xf:bind)"
+                                      select="($xhtml/xh:head/xf:model//xf:bind[(@class and p:has-class('fr-attachment'))
                                                 or @id = $attachment-controls/@bind])[number(current())]"/>
 
                         <!-- Look at all binds except top-level one -->
-                        <xsl:variable name="binds" select="$bind/ancestor-or-self::xforms:bind[position() lt last()]" as="element(xforms:bind)+"/>
+                        <xsl:variable name="binds" select="$bind/ancestor-or-self::xf:bind[position() lt last()]" as="element(xf:bind)+"/>
                         <xsl:variable name="expression" select="string-join($binds/(@ref, @nodeset)[1], '/')" as="xs:string"/>
 
                         <xsl:variable name="holders" select="$data/saxon:evaluate($expression)"/>
@@ -129,7 +129,7 @@
             <message xsl:version="2.0">
 
                 <xsl:variable name="data" select="/*" as="element()"/>
-                <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xhtml:html)"/>
+                <xsl:variable name="xhtml" select="doc('input:xhtml')/*" as="element(xh:html)"/>
                 <xsl:variable name="request" select="doc('input:request')/*" as="element(request)"/>
                 <xsl:variable name="fr-resources" select="doc('input:fr-resources')/*" as="element(resources)"/>
                 <xsl:variable name="attachments" select="doc('input:attachments')/*" as="element(attachments)"/>
@@ -143,12 +143,12 @@
 
                 <!-- Find fr-email-recipient controls and binds -->
                 <xsl:variable name="recipient-controls" as="element()*"
-                              select="$xhtml/xhtml:body//xforms:*[p:has-class('fr-email-recipient')]"/>
-                <xsl:variable name="recipient-binds" as="element(xforms:bind)*"
-                              select="for $control in $recipient-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+                              select="$xhtml/xh:body//xf:*[p:has-class('fr-email-recipient')]"/>
+                <xsl:variable name="recipient-binds" as="element(xf:bind)*"
+                              select="for $control in $recipient-controls return $xhtml/xh:head/xf:model//xf:bind[@id = $control/@bind]"/>
 
                 <xsl:variable name="recipient-paths" as="xs:string*"
-                              select="for $bind in $recipient-binds return string-join(($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
+                              select="for $bind in $recipient-binds return string-join(($bind/ancestor-or-self::xf:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
 
                 <!-- Extract email addresses from form if any -->
                 <xsl:variable name="email-addresses" as="xs:string*"
@@ -156,12 +156,12 @@
 
                 <!-- Find fr-email-recipient controls and binds -->
                 <xsl:variable name="subject-controls" as="element()*"
-                              select="$xhtml/xhtml:body//xforms:*[p:has-class('fr-email-subject')]"/>
-                <xsl:variable name="subject-binds" as="element(xforms:bind)*"
-                              select="for $control in $subject-controls return $xhtml/xhtml:head/xforms:model//xforms:bind[@id = $control/@bind]"/>
+                              select="$xhtml/xh:body//xf:*[p:has-class('fr-email-subject')]"/>
+                <xsl:variable name="subject-binds" as="element(xf:bind)*"
+                              select="for $control in $subject-controls return $xhtml/xh:head/xf:model//xf:bind[@id = $control/@bind]"/>
 
                 <xsl:variable name="subject-paths" as="xs:string*"
-                              select="for $bind in $subject-binds return string-join(($bind/ancestor-or-self::xforms:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
+                              select="for $bind in $subject-binds return string-join(($bind/ancestor-or-self::xf:bind/(@ref, @nodeset)[1])[position() gt 1], '/')"/>
 
                 <!-- Extract values from form if any -->
                 <xsl:variable name="subject-values" as="xs:string*"

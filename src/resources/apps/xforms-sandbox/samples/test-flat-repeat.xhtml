@@ -11,50 +11,50 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>XForms Hello</xhtml:title>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-flat-repeat.js"/>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>XForms Hello</xh:title>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-flat-repeat.js"/>
+        <xf:model>
+            <xf:instance>
                 <instance show="false">
                     <i/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="." relevant="@show = 'true'"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="." relevant="@show = 'true'"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background: none; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:trigger id="show">
-            <xforms:label>Show</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="@show">true</xforms:setvalue>
-        </xforms:trigger>
-        <xforms:trigger id="hide">
-            <xforms:label>Hide</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="@show">false</xforms:setvalue>
-        </xforms:trigger>
-        <xforms:trigger id="add">
-            <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" context="." origin="xxforms:element('i')"/>
-        </xforms:trigger>
-        <xhtml:ul>
-            <xforms:group ref=".">
-                <xforms:repeat ref="i" id="i-repeat">
-                    <xhtml:li><xhtml:img src="http://placekitten.com/g/200/100" alt="cat" id="cat"/></xhtml:li>
-                </xforms:repeat>
-            </xforms:group>
-        </xhtml:ul>
-    </xhtml:body>
-</xhtml:html>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:trigger id="show">
+            <xf:label>Show</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="@show">true</xf:setvalue>
+        </xf:trigger>
+        <xf:trigger id="hide">
+            <xf:label>Hide</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="@show">false</xf:setvalue>
+        </xf:trigger>
+        <xf:trigger id="add">
+            <xf:label>Add</xf:label>
+            <xf:insert ev:event="DOMActivate" context="." origin="xxf:element('i')"/>
+        </xf:trigger>
+        <xh:ul>
+            <xf:group ref=".">
+                <xf:repeat ref="i" id="i-repeat">
+                    <xh:li><xh:img src="http://placekitten.com/g/200/100" alt="cat" id="cat"/></xh:li>
+                </xf:repeat>
+            </xf:group>
+        </xh:ul>
+    </xh:body>
+</xh:html>

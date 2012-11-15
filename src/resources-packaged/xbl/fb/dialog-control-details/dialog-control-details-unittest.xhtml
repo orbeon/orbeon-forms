@@ -11,10 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -23,41 +23,41 @@
 
     xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
 
-    <xhtml:head>
-        <xhtml:title>Control Details Dialog</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Control Details Dialog</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
-                    <xforms:bind type="xforms:string"/>
+                    <xf:bind type="xf:string"/>
                     <fr:databound-select1 appearance="minimal"/>
-                    <xforms:input/>
+                    <xf:input/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="fb-components-instance"><dummy/></xforms:instance>
-            <xforms:submission id="fb-load-components" serialization="none"
+            </xf:instance>
+            <xf:instance id="fb-components-instance"><dummy/></xf:instance>
+            <xf:submission id="fb-load-components" serialization="none"
                                method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application=orbeon"
                                replace="instance" instance="fb-components-instance"
-                               xxforms:readonly="true" xxforms:cache="true"/>
-            <xforms:action ev:event="xforms-ready">
-                <xforms:send submission="fb-load-components"/>
-                <!-- Get binding for xforms:input -->
-                <xforms:insert ref="*"
+                               xxf:readonly="true" xxf:cache="true"/>
+            <xf:action ev:event="xforms-ready">
+                <xf:send submission="fb-load-components"/>
+                <!-- Get binding for xf:input -->
+                <xf:insert ref="*"
                                origin="controlOps:findBindingsForControl(
                                            instance('fb-components-instance'),
-                                           instance('instance')/xforms:input,
-                                           instance('instance')/xforms:bind[@type = 'xforms:string'])"/>
+                                           instance('instance')/xf:input,
+                                           instance('instance')/xf:bind[@type = 'xf:string'])"/>
 
                 <!-- Getting binding for databound-select1 -->
-                <xforms:insert ref="*"
+                <xf:insert ref="*"
                                origin="controlOps:findBindingsForControl(
                                            instance('fb-components-instance'),
                                            instance('instance')/instance('instance')/fr:databound-select1,
-                                           instance('instance')/xforms:bind[@type = 'xforms:string'])"/>
-            </xforms:action>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+                                           instance('instance')/xf:bind[@type = 'xf:string'])"/>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <!-- Component instance -->
         <fb:dialog-control-details id="dialog-control-details" form-ref="instance('form')" components-ref="instance('fb-components-instance')"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

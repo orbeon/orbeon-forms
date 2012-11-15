@@ -11,48 +11,48 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Test cacheable instances using POST</title>
-        <xforms:model id="model">
-            <xforms:instance xmlns="" id="request-1" xxforms:exclude-result-prefixes="#all">
+        <xf:model id="model">
+            <xf:instance xmlns="" id="request-1" xxf:exclude-result-prefixes="#all">
                 <request>Request 1</request>
-            </xforms:instance>
-            <xforms:instance xmlns="" id="request-2" xxforms:exclude-result-prefixes="#all">
+            </xf:instance>
+            <xf:instance xmlns="" id="request-2" xxf:exclude-result-prefixes="#all">
                 <request>Request 2</request>
-            </xforms:instance>
-            <xforms:instance xmlns="" id="response-1" xxforms:exclude-result-prefixes="#all">
+            </xf:instance>
+            <xf:instance xmlns="" id="response-1" xxf:exclude-result-prefixes="#all">
                 <dummy/>
-            </xforms:instance>
-            <xforms:instance xmlns="" id="response-2" xxforms:exclude-result-prefixes="#all">
+            </xf:instance>
+            <xf:instance xmlns="" id="response-2" xxf:exclude-result-prefixes="#all">
                 <dummy/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:submission id="request-1-submission" ref="instance('request-1')" method="post" resource="/xforms-sandbox/service/identity"
-                               replace="instance" instance="response-1" xxforms:cache="true" xxforms:exclude-result-prefixes="#all"/>
-            <xforms:submission id="request-2-submission" ref="instance('request-2')" method="post" resource="/xforms-sandbox/service/identity"
-                               replace="instance" instance="response-2" xxforms:cache="true" xxforms:exclude-result-prefixes="#all"/>
-        </xforms:model>
+            <xf:submission id="request-1-submission" ref="instance('request-1')" method="post" resource="/xforms-sandbox/service/identity"
+                               replace="instance" instance="response-1" xxf:cache="true" xxf:exclude-result-prefixes="#all"/>
+            <xf:submission id="request-2-submission" ref="instance('request-2')" method="post" resource="/xforms-sandbox/service/identity"
+                               replace="instance" instance="response-2" xxf:cache="true" xxf:exclude-result-prefixes="#all"/>
+        </xf:model>
     </head>
     <body>
 
-        <xforms:submit submission="request-1-submission">
-            <xforms:label>Submit 1</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="request-1-submission">
+            <xf:label>Submit 1</xf:label>
+        </xf:submit>
 
-        <xforms:submit submission="request-2-submission">
-            <xforms:label>Submit 2</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="request-2-submission">
+            <xf:label>Submit 2</xf:label>
+        </xf:submit>
 
-        <xforms:trigger>
-            <xforms:label>Clear</xforms:label>
-            <xxforms:invalidate-instances ev:event="DOMActivate"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Clear</xf:label>
+            <xxf:invalidate-instances ev:event="DOMActivate"/>
+        </xf:trigger>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 

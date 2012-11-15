@@ -25,7 +25,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
 /**
- * xxforms:form-urlencode() performs application/x-www-form-urlencoded encoding on an XML document.
+ * xxf:form-urlencode() performs application/x-www-form-urlencoded encoding on an XML document.
  */
 public class XXFormsFormURLEncode extends XFormsFunction {
 

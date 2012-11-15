@@ -32,7 +32,7 @@ public class XFormsRecalculateAction extends XFormsAction {
 
         final XFormsModel model = actionInterpreter.actionXPathContext().getCurrentModel();
 
-        // @xxforms:defaults
+        // @xxf:defaults
         final boolean applyDefaults; {
             final String defaultsString = actionInterpreter.resolveAVT(actionElement, XFormsConstants.XXFORMS_DEFAULTS_QNAME);
             applyDefaults = Boolean.parseBoolean(defaultsString);

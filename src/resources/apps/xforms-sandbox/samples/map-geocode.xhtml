@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,11 +21,11 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - Google Map</xhtml:title>
-        <!--<xhtml:script src="http://maps.google.com/maps?file=api&amp;v=2" type="text/javascript"/>-->
-        <xforms:model id="main-model" xxforms:external-events="my-show-candidates">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL - Google Map</xh:title>
+        <!--<xh:script src="http://maps.google.com/maps?file=api&amp;v=2" type="text/javascript"/>-->
+        <xf:model id="main-model" xxf:external-events="my-show-candidates">
+            <xf:instance id="main-instance">
                 <instance>
                     <street>2000 Howard Avenue</street>
                     <city/>
@@ -35,11 +35,11 @@
                     <candidates text=""/>
                     <show-map>false</show-map>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Call Google geocoding API, and pass back result to XForms -->
-            <xforms:action ev:event="DOMActivate" ev:observer="validate-trigger">
-                <xxforms:script>
+            <xf:action ev:event="DOMActivate" ev:observer="validate-trigger">
+                <xxf:script>
                     <![CDATA[
                         var geocoder = new GClientGeocoder();
                         var address = ORBEON.xforms.Document.getValue("address");
@@ -62,89 +62,89 @@
                             ORBEON.xforms.Document.dispatchEvent("main-model", "my-show-candidates");
                         });
                     ]]>
-                </xxforms:script>
-            </xforms:action>
+                </xxf:script>
+            </xf:action>
 
             <!-- Parse XML we got from the client -->
-            <xforms:action ev:event="my-show-candidates">
-                <xforms:delete ref="candidates/*"/>
-                <xforms:insert context="candidates" origin="saxon:parse(@text)"/>
-                <xforms:setvalue ref="candidates/@text"/>
-                <xxforms:show dialog="candidates-dialog" neighbor="validate-trigger"/>
-            </xforms:action>
+            <xf:action ev:event="my-show-candidates">
+                <xf:delete ref="candidates/*"/>
+                <xf:insert context="candidates" origin="saxon:parse(@text)"/>
+                <xf:setvalue ref="candidates/@text"/>
+                <xxf:show dialog="candidates-dialog" neighbor="validate-trigger"/>
+            </xf:action>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1  { background: transparent }
             .xforms-label                   { display: -moz-inline-box; display: inline-block; width: expression('9em');  min-width: 9em; }
             .xforms-form div                { padding-bottom: .5em; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xxforms:dialog id="candidates-dialog" level="modal" close="true" draggable="false" appearance="full">
-            <xforms:label>Choose address</xforms:label>
-            <xhtml:ul>
-                <xforms:repeat ref="candidates/addresses/address">
-                    <xhtml:li>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label ref="full"/>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:var name="address" value="."/>
-                                <xforms:setvalue ref="/instance/street" value="$address/street"/>
-                                <xforms:setvalue ref="/instance/city" value="$address/city"/>
-                                <xforms:setvalue ref="/instance/state" value="upper-case($address/state)"/>
-                                <xforms:setvalue ref="/instance/zip" value="$address/zip"/>
-                                <xforms:setvalue ref="/instance/address" value="$address/full"/>
-                                <xxforms:hide dialog="candidates-dialog"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:li>
-                </xforms:repeat>
-            </xhtml:ul>
-        </xxforms:dialog>
+        <xxf:dialog id="candidates-dialog" level="modal" close="true" draggable="false" appearance="full">
+            <xf:label>Choose address</xf:label>
+            <xh:ul>
+                <xf:repeat ref="candidates/addresses/address">
+                    <xh:li>
+                        <xf:trigger appearance="minimal">
+                            <xf:label ref="full"/>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:var name="address" value="."/>
+                                <xf:setvalue ref="/instance/street" value="$address/street"/>
+                                <xf:setvalue ref="/instance/city" value="$address/city"/>
+                                <xf:setvalue ref="/instance/state" value="upper-case($address/state)"/>
+                                <xf:setvalue ref="/instance/zip" value="$address/zip"/>
+                                <xf:setvalue ref="/instance/address" value="$address/full"/>
+                                <xxf:hide dialog="candidates-dialog"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:li>
+                </xf:repeat>
+            </xh:ul>
+        </xxf:dialog>
 
         <!-- Address fields -->
-        <xhtml:div>
-            <xforms:input ref="street">
-                <xforms:label>Street: </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="city">
-                <xforms:label>City: </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
+        <xh:div>
+            <xf:input ref="street">
+                <xf:label>Street: </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="city">
+                <xf:label>City: </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
             <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
-                <xforms:label>State: </xforms:label>
-                <xforms:itemset ref="/states/state">
-                    <xforms:label ref="@name"/>
-                    <xforms:value ref="@abbreviation"/>
-                </xforms:itemset>
+                <xf:label>State: </xf:label>
+                <xf:itemset ref="/states/state">
+                    <xf:label ref="@name"/>
+                    <xf:value ref="@abbreviation"/>
+                </xf:itemset>
             </fr:databound-select1>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="zip">
-                <xforms:label>Zip: </xforms:label>
-            </xforms:input>
-        </xhtml:div>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="zip">
+                <xf:label>Zip: </xf:label>
+            </xf:input>
+        </xh:div>
 
         <!-- Validate address -->
-        <xhtml:div>
-            <xforms:output value="normalize-space(string-join((street, city, state, zip), ' '))" id="address" style="display: none"/>
-            <xforms:input ref="candidates/@text" id="candidates"/>
-            <xforms:trigger appearance="minimal" id="validate-trigger">
-                <xforms:label>Validate and show on map</xforms:label>
-            </xforms:trigger>
-        </xhtml:div>
+        <xh:div>
+            <xf:output value="normalize-space(string-join((street, city, state, zip), ' '))" id="address" style="display: none"/>
+            <xf:input ref="candidates/@text" id="candidates"/>
+            <xf:trigger appearance="minimal" id="validate-trigger">
+                <xf:label>Validate and show on map</xf:label>
+            </xf:trigger>
+        </xh:div>
 
         <!-- Map component -->
-        <xhtml:div>
+        <xh:div>
             <fr:map address-ref="address" id="unittest-map"
                     longitude-ref="longitude" latitude-ref="latitude"
                     style="width: 500px; height: 300px"/>
-        </xhtml:div>
+        </xh:div>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

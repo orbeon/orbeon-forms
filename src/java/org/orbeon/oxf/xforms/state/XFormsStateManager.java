@@ -224,7 +224,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             XFormsDocumentCache.instance().storeDocument(containingDocument);
 
             if (isInitialState && containingDocument.getStaticState().isServerStateHandling()) {
-                // Also store document state (used by browser back and <xforms:reset>)
+                // Also store document state (used by browser back and <xf:reset>)
                 indentedLogger.logDebug(LOG_TYPE, "Storing initial document state.");
                 storeDocumentState(containingDocument, isInitialState);
             }

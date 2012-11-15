@@ -24,7 +24,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:textarea.
+ * Handle xf:textarea.
  * 
  * TODO: Subclasses per appearance.
  */
@@ -54,7 +54,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
 
                 // Output all extension attributes
                 if (isConcreteControl) {
-                    // Output xxforms:* extension attributes
+                    // Output xxf:* extension attributes
                     textareaControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 

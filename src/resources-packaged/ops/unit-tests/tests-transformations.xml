@@ -13,8 +13,8 @@
   -->
 <group description="Transformations" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
     xmlns:d="http://orbeon.org/oxf/xml/document"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -354,30 +354,30 @@
 
     <!-- This currently (Saxon 8.1.1) produces only a warning. It would be cleaning to get rid of it... -->
     <test description="XSLT: Ambiguous template" name="oxf:xslt"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xh="http://www.w3.org/1999/xhtml">
         <input name="data">
             <root>
                 <test>
-                    <xhtml:html>
-                        <xhtml:form xhtml:id="test">
+                    <xh:html>
+                        <xh:form xh:id="test">
                             <a>
-                                <xhtml:br/>
+                                <xh:br/>
                             </a>
-                        </xhtml:form>
-                    </xhtml:html>
+                        </xh:form>
+                    </xh:html>
                 </test>
             </root>
         </input>
         <input name="config">
-            <xsl:stylesheet version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            <xsl:stylesheet version="2.0" xmlns:xh="http://www.w3.org/1999/xhtml">
 
-                <xsl:template match="xhtml:*">
+                <xsl:template match="xh:*">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@*|node()"/>
                     </xsl:element>
                 </xsl:template>
 
-                <xsl:template match="@xhtml:*">
+                <xsl:template match="@xh:*">
                     <xsl:attribute name="{local-name()}">
                         <xsl:value-of select="."/>
                     </xsl:attribute>

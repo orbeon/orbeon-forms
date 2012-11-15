@@ -19,7 +19,7 @@
     var YD = YAHOO.util.Dom;
 
     /**
-     * Tree, corresponding to <xforms:select appearance="xxforms:tree"> or <xforms:select1 appearance="xxforms:tree">.
+     * Tree, corresponding to <xf:select appearance="xxf:tree"> or <xf:select1 appearance="xxf:tree">.
      *
      * @constructor
      * @extends {ORBEON.xforms.control.Control}
@@ -149,7 +149,7 @@
                 }
             }
         }
-        // Make selected nodes visible if xxforms:open isn't used
+        // Make selected nodes visible if xxf:open isn't used
         if (! this.itemsetHasOpenAnnotation) {
             values = treeDiv.xformsAllowMultipleSelection ? treeDiv.value.split(" ") : [ treeDiv.value ];
             ORBEON.xforms.Controls.treeOpenSelectedVisible(yuiTree, values);

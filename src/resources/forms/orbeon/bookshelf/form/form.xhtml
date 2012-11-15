@@ -12,11 +12,11 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
     <head>
         <style type="text/css">
@@ -24,7 +24,7 @@
             #image-output-control.xforms-mediatype-image { max-height: 200px }
             .fr-mode-view .fr-grid-content { padding: 0 }
         </style>
-        <xforms:model id="fr-form-model" xxforms:help-tooltip="false" xxforms:noscript-support="false" xxforms:xpath-analysis="true">
+        <xf:model id="fr-form-model" xxf:help-tooltip="false" xxf:noscript-support="false" xxf:xpath-analysis="true">
             <!-- Inline schema -->
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
 
@@ -122,7 +122,7 @@
             </xs:schema>
 
             <!-- Instance that contains all the books -->
-            <xforms:instance id="fr-form-instance" xxforms:validation="strict">
+            <xf:instance id="fr-form-instance" xxf:validation="strict">
                 <book xmlns="">
                     <details>
                         <title/>
@@ -138,26 +138,26 @@
                         <note/>
                     </notes>
                 </book>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind id="fr-form-binds" ref=".">
-                <xforms:bind id="details-bind" ref="details">
-                    <xforms:bind id="title-bind" ref="title" required="true()"/>
-                    <xforms:bind id="author-bind" ref="author" required="true()"/>
-                    <xforms:bind id="language-bind" ref="language"/>
-                    <xforms:bind id="link-bind" ref="link"/>
-                    <xforms:bind id="rating-bind" ref="rating"/>
-                    <xforms:bind id="publication-year-bind" ref="publication-year"/>
-                    <xforms:bind id="review-bind" ref="review"/>
-                    <xforms:bind id="image-bind" ref="image" type="xs:anyURI"/>
-                </xforms:bind>
-                <xforms:bind id="notes-bind" ref="notes">
-                    <xforms:bind id="note-bind" ref="note"/>
-                </xforms:bind>
-            </xforms:bind>
+            <xf:bind id="fr-form-binds" ref=".">
+                <xf:bind id="details-bind" ref="details">
+                    <xf:bind id="title-bind" ref="title" required="true()"/>
+                    <xf:bind id="author-bind" ref="author" required="true()"/>
+                    <xf:bind id="language-bind" ref="language"/>
+                    <xf:bind id="link-bind" ref="link"/>
+                    <xf:bind id="rating-bind" ref="rating"/>
+                    <xf:bind id="publication-year-bind" ref="publication-year"/>
+                    <xf:bind id="review-bind" ref="review"/>
+                    <xf:bind id="image-bind" ref="image" type="xs:anyURI"/>
+                </xf:bind>
+                <xf:bind id="notes-bind" ref="notes">
+                    <xf:bind id="note-bind" ref="note"/>
+                </xf:bind>
+            </xf:bind>
 
             <!-- Metadata -->
-            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
                 <metadata xmlns="">
                     <application-name>orbeon</application-name>
                     <form-name>bookcast</form-name>
@@ -168,20 +168,20 @@
                     <author>Orbeon, Inc.</author>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Attachments -->
-            <xforms:instance id="fr-form-attachments">
+            <xf:instance id="fr-form-attachments">
                 <attachments xmlns="">
                     <css mediatype="text/css" filename="" size=""/>
                     <!-- Fix this once we have proper template -->
                     <!--<pdf mediatype="application/pdf" filename="template.pdf" size="8638">/fr/service/resource/crud/orbeon/bookcast/form/template.pdf</pdf>-->
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- XForms instance containing all the resources -->
-            <xforms:instance id="fr-form-resources">
+            <xf:instance id="fr-form-resources">
                 <resources xmlns="">
                     <resource xml:lang="en">
                         <details>
@@ -412,97 +412,97 @@
                         </note>
                     </resource>
                 </resources>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="note-template">
+            <xf:instance id="note-template">
                 <note xmlns=""/>
-            </xforms:instance>
+            </xf:instance>
 
-        </xforms:model>
+        </xf:model>
     </head>
     <body>
         <fr:view>
             <fr:body>
                 <fr:section id="details-section" bind="details-bind">
-                    <xforms:label ref="$form-resources/details/label"/>
-                    <xforms:help ref="$form-resources/details/help"/>
+                    <xf:label ref="$form-resources/details/label"/>
+                    <xf:help ref="$form-resources/details/help"/>
                     <fr:grid columns="3">
                         <fr:tr>
                             <fr:td>
-                                <xforms:input id="title-control" bind="title-bind" class="fr-summary fr-search fr-email-subject">
-                                    <xforms:label ref="$form-resources/title/label"/>
-                                    <xforms:hint ref="$form-resources/title/hint"/>
-                                    <xforms:help ref="$form-resources/title/help"/>
-                                    <xforms:alert ref="$form-resources/title/alert"/>
-                                </xforms:input>
+                                <xf:input id="title-control" bind="title-bind" class="fr-summary fr-search fr-email-subject">
+                                    <xf:label ref="$form-resources/title/label"/>
+                                    <xf:hint ref="$form-resources/title/hint"/>
+                                    <xf:help ref="$form-resources/title/help"/>
+                                    <xf:alert ref="$form-resources/title/alert"/>
+                                </xf:input>
                             </fr:td>
                             <fr:td>
-                                <xforms:input id="author-control" bind="author-bind" class="fr-summary fr-search fr-email-subject">
-                                    <xforms:label ref="$form-resources/author/label"/>
-                                    <xforms:hint ref="$form-resources/author/hint"/>
-                                    <xforms:help ref="$form-resources/author/help"/>
-                                    <xforms:alert ref="$form-resources/author/alert"/>
-                                </xforms:input>
+                                <xf:input id="author-control" bind="author-bind" class="fr-summary fr-search fr-email-subject">
+                                    <xf:label ref="$form-resources/author/label"/>
+                                    <xf:hint ref="$form-resources/author/hint"/>
+                                    <xf:help ref="$form-resources/author/help"/>
+                                    <xf:alert ref="$form-resources/author/alert"/>
+                                </xf:input>
                             </fr:td>
                             <fr:td rowspan="3">
-                                <xforms:upload id="image-upload-control" bind="image-bind" class="fr-attachment">
-                                    <xforms:label ref="$form-resources/image/label"/>
-                                    <xforms:hint ref="$form-resources/image/hint"/>
-                                    <xforms:help ref="$form-resources/image/help"/>
-                                    <xforms:alert ref="$form-resources/image/alert"/>
-                                    <xforms:filename ref="@filename"/>
-                                    <xforms:mediatype ref="@mediatype"/>
-                                    <xxforms:size ref="@size"/>
-                                </xforms:upload>
-                                <xforms:output id="image-output-control" ref="image" mediatype="image/*" value="."/>
+                                <xf:upload id="image-upload-control" bind="image-bind" class="fr-attachment">
+                                    <xf:label ref="$form-resources/image/label"/>
+                                    <xf:hint ref="$form-resources/image/hint"/>
+                                    <xf:help ref="$form-resources/image/help"/>
+                                    <xf:alert ref="$form-resources/image/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </xf:upload>
+                                <xf:output id="image-output-control" ref="image" mediatype="image/*" value="."/>
                             </fr:td>
                         </fr:tr>
                         <fr:tr>
                             <fr:td>
-                                <xforms:select1 id="language-control" bind="language-bind" class="fr-summary fr-search fr-width-10em">
-                                    <xforms:label ref="$form-resources/language/label"/>
-                                    <xforms:hint ref="$form-resources/language/hint"/>
-                                    <xforms:help ref="$form-resources/language/help"/>
-                                    <xforms:alert ref="$form-resources/language/alert"/>
-                                    <xforms:item>
-                                        <xforms:label>Choose One...</xforms:label>
-                                        <xforms:value/>
-                                    </xforms:item>
-                                    <xforms:itemset ref="$form-resources/language/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
+                                <xf:select1 id="language-control" bind="language-bind" class="fr-summary fr-search fr-width-10em">
+                                    <xf:label ref="$form-resources/language/label"/>
+                                    <xf:hint ref="$form-resources/language/hint"/>
+                                    <xf:help ref="$form-resources/language/help"/>
+                                    <xf:alert ref="$form-resources/language/alert"/>
+                                    <xf:item>
+                                        <xf:label>Choose One...</xf:label>
+                                        <xf:value/>
+                                    </xf:item>
+                                    <xf:itemset ref="$form-resources/language/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
                             </fr:td>
                             <fr:td>
-                                <xforms:input id="link-control" bind="link-bind">
-                                    <xforms:label ref="$form-resources/link/label"/>
-                                    <xforms:hint ref="$form-resources/link/hint"/>
-                                    <xforms:help ref="$form-resources/link/help"/>
-                                    <xforms:alert ref="$form-resources/link/alert"/>
-                                </xforms:input>
+                                <xf:input id="link-control" bind="link-bind">
+                                    <xf:label ref="$form-resources/link/label"/>
+                                    <xf:hint ref="$form-resources/link/hint"/>
+                                    <xf:help ref="$form-resources/link/help"/>
+                                    <xf:alert ref="$form-resources/link/alert"/>
+                                </xf:input>
                             </fr:td>
                         </fr:tr>
                         <fr:tr>
                             <fr:td>
-                                <xforms:select1 id="rating-control" bind="rating-bind" appearance="minimal" class="fr-width-5em">
-                                    <xforms:label ref="$form-resources/rating/label"/>
-                                    <xforms:hint ref="$form-resources/rating/hint"/>
-                                    <xforms:help ref="$form-resources/rating/help"/>
-                                    <xforms:alert ref="$form-resources/rating/alert"/>
-                                    <xforms:itemset ref="$form-resources/rating/item">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select1>
+                                <xf:select1 id="rating-control" bind="rating-bind" appearance="minimal" class="fr-width-5em">
+                                    <xf:label ref="$form-resources/rating/label"/>
+                                    <xf:hint ref="$form-resources/rating/hint"/>
+                                    <xf:help ref="$form-resources/rating/help"/>
+                                    <xf:alert ref="$form-resources/rating/alert"/>
+                                    <xf:itemset ref="$form-resources/rating/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
                             </fr:td>
                             <fr:td>
-                                <xforms:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
-                                    <xforms:label ref="$form-resources/publication-year/label"/>
-                                    <xforms:hint ref="$form-resources/publication-year/hint"/>
-                                    <xforms:help ref="$form-resources/publication-year/help"/>
-                                    <xforms:alert ref="$form-resources/publication-year/alert"/>
-                                </xforms:input>
+                                <xf:input id="publication-year-control" bind="publication-year-bind" class="fr-width-5em">
+                                    <xf:label ref="$form-resources/publication-year/label"/>
+                                    <xf:hint ref="$form-resources/publication-year/hint"/>
+                                    <xf:help ref="$form-resources/publication-year/help"/>
+                                    <xf:alert ref="$form-resources/publication-year/alert"/>
+                                </xf:input>
                             </fr:td>
                         </fr:tr>
                     </fr:grid>
@@ -510,27 +510,27 @@
                         <fr:tr>
                             <fr:td>
                                 <fr:tinymce id="review-control" bind="review-bind">
-                                    <xforms:label ref="$form-resources/review/label"/>
-                                    <xforms:hint ref="$form-resources/review/hint"/>
-                                    <xforms:help ref="$form-resources/review/help"/>
-                                    <xforms:alert ref="$form-resources/review/alert"/>
+                                    <xf:label ref="$form-resources/review/label"/>
+                                    <xf:hint ref="$form-resources/review/hint"/>
+                                    <xf:help ref="$form-resources/review/help"/>
+                                    <xf:alert ref="$form-resources/review/alert"/>
                                 </fr:tinymce>
                             </fr:td>
                         </fr:tr>
                     </fr:grid>
                 </fr:section>
                 <fr:section id="notes-section" bind="notes-bind">
-                    <xforms:label ref="$form-resources/notes/label"/>
-                    <xforms:help ref="$form-resources/notes/help"/>
+                    <xf:label ref="$form-resources/notes/label"/>
+                    <xf:help ref="$form-resources/notes/help"/>
                     <fr:grid repeat="true" ref="note" id="book-repeat" origin="instance('note-template')">
                         <fr:tr>
                             <fr:td>
-                                <xforms:textarea id="note-control" ref="." appearance="xxforms:autosize">
-                                    <xforms:label ref="$form-resources/note/label"/>
-                                    <xforms:hint ref="$form-resources/note/hint"/>
-                                    <xforms:help ref="$form-resources/note/help"/>
-                                    <xforms:alert ref="$form-resources/note/alert"/>
-                                </xforms:textarea>
+                                <xf:textarea id="note-control" ref="." appearance="xxf:autosize">
+                                    <xf:label ref="$form-resources/note/label"/>
+                                    <xf:hint ref="$form-resources/note/hint"/>
+                                    <xf:help ref="$form-resources/note/help"/>
+                                    <xf:alert ref="$form-resources/note/alert"/>
+                                </xf:textarea>
                             </fr:td>
                         </fr:tr>
                     </fr:grid>

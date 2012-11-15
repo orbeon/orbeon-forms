@@ -11,52 +11,52 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>Alert users leaving a form without saving</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="registration">
+    <xh:head>
+        <xh:title>Alert users leaving a form without saving</xh:title>
+        <xf:model>
+            <xf:instance id="registration">
                 <registration>
                     <first-name>Homer</first-name>
                     <last-name>Simpson</last-name>
                 </registration>
-            </xforms:instance>
-            <xforms:instance id="data-safe">
+            </xf:instance>
+            <xf:instance id="data-safe">
                 <data-safe>true</data-safe>
-            </xforms:instance>
-            <xforms:action ev:observer="registration" ev:event="xforms-insert xforms-delete xxforms-value-changed">
-                <xforms:setvalue ref="instance('data-safe')">false</xforms:setvalue>
-            </xforms:action>
-            <xxforms:script ev:event="xforms-ready">
+            </xf:instance>
+            <xf:action ev:observer="registration" ev:event="xforms-insert xforms-delete xxforms-value-changed">
+                <xf:setvalue ref="instance('data-safe')">false</xf:setvalue>
+            </xf:action>
+            <xxf:script ev:event="xforms-ready">
                 window.onbeforeunload = function() {
                     if (ORBEON.xforms.Document.getValue('data-safe-input') != 'true')
                         return "You may lose some unsaved changes.";
                 }
-            </xxforms:script>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xxf:script>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-control { display: block }
             .xforms-input { margin-bottom: .5em }
             .xforms-label { display: inline-block; width: 6em; }
             .xbl-fr-button { padding-left: 6em; line-height: 3em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:output ref="instance('data-safe')" id="data-safe-input" style="display: none"/>
-        <xforms:input ref="first-name">
-            <xforms:label>First name</xforms:label>
-        </xforms:input>
-        <xforms:input ref="last-name">
-            <xforms:label>Last name</xforms:label>
-        </xforms:input>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:output ref="instance('data-safe')" id="data-safe-input" style="display: none"/>
+        <xf:input ref="first-name">
+            <xf:label>First name</xf:label>
+        </xf:input>
+        <xf:input ref="last-name">
+            <xf:label>Last name</xf:label>
+        </xf:input>
         <fr:button>
-            <xforms:label>Save</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="instance('data-safe')">true</xforms:setvalue>
+            <xf:label>Save</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="instance('data-safe')">true</xf:setvalue>
         </fr:button>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

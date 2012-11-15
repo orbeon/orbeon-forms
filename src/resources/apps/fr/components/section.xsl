@@ -14,18 +14,18 @@
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl">
 
     <!-- NOTE: This won't be needed once XBL components properties can be inherited at the form level -->
-    <xsl:template match="xhtml:body//fr:section[not(@editable = 'true')] | xbl:binding/xbl:template//fr:section[not(@editable = 'true')]">
+    <xsl:template match="xh:body//fr:section[not(@editable = 'true')] | xbl:binding/xbl:template//fr:section[not(@editable = 'true')]">
         <fr:section animate="{$is-animate-sections}" collapse="{$is-section-collapse}" mode="{$mode}">
             <xsl:apply-templates select="@* except (@animate, @collapse, @mode)"/>
             <xsl:apply-templates select="node()"/>

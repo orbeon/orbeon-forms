@@ -11,42 +11,42 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Load with Target Attribute</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Load with Target Attribute</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <yahoo>http://www.yahoo.com</yahoo>
                 </instance>
-            </xforms:instance>
-            <xforms:submission method="get" action="http://search.yahoo.com/" serialization="none" id="yahoo-submission"
-                    xxforms:target="iframe"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+            <xf:submission method="get" action="http://search.yahoo.com/" serialization="none" id="yahoo-submission"
+                    xxf:target="iframe"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         Go to Y! Search with:
-        <xforms:trigger>
-            <xforms:label>xforms:load</xforms:label>
-            <xforms:load xxforms:target="iframe" ev:event="DOMActivate" resource="http://search.yahoo.com/" show="replace"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>xf:load</xf:label>
+            <xf:load xxf:target="iframe" ev:event="DOMActivate" resource="http://search.yahoo.com/" show="replace"/>
+        </xf:trigger>
         <!--
         Not supported (yet):
 
-        <xforms:trigger>
-            <xforms:label>xforms:submission</xforms:label>
-            <xforms:send submission="yahoo-submission" ev:event="DOMActivate"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>xf:submission</xf:label>
+            <xf:send submission="yahoo-submission" ev:event="DOMActivate"/>
+        </xf:trigger>
         -->
-        <xhtml:div>
-            <xhtml:iframe name="iframe" src="http://www.google.com/xhtml" width="400" height="400"/>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        <xh:div>
+            <xh:iframe name="iframe" src="http://www.google.com/xhtml" width="400" height="400"/>
+        </xh:div>
+    </xh:body>
+</xh:html>

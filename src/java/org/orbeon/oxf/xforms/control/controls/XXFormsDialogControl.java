@@ -35,7 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represents an extension xxforms:dialog control.
+ * Represents an extension xxf:dialog control.
  */
 public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
 

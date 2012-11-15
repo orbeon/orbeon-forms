@@ -11,19 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XForms Controls</xhtml:title>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+    <xh:head>
+        <xh:title>XForms Controls</xh:title>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
                 (function() {
                     var Test = ORBEON.util.Test;
@@ -66,38 +66,38 @@
                     Test.onOrbeonLoadedRunTest();
                 })();
             ]]>
-        </xhtml:script>
-        <xforms:model id="model" xxforms:external-events="load-initial-data">
-            <xforms:instance id="main-instance">
+        </xh:script>
+        <xf:model id="model" xxf:external-events="load-initial-data">
+            <xf:instance id="main-instance">
                 <instance>0</instance>
-            </xforms:instance>
-            <xforms:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="none">
-                <xforms:setvalue ev:event="xforms-submit-done" value=". + 1"/>
-            </xforms:submission>
-            <xforms:submission id="slow-page" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="all"
-                    xxforms:show-progress="false"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="none">
+                <xf:setvalue ev:event="xforms-submit-done" value=". + 1"/>
+            </xf:submission>
+            <xf:submission id="slow-page" method="post" resource="/xforms-sandbox/service/sleep-5-seconds" replace="all"
+                    xxf:show-progress="false"/>
+        </xf:model>
+        <xh:style type="text/css">
             .actions { margin-bottom: 2em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:div class="actions">
-            <xforms:trigger id="run-long-submission">
-                <xforms:label>Run long submission</xforms:label>
-                <xforms:send ev:event="DOMActivate" submission="sleep"/>
-            </xforms:trigger>
-            <xforms:trigger id="go-to-slow-page">
-                <xforms:label>Go to slow page</xforms:label>
-                <xforms:send ev:event="DOMActivate" submission="slow-page"/>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:output ref="." id="counter">
-                <xforms:label>Counter: </xforms:label>
-            </xforms:output>
-        </xhtml:div>
+        <xh:div class="actions">
+            <xf:trigger id="run-long-submission">
+                <xf:label>Run long submission</xf:label>
+                <xf:send ev:event="DOMActivate" submission="sleep"/>
+            </xf:trigger>
+            <xf:trigger id="go-to-slow-page">
+                <xf:label>Go to slow page</xf:label>
+                <xf:send ev:event="DOMActivate" submission="slow-page"/>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
+            <xf:output ref="." id="counter">
+                <xf:label>Counter: </xf:label>
+            </xf:output>
+        </xh:div>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

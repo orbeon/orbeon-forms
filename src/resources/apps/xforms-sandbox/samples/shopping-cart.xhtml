@@ -11,19 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Checkout</xhtml:title>
-        <xforms:model id="main-model">
+    <xh:head>
+        <xh:title>Checkout</xh:title>
+        <xf:model id="main-model">
 
-            <xforms:instance id="checkout">
+            <xf:instance id="checkout">
                 <checkout>
                     <cart>
                         <item>
@@ -55,110 +55,110 @@
                         </shipping-address>
                     </addresses>
                 </checkout>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="/checkout/cart/item/line-total" calculate="../unit-count * ../unit-price"/>
-            <xforms:bind ref="/checkout/cart/cart-total" calculate="sum(../item/line-total)"/>
-            <xforms:bind ref="/checkout/addresses/billing-address/@use-same-for-shipping" type="xs:boolean"/>
-            <xforms:bind ref="/checkout/addresses/shipping-address" relevant="../billing-address/@use-same-for-shipping = 'false'"/>
+            <xf:bind ref="/checkout/cart/item/line-total" calculate="../unit-count * ../unit-price"/>
+            <xf:bind ref="/checkout/cart/cart-total" calculate="sum(../item/line-total)"/>
+            <xf:bind ref="/checkout/addresses/billing-address/@use-same-for-shipping" type="xs:boolean"/>
+            <xf:bind ref="/checkout/addresses/shipping-address" relevant="../billing-address/@use-same-for-shipping = 'false'"/>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             .description input { width: 30em; }
             .price input { width: 5em; }
             fieldset { margin: 2em 2em 0 0; float: left; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Description</xhtml:th>
-                <xhtml:th>Unit price</xhtml:th>
-                <xhtml:th>Unit count</xhtml:th>
-                <xhtml:th>Total</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="cart/item">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref="description" class="description"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="unit-price" class="price"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="unit-count" class="price"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="line-total"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-            <xhtml:tr>
-                <xhtml:td colspan="3"/>
-                <xhtml:td>
-                    <xforms:output ref="cart/cart-total"/>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Description</xh:th>
+                <xh:th>Unit price</xh:th>
+                <xh:th>Unit count</xh:th>
+                <xh:th>Total</xh:th>
+            </xh:tr>
+            <xf:repeat ref="cart/item">
+                <xh:tr>
+                    <xh:td>
+                        <xf:input ref="description" class="description"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="unit-price" class="price"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="unit-count" class="price"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="line-total"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+            <xh:tr>
+                <xh:td colspan="3"/>
+                <xh:td>
+                    <xf:output ref="cart/cart-total"/>
+                </xh:td>
+            </xh:tr>
+        </xh:table>
 
-        <xforms:group ref="addresses/billing-address">
-            <xhtml:fieldset>
-                <xhtml:legend>Billing address</xhtml:legend>
-                <xhtml:p>
-                    <xforms:input ref="street">
-                        <xforms:label class="fixed-width">Street</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="city">
-                        <xforms:label class="fixed-width">City</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="zip">
-                        <xforms:label class="fixed-width">ZIP</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="state">
-                        <xforms:label class="fixed-width">State</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="@use-same-for-shipping">
-                        <xforms:label class="fixed-width">Use same for shipping</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-            </xhtml:fieldset>
-        </xforms:group>
+        <xf:group ref="addresses/billing-address">
+            <xh:fieldset>
+                <xh:legend>Billing address</xh:legend>
+                <xh:p>
+                    <xf:input ref="street">
+                        <xf:label class="fixed-width">Street</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="city">
+                        <xf:label class="fixed-width">City</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="zip">
+                        <xf:label class="fixed-width">ZIP</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="state">
+                        <xf:label class="fixed-width">State</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="@use-same-for-shipping">
+                        <xf:label class="fixed-width">Use same for shipping</xf:label>
+                    </xf:input>
+                </xh:p>
+            </xh:fieldset>
+        </xf:group>
 
-        <xforms:group ref="addresses/shipping-address">
-            <xhtml:fieldset>
-                <xhtml:legend>Shipping address</xhtml:legend>
-                <xhtml:p>
-                    <xforms:input ref="street">
-                        <xforms:label class="fixed-width">Street</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="city">
-                        <xforms:label class="fixed-width">City</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="zip">
-                        <xforms:label class="fixed-width">ZIP</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="state">
-                        <xforms:label class="fixed-width">State</xforms:label>
-                    </xforms:input>
-                </xhtml:p>
-            </xhtml:fieldset>
-        </xforms:group>
+        <xf:group ref="addresses/shipping-address">
+            <xh:fieldset>
+                <xh:legend>Shipping address</xh:legend>
+                <xh:p>
+                    <xf:input ref="street">
+                        <xf:label class="fixed-width">Street</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="city">
+                        <xf:label class="fixed-width">City</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="zip">
+                        <xf:label class="fixed-width">ZIP</xf:label>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="state">
+                        <xf:label class="fixed-width">State</xf:label>
+                    </xf:input>
+                </xh:p>
+            </xh:fieldset>
+        </xf:group>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

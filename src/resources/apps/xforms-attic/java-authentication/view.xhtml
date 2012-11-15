@@ -12,59 +12,59 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude">
     <head>
         <title>Authentication</title>
-        <xforms:model>
-            <xforms:instance>
+        <xf:model>
+            <xf:instance>
                 <xi:include href="input:data"/>
-            </xforms:instance>
-            <xforms:submission id="logout-submission" action="logout" method="get" replace="all" serialization="none"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:submission id="logout-submission" action="logout" method="get" replace="all" serialization="none"/>
+        </xf:model>
     </head>
     <body>
         <xi:include href="example-description.xml"/>
-        <xforms:group ref=".[remote-user]">
+        <xf:group ref=".[remote-user]">
             <p>
                 You are authenticated. The application has access to the following information:
             </p>
             <table class="gridtable">
                 <tr>
                     <th>Authentication Type</th>
-                    <td><xforms:output value="auth-type"/></td>
+                    <td><xf:output value="auth-type"/></td>
                 </tr>
                 <tr>
                     <th>Secure Connection</th>
-                    <td><xforms:output value="secure"/></td>
+                    <td><xf:output value="secure"/></td>
                 </tr>
                 <tr>
                     <th>Remote User</th>
-                    <td><xforms:output value="remote-user"/></td>
+                    <td><xf:output value="remote-user"/></td>
                 </tr>
                 <tr>
                     <th>User Principal</th>
-                    <td><xforms:output value="user-principal"/></td>
+                    <td><xf:output value="user-principal"/></td>
                 </tr>
                 <tr>
                     <th>Roles</th>
-                    <td><xforms:output value="string-join(role, ', ')"/></td>
+                    <td><xf:output value="string-join(role, ', ')"/></td>
                 </tr>
             </table>
             <p>
                 Following
-                <xforms:submit submission="logout-submission" appearance="minimal">
-                    <xforms:label>this logout link</xforms:label>
-                </xforms:submit>
+                <xf:submit submission="logout-submission" appearance="minimal">
+                    <xf:label>this logout link</xf:label>
+                </xf:submit>
                 will log you out and take you back to the login page.
             </p>
-        </xforms:group>
-        <xforms:group ref=".[not(remote-user)]">
+        </xf:group>
+        <xf:group ref=".[not(remote-user)]">
             <p>
                 You are not logged in. This probably means that you have not yet configured the authentication in your
                 application server. Please read the <a href="http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing">documentation</a>
                 for more information.
             </p>
-        </xforms:group>
+        </xf:group>
     </body>
 </html>

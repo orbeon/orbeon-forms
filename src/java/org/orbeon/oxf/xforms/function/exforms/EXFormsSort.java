@@ -23,7 +23,7 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * exforms:sort() function
+ * exf:sort() function
  */
 public class EXFormsSort extends XXFormsSort {
 

@@ -11,25 +11,25 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Tree Widget</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Tree Widget</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance>
                     <data-set>encyclopedia-instance</data-set>
                     <select1>ar1</select1>
                     <select>"en1" cu1 cr1 sc2</select>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="encyclopedia-instance">
+            </xf:instance>
+            <xf:instance id="encyclopedia-instance">
                 <items>
                     <item label="&quot;Cool&quot; Encyclopedia " value="&quot;en1&quot;">
                         <item label="Science" value="sc1"/>
@@ -46,8 +46,8 @@
                         </item>
                     </item>
                 </items>
-            </xforms:instance>
-            <xforms:instance id="books-instance">
+            </xf:instance>
+            <xf:instance id="books-instance">
                 <items>
                     <item label="Lois McMaster Bujold" value="bujold">
                         <item label="Cordelia's Honor" value="bujold-1"/>
@@ -73,220 +73,220 @@
                         <item label="Shadows of Forgotten Ancestors" value="sagan-5"/>
                     </item>
                 </items>
-            </xforms:instance>
-            <xforms:instance id="template-instance">
+            </xf:instance>
+            <xf:instance id="template-instance">
                 <item label="New item" value="new-item"/>
-            </xforms:instance>
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:action iterate="instance('encyclopedia-instance')//item">
+            </xf:instance>
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:action iterate="instance('encyclopedia-instance')//item">
                     <!--  | instance('books-instance')//item -->
-                    <xforms:insert context="." origin="xxforms:attribute('color', if (starts-with(context()/@value, 's')) then 'red' else 'green')"/>
-                </xforms:action>
-            </xforms:action>
-        </xforms:model>
-        <xhtml:style type="text/css">
+                    <xf:insert context="." origin="xxf:attribute('color', if (starts-with(context()/@value, 's')) then 'red' else 'green')"/>
+                </xf:action>
+            </xf:action>
+        </xf:model>
+        <xh:style type="text/css">
             table td, table th { vertical-align: top }
             .xforms-label { font-weight: bold; padding-right: 1em }
             .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { padding: 0 0 2em 2em }
             .tree-table .xforms-label { display: block; }
             .tree-table .green { background-color: #dfd; }
             .tree-table .red { background-color: #fdd; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:select1 ref="data-set">
-            <xforms:label>Data Set:</xforms:label>
-            <xforms:item>
-                <xforms:label>Encyclopedia</xforms:label>
-                <xforms:value>encyclopedia-instance</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Books</xforms:label>
-                <xforms:value>books-instance</xforms:value>
-            </xforms:item>
-        </xforms:select1>
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Put in red starting with C</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:action iterate="instance('encyclopedia-instance')//item">
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:select1 ref="data-set">
+            <xf:label>Data Set:</xf:label>
+            <xf:item>
+                <xf:label>Encyclopedia</xf:label>
+                <xf:value>encyclopedia-instance</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>Books</xf:label>
+                <xf:value>books-instance</xf:value>
+            </xf:item>
+        </xf:select1>
+        <xh:p>
+            <xf:trigger appearance="minimal">
+                <xf:label>Put in red starting with C</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:action iterate="instance('encyclopedia-instance')//item">
                         <!--  | instance('books-instance')//item -->
-                        <xforms:insert context="." origin="xxforms:attribute('color', if (starts-with(context()/@value, 'c')) then 'red' else 'green')"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:table class="tree-table">
-            <xhtml:tr>
-                <xhtml:th/>
-                <xhtml:th>Incremental</xhtml:th>
-                <xhtml:th>Non-Incremental</xhtml:th>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:var name="current-item"
+                        <xf:insert context="." origin="xxf:attribute('color', if (starts-with(context()/@value, 'c')) then 'red' else 'green')"/>
+                    </xf:action>
+                </xf:action>
+            </xf:trigger>
+        </xh:p>
+        <xh:table class="tree-table">
+            <xh:tr>
+                <xh:th/>
+                <xh:th>Incremental</xh:th>
+                <xh:th>Non-Incremental</xh:th>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xf:var name="current-item"
                         select="instance(instance('main-instance')/data-set)//item[@value = instance('main-instance')/select1]"/>
-                    <xhtml:p>
-                        <xforms:output ref="select1">
-                            <xforms:label>Single selection:</xforms:label>
-                        </xforms:output>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Remove selected</xforms:label>
-                            <xforms:delete ev:event="DOMActivate" ref="$current-item"/>
-                        </xforms:trigger>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Add new item</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" ref="$current-item" origin="instance('template-instance')"/>
-                        </xforms:trigger>
-                    </xhtml:p>
-                </xhtml:td>
-                <xhtml:td>
-                    <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}" xxforms:open="{count(ancestor-or-self::item) = 1}">
-                            <xforms:label ref="@label"/>
-                            <xforms:value ref="@value"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:td>
-                <xhtml:td>
-                    <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">
-                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
-                            <xforms:label ref="@label"/>
-                            <xforms:value ref="@value"/>
-                        </xforms:itemset>
-                    </xforms:select1>
-                </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:var name="current-items"
+                    <xh:p>
+                        <xf:output ref="select1">
+                            <xf:label>Single selection:</xf:label>
+                        </xf:output>
+                    </xh:p>
+                    <xh:p>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>Remove selected</xf:label>
+                            <xf:delete ev:event="DOMActivate" ref="$current-item"/>
+                        </xf:trigger>
+                    </xh:p>
+                    <xh:p>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>Add new item</xf:label>
+                            <xf:insert ev:event="DOMActivate" ref="$current-item" origin="instance('template-instance')"/>
+                        </xf:trigger>
+                    </xh:p>
+                </xh:td>
+                <xh:td>
+                    <xf:select1 ref="select1" appearance="xxf:tree" id="tree1" incremental="true">
+                        <xf:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}" xxf:open="{count(ancestor-or-self::item) = 1}">
+                            <xf:label ref="@label"/>
+                            <xf:value ref="@value"/>
+                        </xf:itemset>
+                    </xf:select1>
+                </xh:td>
+                <xh:td>
+                    <xf:select1 ref="select1" appearance="xxf:tree" id="tree2" incremental="false">
+                        <xf:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                            <xf:label ref="@label"/>
+                            <xf:value ref="@value"/>
+                        </xf:itemset>
+                    </xf:select1>
+                </xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xf:var name="current-items"
                         select="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
-                    <xhtml:p>
-                        <xforms:output ref="select">
-                            <xforms:label>Multiple selection:</xforms:label>
-                        </xforms:output>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Remove selected</xforms:label>
-                            <xforms:delete ev:event="DOMActivate" ref="$current-items"/>
-                        </xforms:trigger>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Add new item</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" ref="$current-items[last()]" origin="instance('template-instance')"/>
-                        </xforms:trigger>
-                    </xhtml:p>
-                </xhtml:td>
-                <xhtml:td>
-                    <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
-                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
-                            <xforms:label ref="@label"/>
-                            <xforms:value ref="@value"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:td>
-                <xhtml:td>
-                    <xforms:select ref="select" appearance="xxforms:tree" id="tree4" incremental="false">
-                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
-                            <xforms:label ref="@label"/>
-                            <xforms:value ref="@value"/>
-                        </xforms:itemset>
-                    </xforms:select>
-                </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:output ref="select">
-                        <xforms:label>Multiple selection (no itemset):</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-                <xhtml:td>
-                    <xforms:select ref="select" appearance="xxforms:tree" id="tree5" incremental="true">
-                        <xforms:choices>
-                            <xforms:label>Encyclopedia</xforms:label>
-                            <xforms:item>
-                                <xforms:label>Science</xforms:label>
-                                <xforms:value>sc1</xforms:value>
-                            </xforms:item>
-                            <xforms:choices>
-                                <xforms:label>Culture</xforms:label>
-                                <xforms:item>
-                                    <xforms:label>Art</xforms:label>
-                                    <xforms:value>ar1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Craft</xforms:label>
-                                    <xforms:value>cr1</xforms:value>
-                                </xforms:item>
-                            </xforms:choices>
-                        </xforms:choices>
-                        <xforms:choices>
-                            <xforms:label>Encyclopedia</xforms:label>
-                            <xforms:item>
-                                <xforms:label>Science</xforms:label>
-                                <xforms:value>sc2</xforms:value>
-                            </xforms:item>
-                            <xforms:choices>
-                                <xforms:label>Culture</xforms:label>
-                                <xforms:item>
-                                    <xforms:label>Art</xforms:label>
-                                    <xforms:value>ar2</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Craft</xforms:label>
-                                    <xforms:value>cr2</xforms:value>
-                                </xforms:item>
-                            </xforms:choices>
-                        </xforms:choices>
-                    </xforms:select>
-                </xhtml:td>
-                <xhtml:td>
-                    <xforms:select ref="select" appearance="xxforms:tree" id="tree6" incremental="false">
-                        <xforms:choices>
-                            <xforms:label>Encyclopedia</xforms:label>
-                            <xforms:item>
-                                <xforms:label>Science</xforms:label>
-                                <xforms:value>sc1</xforms:value>
-                            </xforms:item>
-                            <xforms:choices>
-                                <xforms:label>Culture</xforms:label>
-                                <xforms:item>
-                                    <xforms:label>Art</xforms:label>
-                                    <xforms:value>ar1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Craft</xforms:label>
-                                    <xforms:value>cr1</xforms:value>
-                                </xforms:item>
-                            </xforms:choices>
-                        </xforms:choices>
-                        <xforms:choices>
-                            <xforms:label>Encyclopedia</xforms:label>
-                            <xforms:item>
-                                <xforms:label>Science</xforms:label>
-                                <xforms:value>sc2</xforms:value>
-                            </xforms:item>
-                            <xforms:choices>
-                                <xforms:label>Culture</xforms:label>
-                                <xforms:item>
-                                    <xforms:label>Art</xforms:label>
-                                    <xforms:value>ar2</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Craft</xforms:label>
-                                    <xforms:value>cr2</xforms:value>
-                                </xforms:item>
-                            </xforms:choices>
-                        </xforms:choices>
-                    </xforms:select>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+                    <xh:p>
+                        <xf:output ref="select">
+                            <xf:label>Multiple selection:</xf:label>
+                        </xf:output>
+                    </xh:p>
+                    <xh:p>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>Remove selected</xf:label>
+                            <xf:delete ev:event="DOMActivate" ref="$current-items"/>
+                        </xf:trigger>
+                    </xh:p>
+                    <xh:p>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>Add new item</xf:label>
+                            <xf:insert ev:event="DOMActivate" ref="$current-items[last()]" origin="instance('template-instance')"/>
+                        </xf:trigger>
+                    </xh:p>
+                </xh:td>
+                <xh:td>
+                    <xf:select ref="select" appearance="xxf:tree" id="tree3" incremental="true">
+                        <xf:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                            <xf:label ref="@label"/>
+                            <xf:value ref="@value"/>
+                        </xf:itemset>
+                    </xf:select>
+                </xh:td>
+                <xh:td>
+                    <xf:select ref="select" appearance="xxf:tree" id="tree4" incremental="false">
+                        <xf:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                            <xf:label ref="@label"/>
+                            <xf:value ref="@value"/>
+                        </xf:itemset>
+                    </xf:select>
+                </xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xf:output ref="select">
+                        <xf:label>Multiple selection (no itemset):</xf:label>
+                    </xf:output>
+                </xh:td>
+                <xh:td>
+                    <xf:select ref="select" appearance="xxf:tree" id="tree5" incremental="true">
+                        <xf:choices>
+                            <xf:label>Encyclopedia</xf:label>
+                            <xf:item>
+                                <xf:label>Science</xf:label>
+                                <xf:value>sc1</xf:value>
+                            </xf:item>
+                            <xf:choices>
+                                <xf:label>Culture</xf:label>
+                                <xf:item>
+                                    <xf:label>Art</xf:label>
+                                    <xf:value>ar1</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Craft</xf:label>
+                                    <xf:value>cr1</xf:value>
+                                </xf:item>
+                            </xf:choices>
+                        </xf:choices>
+                        <xf:choices>
+                            <xf:label>Encyclopedia</xf:label>
+                            <xf:item>
+                                <xf:label>Science</xf:label>
+                                <xf:value>sc2</xf:value>
+                            </xf:item>
+                            <xf:choices>
+                                <xf:label>Culture</xf:label>
+                                <xf:item>
+                                    <xf:label>Art</xf:label>
+                                    <xf:value>ar2</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Craft</xf:label>
+                                    <xf:value>cr2</xf:value>
+                                </xf:item>
+                            </xf:choices>
+                        </xf:choices>
+                    </xf:select>
+                </xh:td>
+                <xh:td>
+                    <xf:select ref="select" appearance="xxf:tree" id="tree6" incremental="false">
+                        <xf:choices>
+                            <xf:label>Encyclopedia</xf:label>
+                            <xf:item>
+                                <xf:label>Science</xf:label>
+                                <xf:value>sc1</xf:value>
+                            </xf:item>
+                            <xf:choices>
+                                <xf:label>Culture</xf:label>
+                                <xf:item>
+                                    <xf:label>Art</xf:label>
+                                    <xf:value>ar1</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Craft</xf:label>
+                                    <xf:value>cr1</xf:value>
+                                </xf:item>
+                            </xf:choices>
+                        </xf:choices>
+                        <xf:choices>
+                            <xf:label>Encyclopedia</xf:label>
+                            <xf:item>
+                                <xf:label>Science</xf:label>
+                                <xf:value>sc2</xf:value>
+                            </xf:item>
+                            <xf:choices>
+                                <xf:label>Culture</xf:label>
+                                <xf:item>
+                                    <xf:label>Art</xf:label>
+                                    <xf:value>ar2</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Craft</xf:label>
+                                    <xf:value>cr2</xf:value>
+                                </xf:item>
+                            </xf:choices>
+                        </xf:choices>
+                    </xf:select>
+                </xh:td>
+            </xh:tr>
+        </xh:table>
+    </xh:body>
+</xh:html>

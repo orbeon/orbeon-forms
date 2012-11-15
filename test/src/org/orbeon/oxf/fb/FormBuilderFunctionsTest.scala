@@ -59,7 +59,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         implicit val functionLibrary = XFormsContainingDocument.getFunctionLibrary
         evalOne(
             new DocumentWrapper(createDoc(url), null, XPathCache.getGlobalConfiguration),
-            """xxforms:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
+            """xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
                                 ('data', 'bindings'),
                                 (., .),
                                 'data')""").asInstanceOf[DocumentWrapper]
@@ -74,10 +74,10 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     @Test def modelInstanceBodyElements(): Unit = {
         val doc = getNewDoc()
 
-        assert(findModelElement(doc).getDisplayName === "xforms:model")
+        assert(findModelElement(doc).getDisplayName === "xf:model")
         assert(hasIdValue(findModelElement(doc), "fr-form-model"))
 
-        assert(name(formInstanceRoot(doc) parent * head) === "xforms:instance")
+        assert(name(formInstanceRoot(doc) parent * head) === "xf:instance")
 
         assert(qname(findFRBodyElement(doc)) === (XF → "group"))
     }
@@ -165,7 +165,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     private def insertControl(isCustomInstance: Boolean): Unit =
         withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
 
-            val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
+            val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
 
             // Insert a new control into the next empty td
             selectFirstTd(doc)
@@ -232,7 +232,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             }
 
             // Insert a new control
-            val binding = <binding element="xforms|input" xmlns:xforms="http://www.w3.org/2002/xforms"/>
+            val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
             val newControlNameOption = insertNewControl(doc, binding)
 
             assert(newControlNameOption === Some(if (isCustomInstance) "control-3" else "control-4"))
@@ -281,9 +281,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val doc = elemToDocumentInfo(
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:head>
-                    <xforms:model id="fr-form-model" xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <xforms:instance id="fr-form-instance"><form/></xforms:instance>
-                    </xforms:model>
+                    <xf:model id="fr-form-model" xmlns:xf="http://www.w3.org/2002/xforms">
+                        <xf:instance id="fr-form-instance"><form/></xf:instance>
+                    </xf:model>
                 </xh:head>
                 <xh:body>
                     <fr:body xmlns:fr="http://orbeon.org/oxf/xml/form-runner">

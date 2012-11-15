@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
- * Represents an xforms:group container control.
+ * Represents an xf:group container control.
  */
 public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
 
@@ -53,7 +53,7 @@ public class XFormsGroupControl extends XFormsSingleNodeContainerControl {
 
     @Override
     public boolean isStaticReadonly() {
-        // Static readonly-ness doesn't seem to make much sense for xforms:group, and we don't want to see the
+        // Static readonly-ness doesn't seem to make much sense for xf:group, and we don't want to see the
         // xforms-static class in the resulting HTML
         return false;
     }

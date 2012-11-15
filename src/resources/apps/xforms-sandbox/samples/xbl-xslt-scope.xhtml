@@ -11,8 +11,8 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:oxf="http://www.orbeon.com/oxf/processors"
@@ -20,10 +20,10 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XBL</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <items xmlns="">
                     <item label="One" value="1"/>
                     <item label="Eight" value="8"/>
@@ -34,8 +34,8 @@
                     <item label="Six" value="6"/>
                     <item label="Seven" value="7"/>
                 </items>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="foo-table-sort" element="foo|table-sort">
@@ -51,61 +51,61 @@
                             </xsl:copy>
                         </xsl:template>
                         <xsl:template match="/*">
-                            <xhtml:div xxbl:scope="inner">
-                                <xforms:model id="internal">
-                                    <xforms:instance id="sort">
+                            <xh:div xxbl:scope="inner">
+                                <xf:model id="internal">
+                                    <xf:instance id="sort">
                                         <sort>
                                             <order>ascending</order>
                                             <key>none</key>
                                         </sort>
-                                    </xforms:instance>
-                                </xforms:model>
-                                <xhtml:p>
-                                    <xforms:select1 ref="key" appearance="full">
-                                        <xforms:label>Sort key: </xforms:label>
-                                        <xforms:item>
-                                            <xforms:label>label</xforms:label>
-                                            <xforms:value>@label</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>value</xforms:label>
-                                            <xforms:value>@value</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>none</xforms:label>
-                                            <xforms:value>none</xforms:value>
-                                        </xforms:item>
-                                    </xforms:select1>
-                                </xhtml:p>
-                                <xhtml:p>
-                                    <xforms:select1 ref="order" appearance="full">
-                                        <xforms:label>Sort order: </xforms:label>
-                                        <xforms:item>
-                                            <xforms:label>ascending</xforms:label>
-                                            <xforms:value>ascending</xforms:value>
-                                        </xforms:item>
-                                        <xforms:item>
-                                            <xforms:label>descending</xforms:label>
-                                            <xforms:value>descending</xforms:value>
-                                        </xforms:item>
+                                    </xf:instance>
+                                </xf:model>
+                                <xh:p>
+                                    <xf:select1 ref="key" appearance="full">
+                                        <xf:label>Sort key: </xf:label>
+                                        <xf:item>
+                                            <xf:label>label</xf:label>
+                                            <xf:value>@label</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>value</xf:label>
+                                            <xf:value>@value</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>none</xf:label>
+                                            <xf:value>none</xf:value>
+                                        </xf:item>
+                                    </xf:select1>
+                                </xh:p>
+                                <xh:p>
+                                    <xf:select1 ref="order" appearance="full">
+                                        <xf:label>Sort order: </xf:label>
+                                        <xf:item>
+                                            <xf:label>ascending</xf:label>
+                                            <xf:value>ascending</xf:value>
+                                        </xf:item>
+                                        <xf:item>
+                                            <xf:label>descending</xf:label>
+                                            <xf:value>descending</xf:value>
+                                        </xf:item>
 
-                                    </xforms:select1>
-                                </xhtml:p>
-                                <xhtml:table xxbl:scope="outer">
+                                    </xf:select1>
+                                </xh:p>
+                                <xh:table xxbl:scope="outer">
                                     <xsl:apply-templates select="@*|node()"/>
-                                </xhtml:table>
-                            </xhtml:div>
+                                </xh:table>
+                            </xh:div>
                         </xsl:template>
-                        <xsl:template match="xforms:repeat">
-                            <xforms:var name="sortOrder" xxbl:scope="outer">
-                                <xxforms:sequence value="order" xxbl:scope="inner"/>
-                            </xforms:var>
-                            <xforms:var name="sortKey" xxbl:scope="outer">
-                                <xxforms:sequence value="key" xxbl:scope="inner"/>
-                            </xforms:var>
-                            <xforms:var name="ref" value="{@ref}" xxbl:scope="outer"/>
-                            <xforms:var name="rewrittenref" xxbl:scope="outer">
-                                <xxforms:sequence xxbl:scope="outer"
+                        <xsl:template match="xf:repeat">
+                            <xf:var name="sortOrder" xxbl:scope="outer">
+                                <xxf:sequence value="order" xxbl:scope="inner"/>
+                            </xf:var>
+                            <xf:var name="sortKey" xxbl:scope="outer">
+                                <xxf:sequence value="key" xxbl:scope="inner"/>
+                            </xf:var>
+                            <xf:var name="ref" value="{@ref}" xxbl:scope="outer"/>
+                            <xf:var name="rewrittenref" xxbl:scope="outer">
+                                <xxf:sequence xxbl:scope="outer"
                                     select="
                                 
                                 if ($sortKey = 'none') 
@@ -114,36 +114,36 @@
                                 
                                 "
                                 />
-                            </xforms:var>
-                            <xforms:repeat id="repeat" ref="$rewrittenref" xxbl:scope="outer">
+                            </xf:var>
+                            <xf:repeat id="repeat" ref="$rewrittenref" xxbl:scope="outer">
                                 <xsl:apply-templates select="node()"/>
-                            </xforms:repeat>
+                            </xf:repeat>
                         </xsl:template>
                     </xsl:transform>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:h2>Sort table</xhtml:h2>
+        <xh:h2>Sort table</xh:h2>
         <foo:table-sort class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Label</xhtml:th>
-                <xhtml:th>Value</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="item">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output value="@label"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="@value"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
+            <xh:tr>
+                <xh:th>Label</xh:th>
+                <xh:th>Value</xh:th>
+            </xh:tr>
+            <xf:repeat ref="item">
+                <xh:tr>
+                    <xh:td>
+                        <xf:output value="@label"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="@value"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
         </foo:table-sort>
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

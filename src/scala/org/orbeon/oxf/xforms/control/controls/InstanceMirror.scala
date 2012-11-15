@@ -54,11 +54,11 @@ object InstanceMirror {
 
         // In "into" mode, use ancestor-or-self because outerNode passed is the containing node (node into which other
         // nodes are inserted, node from which other nodes are removed, or node which text value changes), which in the
-        // case of a root element is the xforms:instance element. The exception is when you insert a node before or
-        // after an xforms:instance element, in which case the change is not in the instance.
+        // case of a root element is the xf:instance element. The exception is when you insert a node before or
+        // after an xf:instance element, in which case the change is not in the instance.
 
         val axis = if (! into) "ancestor" else if (outerNode.getNodeKind == ATTRIBUTE_NODE) "../ancestor" else "ancestor-or-self"
-        val findInstanceExpr = "(" + axis + "::xforms:instance)[1]"
+        val findInstanceExpr = "(" + axis + "::xf:instance)[1]"
 
         evalOne(outerNode, findInstanceExpr) match {
             case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
@@ -108,7 +108,7 @@ object InstanceMirror {
         val path = dropStartingSlash(Navigator.getPath(innerNode))
 
         // Find instance in original doc
-        evalOne(outerDoc, "//xforms:instance[@id = $sourceId]",
+        evalOne(outerDoc, "//xf:instance[@id = $sourceId]",
                 variables = Map("sourceId" → StringValue.makeStringValue(sourceId))) match {
             case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
                 // Find destination node in inline instance in original doc

@@ -11,16 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:ui="http://orbeon.org/oxf/xml/examples/ui">
-    <xhtml:head>
-        <xhtml:title>To-Do Lists</xhtml:title>
+    <xh:head>
+        <xh:title>To-Do Lists</xh:title>
         <!-- Styles used just for this example -->
-        <xhtml:style type="text/css">
+        <xh:style type="text/css">
             .actions-label           { white-space: nowrap; text-align: right; }
             .actions-list            { white-space: nowrap; }
             .actions-action          { padding-left: 1em;  }
@@ -34,10 +34,10 @@
             .todo-action-table input { vertical-align: middle }
             .todo-action-table .xforms-trigger { vertical-align: middle }
             .xforms-trigger-appearance-minimal img { margin-right: 0.5em; vertical-align: middle }
-        </xhtml:style>
-        <xforms:model>
+        </xh:style>
+        <xf:model>
             <!-- Data entered by the user -->
-            <xforms:instance id="instance">
+            <xf:instance id="instance">
                 <lists ui:mode="edit" ui:list-edit-trigger="" ui:list-delete-trigger="" ui:todo-edit-trigger="" ui:todo-delete-trigger="" ui:add-due-trigger="" ui:remove-due-trigger="" ui:mark-done-trigger="" ui:not-done-trigger="">
                     <list description="Buy groceries" ui:mode="view" ui:done="" ui:output="" ui:input="" ui:save-trigger="">
                         <todo description="Milk" due="" done="" ui:mode="view" ui:output="" ui:input="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
@@ -57,238 +57,238 @@
                         <todo description="New to do" due="" done="" ui:mode="edit" ui:output="" ui:input="" ui:save-trigger="" ui:mark-done-trigger="" ui:mark-not-done-trigger=""/>
                     </list>
                 </lists>
-            </xforms:instance>
+            </xf:instance>
             <!-- Rules that apply to the data entered by the user -->
-            <xforms:bind ref="list" relevant="count(following-sibling::list) > 0">
-                <xforms:bind ref="@description" readonly="count(../todo) > 1 and count(../todo[@done = '']) = 1"/>
-                <xforms:bind ref="todo" relevant="count(following-sibling::todo) > 0">
-                    <xforms:bind ref="@description" readonly="../@done = 'true'"/>
-                    <xforms:bind ref="@due" readonly="../@done = 'true'" relevant=". != ''" type="xs:date"/>
-                </xforms:bind>
-            </xforms:bind>
+            <xf:bind ref="list" relevant="count(following-sibling::list) > 0">
+                <xf:bind ref="@description" readonly="count(../todo) > 1 and count(../todo[@done = '']) = 1"/>
+                <xf:bind ref="todo" relevant="count(following-sibling::todo) > 0">
+                    <xf:bind ref="@description" readonly="../@done = 'true'"/>
+                    <xf:bind ref="@due" readonly="../@done = 'true'" relevant=". != ''" type="xs:date"/>
+                </xf:bind>
+            </xf:bind>
             <!-- Rules that apply to the UI -->
-            <xforms:bind ref="/lists">
-                <xforms:bind ref="list">
-                    <xforms:bind ref="@ui:done" calculate="if (count(../todo) > 1 and count(../todo[@done = '']) = 1) then 'true' else ''"/>
-                    <xforms:bind ref="@ui:output" relevant="../@ui:mode = 'view' or ../@ui:done = 'true'"/>
-                    <xforms:bind ref="@ui:input" relevant="../@ui:mode = 'edit' and ../@ui:done = ''"/>
-                    <xforms:bind ref="@ui:save-trigger" relevant="../@ui:mode = 'edit' and ../@ui:done = ''"/>
-                    <xforms:bind ref="todo">
-                        <xforms:bind ref="@ui:mark-done-trigger" relevant="../@done = ''"/>
-                        <xforms:bind ref="@ui:mark-not-done-trigger" relevant="../@done = 'true'"/>
-                        <xforms:bind ref="@ui:output" relevant="../@ui:mode = 'view' or ../@done = 'true'"/>
-                        <xforms:bind ref="@ui:input" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
-                        <xforms:bind ref="@ui:save-trigger" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
-                    </xforms:bind>
-                </xforms:bind>
-                <xforms:bind ref="@ui:list-edit-trigger" readonly="not(../list[index('list')]/@ui:mode = 'view' and ../list[index('list')]/@ui:done = '')"/>
-                <xforms:bind ref="@ui:list-delete-trigger" readonly="not(count(../list) > 1)"/>
-                <xforms:bind ref="@ui:todo-edit-trigger" readonly="not(../list[index('list')]/todo[index('todo')][@ui:mode = 'view' and @done = ''])"/>
-                <xforms:bind ref="@ui:todo-delete-trigger" readonly="not(count(../list[index('list')]/todo) > 1)"/>
-                <xforms:bind ref="@ui:add-due-trigger" readonly="not(../list[index('list')]/todo[index('todo')][@due = '' and @done = ''])"/>
-                <xforms:bind ref="@ui:remove-due-trigger" readonly="not(../list[index('list')]/todo[index('todo')][@due != '' and @done = ''])"/>
-                <xforms:bind ref="@ui:mark-done-trigger" readonly="not(../list[index('list')]/todo[index('todo')]/@done = '')"/>
-                <xforms:bind ref="@ui:not-done-trigger" readonly="not(../list[index('list')]/todo[index('todo')]/@done = 'true')"/>
-            </xforms:bind>
-            <xforms:bind ref="instance('triggers')">
-                <xforms:bind ref="remove-list" readonly="count(instance('lists')/list) = 1"/>
-                <xforms:bind ref="remove-list-item" readonly="count(instance('lists')/list[index('listSet')]/todo) = 1"/>
-            </xforms:bind>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xhtml:i>Note:</xhtml:i> To select a list or to do, click on the list or to do description.
-        </xhtml:p>
-        <xhtml:table class="todo-action-table">
+            <xf:bind ref="/lists">
+                <xf:bind ref="list">
+                    <xf:bind ref="@ui:done" calculate="if (count(../todo) > 1 and count(../todo[@done = '']) = 1) then 'true' else ''"/>
+                    <xf:bind ref="@ui:output" relevant="../@ui:mode = 'view' or ../@ui:done = 'true'"/>
+                    <xf:bind ref="@ui:input" relevant="../@ui:mode = 'edit' and ../@ui:done = ''"/>
+                    <xf:bind ref="@ui:save-trigger" relevant="../@ui:mode = 'edit' and ../@ui:done = ''"/>
+                    <xf:bind ref="todo">
+                        <xf:bind ref="@ui:mark-done-trigger" relevant="../@done = ''"/>
+                        <xf:bind ref="@ui:mark-not-done-trigger" relevant="../@done = 'true'"/>
+                        <xf:bind ref="@ui:output" relevant="../@ui:mode = 'view' or ../@done = 'true'"/>
+                        <xf:bind ref="@ui:input" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
+                        <xf:bind ref="@ui:save-trigger" relevant="../@ui:mode = 'edit' and ../@done = ''"/>
+                    </xf:bind>
+                </xf:bind>
+                <xf:bind ref="@ui:list-edit-trigger" readonly="not(../list[index('list')]/@ui:mode = 'view' and ../list[index('list')]/@ui:done = '')"/>
+                <xf:bind ref="@ui:list-delete-trigger" readonly="not(count(../list) > 1)"/>
+                <xf:bind ref="@ui:todo-edit-trigger" readonly="not(../list[index('list')]/todo[index('todo')][@ui:mode = 'view' and @done = ''])"/>
+                <xf:bind ref="@ui:todo-delete-trigger" readonly="not(count(../list[index('list')]/todo) > 1)"/>
+                <xf:bind ref="@ui:add-due-trigger" readonly="not(../list[index('list')]/todo[index('todo')][@due = '' and @done = ''])"/>
+                <xf:bind ref="@ui:remove-due-trigger" readonly="not(../list[index('list')]/todo[index('todo')][@due != '' and @done = ''])"/>
+                <xf:bind ref="@ui:mark-done-trigger" readonly="not(../list[index('list')]/todo[index('todo')]/@done = '')"/>
+                <xf:bind ref="@ui:not-done-trigger" readonly="not(../list[index('list')]/todo[index('todo')]/@done = 'true')"/>
+            </xf:bind>
+            <xf:bind ref="instance('triggers')">
+                <xf:bind ref="remove-list" readonly="count(instance('lists')/list) = 1"/>
+                <xf:bind ref="remove-list-item" readonly="count(instance('lists')/list[index('listSet')]/todo) = 1"/>
+            </xf:bind>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xh:i>Note:</xh:i> To select a list or to do, click on the list or to do description.
+        </xh:p>
+        <xh:table class="todo-action-table">
             <!-- Actions on list -->
-            <xhtml:tr>
-                <xhtml:th class="actions-label">Current to-do list:</xhtml:th>
-                <xhtml:td class="actions-list">
+            <xh:tr>
+                <xh:th class="actions-label">Current to-do list:</xh:th>
+                <xh:td class="actions-list">
                     <!-- Edit description -->
-                    <xforms:group ref="@ui:list-edit-trigger" class="actions-action" id="list-action-edit-group">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="/lists/list[index('list')]/@ui:mode" value="'edit'"/>
-                            <xforms:setfocus control="list-description-input"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal" id="list-action-edit-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/edit.gif"/> Edit</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                    <xf:group ref="@ui:list-edit-trigger" class="actions-action" id="list-action-edit-group">
+                        <xf:action ev:event="DOMActivate">
+                            <xf:setvalue ref="/lists/list[index('list')]/@ui:mode" value="'edit'"/>
+                            <xf:setfocus control="list-description-input"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal" id="list-action-edit-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/edit.gif"/> Edit</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Create new list -->
-                    <xforms:group class="actions-action" id="list-action-new-group">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert ref="/lists/list"
+                    <xf:group class="actions-action" id="list-action-new-group">
+                        <xf:action ev:event="DOMActivate">
+                            <xf:insert ref="/lists/list"
                                 at="min((last(), index('list') + 1))" position="before"/>
-                            <xforms:setfocus control="list-description-input"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal" id="list-action-new-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/add.gif"/> New</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                            <xf:setfocus control="list-description-input"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal" id="list-action-new-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/add.gif"/> New</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Delete current list -->
-                    <xforms:group ref="@ui:list-delete-trigger" class="actions-action" id="list-action-delete-group">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:delete ref="/lists/list" at="index('list')"/>
-                            <xforms:setindex repeat="list"
+                    <xf:group ref="@ui:list-delete-trigger" class="actions-action" id="list-action-delete-group">
+                        <xf:action ev:event="DOMActivate">
+                            <xf:delete ref="/lists/list" at="index('list')"/>
+                            <xf:setindex repeat="list"
                                 index="max((min((index('list'), count(/lists/list) - 1)), 1))"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal" id="list-action-delete-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/remove.gif"/> Delete</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
-                </xhtml:td>
-            </xhtml:tr>
+                        </xf:action>
+                        <xf:trigger appearance="minimal" id="list-action-delete-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/remove.gif"/> Delete</xf:label>
+                        </xf:trigger>
+                    </xf:group>
+                </xh:td>
+            </xh:tr>
             <!-- Actions on to do -->
-            <xhtml:tr>
-                <xhtml:th class="actions-label" rowspan="2">Current to do:</xhtml:th>
-                <xhtml:td class="actions-list">
+            <xh:tr>
+                <xh:th class="actions-label" rowspan="2">Current to do:</xh:th>
+                <xh:td class="actions-list">
                     <!-- Edit description -->
-                    <xforms:group ref="@ui:todo-edit-trigger" class="actions-action" id="todo-action-edit-group">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode" value="'edit'"/>
-                            <xforms:setfocus control="todo-description-input"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal" id="todo-action-edit-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/edit.gif"/> Edit</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                    <xf:group ref="@ui:todo-edit-trigger" class="actions-action" id="todo-action-edit-group">
+                        <xf:action ev:event="DOMActivate">
+                            <xf:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@ui:mode" value="'edit'"/>
+                            <xf:setfocus control="todo-description-input"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal" id="todo-action-edit-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/edit.gif"/> Edit</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Create new to do -->
-                    <xforms:group class="actions-action" id="todo-action-new-group">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert ref="/lists/list[index('list')]/todo"
+                    <xf:group class="actions-action" id="todo-action-new-group">
+                        <xf:action ev:event="DOMActivate">
+                            <xf:insert ref="/lists/list[index('list')]/todo"
                                 at="min((last(), index('todo') + 1))" position="before"/>
-                            <xforms:setfocus control="todo-description-input"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal" id="todo-action-new-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/add.gif"/> New</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                            <xf:setfocus control="todo-description-input"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal" id="todo-action-new-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/add.gif"/> New</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Delete current to do -->
-                    <xforms:group ref="@ui:todo-delete-trigger" class="actions-action" id="todo-action-delete-group">
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:delete ref="/lists/list[index('list')]/todo" at="index('todo')"/>
-                            <xforms:setindex repeat="todo"
+                    <xf:group ref="@ui:todo-delete-trigger" class="actions-action" id="todo-action-delete-group">
+                        <xf:action ev:event="DOMActivate">
+                            <xf:delete ref="/lists/list[index('list')]/todo" at="index('todo')"/>
+                            <xf:setindex repeat="todo"
                                 index="max((min((index('todo'), count(/lists/list[index('list')]/todo) - 1)), 1))"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal" id="todo-action-delete-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/remove.gif"/> Delete</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
-                </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
+                        </xf:action>
+                        <xf:trigger appearance="minimal" id="todo-action-delete-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/remove.gif"/> Delete</xf:label>
+                        </xf:trigger>
+                    </xf:group>
+                </xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
                     <!-- Add due date -->
-                    <xforms:group ref="@ui:add-due-trigger" class="actions-action" id="todo-action-add-group">
-                        <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"
+                    <xf:group ref="@ui:add-due-trigger" class="actions-action" id="todo-action-add-group">
+                        <xf:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"
                             value="current-date()"/>
-                        <xforms:trigger appearance="minimal" id="todo-action-add-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/date-add.gif"/> Add due date</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                        <xf:trigger appearance="minimal" id="todo-action-add-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/date-add.gif"/> Add due date</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Remove due date -->
-                    <xforms:group ref="@ui:remove-due-trigger" class="actions-action" id="todo-action-remove-group">
-                        <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"/>
-                        <xforms:trigger appearance="minimal" id="todo-action-remove-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/date-remove.gif"/> Remove due date</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                    <xf:group ref="@ui:remove-due-trigger" class="actions-action" id="todo-action-remove-group">
+                        <xf:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@due"/>
+                        <xf:trigger appearance="minimal" id="todo-action-remove-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/date-remove.gif"/> Remove due date</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Mark done -->
-                    <xforms:group ref="@ui:mark-done-trigger" class="actions-action" id="todo-action-done-group">
-                        <xforms:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@done" ev:event="DOMActivate">true</xforms:setvalue>
-                        <xforms:trigger appearance="minimal" id="todo-action-done-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/mark-done.gif"/> Done</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                    <xf:group ref="@ui:mark-done-trigger" class="actions-action" id="todo-action-done-group">
+                        <xf:setvalue ref="/lists/list[index('list')]/todo[index('todo')]/@done" ev:event="DOMActivate">true</xf:setvalue>
+                        <xf:trigger appearance="minimal" id="todo-action-done-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/mark-done.gif"/> Done</xf:label>
+                        </xf:trigger>
+                    </xf:group>
                     <!-- Not done -->
-                    <xforms:group ref="@ui:not-done-trigger" class="actions-action" id="todo-action-notdone-group">
-                        <xforms:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@done"/>
-                        <xforms:trigger appearance="minimal" id="todo-action-notdone-label" ref=".">
-                            <xforms:label><xhtml:img src="/apps/xforms-todo/images/mark-undo.gif"/> Not done</xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
+                    <xf:group ref="@ui:not-done-trigger" class="actions-action" id="todo-action-notdone-group">
+                        <xf:setvalue ev:event="DOMActivate" ref="/lists/list[index('list')]/todo[index('todo')]/@done"/>
+                        <xf:trigger appearance="minimal" id="todo-action-notdone-label" ref=".">
+                            <xf:label><xh:img src="/apps/xforms-todo/images/mark-undo.gif"/> Not done</xf:label>
+                        </xf:trigger>
+                    </xf:group>
+                </xh:td>
+            </xh:tr>
+        </xh:table>
 
         <!-- Iterate over lists -->
-        <xhtml:div class="lists-container">
-            <xforms:repeat ref="list" id="list">
-                <xhtml:div class="list-container">
-                    <xhtml:div>
+        <xh:div class="lists-container">
+            <xf:repeat ref="list" id="list">
+                <xh:div class="list-container">
+                    <xh:div>
                         <!-- Description value -->
-                        <xforms:group ref="@ui:output">
-                            <xforms:output ref="../@description"/>
-                        </xforms:group>
-                        <xforms:group>
+                        <xf:group ref="@ui:output">
+                            <xf:output ref="../@description"/>
+                        </xf:group>
+                        <xf:group>
                             <!-- Description edition field -->
-                            <xforms:group ref="@ui:input">
-                                <xforms:input id="list-description-input" ref="../@description" class="list-description-input">
-                                    <xforms:label/>
-                                </xforms:input>
-                            </xforms:group>
+                            <xf:group ref="@ui:input">
+                                <xf:input id="list-description-input" ref="../@description" class="list-description-input">
+                                    <xf:label/>
+                                </xf:input>
+                            </xf:group>
                             <!-- Trigger to save description -->
-                            <xforms:trigger appearance="minimal" ref="@ui:save-trigger">
-                                <xforms:label><xhtml:img src="/apps/xforms-todo/images/save.gif" alt="Save"/></xforms:label>
-                            </xforms:trigger>
+                            <xf:trigger appearance="minimal" ref="@ui:save-trigger">
+                                <xf:label><xh:img src="/apps/xforms-todo/images/save.gif" alt="Save"/></xf:label>
+                            </xf:trigger>
                             <!-- This catches both "enter" in the input and pressing the trigger -->
-                            <xforms:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
-                        </xforms:group>
+                            <xf:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
+                        </xf:group>
                         <!-- How many to do are left -->
-                        <xforms:output value="if (count(todo) = 1) then ''
+                        <xf:output value="if (count(todo) = 1) then ''
                             else if (count(todo[@done = '']) = 1) then '(Done)'
                             else concat('(', count(todo[@done = '']) - 1, ' left)')"/>
-                    </xhtml:div>
-                    <xhtml:div style="padding: 5px">
+                    </xh:div>
+                    <xh:div style="padding: 5px">
                         <!-- Iterate over to dos -->
-                        <xforms:repeat ref="todo" id="todo" xxforms:dnd="true">
-                            <xhtml:div class="todo-container">
+                        <xf:repeat ref="todo" id="todo" xxf:dnd="true">
+                            <xh:div class="todo-container">
                                 <!-- In progress icon -->
-                                <xforms:group ref="@ui:mark-done-trigger" class="todo-status">
-                                    <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then 'true' else ." ev:event="DOMActivate"/>
-                                    <xforms:trigger appearance="minimal" ref=".">
-                                        <xforms:label><xhtml:img src="/apps/xforms-todo/images/status-in-progress.gif" alt="In Progress"/></xforms:label>
-                                    </xforms:trigger>
-                                </xforms:group>
+                                <xf:group ref="@ui:mark-done-trigger" class="todo-status">
+                                    <xf:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then 'true' else ." ev:event="DOMActivate"/>
+                                    <xf:trigger appearance="minimal" ref=".">
+                                        <xf:label><xh:img src="/apps/xforms-todo/images/status-in-progress.gif" alt="In Progress"/></xf:label>
+                                    </xf:trigger>
+                                </xf:group>
                                 <!-- Done icon -->
-                                <xforms:group ref="@ui:mark-not-done-trigger" class="todo-status">
-                                    <xforms:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then '' else ." ev:event="DOMActivate"/>
-                                    <xforms:trigger appearance="minimal" ref=".">
-                                        <xforms:label><xhtml:img src="/apps/xforms-todo/images/status-done.gif" alt="Done"/></xforms:label>
-                                    </xforms:trigger>
-                                </xforms:group>
+                                <xf:group ref="@ui:mark-not-done-trigger" class="todo-status">
+                                    <xf:setvalue ref="../@done" value="if (/lists/@ui:mode = 'edit') then '' else ." ev:event="DOMActivate"/>
+                                    <xf:trigger appearance="minimal" ref=".">
+                                        <xf:label><xh:img src="/apps/xforms-todo/images/status-done.gif" alt="Done"/></xf:label>
+                                    </xf:trigger>
+                                </xf:group>
                                 <!-- Position of current to do -->
-                                <xforms:output value="if (@done = '') then
+                                <xf:output value="if (@done = '') then
                                     concat(count(preceding-sibling::todo[@done = '']) + 1, '.') else '-'"
                                     class="todo-position"/>
                                 <!-- Description value -->
-                                <xforms:group ref="@ui:output">
-                                    <xforms:output ref="../@description"/>
-                                </xforms:group>
-                                <xforms:group>
+                                <xf:group ref="@ui:output">
+                                    <xf:output ref="../@description"/>
+                                </xf:group>
+                                <xf:group>
                                     <!-- Description edition field -->
-                                    <xforms:group ref="@ui:input">
-                                        <xforms:input id="todo-description-input" ref="../@description">
-                                            <xforms:label/>
-                                        </xforms:input>
-                                    </xforms:group>
+                                    <xf:group ref="@ui:input">
+                                        <xf:input id="todo-description-input" ref="../@description">
+                                            <xf:label/>
+                                        </xf:input>
+                                    </xf:group>
                                     <!-- Trigger to save description -->
-                                    <xforms:trigger appearance="minimal" ref="@ui:save-trigger">
-                                        <xforms:label><xhtml:img src="/apps/xforms-todo/images/save.gif" alt="Save"/></xforms:label>
-                                    </xforms:trigger>
+                                    <xf:trigger appearance="minimal" ref="@ui:save-trigger">
+                                        <xf:label><xh:img src="/apps/xforms-todo/images/save.gif" alt="Save"/></xf:label>
+                                    </xf:trigger>
                                     <!-- This catches both "enter" in the input and pressing the trigger -->
-                                    <xforms:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
-                                </xforms:group>
-                                <xforms:group ref="@due">
+                                    <xf:setvalue ev:event="DOMActivate" ev:propagate="stop" ref="@ui:mode" value="'view'"/>
+                                </xf:group>
+                                <xf:group ref="@due">
                                     -- due on:
-                                    <xforms:input ref="."/>
-                                </xforms:group>
-                            </xhtml:div>
-                        </xforms:repeat>
-                    </xhtml:div>
-                </xhtml:div>
-            </xforms:repeat>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+                                    <xf:input ref="."/>
+                                </xf:group>
+                            </xh:div>
+                        </xf:repeat>
+                    </xh:div>
+                </xh:div>
+            </xf:repeat>
+        </xh:div>
+    </xh:body>
+</xh:html>

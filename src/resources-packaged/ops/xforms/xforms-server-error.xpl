@@ -14,7 +14,7 @@
 <p:pipeline xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:saxon="http://saxon.sf.net/"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Generate exception document -->
@@ -73,12 +73,12 @@
                     </xsl:copy>
                 </xsl:template>
                 <!-- NOTE: We should probably use oxf:qname-converter instead, but it has a bug that prevents this use case to work -->
-                <xsl:template match="xhtml:*">
+                <xsl:template match="xh:*">
                     <xsl:element name="{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>
                 </xsl:template>
-                <xsl:template match="@xhtml:*">
+                <xsl:template match="@xh:*">
                     <xsl:attribute name="{local-name()}" select="."/>
                 </xsl:template>
             </xsl:stylesheet>

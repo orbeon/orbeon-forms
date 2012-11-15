@@ -11,34 +11,34 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Checkbox selection update bug</xhtml:title>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Checkbox selection update bug</xh:title>
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <selection>1 2</selection>
                     <value>1</value>
                     <value>2</value>
                     <index>1</index>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
             YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -73,43 +73,43 @@
                 }
             });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:script>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             Steps to reproduce (doesn't seem browser-dependent):
-        </xhtml:p>
-        <xhtml:ol>
-            <xhtml:li>Change radio from 1 to 2</xhtml:li>
-            <xhtml:li>=> Checkbox should remain selected</xhtml:li>
-            <xhtml:li>Change radio back from 2 to 1</xhtml:li>
-            <xhtml:li>=> Checkbox should remain selected</xhtml:li>
-        </xhtml:ol>
+        </xh:p>
+        <xh:ol>
+            <xh:li>Change radio from 1 to 2</xh:li>
+            <xh:li>=> Checkbox should remain selected</xh:li>
+            <xh:li>Change radio back from 2 to 1</xh:li>
+            <xh:li>=> Checkbox should remain selected</xh:li>
+        </xh:ol>
 
-        <xforms:select id="checkbox" ref="selection" appearance="full" xxforms:encrypt-item-values="false">
-            <xforms:label>Selection: </xforms:label>
-            <xforms:item>
-                <xforms:label/>
-                <xforms:value ref="../value[xs:integer(../index)]"/>
-            </xforms:item>
-        </xforms:select>
+        <xf:select id="checkbox" ref="selection" appearance="full" xxf:encrypt-item-values="false">
+            <xf:label>Selection: </xf:label>
+            <xf:item>
+                <xf:label/>
+                <xf:value ref="../value[xs:integer(../index)]"/>
+            </xf:item>
+        </xf:select>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:select1 id="value-selection" ref="index" appearance="full">
-            <xforms:label>Switch value here: </xforms:label>
-            <xforms:item>
-                <xforms:label>1</xforms:label>
-                <xforms:value>1</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>2</xforms:label>
-                <xforms:value>2</xforms:value>
-            </xforms:item>
-        </xforms:select1>
+        <xf:select1 id="value-selection" ref="index" appearance="full">
+            <xf:label>Switch value here: </xf:label>
+            <xf:item>
+                <xf:label>1</xf:label>
+                <xf:value>1</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>2</xf:label>
+                <xf:value>2</xf:value>
+            </xf:item>
+        </xf:select1>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

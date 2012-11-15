@@ -41,7 +41,7 @@ import collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
 import scala.collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
 
-// Represents an xforms:repeat container control.
+// Represents an xf:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
         with NoLHHATrait
@@ -287,7 +287,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
      * NOTE: The new binding context must have been set on this control before calling.
      *
      * @param oldRepeatItems        old items
-     * @param insertedItems         items just inserted by xforms:insert if any, or null
+     * @param insertedItems         items just inserted by xf:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
     def updateIterations(oldRepeatItems: Seq[Item], insertedItems: Seq[Item], isInsertDelete: Boolean):
@@ -533,7 +533,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             val refreshInfo = this.refreshInfo
             this.refreshInfo = null
             if (refreshInfo.isNodesetChanged) {
-                // Dispatch custom event to xforms:repeat to notify that the nodeset has changed
+                // Dispatch custom event to xf:repeat to notify that the nodeset has changed
                 Dispatch.dispatchEvent(new XXFormsNodesetChangedEvent(this, refreshInfo.newIterations,
                     refreshInfo.movedIterationsOldPositions, refreshInfo.movedIterationsNewPositions))
             }

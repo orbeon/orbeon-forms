@@ -41,9 +41,9 @@
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
 
     <!-- Formats -->
-    <property as="xs:string"  name="oxf.xforms.format.output.date"                      value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', xxforms:lang(), (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.dateTime"                  value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', xxforms:lang(), (), ()) else ."/>
-    <property as="xs:string"  name="oxf.xforms.format.output.time"                      value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', xxforms:lang(), (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.output.date"                      value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y] [ZN]', xxf:lang(), (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.output.dateTime"                  value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', xxf:lang(), (), ()) else ."/>
+    <property as="xs:string"  name="oxf.xforms.format.output.time"                      value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] [ZN]', xxf:lang(), (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.decimal"                   value="if (. castable as xs:decimal) then format-number(xs:decimal(.),'###,###,###,##0.00') else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.integer"                   value="if (. castable as xs:integer) then format-number(xs:integer(.),'###,###,###,##0') else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.float"                     value="if (. castable as xs:float) then format-number(xs:float(.),'#,##0.000') else ."/>

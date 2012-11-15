@@ -23,7 +23,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.BooleanValue;
 
 /**
- * xxforms:is-user-in-role(xs:string) as xs:boolean
+ * xxf:is-user-in-role(xs:string) as xs:boolean
  *
  * Returns user name of current user, or empty sequence
  */

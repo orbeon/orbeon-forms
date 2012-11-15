@@ -11,41 +11,41 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     debug="false">
 
-    <xhtml:head>
-        <xhtml:title>Offline performance of forms with lots of fields</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
-            <xforms:instance id="ui">
+    <xh:head>
+        <xh:title>Offline performance of forms with lots of fields</xh:title>
+        <xf:model xxf:offline="true" id="main-model" xxf:external-events="go-offline">
+            <xf:instance id="ui">
                 <ui>
                     <fields/>
                     <offline>false</offline>
                 </ui>
-            </xforms:instance>
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:insert iterate="for $i in (1 to 300) return ." context="/ui/fields" origin="xxforms:element('field')"/>
-            </xforms:action>
-            <xforms:action ev:event="xxforms-offline">
-                <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
-            </xforms:action>
-            <xforms:action ev:event="xxforms-online">
-                <xforms:setvalue ref="instance('ui')/offline">false</xforms:setvalue>
-            </xforms:action>
-        </xforms:model>
-        <xhtml:link rel="stylesheet" href="/ops/yui/profilerviewer/assets/skins/sam/profilerviewer.css" type="text/css"/>
-        <xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuiloader/yuiloader-beta.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/element/element-beta.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/profiler/profiler-beta.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/profilerviewer/profilerviewer-beta.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:insert iterate="for $i in (1 to 300) return ." context="/ui/fields" origin="xxf:element('field')"/>
+            </xf:action>
+            <xf:action ev:event="xxforms-offline">
+                <xf:setvalue ref="instance('ui')/offline">true</xf:setvalue>
+            </xf:action>
+            <xf:action ev:event="xxforms-online">
+                <xf:setvalue ref="instance('ui')/offline">false</xf:setvalue>
+            </xf:action>
+        </xf:model>
+        <xh:link rel="stylesheet" href="/ops/yui/profilerviewer/assets/skins/sam/profilerviewer.css" type="text/css"/>
+        <xh:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuiloader/yuiloader-beta.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/element/element-beta.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/profiler/profiler-beta.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/profilerviewer/profilerviewer-beta.js"/>
+        <xh:script type="text/javascript">
             var start = new Date().getTime();
             YAHOO.util.Event.onDOMReady(function (){
                 YAHOO.util.Event.addListener("set-values-trigger", "click", function() {
@@ -67,36 +67,36 @@
                     }
                 });
             });
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body class="yui-skin-sam">
-        <xforms:repeat ref="fields/*">
-            <xhtml:p>
-                <xforms:input id="field" ref="."/>
-            </xhtml:p>
-        </xforms:repeat>
-        <xhtml:p>
+        </xh:script>
+    </xh:head>
+    <xh:body class="yui-skin-sam">
+        <xf:repeat ref="fields/*">
+            <xh:p>
+                <xf:input id="field" ref="."/>
+            </xh:p>
+        </xf:repeat>
+        <xh:p>
             <!-- Trigger when online -->
-            <xforms:trigger ref=".[offline = 'false']">
-                <xforms:label>Take offline</xforms:label>
-                <xxforms:offline ev:event="DOMActivate"/>
-            </xforms:trigger>
+            <xf:trigger ref=".[offline = 'false']">
+                <xf:label>Take offline</xf:label>
+                <xxf:offline ev:event="DOMActivate"/>
+            </xf:trigger>
             <!-- Tiggers when offline -->
-            <xforms:trigger ref=".[offline = 'true']" id="clear-values-trigger">
-                <xforms:label>Clear values</xforms:label>
-            </xforms:trigger>
-            <xforms:trigger ref=".[offline = 'true']" id="set-values-trigger">
-                <xforms:label>Set values</xforms:label>
-            </xforms:trigger>
-            <xforms:trigger ref=".[offline = 'true']">
-                <xforms:label>Save to Gears</xforms:label>
-                <xxforms:offline-save ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:trigger ref=".[offline = 'true']" id="take-online-trigger">
-                <xforms:label>Take online</xforms:label>
-                <xxforms:online ev:event="DOMActivate"/>
-            </xforms:trigger>
-        </xhtml:p>
+            <xf:trigger ref=".[offline = 'true']" id="clear-values-trigger">
+                <xf:label>Clear values</xf:label>
+            </xf:trigger>
+            <xf:trigger ref=".[offline = 'true']" id="set-values-trigger">
+                <xf:label>Set values</xf:label>
+            </xf:trigger>
+            <xf:trigger ref=".[offline = 'true']">
+                <xf:label>Save to Gears</xf:label>
+                <xxf:offline-save ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:trigger ref=".[offline = 'true']" id="take-online-trigger">
+                <xf:label>Take online</xf:label>
+                <xxf:online ev:event="DOMActivate"/>
+            </xf:trigger>
+        </xh:p>
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

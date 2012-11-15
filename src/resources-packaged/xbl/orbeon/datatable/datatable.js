@@ -751,7 +751,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
             return; // we've already done an update for this dynamic state!
         }
 
-        // This method is called when the xforms:repeat nodeset has been changed
+        // This method is called when the xf:repeat nodeset has been changed
         // this.totalNbRows is the number of rows memorized during the last run of this method...
         if (this.totalNbRows == undefined) {
             this.totalNbRows = -1;

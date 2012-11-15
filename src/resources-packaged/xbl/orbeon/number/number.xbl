@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -39,13 +39,13 @@
                 <large-icon>/apps/fr/style/images/silk/plugin.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:decimal"/>
+                <bind type="xf:decimal"/>
                 <view>
-                    <fr:number xmlns:xforms="http://www.w3.org/2002/xforms">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
+                    <fr:number xmlns:xf="http://www.w3.org/2002/xforms">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
                     </fr:number>
                 </view>
             </templates>
@@ -125,7 +125,7 @@
 
                             <!-- The visible HTML input -->
                             <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid-visited -->
-                            <xhtml:input
+                            <xh:input
                                 class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
                                 type="text"
                                 xbl:attr="tabindex tabindex=navindex"/>

@@ -11,38 +11,38 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Submission Replace All</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Submission Replace All</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <name/>
-            </xforms:instance>
-            <xforms:instance id="orbeon-embeddable">
+            </xf:instance>
+            <xf:instance id="orbeon-embeddable">
                 <orbeon-embeddable/>
-            </xforms:instance>
-            <xforms:submission id="say-hello" method="post" action="/xforms-sandbox/sample/submission-replace-all-2{
+            </xf:instance>
+            <xf:submission id="say-hello" method="post" action="/xforms-sandbox/sample/submission-replace-all-2{
                 if (instance('orbeon-embeddable') != '') then '?orbeon-embeddable=true' else ''}" replace="all"/>
-            <xforms:setvalue ref="instance('orbeon-embeddable')" value="xxforms:get-request-parameter('orbeon-embeddable')" ev:event="xforms-ready"/>
+            <xf:setvalue ref="instance('orbeon-embeddable')" value="xxf:get-request-parameter('orbeon-embeddable')" ev:event="xforms-ready"/>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:input ref="/name">
-                <xforms:label>What is your name? </xforms:label>
-            </xforms:input>
-            <xforms:trigger>
-                <xforms:label>Submit</xforms:label>
-                <xforms:send submission="say-hello" ev:event="DOMActivate"/>
-            </xforms:trigger>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:input ref="/name">
+                <xf:label>What is your name? </xf:label>
+            </xf:input>
+            <xf:trigger>
+                <xf:label>Submit</xf:label>
+                <xf:send submission="say-hello" ev:event="DOMActivate"/>
+            </xf:trigger>
+        </xh:p>
+    </xh:body>
+</xh:html>

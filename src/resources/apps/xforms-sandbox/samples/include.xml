@@ -11,10 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:div xmlns:xforms="http://www.w3.org/2002/xforms"
-              xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<xh:div xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:foo="http://orbeon.org/oxf/xml/foo">
-    <xforms:input ref="/foo:value">
-        <xforms:label>Value:</xforms:label>
-    </xforms:input>
-</xhtml:div>
+    <xf:input ref="/foo:value">
+        <xf:label>Value:</xf:label>
+    </xf:input>
+</xh:div>

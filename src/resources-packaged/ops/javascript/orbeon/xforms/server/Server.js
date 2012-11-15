@@ -35,7 +35,7 @@
                         var iteration = id.substring(separatorPosition + 1);
                         element = ORBEON.util.Utils.findRepeatDelimiter(repeatID, iteration);
                         if (element == null) {
-                            // If everything else has failed, the id might be an xforms:repeat id!
+                            // If everything else has failed, the id might be an xf:repeat id!
                             element = ORBEON.util.Dom.get("repeat-begin-" + id);
                         }
                     }

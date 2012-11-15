@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,20 +21,20 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - Autocomplete</xhtml:title>
-        <xforms:model id="main-model">
+    <xh:head>
+        <xh:title>XBL - Autocomplete</xh:title>
+        <xf:model id="main-model">
 
             <!-- Instance used to search countries -->
-            <xforms:instance id="search-dynamic">
+            <xf:instance id="search-dynamic">
                 <instance><country-name/></instance>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Instance with all the countries -->
-            <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
+            <xf:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
             <!-- Instance with subset of the countries to show in the auto-complete -->
-            <xforms:instance id="searched-countries"><empty/></xforms:instance>
-            <xforms:instance id="additional-countries">
+            <xf:instance id="searched-countries"><empty/></xf:instance>
+            <xf:instance id="additional-countries">
                 <additional-countries>
                     <country>
                         <name>United States</name>
@@ -45,232 +45,232 @@
                         <us-code>vq2</us-code>
                     </country>
                 </additional-countries>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Internal state for this test -->
-            <xforms:instance id="selected-countries">
+            <xf:instance id="selected-countries">
                 <selected-countries readonly="false" relevant="true">
                     <static effective-target-id="">ca</static>
                     <dynamic effective-target-id="" label="Canada">ca</dynamic>
                     <resource effective-target-id="" label="Canada">ca</resource>
                 </selected-countries>
-            </xforms:instance>
+            </xf:instance>
             <!-- Constraint on selected country -->
-            <xforms:bind ref="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'" relevant="../@relevant = 'true'"/>
+            <xf:bind ref="instance('selected-countries')/*" constraint="starts-with(., 's')" readonly="../@readonly = 'true'" relevant="../@relevant = 'true'"/>
 
-            <xforms:instance id="configuration">
+            <xf:instance id="configuration">
                 <configuration>
                     <max-results-displayed>4</max-results-displayed>
                 </configuration>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Submission getting list of updated countries -->
-            <xforms:submission ref="instance('search-dynamic')" id="update-countries" validate="false"
+            <xf:submission ref="instance('search-dynamic')" id="update-countries" validate="false"
                 method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="searched-countries"/>
 
             <!-- Add other countries for testing to list of all countries -->
-            <xforms:insert ev:event="xforms-model-construct-done"
+            <xf:insert ev:event="xforms-model-construct-done"
                 ref="instance('all-countries')/country" origin="instance('additional-countries')/*"/>
 
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/autocomplete/autocomplete-unittest.js"/>
+        <xh:style type="text/css">
             fieldset { margin-top: 2em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:trigger appearance="minimal" id="toggle-readonly">
-            <xforms:label>Toggle readonly</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
-        </xforms:trigger> |
-        <xforms:trigger appearance="minimal" id="toggle-relevant">
-            <xforms:label>Toggle relevant</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
-        </xforms:trigger>
+        <xf:trigger appearance="minimal" id="toggle-readonly">
+            <xf:label>Toggle readonly</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
+        </xf:trigger> |
+        <xf:trigger appearance="minimal" id="toggle-relevant">
+            <xf:label>Toggle relevant</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
+        </xf:trigger>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Static itemset</xhtml:legend>
-            <xhtml:div>
-                <xforms:output value="instance('selected-countries')/static" id="static-output-value">
-                    <xforms:label>Code: </xforms:label>
-                </xforms:output>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:trigger appearance="minimal" id="static-set-to-canada">
-                    <xforms:label>Set label to Canada</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="static-autocomplete" name="fr-set-label">
-                        <xforms:property name="label" value="'Canada'"/>
-                    </xforms:dispatch>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="static-set-to-utopia">
-                    <xforms:label>Set label to Utopia</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="static-autocomplete" name="fr-set-label">
-                        <xforms:property name="label" value="'Utopia'"/>
-                    </xforms:dispatch>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="static-reset">
-                    <xforms:label>Reset</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/static"/>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="static-set-to-sz">
-                    <xforms:label>Set value to sz</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/static">sz</xforms:setvalue>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="static-setfocus-outer">
-                    <xforms:label>Set focus outer</xforms:label>
-                    <xforms:setfocus ev:event="DOMActivate" control="static-autocomplete"/>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="static-setfocus-inner">
-                    <xforms:label>Set focus inner</xforms:label>
-                    <xforms:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/static/@effective-target-id}"/>
-                </xforms:trigger>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:group ref="instance('selected-countries')/static">
-                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxforms:target-prefixes'), event('xxforms:targetid')), '$')"/>
+        <xh:fieldset>
+            <xh:legend>Static itemset</xh:legend>
+            <xh:div>
+                <xf:output value="instance('selected-countries')/static" id="static-output-value">
+                    <xf:label>Code: </xf:label>
+                </xf:output>
+            </xh:div>
+            <xh:div>
+                <xf:trigger appearance="minimal" id="static-set-to-canada">
+                    <xf:label>Set label to Canada</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="static-autocomplete" name="fr-set-label">
+                        <xf:property name="label" value="'Canada'"/>
+                    </xf:dispatch>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="static-set-to-utopia">
+                    <xf:label>Set label to Utopia</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="static-autocomplete" name="fr-set-label">
+                        <xf:property name="label" value="'Utopia'"/>
+                    </xf:dispatch>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="static-reset">
+                    <xf:label>Reset</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/static"/>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="static-set-to-sz">
+                    <xf:label>Set value to sz</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/static">sz</xf:setvalue>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="static-setfocus-outer">
+                    <xf:label>Set focus outer</xf:label>
+                    <xf:setfocus ev:event="DOMActivate" control="static-autocomplete"/>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="static-setfocus-inner">
+                    <xf:label>Set focus inner</xf:label>
+                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/static/@effective-target-id}"/>
+                </xf:trigger>
+            </xh:div>
+            <xh:div>
+                <xf:group ref="instance('selected-countries')/static">
+                    <xf:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')"/>
                     <fr:autocomplete ref="." id="static-autocomplete"
                                      dynamic-itemset="false" max-results-displayed="4" tabindex="1">
-                        <xforms:label>Country code: </xforms:label>
-                        <xforms:itemset ref="instance('all-countries')/country">
-                            <xforms:label ref="name"/>
-                            <xforms:value ref="us-code"/>
-                        </xforms:itemset>
-                        <xforms:alert>Value is mandatory</xforms:alert>
+                        <xf:label>Country code: </xf:label>
+                        <xf:itemset ref="instance('all-countries')/country">
+                            <xf:label ref="name"/>
+                            <xf:value ref="us-code"/>
+                        </xf:itemset>
+                        <xf:alert>Value is mandatory</xf:alert>
                     </fr:autocomplete>
-                </xforms:group>
-            </xhtml:div>
-        </xhtml:fieldset>
+                </xf:group>
+            </xh:div>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Dynamic itemset, custom</xhtml:legend>
-            <xhtml:div>
-                <xforms:output value="instance('selected-countries')/dynamic" id="dynamic-output-value">
-                    <xforms:label>Code: </xforms:label>
-                </xforms:output>
-                <xforms:output value="instance('selected-countries')/dynamic/@label" id="dynamic-output-label">
-                    <xforms:label>Label: </xforms:label>
-                </xforms:output>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:trigger appearance="minimal" id="dynamic-set-to-canada">
-                    <xforms:label>Set label to Canada</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="dynamic-autocomplete" name="fr-set-label">
-                        <xforms:property name="label" value="'Canada'"/>
-                    </xforms:dispatch>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="dynamic-set-to-utopia">
-                    <xforms:label>Set label to Utopia</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="dynamic-autocomplete" name="fr-set-label">
-                        <xforms:property name="label" value="'Utopia'"/>
-                    </xforms:dispatch>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="dynamic-reset">
-                    <xforms:label>Reset</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/dynamic"/>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="dynamic-setfocus-outer">
-                    <xforms:label>Set focus outer</xforms:label>
-                    <xforms:setfocus ev:event="DOMActivate" control="dynamic-autocomplete"/>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="dynamic-setfocus-inner">
-                    <xforms:label>Set focus inner</xforms:label>
-                    <xforms:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/dynamic/@effective-target-id}"/>
-                </xforms:trigger>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:group ref="instance('selected-countries')/dynamic">
-                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxforms:target-prefixes'), event('xxforms:targetid')), '$')"/>
+        <xh:fieldset>
+            <xh:legend>Dynamic itemset, custom</xh:legend>
+            <xh:div>
+                <xf:output value="instance('selected-countries')/dynamic" id="dynamic-output-value">
+                    <xf:label>Code: </xf:label>
+                </xf:output>
+                <xf:output value="instance('selected-countries')/dynamic/@label" id="dynamic-output-label">
+                    <xf:label>Label: </xf:label>
+                </xf:output>
+            </xh:div>
+            <xh:div>
+                <xf:trigger appearance="minimal" id="dynamic-set-to-canada">
+                    <xf:label>Set label to Canada</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="dynamic-autocomplete" name="fr-set-label">
+                        <xf:property name="label" value="'Canada'"/>
+                    </xf:dispatch>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="dynamic-set-to-utopia">
+                    <xf:label>Set label to Utopia</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="dynamic-autocomplete" name="fr-set-label">
+                        <xf:property name="label" value="'Utopia'"/>
+                    </xf:dispatch>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="dynamic-reset">
+                    <xf:label>Reset</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/dynamic"/>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="dynamic-setfocus-outer">
+                    <xf:label>Set focus outer</xf:label>
+                    <xf:setfocus ev:event="DOMActivate" control="dynamic-autocomplete"/>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="dynamic-setfocus-inner">
+                    <xf:label>Set focus inner</xf:label>
+                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/dynamic/@effective-target-id}"/>
+                </xf:trigger>
+            </xh:div>
+            <xh:div>
+                <xf:group ref="instance('selected-countries')/dynamic">
+                    <xf:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')"/>
                     <fr:autocomplete ref="." id="dynamic-autocomplete" labelref="@label"
                                      dynamic-itemset="true">
                         <!-- React to user searching -->
-                        <xforms:action ev:event="fr-search-changed">
-                            <xforms:var name="search-value" value="event('fr-search-value')"/>
-                            <xforms:var name="make-suggestion" value="for $l in string-length($search-value) return $l >= 2 or $l = 0"/>
-                            <xforms:action if="$make-suggestion">
+                        <xf:action ev:event="fr-search-changed">
+                            <xf:var name="search-value" value="event('fr-search-value')"/>
+                            <xf:var name="make-suggestion" value="for $l in string-length($search-value) return $l >= 2 or $l = 0"/>
+                            <xf:action if="$make-suggestion">
                                 <!-- Update itemset -->
-                                <xforms:var name="make-suggestion" value="string-length() >= 2"/>
-                                <xforms:setvalue ref="instance('search-dynamic')/country-name" value="$search-value"/>
-                                <xforms:send submission="update-countries"/>
-                                <xforms:insert context="instance('searched-countries')" ref="country"
+                                <xf:var name="make-suggestion" value="string-length() >= 2"/>
+                                <xf:setvalue ref="instance('search-dynamic')/country-name" value="$search-value"/>
+                                <xf:send submission="update-countries"/>
+                                <xf:insert context="instance('searched-countries')" ref="country"
                                     origin="instance('additional-countries')/country[starts-with(name, $search-value)]"
                                     at="last()" position="after"/>
-                            </xforms:action>
-                            <xforms:action if="not($make-suggestion)">
+                            </xf:action>
+                            <xf:action if="not($make-suggestion)">
                                 <!-- Delete itemset -->
-                                <xforms:delete ref="instance('searched-countries')/country"/>
-                            </xforms:action>
-                        </xforms:action>
+                                <xf:delete ref="instance('searched-countries')/country"/>
+                            </xf:action>
+                        </xf:action>
 
-                        <xforms:label>Country code: </xforms:label>
-                        <xforms:itemset ref="instance('searched-countries')/country">
-                            <xforms:label ref="name"/>
-                            <xforms:value ref="us-code"/>
-                        </xforms:itemset>
-                        <xforms:alert>Value is mandatory</xforms:alert>
+                        <xf:label>Country code: </xf:label>
+                        <xf:itemset ref="instance('searched-countries')/country">
+                            <xf:label ref="name"/>
+                            <xf:value ref="us-code"/>
+                        </xf:itemset>
+                        <xf:alert>Value is mandatory</xf:alert>
                         <fr:max-results-displayed ref="instance('configuration')/max-results-displayed"/>
                     </fr:autocomplete>
-                </xforms:group>
-            </xhtml:div>
-        </xhtml:fieldset>
+                </xf:group>
+            </xh:div>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Using resource</xhtml:legend>
-            <xhtml:div>
-                <xforms:output value="instance('selected-countries')/resource" id="resource-output-value">
-                    <xforms:label>Code: </xforms:label>
-                </xforms:output>
-                <xforms:output value="instance('selected-countries')/resource/@label" id="resource-output-label">
-                    <xforms:label>Label: </xforms:label>
-                </xforms:output>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:trigger appearance="minimal" id="resource-set-to-canada">
-                    <xforms:label>Set label to Canada</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="resource-autocomplete" name="fr-set-label">
-                        <xforms:property name="label" value="'Canada'"/>
-                    </xforms:dispatch>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="resource-set-to-utopia">
-                    <xforms:label>Set label to Utopia</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="resource-autocomplete" name="fr-set-label">
-                        <xforms:property name="label" value="'Utopia'"/>
-                    </xforms:dispatch>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="resource-reset">
-                    <xforms:label>Reset</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/resource"/>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="resource-setfocus-outer">
-                    <xforms:label>Set focus outer</xforms:label>
-                    <xforms:setfocus ev:event="DOMActivate" control="resource-autocomplete"/>
-                </xforms:trigger> |
-                <xforms:trigger appearance="minimal" id="resource-setfocus-inner">
-                    <xforms:label>Set focus inner</xforms:label>
-                    <xforms:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/resource/@effective-target-id}"/>
-                </xforms:trigger>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:group ref="instance('selected-countries')/resource">
-                    <xforms:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxforms:target-prefixes'), event('xxforms:targetid')), '$')"/>
+        <xh:fieldset>
+            <xh:legend>Using resource</xh:legend>
+            <xh:div>
+                <xf:output value="instance('selected-countries')/resource" id="resource-output-value">
+                    <xf:label>Code: </xf:label>
+                </xf:output>
+                <xf:output value="instance('selected-countries')/resource/@label" id="resource-output-label">
+                    <xf:label>Label: </xf:label>
+                </xf:output>
+            </xh:div>
+            <xh:div>
+                <xf:trigger appearance="minimal" id="resource-set-to-canada">
+                    <xf:label>Set label to Canada</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="resource-autocomplete" name="fr-set-label">
+                        <xf:property name="label" value="'Canada'"/>
+                    </xf:dispatch>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="resource-set-to-utopia">
+                    <xf:label>Set label to Utopia</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="resource-autocomplete" name="fr-set-label">
+                        <xf:property name="label" value="'Utopia'"/>
+                    </xf:dispatch>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="resource-reset">
+                    <xf:label>Reset</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref="instance('selected-countries')/resource"/>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="resource-setfocus-outer">
+                    <xf:label>Set focus outer</xf:label>
+                    <xf:setfocus ev:event="DOMActivate" control="resource-autocomplete"/>
+                </xf:trigger> |
+                <xf:trigger appearance="minimal" id="resource-setfocus-inner">
+                    <xf:label>Set focus inner</xf:label>
+                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/resource/@effective-target-id}"/>
+                </xf:trigger>
+            </xh:div>
+            <xh:div>
+                <xf:group ref="instance('selected-countries')/resource">
+                    <xf:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')"/>
                     <fr:autocomplete ref="." labelref="@label" id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
-                        <xforms:label>Country code: </xforms:label>
-                        <xforms:itemset ref="/countries/country">
-                            <xforms:label ref="name"/>
-                            <xforms:value ref="us-code"/>
-                        </xforms:itemset>
-                        <xforms:alert>Value is mandatory</xforms:alert>
+                        <xf:label>Country code: </xf:label>
+                        <xf:itemset ref="/countries/country">
+                            <xf:label ref="name"/>
+                            <xf:value ref="us-code"/>
+                        </xf:itemset>
+                        <xf:alert>Value is mandatory</xf:alert>
                     </fr:autocomplete>
-                </xforms:group>
-            </xhtml:div>
-        </xhtml:fieldset>
+                </xf:group>
+            </xh:div>
+        </xh:fieldset>
 
         <!-- Invisible input we use to trigger focus out events -->
-        <xforms:input id="focus-input" style="height: 1px; width: 1px; overflow: hidden; display: block" ref="xxforms:element('dummy')"/>
+        <xf:input id="focus-input" style="height: 1px; width: 1px; overflow: hidden; display: block" ref="xxf:element('dummy')"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

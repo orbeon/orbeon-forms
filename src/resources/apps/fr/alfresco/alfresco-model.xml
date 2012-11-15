@@ -19,10 +19,10 @@
 <!--
     This XForms model implements the interface to Alfresco through the Web Services API.
 -->
-<xforms:model id="fr-alfresco-model"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+<xf:model id="fr-alfresco-model"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
@@ -37,87 +37,87 @@
         xmlns:utility="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
 
     <!-- Global parameters -->
-    <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
-    <xforms:var name="app" value="$parameters/app" as="xs:string"/>
-    <xforms:var name="form" value="$parameters/form" as="xs:string"/>
+    <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
+    <xf:var name="app" value="$parameters/app" as="xs:string"/>
+    <xf:var name="form" value="$parameters/form" as="xs:string"/>
 
     <!-- Connection parameters depending on app/form -->
-    <xforms:var name="alfresco-uri" value="xxforms:property(string-join(('oxf.fr.alfresco.uri', $app, $form), '.'))" as="xs:anyURI"/>
-    <xforms:var name="alfresco-username" value="xxforms:property(string-join(('oxf.fr.alfresco.username', $app, $form), '.'))" as="xs:string"/>
-    <xforms:var name="alfresco-credentials" value="xxforms:property(string-join(('oxf.fr.alfresco.credentials', $app, $form), '.'))" as="xs:string"/>
-    <!-- NOTE: Users have reported issues with encoding with ISO 9075-14:2003 (xxforms:encode-iso9075-14($p)), so we
+    <xf:var name="alfresco-uri" value="xxf:property(string-join(('oxf.fr.alfresco.uri', $app, $form), '.'))" as="xs:anyURI"/>
+    <xf:var name="alfresco-username" value="xxf:property(string-join(('oxf.fr.alfresco.username', $app, $form), '.'))" as="xs:string"/>
+    <xf:var name="alfresco-credentials" value="xxf:property(string-join(('oxf.fr.alfresco.credentials', $app, $form), '.'))" as="xs:string"/>
+    <!-- NOTE: Users have reported issues with encoding with ISO 9075-14:2003 (xxf:encode-iso9075-14($p)), so we
          don't encode anymore. It is not clear why this was done anyway. Success has been reported 2011-11 with Alfresco
          4.0.a. -->
-    <xforms:var name="alfresco-path"
-          select="string-join(for $p in tokenize(xxforms:property(string-join(('oxf.fr.alfresco.path', $app, $form), '.')), '/')
+    <xf:var name="alfresco-path"
+          value="string-join(for $p in tokenize(xxf:property(string-join(('oxf.fr.alfresco.path', $app, $form), '.')), '/')
                     return $p, '/')" as="xs:string"/>
 
     <!-- ===== Public interface ==================================================================================== -->
 
-    <xforms:action ev:event="alfresco-send-document">
+    <xf:action ev:event="alfresco-send-document">
         <!-- Set properties provided by the user -->
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[1]/alf-cml:value" value="event('fr:name')"/>
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[2]/alf-cml:value" value="event('fr:title')"/>
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[3]/alf-cml:value" value="event('fr:description')"/>
+        <xf:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[1]/alf-cml:value" value="event('fr:name')"/>
+        <xf:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[2]/alf-cml:value" value="event('fr:title')"/>
+        <xf:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:property[3]/alf-cml:value" value="event('fr:description')"/>
 
         <!-- Set encoded child node name based on name -->
-        <xforms:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:parent/alf-cml:childName"
-                         value="concat('{http://www.alfresco.org/model/content/1.0}', xxforms:encode-iso9075-14(event('fr:name')))"/>
+        <xf:setvalue ref="instance('alfresco-create-ws-request')//alf-cml:parent/alf-cml:childName"
+                         value="concat('{http://www.alfresco.org/model/content/1.0}', xxf:encode-iso9075-14(event('fr:name')))"/>
 
         <!-- Set content and type -->
-        <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:content" value="event('fr:content')"/>
-        <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:format/alf-content:mimetype" value="event('fr:mimetype')"/>
+        <xf:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:content" value="event('fr:content')"/>
+        <xf:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:format/alf-content:mimetype" value="event('fr:mimetype')"/>
 
         <!-- Clear error -->
-        <xforms:setvalue ref="instance('alfresco-error')/got-error" value="false()"/>
+        <xf:setvalue ref="instance('alfresco-error')/got-error" value="false()"/>
 
         <!-- 1. Authenticate -->
-        <xforms:send submission="alfresco-auth-submission"/>
+        <xf:send submission="alfresco-auth-submission"/>
         <!-- 2. Create new document -->
-        <xforms:send if="instance('alfresco-error')/got-error = 'false'" submission="alfresco-create-submission"/>
+        <xf:send if="instance('alfresco-error')/got-error = 'false'" submission="alfresco-create-submission"/>
         <!-- 3. Upload document -->
-        <xforms:action if="instance('alfresco-error')/got-error = 'false'">
+        <xf:action if="instance('alfresco-error')/got-error = 'false'">
             <!-- Propagate UUID -->
-            <xforms:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:uuid" value="instance('alfresco-create-ws-response')//*[local-name() = 'uuid']"/>
+            <xf:setvalue ref="instance('alfresco-post-content-ws-request')//alf-content:uuid" value="instance('alfresco-create-ws-response')//*[local-name() = 'uuid']"/>
             <!-- Upload content -->
-            <xforms:send submission="alfresco-post-content-submission"/>
-        </xforms:action>
+            <xf:send submission="alfresco-post-content-submission"/>
+        </xf:action>
         <!-- Display success message if ok -->
-        <!--<xforms:action if="instance('alfresco-error')/got-error = 'false'">-->
-            <!--<xforms:message>Document envoyé avec succès.</xforms:message>-->
-        <!--</xforms:action>-->
+        <!--<xf:action if="instance('alfresco-error')/got-error = 'false'">-->
+            <!--<xf:message>Document envoyé avec succès.</xf:message>-->
+        <!--</xf:action>-->
         <!-- Display error if any -->
-        <!--<xforms:action if="instance('alfresco-error')/got-error = 'true'">-->
-            <!--<xforms:message>-->
-                <!--Alfresco error: <xforms:output value="instance('alfresco-error')/message"/>-->
-            <!--</xforms:message>-->
-        <!--</xforms:action>-->
-    </xforms:action>
+        <!--<xf:action if="instance('alfresco-error')/got-error = 'true'">-->
+            <!--<xf:message>-->
+                <!--Alfresco error: <xf:output value="instance('alfresco-error')/message"/>-->
+            <!--</xf:message>-->
+        <!--</xf:action>-->
+    </xf:action>
 
     <!-- React to failed submission -->
-    <xforms:action ev:event="xforms-submit-error">
+    <xf:action ev:event="xforms-submit-error">
         <!-- Remember any submission error -->
-        <xforms:setvalue ref="instance('alfresco-error')/got-error" value="true()"/>
-        <!--<xforms:setvalue ref="instance('alfresco-error')/message" value="event('body')"/>-->
+        <xf:setvalue ref="instance('alfresco-error')/got-error" value="true()"/>
+        <!--<xf:setvalue ref="instance('alfresco-error')/message" value="event('body')"/>-->
         <!-- Notify persistence model -->
-        <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-            <xforms:property name="submission-id" value="event('xxforms:targetid')"/>
-            <xforms:property name="response-body" value="event('response-body')"/>
-            <xforms:property name="error-type" value="event('error-type')"/>
-        </xforms:dispatch>
-    </xforms:action>
+        <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
+            <xf:property name="submission-id" value="event('xxf:targetid')"/>
+            <xf:property name="response-body" value="event('response-body')"/>
+            <xf:property name="error-type" value="event('error-type')"/>
+        </xf:dispatch>
+    </xf:action>
 
-    <xforms:instance id="alfresco-error">
+    <xf:instance id="alfresco-error">
         <error xmlns="">
             <got-error>false</got-error>
             <!--<message/>-->
         </error>
-    </xforms:instance>
+    </xf:instance>
 
     <!-- ===== Authentication ====================================================================================== -->
 
     <!-- Authentication service -->
-    <xforms:instance id="alfresco-auth-ws-request">
+    <xf:instance id="alfresco-auth-ws-request">
         <soap:Envelope>
             <soap:Body>
                 <startSession xmlns="http://www.alfresco.org/ws/service/authentication/1.0">
@@ -127,9 +127,9 @@
                 </startSession>
             </soap:Body>
         </soap:Envelope>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:instance id="alfresco-auth-ws-response">
+    <xf:instance id="alfresco-auth-ws-response">
         <soap:Envelope/>
         <!-- Example response -->
         <!--
@@ -145,9 +145,9 @@
             </soap:Body>
         </soap:Envelope>
         -->
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:instance id="alfresco-auth-headers">
+    <xf:instance id="alfresco-auth-headers">
         <soap:Header>
             <Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
                 <Timestamp xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" utility:Id="">
@@ -160,32 +160,32 @@
                 </UsernameToken>
             </Security>
         </soap:Header>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:submission ref="instance('alfresco-auth-ws-request')" id="alfresco-auth-submission"
+    <xf:submission ref="instance('alfresco-auth-ws-request')" id="alfresco-auth-submission"
         method="post" action="{$alfresco-uri}api/AuthenticationService"
-        xxforms:username="{$alfresco-username}" xxforms:password="{$alfresco-credentials}"
+        xxf:username="{$alfresco-username}" xxf:password="{$alfresco-credentials}"
         mediatype="application/soap+xml; action="
         replace="instance" instance="alfresco-auth-ws-response">
 
-        <xforms:action ev:event="xforms-submit">
+        <xf:action ev:event="xforms-submit">
             <!-- Fill-out credentials -->
-            <xforms:setvalue ref=".//alf-auth:username" value="$alfresco-username"/>
-            <xforms:setvalue ref=".//alf-auth:password" value="$alfresco-credentials"/>
-        </xforms:action>
+            <xf:setvalue ref=".//alf-auth:username" value="$alfresco-username"/>
+            <xf:setvalue ref=".//alf-auth:password" value="$alfresco-credentials"/>
+        </xf:action>
 
-        <xforms:action ev:event="xforms-submit-done">
+        <xf:action ev:event="xforms-submit-done">
             <!-- Create SOAP headers for other services -->
-            <xforms:setvalue ref="instance('alfresco-auth-headers')//secext:Password" value="instance('alfresco-auth-ws-response')//alf-auth:ticket"/>
-            <xforms:setvalue ref="instance('alfresco-auth-headers')//utility:Created" value="current-dateTime()"/>
-            <xforms:setvalue ref="instance('alfresco-auth-headers')//utility:Expires" value="current-dateTime() + xs:dayTimeDuration('PT5M')"/>
-        </xforms:action>
-    </xforms:submission>
+            <xf:setvalue ref="instance('alfresco-auth-headers')//secext:Password" value="instance('alfresco-auth-ws-response')//alf-auth:ticket"/>
+            <xf:setvalue ref="instance('alfresco-auth-headers')//utility:Created" value="current-dateTime()"/>
+            <xf:setvalue ref="instance('alfresco-auth-headers')//utility:Expires" value="current-dateTime() + xs:dayTimeDuration('PT5M')"/>
+        </xf:action>
+    </xf:submission>
 
     <!-- ===== Create new reference ================================================================================ -->
 
     <!-- Create new reference -->
-    <xforms:instance id="alfresco-create-ws-request">
+    <xf:instance id="alfresco-create-ws-request">
         <soap:Envelope>
             <!-- Headers are copied here -->
             <soap:Body>
@@ -225,9 +225,9 @@
                 </update>
             </soap:Body>
         </soap:Envelope>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:instance id="alfresco-create-ws-response">
+    <xf:instance id="alfresco-create-ws-response">
         <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"/>
         <!-- Example response -->
         <!--
@@ -253,27 +253,27 @@
             </soapenv:Body>
         </soapenv:Envelope>
         -->
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:submission ref="instance('alfresco-create-ws-request')" id="alfresco-create-submission"
+    <xf:submission ref="instance('alfresco-create-ws-request')" id="alfresco-create-submission"
         method="post" action="{$alfresco-uri}/api/RepositoryService"
-        xxforms:username="{$alfresco-username}" xxforms:password="{$alfresco-credentials}"
+        xxf:username="{$alfresco-username}" xxf:password="{$alfresco-credentials}"
         mediatype="application/soap+xml; action="
         replace="instance" instance="alfresco-create-ws-response">
 
-        <xforms:action ev:event="xforms-submit">
+        <xf:action ev:event="xforms-submit">
             <!-- Set path -->
-            <xforms:setvalue ref=".//alf-cml:path" value="$alfresco-path"/>
+            <xf:setvalue ref=".//alf-cml:path" value="$alfresco-path"/>
             <!-- Set authentication headers -->
-            <xforms:delete ref="instance('alfresco-create-ws-request')/soap:Header"/>
-            <xforms:insert context="instance('alfresco-create-ws-request')" origin="instance('alfresco-auth-headers')"/>
-        </xforms:action>
-    </xforms:submission>
+            <xf:delete ref="instance('alfresco-create-ws-request')/soap:Header"/>
+            <xf:insert context="instance('alfresco-create-ws-request')" origin="instance('alfresco-auth-headers')"/>
+        </xf:action>
+    </xf:submission>
 
     <!-- ==== Post content ========================================================================================= -->
 
     <!-- Post content -->
-    <xforms:instance id="alfresco-post-content-ws-request">
+    <xf:instance id="alfresco-post-content-ws-request">
         <soap:Envelope>
             <!-- Headers are copied here -->
             <soap:Body>
@@ -295,23 +295,23 @@
                 </write>
             </soap:Body>
         </soap:Envelope>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:instance id="alfresco-post-content-ws-response">
+    <xf:instance id="alfresco-post-content-ws-response">
         <dummy/>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:submission ref="instance('alfresco-post-content-ws-request')" id="alfresco-post-content-submission"
+    <xf:submission ref="instance('alfresco-post-content-ws-request')" id="alfresco-post-content-submission"
         method="post" action="{$alfresco-uri}/api/ContentService"
-        xxforms:username="{$alfresco-username}" xxforms:password="{$alfresco-credentials}"
+        xxf:username="{$alfresco-username}" xxf:password="{$alfresco-credentials}"
         mediatype="application/soap+xml; action="
         replace="instance" instance="alfresco-post-content-ws-response">
 
-        <xforms:action ev:event="xforms-submit">
+        <xf:action ev:event="xforms-submit">
             <!-- Set authentication headers -->
-            <xforms:delete ref="instance('alfresco-post-content-ws-request')/soap:Header"/>
-            <xforms:insert context="instance('alfresco-post-content-ws-request')" origin="instance('alfresco-auth-headers')"/>
-        </xforms:action>
-    </xforms:submission>
+            <xf:delete ref="instance('alfresco-post-content-ws-request')/soap:Header"/>
+            <xf:insert context="instance('alfresco-post-content-ws-request')" origin="instance('alfresco-auth-headers')"/>
+        </xf:action>
+    </xf:submission>
 
-</xforms:model>
+</xf:model>

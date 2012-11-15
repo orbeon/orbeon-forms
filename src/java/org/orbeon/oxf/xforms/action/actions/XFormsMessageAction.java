@@ -86,13 +86,13 @@ public class XFormsMessageAction extends XFormsAction {
 
                 final IndentedLogger indentedLogger = containingDocument.getIndentedLogger();
                 if (XFormsConstants.XXFORMS_LOG_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logDebug("xforms:message", messageValue);
+                    indentedLogger.logDebug("xf:message", messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_INFO_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logInfo("xforms:message", messageValue);
+                    indentedLogger.logInfo("xf:message", messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_WARN_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logWarning("xforms:message", messageValue);
+                    indentedLogger.logWarning("xf:message", messageValue);
                 } else if (XFormsConstants.XXFORMS_LOG_ERROR_DEBUG_LEVEL_QNAME.equals(levelQName)) {
-                    indentedLogger.logError("xforms:message", messageValue);
+                    indentedLogger.logError("xf:message", messageValue);
                 }
 
             } else if (SUPPORTED_APPEARANCES.get(levelQName) != null) {
@@ -110,11 +110,11 @@ public class XFormsMessageAction extends XFormsAction {
 
                 // NOTE: In the future, we *may* want to save and resume the event state before and after
                 // displaying a message, in order to possibly provide a behavior which is more consistent with what
-                // users may expect regarding actions executed after xforms:message.
+                // users may expect regarding actions executed after xf:message.
 
             } else {
                 // Unsupported appearance
-                throw new OXFException("xforms:message element's 'level' attribute must have value: 'ephemeral'|'modeless'|'modal'|'xxforms:log-debug'|'xxforms:log-info'|'xxforms:log-warn'|'xxforms:log-error'.");
+                throw new OXFException("xf:message element's 'level' attribute must have value: 'ephemeral'|'modeless'|'modal'|'xxf:log-debug'|'xxf:log-info'|'xxf:log-warn'|'xxf:log-error'.");
             }
         }
     }

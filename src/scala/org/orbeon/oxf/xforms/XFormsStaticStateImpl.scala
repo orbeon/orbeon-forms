@@ -88,10 +88,13 @@ object XFormsStaticStateImpl {
 
     val BASIC_NAMESPACE_MAPPING =
         new NamespaceMapping(Map(
-            XFORMS_PREFIX → XFORMS_NAMESPACE_URI,
-            XXFORMS_PREFIX → XXFORMS_NAMESPACE_URI,
-            XML_EVENTS_PREFIX → XML_EVENTS_NAMESPACE_URI,
-            XHTML_PREFIX → XMLConstants.XHTML_NAMESPACE_URI
+            XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
+            XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
+            XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
+            XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
+            XML_EVENTS_PREFIX    → XML_EVENTS_NAMESPACE_URI,
+            XHTML_PREFIX         → XMLConstants.XHTML_NAMESPACE_URI,
+            XHTML_SHORT_PREFIX   → XMLConstants.XHTML_NAMESPACE_URI
         ))
 
     // Create static state from an encoded version. This is used when restoring a static state from a serialized form.

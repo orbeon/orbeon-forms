@@ -67,7 +67,7 @@ public class XFormsInsertAction extends XFormsAction {
         // Set Binding node-set is the empty node-set."
         if (contextAttribute == null && isEmptyNodesetBinding) {
             if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("xforms:insert", "context is empty, terminating");
+                indentedLogger.logDebug("xf:insert", "context is empty, terminating");
             return;
         }
 
@@ -77,7 +77,7 @@ public class XFormsInsertAction extends XFormsAction {
             // "If the result is an empty nodeset or not a nodeset, then the insert action is terminated with no effect. "
             if (overriddenContext == null || !(overriddenContext instanceof NodeInfo)) {
                 if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("xforms:insert", "overridden context is an empty nodeset or not a nodeset, terminating");
+                    indentedLogger.logDebug("xf:insert", "overridden context is an empty nodeset or not a nodeset, terminating");
                 return;
             } else {
                 insertContextItem = overriddenContext;
@@ -91,7 +91,7 @@ public class XFormsInsertAction extends XFormsAction {
         // NOTE: In addition we support inserting into a context which is a document node
         if (contextAttribute != null && isEmptyNodesetBinding && !DataModel.isElement(insertContextItem) && !DataModel.isDocument(insertContextItem)) {
             if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("xforms:insert", "insert context is not an element node and binding node-set is empty, terminating");
+                indentedLogger.logDebug("xf:insert", "insert context is not an element node and binding node-set is empty, terminating");
             return;
         }
 
@@ -112,7 +112,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originObjects.size() == 0) {
                     if (indentedLogger.isDebugEnabled())
-                        indentedLogger.logDebug("xforms:insert", "origin node-set is empty, terminating");
+                        indentedLogger.logDebug("xf:insert", "origin node-set is empty, terminating");
                     return;
                 }
             }
@@ -163,7 +163,7 @@ public class XFormsInsertAction extends XFormsAction {
             } else {
                 // Invalid value
                 if (indentedLogger.isInfoEnabled())
-                    indentedLogger.logWarning("xforms:insert", "invalid position attribute, defaulting to \"after\"", "value", resolvedPositionAttribute);
+                    indentedLogger.logWarning("xf:insert", "invalid position attribute, defaulting to \"after\"", "value", resolvedPositionAttribute);
 
                 normalizedPosition = "after";
             }
@@ -193,7 +193,7 @@ public class XFormsInsertAction extends XFormsAction {
 
                 if (isEmptyNodesetBinding) {
                     if (indentedLogger != null && indentedLogger.isDebugEnabled())
-                        indentedLogger.logDebug("xforms:insert", "origin node-set from node-set binding is empty, terminating");
+                        indentedLogger.logDebug("xf:insert", "origin node-set from node-set binding is empty, terminating");
                     return Collections.EMPTY_LIST;
                 }
 
@@ -211,7 +211,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // "The insert action is terminated with no effect if the origin node-set is the empty node-set."
                 if (originItems.size() == 0) {
                     if (indentedLogger != null && indentedLogger.isDebugEnabled())
-                        indentedLogger.logDebug("xforms:insert", "origin node-set is empty, terminating");
+                        indentedLogger.logDebug("xf:insert", "origin node-set is empty, terminating");
                     return Collections.EMPTY_LIST;
                 }
 
@@ -378,7 +378,7 @@ public class XFormsInsertAction extends XFormsAction {
                             } else {
                                 // We never insert attributes or namespace nodes as siblings
                                 if (indentedLogger != null && indentedLogger.isDebugEnabled())
-                                    indentedLogger.logDebug("xforms:insert", "skipping insertion of node as sibling in element content",
+                                    indentedLogger.logDebug("xf:insert", "skipping insertion of node as sibling in element content",
                                                     "type", clonedNode.getNodeTypeName(),
                                                     "node", clonedNode instanceof Attribute ? Dom4jUtils.attributeToDebugString((Attribute) clonedNode) : clonedNode.toString()
                                             );
@@ -401,11 +401,11 @@ public class XFormsInsertAction extends XFormsAction {
         // Log stuff
         if (indentedLogger != null && indentedLogger.isDebugEnabled()) {
             if (didInsertNodes)
-                indentedLogger.logDebug("xforms:insert", "inserted nodes",
+                indentedLogger.logDebug("xf:insert", "inserted nodes",
                         "count", Integer.toString(insertedNodes.size()), "instance",
                                 (modifiedInstance != null) ? modifiedInstance.getEffectiveId() : null);
             else
-                indentedLogger.logDebug("xforms:insert", "no node inserted");
+                indentedLogger.logDebug("xf:insert", "no node inserted");
         }
 
         // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"

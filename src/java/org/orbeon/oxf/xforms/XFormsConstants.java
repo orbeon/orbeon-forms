@@ -51,7 +51,7 @@ public class XFormsConstants {
         ALLOWED_XXFORMS_ELEMENTS.add("attribute");
         ALLOWED_XXFORMS_ELEMENTS.add("text");
         ALLOWED_XXFORMS_ELEMENTS.add("context");
-        ALLOWED_XXFORMS_ELEMENTS.add("size");//xforms:upload/xxforms:size
+        ALLOWED_XXFORMS_ELEMENTS.add("size");//xf:upload/xxf:size
 
         ALLOWED_XXFORMS_ELEMENTS.add("dynamic");
 
@@ -110,7 +110,7 @@ public class XFormsConstants {
     // XForms controls
     public static final QName XFORMS_GROUP_QNAME = new QName("group", XFORMS_NAMESPACE);
     public static final QName XFORMS_REPEAT_QNAME = new QName("repeat", XFORMS_NAMESPACE);
-    public static final QName XFORMS_REPEAT_ITERATION_QNAME = new QName("repeat-iteration", XFORMS_NAMESPACE); // NOTE: Supposed to be xxforms:repeat-iteration
+    public static final QName XFORMS_REPEAT_ITERATION_QNAME = new QName("repeat-iteration", XFORMS_NAMESPACE); // NOTE: Supposed to be xxf:repeat-iteration
     public static final String REPEAT_NAME = XFORMS_REPEAT_QNAME.getName();
     public static final QName XFORMS_SWITCH_QNAME = new QName("switch", XFORMS_NAMESPACE);
     public static final QName XFORMS_CASE_QNAME = new QName("case", XFORMS_NAMESPACE);
@@ -345,7 +345,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_PROGRESS_MESSAGE_QNAME = new QName("progress-message", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_OPEN_QNAME = new QName("open", XXFORMS_NAMESPACE);
 
-    // XForms 2.0 standardizes the xforms:property element
+    // XForms 2.0 standardizes the xf:property element
     public static final QName XFORMS_PROPERTY_QNAME = new QName("property", XFORMS_NAMESPACE);
     public static final QName XXFORMS_CONTEXT_QNAME = new QName("context", XXFORMS_NAMESPACE);
 

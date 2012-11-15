@@ -22,8 +22,8 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Represents an extension xxforms:text control. This control is used to produce plain text child of xhtml:title, for
- * example. It is based on xforms:output.
+ * Represents an extension xxf:text control. This control is used to produce plain text child of xhtml:title, for
+ * example. It is based on xf:output.
  */
 public class XXFormsTextControl extends XFormsOutputControl {
 
@@ -58,7 +58,7 @@ public class XXFormsTextControl extends XFormsOutputControl {
         // Control id
         attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, textControl2.getEffectiveId());
 
-        // The client does not store an HTML representation of the xxforms:text control, so we
+        // The client does not store an HTML representation of the xxf:text control, so we
         // have to output these attributes.
         {
             // HTML element id

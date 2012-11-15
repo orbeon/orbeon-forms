@@ -1,22 +1,22 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
     <head>
         <title>XForms Repeat Insert</title>
-        <xforms:model>
-            <xforms:instance xxforms:exclude-result-prefixes="#all" id="fruits">
+        <xf:model>
+            <xf:instance xxf:exclude-result-prefixes="#all" id="fruits">
                 <fruits xmlns="">
                     <fruit>Apple</fruit>
                     <fruit>Orange</fruit>
                     <fruit>Pear</fruit>
                 </fruits>
-            </xforms:instance>
-            <xforms:instance xxforms:exclude-result-prefixes="#all" id="new-fruit">
+            </xf:instance>
+            <xf:instance xxf:exclude-result-prefixes="#all" id="new-fruit">
                 <fruit xmlns=""/>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
         <style type="text/css">
             .xforms-input input { margin-bottom: .5em; background-color: white }
             .xforms-repeat-selected-item-1 input { background-color: orange }
@@ -26,42 +26,42 @@
     <body>
         <fieldset>
             <legend>My Fruits</legend>
-            <xforms:repeat ref="fruit" id="fruit-repeat">
-                <xforms:output value="position()"/>
-                <xforms:input ref="."/>
+            <xf:repeat ref="fruit" id="fruit-repeat">
+                <xf:output value="position()"/>
+                <xf:input ref="."/>
                 <br/>
-            </xforms:repeat>
+            </xf:repeat>
         </fieldset>
         <fieldset>
             <legend>Insert</legend>
 
-            <xforms:trigger>
-                <xforms:label>At the end</xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            <xf:trigger>
+                <xf:label>At the end</xf:label>
+                <xf:insert ev:event="DOMActivate"
                                context="." ref="fruit"
                                origin="instance('new-fruit')"/>
-            </xforms:trigger>
+            </xf:trigger>
 
-            <xforms:trigger>
-                <xforms:label>At the beginning</xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            <xf:trigger>
+                <xf:label>At the beginning</xf:label>
+                <xf:insert ev:event="DOMActivate"
                                context="." ref="fruit" at="1" position="before"
                                origin="instance('new-fruit')"/>
-            </xforms:trigger>
+            </xf:trigger>
 
-            <xforms:trigger>
-                <xforms:label>After position <xforms:output value="index('fruit-repeat')"/></xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            <xf:trigger>
+                <xf:label>After position <xf:output value="index('fruit-repeat')"/></xf:label>
+                <xf:insert ev:event="DOMActivate"
                                context="." ref="fruit" at="index('fruit-repeat')"
                                origin="instance('new-fruit')"/>
-            </xforms:trigger>
+            </xf:trigger>
 
-            <xforms:trigger>
-                <xforms:label>Before position <xforms:output value="index('fruit-repeat')"/></xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            <xf:trigger>
+                <xf:label>Before position <xf:output value="index('fruit-repeat')"/></xf:label>
+                <xf:insert ev:event="DOMActivate"
                                context="." ref="fruit" at="index('fruit-repeat')" position="before"
                                origin="instance('new-fruit')"/>
-            </xforms:trigger>
+            </xf:trigger>
         </fieldset>
     
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>

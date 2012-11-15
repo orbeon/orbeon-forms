@@ -15,11 +15,10 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -29,17 +28,17 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=308399&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values>
                                 <value code="1">One</value>
                                 <value code="3"/>
                                 <value code="">Five</value>
                                 <value code="7">Seven</value>
                             </values>
-                        </xforms:instance>
+                        </xf:instance>
                         
                         <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
                             
@@ -54,15 +53,15 @@
                                 </xs:simpleContent>
                             </xs:complexType>	
                         </xs:schema>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:input ref="value[1]"/>
-                    <xforms:input ref="value[2]"/>
-                    <xforms:input ref="value[3]"/>
-                    <xforms:input ref="value[4]"/>
-                </xhtml:body>
-            </xhtml:html>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input ref="value[1]"/>
+                    <xf:input ref="value[2]"/>
+                    <xf:input ref="value[3]"/>
+                    <xf:input ref="value[4]"/>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -84,10 +83,10 @@
     <test description="Schema validation with union" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values>
                                 <value>2009</value>
                                 <value>2009-03</value>
@@ -95,25 +94,25 @@
                                 <value>2009-13</value>
                                 <value>2009-03-32</value>
                             </values>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:bind ref="value" type="uwdcdate"/>
+                        <xf:bind ref="value" type="uwdcdate"/>
 
                         <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
                             <xs:simpleType name="uwdcdate">
                                 <xs:union memberTypes="xs:gYear xs:gYearMonth xs:date"/>
                             </xs:simpleType>
                         </xs:schema>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:input ref="value[1]"/>
-                    <xforms:input ref="value[2]"/>
-                    <xforms:input ref="value[3]"/>
-                    <xforms:input ref="value[4]"/>
-                    <xforms:input ref="value[5]"/>
-                </xhtml:body>
-            </xhtml:html>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input ref="value[1]"/>
+                    <xf:input ref="value[2]"/>
+                    <xf:input ref="value[3]"/>
+                    <xf:input ref="value[4]"/>
+                    <xf:input ref="value[5]"/>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">

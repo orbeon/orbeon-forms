@@ -14,11 +14,11 @@
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -28,8 +28,7 @@
         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
-        xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
-        xmlns:exf="http://www.exforms.org/exf/1-0">
+        xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -38,10 +37,10 @@
                   select="string-join(('http://orbeon.org/oxf/xml/form-builder/component', doc('input:parameters')/*/app, doc('input:parameters')/*/form), '/')"/>
 
     <!-- Global stuff -->
-    <xsl:variable name="fr-form-model"         select="/xhtml:html/xhtml:head//xforms:model[@id = 'fr-form-model']" as="element(xforms:model)*"/>
-    <xsl:variable name="fr-form-instance"      select="$fr-form-model/xforms:instance[@id = 'fr-form-instance']"    as="element(xforms:instance)"/>
-    <xsl:variable name="fr-resources-instance" select="$fr-form-model/xforms:instance[@id = 'fr-form-resources']"   as="element(xforms:instance)"/>
-    <xsl:variable name="fr-metadata-instance"  select="$fr-form-model/xforms:instance[@id = 'fr-form-metadata']"    as="element(xforms:instance)*"/>
+    <xsl:variable name="fr-form-model"         select="/xh:html/xh:head//xf:model[@id = 'fr-form-model']" as="element(xf:model)*"/>
+    <xsl:variable name="fr-form-instance"      select="$fr-form-model/xf:instance[@id = 'fr-form-instance']"    as="element(xf:instance)"/>
+    <xsl:variable name="fr-resources-instance" select="$fr-form-model/xf:instance[@id = 'fr-form-resources']"   as="element(xf:instance)"/>
+    <xsl:variable name="fr-metadata-instance"  select="$fr-form-model/xf:instance[@id = 'fr-form-metadata']"    as="element(xf:instance)*"/>
 
     <!-- Actions and services -->
     <!-- NOTE: Actions and services are implemented, for historical reasons, as XForms instances, submissions, and action
@@ -49,25 +48,25 @@
          future, actions should be described in a more declarative format. See also:
          http://wiki.orbeon.com/forms/projects/form-runner-builder/improved-actions-and-services-format
      -->
-    <xsl:variable name="actions" select="$fr-form-model/xforms:action[ends-with(@id, '-binding')]"/>
-    <xsl:variable name="service-instances" select="$fr-form-model/xforms:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>
-    <xsl:variable name="service-submissions" select="$fr-form-model/xforms:submission[p:classes() = ('fr-service', 'fr-database-service')]"/>
+    <xsl:variable name="actions" select="$fr-form-model/xf:action[ends-with(@id, '-binding')]"/>
+    <xsl:variable name="service-instances" select="$fr-form-model/xf:instance[p:classes() = ('fr-service', 'fr-database-service')]"/>
+    <xsl:variable name="service-submissions" select="$fr-form-model/xf:submission[p:classes() = ('fr-service', 'fr-database-service')]"/>
 
     <!-- Distinct source ids for the given action -->
     <!-- NOTE: Source can also be a model -->
     <xsl:function name="fr:action-sources" as="xs:string*">
-        <xsl:param name="action" as="element(xforms:action)"/>
-        <xsl:sequence select="distinct-values($action/xforms:action[1]/@*:observer/tokenize(., '\s+'))"/>
+        <xsl:param name="action" as="element(xf:action)"/>
+        <xsl:sequence select="distinct-values($action/xf:action[1]/@*:observer/tokenize(., '\s+'))"/>
     </xsl:function>
 
     <!-- Distinct destination ids for the given action -->
     <xsl:function name="fr:action-destinations" as="xs:string*">
-        <xsl:param name="action" as="element(xforms:action)"/>
+        <xsl:param name="action" as="element(xf:action)"/>
         <xsl:sequence select="distinct-values($action//(*:variable | *:var)[@name = 'control-name']/(@value, @select)/replace(., '''([^..]*)''', '$1-control'))"/>
     </xsl:function>
 
     <!-- Distinct action elements for which the given id is a source or destination or both -->
-    <xsl:function name="fr:action-for-id" as="element(xforms:action)*">
+    <xsl:function name="fr:action-for-id" as="element(xf:action)*">
         <xsl:param name="id" as="xs:string"/>
         <xsl:sequence select="$actions[$id = distinct-values((fr:action-sources(.), fr:action-destinations(.)))]"/>
     </xsl:function>
@@ -99,7 +98,7 @@
                 </icon>
             </metadata>
 
-            <xsl:apply-templates select="/xhtml:html/xhtml:body//fr:section"/>
+            <xsl:apply-templates select="/xh:html/xh:body//fr:section"/>
         </xbl:xbl>
     </xsl:template>
 
@@ -110,12 +109,12 @@
     </xsl:function>
 
     <!-- When copying actions, update references to instance and resources -->
-    <xsl:template match="xforms:setvalue/@ref[starts-with(., 'instance(''fr-form-instance'')/*')] |
-                         xforms:setvalue/@value[starts-with(., 'instance(''fr-form-instance'')/*')]" mode="filter-actions">
+    <xsl:template match="xf:setvalue/@ref[starts-with(., 'instance(''fr-form-instance'')/*')] |
+                         xf:setvalue/@value[starts-with(., 'instance(''fr-form-instance'')/*')]" mode="filter-actions">
         <xsl:attribute name="{name()}" select="concat('instance(''fr-form-instance'')', substring-after(., 'instance(''fr-form-instance'')/*'))"/>
     </xsl:template>
-    <xsl:template match="xxforms:variable[@name = 'control-resources'] | xforms:var[@name = 'control-resources']" mode="filter-actions">
-        <xforms:var name="control-resources" value="$form-resources/*[name() = $control-name]"/>
+    <xsl:template match="xxf:variable[@name = 'control-resources'] | xf:var[@name = 'control-resources']" mode="filter-actions">
+        <xf:var name="control-resources" value="$form-resources/*[name() = $control-name]"/>
     </xsl:template>
 
     <!-- When copying actions, update references to xforms-ready and fr-form-model -->
@@ -128,7 +127,7 @@
     </xsl:template>
 
     <!-- Generate one component per section -->
-    <xsl:template match="/xhtml:html/xhtml:body//fr:section">
+    <xsl:template match="/xh:html/xh:body//fr:section">
 
         <!-- ==== Section information ============================================================================== -->
 
@@ -140,11 +139,11 @@
         <xsl:variable name="section-name" select="controlOps:controlName(@id)" as="xs:string"/>
 
         <!-- Section bind -->
-        <xsl:variable name="section-bind" select="$fr-form-model//xforms:bind[@id = concat($section-name, '-bind')]" as="element(xforms:bind)"/>
+        <xsl:variable name="section-bind" select="$fr-form-model//xf:bind[@id = concat($section-name, '-bind')]" as="element(xf:bind)"/>
         <xsl:variable name="section-name" select="$section-bind/((@ref, @nodeset)[1])" as="xs:string"/>
 
         <!-- Section instance data element -->
-        <!-- NOTE: could also gather ancestor-or-self::xforms:bind/@ref and evaluate expression to be more generic -->
+        <!-- NOTE: could also gather ancestor-or-self::xf:bind/@ref and evaluate expression to be more generic -->
         <!-- TODO: What do do with custom data model? -->
         <xsl:variable name="section-data" select="$fr-form-instance/*/*[name() = $section-name]" as="element()"/>
 
@@ -160,16 +159,16 @@
         <!-- ==== Repeats ========================================================================================== -->
 
         <xsl:variable name="repeat-ids" select="$fr-section//*[gridOps:isRepeat(.)]/fbf:templateId(controlOps:controlName(@id))"/>
-        <xsl:variable name="repeat-templates" select="$fr-form-model/xforms:instance[@id = $repeat-ids]" as="element()*"/>
+        <xsl:variable name="repeat-templates" select="$fr-form-model/xf:instance[@id = $repeat-ids]" as="element()*"/>
 
         <!-- ==== Actions and services ============================================================================= -->
 
         <!-- Controls under this section which are the source or destination of an action or both -->
         <xsl:variable name="action-controls" select="$fr-section//*[@id = ($all-action-sources, $all-action-destinations)]"/>
-        <!-- Unique xforms:action elements which use controls under this section -->
+        <!-- Unique xf:action elements which use controls under this section -->
         <xsl:variable name="relevant-actions" select="$actions[@id = distinct-values($action-controls/@id/fr:action-for-id(.)/@id)]"/>
         <!-- Unique service ids used by relevant actions -->
-        <xsl:variable name="relevant-service-ids" select="distinct-values($relevant-actions/xforms:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1'))"/>
+        <xsl:variable name="relevant-service-ids" select="distinct-values($relevant-actions/xf:action[position() = (2, 3)]/@*:observer/replace(., '(.*)-submission$', '$1'))"/>
         <!-- Unique service instances and submissions used by relevant actions -->
         <xsl:variable name="relevant-services" select="
             $service-instances[replace(@id, '(.*)-instance$', '$1') = $relevant-service-ids] |
@@ -212,30 +211,30 @@
 
             <!-- XBL implementation -->
             <xbl:implementation>
-                <xforms:model id="{$component-id}-model">
+                <xf:model id="{$component-id}-model">
                     <!-- Copy schema attribute if present -->
                     <xsl:copy-of select="$fr-form-model/@schema"/>
 
                     <!-- Section data model -->
-                    <xforms:instance id="fr-form-instance">
+                    <xf:instance id="fr-form-instance">
                         <xsl:copy-of select="$section-data"/>
-                    </xforms:instance>
+                    </xf:instance>
 
                     <!-- Template -->
-                    <xforms:instance id="fr-form-template">
+                    <xf:instance id="fr-form-template">
                         <xsl:copy-of select="$section-data"/>
-                    </xforms:instance>
+                    </xf:instance>
 
                     <!-- Repeat templates if any -->
                     <xsl:copy-of select="$repeat-templates"/>
 
                     <!-- Section constraints -->
-                    <xforms:bind>
-                        <xsl:copy-of select="$section-bind/xforms:bind"/>
-                    </xforms:bind>
+                    <xf:bind>
+                        <xsl:copy-of select="$section-bind/xf:bind"/>
+                    </xf:bind>
 
                     <!-- Sections resources -->
-                    <xforms:instance id="fr-form-resources">
+                    <xf:instance id="fr-form-resources">
                         <resources xmlns="">
                             <xsl:for-each select="$fr-resources-instance/*/resource">
                                 <xsl:variable name="lang" select="@xml:lang" as="xs:string"/>
@@ -246,18 +245,18 @@
                                 </resource>
                             </xsl:for-each>
                         </resources>
-                    </xforms:instance>
+                    </xf:instance>
 
                     <!-- Try to match the current form language, or use the first language available if not found -->
-                    <xforms:var name="form-resources"
-                                value="instance('fr-form-resources')/(resource[@xml:lang = xxforms:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
+                    <xf:var name="form-resources"
+                                value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 
                     <!-- Keep track of whether fields should be readonly because the node we're bound to is readonly -->
-                    <xforms:instance id="readonly"><readonly/></xforms:instance>
+                    <xf:instance id="readonly"><readonly/></xf:instance>
 
                     <!-- This is also at the top-level in components.xsl -->
-                    <xforms:var name="fr-mode" value="xxforms:instance('fr-parameters-instance')/mode"/>
-                    <xforms:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
+                    <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode"/>
+                    <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->
@@ -265,74 +264,74 @@
 
                     <!-- Services and actions -->
                     <xsl:if test="exists(($relevant-services, $relevant-actions))">
-                        <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+                        <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
                             <request/>
-                        </xforms:instance>
-                        <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+                        </xf:instance>
+                        <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
                             <response/>
-                        </xforms:instance>
+                        </xf:instance>
                         <xsl:apply-templates select="$relevant-services, $relevant-actions" mode="filter-actions">
                             <xsl:with-param name="component-id" tunnel="yes" select="$component-id"/>
                         </xsl:apply-templates>
                     </xsl:if>
 
-                </xforms:model>
+                </xf:model>
             </xbl:implementation>
 
             <!-- XBL template -->
             <xbl:template>
 
-                <xforms:group appearance="xxforms:internal" xxbl:scope="outer">
+                <xf:group appearance="xxf:internal" xxbl:scope="outer">
 
                     <!-- Inner group -->
-                    <xforms:group appearance="xxforms:internal" xxbl:scope="inner">
+                    <xf:group appearance="xxf:internal" xxbl:scope="inner">
                         <!-- Variable pointing to external node -->
-                        <xforms:var id="binding" name="binding" as="node()?">
-                            <xxforms:sequence value="." xxbl:scope="outer"/>
-                        </xforms:var>
+                        <xf:var id="binding" name="binding" as="node()?">
+                            <xxf:sequence value="." xxbl:scope="outer"/>
+                        </xf:var>
 
-                        <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
+                        <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
                             <!-- Section becomes visible OR binding changes -->
-                            <xforms:action>
-                                <xforms:action if="$binding/*">
+                            <xf:action>
+                                <xf:action if="$binding/*">
                                     <!-- There are already some nodes, copy them in. This handles the case where existing
                                          external data must be loaded in, for example when editing a form. -->
-                                    <xforms:delete ref="instance()/*"/>
-                                    <xforms:insert context="instance()" origin="$binding/*"/>
-                                </xforms:action>
-                                <xforms:action if="not($binding/*)">
+                                    <xf:delete ref="instance()/*"/>
+                                    <xf:insert context="instance()" origin="$binding/*"/>
+                                </xf:action>
+                                <xf:action if="not($binding/*)">
                                     <!-- No nodes, copy template out. This handles the case where there is not yet existing
                                          external data. -->
-                                    <xforms:insert context="$binding" origin="instance('fr-form-template')/*"/>
-                                    <xforms:insert context="instance()" origin="instance('fr-form-template')/*"/>
-                                </xforms:action>
-                            </xforms:action>
-                        </xforms:action>
+                                    <xf:insert context="$binding" origin="instance('fr-form-template')/*"/>
+                                    <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
+                                </xf:action>
+                            </xf:action>
+                        </xf:action>
 
                         <!-- Propagate readonly -->
-                        <xforms:var name="readonly" as="xs:boolean" value="exf:readonly($binding)">
-                            <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/>
-                        </xforms:var>
+                        <xf:var name="readonly" as="xs:boolean" value="exf:readonly($binding)">
+                            <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/>
+                        </xf:var>
 
                         <!-- Expose internally a variable pointing to Form Runner resources -->
-                        <xforms:var name="fr-resources" as="element()?">
-                            <xxforms:sequence value="$fr-resources" xxbl:scope="outer"/>
-                        </xforms:var>
+                        <xf:var name="fr-resources" as="element()?">
+                            <xxf:sequence value="$fr-resources" xxbl:scope="outer"/>
+                        </xf:var>
 
-                        <xforms:group appearance="xxforms:internal">
+                        <xf:group appearance="xxf:internal">
                             <!-- Synchronize data with external world upon local value change -->
                             <!-- This assumes the element QName match, or the value is not copied -->
-                            <xforms:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(event('xxforms:binding'))">
-                                <xforms:var name="source-binding" value="event('xxforms:binding')" as="element()"/>
-                                <xforms:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
-                            </xforms:action>
+                            <xf:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(event('xxf:binding'))">
+                                <xf:var name="source-binding" value="event('xxf:binding')" as="element()"/>
+                                <xf:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
+                            </xf:action>
 
                             <!-- Copy grids within section -->
                             <xsl:copy-of select="$fr-section/(fr:grid | fb:grid)"/>
 
-                        </xforms:group>
-                    </xforms:group>
-                </xforms:group>
+                        </xf:group>
+                    </xf:group>
+                </xf:group>
             </xbl:template>
         </xbl:binding>
 

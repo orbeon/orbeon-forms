@@ -1,5 +1,5 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <xi:include href="include12.xml"/>

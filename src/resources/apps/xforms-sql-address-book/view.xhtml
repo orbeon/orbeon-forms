@@ -11,113 +11,113 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude">
-    <xhtml:head>
-        <xhtml:title>SQL Address Book</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main">
+    <xh:head>
+        <xh:title>SQL Address Book</xh:title>
+        <xf:model>
+            <xf:instance id="main">
                 <dummy/>
-            </xforms:instance>
-            <xforms:instance id="add-instance">
+            </xf:instance>
+            <xf:instance id="add-instance">
                 <form>
                     <first/>
                     <last/>
                     <phone/>
                 </form>
-            </xforms:instance>
-            <xforms:instance id="delete-instance">
+            </xf:instance>
+            <xf:instance id="delete-instance">
                 <form>
                     <id/>
                 </form>
-            </xforms:instance>
-            <xforms:instance id="refresh-instance">
+            </xf:instance>
+            <xf:instance id="refresh-instance">
                 <form/>
-            </xforms:instance>
-            <xforms:instance id="status">
+            </xf:instance>
+            <xf:instance id="status">
                 <status>
                     <message>Read records</message>
                 </status>
-            </xforms:instance>
-            <xforms:submission id="get-submission" ref="instance('main')" replace="instance" method="post" action="/xforms-sql-address-book/get"/>
-            <xforms:submission id="add-submission" ref="instance('add-instance')" replace="none" instance="main" method="post" action="/xforms-sql-address-book/add"/>
-            <xforms:submission id="delete-submission" ref="instance('delete-instance')" replace="none" instance="main" method="post" action="/xforms-sql-address-book/delete"/>
-            <xforms:send submission="get-submission" ev:event="xforms-ready"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>First Name</xhtml:th>
-                <xhtml:th>Last Name</xhtml:th>
-                <xhtml:th>Phone Number</xhtml:th>
-                <xhtml:th>Action</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="friend" id="friendsRepeat">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output ref="first"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="last"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="phone"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:trigger>
-                            <xforms:label>Remove</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('delete-instance')/id" value="instance('main')/friend[index('friendsRepeat')]/id"/>
-                                <xforms:send submission="delete-submission"/>
-                                <xforms:send submission="get-submission"/>
-                                <xforms:setvalue ref="instance('status')/message">Deleted record</xforms:setvalue>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-            <xforms:group ref="instance('add-instance')">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref="first"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="last"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="phone"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:trigger>
-                            <xforms:label>Add</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:send submission="add-submission"/>
-                                <xforms:send submission="get-submission"/>
-                                <xforms:setvalue ref="instance('status')/message">Added record</xforms:setvalue>
-                                <xforms:setvalue ref="first"/>
-                                <xforms:setvalue ref="last"/>
-                                <xforms:setvalue ref="phone"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:group>
+            </xf:instance>
+            <xf:submission id="get-submission" ref="instance('main')" replace="instance" method="post" action="/xforms-sql-address-book/get"/>
+            <xf:submission id="add-submission" ref="instance('add-instance')" replace="none" instance="main" method="post" action="/xforms-sql-address-book/add"/>
+            <xf:submission id="delete-submission" ref="instance('delete-instance')" replace="none" instance="main" method="post" action="/xforms-sql-address-book/delete"/>
+            <xf:send submission="get-submission" ev:event="xforms-ready"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>First Name</xh:th>
+                <xh:th>Last Name</xh:th>
+                <xh:th>Phone Number</xh:th>
+                <xh:th>Action</xh:th>
+            </xh:tr>
+            <xf:repeat ref="friend" id="friendsRepeat">
+                <xh:tr>
+                    <xh:td>
+                        <xf:output ref="first"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="last"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="phone"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:trigger>
+                            <xf:label>Remove</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="instance('delete-instance')/id" value="instance('main')/friend[index('friendsRepeat')]/id"/>
+                                <xf:send submission="delete-submission"/>
+                                <xf:send submission="get-submission"/>
+                                <xf:setvalue ref="instance('status')/message">Deleted record</xf:setvalue>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+            <xf:group ref="instance('add-instance')">
+                <xh:tr>
+                    <xh:td>
+                        <xf:input ref="first"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="last"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="phone"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:trigger>
+                            <xf:label>Add</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:send submission="add-submission"/>
+                                <xf:send submission="get-submission"/>
+                                <xf:setvalue ref="instance('status')/message">Added record</xf:setvalue>
+                                <xf:setvalue ref="first"/>
+                                <xf:setvalue ref="last"/>
+                                <xf:setvalue ref="phone"/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:td>
+                </xh:tr>
+            </xf:group>
             <!-- Workaround for IE CSS issue with border collapse (border at the bottom of the table not showing) -->
-            <xhtml:tr/>
-        </xhtml:table>
-        <xhtml:p>
-            Status: <xforms:output ref="instance('status')/message"/>
-        </xhtml:p>
-        <xforms:trigger>
-            <xforms:label>Refresh</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:send submission="get-submission"/>
-                <xforms:setvalue ref="instance('status')/message">Read records</xforms:setvalue>
-            </xforms:action>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            <xh:tr/>
+        </xh:table>
+        <xh:p>
+            Status: <xf:output ref="instance('status')/message"/>
+        </xh:p>
+        <xf:trigger>
+            <xf:label>Refresh</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:send submission="get-submission"/>
+                <xf:setvalue ref="instance('status')/message">Read records</xf:setvalue>
+            </xf:action>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

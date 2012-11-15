@@ -11,52 +11,52 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <xhtml:head>
-        <xhtml:title>XForms Wizard - Summary</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance src="input:instance"/>
-            <xforms:submission id="start-submission" resource="/xforms-wizard-pfc/" method="post" replace="all"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table cellpadding="3">
-            <xhtml:tr>
-                <xhtml:td rowspan="3" style="background-color: #fce5b6"><font size="5">4</font></xhtml:td>
-                <xhtml:td colspan="1"><b>Step 4 of 4</b></xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xhtml:p>You are done!</xhtml:p>
-                    <xhtml:p>The data you have entered has been collected as follows:</xhtml:p>
-                    <xhtml:table class="gridtable">
-                        <xhtml:tr>
-                            <xhtml:th>Your first name:</xhtml:th>
-                            <xhtml:td><xforms:output ref="user/firstname"/></xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:th>Your last name:</xhtml:th>
-                            <xhtml:td><xforms:output ref="user/lastname"/></xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:th>Your age:</xhtml:th>
-                            <xhtml:td><xforms:output ref="user/age"/></xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:table>
-                </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:trigger>
-                        <xforms:label>Go back to start</xforms:label>
-                        <xforms:send ev:event="DOMActivate" submission="start-submission"/>
-                    </xforms:trigger>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+    <xh:head>
+        <xh:title>XForms Wizard - Summary</xh:title>
+        <xf:model xmlns:xf="http://www.w3.org/2002/xforms">
+            <xf:instance src="input:instance"/>
+            <xf:submission id="start-submission" resource="/xforms-wizard-pfc/" method="post" replace="all"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:table cellpadding="3">
+            <xh:tr>
+                <xh:td rowspan="3" style="background-color: #fce5b6"><font size="5">4</font></xh:td>
+                <xh:td colspan="1"><b>Step 4 of 4</b></xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xh:p>You are done!</xh:p>
+                    <xh:p>The data you have entered has been collected as follows:</xh:p>
+                    <xh:table class="gridtable">
+                        <xh:tr>
+                            <xh:th>Your first name:</xh:th>
+                            <xh:td><xf:output ref="user/firstname"/></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:th>Your last name:</xh:th>
+                            <xh:td><xf:output ref="user/lastname"/></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:th>Your age:</xh:th>
+                            <xh:td><xf:output ref="user/age"/></xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xf:trigger>
+                        <xf:label>Go back to start</xf:label>
+                        <xf:send ev:event="DOMActivate" submission="start-submission"/>
+                    </xf:trigger>
+                </xh:td>
+            </xh:tr>
+        </xh:table>
+    </xh:body>
+</xh:html>

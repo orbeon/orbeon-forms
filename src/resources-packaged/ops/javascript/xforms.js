@@ -1544,7 +1544,7 @@ ORBEON.xforms.Controls = {
         var isStaticReadonly = YAHOO.util.Dom.hasClass(control, "xforms-static");
         var formElement = ORBEON.xforms.Controls.getForm(control);
         if (YAHOO.util.Dom.hasClass(control, "xforms-output-appearance-xxforms-download")) {
-            // XForms output with xxforms:download appearance
+            // XForms output with xxf:download appearance
             var anchor = ORBEON.util.Dom.getElementsByName(control, "a")[0];
             if (newControlValue == "") {
                 anchor.setAttribute("href", "#");
@@ -2191,7 +2191,7 @@ ORBEON.xforms.Controls = {
         }
 
         // Save current value as server value. We usually do this on focus, but for control where we set the focus
-        // with xforms:setfocus, we still receive the focus event when the value changes, but after the change event
+        // with xf:setfocus, we still receive the focus event when the value changes, but after the change event
         // (which means we then don't send the new value to the server).
         if (ORBEON.xforms.ServerValueStore.get(controlId) == null) {
             var currentValue = ORBEON.xforms.Controls.getCurrentValue(control);
@@ -3066,7 +3066,7 @@ ORBEON.xforms.Events = {
                 // Get control
                 var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help-image");
                 if (control) {
-                    // The xforms:input is a unique case where the 'for' points to the input field, not the element representing the control
+                    // The xf:input is a unique case where the 'for' points to the input field, not the element representing the control
                     if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                         var message = ORBEON.xforms.Controls.getHelpMessage(control);
@@ -3391,7 +3391,7 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * xforms:select tree: handle click on check box
+     * xf:select tree: handle click on check box
      */
     treeCheckClick: function() {
         var tree = this.tree;
@@ -3410,7 +3410,7 @@ ORBEON.xforms.Events = {
     },
 
     /**
-     * xforms:select and xforms:select tree: handle click on label
+     * xf:select and xf:select tree: handle click on label
      */
     treeLabelClick: function(object) {
 

@@ -13,10 +13,10 @@
 -->
 <xsl:stylesheet version="2.0"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:f="http//www.orbeon.com/function">
 
     <xsl:variable name="MAX-TOP-LEVEL" as="xs:integer" select="50"/>

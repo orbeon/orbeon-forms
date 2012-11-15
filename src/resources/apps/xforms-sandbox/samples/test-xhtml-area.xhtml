@@ -1,29 +1,29 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XHTML Editor</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance>
+    <xh:head>
+        <xh:title>XHTML Editor</xh:title>
+        <xf:model xmlns:xf="http://www.w3.org/2002/xforms">
+            <xf:instance>
                 <instance>
                     <relevant>false</relevant>
                     <readonly>false</readonly>
                     <text>Initial</text>
                     <input/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="text" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="text" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
+        </xf:model>
 
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
             YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -85,28 +85,28 @@
                 }
             });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div>
-            <xforms:trigger appearance="minimal" id="toggle-relevant">
-                <xforms:label>Toggle relevant</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
-            </xforms:trigger> |
-            <xforms:trigger appearance="minimal" id="toggle-readonly">
-                <xforms:label>Toggle readonly</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
-            </xforms:trigger> |
-            <xforms:trigger appearance="minimal" id="set-value">
-                <xforms:label>Set value</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="text">New value</xforms:setvalue>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:textarea ref="text" mediatype="text/html" id="html-editor"/>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:output ref="text" id="output-from-editor"/>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        </xh:script>
+    </xh:head>
+    <xh:body>
+        <xh:div>
+            <xf:trigger appearance="minimal" id="toggle-relevant">
+                <xf:label>Toggle relevant</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
+            </xf:trigger> |
+            <xf:trigger appearance="minimal" id="toggle-readonly">
+                <xf:label>Toggle readonly</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+            </xf:trigger> |
+            <xf:trigger appearance="minimal" id="set-value">
+                <xf:label>Set value</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="text">New value</xf:setvalue>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
+            <xf:textarea ref="text" mediatype="text/html" id="html-editor"/>
+        </xh:div>
+        <xh:div>
+            <xf:output ref="text" id="output-from-editor"/>
+        </xh:div>
+    </xh:body>
+</xh:html>

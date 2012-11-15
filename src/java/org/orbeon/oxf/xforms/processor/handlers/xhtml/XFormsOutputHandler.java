@@ -19,7 +19,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Base xforms:output handler.
+ * Base xf:output handler.
  */
 public abstract class XFormsOutputHandler extends XFormsControlLifecyleHandler {
 

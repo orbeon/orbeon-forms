@@ -11,16 +11,16 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
-    <xhtml:head>
-        <xhtml:title>See You Again</xhtml:title>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xhtml:img src="/apps/pfc-atm/images/apukwik.gif" width="314" height="232" alt="See you again!"/>
-        </xhtml:p>
-        <xhtml:p style="margin-top: 3em">
-            <xhtml:a href="/pfc-atm/">Back</xhtml:a> to ATM home.
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+    <xh:head>
+        <xh:title>See You Again</xh:title>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xh:img src="/apps/pfc-atm/images/apukwik.gif" width="314" height="232" alt="See you again!"/>
+        </xh:p>
+        <xh:p style="margin-top: 3em">
+            <xh:a href="/pfc-atm/">Back</xh:a> to ATM home.
+        </xh:p>
+    </xh:body>
+</xh:html>

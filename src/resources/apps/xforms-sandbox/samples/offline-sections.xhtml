@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Offline Sections</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model" xxforms:external-events="go-offline">
-            <xforms:instance id="ui">
+    <xh:head>
+        <xh:title>Offline Sections</xh:title>
+        <xf:model xxf:offline="true" id="main-model" xxf:external-events="go-offline">
+            <xf:instance id="ui">
                 <ui>
                     <section>1</section>
                     <section-1>
@@ -39,8 +39,8 @@
                     <previous-button/>
                     <show-all-pages>false</show-all-pages>
                 </ui>
-            </xforms:instance>
-            <xforms:instance id="yes-no">
+            </xf:instance>
+            <xf:instance id="yes-no">
                 <items>
                     <item>
                         <value>true</value>
@@ -51,27 +51,27 @@
                         <label>No</label>
                     </item>
                 </items>
-            </xforms:instance>
-            <xforms:bind ref="instance('ui')">
-                <xforms:bind name="section" ref="section" xxforms:offline="true"/>
-                <xforms:bind ref="section-1" relevant="$section = 1 or $show-all-pages = 'true'" xxforms:offline="true"/>
-                <xforms:bind ref="section-2" relevant="$section = 2 or $show-all-pages = 'true'" xxforms:offline="true"/>
-                <xforms:bind ref="section-3" relevant="$section = 3 or $show-all-pages = 'true'" xxforms:offline="true"/>
+            </xf:instance>
+            <xf:bind ref="instance('ui')">
+                <xf:bind name="section" ref="section" xxf:offline="true"/>
+                <xf:bind ref="section-1" relevant="$section = 1 or $show-all-pages = 'true'" xxf:offline="true"/>
+                <xf:bind ref="section-2" relevant="$section = 2 or $show-all-pages = 'true'" xxf:offline="true"/>
+                <xf:bind ref="section-3" relevant="$section = 3 or $show-all-pages = 'true'" xxf:offline="true"/>
 
-                <xforms:bind ref="previous-button" readonly="$section = '1'" xxforms:offline="true"/>
-                <xforms:bind ref="next-button" readonly="$section = '3'" xxforms:offline="true"/>
+                <xf:bind ref="previous-button" readonly="$section = '1'" xxf:offline="true"/>
+                <xf:bind ref="next-button" readonly="$section = '3'" xxf:offline="true"/>
 
-                <xforms:bind ref="show-all-pages" name="show-all-pages" xxforms:offline="true"/>
-            </xforms:bind>
+                <xf:bind ref="show-all-pages" name="show-all-pages" xxf:offline="true"/>
+            </xf:bind>
 
-            <xforms:action ev:event="xxforms-offline">
-                <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
-            </xforms:action>
-            <xforms:action ev:event="xxforms-online">
-                <xforms:setvalue ref="instance('ui')/offline">false</xforms:setvalue>
-            </xforms:action>
-        </xforms:model>
-        <xhtml:script type="text/javascript">
+            <xf:action ev:event="xxforms-offline">
+                <xf:setvalue ref="instance('ui')/offline">true</xf:setvalue>
+            </xf:action>
+            <xf:action ev:event="xxforms-online">
+                <xf:setvalue ref="instance('ui')/offline">false</xf:setvalue>
+            </xf:action>
+        </xf:model>
+        <xh:script type="text/javascript">
             function nextPreviousClicked(event) {
                 var currentSection = ORBEON.xforms.Document.getValue("section");
                 ORBEON.xforms.Document.setValue("section", parseInt(currentSection)
@@ -81,54 +81,54 @@
                 YAHOO.util.Event.addListener("next", "click", nextPreviousClicked);
                 YAHOO.util.Event.addListener("previous", "click", nextPreviousClicked);
             });
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="section" id="section" style="display: inline"/>
-        <xforms:input ref="show-all-pages" id="show-all-pages" style="display: inline"/>
+        </xh:script>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="section" id="section" style="display: inline"/>
+        <xf:input ref="show-all-pages" id="show-all-pages" style="display: inline"/>
 
-        <xhtml:p>
-            <xforms:group ref="section-1">
-                <xforms:input ref="first-name">
-                    <xforms:label>First name</xforms:label>
-                </xforms:input>
-            </xforms:group>
-            <xforms:group ref="section-2">
-                <xforms:select1 appearance="full" ref="accept-privacy" id="accept-privacy">
-                    <xforms:itemset ref="instance('yes-no')/item">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </xforms:group>
-            <xforms:group ref="section-3">
-                <xforms:input ref="last-name">
-                    <xforms:label>Last name</xforms:label>
-                </xforms:input>
-            </xforms:group>
-        </xhtml:p>
-        <xhtml:p>
+        <xh:p>
+            <xf:group ref="section-1">
+                <xf:input ref="first-name">
+                    <xf:label>First name</xf:label>
+                </xf:input>
+            </xf:group>
+            <xf:group ref="section-2">
+                <xf:select1 appearance="full" ref="accept-privacy" id="accept-privacy">
+                    <xf:itemset ref="instance('yes-no')/item">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
+                </xf:select1>
+            </xf:group>
+            <xf:group ref="section-3">
+                <xf:input ref="last-name">
+                    <xf:label>Last name</xf:label>
+                </xf:input>
+            </xf:group>
+        </xh:p>
+        <xh:p>
             <!-- Take online/offline -->
-            <xforms:trigger ref=".[offline = 'false']">
-                <xforms:label>Take offline</xforms:label>
-                <xxforms:offline ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:trigger ref=".[offline = 'true']">
-                <xforms:label>Take online</xforms:label>
-                <xxforms:online ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:trigger ref=".[instance('ui')/offline = 'true']">
-                <xforms:label>Save to Gears</xforms:label>
-                <xxforms:offline-save ev:event="DOMActivate"/>
-            </xforms:trigger>
+            <xf:trigger ref=".[offline = 'false']">
+                <xf:label>Take offline</xf:label>
+                <xxf:offline ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:trigger ref=".[offline = 'true']">
+                <xf:label>Take online</xf:label>
+                <xxf:online ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:trigger ref=".[instance('ui')/offline = 'true']">
+                <xf:label>Save to Gears</xf:label>
+                <xxf:offline-save ev:event="DOMActivate"/>
+            </xf:trigger>
             <!-- Next/previous -->
-            <xforms:trigger ref="previous-button" id="previous">
-                <xforms:label>Previous</xforms:label>
-            </xforms:trigger>
-            <xforms:trigger ref="next-button" id="next">
-                <xforms:label>Next</xforms:label>
-            </xforms:trigger>
-        </xhtml:p>
+            <xf:trigger ref="previous-button" id="previous">
+                <xf:label>Previous</xf:label>
+            </xf:trigger>
+            <xf:trigger ref="next-button" id="next">
+                <xf:label>Next</xf:label>
+            </xf:trigger>
+        </xh:p>
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

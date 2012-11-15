@@ -11,65 +11,65 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Group around Table Elements</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Group around Table Elements</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <value tr="false" repeat="true"/>
                     <value tr="false" repeat="false"/>
                     <value tr="true" repeat="true"/>
                     <value tr="true" repeat="false"/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:h2>Table with repeat</xhtml:h2>
-        <xhtml:table>
-            <xforms:repeat id="tr-repeat" ref="/instance/value">
-                <xhtml:tr>
-                    <xhtml:td>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:h2>Table with repeat</xh:h2>
+        <xh:table>
+            <xf:repeat id="tr-repeat" ref="/instance/value">
+                <xh:tr>
+                    <xh:td>
                         Group shows line:
-                        <xforms:select ref="@tr" appearance="full">
-                            <xforms:item>
-                                <xforms:value>true</xforms:value>
-                                <xforms:label/>
-                            </xforms:item>
-                        </xforms:select>
-                    </xhtml:td>
-                    <xhtml:td>
+                        <xf:select ref="@tr" appearance="full">
+                            <xf:item>
+                                <xf:value>true</xf:value>
+                                <xf:label/>
+                            </xf:item>
+                        </xf:select>
+                    </xh:td>
+                    <xh:td>
                         Repeat shows line:
-                        <xforms:select ref="@repeat" appearance="full">
-                            <xforms:item>
-                                <xforms:value>true</xforms:value>
-                                <xforms:label/>
-                            </xforms:item>
-                        </xforms:select>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+                        <xf:select ref="@repeat" appearance="full">
+                            <xf:item>
+                                <xf:value>true</xf:value>
+                                <xf:label/>
+                            </xf:item>
+                        </xf:select>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
 
-        <xhtml:h2>Table with group</xhtml:h2>
-        <xhtml:table>
-            <xforms:repeat ref="/instance/value[@repeat = 'true']" id="value-repeat">
-                <xforms:group ref=".[@tr = 'true']" id="tr-group">
-                    <xhtml:tr>
-                        <xhtml:td>Line <xforms:output value="count(preceding-sibling::value) + 1"/></xhtml:td>
-                    </xhtml:tr>
-                </xforms:group>
-            </xforms:repeat>
+        <xh:h2>Table with group</xh:h2>
+        <xh:table>
+            <xf:repeat ref="/instance/value[@repeat = 'true']" id="value-repeat">
+                <xf:group ref=".[@tr = 'true']" id="tr-group">
+                    <xh:tr>
+                        <xh:td>Line <xf:output value="count(preceding-sibling::value) + 1"/></xh:td>
+                    </xh:tr>
+                </xf:group>
+            </xf:repeat>
 
-        </xhtml:table>
+        </xh:table>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

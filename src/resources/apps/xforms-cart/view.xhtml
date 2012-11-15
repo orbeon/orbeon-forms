@@ -11,55 +11,55 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xforms="http://www.w3.org/2002/xforms">
+<xh:html xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms">
 
-    <xhtml:head>
-        <xhtml:title>Accessing the Session - Shopping Cart</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:action ev:event="xforms-ready">
-                <xforms:send submission="get"/>
-            </xforms:action>
-            <xforms:instance id="item">
+    <xh:head>
+        <xh:title>Accessing the Session - Shopping Cart</xh:title>
+        <xf:model id="main-model">
+            <xf:action ev:event="xforms-ready">
+                <xf:send submission="get"/>
+            </xf:action>
+            <xf:instance id="item">
                 <item/>
-            </xforms:instance>
-            <xforms:instance id="cart">
+            </xf:instance>
+            <xf:instance id="cart">
                 <cart/>
-            </xforms:instance>
-            <xforms:submission id="get" action="/xforms-cart/get" method="get" serialization="none" replace="instance" instance="cart"/>
-            <xforms:submission id="add" action="/xforms-cart/add" ref="instance('item')" method="post" replace="none"/>
-            <xforms:submission id="clear" action="/xforms-cart/clear" ref="instance('item')" method="post" replace="none"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:group>
-                <xforms:input ref="instance('item')">
-                    <xforms:label>Enter an item:</xforms:label>
-                </xforms:input>
-                <xforms:trigger>
-                    <xforms:label>Add to cart</xforms:label>
-                </xforms:trigger>
-                <xforms:action ev:event="DOMActivate" if="normalize-space(instance('item')) != ''">
-                    <xforms:send submission="add"/>
-                    <xforms:send submission="get"/>
-                    <xforms:setvalue ref="instance('item')"/>
-                </xforms:action>
-            </xforms:group>
-            <xforms:trigger>
-                <xforms:label>Empty cart</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:send submission="clear"/>
-                    <xforms:send submission="get"/>
-                    <xforms:setvalue ref="instance('item')"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:ol>
-            <xforms:repeat ref="instance('cart')/item" id="main-repeat">
-                <xhtml:li><xforms:output ref="."/></xhtml:li>
-            </xforms:repeat>
-        </xhtml:ol>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:submission id="get" action="/xforms-cart/get" method="get" serialization="none" replace="instance" instance="cart"/>
+            <xf:submission id="add" action="/xforms-cart/add" ref="instance('item')" method="post" replace="none"/>
+            <xf:submission id="clear" action="/xforms-cart/clear" ref="instance('item')" method="post" replace="none"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:group>
+                <xf:input ref="instance('item')">
+                    <xf:label>Enter an item:</xf:label>
+                </xf:input>
+                <xf:trigger>
+                    <xf:label>Add to cart</xf:label>
+                </xf:trigger>
+                <xf:action ev:event="DOMActivate" if="normalize-space(instance('item')) != ''">
+                    <xf:send submission="add"/>
+                    <xf:send submission="get"/>
+                    <xf:setvalue ref="instance('item')"/>
+                </xf:action>
+            </xf:group>
+            <xf:trigger>
+                <xf:label>Empty cart</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:send submission="clear"/>
+                    <xf:send submission="get"/>
+                    <xf:setvalue ref="instance('item')"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:p>
+        <xh:ol>
+            <xf:repeat ref="instance('cart')/item" id="main-repeat">
+                <xh:li><xf:output ref="."/></xh:li>
+            </xf:repeat>
+        </xh:ol>
+    </xh:body>
+</xh:html>

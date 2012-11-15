@@ -29,7 +29,7 @@ import java.util.*;
  *
  * As an extension, supports XForms properties in the xxforms namespace to access XForms engine properties. E.g.:
  *
- *   property('xxforms:noscript')
+ *   property('xxf:noscript')
  */
 public class Property extends XFormsFunction {
 

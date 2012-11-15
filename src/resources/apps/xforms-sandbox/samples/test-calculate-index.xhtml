@@ -11,43 +11,43 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:saxon="http://saxon.sf.net/"
             xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude">
 
-    <xhtml:head>
-        <xhtml:title>Test</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Test</xh:title>
+        <xf:model>
 
-            <xforms:instance id="main-instance">
+            <xf:instance id="main-instance">
                 <ui>
                     <item>Item 1</item>
                     <item>Item 2</item>
                     <item>Item 3</item>
                     <section-index/>
                 </ui>
-            </xforms:instance>
-            <xforms:bind ref="section-index" calculate="index('repeat-section')"/>
+            </xf:instance>
+            <xf:bind ref="section-index" calculate="index('repeat-section')"/>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
         Section index:
-        <xforms:output value="index('repeat-section')"/>
+        <xf:output value="index('repeat-section')"/>
         /
-        <xforms:output value="section-index"/>
+        <xf:output value="section-index"/>
 
-        <xforms:repeat ref="item" id="repeat-section">
-            <xhtml:div>
-                <xforms:output value="."/>
-            </xhtml:div>
-        </xforms:repeat>
+        <xf:repeat ref="item" id="repeat-section">
+            <xh:div>
+                <xf:output value="."/>
+            </xh:div>
+        </xf:repeat>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

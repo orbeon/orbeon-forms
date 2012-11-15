@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xml;
 
 /**
- * Handle xforms:group.
+ * Handle xf:group.
  */
 public class XFormsGroupHandler extends XFormsControlLifecyleHandlerXML {
 	

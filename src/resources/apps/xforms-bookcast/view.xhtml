@@ -12,15 +12,15 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
     <head>
         <title>XForms Bookcast</title>
         <link rel="alternate" type="application/atom+xml" title="Orbeon XForms Bookcast Tutorial Feed" href="atom"/>
-        <xforms:model>
+        <xf:model>
 
             <xs:schema elementFormDefault="qualified" attributeFormDefault="unqualified">
 
@@ -79,10 +79,10 @@
             </xs:schema>
 
             <!-- Load list of books when the XForms engine is ready -->
-            <xforms:send ev:event="xforms-ready" submission="list-submission"/>
+            <xf:send ev:event="xforms-ready" submission="list-submission"/>
 
             <!-- Instance that contains all the books -->
-            <xforms:instance id="books-instance">
+            <xf:instance id="books-instance">
                 <books xmlns="">
                     <book>
                         <title/>
@@ -93,14 +93,14 @@
                         <notes/>
                     </book>
                 </books>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="instance('books-instance')/book">
-                <xforms:bind ref="title" required="true()"/>
-                <xforms:bind ref="author" required="true()"/>
-            </xforms:bind>
+            <xf:bind ref="instance('books-instance')/book">
+                <xf:bind ref="title" required="true()"/>
+                <xf:bind ref="author" required="true()"/>
+            </xf:bind>
 
-            <xforms:instance id="book-template">
+            <xf:instance id="book-template">
                 <book xmlns="">
                     <title/>
                     <author/>
@@ -109,9 +109,9 @@
                     <rating/>
                     <notes/>
                 </book>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="languages-instance">
+            <xf:instance id="languages-instance">
                 <languages xmlns="">
                     <language>
                         <name>English</name>
@@ -126,9 +126,9 @@
                         <value>es</value>
                     </language>
                 </languages>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="ratings-instance">
+            <xf:instance id="ratings-instance">
                 <ratings xmlns="">
                     <rating>
                         <name>1</name>
@@ -151,26 +151,26 @@
                         <value>5</value>
                     </rating>
                 </ratings>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Submission to get the document containing all the books -->
-            <xforms:submission id="list-submission" serialization="none"
+            <xf:submission id="list-submission" serialization="none"
                        method="get" action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
                        replace="instance" instance="books-instance"/>
 
             <!-- Submission to save the document containing all the books -->
-            <xforms:submission id="save-submission" ref="instance('books-instance')"
+            <xf:submission id="save-submission" ref="instance('books-instance')"
                     action="/exist/rest/db/orbeon/xforms-bookcast/books.xml"
                     method="put" replace="none">
-                <xforms:message ev:event="xforms-submit-error" level="modal">An error occurred while saving!</xforms:message>
-            </xforms:submission>
+                <xf:message ev:event="xforms-submit-error" level="modal">An error occurred while saving!</xf:message>
+            </xf:submission>
 
             <!-- Submission to load the sample data -->
-            <xforms:submission id="sample-data-submission" serialization="none"
+            <xf:submission id="sample-data-submission" serialization="none"
                        method="get" action="oxf:/apps/xforms-bookcast/sample-data.xml"
                        replace="instance" instance="books-instance"/>
 
-        </xforms:model>
+        </xf:model>
         <!-- CSS style specific to this page -->
         <style type="text/css">
             .xforms-label { font-weight: bold }
@@ -200,19 +200,19 @@
         <table class="books-action-table">
             <tr>
                 <td>
-                    <xforms:submit submission="save-submission" appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/save.gif" alt="Save"/><span>Save</span></xforms:label>
-                    </xforms:submit>
+                    <xf:submit submission="save-submission" appearance="minimal">
+                        <xf:label><img src="/apps/xforms-bookcast/images/save.gif" alt="Save"/><span>Save</span></xf:label>
+                    </xf:submit>
                 </td>
                 <td>
-                    <xforms:submit submission="list-submission" appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/><span>Revert</span></xforms:label>
-                    </xforms:submit>
+                    <xf:submit submission="list-submission" appearance="minimal">
+                        <xf:label><img src="/apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/><span>Revert</span></xf:label>
+                    </xf:submit>
                 </td>
                 <td>
-                    <xforms:submit submission="sample-data-submission" appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/><span>Load Sample Data</span></xforms:label>
-                    </xforms:submit>
+                    <xf:submit submission="sample-data-submission" appearance="minimal">
+                        <xf:label><img src="/apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/><span>Load Sample Data</span></xf:label>
+                    </xf:submit>
                 </td>
             </tr>
         </table>
@@ -221,72 +221,72 @@
         <table class="books-table">
             <tr>
                 <td>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label><img src="/apps/xforms-bookcast/images/add.gif"/></xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="1" position="before" origin="instance('book-template')"/>
-                    </xforms:trigger>
+                    <xf:trigger appearance="minimal">
+                        <xf:label><img src="/apps/xforms-bookcast/images/add.gif"/></xf:label>
+                        <xf:insert ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="1" position="before" origin="instance('book-template')"/>
+                    </xf:trigger>
                 </td>
                 <td class="add-td">
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label>Add One</xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="1" position="before" origin="instance('book-template')"/>
-                    </xforms:trigger>
+                    <xf:trigger appearance="minimal">
+                        <xf:label>Add One</xf:label>
+                        <xf:insert ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="1" position="before" origin="instance('book-template')"/>
+                    </xf:trigger>
                 </td>
             </tr>
-            <xforms:repeat ref="book" id="book-repeat">
+            <xf:repeat ref="book" id="book-repeat">
                 <tr>
                     <td>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:delete ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="index('book-repeat')"/>
-                            <xforms:label><img src="/apps/xforms-bookcast/images/remove.gif"/></xforms:label>
-                        </xforms:trigger>
+                        <xf:trigger appearance="minimal">
+                            <xf:delete ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="index('book-repeat')"/>
+                            <xf:label><img src="/apps/xforms-bookcast/images/remove.gif"/></xf:label>
+                        </xf:trigger>
                     </td>
                     <td class="form-td">
-                        <xforms:input ref="title">
-                            <xforms:label class="books-label">Title</xforms:label>
-                            <xforms:alert>The title is required</xforms:alert>
-                        </xforms:input>
+                        <xf:input ref="title">
+                            <xf:label class="books-label">Title</xf:label>
+                            <xf:alert>The title is required</xf:alert>
+                        </xf:input>
                         <br/>
-                        <xforms:input ref="author">
-                            <xforms:label class="books-label">Author</xforms:label>
-                            <xforms:alert>The author is required</xforms:alert>
-                        </xforms:input>
+                        <xf:input ref="author">
+                            <xf:label class="books-label">Author</xf:label>
+                            <xf:alert>The author is required</xf:alert>
+                        </xf:input>
                         <br/>
-                        <xforms:select1 ref="language">
-                            <xforms:label class="books-label">Language</xforms:label>
-                            <xforms:item>
-                                <xforms:label>Choose One...</xforms:label>
-                                <xforms:value/>
-                            </xforms:item>
-                            <xforms:itemset ref="instance('languages-instance')/language">
-                                <xforms:label ref="name"/>
-                                <xforms:value ref="value"/>
-                            </xforms:itemset>
-                        </xforms:select1>
+                        <xf:select1 ref="language">
+                            <xf:label class="books-label">Language</xf:label>
+                            <xf:item>
+                                <xf:label>Choose One...</xf:label>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:itemset ref="instance('languages-instance')/language">
+                                <xf:label ref="name"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                        </xf:select1>
                         <br/>
-                        <xforms:input ref="link">
-                            <xforms:label class="books-label">Link</xforms:label>
-                            <xforms:alert>The link is incorrect</xforms:alert>
-                        </xforms:input>
+                        <xf:input ref="link">
+                            <xf:label class="books-label">Link</xf:label>
+                            <xf:alert>The link is incorrect</xf:alert>
+                        </xf:input>
                         <br/>
-                        <xforms:select1 ref="rating" appearance="full">
-                            <xforms:label class="books-label">Rating</xforms:label>
-                            <xforms:item>
-                                <xforms:label>None</xforms:label>
-                                <xforms:value/>
-                            </xforms:item>
-                            <xforms:itemset ref="instance('ratings-instance')/rating">
-                                <xforms:label ref="name"/>
-                                <xforms:value ref="value"/>
-                            </xforms:itemset>
-                        </xforms:select1>
+                        <xf:select1 ref="rating" appearance="full">
+                            <xf:label class="books-label">Rating</xf:label>
+                            <xf:item>
+                                <xf:label>None</xf:label>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:itemset ref="instance('ratings-instance')/rating">
+                                <xf:label ref="name"/>
+                                <xf:value ref="value"/>
+                            </xf:itemset>
+                        </xf:select1>
                         <br/>
-                        <xforms:textarea ref="notes" appearance="xxforms:autosize">
-                            <xforms:label class="books-label">Notes</xforms:label>
-                        </xforms:textarea>
+                        <xf:textarea ref="notes" appearance="xxf:autosize">
+                            <xf:label class="books-label">Notes</xf:label>
+                        </xf:textarea>
                     </td>
                 </tr>
-            </xforms:repeat>
+            </xf:repeat>
         </table>
     </body>
 </html>

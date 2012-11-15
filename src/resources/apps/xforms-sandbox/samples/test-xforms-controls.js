@@ -102,7 +102,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:select and xforms:select1",
+    name: "xf:select and xf:select1",
 
     getSelect: function(controlId) {
         var control = YAHOO.util.Dom.get(controlId);
@@ -206,7 +206,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:input type xs:date",
+    name: "xf:input type xs:date",
 
     dateValueControlId: "date" + XFORMS_SEPARATOR_1 + "1",
     dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
@@ -270,7 +270,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:input type xs:time",
+    name: "xf:input type xs:time",
 
     timeValueId: "time" + XFORMS_SEPARATOR_1 + "1",
     timeValueInputId: "time$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
@@ -329,7 +329,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:trigger appearance=\"minimal\"",
+    name: "xf:trigger appearance=\"minimal\"",
 
     triggerId: "trigger-minimal" + XFORMS_SEPARATOR_1 + "1",
 
@@ -353,7 +353,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-    name: "xforms:output appearance=\"xxforms:download\"",
+    name: "xf:output appearance=\"xxf:download\"",
 
     outputFileId: "output-file-value" + XFORMS_SEPARATOR_1 + "1",
 

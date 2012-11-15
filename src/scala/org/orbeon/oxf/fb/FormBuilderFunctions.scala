@@ -67,7 +67,7 @@ object FormBuilderFunctions extends Logging {
     // Get the form model
     def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, "fr-form-model")) head
 
-    // Find an xforms:instance element
+    // Find an xf:instance element
     def instanceElement(inDoc: NodeInfo, id: String) =
         findModelElement(inDoc) \ "*:instance" filter (hasIdValue(_, id)) headOption
 

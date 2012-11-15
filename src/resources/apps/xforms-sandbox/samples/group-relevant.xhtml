@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Group Relevance</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Group Relevance</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <current-group>1</current-group>
                     <show-trigger>yes</show-trigger>
@@ -36,52 +36,52 @@
                         <repeat2a></repeat2a>
                     </group>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="group" relevant="(count(preceding-sibling::group) + 1) = ../current-group"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="current-group" id="selector-input">
-            <xforms:label>Relevant group</xforms:label>
-        </xforms:input>
-        <xforms:input ref="show-trigger" id="show-trigger-input">
-            <xforms:label>Show trigger</xforms:label>
-        </xforms:input>
-        <xforms:group ref="group[1]" id="group1a">
-            <xforms:group id="group1b">
-                <xforms:input ref="input" id="input1">
-                    <xforms:label>Input 1</xforms:label>
-                </xforms:input>
-                <xforms:group ref=".[../show-trigger = 'yes']">
-                    <xforms:trigger id="trigger1" appearance="minimal">
-                        <xforms:label>
-                            <xhtml:img src="/config/theme/images/plus.gif"/>
-                            <xhtml:span>Trigger 1</xhtml:span>
-                        </xforms:label>
-                    </xforms:trigger>
-                </xforms:group>
-                [<xforms:repeat ref="repeat1a">
-                    <xforms:output value="'X'"/>
-                </xforms:repeat>]
-            </xforms:group>
-        </xforms:group>
-        <xforms:group ref="group[2]" id="group2a">
-            <xforms:group id="group2b">
-                <xforms:input ref="input" id="input2">
-                    <xforms:label>Input 2</xforms:label>
-                </xforms:input>
-                <xforms:group ref=".[../show-trigger = 'yes']">
-                    <xforms:trigger id="trigger2" appearance="minimal">
-                        <xforms:label>
-                            <xhtml:img src="/config/theme/images/plus.gif"/>
-                            <xhtml:span>Trigger 2</xhtml:span>
-                        </xforms:label>
-                    </xforms:trigger>
-                </xforms:group>
-                [<xforms:repeat ref="repeat2a">
-                    <xforms:output value="'.'"/>
-                </xforms:repeat>]
-            </xforms:group>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:bind ref="group" relevant="(count(preceding-sibling::group) + 1) = ../current-group"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="current-group" id="selector-input">
+            <xf:label>Relevant group</xf:label>
+        </xf:input>
+        <xf:input ref="show-trigger" id="show-trigger-input">
+            <xf:label>Show trigger</xf:label>
+        </xf:input>
+        <xf:group ref="group[1]" id="group1a">
+            <xf:group id="group1b">
+                <xf:input ref="input" id="input1">
+                    <xf:label>Input 1</xf:label>
+                </xf:input>
+                <xf:group ref=".[../show-trigger = 'yes']">
+                    <xf:trigger id="trigger1" appearance="minimal">
+                        <xf:label>
+                            <xh:img src="/config/theme/images/plus.gif"/>
+                            <xh:span>Trigger 1</xh:span>
+                        </xf:label>
+                    </xf:trigger>
+                </xf:group>
+                [<xf:repeat ref="repeat1a">
+                    <xf:output value="'X'"/>
+                </xf:repeat>]
+            </xf:group>
+        </xf:group>
+        <xf:group ref="group[2]" id="group2a">
+            <xf:group id="group2b">
+                <xf:input ref="input" id="input2">
+                    <xf:label>Input 2</xf:label>
+                </xf:input>
+                <xf:group ref=".[../show-trigger = 'yes']">
+                    <xf:trigger id="trigger2" appearance="minimal">
+                        <xf:label>
+                            <xh:img src="/config/theme/images/plus.gif"/>
+                            <xh:span>Trigger 2</xh:span>
+                        </xf:label>
+                    </xf:trigger>
+                </xf:group>
+                [<xf:repeat ref="repeat2a">
+                    <xf:output value="'.'"/>
+                </xf:repeat>]
+            </xf:group>
+        </xf:group>
+    </xh:body>
+</xh:html>

@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -60,23 +60,23 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xforms:group>
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint"/>
-                <xhtml:div class="xbl-fr-upload-field-container">
-                    <xforms:upload xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxforms:script>
-                        <xbl:content includes=":root > xforms|filename, :root > xforms|mediatype, :root > xxforms|size"/>
-                    </xforms:upload>
-                	<xhtml:div class="xbl-fr-upload-fakefile">
-                		<xhtml:input class="xbl-fr-upload-visible-input"/>
-                		<xhtml:span class="yui-button">
-                		    <xhtml:span class="first-child">
-                        		<xhtml:button type="button">Select file</xhtml:button>
-                		    </xhtml:span>
-                		</xhtml:span>
-                	</xhtml:div>
-            	</xhtml:div>
-            </xforms:group>
+            <xf:group>
+                <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint"/>
+                <xh:div class="xbl-fr-upload-field-container">
+                    <xf:upload xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxf:script>
+                        <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
+                    </xf:upload>
+                	<xh:div class="xbl-fr-upload-fakefile">
+                		<xh:input class="xbl-fr-upload-visible-input"/>
+                		<xh:span class="yui-button">
+                		    <xh:span class="first-child">
+                        		<xh:button type="button">Select file</xh:button>
+                		    </xh:span>
+                		</xh:span>
+                	</xh:div>
+            	</xh:div>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

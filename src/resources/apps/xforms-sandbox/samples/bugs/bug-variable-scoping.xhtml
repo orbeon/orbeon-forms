@@ -11,46 +11,46 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:foo="http://orbeon.org/oxf/xml/foo"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xbl="http://www.w3.org/ns/xbl">
 
-    <xhtml:head>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <value/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:trigger>
-            <xforms:label>Open</xforms:label>
-            <xxforms:show ev:event="DOMActivate" dialog="test-dialog"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Open</xf:label>
+            <xxf:show ev:event="DOMActivate" dialog="test-dialog"/>
+        </xf:trigger>
 
-        <xxforms:dialog id="test-dialog">
-            <xforms:label>Test Dialog</xforms:label>
+        <xxf:dialog id="test-dialog">
+            <xf:label>Test Dialog</xf:label>
 
-            <xforms:var name="test-variable-1" value="'42'"/>
-            <xforms:var name="test-variable-2" value="'101'"/>
-            <xforms:message ev:event="xxforms-dialog-open">
-                Values: <xforms:output value="$test-variable-1"/>, <xforms:output value="$test-variable-2"/>
-            </xforms:message>
+            <xf:var name="test-variable-1" value="'42'"/>
+            <xf:var name="test-variable-2" value="'101'"/>
+            <xf:message ev:event="xxforms-dialog-open">
+                Values: <xf:output value="$test-variable-1"/>, <xf:output value="$test-variable-2"/>
+            </xf:message>
 
-            <xhtml:div>
-                <xforms:output value="$test-variable-1"/>,
-                <xforms:output value="$test-variable-2"/>
-            </xhtml:div>
-        </xxforms:dialog>
+            <xh:div>
+                <xf:output value="$test-variable-1"/>,
+                <xf:output value="$test-variable-2"/>
+            </xh:div>
+        </xxf:dialog>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

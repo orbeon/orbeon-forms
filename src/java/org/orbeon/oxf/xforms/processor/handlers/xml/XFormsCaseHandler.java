@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:case.
+ * Handle xf:case.
  */
 public class XFormsCaseHandler extends XFormsControlLifecyleHandlerXML {
 	

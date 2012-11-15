@@ -194,7 +194,7 @@ public class XFormsUtils {
     /**
      * Get the value of a child element known to have only static content.
      *
-     * @param childElement          element to evaluate (xforms:label, etc.)
+     * @param childElement          element to evaluate (xf:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
@@ -215,7 +215,7 @@ public class XFormsUtils {
             // Visit the subtree and serialize
 
             // NOTE: It is a little funny to do our own serialization here, but the alternative is to build a DOM and
-            // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
+            // serialize it, which is not trivial because of the possible interleaved xf:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
 
@@ -238,7 +238,7 @@ public class XFormsUtils {
      * @param container             current XFormsContainingDocument
      * @param sourceEffectiveId     source effective id for id resolution
      * @param scope                 XBL scope
-     * @param childElement          element to evaluate (xforms:label, etc.)
+     * @param childElement          element to evaluate (xf:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed
@@ -260,14 +260,14 @@ public class XFormsUtils {
 
     /**
      * Get the value of an element by trying single-node binding, value attribute, linking attribute, and inline value
-     * (including nested XHTML and xforms:output elements).
+     * (including nested XHTML and xf:output elements).
      *
      * This may return an HTML string if HTML is accepted and found, or a plain string otherwise.
      *
      * @param container             current XBLContainer
      * @param contextStack          context stack for XPath evaluation
      * @param sourceEffectiveId     source effective id for id resolution
-     * @param childElement          element to evaluate (xforms:label, etc.)
+     * @param childElement          element to evaluate (xf:label, etc.)
      * @param acceptHTML            whether the result may contain HTML
      * @param containsHTML          whether the result actually contains HTML (null allowed)
      * @return                      string containing the result of the evaluation, null if evaluation failed (see comments)
@@ -360,7 +360,7 @@ public class XFormsUtils {
             // Visit the subtree and serialize
 
             // NOTE: It is a little funny to do our own serialization here, but the alternative is to build a DOM and
-            // serialize it, which is not trivial because of the possible interleaved xforms:output's. Furthermore, we
+            // serialize it, which is not trivial because of the possible interleaved xf:output's. Furthermore, we
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
             Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(container, contextStack,
@@ -876,7 +876,7 @@ public class XFormsUtils {
 
         public void startElement(Element element) {
             if (element.getQName().equals(XFormsConstants.XFORMS_OUTPUT_QNAME)) {
-                // This is an xforms:output nested among other markup
+                // This is an xf:output nested among other markup
 
                 final XFormsOutputControl outputControl = new XFormsOutputControl(container, null, element, null) {
                     // Override this as super.getContextStack() gets the containingDocument's stack, and here we need whatever is the current stack

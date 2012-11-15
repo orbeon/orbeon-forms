@@ -11,63 +11,63 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Date Control</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Date Control</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <url/>
                     <a>value1</a>
                     <b>value2</b>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="url">
-            <xforms:label>Enter value:</xforms:label>
-        </xforms:input>
-        <xhtml:br/>
-        <xforms:output value="encode-for-uri(url)">
-            <xforms:label>encode-for-uri()</xforms:label>
-        </xforms:output>
-        <xhtml:br/>
-        <xforms:output value="iri-to-uri(url)">
-            <xforms:label>iri-to-uri()</xforms:label>
-        </xforms:output>
-        <xhtml:br/>
-        <xforms:output value="escape-html-uri(url)">
-            <xforms:label>escape-html-uri()</xforms:label>
-        </xforms:output>
-        <xhtml:br/>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="url">
+            <xf:label>Enter value:</xf:label>
+        </xf:input>
+        <xh:br/>
+        <xf:output value="encode-for-uri(url)">
+            <xf:label>encode-for-uri()</xf:label>
+        </xf:output>
+        <xh:br/>
+        <xf:output value="iri-to-uri(url)">
+            <xf:label>iri-to-uri()</xf:label>
+        </xf:output>
+        <xh:br/>
+        <xf:output value="escape-html-uri(url)">
+            <xf:label>escape-html-uri()</xf:label>
+        </xf:output>
+        <xh:br/>
 
-        <xforms:trigger>
-            <xforms:label>Load</xforms:label>
-            <xforms:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Load</xforms:label>
-            <xforms:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}/something"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Load</xforms:label>
-            <xforms:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}/{{something}}"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Load</xforms:label>
-            <xforms:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}/{{something}}/else"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Load</xforms:label>
-            <xforms:load ev:event="DOMActivate" resource="http://www.google.com/{concat(string(instance('instance')/a), '{', '{{', string(instance('instance')/b), '}', '}}')}/{{something}}/else"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+        <xf:trigger>
+            <xf:label>Load</xf:label>
+            <xf:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Load</xf:label>
+            <xf:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}/something"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Load</xf:label>
+            <xf:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}/{{something}}"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Load</xf:label>
+            <xf:load ev:event="DOMActivate" resource="http://www.google.com/{instance('instance')/a}/{{something}}/else"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Load</xf:label>
+            <xf:load ev:event="DOMActivate" resource="http://www.google.com/{concat(string(instance('instance')/a), '{', '{{', string(instance('instance')/b), '}', '}}')}/{{something}}/else"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

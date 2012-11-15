@@ -11,23 +11,23 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Insert &amp; Delete</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XForms Insert &amp; Delete</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
 
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="books-instance">
+            </xf:instance>
+            <xf:instance id="books-instance">
                 <books>
                     <book xmlns="" id="1" id2="a">
                         <title/>
@@ -38,66 +38,66 @@
                         <author/>
                     </book>
                 </books>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>Insert Book</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="instance('main-instance')" ref="book" origin="instance('books-instance')/book[1]"/>
-                    <xforms:setvalue ref="instance('books-instance')/book[1]/@id" value=". + 1"/>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Insert Books</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="instance('main-instance')" ref="book" origin="instance('books-instance')/book"/>
-                    <xforms:setvalue ref="instance('books-instance')/book[1]/@id" value=". + 1"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>Delete Book</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:delete ref="instance('main-instance')/book" at="last()"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>Insert Attribute on Root Element</xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:trigger>
+                <xf:label>Insert Book</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert context="instance('main-instance')" ref="book" origin="instance('books-instance')/book[1]"/>
+                    <xf:setvalue ref="instance('books-instance')/book[1]/@id" value=". + 1"/>
+                </xf:action>
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Insert Books</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert context="instance('main-instance')" ref="book" origin="instance('books-instance')/book"/>
+                    <xf:setvalue ref="instance('books-instance')/book[1]/@id" value=". + 1"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger>
+                <xf:label>Delete Book</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:delete ref="instance('main-instance')/book" at="last()"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger>
+                <xf:label>Insert Attribute on Root Element</xf:label>
+                <xf:insert ev:event="DOMActivate"
                         context="instance('main-instance')" origin="instance('books-instance')/book[1]/@id"/>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Insert Attributes on Root Element</xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Insert Attributes on Root Element</xf:label>
+                <xf:insert ev:event="DOMActivate"
                         context="instance('main-instance')" origin="instance('books-instance')/book[1]/@*"/>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Insert Attributes on Root Element (Node-Set)</xforms:label>
-                <xforms:insert ev:event="DOMActivate"
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Insert Attributes on Root Element (Node-Set)</xf:label>
+                <xf:insert ev:event="DOMActivate"
                         ref="instance('main-instance')/@*" origin="instance('books-instance')/book[1]/@*"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>Delete Attribute on Root Element</xforms:label>
-                <xforms:delete ev:event="DOMActivate" ref="instance('main-instance')/@id"/>
-            </xforms:trigger>
-        </xhtml:p>
-         <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>Insert Items</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="instance('main-instance')" origin="('Text', instance('books-instance')/book[1]/@id, 2)"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger>
+                <xf:label>Delete Attribute on Root Element</xf:label>
+                <xf:delete ev:event="DOMActivate" ref="instance('main-instance')/@id"/>
+            </xf:trigger>
+        </xh:p>
+         <xh:p>
+            <xf:trigger>
+                <xf:label>Insert Items</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert context="instance('main-instance')" origin="('Text', instance('books-instance')/book[1]/@id, 2)"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:p>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

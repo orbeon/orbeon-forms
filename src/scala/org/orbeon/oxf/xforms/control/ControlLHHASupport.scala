@@ -103,19 +103,19 @@ object LHHASupport {
         def isHTML = false
     }
 
-    // Whether a given control has an associated xforms:label element.
+    // Whether a given control has an associated xf:label element.
     def hasLabel(containingDocument: XFormsContainingDocument, prefixedId: String) =
         containingDocument.getStaticOps.getLabel(prefixedId) ne null
 
-    // Whether a given control has an associated xforms:hint element.
+    // Whether a given control has an associated xf:hint element.
     def hasHint(containingDocument: XFormsContainingDocument, prefixedId: String) =
         containingDocument.getStaticOps.getHint(prefixedId) ne null
 
-    // Whether a given control has an associated xforms:help element.
+    // Whether a given control has an associated xf:help element.
     def hasHelp(containingDocument: XFormsContainingDocument, prefixedId: String) =
         containingDocument.getStaticOps.getHelp(prefixedId) ne null
 
-    // Whether a given control has an associated xforms:alert element.
+    // Whether a given control has an associated xf:alert element.
     def hasAlert(containingDocument: XFormsContainingDocument, prefixedId: String) =
         containingDocument.getStaticOps.getAlert(prefixedId) ne null
 }

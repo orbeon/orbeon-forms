@@ -24,12 +24,9 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
-         xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+         xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
 
-    <xbl:binding id="fr-section" element="fr|section" xxforms:external-events="fb-set-current-section fb-update-section-label" xxbl:mode="binding lhha custom-lhha">
+    <xbl:binding id="fr-section" element="fr|section" xxf:external-events="fb-set-current-section fb-update-section-label" xxbl:mode="binding lhha custom-lhha">
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
@@ -41,11 +38,11 @@
         </xbl:handlers>
 
         <xbl:implementation>
-            <xforms:model id="model">
-                <xforms:instance id="open">
+            <xf:model id="model">
+                <xf:instance id="open">
                     <open/>
-                </xforms:instance>
-            </xforms:model>
+                </xf:instance>
+            </xf:model>
         </xbl:implementation>
 
         <xbl:template xxbl:transform="oxf:xslt">
@@ -66,85 +63,85 @@
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
                         <xf:var name="id" xbl:attr="xbl:text=id"/>
-                        <xf:var name="fb-section" value="xxforms:instance('fb-form-instance')/xhtml:body//fr:section[@id = $id]"/>
+                        <xf:var name="fb-section" value="xxf:instance('fb-form-instance')/xh:body//fr:section[@id = $id]"/>
                         <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ''"/>
 
-                        <xforms:group xbl:attr="model context ref bind"
+                        <xf:group xbl:attr="model context ref bind"
                                 class="{string-join(('fr-section-container', @class), ' ')} {{$fb-can-do-classes}}">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">
 
                                 <!-- Q: Is this the best way to get access to Form Runner resources? -->
-                                <xxf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xxf:var>
+                                <xf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xf:var>
 
                                 <!-- Whether the section is open, initialized from XSLT variable -->
                                 <xf:var name="open" value="instance('open') = 'true'">
                                     <!-- TODO: get rid of the toggle once we have a data-bound switch -->
-                                    <xforms:toggle ev:event="xforms-value-changed" case="case-{{if (. = 'true') then 'open' else 'closed'}}"/>
+                                    <xf:toggle ev:event="xforms-value-changed" case="case-{{if (. = 'true') then 'open' else 'closed'}}"/>
                                 </xf:var>
 
                                 <xf:setvalue ev:event="xforms-enabled" ref="instance('open')" value="'{$open}'"/>
 
                                 <!-- Section title area: open/close button, title, help -->
-                                <xsl:element name="{if ($ancestor-sections = 0) then 'xhtml:h2' else 'xhtml:h3'}">
+                                <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">
                                     <xsl:attribute name="class" select="'fr-section-title'"/>
 
                                     <!-- Open/close button -->
-                                    <xforms:var name="fb-vars" value="xxforms:instance('fb-variables')"/>
-                                    <xforms:group appearance="xxforms:internal">
+                                    <xf:var name="fb-vars" value="xxf:instance('fb-variables')"/>
+                                    <xf:group appearance="xxf:internal">
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
-                                            <xforms:action ev:event="DOMActivate">
-                                                <xforms:var name="expand" value="xxforms:case('switch') = 'case-closed'" as="xs:boolean"/>
-                                                <xforms:action if="$expand">
+                                            <xf:action ev:event="DOMActivate">
+                                                <xf:var name="expand" value="xxf:case('switch') = 'case-closed'" as="xs:boolean"/>
+                                                <xf:action if="$expand">
                                                     <!-- Expand -->
                                                     <xf:setvalue ref="instance('open')">true</xf:setvalue>
-                                                </xforms:action>
-                                                <xforms:action if="not($expand)">
+                                                </xf:action>
+                                                <xf:action if="not($expand)">
                                                     <!-- Collapse -->
                                                     <xf:setvalue ref="instance('open')">false</xf:setvalue>
-                                                </xforms:action>
-                                            </xforms:action>
+                                                </xf:action>
+                                            </xf:action>
                                         </xsl:if>
 
                                         <!-- Actual section title -->
                                         <xsl:choose>
                                             <xsl:when test="$collapse">
-                                                <xforms:trigger appearance="minimal" id="fr-section-label" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
-                                                    <xforms:label value="xxforms:label('fr-section')"/>
-                                                    <xforms:help  value="xxforms:help('fr-section')"/>
-                                                    <xforms:hint  value="xxforms:hint('fr-section')"/>
-                                                </xforms:trigger>
+                                                <xf:trigger appearance="minimal" id="fr-section-label" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
+                                                    <xf:label value="xxf:label('fr-section')"/>
+                                                    <xf:help  value="xxf:help('fr-section')"/>
+                                                    <xf:hint  value="xxf:hint('fr-section')"/>
+                                                </xf:trigger>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xforms:output appearance="minimal" value="''">
-                                                    <xforms:label value="xxforms:label('fr-section')"/>
-                                                    <xforms:help  value="xxforms:help('fr-section')"/>
-                                                    <xforms:hint  value="xxforms:hint('fr-section')"/>
-                                                </xforms:output>
+                                                <xf:output appearance="minimal" value="''">
+                                                    <xf:label value="xxf:label('fr-section')"/>
+                                                    <xf:help  value="xxf:help('fr-section')"/>
+                                                    <xf:hint  value="xxf:hint('fr-section')"/>
+                                                </xf:output>
                                             </xsl:otherwise>
                                         </xsl:choose>
 
-                                    </xforms:group>
+                                    </xf:group>
 
                                 </xsl:element>
 
-                                <xforms:switch id="switch" xxforms:readonly-appearance="dynamic">
+                                <xf:switch id="switch" xxf:readonly-appearance="dynamic">
                                     <!-- Closed section -->
-                                    <xforms:case id="case-closed" selected="{not($open)}"/>
+                                    <xf:case id="case-closed" selected="{not($open)}"/>
                                     <!-- Open section -->
-                                    <xforms:case id="case-open" selected="{$open}">
+                                    <xf:case id="case-open" selected="{$open}">
                                         <xsl:if test="$animate">
                                             <xsl:attribute name="class">xxforms-animate</xsl:attribute>
                                         </xsl:if>
-                                        <xforms:group class="fr-section-content" xxbl:scope="outer">
+                                        <xf:group class="fr-section-content" xxbl:scope="outer">
                                             <!-- Section content except label, event handlers, and buttons -->
-                                            <xsl:apply-templates select="* except (xforms:label, xforms:help, fr:buttons)"/>
-                                        </xforms:group>
-                                    </xforms:case>
-                                </xforms:switch>
+                                            <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
+                                        </xf:group>
+                                    </xf:case>
+                                </xf:switch>
                             </xf:group>
-                        </xforms:group>
+                        </xf:group>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

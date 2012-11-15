@@ -14,13 +14,13 @@
 <!--
     This is the standard Form Builder standard controls library.
  -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl">
@@ -31,7 +31,7 @@
         <display-name lang="ru">[Buttons]</display-name>
     </metadata>
 
-    <xbl:binding id="fb-trigger" element="xforms|trigger">
+    <xbl:binding id="fb-trigger" element="xf|trigger">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Button</display-name>
             <display-name lang="fr">Bouton</display-name>
@@ -41,17 +41,17 @@
                 <large-icon>/forms/orbeon/builder/images/button.png</large-icon>
             </icon>
             <template>
-                <xforms:trigger id="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:trigger>
+                <xf:trigger id="" xmlns="">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
             </template>
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-trigger-minimal" element="xforms|trigger[appearance='minimal']">
+    <xbl:binding id="fb-trigger-minimal" element="xf|trigger[appearance='minimal']">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Link Button</display-name>
             <display-name lang="fr">Bouton lien</display-name>
@@ -61,12 +61,12 @@
                 <large-icon>/apps/fr/style/images/silk/link.png</large-icon>
             </icon>
             <template>
-                <xforms:trigger id="" xmlns="" appearance="minimal">
-                    <xforms:label ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:trigger>
+                <xf:trigger id="" xmlns="" appearance="minimal">
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
+                </xf:trigger>
             </template>
         </metadata>
     </xbl:binding>
@@ -83,10 +83,10 @@
             </icon>
             <template xmlns="">
                 <fr:button id="">
-                    <xforms:label ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:alert ref=""/>
+                    <xf:label ref=""/>
+                    <xf:help ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:alert ref=""/>
                 </fr:button>
             </template>
         </metadata>
@@ -94,7 +94,7 @@
     -->
 
     <!-- Not fully working in Form Builder as of 2012-11-09
-    <xbl:binding id="fb-slider" element="xforms|range">
+    <xbl:binding id="fb-slider" element="xf|range">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Slider</display-name>
             <display-name lang="fr">Curseur</display-name>
@@ -103,12 +103,12 @@
                 <large-icon>/forms/orbeon/builder/images/timeline_marker.png</large-icon>
             </icon>
             <template xmlns="">
-                <xforms:range id="" ref="" xmlns="">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                </xforms:range>
+                <xf:range id="" ref="" xmlns="">
+                    <xf:label ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:help ref=""/>
+                    <xf:alert ref=""/>
+                </xf:range>
             </template>
         </metadata>
     </xbl:binding>

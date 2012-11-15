@@ -15,8 +15,8 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
@@ -29,11 +29,11 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="xforms:model[1]">
+                <xsl:template match="xf:model[1]">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>
                         <!-- Force client state mode -->
-                        <xsl:attribute name="xxforms:state-handling">client</xsl:attribute>
+                        <xsl:attribute name="xxf:state-handling">client</xsl:attribute>
                         <xsl:apply-templates/>
                     </xsl:copy>
                 </xsl:template>

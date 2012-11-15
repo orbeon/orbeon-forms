@@ -35,7 +35,7 @@
          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <!-- NOTE on namespaces: in editable mode, we might be passed a path with @edit-ref that makes assumptions on NS prefixes,
-         such as xhtml:, xforms:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
+         such as xh:, xf:, etc. so make sure the basic ones are defined for now. Would be worth improving on this. -->
 
     <xbl:binding id="fr-grid-binding" element="fr|grid">
 
@@ -64,7 +64,7 @@
                 <xsl:variable name="remove-constraint"  select="$root/@remove-constraint"/>
                 <xsl:variable name="repeat-id"          select="concat($root/@id, '-repeat')"/>
 
-                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('xxforms:bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
+                <xsl:variable name="repeat-expression"  select="($root/@ref, $root/@nodeset, concat('xxf:bind(''', $root/@bind, ''')'))[1]" as="xs:string"/>
 
                 <xsl:template match="/*">
 
@@ -72,26 +72,26 @@
                     <xf:group appearance="xxf:internal">
                         <xsl:if test="$is-editable">
                             <!-- Point to the design-time source -->
-                            <xxf:var name="grid" value="{$edit-ref}"/>
+                            <xf:var name="grid" value="{$edit-ref}"/>
 
                             <!-- Form Builder resources -->
-                            <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+                            <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
                         </xsl:if>
 
                         <xsl:if test="$is-repeat">
-                            <xxf:var name="repeat-context">
+                            <xf:var name="repeat-context">
                                 <xxf:sequence value="." xxbl:scope="outer"/>
-                            </xxf:var>
-                            <xxf:var name="repeat-sequence">
+                            </xf:var>
+                            <xf:var name="repeat-sequence">
                                 <xxf:sequence value="{$repeat-expression}" xxbl:scope="outer"/>
-                            </xxf:var>
-                            <xxf:var name="repeat-origin">
+                            </xf:var>
+                            <xf:var name="repeat-origin">
                                 <xxf:sequence value="{if (@origin) then @origin else '()'}" xxbl:scope="outer"/>
-                            </xxf:var>
-                            <xxf:var name="repeat-index">
+                            </xf:var>
+                            <xf:var name="repeat-index">
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
                                 <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
-                            </xxf:var>
+                            </xf:var>
                         </xsl:if>
 
                         <!-- Grid table -->
@@ -113,11 +113,11 @@
                                         <xsl:if test="not($readonly)">
                                             <xf:group ref="$repeat-context[not(xxf:readonly(.))]">
                                                 <xh:th class="fr-repeat-column fr-repeat-column-trigger">
-                                                    <xxf:var name="can-add" as="xs:boolean"
+                                                    <xf:var name="can-add" as="xs:boolean"
                                                              value="{if ($max-occurs = 'unbounded') then 'true()'
                                                                        else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
                                                     <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
-                                                        <xf:label><xhtml:i class="icon-plus-sign"/></xf:label>
+                                                        <xf:label><xh:i class="icon-plus-sign"/></xf:label>
                                                         <xf:insert ev:event="DOMActivate"
                                                                    context="$repeat-context"
                                                                    ref="$repeat-sequence"
@@ -125,7 +125,7 @@
                                                                    at="$repeat-index"/>
                                                     </xf:trigger>
                                                     <xf:group ref="$repeat-context[not($can-add)]">
-                                                        <xhtml:i class="icon-plus-sign disabled"/>
+                                                        <xh:i class="icon-plus-sign disabled"/>
                                                     </xf:group>
                                                 </xh:th>
                                             </xf:group>
@@ -187,14 +187,14 @@
                                                             <xf:group ref="$repeat-context[not(xxf:readonly(.))]">
                                                                 <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
                                                                     <!-- Remove trigger -->
-                                                                    <xxf:var name="can-remove"
+                                                                    <xf:var name="can-remove"
                                                                              value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
                                                                     <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]">
-                                                                        <xf:label><xhtml:i class="icon-minus-sign"/></xf:label>
+                                                                        <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                                                         <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
                                                                     </xf:trigger>
                                                                     <xf:group ref="$repeat-context[not($can-remove)]">
-                                                                        <xhtml:i class="icon-minus-sign disabled"/>
+                                                                        <xh:i class="icon-minus-sign disabled"/>
                                                                     </xf:group>
                                                                 </xh:td>
                                                             </xf:group>
@@ -208,8 +208,8 @@
                                                         <xsl:variable name="has-control" select="exists($control)"/>
                                                         <!-- NOTE: Not all controls with fr-attachment require a separate upload button.
                                                              For example, fr:attachment and fr:image-attachment already provide an upload
-                                                             button. So for now, we have only xforms:output with an image mediatype. -->
-                                                        <xsl:variable name="has-upload" select="exists($control/self::xforms:output[starts-with(@mediatype, 'image/')])"/>
+                                                             button. So for now, we have only xf:output with an image mediatype. -->
+                                                        <xsl:variable name="has-upload" select="exists($control/self::xf:output[starts-with(@mediatype, 'image/')])"/>
 
                                                         <xsl:if test="$is-editable">
                                                             <!-- Point to this td -->
@@ -265,7 +265,7 @@
                                     <xsl:when test="$is-repeat">
                                         <!-- Enclose within repeat -->
                                         <xf:repeat ref="{$repeat-expression}" id="{$repeat-id}" xxbl:scope="outer">
-                                            <xf:group appearance="xxforms:internal" xxbl:scope="inner" id="my-group">
+                                            <xf:group appearance="xxf:internal" xxbl:scope="inner" id="my-group">
                                                 <xsl:copy-of select="$content"/>
                                             </xf:group>
                                         </xf:repeat>
@@ -278,13 +278,13 @@
                             <!--</xh:tbody>-->
 
                             <!--<xsl:if test="fr:footer">-->
-                                <!--<xhtml:tfoot>-->
+                                <!--<xh:tfoot>-->
                                     <!--&lt;!&ndash; Optional row(s) shown after the repeated rows &ndash;&gt;-->
                                     <!--<xsl:for-each select="fr:footer">-->
-                                        <!--<xsl:apply-templates select="xhtml:tr" mode="prepend-td"/>-->
+                                        <!--<xsl:apply-templates select="xh:tr" mode="prepend-td"/>-->
                                         <!--<xsl:apply-templates select="fr:tr" mode="prepend-td"/>-->
                                     <!--</xsl:for-each>-->
-                                <!--</xhtml:tfoot>-->
+                                <!--</xh:tfoot>-->
                             <!--</xsl:if>-->
                         </xh:table>
                     </xf:group>

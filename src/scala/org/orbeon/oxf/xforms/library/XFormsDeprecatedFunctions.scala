@@ -60,7 +60,7 @@ trait XFormsDeprecatedFunctions extends OrbeonFunctionLibrary {
             Arg(STRING, EXACTLY_ONE)
         )
 
-        // NOTE: Deprecated under this name. Use xxforms:if() instead
+        // NOTE: Deprecated under this name. Use xxf:if() instead
         Fun("xfif", classOf[If], 0, 3, STRING, EXACTLY_ONE,
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
@@ -76,14 +76,14 @@ trait XFormsDeprecatedFunctions extends OrbeonFunctionLibrary {
 
     Namespace(XFormsConstants.XFORMS_NAMESPACE_URI) {
 
-        // xforms:if()
+        // xf:if()
         Fun("if", classOf[If], 0, 3, STRING, EXACTLY_ONE,
             Arg(BOOLEAN, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE),
             Arg(STRING, EXACTLY_ONE)
         )
 
-        // xforms:seconds-from-dateTime(), which is incompatible with the XPath 2.0 version
+        // xf:seconds-from-dateTime(), which is incompatible with the XPath 2.0 version
         Fun("seconds-from-dateTime", classOf[SecondsFromDateTime], 0, 1, DECIMAL, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)
         )

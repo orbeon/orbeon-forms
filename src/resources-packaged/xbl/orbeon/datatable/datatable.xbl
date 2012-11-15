@@ -21,8 +21,8 @@
     See also the samples (datatable-ng*.xhtml) in the XForms sandbox.
 
 -->
-<xbl:xbl script-type="application/xhtml+xml" xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xbl:xbl script-type="application/xhtml+xml" xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -55,10 +55,10 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-datatable-set-index-in-current-page" phase="target">
-                <xforms:setindex repeat="fr-datatable-repeat" index="event('index')"/>
+                <xf:setindex repeat="fr-datatable-repeat" index="event('index')"/>
             </xbl:handler>
             <xbl:handler event="fr-goto-page" phase="target">
-                <xforms:setvalue ev:event="DOMActivate" model="datatable-model" ref="instance('page')" value="event('fr-new-page')"/>
+                <xf:setvalue ev:event="DOMActivate" model="datatable-model" ref="instance('page')" value="event('fr-new-page')"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:template xxbl:transform="oxf:xslt">

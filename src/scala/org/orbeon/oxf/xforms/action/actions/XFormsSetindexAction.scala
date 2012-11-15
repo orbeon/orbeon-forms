@@ -68,7 +68,7 @@ object XFormsSetindexAction {
                 val repeatControl = Some(control) collect { case repeat: XFormsRepeatControl ⇒ repeat }
                 
                 if (indentedLogger.isDebugEnabled)
-                    indentedLogger.logDebug("xforms:setindex", "setting index upon xforms:setindex",
+                    indentedLogger.logDebug("xf:setindex", "setting index upon xf:setindex",
                         "old index", repeatControl map (_.getIndex.toString) orNull,
                         "new index", index.toString)
 
@@ -87,7 +87,7 @@ object XFormsSetindexAction {
                 // "If there is a null search result for the target object and the source object is an XForms action such as
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
                 if (indentedLogger.isDebugEnabled)
-                    indentedLogger.logDebug("xforms:setindex", "index does not refer to an existing xforms:repeat element, ignoring action", "repeat id", repeatStaticId)
+                    indentedLogger.logDebug("xf:setindex", "index does not refer to an existing xf:repeat element, ignoring action", "repeat id", repeatStaticId)
                 
                 -1
         }

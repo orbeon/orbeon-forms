@@ -11,77 +11,77 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Error Dialog</xhtml:title>
-        <xforms:model id="xforms-model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Error Dialog</xh:title>
+        <xf:model id="xforms-model">
+            <xf:instance id="instance">
                 <instance>
                     <a>84</a>
                     <b>2</b>
                     <division/>
                     <sum/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="division" calculate="../a div ../b"/>
-            <xforms:bind ref="sum" calculate="../a + ../b"/>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-error-ajax.js"/>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="division" calculate="../a div ../b"/>
+            <xf:bind ref="sum" calculate="../a + ../b"/>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-error-ajax.js"/>
+        <xh:style type="text/css">
             .xforms-input input { width: 5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div id="triggers">
-            <xforms:trigger>
-                <xforms:label>Client-side JS error</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xxforms:script>invalidFunctionCall();</xxforms:script>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Server-side non-fatal error</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="b"/>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:div id="triggers">
+            <xf:trigger>
+                <xf:label>Client-side JS error</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xxf:script>invalidFunctionCall();</xxf:script>
+                </xf:action>
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Server-side non-fatal error</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="b"/>
                     <!-- If this button is clicked multiple times in a row, we want the error to happen each time -->
-                    <xforms:recalculate/>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Server-side fatal error</xforms:label>
-                <xxforms:script ev:event="DOMActivate">
+                    <xf:recalculate/>
+                </xf:action>
+            </xf:trigger>
+            <xf:trigger>
+                <xf:label>Server-side fatal error</xf:label>
+                <xxf:script ev:event="DOMActivate">
                     // Store invalid sequence id
                     var formId = ORBEON.xforms.Controls.getForm(this).id;
                     ORBEON.xforms.Document.storeInClientState(formId, "sequence", 1764);
                     // Dispatch event, so an Ajax request is sent, which gives a fatal error
                     ORBEON.xforms.Document.dispatchEvent("xforms-model", "dummy-event");
-                </xxforms:script>
-            </xforms:trigger>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="a">
-                <xforms:label>A: </xforms:label>
-            </xforms:input>
-            <xforms:input ref="b">
-                <xforms:label>B: </xforms:label>
-            </xforms:input>
-            <xforms:output ref="division">
-                <xforms:label>A/B: </xforms:label>
-            </xforms:output>
-            <xforms:output ref="sum">
-                <xforms:label>A+B: </xforms:label>
-            </xforms:output>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+                </xxf:script>
+            </xf:trigger>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="a">
+                <xf:label>A: </xf:label>
+            </xf:input>
+            <xf:input ref="b">
+                <xf:label>B: </xf:label>
+            </xf:input>
+            <xf:output ref="division">
+                <xf:label>A/B: </xf:label>
+            </xf:output>
+            <xf:output ref="sum">
+                <xf:label>A+B: </xf:label>
+            </xf:output>
+        </xh:div>
+    </xh:body>
+</xh:html>

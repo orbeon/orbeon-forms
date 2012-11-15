@@ -80,7 +80,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
             contextStack.popBinding()
             result
         } else {
-            // LHHA is somewhere else, assumed as a child of xforms:* or xxforms:*
+            // LHHA is somewhere else, assumed as a child of xf:* or xxf:*
 
             // Find context object for XPath evaluation
             val contextElement = lhhaElement.getParent

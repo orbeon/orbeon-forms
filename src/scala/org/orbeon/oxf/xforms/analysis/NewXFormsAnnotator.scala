@@ -77,7 +77,7 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
     when(HeadState) {
         case Event(ev @ StartElement(HtmlTitle, _), parentOption) ⇒
             forward(out, ev)
-//            // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xforms:output)
+//            // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
 //            val newAtts = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex)
 //            htmlElementId = reusableStringArray[0]
 //            htmlTitleElementId = htmlElementId
@@ -89,7 +89,7 @@ class NewXFormsAnnotator(out: XMLReceiver) extends SAXMachine[State, Option[Elem
         case Event(ev @ StartElement(XFormsOutput, atts), parentOption) ⇒
 //            val newAtts = XMLUtils.addOrReplaceAttribute(atts, "", "", "for", htmlTitleElementId)
 //            startPrefixMapping(true, "xxforms", XXFORMS_NAMESPACE_URI)
-//            startElement(true, XXFORMS_NAMESPACE_URI, "text", "xxforms:text", newAtts)
+//            startElement(true, XXFORMS_NAMESPACE_URI, "text", "xxf:text", newAtts)
             stay() using newElementDetail(ev, parentOption)
     }
     when(TitleState)(defaultHandler)

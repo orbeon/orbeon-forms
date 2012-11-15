@@ -11,11 +11,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -36,13 +36,13 @@
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:decimal"/>
+                <bind type="xf:decimal"/>
                 <view>
                     <fr:us-currency-thousands>
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
                     </fr:us-currency-thousands>
                 </view>
             </templates>
@@ -56,34 +56,34 @@
         </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
-            <xforms:model>
-                <xforms:instance>
+            <xf:model>
+                <xf:instance>
                     <value/>
-                </xforms:instance>
-                <xforms:bind ref="." constraint="substring-after(., '$') castable as xs:decimal"/>
+                </xf:instance>
+                <xf:bind ref="." constraint="substring-after(., '$') castable as xs:decimal"/>
                 <!-- FR HACK: Make instance read-only when the form must be read-only -->
-                <xforms:bind ref="." readonly="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
-            </xforms:model>
+                <xf:bind ref="." readonly="xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+            </xf:model>
         </xbl:implementation>
         <xbl:template>
             <!-- React to update to bound node -->
-            <xforms:var name="value" value="xxforms:binding('fr-us-currency-thousands')/string()">
-                <xforms:setvalue
+            <xf:var name="value" value="xxf:binding('fr-us-currency-thousands')/string()">
+                <xf:setvalue
                     ev:event="xforms-value-changed xforms-enabled"
                     ref="instance()"
                     value="if ($value castable as xs:decimal) then format-number($value, '$ #.000') else $value"/>
-            </xforms:var>
+            </xf:var>
 
-            <xforms:input ref="instance()" id="currency-input" xbl:attr="navindex navindex=tabindex">
+            <xf:input ref="instance()" id="currency-input" xbl:attr="navindex navindex=tabindex">
                 <!-- React to update to local values -->
-                <xforms:action ev:event="xforms-value-changed">
-                    <xforms:var name="currency-normalized" value="normalize-space(.)"/>
-                    <xforms:var name="currency-no-dollar" value="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized"/>
-                    <xforms:setvalue
-                        ref="xxforms:binding('fr-us-currency-thousands')"
+                <xf:action ev:event="xforms-value-changed">
+                    <xf:var name="currency-normalized" value="normalize-space(.)"/>
+                    <xf:var name="currency-no-dollar" value="if (starts-with($currency-normalized, '$')) then substring-after($currency-normalized, '$') else $currency-normalized"/>
+                    <xf:setvalue
+                        ref="xxf:binding('fr-us-currency-thousands')"
                         value="if ($currency-no-dollar castable as xs:decimal) then xs:decimal($currency-no-dollar) else $currency-no-dollar"/>
-                </xforms:action>
-            </xforms:input>
+                </xf:action>
+            </xf:input>
         </xbl:template>
     </xbl:binding>
 

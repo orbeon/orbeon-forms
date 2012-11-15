@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Setfocus to Repeat Iteration</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Setfocus to Repeat Iteration</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <table xmlns="">
                     <tr>
                         <td>1</td>
@@ -40,31 +40,31 @@
                         <td>9</td>
                     </tr>
                 </table>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-ready">
-                <xforms:setindex repeat="row-repeat" index="2"/>
-                <xforms:setindex repeat="cell-repeat" index="3"/>
-                <xforms:setfocus control="my-input"/>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready">
+                <xf:setindex repeat="row-repeat" index="2"/>
+                <xf:setindex repeat="cell-repeat" index="3"/>
+                <xf:setfocus control="my-input"/>
+            </xf:action>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
         <table>
-            <xforms:repeat ref="tr" id="row-repeat" xxforms:dnd="true">
+            <xf:repeat ref="tr" id="row-repeat" xxf:dnd="true">
                 <tr>
-                    <xforms:repeat ref="td" id="cell-repeat">
+                    <xf:repeat ref="td" id="cell-repeat">
                         <td>
-                            <xforms:input id="my-input" ref="."/>
+                            <xf:input id="my-input" ref="."/>
                         </td>
-                    </xforms:repeat>
+                    </xf:repeat>
                 </tr>
-            </xforms:repeat>
+            </xf:repeat>
         </table>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

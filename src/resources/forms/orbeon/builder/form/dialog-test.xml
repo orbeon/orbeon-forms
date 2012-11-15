@@ -11,30 +11,30 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-test-dialog" level="modal" close="true" draggable="false" class="fb-test-dialog xxforms-set-height">
 
-    <xforms:label ref="$form-resources/dialog-test/label"/>
-    <xhtml:div class="fb-dialog-remaining-height">
-        <xhtml:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
-    </xhtml:div>
-    <xhtml:div class="fr-dialog-buttons">
-        <xhtml:span>
-            <xforms:trigger appearance="xxforms:primary">
-                <xforms:label>
-                    <xforms:output value="$fr-resources/detail/labels/close"/>
-                </xforms:label>
-                <xxforms:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
-            </xforms:trigger>
-        </xhtml:span>
-    </xhtml:div>
-</xxforms:dialog>
+    <xf:label ref="$form-resources/dialog-test/label"/>
+    <xh:div class="fb-dialog-remaining-height">
+        <xh:iframe id="fb-test-iframe" name="fb-test-iframe" class="fb-test-iframe" src="about:blank"/>
+    </xh:div>
+    <xh:div class="fr-dialog-buttons">
+        <xh:span>
+            <xf:trigger appearance="xxf:primary">
+                <xf:label>
+                    <xf:output value="$fr-resources/detail/labels/close"/>
+                </xf:label>
+                <xxf:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
+            </xf:trigger>
+        </xh:span>
+    </xh:div>
+</xxf:dialog>

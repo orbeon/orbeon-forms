@@ -11,47 +11,47 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Load Calculator</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Load Calculator</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <process-time>200</process-time>
                     <wait-time>15</wait-time>
                     <users/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance/users" calculate="(../process-time + ../wait-time * 1000) div ../process-time"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
+            </xf:instance>
+            <xf:bind ref="/instance/users" calculate="(../process-time + ../wait-time * 1000) div ../process-time"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
             Rule of thumb for computing how many concurrent users a server can handle based on just
             the time the server takes to process a request and the estimated amount of time users
             spend on a page between two requests.
-        </xhtml:p>
-        <xhtml:div>
-            <xforms:input ref="process-time" incremental="true">
-                <xforms:label>Time per request (ms): </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="wait-time" incremental="true">
-                <xforms:label>Time spent by user on page (seconds): </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:output ref="users">
-                <xforms:label>Number of users: </xforms:label>
-            </xforms:output>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        </xh:p>
+        <xh:div>
+            <xf:input ref="process-time" incremental="true">
+                <xf:label>Time per request (ms): </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="wait-time" incremental="true">
+                <xf:label>Time spent by user on page (seconds): </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:output ref="users">
+                <xf:label>Number of users: </xf:label>
+            </xf:output>
+        </xh:div>
+    </xh:body>
+</xh:html>

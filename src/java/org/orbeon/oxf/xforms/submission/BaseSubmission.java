@@ -250,7 +250,7 @@ public abstract class BaseSubmission implements Submission {
                 // response has already been written out. This gives the form author a chance to do something in cases
                 // the response is buffered, for example do a sendError().
                 if (! NetUtils.isSuccessCode(connectionResult.statusCode))
-                    throw new XFormsSubmissionException(submission, "xforms:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                    throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
                             new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
 
             } else {

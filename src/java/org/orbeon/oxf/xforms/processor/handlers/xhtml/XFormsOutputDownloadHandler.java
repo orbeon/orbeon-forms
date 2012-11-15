@@ -25,7 +25,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handler for xforms:output[@appearance = 'xxforms:download'].
+ * Handler for xf:output[@appearance = 'xxf:download'].
  */
 public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
@@ -78,7 +78,7 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
         // This, as of 2009-05, seems to be how most sites handle this
         containerAttributes.addAttribute("", "target", "target", ContentHandlerHelper.CDATA, "_blank");
 
-        // Output xxforms:* extension attributes
+        // Output xxf:* extension attributes
         if (outputControl != null)
             outputControl.addExtensionAttributes(containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
 

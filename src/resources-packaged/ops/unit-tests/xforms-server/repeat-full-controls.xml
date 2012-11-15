@@ -11,25 +11,25 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxforms:controls xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+<xxf:controls xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
     <table>
-        <xforms:repeat ref="/form/company/department" id="id123">
+        <xf:repeat ref="/form/company/department" id="id123">
             <tr>
                 <td>
                     <table>
-                        <xforms:repeat ref="employee" id="id124">
+                        <xf:repeat ref="employee" id="id124">
                             <tr>
                                 <td>
-                                    <xforms:output ref="@first" id="id125"/>
+                                    <xf:output ref="@first" id="id125"/>
                                 </td>
                                 <td>
-                                    <xforms:output ref="@last" id="id126"/>
+                                    <xf:output ref="@last" id="id126"/>
                                 </td>
                             </tr>
-                        </xforms:repeat>
+                        </xf:repeat>
                     </table>
                 </td>
             </tr>
-        </xforms:repeat>
+        </xf:repeat>
     </table>
-</xxforms:controls>
+</xxf:controls>

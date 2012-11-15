@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
@@ -43,9 +43,9 @@
     <body>
 
 
-        <h1>Using YUI's datatable (new generation) in xforms:switch</h1>
+        <h1>Using YUI's datatable (new generation) in xf:switch</h1>
 
-        <p>This sample has been developed to test datatable widgets within xforms:switch.</p>
+        <p>This sample has been developed to test datatable widgets within xf:switch.</p>
 
         <xf:switch>
             <xf:case id="hide" selected="true">
@@ -55,7 +55,7 @@
                 </xf:trigger>
             </xf:case>
             <xf:case id="show" selected="false">
-                <fr:datatable id="table-repeat1" appearance="xxforms:data-table">
+                <fr:datatable id="table-repeat1" appearance="xxf:data-table">
                     <!-- Optional <thead>, otherwise try to build one from body -->
                     <thead>
                         <tr>

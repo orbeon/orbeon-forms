@@ -11,654 +11,654 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:exf="http://www.exforms.org/exf/1-0">
 
-    <xhtml:head>
-        <xhtml:title>Datatable</xhtml:title>
+    <xh:head>
+        <xh:title>Datatable</xh:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Datatable test events</xhtml:legend>
-            <xhtml:p>
-                <xforms:group ref="instance('controls')">
-                    <xforms:input ref="switch" id="switch">
-                        <xforms:label>Case id: </xforms:label>
-                        <xforms:help>Used by tests that check fr:databound-switch.</xforms:help>
-                    </xforms:input>
-                </xforms:group>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:group ref="instance('controls')">
-                    <xforms:input ref="maxLength" id="maxLength">
-                        <xforms:label>Maximum length: </xforms:label>
-                        <xforms:help>Used by tests that check instance updates.</xforms:help>
-                    </xforms:input>
-                </xforms:group>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:group ref="instance('controls')">
-                    <xforms:input ref="show" id="show">
-                        <xforms:label>Show: </xforms:label>
-                        <xforms:help>Used by tests that hide/show cycles.</xforms:help>
-                    </xforms:input>
-                </xforms:group>
-            </xhtml:p>
-            <xhtml:ol>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-all">
-                        <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-all">
-                        <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-            </xhtml:ol>
-        </xhtml:fieldset>
+        <xh:fieldset>
+            <xh:legend>Datatable test events</xh:legend>
+            <xh:p>
+                <xf:group ref="instance('controls')">
+                    <xf:input ref="switch" id="switch">
+                        <xf:label>Case id: </xf:label>
+                        <xf:help>Used by tests that check fr:databound-switch.</xf:help>
+                    </xf:input>
+                </xf:group>
+            </xh:p>
+            <xh:p>
+                <xf:group ref="instance('controls')">
+                    <xf:input ref="maxLength" id="maxLength">
+                        <xf:label>Maximum length: </xf:label>
+                        <xf:help>Used by tests that check instance updates.</xf:help>
+                    </xf:input>
+                </xf:group>
+            </xh:p>
+            <xh:p>
+                <xf:group ref="instance('controls')">
+                    <xf:input ref="show" id="show">
+                        <xf:label>Show: </xf:label>
+                        <xf:help>Used by tests that hide/show cycles.</xf:help>
+                    </xf:input>
+                </xf:group>
+            </xh:p>
+            <xh:ol>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-all">
+                        <xf:label>Open all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-all">
+                        <xf:label>Close all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+            </xh:ol>
+        </xh:fieldset>
 
 
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
             <!-- <fr:case selected="true" id="_new">
                 <fr:label>#new: style attributes are not properly copied</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a
+                <xh:div>
+                    <xh:p>Bug <xh:a
                             href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314292&amp;group_id=168&amp;atid=350207"
-                            >314292</xhtml:a>.</xhtml:p>
+                            >314292</xh:a>.</xh:p>
                     <fr:datatable id="table-new">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th fr:resizeable="true">A header (that shouldn't display)</xhtml:th>
-                                <xhtml:th>A loooooooong header</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th fr:resizeable="true">A header (that shouldn't display)</xh:th>
+                                <xh:th>A loooooooong header</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
                                         <span style="display:none">
-                                            <xforms:output value="position()"/>
+                                            <xf:output value="position()"/>
                                         </span>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
                 </fr:case>-->
             <fr:case selected="false" id="repeat-refresh">
-                <fr:label>Check that every table in an xforms:repeat gets updated</fr:label>
-                <xhtml:div>
-                    <xhtml:p>When embedded in an xforms:repeat, each datatable should properly be updated when its nodeset changes.</xhtml:p>
-                    <xforms:repeat ref="instance('lorem')/line[position() = (1, 2)]">
+                <fr:label>Check that every table in an xf:repeat gets updated</fr:label>
+                <xh:div>
+                    <xh:p>When embedded in an xf:repeat, each datatable should properly be updated when its nodeset changes.</xh:p>
+                    <xf:repeat ref="instance('lorem')/line[position() = (1, 2)]">
                         <fr:datatable id="repeat-refresh-table" scrollable="both" width="500px" height="200px">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xhtml:th>Text</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="instance('lorem')/line[string-length(.) &lt; xxforms:instance('controls')/maxLength]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xhtml:td>
-                                            <xforms:output value="."/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xh:th>Text</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="instance('lorem')/line[string-length(.) &lt; xxf:instance('controls')/maxLength]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output value="."/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                        <xhtml:hr/>
-                    </xforms:repeat>
-                </xhtml:div>
+                        <xh:hr/>
+                    </xf:repeat>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314679">
                 <fr:label>#314679: RFE: add a fr:sortKey attribute to manually define sort keys when needed</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314679&amp;group_id=168&amp;atid=350207"
-                            >314679</xhtml:a>.</xhtml:p>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314679&amp;group_id=168&amp;atid=350207"
+                            >314679</xh:a>.</xh:p>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="table-314679">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th fr:sortable="true" fr:sorted="ascending" fr:sortKey="position">Position</xhtml:th>
-                                    <xhtml:th>Text</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[position &lt; 3]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="if (position=0) then 'one' else if (position=1) then 'two' else 'three'"/>
-                                        </xhtml:td>
-                                        <xhtml:td>
-                                            <xforms:output value="text"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th fr:sortable="true" fr:sorted="ascending" fr:sortKey="position">Position</xh:th>
+                                    <xh:th>Text</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[position &lt; 3]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="if (position=0) then 'one' else if (position=1) then 'two' else 'three'"/>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output value="text"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="optional-scrollh-v">
                 <fr:label>Optional horizontal scrollbar with a vertical scrollbar</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="optional-scrollh-v-table" scrollable="both" width="500px" height="200px">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th fr:resizeable="true">Text</xhtml:th>
-                                    <xhtml:th fr:resizeable="true">Position</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 50]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="text"/>
-                                        </xhtml:td>
-                                        <xhtml:td>
-                                            <xforms:output value="position"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th fr:resizeable="true">Text</xh:th>
+                                    <xh:th fr:resizeable="true">Position</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 50]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="text"/>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output value="position"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="optional-scrollh">
                 <fr:label>Optional horizontal scrollbar</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="optional-scrollh-table" scrollable="horizontal" width="500px">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th fr:resizeable="true">Text</xhtml:th>
-                                    <xhtml:th fr:resizeable="true">Position</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length > 40 and length &lt; 50]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="text"/>
-                                        </xhtml:td>
-                                        <xhtml:td>
-                                            <xforms:output value="position"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th fr:resizeable="true">Text</xh:th>
+                                    <xh:th fr:resizeable="true">Position</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length > 40 and length &lt; 50]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="text"/>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output value="position"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314466">
-                <fr:label>#314466:Datatable generates an error in IE when used within an xxforms:dialog.</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314466&amp;group_id=168&amp;atid=350207"
-                            >314466</xhtml:a>.</xhtml:p>
-                    <xhtml:p>The fact that the test suite starts is already an indication that the bug has been fixed (otherwise, a JavaScript error
-                        is generated before the suite even starts).</xhtml:p>
-                    <xforms:trigger id="show-314466">
-                        <xforms:label>show 314466</xforms:label>
-                        <xxforms:show ev:event="DOMActivate" dialog="_314466-dialog"/>
-                    </xforms:trigger>
-                    <xforms:trigger id="hide-314466">
-                        <xforms:label>hide 314466</xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="_314466-dialog"/>
-                    </xforms:trigger>
-                    <xxforms:dialog id="_314466-dialog" level="modeless" close="false">
-                        <xforms:label>Test #314466</xforms:label>
+                <fr:label>#314466:Datatable generates an error in IE when used within an xxf:dialog.</fr:label>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314466&amp;group_id=168&amp;atid=350207"
+                            >314466</xh:a>.</xh:p>
+                    <xh:p>The fact that the test suite starts is already an indication that the bug has been fixed (otherwise, a JavaScript error
+                        is generated before the suite even starts).</xh:p>
+                    <xf:trigger id="show-314466">
+                        <xf:label>show 314466</xf:label>
+                        <xxf:show ev:event="DOMActivate" dialog="_314466-dialog"/>
+                    </xf:trigger>
+                    <xf:trigger id="hide-314466">
+                        <xf:label>hide 314466</xf:label>
+                        <xxf:hide ev:event="DOMActivate" dialog="_314466-dialog"/>
+                    </xf:trigger>
+                    <xxf:dialog id="_314466-dialog" level="modeless" close="false">
+                        <xf:label>Test #314466</xf:label>
                         <fr:datatable id="_314466-table">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Text</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[string-length() &lt; 30]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="."/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Text</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[string-length() &lt; 30]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="."/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xxforms:dialog>
-                </xhtml:div>
+                    </xxf:dialog>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314459">
                 <fr:label>#314459:Paginated datatables: the page number is not properly set when the datatable is hidden (by an empty context) and
                     show again.</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314459&amp;group_id=168&amp;atid=350207"
-                            >314459</xhtml:a>.</xhtml:p>
-                    <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
+                <xh:div>
+                    <xh:p>Bug <xh:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314459&amp;group_id=168&amp;atid=350207"
+                            >314459</xh:a>.</xh:p>
+                    <xf:group ref="instance('lorem')[instance('controls')/show = 'true']">
                         <fr:datatable id="_314459-table" paginated="true" rowsPerPage="5">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Text</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[string-length() &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="."/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Text</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[string-length() &lt; xxf:instance('controls')/maxLength cast as xs:integer]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="."/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314415">
-                <fr:label>#314415:Datatable within an xforms:repeat are not properly initialized when iterations are deleted and added
+                <fr:label>#314415:Datatable within an xf:repeat are not properly initialized when iterations are deleted and added
                     again</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314415&amp;group_id=168&amp;atid=350207"
-                            >314415</xhtml:a>.</xhtml:p>
-                    <xforms:group ref="instance('lorem')[instance('controls')/show = 'true']">
-                        <xforms:repeat ref="line[position() = (1, 2)]">
+                <xh:div>
+                    <xh:p>Bug <xh:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314415&amp;group_id=168&amp;atid=350207"
+                            >314415</xh:a>.</xh:p>
+                    <xf:group ref="instance('lorem')[instance('controls')/show = 'true']">
+                        <xf:repeat ref="line[position() = (1, 2)]">
                             <fr:datatable id="_314415-table" scrollable="both" width="500px" height="200px">
-                                <xhtml:thead>
-                                    <xhtml:tr>
-                                        <xhtml:th>Text</xhtml:th>
-                                    </xhtml:tr>
-                                </xhtml:thead>
-                                <xhtml:tbody>
-                                    <xforms:repeat ref="instance('lorem')/line[string-length(.) > 100]">
-                                        <xhtml:tr>
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xhtml:tr>
-                                    </xforms:repeat>
-                                </xhtml:tbody>
+                                <xh:thead>
+                                    <xh:tr>
+                                        <xh:th>Text</xh:th>
+                                    </xh:tr>
+                                </xh:thead>
+                                <xh:tbody>
+                                    <xf:repeat ref="instance('lorem')/line[string-length(.) > 100]">
+                                        <xh:tr>
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xh:tr>
+                                    </xf:repeat>
+                                </xh:tbody>
                             </fr:datatable>
-                        </xforms:repeat>
-                    </xforms:group>
-                </xhtml:div>
+                        </xf:repeat>
+                    </xf:group>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314422">
                 <fr:label>#314422: Datatable: go to the last page when the current page disappears</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314422&amp;group_id=168&amp;atid=350207"
-                            >314422</xhtml:a>.</xhtml:p>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p>Bug <xh:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314422&amp;group_id=168&amp;atid=350207"
+                            >314422</xh:a>.</xh:p>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="_314422-table" debug="false" paginated="true" rowsPerPage="5">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xhtml:th>Text</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position"/>
-                                        </xhtml:td>
-                                        <xhtml:td>
-                                            <xforms:output value="text"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xh:th>Text</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; xxf:instance('controls')/maxLength cast as xs:integer]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position"/>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output value="text"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314359">
                 <fr:label>#314359: Scrollable datatables get their header and body columns desynchronized in Firefox</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314359&amp;group_id=168&amp;atid=350207"
-                            >314359</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314359&amp;group_id=168&amp;atid=350207"
+                            >314359</xh:a>.</xh:p>
                     <fr:datatable id="table-314359" scrollable="horizontal" width="500px">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>A loooooooong header</xhtml:th>
-                                <xhtml:th>A header</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) > 100]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>A loooooooong header</xh:th>
+                                <xh:th>A header</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) > 100]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314292">
                 <fr:label>#314292: Datatable is not properly rendered. It looks like it's slightly shifted to the left in IE6/7</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314292&amp;group_id=168&amp;atid=350207"
-                            >314292</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314292&amp;group_id=168&amp;atid=350207"
+                            >314292</xh:a>.</xh:p>
                     <fr:datatable id="table-314292">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>A header</xhtml:th>
-                                <xhtml:th>A loooooooong header</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>A header</xh:th>
+                                <xh:th>A loooooooong header</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314217">
                 <fr:label>#314217: empty horizontally scrollable datatables do not display a scrollbar in Firefox</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314217&amp;group_id=168&amp;atid=350207"
-                            >314217</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314217&amp;group_id=168&amp;atid=350207"
+                            >314217</xh:a>.</xh:p>
                     <fr:datatable id="table-314217" scrollable="horizontal" width="150px">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>A header</xhtml:th>
-                                <xhtml:th>A loooooooong header</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[false()]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>A header</xh:th>
+                                <xh:th>A loooooooong header</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[false()]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="widths">
                 <fr:label>Check column and table widths</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This table is used to check that column and table widths are consistent</xhtml:p>
+                <xh:div>
+                    <xh:p>This table is used to check that column and table widths are consistent</xh:p>
                     <fr:datatable id="table-widths">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Number</xhtml:th>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Number</xh:th>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="widths-resizeable">
                 <fr:label>Check column and table widths with resizeabled columns</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This table is used to check that column and table widths are consistent</xhtml:p>
+                <xh:div>
+                    <xh:p>This table is used to check that column and table widths are consistent</xh:p>
                     <fr:datatable id="table-widths-resizeable">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th fr:resizeable="true" id="th-wr1">Number</xhtml:th>
-                                <xhtml:th fr:resizeable="true" id="th-wr2">Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th fr:resizeable="true" id="th-wr1">Number</xh:th>
+                                <xh:th fr:resizeable="true" id="th-wr2">Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314216">
                 <fr:label>#314216: reduce the width of the right column</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314216&amp;group_id=168&amp;atid=350207"
-                            >314216</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314216&amp;group_id=168&amp;atid=350207"
+                            >314216</xh:a>.</xh:p>
                     <fr:datatable id="table-314216">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th fr:resizeable="true">Number</xhtml:th>
-                                <xhtml:th id="th-314216-2" fr:resizeable="true">Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th fr:resizeable="true">Number</xh:th>
+                                <xh:th id="th-314216-2" fr:resizeable="true">Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314209">
                 <fr:label>#314209: Hide/Show cycle</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
-                            >314209</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314209&amp;group_id=168&amp;atid=350207"
+                            >314209</xh:a>.</xh:p>
                     <fr:datatable id="table-314209" scrollable="horizontal" width="100%">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314211">
                 <fr:label>#314211: Most simple datatable</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314211&amp;group_id=168&amp;atid=350207"
-                            >314211</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314211&amp;group_id=168&amp;atid=350207"
+                            >314211</xh:a>.</xh:p>
                     <fr:datatable id="table-314211">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314174">
                 <fr:label>#314174: External pagination</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314174&amp;group_id=168&amp;atid=350207"
-                            >314174</xhtml:a>.</xhtml:p>
-                    <xhtml:p>The pagination isn't supposed to work, the purpose of this test is just to display the table.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314174&amp;group_id=168&amp;atid=350207"
+                            >314174</xh:a>.</xh:p>
+                    <xh:p>The pagination isn't supposed to work, the purpose of this test is just to display the table.</xh:p>
                     <fr:datatable id="table-314174" paginated="true" sortAndPaginationMode="external" nbPages="5" page="2">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="_314210">
                 <fr:label>#314210: 100% width, horizontal scroll, short lines</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207">314210</xhtml:a>.</xhtml:p>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314210&amp;group_id=168&amp;atid=350207">314210</xh:a>.</xh:p>
                     <fr:datatable width="50%" scrollable="horizontal" id="table-314210">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Number</xhtml:th>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Number</xh:th>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
             <fr:case selected="false" id="goto-page-event">
                 <fr:label>fr-goto-page event</fr:label>
                 <fr:button id="goto-page-event-page-5">
-                    <xforms:label>Go to page 5</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="goto-page-event-table" name="fr-goto-page">
-                        <xforms:property name="fr-new-page" value="5"/>
-                    </xforms:dispatch>
+                    <xf:label>Go to page 5</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="goto-page-event-table" name="fr-goto-page">
+                        <xf:property name="fr-new-page" value="5"/>
+                    </xf:dispatch>
                 </fr:button>
-                <xforms:group ref="instance('lorem')">
+                <xf:group ref="instance('lorem')">
                     <fr:datatable id="goto-page-event-table" paginated="true" rowsPerPage="5">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xforms:group>
+                </xf:group>
             </fr:case>
             <fr:case selected="false" id="internal-paging-external-sorting">
                 <fr:label>Internal paging with external sorting</fr:label>
-                <xforms:group ref="instance('detailed-lorem')">
+                <xf:group ref="instance('detailed-lorem')">
                     <fr:datatable id="internal-paging-external-sorting-table" paginated="true" sort-mode="external" rowsPerPage="5">
-                        <xforms:action ev:event="fr-update-sort">
-                            <xforms:setvalue ref="instance('controls')/sortOrder" value="if (instance('controls')/sortedColumn = event('fr-column') and . = 'ascending') then 'descending' else 'ascending'"/>
-                            <xforms:setvalue ref="instance('controls')/sortedColumn" value="event('fr-column')"/>
-                            <xforms:var name="column" value="('position', 'text', 'length', 'nb-words')[event('fr-column')]"/>
-                            <xforms:var name="type" value="('number', 'text', 'number', 'number')[event('fr-column')]"/>
-                            <xforms:var name="sorted" value="exf:sort(instance('detailed-lorem')/line, $column, $type, instance('controls')/sortOrder)"/>
-                            <xforms:delete ref="instance('detailed-lorem')/line"/>
-                            <xforms:insert context="instance('detailed-lorem')" origin="$sorted"/>
-                        </xforms:action>
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 1 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'" fr:sorted="ascending">Position</xhtml:th>
-                                <xhtml:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 2 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'">Text</xhtml:th>
-                                <xhtml:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 3 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'">Length</xhtml:th>
-                                <xhtml:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 4 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'">Length</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line">
-                                <xhtml:tr>
-                                    <xhtml:td><xforms:output value="position"/></xhtml:td>
-                                    <xhtml:td><xforms:output value="text"/></xhtml:td>
-                                    <xhtml:td><xforms:output value="length"/></xhtml:td>
-                                    <xhtml:td><xforms:output value="nb-words"/></xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xf:action ev:event="fr-update-sort">
+                            <xf:setvalue ref="instance('controls')/sortOrder" value="if (instance('controls')/sortedColumn = event('fr-column') and . = 'ascending') then 'descending' else 'ascending'"/>
+                            <xf:setvalue ref="instance('controls')/sortedColumn" value="event('fr-column')"/>
+                            <xf:var name="column" value="('position', 'text', 'length', 'nb-words')[event('fr-column')]"/>
+                            <xf:var name="type" value="('number', 'text', 'number', 'number')[event('fr-column')]"/>
+                            <xf:var name="sorted" value="exf:sort(instance('detailed-lorem')/line, $column, $type, instance('controls')/sortOrder)"/>
+                            <xf:delete ref="instance('detailed-lorem')/line"/>
+                            <xf:insert context="instance('detailed-lorem')" origin="$sorted"/>
+                        </xf:action>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 1 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'" fr:sorted="ascending">Position</xh:th>
+                                <xh:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 2 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'">Text</xh:th>
+                                <xh:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 3 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'">Length</xh:th>
+                                <xh:th fr:sortable="true" fr:sortMessage="if (instance('controls')/sortedColumn = 4 and instance('controls')/sortOrder = 'ascending') then 'Sort ascending' else 'Sort descending'">Length</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line">
+                                <xh:tr>
+                                    <xh:td><xf:output value="position"/></xh:td>
+                                    <xh:td><xf:output value="text"/></xh:td>
+                                    <xh:td><xf:output value="length"/></xh:td>
+                                    <xh:td><xf:output value="nb-words"/></xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xforms:group>
+                </xf:group>
             </fr:case>
         </fr:accordion>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

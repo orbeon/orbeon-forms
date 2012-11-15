@@ -27,11 +27,11 @@ import org.orbeon.oxf.fb.ContainerOps._
 object ToolboxOps {
 
     private val lhhaTemplate: NodeInfo =
-        <template xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:label ref=""/>
-            <xforms:hint ref=""/>
-            <xforms:help ref=""/>
-            <xforms:alert ref=""/>
+        <template xmlns:xf="http://www.w3.org/2002/xforms">
+            <xf:label ref=""/>
+            <xf:hint ref=""/>
+            <xf:help ref=""/>
+            <xf:alert ref=""/>
         </template>
 
     // Insert a new control in a cell
@@ -60,7 +60,7 @@ object ToolboxOps {
                             controlElement
                     }
 
-                // Set default pointer to resources if there is an xforms:alert
+                // Set default pointer to resources if there is an xf:alert
                 setvalue(newControlElement \ "*:alert" \@ "ref", "$fr-resources/detail/labels/alert")
 
                 // Adjust bindings on newly inserted control
@@ -177,10 +177,10 @@ object ToolboxOps {
         val gridTemplate: NodeInfo =
             <fr:grid edit-ref="" id={ids.next()}
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:tr>
-                    <xhtml:td id={ids.next()}/>
-                </xhtml:tr>
+                     xmlns:xh="http://www.w3.org/1999/xhtml">
+                <xh:tr>
+                    <xh:td id={ids.next()}/>
+                </xh:tr>
             </fr:grid>
 
         // Insert after current level 2 if found, otherwise into level 1
@@ -203,21 +203,21 @@ object ToolboxOps {
         // Obtain ids first
         val ids = nextIds(inDoc, "tmp", 2).toIterator
 
-        // NOTE: use xxforms:update="full" so that xxf:dynamic can better update top-level XBL controls
+        // NOTE: use xxf:update="full" so that xxf:dynamic can better update top-level XBL controls
         val sectionTemplate: NodeInfo =
-            <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxforms:update="full"
-                        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                        xmlns:xforms="http://www.w3.org/2002/xforms"
-                        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            <fr:section id={controlId(newSectionName)} bind={bindId(newSectionName)} edit-ref="" xxf:update="full"
+                        xmlns:xh="http://www.w3.org/1999/xhtml"
+                        xmlns:xf="http://www.w3.org/2002/xforms"
+                        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                <xforms:label ref={"$form-resources/" + newSectionName + "/label"}/>
-                <xforms:help ref={"$form-resources/" + newSectionName + "/help"}/>{
+                <xf:label ref={"$form-resources/" + newSectionName + "/label"}/>
+                <xf:help ref={"$form-resources/" + newSectionName + "/help"}/>{
                 if (withGrid)
                     <fr:grid edit-ref="" id={ids.next()}>
-                        <xhtml:tr>
-                            <xhtml:td id={ids.next()}/>
-                        </xhtml:tr>
+                        <xh:tr>
+                            <xh:td id={ids.next()}/>
+                        </xh:tr>
                     </fr:grid>
             }</fr:section>
 
@@ -264,9 +264,9 @@ object ToolboxOps {
 
             case None ⇒
                 // Insert template instance if not present
-                val template: NodeInfo = <xforms:instance xmlns:xforms="http://www.w3.org/2002/xforms"
+                val template: NodeInfo = <xf:instance xmlns:xf="http://www.w3.org/2002/xforms"
                                                           xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                                                          id={templateInstanceId} fb:readonly="true">{<dummy/>.copy(label = newGridName)}</xforms:instance>
+                                                          id={templateInstanceId} fb:readonly="true">{<dummy/>.copy(label = newGridName)}</xf:instance>
 
                 insert(into = modelElement, after = modelElement \ "*:instance" takeRight 1, origin = template)
         }
@@ -280,10 +280,10 @@ object ToolboxOps {
                      origin={makeInstanceExpression(templateInstanceId)}
                      min="1"
                      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-                     xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                <xhtml:tr>
-                    <xhtml:td id={nextId(inDoc, "tmp")}/>
-                </xhtml:tr>
+                     xmlns:xh="http://www.w3.org/1999/xhtml">
+                <xh:tr>
+                    <xh:td id={nextId(inDoc, "tmp")}/>
+                </xh:tr>
             </fr:grid>
 
         // Insert grid

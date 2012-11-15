@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,16 +21,16 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Example of fr:box-select control</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Example of fr:box-select control</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <value1/>
                     <value2/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="items-instance">
+            </xf:instance>
+            <xf:instance id="items-instance">
                 <fruits xmlns="">
                     <fruit id="1">
                         <name>Apple</name>
@@ -45,29 +45,29 @@
                         <name>Kiwi</name>
                     </fruit>
                 </fruits>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
         <fr:box-select ref="value1" id="value1">
-            <xforms:label>Fruit 1: </xforms:label>
-            <xforms:itemset ref="xxforms:instance('items-instance')/fruit">
-                <xforms:label ref="name"/>
-                <xforms:value ref="@id"/>
-            </xforms:itemset>
+            <xf:label>Fruit 1: </xf:label>
+            <xf:itemset ref="xxf:instance('items-instance')/fruit">
+                <xf:label ref="name"/>
+                <xf:value ref="@id"/>
+            </xf:itemset>
         </fr:box-select>
 
         <fr:box-select ref="value2" id="value2">
-            <xforms:label>Fruit 2: </xforms:label>
-            <xforms:itemset ref="xxforms:instance('items-instance')/fruit">
-                <xforms:label ref="name"/>
-                <xforms:value ref="@id"/>
-            </xforms:itemset>
+            <xf:label>Fruit 2: </xf:label>
+            <xf:itemset ref="xxf:instance('items-instance')/fruit">
+                <xf:label ref="name"/>
+                <xf:value ref="@id"/>
+            </xf:itemset>
         </fr:box-select>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>
 

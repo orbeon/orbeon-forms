@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
- * Represents an xforms:secret control.
+ * Represents an xf:secret control.
  */
 public class XFormsSecretControl extends XFormsValueControl implements FocusableTrait {
 

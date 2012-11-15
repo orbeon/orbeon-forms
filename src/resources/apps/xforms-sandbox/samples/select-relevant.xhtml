@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Relevant Select</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Relevant Select</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <select/>
                     <select-item-relevance/>
@@ -38,42 +38,42 @@
                         </item>
                     </itemset>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance/select" relevant="/instance/relevant = 'true'"/>
-            <xforms:bind ref="/instance/itemset/item[value = 'true']" relevant="/instance/relevant = 'true'"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div style="margin-bottom: 1em">
-            <xforms:select1 ref="/instance/relevant" appearance="full">
-                <xforms:label>Display radio button below?</xforms:label>
-                <xforms:item>
-                    <xforms:label>Yes</xforms:label>
-                    <xforms:value>true</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>No</xforms:label>
-                    <xforms:value>false</xforms:value>
-                </xforms:item>
-            </xforms:select1>
-        </xhtml:div>
-        <!--<xhtml:div style="margin-bottom: 1em">-->
-            <!--<xforms:select1 ref="/instance/select" appearance="full">-->
-                <!--<xforms:label class="gaga">Label for select</xforms:label>-->
-                <!--<xforms:item>-->
-                    <!--<xforms:label>Dummy</xforms:label>-->
-                    <!--<xforms:value>dummy</xforms:value>-->
-                <!--</xforms:item>-->
-            <!--</xforms:select1>-->
-        <!--</xhtml:div>-->
-        <xhtml:div style="margin-bottom: 1em">
-            <xforms:select1 ref="/instance/select-item-relevance" appearance="minimal">
-                <xforms:label class="gaga">Label for select</xforms:label>
-                <xforms:itemset ref="/instance/itemset/item">
-                    <xforms:label ref="label"/>
-                    <xforms:value ref="value"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:bind ref="/instance/select" relevant="/instance/relevant = 'true'"/>
+            <xf:bind ref="/instance/itemset/item[value = 'true']" relevant="/instance/relevant = 'true'"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:div style="margin-bottom: 1em">
+            <xf:select1 ref="/instance/relevant" appearance="full">
+                <xf:label>Display radio button below?</xf:label>
+                <xf:item>
+                    <xf:label>Yes</xf:label>
+                    <xf:value>true</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>No</xf:label>
+                    <xf:value>false</xf:value>
+                </xf:item>
+            </xf:select1>
+        </xh:div>
+        <!--<xh:div style="margin-bottom: 1em">-->
+            <!--<xf:select1 ref="/instance/select" appearance="full">-->
+                <!--<xf:label class="gaga">Label for select</xf:label>-->
+                <!--<xf:item>-->
+                    <!--<xf:label>Dummy</xf:label>-->
+                    <!--<xf:value>dummy</xf:value>-->
+                <!--</xf:item>-->
+            <!--</xf:select1>-->
+        <!--</xh:div>-->
+        <xh:div style="margin-bottom: 1em">
+            <xf:select1 ref="/instance/select-item-relevance" appearance="minimal">
+                <xf:label class="gaga">Label for select</xf:label>
+                <xf:itemset ref="/instance/itemset/item">
+                    <xf:label ref="label"/>
+                    <xf:value ref="value"/>
+                </xf:itemset>
+            </xf:select1>
+        </xh:div>
+    </xh:body>
+</xh:html>

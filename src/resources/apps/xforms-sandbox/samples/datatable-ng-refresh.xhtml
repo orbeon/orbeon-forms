@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+    xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom">
 
 
@@ -67,7 +67,7 @@
                         repeat-ref="/atom:feed/atom:entry[contains(lower-case(atom:title), lower-case(instance('search')/title)) and contains(lower-case(atom:author), lower-case(instance('search')/author))]">
                         <td>
                             <!-- Classes allow setting column properties -->
-                            <xf:output ref="atom:published" xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
+                            <xf:output ref="atom:published" xxf:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"/>
                         </td>
                         <td>
                             <!-- Classes allow setting column properties -->

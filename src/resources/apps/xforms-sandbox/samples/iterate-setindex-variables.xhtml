@@ -1,16 +1,16 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:exforms="http://www.exforms.org/exf/1-0">
+    xmlns:exf="http://www.exforms.org/exf/1-0">
 
-    <xhtml:head>
-        <xhtml:title>Iterating with xforms:setindex and variables</xhtml:title>
-        <xforms:model id="my-model" xxforms:state-handling="client">
-            <xforms:instance id="my-instance">
+    <xh:head>
+        <xh:title>Iterating with xf:setindex and variables</xh:title>
+        <xf:model id="my-model" xxf:state-handling="client">
+            <xf:instance id="my-instance">
                 <items>
                     <item>
                         <label>One</label>
@@ -25,27 +25,27 @@
                         <value/>
                     </item>
                 </items>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-ready" iterate="item">
-                <xforms:setindex repeat="items-repeat" index="position()"/>
-                <xforms:dispatch name="my-event" targetid="my-count"/>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready" iterate="item">
+                <xf:setindex repeat="items-repeat" index="position()"/>
+                <xf:dispatch name="my-event" targetid="my-count"/>
+            </xf:action>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:var name="instance" value="."/>
-        <exforms:variable name="items" select="$instance/item"/>
+        <xf:var name="instance" value="."/>
+        <exf:variable name="items" select="$instance/item"/>
 
-        <xforms:repeat ref="$items" id="items-repeat">
-            <exforms:variable name="current-item" select="."/>
-            <xforms:var name="current-position" value="position()"/>
-            <xforms:output id="my-count" ref="$current-item/value">
-                <xforms:label value="concat($current-item/label, ':')"/>
-                <xforms:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
-            </xforms:output>
-        </xforms:repeat>
-    </xhtml:body>
-</xhtml:html>
+        <xf:repeat ref="$items" id="items-repeat">
+            <exf:variable name="current-item" select="."/>
+            <xf:var name="current-position" value="position()"/>
+            <xf:output id="my-count" ref="$current-item/value">
+                <xf:label value="concat($current-item/label, ':')"/>
+                <xf:setvalue ev:event="my-event" ref="$current-item/value" value="count($items) + $current-position"/>
+            </xf:output>
+        </xf:repeat>
+    </xh:body>
+</xh:html>

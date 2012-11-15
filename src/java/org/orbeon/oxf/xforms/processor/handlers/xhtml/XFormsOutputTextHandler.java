@@ -20,7 +20,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * Handler for xforms:output[@appearance = 'xxforms:text'].
+ * Handler for xf:output[@appearance = 'xxf:text'].
  */
 public class XFormsOutputTextHandler extends XFormsOutputHandler {
 
@@ -29,7 +29,7 @@ public class XFormsOutputTextHandler extends XFormsOutputHandler {
 
         // Just output value for "text" appearance
 //        if (isImageMediatype || isHTMLMediaType) {
-//            throw new ValidationException("Cannot use mediatype value for \"xxforms:text\" appearance: " + mediatypeValue, handlerContext.getLocationData());
+//            throw new ValidationException("Cannot use mediatype value for \"xxf:text\" appearance: " + mediatypeValue, handlerContext.getLocationData());
 //        }
 
         final XFormsOutputControl outputControl = (XFormsOutputControl) control;

@@ -88,7 +88,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
             )
 
         // Set value into the instance
-        // NOTE: Here we decided to use the actions logger, by compatibility with xforms:setvalue. Anything we would like to log in "submission" mode?
+        // NOTE: Here we decided to use the actions logger, by compatibility with xf:setvalue. Anything we would like to log in "submission" mode?
         DataModel.setValueIfChanged(destinationNodeInfo, responseBody, handleSetValueSuccess, handleSetValueError)
 
         // Dispatch xforms-submit-done

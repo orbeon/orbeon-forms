@@ -11,30 +11,30 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Checkbox selection update bug</xhtml:title>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Checkbox selection update bug</xh:title>
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <value1/>
                     <value2/>
                     <enabled>false</enabled>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="enabled" type="xs:boolean"/>
+            </xf:instance>
+            <xf:bind ref="enabled" type="xs:boolean"/>
 
-            <xforms:instance id="items">
+            <xf:instance id="items">
                 <items xmlns="">
                     <item>
                         <label>1</label>
@@ -45,73 +45,73 @@
                         <value>2</value>
                     </item>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             fieldset { padding: .5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:input id="checkbox" ref="enabled">
-            <xforms:label>Show</xforms:label>
-        </xforms:input>
+        <xf:input id="checkbox" ref="enabled">
+            <xf:label>Show</xf:label>
+        </xf:input>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:group ref=".[enabled = 'true']" appearance="xxforms:fieldset">
-            <xforms:label>Static itemsets</xforms:label>
+        <xf:group ref=".[enabled = 'true']" appearance="xxf:fieldset">
+            <xf:label>Static itemsets</xf:label>
 
-            <xforms:select1 id="single" ref="value1" appearance="full">
-                <xforms:label>Value: </xforms:label>
-                <xforms:item>
-                    <xforms:label>1</xforms:label>
-                    <xforms:value>1</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>2</xforms:label>
-                    <xforms:value>2</xforms:value>
-                </xforms:item>
-            </xforms:select1>
+            <xf:select1 id="single" ref="value1" appearance="full">
+                <xf:label>Value: </xf:label>
+                <xf:item>
+                    <xf:label>1</xf:label>
+                    <xf:value>1</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>2</xf:label>
+                    <xf:value>2</xf:value>
+                </xf:item>
+            </xf:select1>
 
-            <xhtml:br/>
+            <xh:br/>
 
-            <xforms:select id="multiple" ref="value2" appearance="full">
-                <xforms:label>Value: </xforms:label>
-                <xforms:item>
-                    <xforms:label>1</xforms:label>
-                    <xforms:value>1</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>2</xforms:label>
-                    <xforms:value>2</xforms:value>
-                </xforms:item>
-            </xforms:select>
-        </xforms:group>
+            <xf:select id="multiple" ref="value2" appearance="full">
+                <xf:label>Value: </xf:label>
+                <xf:item>
+                    <xf:label>1</xf:label>
+                    <xf:value>1</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>2</xf:label>
+                    <xf:value>2</xf:value>
+                </xf:item>
+            </xf:select>
+        </xf:group>
 
-        <xforms:group ref=".[enabled = 'true']" appearance="xxforms:fieldset">
-            <xforms:label>Dynamic itemsets</xforms:label>
+        <xf:group ref=".[enabled = 'true']" appearance="xxf:fieldset">
+            <xf:label>Dynamic itemsets</xf:label>
 
-            <xforms:select1 id="single-dynamic" ref="value1" appearance="full">
-                <xforms:label>Value: </xforms:label>
-                <xforms:itemset ref="instance('items')/item">
-                    <xforms:label ref="label"/>
-                    <xforms:value ref="value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 id="single-dynamic" ref="value1" appearance="full">
+                <xf:label>Value: </xf:label>
+                <xf:itemset ref="instance('items')/item">
+                    <xf:label ref="label"/>
+                    <xf:value ref="value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xhtml:br/>
+            <xh:br/>
 
-            <xforms:select id="multiple-dynamic" ref="value2" appearance="full">
-                <xforms:label>Value: </xforms:label>
-                <xforms:itemset ref="instance('items')/item">
-                    <xforms:label ref="label"/>
-                    <xforms:value ref="value"/>
-                </xforms:itemset>
-            </xforms:select>
-        </xforms:group>
+            <xf:select id="multiple-dynamic" ref="value2" appearance="full">
+                <xf:label>Value: </xf:label>
+                <xf:itemset ref="instance('items')/item">
+                    <xf:label ref="label"/>
+                    <xf:value ref="value"/>
+                </xf:itemset>
+            </xf:select>
+        </xf:group>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

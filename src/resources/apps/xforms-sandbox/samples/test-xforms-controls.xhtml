@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,15 +21,15 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XForms Controls</xhtml:title>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-xforms-controls.js"/>
-        <xforms:model xxforms:encrypt-item-values="false">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XForms Controls</xh:title>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-xforms-controls.js"/>
+        <xf:model xxf:encrypt-item-values="false">
+            <xf:instance id="main-instance">
                 <instance repeat-shown="true" readonly="" relevant="true">
                     <label>Label</label>
                     <help>Help</help>
@@ -58,13 +58,13 @@
                     <disabled/>
                     <readonly/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
-            <xforms:bind ref="type-change[type = 'date']/input" type="xs:date"/>
-            <xforms:bind ref="type-change[type = 'float']/input" type="xs:float"/>
-            <xforms:bind ref="disabled" relevant="false()"/>
-            <xforms:bind ref="readonly" readonly="true()" relevant="context()/@relevant = 'true'"/>
-            <xforms:instance id="flavors">
+            </xf:instance>
+            <xf:bind ref="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
+            <xf:bind ref="type-change[type = 'date']/input" type="xs:date"/>
+            <xf:bind ref="type-change[type = 'float']/input" type="xs:float"/>
+            <xf:bind ref="disabled" relevant="false()"/>
+            <xf:bind ref="readonly" readonly="true()" relevant="context()/@relevant = 'true'"/>
+            <xf:instance id="flavors">
                 <flavors>
                     <flavor label="Fruits" color="red">
                         <flavor name="o" color="orange" label="Orange"/>
@@ -75,296 +75,296 @@
                         <flavor name="v" color="yellow" label="Vanilla"/>
                     </flavor>
                 </flavors>
-            </xforms:instance>
+            </xf:instance>
             <!-- Global MIPS that apply to all the controls -->
-            <xforms:bind ref="* except (disabled, readonly)" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
-            <xforms:bind ref="@*" type="xs:boolean"/>
-            <xforms:bind ref="input-boolean" type="xs:boolean"/>
-            <xforms:bind ref="date" type="xs:date"/>
-            <xforms:bind ref="time" type="xs:time"/>
-            <xforms:bind ref="date-time" type="xs:dateTime"/>
-            <xforms:bind ref="output-file/uri" type="xs:anyURI"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            <xf:bind ref="* except (disabled, readonly)" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
+            <xf:bind ref="@*" type="xs:boolean"/>
+            <xf:bind ref="input-boolean" type="xs:boolean"/>
+            <xf:bind ref="date" type="xs:date"/>
+            <xf:bind ref="time" type="xs:time"/>
+            <xf:bind ref="date-time" type="xs:dateTime"/>
+            <xf:bind ref="output-file/uri" type="xs:anyURI"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
             .red { background-color: #faa }
             .yellow { background-color: #ff9    ; }
             .brown { background-color: #c90; }
             .orange { background-color: #fc0; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:h2>Global properties</xhtml:h2>
-        <xhtml:div>
-            <xforms:input ref="@repeat-shown" id="repeat-shown">
-                <xforms:label>Repeat shown: </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="@readonly" id="readonly">
-                <xforms:label>Readonly: </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="@relevant" id="relevant">
-                <xforms:label>Relevant: </xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:trigger appearance="minimal" id="focus-trigger">
-                <xforms:label>(focus trigger)</xforms:label>
-            </xforms:trigger>
-        </xhtml:div>
+        <xh:h2>Global properties</xh:h2>
+        <xh:div>
+            <xf:input ref="@repeat-shown" id="repeat-shown">
+                <xf:label>Repeat shown: </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="@readonly" id="readonly">
+                <xf:label>Readonly: </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="@relevant" id="relevant">
+                <xf:label>Relevant: </xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:trigger appearance="minimal" id="focus-trigger">
+                <xf:label>(focus trigger)</xf:label>
+            </xf:trigger>
+        </xh:div>
 
-        <xhtml:div id="controls">
-            <xforms:repeat ref=".[@repeat-shown = 'true']">
+        <xh:div id="controls">
+            <xf:repeat ref=".[@repeat-shown = 'true']">
 
                 <!-- Input -->
-                <xhtml:h2>Input</xhtml:h2>
-                <xhtml:div>
-                    <xforms:input ref="input" id="input">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:input>
-                </xhtml:div>
+                <xh:h2>Input</xh:h2>
+                <xh:div>
+                    <xf:input ref="input" id="input">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:input>
+                </xh:div>
 
                 <!-- Text area -->
-                <xhtml:h2>Text area</xhtml:h2>
-                <xhtml:div>
-                    <xforms:textarea ref="textarea" id="textarea">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:textarea>
-                </xhtml:div>
+                <xh:h2>Text area</xh:h2>
+                <xh:div>
+                    <xf:textarea ref="textarea" id="textarea">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:textarea>
+                </xh:div>
 
                 <!-- Secret -->
-                <xhtml:h2>Secret</xhtml:h2>
-                <xhtml:div>
-                    <xforms:secret ref="secret" id="secret">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:secret>
-                </xhtml:div>
+                <xh:h2>Secret</xh:h2>
+                <xh:div>
+                    <xf:secret ref="secret" id="secret">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:secret>
+                </xh:div>
 
                 <!-- Boolean input -->
-                <xhtml:h2>xforms:input boolean</xhtml:h2>
-                <xhtml:div>
-                    <xforms:input ref="input-boolean" id="input-boolean">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:input>
-                </xhtml:div>
+                <xh:h2>xf:input boolean</xh:h2>
+                <xh:div>
+                    <xf:input ref="input-boolean" id="input-boolean">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:input>
+                </xh:div>
 
                 <!-- Select and Select1 -->
-                <xhtml:h2>xforms:select and xforms:select1</xhtml:h2>
-                <xforms:group ref="select">
-                    <xhtml:div>
-                        <xforms:select1 appearance="full" ref="single" id="flavor-select1-full">
-                            <xforms:itemset ref="instance('flavors')/flavor/flavor" class="{@color}">
-                                <xforms:label ref="@label"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:div>
-                    <xhtml:div>
-                        <xforms:select appearance="full" ref="multiple" id="flavor-select-full">
-                            <xforms:itemset ref="instance('flavors')/flavor/flavor" class="{@color}">
-                                <xforms:label ref="@label"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                        </xforms:select>
-                    </xhtml:div>
-                    <xhtml:div>
-                        <xforms:select1 appearance="compact" ref="single" id="flavor-select1-compact">
-                            <xforms:itemset ref="instance('flavors')//flavor" class="{@color}">
-                                <xforms:label ref="@label"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:div>
-                    <xhtml:div>
-                        <xforms:select appearance="compact" ref="multiple" id="flavor-select-compact">
-                            <xforms:itemset ref="instance('flavors')//flavor" class="{@color}">
-                                <xforms:label ref="@label"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                        </xforms:select>
-                    </xhtml:div>
-                    <xhtml:div>
-                        <xforms:select1 appearance="minimal" ref="single" id="flavor-select-minimal">
-                            <xforms:itemset ref="instance('flavors')//flavor" class="{@color}">
-                                <xforms:label ref="@label"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:div>
-                    <xhtml:div>
-                        <xforms:trigger appearance="minimal" id="set-out-of-range">
-                            <xforms:label>Set out of range</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="single">x</xforms:setvalue>
-                                <xforms:setvalue ref="multiple">x</xforms:setvalue>
-                            </xforms:action>
-                        </xforms:trigger> |
-                        <xforms:trigger appearance="minimal" id="set-to-strawberry">
-                            <xforms:label>Set to Strawberry</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="single">s</xforms:setvalue>
-                                <xforms:setvalue ref="multiple">s</xforms:setvalue>
-                            </xforms:action>
-                        </xforms:trigger> |
-                        <xforms:trigger appearance="minimal" id="add-flavor">
-                            <xforms:label>Add flavor</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert ref="instance('flavors')/flavor[1]/flavor"/>
-                                <xforms:action context="instance('flavors')/flavor[1]/flavor[last()]">
-                                    <xforms:setvalue ref="@label">Key lime</xforms:setvalue>
-                                    <xforms:setvalue ref="@name">k</xforms:setvalue>
-                                    <xforms:setvalue ref="@color">yellow</xforms:setvalue>
-                                </xforms:action>
-                            </xforms:action>
-                        </xforms:trigger> |
-                        <xforms:trigger appearance="minimal" id="change-colors">
-                            <xforms:label>Change colors</xforms:label>
-                            <xforms:action ev:event="DOMActivate" context="instance('flavors')">
-                                <xforms:setvalue ref="flavor[1]/@color">brown</xforms:setvalue>
-                                <xforms:setvalue ref="(flavor/flavor)[1]/@color">yellow</xforms:setvalue>
-                                <xforms:setvalue ref="(flavor/flavor)[2]/@color">brown</xforms:setvalue>
-                                <xforms:setvalue ref="flavor[2]/@color">red</xforms:setvalue>
-                                <xforms:setvalue ref="(flavor/flavor)[3]/@color">red</xforms:setvalue>
-                                <xforms:setvalue ref="(flavor/flavor)[4]/@color">orange</xforms:setvalue>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:div>
-                </xforms:group>
+                <xh:h2>xf:select and xf:select1</xh:h2>
+                <xf:group ref="select">
+                    <xh:div>
+                        <xf:select1 appearance="full" ref="single" id="flavor-select1-full">
+                            <xf:itemset ref="instance('flavors')/flavor/flavor" class="{@color}">
+                                <xf:label ref="@label"/>
+                                <xf:value ref="@name"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </xh:div>
+                    <xh:div>
+                        <xf:select appearance="full" ref="multiple" id="flavor-select-full">
+                            <xf:itemset ref="instance('flavors')/flavor/flavor" class="{@color}">
+                                <xf:label ref="@label"/>
+                                <xf:value ref="@name"/>
+                            </xf:itemset>
+                        </xf:select>
+                    </xh:div>
+                    <xh:div>
+                        <xf:select1 appearance="compact" ref="single" id="flavor-select1-compact">
+                            <xf:itemset ref="instance('flavors')//flavor" class="{@color}">
+                                <xf:label ref="@label"/>
+                                <xf:value ref="@name"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </xh:div>
+                    <xh:div>
+                        <xf:select appearance="compact" ref="multiple" id="flavor-select-compact">
+                            <xf:itemset ref="instance('flavors')//flavor" class="{@color}">
+                                <xf:label ref="@label"/>
+                                <xf:value ref="@name"/>
+                            </xf:itemset>
+                        </xf:select>
+                    </xh:div>
+                    <xh:div>
+                        <xf:select1 appearance="minimal" ref="single" id="flavor-select-minimal">
+                            <xf:itemset ref="instance('flavors')//flavor" class="{@color}">
+                                <xf:label ref="@label"/>
+                                <xf:value ref="@name"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </xh:div>
+                    <xh:div>
+                        <xf:trigger appearance="minimal" id="set-out-of-range">
+                            <xf:label>Set out of range</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="single">x</xf:setvalue>
+                                <xf:setvalue ref="multiple">x</xf:setvalue>
+                            </xf:action>
+                        </xf:trigger> |
+                        <xf:trigger appearance="minimal" id="set-to-strawberry">
+                            <xf:label>Set to Strawberry</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="single">s</xf:setvalue>
+                                <xf:setvalue ref="multiple">s</xf:setvalue>
+                            </xf:action>
+                        </xf:trigger> |
+                        <xf:trigger appearance="minimal" id="add-flavor">
+                            <xf:label>Add flavor</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:insert ref="instance('flavors')/flavor[1]/flavor"/>
+                                <xf:action context="instance('flavors')/flavor[1]/flavor[last()]">
+                                    <xf:setvalue ref="@label">Key lime</xf:setvalue>
+                                    <xf:setvalue ref="@name">k</xf:setvalue>
+                                    <xf:setvalue ref="@color">yellow</xf:setvalue>
+                                </xf:action>
+                            </xf:action>
+                        </xf:trigger> |
+                        <xf:trigger appearance="minimal" id="change-colors">
+                            <xf:label>Change colors</xf:label>
+                            <xf:action ev:event="DOMActivate" context="instance('flavors')">
+                                <xf:setvalue ref="flavor[1]/@color">brown</xf:setvalue>
+                                <xf:setvalue ref="(flavor/flavor)[1]/@color">yellow</xf:setvalue>
+                                <xf:setvalue ref="(flavor/flavor)[2]/@color">brown</xf:setvalue>
+                                <xf:setvalue ref="flavor[2]/@color">red</xf:setvalue>
+                                <xf:setvalue ref="(flavor/flavor)[3]/@color">red</xf:setvalue>
+                                <xf:setvalue ref="(flavor/flavor)[4]/@color">orange</xf:setvalue>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:div>
+                </xf:group>
 
                 <!-- Date -->
-                <xhtml:h2>xforms:input type xs:date (default appearance)</xhtml:h2>
-                <xhtml:div>
-                    <xforms:input ref="date" id="date">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:input>
-                </xhtml:div>
-                <xhtml:h2>xforms:input type xs:date (minimal appearance)</xhtml:h2>
-                <xhtml:div>
-                    <xforms:input ref="date" appearance="minimal" id="date-minimal">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:input>
-                </xhtml:div>
+                <xh:h2>xf:input type xs:date (default appearance)</xh:h2>
+                <xh:div>
+                    <xf:input ref="date" id="date">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:input>
+                </xh:div>
+                <xh:h2>xf:input type xs:date (minimal appearance)</xh:h2>
+                <xh:div>
+                    <xf:input ref="date" appearance="minimal" id="date-minimal">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:input>
+                </xh:div>
 
                 <!-- Time -->
-                <xhtml:h2>xforms:input type xs:time</xhtml:h2>
-                <xhtml:div>
-                    <xforms:input ref="time" id="time">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:input>
-                </xhtml:div>
+                <xh:h2>xf:input type xs:time</xh:h2>
+                <xh:div>
+                    <xf:input ref="time" id="time">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:input>
+                </xh:div>
 
                 <!-- Date and time -->
-                <xhtml:h2>xforms:input type xs:dateTime</xhtml:h2>
-                <xhtml:div>
-                    <xforms:input ref="date-time" id="date-time">
-                        <xforms:label ref="../label"/>
-                        <xforms:help ref="../help"/>
-                        <xforms:hint ref="../hint"/>
-                        <xforms:alert ref="../alert"/>
-                    </xforms:input>
-                </xhtml:div>
+                <xh:h2>xf:input type xs:dateTime</xh:h2>
+                <xh:div>
+                    <xf:input ref="date-time" id="date-time">
+                        <xf:label ref="../label"/>
+                        <xf:help ref="../help"/>
+                        <xf:hint ref="../hint"/>
+                        <xf:alert ref="../alert"/>
+                    </xf:input>
+                </xh:div>
 
                 <!-- Trigger -->
-                <xhtml:h2>xforms:trigger</xhtml:h2>
-                <xhtml:div>
-                    <xforms:trigger ref="trigger" id="trigger-default">
-                        <xforms:label ref="../label"/>
-                        <xforms:hint>Hint</xforms:hint>
-                    </xforms:trigger>
-                    <xforms:trigger ref="trigger" id="trigger-minimal" appearance="minimal">
-                        <xforms:label ref="../label"/>
-                        <xforms:hint>Hint</xforms:hint>
-                    </xforms:trigger>
-                </xhtml:div>
+                <xh:h2>xf:trigger</xh:h2>
+                <xh:div>
+                    <xf:trigger ref="trigger" id="trigger-default">
+                        <xf:label ref="../label"/>
+                        <xf:hint>Hint</xf:hint>
+                    </xf:trigger>
+                    <xf:trigger ref="trigger" id="trigger-minimal" appearance="minimal">
+                        <xf:label ref="../label"/>
+                        <xf:hint>Hint</xf:hint>
+                    </xf:trigger>
+                </xh:div>
 
                 <!-- Submit -->
-                <xhtml:h2>xforms:submit</xhtml:h2>
-                <xhtml:div>
-                    <xforms:submit ref="submit" id="submit">
-                        <xforms:label ref="../label"/>
-                        <xforms:hint>Hint</xforms:hint>
-                    </xforms:submit>
-                </xhtml:div>
+                <xh:h2>xf:submit</xh:h2>
+                <xh:div>
+                    <xf:submit ref="submit" id="submit">
+                        <xf:label ref="../label"/>
+                        <xf:hint>Hint</xf:hint>
+                    </xf:submit>
+                </xh:div>
 
                 <!-- Download -->
-                <xhtml:h2>xforms:output appearance="xxforms:download"</xhtml:h2>
-                <xforms:group ref="output-file">
-                    <xhtml:div>
-                        <xforms:output ref="uri" appearance="xxforms:download" id="output-file-value" xxforms:target="gaga">
-                            <xforms:label>Download file</xforms:label>
-                        </xforms:output>
-                    </xhtml:div>
-                </xforms:group>
+                <xh:h2>xf:output appearance="xxf:download"</xh:h2>
+                <xf:group ref="output-file">
+                    <xh:div>
+                        <xf:output ref="uri" appearance="xxf:download" id="output-file-value" xxf:target="gaga">
+                            <xf:label>Download file</xf:label>
+                        </xf:output>
+                    </xh:div>
+                </xf:group>
 
                 <!-- Type change -->
-                <xhtml:h2>Type change</xhtml:h2>
-                <xforms:group ref="type-change">
-                    <xhtml:div>
-                        <xforms:input ref="input" id="type-change-input"/>
-                    </xhtml:div>
-                    <xhtml:div>
-                        <xforms:trigger appearance="minimal" id="set-type-reset">
-                            <xforms:label>Reset type</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="type"/>
-                                <xforms:rebuild/>
-                            </xforms:action>
-                        </xforms:trigger> |
-                        <xforms:trigger appearance="minimal" id="set-type-date">
-                            <xforms:label>Set to date</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="type">date</xforms:setvalue>
-                                <xforms:rebuild/>
-                            </xforms:action>
-                        </xforms:trigger> |
-                        <xforms:trigger appearance="minimal" id="set-type-float">
-                            <xforms:label>Set to float</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="type">float</xforms:setvalue>
-                                <xforms:rebuild/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:div>
-                </xforms:group>
+                <xh:h2>Type change</xh:h2>
+                <xf:group ref="type-change">
+                    <xh:div>
+                        <xf:input ref="input" id="type-change-input"/>
+                    </xh:div>
+                    <xh:div>
+                        <xf:trigger appearance="minimal" id="set-type-reset">
+                            <xf:label>Reset type</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="type"/>
+                                <xf:rebuild/>
+                            </xf:action>
+                        </xf:trigger> |
+                        <xf:trigger appearance="minimal" id="set-type-date">
+                            <xf:label>Set to date</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="type">date</xf:setvalue>
+                                <xf:rebuild/>
+                            </xf:action>
+                        </xf:trigger> |
+                        <xf:trigger appearance="minimal" id="set-type-float">
+                            <xf:label>Set to float</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="type">float</xf:setvalue>
+                                <xf:rebuild/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:div>
+                </xf:group>
 
                 <!-- Disabled and readonly field -->
-                <xhtml:h2>Disabled and readonly field</xhtml:h2>
-                <xforms:input ref="disabled" id="disabled-input">
-                    <xforms:label>Disabled input </xforms:label>
-                </xforms:input>
-                <xforms:input ref="readonly" id="readonly-input">
+                <xh:h2>Disabled and readonly field</xh:h2>
+                <xf:input ref="disabled" id="disabled-input">
+                    <xf:label>Disabled input </xf:label>
+                </xf:input>
+                <xf:input ref="readonly" id="readonly-input">
                     <!-- This field is used by testReadonly() to test that a readonly field is still readonly after it becomes relevant,
                          i.e. that the 'disabled' attribute on form controls is not removed when the control becomes relevant if it
                          is readonly. -->
-                    <xforms:label>Readonly input </xforms:label>
-                </xforms:input>
+                    <xf:label>Readonly input </xf:label>
+                </xf:input>
 
-            </xforms:repeat>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+            </xf:repeat>
+        </xh:div>
+    </xh:body>
+</xh:html>

@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -29,7 +29,7 @@
     <xbl:script src="/xbl/orbeon/tinymce/tinymce.js"/>
     <xbl:script src="/xbl/orbeon/tinymce/tinymce-config.js"/>
     <xbl:binding id="fr-tinymce" element="fr|tinymce" xxbl:mode="binding lhha">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xforms="http://www.w3.org/2002/xforms">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Formatted text</display-name>
             <display-name lang="fr">Texte formatté</display-name>
             <display-name lang="ru">Текст в формате HTML</display-name>
@@ -40,10 +40,10 @@
             <templates>
                 <view>
                     <fr:tinymce id="" xmlns="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
                     </fr:tinymce>
                 </view>
             </templates>
@@ -100,14 +100,14 @@
 
                 <!-- In portlet mode, we want the resource id to be processed into a base URL, and we use a magic value to
                      indicate that. Search for 1b713b2e6d7fd45753f4b8a6270b776e in the code for more details. -->
-                <xhtml:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce/1b713b2e6d7fd45753f4b8a6270b776e.js" class="tinymce-base-url"/>
+                <xh:a f:url-type="resource" style="display: none" href="/xbl/orbeon/tinymce/jscripts/tiny_mce/1b713b2e6d7fd45753f4b8a6270b776e.js" class="tinymce-base-url"/>
 
                 <!--
                     div to be converted into a TinyMCE Editor instance.
                     By default, a certain div element is used to bind the TinyMCE editor,
                     instead of the "textareas" default. Important: Make sure that class
                     attribute corresponds to myDivClass variable in tinymce.js! -->
-                <xhtml:div
+                <xh:div
                     class="xbl-fr-tinymce-div xbl-html-input"
                     id="tinymce-div"
                     xbl:attr="style tabindex tabindex=navindex" />

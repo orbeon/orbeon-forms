@@ -11,33 +11,33 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Read-Only Instance</xhtml:title>
-        <xforms:model xxforms:state-handling="client">
-            <xforms:instance id="main-instance" xxforms:readonly="true">
+    <xh:head>
+        <xh:title>Read-Only Instance</xh:title>
+        <xf:model xxf:state-handling="client">
+            <xf:instance id="main-instance" xxf:readonly="true">
                 <form>
                     <first-name>John</first-name>
                     <last-name>Doe</last-name>
                 </form>
-            </xforms:instance>
+            </xf:instance>
             <!-- Uncommenting the code below should cause an error -->
-            <!--<xforms:bind ref="first-name" relevant="false()"/>-->
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="first-name">
-            <xforms:label>First name</xforms:label>
-        </xforms:input>
-        <xforms:output ref="last-name">
-            <xforms:label>Last name</xforms:label>
-        </xforms:output>
-    </xhtml:body>
-</xhtml:html>
+            <!--<xf:bind ref="first-name" relevant="false()"/>-->
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="first-name">
+            <xf:label>First name</xf:label>
+        </xf:input>
+        <xf:output ref="last-name">
+            <xf:label>Last name</xf:label>
+        </xf:output>
+    </xh:body>
+</xh:html>

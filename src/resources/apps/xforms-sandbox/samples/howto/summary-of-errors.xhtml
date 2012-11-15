@@ -1,18 +1,18 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Summary of errors</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Summary of errors</xh:title>
+        <xf:model>
 
             <!-- Instance with the sub-documents -->
-            <xforms:instance id="company">
+            <xf:instance id="company">
                 <company>
                     <name/>
                     <address/>
@@ -34,87 +34,87 @@
                         </employee>
                     </employees>
                 </company>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="edit-employee">
+            <xf:instance id="edit-employee">
                 <employee/>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Validation rules  -->
-            <xforms:bind ref="instance('company')/name" required="true()"/>
-            <xforms:bind ref="instance('company')/employees/employee, instance('edit-employee')">
-                <xforms:bind ref="first-name, last-name" required="true()"/>
-                <xforms:bind ref="expenses" constraint=". castable as xs:integer and xs:integer(.) lt 25000"/>
-            </xforms:bind>
+            <xf:bind ref="instance('company')/name" required="true()"/>
+            <xf:bind ref="instance('company')/employees/employee, instance('edit-employee')">
+                <xf:bind ref="first-name, last-name" required="true()"/>
+                <xf:bind ref="expenses" constraint=". castable as xs:integer and xs:integer(.) lt 25000"/>
+            </xf:bind>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
             .xforms-label { display: block; margin-top: 1em }
             .buttons { margin-top: 1em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:input ref="name">
-            <xforms:label>Company name</xforms:label>
-            <xforms:alert>Company name is mandatory</xforms:alert>
-        </xforms:input>
-        <xforms:input ref="address">
-            <xforms:label>Company address</xforms:label>
-        </xforms:input>
+        <xf:input ref="name">
+            <xf:label>Company name</xf:label>
+            <xf:alert>Company name is mandatory</xf:alert>
+        </xf:input>
+        <xf:input ref="address">
+            <xf:label>Company address</xf:label>
+        </xf:input>
 
-        <!-- Summary of errors; the magic is done by the xxforms:valid() function -->
-        <xhtml:ul>
-            <xforms:repeat ref="employees/employee[not(xxforms:valid(., true()))]">
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label>Correct errors for employee <xforms:output value="@id"/></xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert ref="instance('edit-employee')" origin="context()"/>
-                            <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:li>
-            </xforms:repeat>
-        </xhtml:ul>
+        <!-- Summary of errors; the magic is done by the xxf:valid() function -->
+        <xh:ul>
+            <xf:repeat ref="employees/employee[not(xxf:valid(., true()))]">
+                <xh:li>
+                    <xf:trigger appearance="minimal">
+                        <xf:label>Correct errors for employee <xf:output value="@id"/></xf:label>
+                        <xf:action ev:event="DOMActivate">
+                            <xf:insert ref="instance('edit-employee')" origin="context()"/>
+                            <xf:dispatch name="fr-visit-all" targetid="error-summary"/>
+                        </xf:action>
+                    </xf:trigger>
+                </xh:li>
+            </xf:repeat>
+        </xh:ul>
 
         <!-- Edit current employee -->
-        <xforms:group ref="instance('edit-employee')[exists(*)]" id="edit-employee-group">
-            <xforms:input ref="first-name">
-                <xforms:label>First name</xforms:label>
-                <xforms:alert>First name is mandatory</xforms:alert>
-            </xforms:input>
-            <xforms:input ref="last-name">
-                <xforms:label>Last name</xforms:label>
-                <xforms:alert>Last name is mandatory</xforms:alert>
-            </xforms:input>
-            <xforms:input ref="expenses">
-                <xforms:label>Expenses</xforms:label>
-                <xforms:alert>Expenses cannot be over $25,000</xforms:alert>
-            </xforms:input>
-            <xhtml:div class="buttons">
-                <xforms:group>
-                    <xforms:delete ev:event="DOMActivate" ref="*"/>
+        <xf:group ref="instance('edit-employee')[exists(*)]" id="edit-employee-group">
+            <xf:input ref="first-name">
+                <xf:label>First name</xf:label>
+                <xf:alert>First name is mandatory</xf:alert>
+            </xf:input>
+            <xf:input ref="last-name">
+                <xf:label>Last name</xf:label>
+                <xf:alert>Last name is mandatory</xf:alert>
+            </xf:input>
+            <xf:input ref="expenses">
+                <xf:label>Expenses</xf:label>
+                <xf:alert>Expenses cannot be over $25,000</xf:alert>
+            </xf:input>
+            <xh:div class="buttons">
+                <xf:group>
+                    <xf:delete ev:event="DOMActivate" ref="*"/>
                     <fr:button>
-                        <xforms:label>OK</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:insert ref="instance('company')/employees/employee[@id = instance('edit-employee')/@id]"
+                        <xf:label>OK</xf:label>
+                        <xf:action ev:event="DOMActivate">
+                            <xf:insert ref="instance('company')/employees/employee[@id = instance('edit-employee')/@id]"
                                 origin="instance('edit-employee')"/>
-                            <xforms:delete ref="(instance('company')/employees/employee[@id = instance('edit-employee')/@id])[1]"/>
-                        </xforms:action>
+                            <xf:delete ref="(instance('company')/employees/employee[@id = instance('edit-employee')/@id])[1]"/>
+                        </xf:action>
                     </fr:button>
                     <fr:button>
-                        <xforms:label>Cancel</xforms:label>
+                        <xf:label>Cancel</xf:label>
                     </fr:button>
-                </xforms:group>
-            </xhtml:div>
-        </xforms:group>
+                </xf:group>
+            </xh:div>
+        </xf:group>
 
         <!-- Error summary for the current employee -->
         <fr:error-summary observer="edit-employee" id="error-summary">
             <fr:label>Errors for this employee</fr:label>
         </fr:error-summary>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

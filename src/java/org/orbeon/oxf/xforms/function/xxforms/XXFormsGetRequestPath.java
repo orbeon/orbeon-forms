@@ -21,7 +21,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
 /**
- * xxforms:get-request-path() xs:string
+ * xxf:get-request-path() xs:string
  *
  * Return the value of the request path.
  */

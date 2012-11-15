@@ -11,16 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xhtml:head>
-        <xforms:model id="main-model">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xf:model id="main-model">
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <book>
                         <title>Don Quixote de la Mancha</title>
@@ -35,23 +35,23 @@
                         <author>Arthur C. Clarke</author>
                     </book>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="book">
-                <xforms:bind id="title-bind" ref="title" required="true()"/>
-                <xforms:bind id="author-bind" ref="author" required="true()"/>
-            </xforms:bind>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:repeat ref="book">
-            <xforms:input id="title-control" bind="title-bind">
-                <xforms:label>Title</xforms:label>
-            </xforms:input>
-            <xforms:input id="author-control" bind="author-bind">
-                <xforms:label>Author</xforms:label>
-            </xforms:input>
-            <xhtml:br/>
-        </xforms:repeat>
-    </xhtml:body>
-</xhtml:html>
+            <xf:bind ref="book">
+                <xf:bind id="title-bind" ref="title" required="true()"/>
+                <xf:bind id="author-bind" ref="author" required="true()"/>
+            </xf:bind>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:repeat ref="book">
+            <xf:input id="title-control" bind="title-bind">
+                <xf:label>Title</xf:label>
+            </xf:input>
+            <xf:input id="author-control" bind="author-bind">
+                <xf:label>Author</xf:label>
+            </xf:input>
+            <xh:br/>
+        </xf:repeat>
+    </xh:body>
+</xh:html>

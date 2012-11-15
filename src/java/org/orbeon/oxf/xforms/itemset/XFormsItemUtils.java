@@ -77,7 +77,7 @@ public class XFormsItemUtils {
     }
 
     /**
-     * Evaluate the itemset for a given xforms:select or xforms:select1 control.
+     * Evaluate the itemset for a given xf:select or xf:select1 control.
      *
      * @param select1Control        control to evaluate
      * @return                      Itemset
@@ -116,7 +116,7 @@ public class XFormsItemUtils {
                 final String localname = element.getName();
 
                 if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
-                    // xforms:item
+                    // xf:item
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
 
@@ -127,7 +127,7 @@ public class XFormsItemUtils {
                     currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
 
                 } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
-                    // xforms:itemset
+                    // xf:itemset
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
 
@@ -149,7 +149,7 @@ public class XFormsItemUtils {
                             {
                                 final org.orbeon.saxon.om.Item currentNodeInfo = currentNodeSet.get(currentPosition - 1);
 
-                                // Handle children of xforms:itemset
+                                // Handle children of xf:itemset
 
                                 // We support relevance of items as an extension to XForms
 
@@ -166,7 +166,7 @@ public class XFormsItemUtils {
                                                 ? valueElement : element.element(XFormsConstants.COPY_QNAME);
                                     }
                                     if (valueCopyElement == null)
-                                        throw new ValidationException("xforms:itemset element must contain one xforms:value or one xforms:copy element.", select1Control.getLocationData());
+                                        throw new ValidationException("xf:itemset element must contain one xf:value or one xf:copy element.", select1Control.getLocationData());
 
                                     // Update stack and containers
                                     if (nodeStack.size() != 0) {
@@ -190,8 +190,8 @@ public class XFormsItemUtils {
 
                                     // Handle new item
                                     if (valueCopyElement.getName().equals(XFormsConstants.XFORMS_VALUE_QNAME.getName())) {
-                                        // Handle xforms:value
-                                        // TODO: This could be optimized for xforms:value/@ref|@value as we could get the expression from the cache only once
+                                        // Handle xf:value
+                                        // TODO: This could be optimized for xf:value/@ref|@value as we could get the expression from the cache only once
                                         final String value = getValueValue(valueCopyElement);
 
                                         // NOTE: At this point, if the value is null, we should consider the item
@@ -201,8 +201,8 @@ public class XFormsItemUtils {
                                         final Map<QName, String> attributes = getAttributes(element);
                                         currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, value));
                                     } else {
-                                        // TODO: handle xforms:copy
-                                        throw new ValidationException("xforms:copy is not yet supported.", select1Control.getLocationData());
+                                        // TODO: handle xf:copy
+                                        throw new ValidationException("xf:copy is not yet supported.", select1Control.getLocationData());
                                     }
 
                                     // Always push the last item to the stack
@@ -215,7 +215,7 @@ public class XFormsItemUtils {
                     }
 
                 } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
-                    // xforms:choices
+                    // xf:choices
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
 
@@ -251,7 +251,7 @@ public class XFormsItemUtils {
 
             private String getValueValue(Element valueElement) {
                 if (valueElement == null)
-                    throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:value element.", select1Control.getLocationData());
+                    throw new ValidationException("xf:item or xf:itemset must contain an xf:value element.", select1Control.getLocationData());
                 final Scope elementScope = select1Control.getChildElementScope(valueElement);
                 final String elementEffectiveId = getElementEffectiveId(valueElement);
                 return XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, valueElement, false, null);
@@ -259,7 +259,7 @@ public class XFormsItemUtils {
 
             private Label getLabelValue(Element labelElement) {
                 if (labelElement == null)
-                    throw new ValidationException("xforms:item or xforms:itemset must contain an xforms:label element.", select1Control.getLocationData());
+                    throw new ValidationException("xf:item or xf:itemset must contain an xf:label element.", select1Control.getLocationData());
                 final Scope elementScope = select1Control.getChildElementScope(labelElement);
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
                 final boolean supportsHTML = select1Control.isFullAppearance(); // Only support HTML when appearance is "full"

@@ -24,7 +24,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * Handle xxforms:dialog.
+ * Handle xxf:dialog.
  *
  * TODO: Subclasses per appearance.
  */

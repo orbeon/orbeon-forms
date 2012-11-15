@@ -30,7 +30,7 @@
             if (this._messageDialog == null) {
                 // Prevent SimpleDialog from registering itself on the form
                 SimpleDialog.prototype.registerForm = function() {};
-                // Create one single instance of the YUI dialog used for xforms:message
+                // Create one single instance of the YUI dialog used for xf:message
                 this._messageDialog = new SimpleDialog("xforms-message-dialog", {
                     width: "30em",
                     fixedcenter: true,
@@ -75,7 +75,7 @@
 
         /**
          * Gives an number of messages to show, which will be shown as soon as possible. This is typically called
-         * when the page is first loaded to show messages for xforms:message actions that ran before the HTML
+         * when the page is first loaded to show messages for xf:message actions that ran before the HTML
          * was sent to the client.
          *
          * @param {Array.<string>} messages

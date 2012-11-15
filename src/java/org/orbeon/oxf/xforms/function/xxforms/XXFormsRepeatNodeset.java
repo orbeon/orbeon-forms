@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * The xxforms:repeat-nodeset() function returns the current node-set for a given enclosing repeat.
+ * The xxf:repeat-nodeset() function returns the current node-set for a given enclosing repeat.
  */
 public class XXFormsRepeatNodeset extends XFormsFunction {
 

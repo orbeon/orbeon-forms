@@ -20,7 +20,7 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.xforms.analysis.model.Model
 
 /**
- * xxforms:custom-mip($item as item()*, $mip-name as xs:string) as xs:string
+ * xxf:custom-mip($item as item()*, $mip-name as xs:string) as xs:string
  */
 class XXFormsCustomMIP extends XXFormsMIPFunction {
 

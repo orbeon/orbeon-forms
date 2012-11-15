@@ -11,57 +11,57 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat With Switch</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Repeat With Switch</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <fruits>
                     <fruit>
                         <name>Apple</name>
                         <price>12</price>
                     </fruit>
                 </fruits>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:repeat ref="fruit" id="fruit">
-            <xhtml:div>
-                <xforms:switch>
-                    <xforms:case id="case-1">
-                        Case 1: <xforms:input ref="name"/>
-                    </xforms:case>
-                    <xforms:case id="case-2">
-                        Case 2: <xforms:input ref="price"/>
-                    </xforms:case>
-                </xforms:switch>
-                <xforms:trigger>
-                    <xforms:label>Toggle 1</xforms:label>
-                    <xforms:toggle ev:event="DOMActivate" case="case-1"/>
-                </xforms:trigger>
-                <xforms:trigger>
-                    <xforms:label>Toggle 1</xforms:label>
-                    <xforms:toggle ev:event="DOMActivate" case="case-2"/>
-                </xforms:trigger>
-            </xhtml:div>
-        </xforms:repeat>
-        <xforms:trigger>
-            <xforms:label>Add fruit</xforms:label>
-            <xforms:insert ref="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Remove fruit</xforms:label>
-            <xforms:delete ref="fruit" at="index('fruit')" ev:event="DOMActivate"/>
-        </xforms:trigger>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:repeat ref="fruit" id="fruit">
+            <xh:div>
+                <xf:switch>
+                    <xf:case id="case-1">
+                        Case 1: <xf:input ref="name"/>
+                    </xf:case>
+                    <xf:case id="case-2">
+                        Case 2: <xf:input ref="price"/>
+                    </xf:case>
+                </xf:switch>
+                <xf:trigger>
+                    <xf:label>Toggle 1</xf:label>
+                    <xf:toggle ev:event="DOMActivate" case="case-1"/>
+                </xf:trigger>
+                <xf:trigger>
+                    <xf:label>Toggle 1</xf:label>
+                    <xf:toggle ev:event="DOMActivate" case="case-2"/>
+                </xf:trigger>
+            </xh:div>
+        </xf:repeat>
+        <xf:trigger>
+            <xf:label>Add fruit</xf:label>
+            <xf:insert ref="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Remove fruit</xf:label>
+            <xf:delete ref="fruit" at="index('fruit')" ev:event="DOMActivate"/>
+        </xf:trigger>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

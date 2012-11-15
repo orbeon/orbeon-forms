@@ -31,7 +31,7 @@
 
     <xbl:binding id="fr-autocomplete" element="fr|autocomplete" xxf:external-events="fr-value-selected" xxbl:mode="binding lhha">
 
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xforms="http://www.w3.org/2002/xforms">
+        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Autocomplete</display-name>
             <display-name lang="fr">Auto-complétion</display-name>
             <display-name lang="ru">Автозаполнение</display-name>
@@ -43,37 +43,37 @@
                 <instance label=""/>
                 <view>
                     <fr:autocomplete id="" appearance="minimal" labelref="@label" xmlns="" resource="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
                         <!-- Itemset points to an empty nodeset until users set them in the control details dialog -->
-                        <xforms:itemset ref="()">
-                            <xforms:label ref="()"/>
-                            <xforms:value ref="()"/>
-                        </xforms:itemset>
+                        <xf:itemset ref="()">
+                            <xf:label ref="()"/>
+                            <xf:value ref="()"/>
+                        </xf:itemset>
                     </fr:autocomplete>
                 </view>
             </templates>
             <control-details>
-                <xforms:input ref="@resource">
-                    <xforms:label lang="en">Resource URI</xforms:label>
-                    <xforms:label lang="fr">URI de la ressource</xforms:label>
-                    <xforms:hint lang="en">HTTP URI returning data used for the suggestions</xforms:hint>
-                    <xforms:hint lang="fr">URI HTTP auquel réside le service</xforms:hint>
-                </xforms:input>
-                <xforms:input ref="xforms:itemset/@ref">
-                    <xforms:label ref="$resources/dialog-actions/items/label"/>
-                    <xforms:hint ref="$resources/dialog-actions/items/hint"/>
-                </xforms:input>
-                <xforms:input ref="xforms:itemset/xforms:label/@ref">
-                    <xforms:label ref="$resources/dialog-actions/label/label"/>
-                    <xforms:hint ref="$resources/dialog-actions/label/hint"/>
-                </xforms:input>
-                <xforms:input ref="xforms:itemset/xforms:value/@ref">
-                    <xforms:label ref="$resources/dialog-actions/value/label"/>
-                    <xforms:hint ref="$resources/dialog-actions/value/hint"/>
-                </xforms:input>
+                <xf:input ref="@resource">
+                    <xf:label lang="en">Resource URI</xf:label>
+                    <xf:label lang="fr">URI de la ressource</xf:label>
+                    <xf:hint lang="en">HTTP URI returning data used for the suggestions</xf:hint>
+                    <xf:hint lang="fr">URI HTTP auquel réside le service</xf:hint>
+                </xf:input>
+                <xf:input ref="xf:itemset/@ref">
+                    <xf:label ref="$resources/dialog-actions/items/label"/>
+                    <xf:hint ref="$resources/dialog-actions/items/hint"/>
+                </xf:input>
+                <xf:input ref="xf:itemset/xf:label/@ref">
+                    <xf:label ref="$resources/dialog-actions/label/label"/>
+                    <xf:hint ref="$resources/dialog-actions/label/hint"/>
+                </xf:input>
+                <xf:input ref="xf:itemset/xf:value/@ref">
+                    <xf:label ref="$resources/dialog-actions/value/label"/>
+                    <xf:hint ref="$resources/dialog-actions/value/hint"/>
+                </xf:input>
             </control-details>
         </metadata>
 

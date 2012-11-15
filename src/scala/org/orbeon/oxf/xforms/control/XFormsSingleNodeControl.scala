@@ -218,7 +218,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     // Allow override only for dangling XFormsOutputControl
     def isAllowedBoundItem(item: Item) = staticControl.isAllowedBoundItem(item)
 
-    // NOTE: We don't compare the type here anymore, because only some controls (xforms:input) need to tell the client
+    // NOTE: We don't compare the type here anymore, because only some controls (xf:input) need to tell the client
     // about value type changes.
     override def equalsExternal(other: XFormsControl): Boolean =
         other match {

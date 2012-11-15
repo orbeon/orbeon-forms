@@ -91,10 +91,10 @@ public class ControlIndex {
     private boolean mustMapControl(XFormsControl control) {
 
         // Remember:
-        // xforms:upload
-        // xforms:repeat
-        // xxforms:dialog
-        // xforms:select[@appearance = 'full'] in noscript mode
+        // xf:upload
+        // xf:repeat
+        // xxf:dialog
+        // xf:select[@appearance = 'full'] in noscript mode
         return control instanceof XFormsUploadControl
                 || control instanceof XFormsRepeatControl
                 || control instanceof XXFormsDialogControl
@@ -127,7 +127,7 @@ public class ControlIndex {
     }
 
     /**
-     * Return the list of xforms:select[@appearance = 'full'] in noscript mode.
+     * Return the list of xf:select[@appearance = 'full'] in noscript mode.
      *
      * @return LinkedHashMap
      */

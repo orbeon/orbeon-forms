@@ -22,7 +22,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.AtomicValue;
 
 /**
- * xxforms:property() function.
+ * xxf:property() function.
  *
  * Return the value of a property from properties.xml.
  */

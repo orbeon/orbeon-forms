@@ -11,25 +11,25 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
             xmlns:xbl="http://www.w3.org/ns/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xf:model>
+            <xf:instance>
                 <value>Hello, world!</value>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
         <!-- First component -->
         <xbl:xbl xmlns:exf="http://www.exforms.org/exf/1-0">
             <xbl:binding id="foo-component" element="fr|foo">
                 <xbl:template>
                     <!-- Use prefix exf declared only in this XBL binding, and use on element with id "clash" -->
-                    <xforms:output id="clash" value="exf:readonly()">
-                        <xforms:label>Read-only: </xforms:label>
-                    </xforms:output>
+                    <xf:output id="clash" value="exf:readonly()">
+                        <xf:label>Read-only: </xf:label>
+                    </xf:output>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
@@ -38,18 +38,18 @@
             <xbl:binding id="bar-component" element="fr|bar">
                 <xbl:template>
                     <!-- Element with id "clash" doesn't have the exf prefix used by the other component -->
-                    <xforms:output id="clash" ref=".">
-                        <xforms:label>Message: </xforms:label>
-                    </xforms:output>
+                    <xf:output id="clash" ref=".">
+                        <xf:label>Message: </xf:label>
+                    </xf:output>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
         <!-- Use XBL components -->
         <fr:foo/>
         <fr:bar/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

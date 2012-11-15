@@ -21,10 +21,10 @@ import org.orbeon.saxon.value.Int64Value
 import org.orbeon.oxf.xforms.{XFormsUtils, BindingContext, XFormsContextStack}
 
 /**
- * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
+ * Return the current node of one of the enclosing xf:repeat iteration, either the closest
  * iteration if no argument is passed, or the iteration for the repeat id passed.
  *
- * This function must be called from within an xforms:repeat.
+ * This function must be called from within an xf:repeat.
  */
 class XXFormsRepeatPosition extends XFormsFunction {
 
@@ -51,8 +51,8 @@ object XXFormsRepeatFunctions {
         } while (currentBindingContext ne null)
 
         repeatId match {
-            case Some(id) ⇒ throw new ValidationException("No enclosing xforms:repeat found for repeat id: " + id, initialBindingContext.locationData)
-            case None ⇒throw new ValidationException("No enclosing xforms:repeat found.", initialBindingContext.locationData)
+            case Some(id) ⇒ throw new ValidationException("No enclosing xf:repeat found for repeat id: " + id, initialBindingContext.locationData)
+            case None ⇒throw new ValidationException("No enclosing xf:repeat found.", initialBindingContext.locationData)
         }
     }
 }

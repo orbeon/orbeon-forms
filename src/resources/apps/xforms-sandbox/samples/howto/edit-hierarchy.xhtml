@@ -1,13 +1,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Hierarchy with a single-level repeat</title>
-        <xforms:model>
-            <xforms:instance>
+        <xf:model>
+            <xf:instance>
                 <root>
                   <element1>
                      <element2>
@@ -24,14 +24,14 @@
                      </element2>
                   </element1>
                 </root>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
     </head>
     <body>
-        <xforms:repeat ref="//*">
-            <xforms:output value="string-join(for $element in ancestor-or-self::* return '', ' → ')"/>
-            <xforms:output value="name()"/>
+        <xf:repeat ref="//*">
+            <xf:output value="string-join(for $element in ancestor-or-self::* return '', ' → ')"/>
+            <xf:output value="name()"/>
             <br/>
-        </xforms:repeat>
+        </xf:repeat>
     </body>
 </html>

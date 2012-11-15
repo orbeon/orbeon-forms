@@ -32,7 +32,7 @@ import state.XFormsStateManager
 import org.orbeon.oxf.util.URLRewriterUtils._
 
 /**
- * Handler for <xhtml:head>. Outputs CSS and JS.
+ * Handler for <xh:head>. Outputs CSS and JS.
  */
 class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
 

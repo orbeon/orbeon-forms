@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,25 +21,25 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - reCAPTCHA</xhtml:title>
-        <xforms:model id="main-model" xxforms:noscript="true">
-            <xforms:instance id="config">
+    <xh:head>
+        <xh:title>XBL - reCAPTCHA</xh:title>
+        <xf:model id="main-model" xxf:noscript="true">
+            <xf:instance id="config">
                 <config>
                     <public-key>6LesxAYAAAAAAEF9eTyysdkOF6O2OsPLO9zAiyzX</public-key>
                     <private-key>6LesxAYAAAAAAJIXoxMvErqbisKkt7W-CPoE_Huo</private-key>
                 </config>
-            </xforms:instance>
-            <xforms:instance id="ui">
+            </xf:instance>
+            <xf:instance id="ui">
                 <ui>
                     <error-code/>
                 </ui>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:script type="text/javascript" src="/ops/yui/yahoo-dom-event/yahoo-dom-event.js"/>
-        <xhtml:script type="text/javascript" src="/ops/javascript/underscore/underscore.js"/>
-        <xhtml:script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+        </xf:model>
+        <xh:script type="text/javascript" src="/ops/yui/yahoo-dom-event/yahoo-dom-event.js"/>
+        <xh:script type="text/javascript" src="/ops/javascript/underscore/underscore.js"/>
+        <xh:script type="text/javascript" src="http://api.recaptcha.net/js/recaptcha_ajax.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
                 YAHOO.util.Event.onDOMReady(function() {
                     var container = document.getElementById("recaptcha");
@@ -61,51 +61,51 @@
                     }
                 });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:script>
+    </xh:head>
+    <xh:body>
 
-        <xforms:switch>
-            <xforms:case id="recaptcha-case">
+        <xf:switch>
+            <xf:case id="recaptcha-case">
                 <!-- The reCAPTCHA component -->
                 <fr:recaptcha id="recaptcha">
                     <fr:public-key ref="instance('config')/public-key"/>
                     <fr:private-key ref="instance('config')/private-key"/>
-                    <xforms:toggle ev:event="fr-verify-done" case="success-case"/>
-                    <xforms:action ev:event="fr-verify-error">
-                        <xforms:setvalue ref="instance('ui')/error-code" value="event('fr-error-code')"/>
-                        <xforms:toggle case="failure-case"/>
-                    </xforms:action>
+                    <xf:toggle ev:event="fr-verify-done" case="success-case"/>
+                    <xf:action ev:event="fr-verify-error">
+                        <xf:setvalue ref="instance('ui')/error-code" value="event('fr-error-code')"/>
+                        <xf:toggle case="failure-case"/>
+                    </xf:action>
                 </fr:recaptcha>
                 <fr:button id="verify-button">
-                    <xforms:label>Verify</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" targetid="recaptcha" name="fr-verify"/>
+                    <xf:label>Verify</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" targetid="recaptcha" name="fr-verify"/>
                 </fr:button>
-            </xforms:case>
-            <xforms:case id="success-case">
-                Yes, correct! Wasn't that fun? Yep?<xhtml:br/>
-                Then let's try again:<xhtml:br/>
+            </xf:case>
+            <xf:case id="success-case">
+                Yes, correct! Wasn't that fun? Yep?<xh:br/>
+                Then let's try again:<xh:br/>
                 <fr:button>
-                    <xforms:label>Try again</xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch targetid="recaptcha" name="fr-reload"/>
-                        <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
-                    </xforms:action>
+                    <xf:label>Try again</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:dispatch targetid="recaptcha" name="fr-reload"/>
+                        <xf:toggle ev:event="DOMActivate" case="recaptcha-case"/>
+                    </xf:action>
                 </fr:button>
-            </xforms:case>
-            <xforms:case id="failure-case">
-                Oops, something went wrong.<xhtml:br/>
-                The error code is: <xforms:output value="instance('ui')/error-code" id="error-code"/>.<xhtml:br/>
-                Let's try to give it another shot:<xhtml:br/>
+            </xf:case>
+            <xf:case id="failure-case">
+                Oops, something went wrong.<xh:br/>
+                The error code is: <xf:output value="instance('ui')/error-code" id="error-code"/>.<xh:br/>
+                Let's try to give it another shot:<xh:br/>
                 <fr:button>
-                    <xforms:label>Try again</xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch targetid="recaptcha" name="fr-reload"/>
-                        <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
-                    </xforms:action>
+                    <xf:label>Try again</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:dispatch targetid="recaptcha" name="fr-reload"/>
+                        <xf:toggle ev:event="DOMActivate" case="recaptcha-case"/>
+                    </xf:action>
                 </fr:button>
-            </xforms:case>
-        </xforms:switch>
+            </xf:case>
+        </xf:switch>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

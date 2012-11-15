@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 
 /**
- * Handle xforms:group.
+ * Handle xf:group.
  */
 public abstract class XFormsGroupHandler extends XFormsControlLifecyleHandler {
 

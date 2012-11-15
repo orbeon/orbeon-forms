@@ -57,7 +57,7 @@ object XFormsActions {
         xxformsQName("join-submissions")        → new XXFormsJoinSubmissions,
         xxformsQName("setvisited")              → new XXFormsSetvisitedAction,
     
-        // xbl:handler as action container working like xforms:action
+        // xbl:handler as action container working like xf:action
         XBL_HANDLER_QNAME                       → new XFormsActionAction
     )
 
@@ -82,15 +82,15 @@ object XFormsActions {
     // Whether the given action exists
     def isAction(qName: QName) = Actions.contains(qName)
 
-    // Whether the QName is xforms:action
+    // Whether the QName is xf:action
     def isContainerAction(qName: QName) = Set(xformsQName("action"), XBL_HANDLER_QNAME)(qName)
 
-    // Whether the element is xforms:action
+    // Whether the element is xf:action
     def isDispatchAction(qName: QName) =
         qName.getNamespaceURI == XFORMS_NAMESPACE_URI && qName.getName == "dispatch"
 
     val scriptQName = xxformsQName("script")
 
-    // Return the xxforms:script action
+    // Return the xxf:script action
     def getScriptAction = Actions(scriptQName)
 }

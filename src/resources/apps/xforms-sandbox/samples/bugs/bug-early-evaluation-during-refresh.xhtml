@@ -11,31 +11,31 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <head>
-        <xforms:model id="model1">
-            <xforms:instance id="instance1">
+        <xf:model id="model1">
+            <xf:instance id="instance1">
                 <instance xmlns=""/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-ready">
-                <xforms:dispatch name="xxforms-repeat-activate" targetid="my-trigger" xxforms:repeat-indexes="2"/>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready">
+                <xf:dispatch name="xxforms-repeat-activate" targetid="my-trigger" xxf:repeat-indexes="2"/>
+            </xf:action>
 
-        </xforms:model>
-        <xforms:model id="model2">
-            <xforms:instance id="instance2">
+        </xf:model>
+        <xf:model id="model2">
+            <xf:instance id="instance2">
                 <instance xmlns="">
                     <record/>
                     <record/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
+        </xf:model>
     </head>
     <body>
 
@@ -46,15 +46,15 @@
             </a>.
         </p>
 
-        <xforms:repeat model="model2" ref="record" id="my-repeat">
+        <xf:repeat model="model2" ref="record" id="my-repeat">
             <div>
-                 <xforms:trigger id="my-trigger" ref=".">
-                    <xforms:label>Do Stuff</xforms:label>
+                 <xf:trigger id="my-trigger" ref=".">
+                    <xf:label>Do Stuff</xf:label>
                      <!-- Add event handler so that refresh goes through event dispatching -->
-                     <xforms:action ev:event="#all"/>
-                </xforms:trigger>
+                     <xf:action ev:event="#all"/>
+                </xf:trigger>
             </div>
-        </xforms:repeat>
+        </xf:repeat>
 
     </body>
 </html>

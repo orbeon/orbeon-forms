@@ -11,10 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -22,51 +22,51 @@
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:utils="java:org.orbeon.oxf.xforms.XFormsUtils">
 
-    <xhtml:head>
-        <xhtml:title>Tidy HTML</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Tidy HTML</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <filter-broken-pi xsi:type="xs:boolean">true</filter-broken-pi>
                     <html/>
                     <xhtml-tagsoup/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="fr-xsl-output-instance">
+            </xf:instance>
+            <xf:instance id="fr-xsl-output-instance">
                 <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-textarea {
                 height: 20em;
                 width: 100%;
             }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:group appearance="xxforms:internal">
-            <xforms:input ref="filter-broken-pi">
-                <xforms:label>Filter broken PI</xforms:label>
-            </xforms:input>
+        <xf:group appearance="xxf:internal">
+            <xf:input ref="filter-broken-pi">
+                <xf:label>Filter broken PI</xf:label>
+            </xf:input>
 
-            <xhtml:hr/>
+            <xh:hr/>
 
-            <xforms:textarea ref="html">
-                <xforms:label>Input HTML</xforms:label>
-            </xforms:textarea>
+            <xf:textarea ref="html">
+                <xf:label>Input HTML</xf:label>
+            </xf:textarea>
 
-            <xforms:action ev:event="xforms-value-changed">
-                <xforms:var name="filtered" value="if (filter-broken-pi = 'true') then replace(html, '&lt;\?[^>]*>', '') else html" as="xs:string"/>
-                <xforms:setvalue ref="xhtml-tagsoup" value="saxon:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
-            </xforms:action>
-        </xforms:group>
+            <xf:action ev:event="xforms-value-changed">
+                <xf:var name="filtered" value="if (filter-broken-pi = 'true') then replace(html, '&lt;\?[^>]*>', '') else html" as="xs:string"/>
+                <xf:setvalue ref="xhtml-tagsoup" value="saxon:serialize(utils:htmlStringToDocumentTagSoup($filtered, ()), instance('fr-xsl-output-instance'))"/>
+            </xf:action>
+        </xf:group>
 
-        <xforms:textarea ref="xhtml-tagsoup">
-            <xforms:label>TagSoup</xforms:label>
-        </xforms:textarea>
+        <xf:textarea ref="xhtml-tagsoup">
+            <xf:label>TagSoup</xf:label>
+        </xf:textarea>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

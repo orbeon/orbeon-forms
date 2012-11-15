@@ -1,56 +1,56 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:v="http://www.example.com/validation">
 
-    <xhtml:head>
-        <xhtml:title>External validation</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>External validation</xh:title>
+        <xf:model>
             
-            <xforms:instance id="user-info">
+            <xf:instance id="user-info">
                 <user-info>
                     <first-name>Tom</first-name>
                     <last-name>Smith</last-name>
                     <customer-number>1234-4567-7890</customer-number>
                 </user-info>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Mark all fields as required -->
-            <xforms:bind ref="*" required="true()"/>
+            <xf:bind ref="*" required="true()"/>
 
             <!-- Mark all externally-invalid fields as invalid -->
-            <xforms:bind id="external-constraints-bind" ref="//*" constraint="not(@v:valid = 'false')"/>
+            <xf:bind id="external-constraints-bind" ref="//*" constraint="not(@v:valid = 'false')"/>
 
             <!-- Temporary validation result -->
-            <xforms:instance id="validation-result"><dummy/></xforms:instance>
+            <xf:instance id="validation-result"><dummy/></xf:instance>
 
             <!-- External validation submission -->
-            <xforms:submission id="validation-submission" ref="instance('user-info')"
+            <xf:submission id="validation-submission" ref="instance('user-info')"
                     resource="/apps/xforms-sandbox/samples/howto/external-validation-response.xml"
                     method="post" replace="instance" instance="validation-result">
                 <!-- Clear external errors just before doing external validation -->
-                <xforms:delete ev:event="xforms-submit" ref="//@v:*"/>
-                <xforms:action ev:event="xforms-submit-done">
+                <xf:delete ev:event="xforms-submit" ref="//@v:*"/>
+                <xf:action ev:event="xforms-submit-done">
                     <!-- Insert external validation results when done -->
-                    <xforms:insert ref="." origin="instance('validation-result')/v:data/*"/>
+                    <xf:insert ref="." origin="instance('validation-result')/v:data/*"/>
                     <!-- Add note that certain errors are revalidated until upon revalidation -->
-                    <xforms:setvalue iterate="//@v:alert" ref="." value="concat(., ' (save again to revalidate)')"/>
+                    <xf:setvalue iterate="//@v:alert" ref="." value="concat(., ' (save again to revalidate)')"/>
                     <!-- Show all errors on form -->
-                    <xforms:dispatch name="fr-visit-all" targetid="error-summary-incremental"/>
-                    <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
+                    <xf:dispatch name="fr-visit-all" targetid="error-summary-incremental"/>
+                    <xf:dispatch name="fr-visit-all" targetid="error-summary"/>
                     <!-- Update error summary for incremental mode -->
-                    <xforms:refresh/>
-                    <xforms:dispatch name="fr-update" targetid="error-summary"/>
-                </xforms:action>
-            </xforms:submission>
+                    <xf:refresh/>
+                    <xf:dispatch name="fr-update" targetid="error-summary"/>
+                </xf:action>
+            </xf:submission>
             
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .fields .xforms-alert-inactive { display: none; }
             .fields .xforms-invalid .xforms-alert { background-image: url('../../../apps/fr/style/images/silk/bullet_red.png') }
 
@@ -66,51 +66,51 @@
             .xbl-fr-error-summary .fr-error-alert { color: black; }
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             .global-errors { display: none; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group id="form-group" class="fields">
-            <xhtml:div>
-                <xforms:input ref="first-name">
-                    <xforms:label>First name</xforms:label>
-                    <xforms:alert value="if (xxforms:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The first name is required'"/>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="last-name">
-                    <xforms:label>Last name</xforms:label>
-                    <xforms:alert value="if (xxforms:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The last name is required'"/>
-                </xforms:input>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:input ref="customer-number">
-                    <xforms:label>Customer number</xforms:label>
-                    <xforms:alert value="if (xxforms:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The customer number is required'"/>
-                </xforms:input>
-            </xhtml:div>
-        </xforms:group>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:group id="form-group" class="fields">
+            <xh:div>
+                <xf:input ref="first-name">
+                    <xf:label>First name</xf:label>
+                    <xf:alert value="if (xxf:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The first name is required'"/>
+                </xf:input>
+            </xh:div>
+            <xh:div>
+                <xf:input ref="last-name">
+                    <xf:label>Last name</xf:label>
+                    <xf:alert value="if (xxf:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The last name is required'"/>
+                </xf:input>
+            </xh:div>
+            <xh:div>
+                <xf:input ref="customer-number">
+                    <xf:label>Customer number</xf:label>
+                    <xf:alert value="if (xxf:invalid-binds(.) = 'external-constraints-bind') then @v:alert else 'The customer number is required'"/>
+                </xf:input>
+            </xh:div>
+        </xf:group>
 
-        <xhtml:div class="buttons">
+        <xh:div class="buttons">
             <fr:button>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/images/silk/disk.png"/>
-                    <xhtml:span>Save</xhtml:span>
-                </xforms:label>
-                <xforms:send ev:event="DOMActivate" submission="validation-submission"/>
+                <xf:label>
+                    <xh:img src="/apps/fr/style/images/silk/disk.png"/>
+                    <xh:span>Save</xh:span>
+                </xf:label>
+                <xf:send ev:event="DOMActivate" submission="validation-submission"/>
             </fr:button>
             <fr:button>
-                <xforms:label>
-                    <xhtml:span>Clear</xhtml:span>
-                </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fr-clear" targetid="error-summary"/>
+                <xf:label>
+                    <xh:span>Clear</xh:span>
+                </xf:label>
+                <xf:dispatch ev:event="DOMActivate" name="fr-clear" targetid="error-summary"/>
             </fr:button>
             <fr:button>
-                <xforms:label>
-                    <xhtml:span>Update</xhtml:span>
-                </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fr-update" targetid="error-summary"/>
+                <xf:label>
+                    <xh:span>Update</xh:span>
+                </xf:label>
+                <xf:dispatch ev:event="DOMActivate" name="fr-update" targetid="error-summary"/>
             </fr:button>
-        </xhtml:div>
+        </xh:div>
 
         <fr:error-summary id="error-summary-incremental" observer="form-group">
             <fr:label>Errors in this form (incremental)</fr:label>
@@ -126,5 +126,5 @@
         </fr:error-summary>
         <!-- Uncomment this for the XForms inspector -->
         <fr:xforms-inspector/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

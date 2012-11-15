@@ -171,7 +171,7 @@ public class XFormsProperties {
                     final String stringValue = value.toString();
                     if (!(stringValue.equals(XFormsProperties.STATE_HANDLING_SERVER_VALUE)
                             || stringValue.equals(XFormsProperties.STATE_HANDLING_CLIENT_VALUE)))
-                        throw new ValidationException("Invalid xxforms:" + name
+                        throw new ValidationException("Invalid xxf:" + name
                                 + " property value value: " + stringValue, locationData);
                 }
             },
@@ -185,7 +185,7 @@ public class XFormsProperties {
                     final String stringValue = value.toString();
                     if (!(stringValue.equals(XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE)
                             || stringValue.equals(XFormsProperties.READONLY_APPEARANCE_DYNAMIC_VALUE)))
-                        throw new ValidationException("Invalid xxforms:" + name
+                        throw new ValidationException("Invalid xxf:" + name
                                 + " property value value: " + stringValue, locationData);
                 }
             },

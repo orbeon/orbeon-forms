@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handler for xforms:output[@mediatype = 'text/html'].
+ * Handler for xf:output[@mediatype = 'text/html'].
  */
 public class XFormsOutputHTMLHandler extends XFormsOutputHandler {
 

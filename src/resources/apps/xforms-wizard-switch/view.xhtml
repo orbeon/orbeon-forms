@@ -11,161 +11,161 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting" 
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <xhtml:head>
-        <xhtml:title>XForms Wizard</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="text" xxforms:exclude-result-prefixes="#all">
+    <xh:head>
+        <xh:title>XForms Wizard</xh:title>
+        <xf:model>
+            <xf:instance id="text" xxf:exclude-result-prefixes="#all">
                 <user>
                     <firstname/>
                     <lastname/>
                     <age/>
                 </user>
-            </xforms:instance>
-            <xforms:instance id="control-instance">
+            </xf:instance>
+            <xf:instance id="control-instance">
                 <control-instance>
                     <back/>
                     <finish readonly="false"/>
                 </control-instance>
-            </xforms:instance>
-            <xforms:instance id="formatted">
+            </xf:instance>
+            <xf:instance id="formatted">
                 <formated-instance/>
-            </xforms:instance>                
-            <xforms:bind ref="age" constraint="number(.) >= 0"/>
-            <xforms:bind ref="instance('control-instance')">
-                <xforms:bind ref="back" readonly="true()"/>
-                <xforms:bind ref="finish" readonly="@readonly = 'false'"/>
-            </xforms:bind>
-            <xforms:bind ref="instance('formatted')"
-                calculate="xxforms:serialize(xxforms:call-xpl('oxf:/ops/utils/formatting/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="age" constraint="number(.) >= 0"/>
+            <xf:bind ref="instance('control-instance')">
+                <xf:bind ref="back" readonly="true()"/>
+                <xf:bind ref="finish" readonly="@readonly = 'false'"/>
+            </xf:bind>
+            <xf:bind ref="instance('formatted')"
+                calculate="xxf:serialize(xxf:call-xpl('oxf:/ops/utils/formatting/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
+        </xf:model>
+        <xh:style type="text/css">
             .wizard-td { background-color: #fce5b6; font-size: 16pt }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group ref="instance('text')">
-            <xforms:switch>
-                <xforms:case id="firstname" selected="true">
-                    <xhtml:table cellpadding="3">
-                        <xhtml:tr>
-                            <xhtml:td rowspan="3" class="wizard-td">1</xhtml:td>
-                            <xhtml:td colspan="1"><b>Step 1 of 4</b></xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input ref="firstname">
-                                    <xforms:label class="fixed-width">First name:</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="lastname"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:trigger ref="instance('control-instance')/back">
-                                    <xforms:label>&lt; Previous</xforms:label>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>Next ></xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="lastname"/>
-                                </xforms:trigger>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:table>
-                </xforms:case>
-                <xforms:case id="lastname">
-                    <xhtml:table cellpadding="3">
-                        <xhtml:tr>
-                            <xhtml:td rowspan="3" class="wizard-td">2</xhtml:td>
-                            <xhtml:td colspan="1"><b>Step 2 of 4</b></xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input ref="lastname">
-                                    <xforms:label class="fixed-width">Last name:</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="age"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:trigger>
-                                    <xforms:label>&lt; Previous</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="firstname"/>
-                                </xforms:trigger>
-                                <xforms:trigger>
-                                    <xforms:label>Next ></xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="age"/>
-                                </xforms:trigger>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:table>
-                </xforms:case>
-                <xforms:case id="age">
-                    <xhtml:table cellpadding="3">
-                        <xhtml:tr>
-                            <xhtml:td rowspan="3" class="wizard-td">3</xhtml:td>
-                            <xhtml:td colspan="1"><b>Step 3 of 4</b></xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input ref="age" incremental="true">
-                                    <xforms:label class="fixed-width">Age:</xforms:label>
-                                    <xforms:alert>Please enter a valid age.</xforms:alert>
-                                    <xforms:action ev:event="xforms-valid">
-                                        <xforms:setvalue ref="instance('control-instance')/finish/@readonly">true</xforms:setvalue>
-                                    </xforms:action>
-                                    <xforms:action ev:event="xforms-invalid">
-                                        <xforms:setvalue ref="instance('control-instance')/finish/@readonly">false</xforms:setvalue>
-                                    </xforms:action>
-                                    <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:trigger>
-                                    <xforms:label>&lt; Previous</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="lastname"/>
-                                </xforms:trigger>
-                                <xforms:trigger ref="instance('control-instance')/finish">
-                                    <xforms:label>Finish ></xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
-                                </xforms:trigger>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:table>
-                </xforms:case>
-                <xforms:case id="showinstance">
-                    <xhtml:table cellpadding="3">
-                        <xhtml:tr>
-                            <xhtml:td rowspan="3" class="wizard-td">4</xhtml:td>
-                            <xhtml:td colspan="1"><b>Step 4 of 4</b></xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xhtml:p>You are done!</xhtml:p>
-                                <xhtml:p>The data you have entered has been collected in this XML document:</xhtml:p>
-                                <xforms:output ref="instance('formatted')" mediatype="text/html"/>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:trigger>
-                                    <xforms:label>Go back to start</xforms:label>
-                                    <xforms:toggle ev:event="DOMActivate" case="firstname"/>
-                                </xforms:trigger>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:table>
-                </xforms:case>
-            </xforms:switch>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:group ref="instance('text')">
+            <xf:switch>
+                <xf:case id="firstname" selected="true">
+                    <xh:table cellpadding="3">
+                        <xh:tr>
+                            <xh:td rowspan="3" class="wizard-td">1</xh:td>
+                            <xh:td colspan="1"><b>Step 1 of 4</b></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="firstname">
+                                    <xf:label class="fixed-width">First name:</xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="lastname"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:trigger ref="instance('control-instance')/back">
+                                    <xf:label>&lt; Previous</xf:label>
+                                </xf:trigger>
+                                <xf:trigger>
+                                    <xf:label>Next ></xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="lastname"/>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+                <xf:case id="lastname">
+                    <xh:table cellpadding="3">
+                        <xh:tr>
+                            <xh:td rowspan="3" class="wizard-td">2</xh:td>
+                            <xh:td colspan="1"><b>Step 2 of 4</b></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="lastname">
+                                    <xf:label class="fixed-width">Last name:</xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="age"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:trigger>
+                                    <xf:label>&lt; Previous</xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="firstname"/>
+                                </xf:trigger>
+                                <xf:trigger>
+                                    <xf:label>Next ></xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="age"/>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+                <xf:case id="age">
+                    <xh:table cellpadding="3">
+                        <xh:tr>
+                            <xh:td rowspan="3" class="wizard-td">3</xh:td>
+                            <xh:td colspan="1"><b>Step 3 of 4</b></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input ref="age" incremental="true">
+                                    <xf:label class="fixed-width">Age:</xf:label>
+                                    <xf:alert>Please enter a valid age.</xf:alert>
+                                    <xf:action ev:event="xforms-valid">
+                                        <xf:setvalue ref="instance('control-instance')/finish/@readonly">true</xf:setvalue>
+                                    </xf:action>
+                                    <xf:action ev:event="xforms-invalid">
+                                        <xf:setvalue ref="instance('control-instance')/finish/@readonly">false</xf:setvalue>
+                                    </xf:action>
+                                    <xf:toggle ev:event="DOMActivate" case="showinstance"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:trigger>
+                                    <xf:label>&lt; Previous</xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="lastname"/>
+                                </xf:trigger>
+                                <xf:trigger ref="instance('control-instance')/finish">
+                                    <xf:label>Finish ></xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="showinstance"/>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+                <xf:case id="showinstance">
+                    <xh:table cellpadding="3">
+                        <xh:tr>
+                            <xh:td rowspan="3" class="wizard-td">4</xh:td>
+                            <xh:td colspan="1"><b>Step 4 of 4</b></xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xh:p>You are done!</xh:p>
+                                <xh:p>The data you have entered has been collected in this XML document:</xh:p>
+                                <xf:output ref="instance('formatted')" mediatype="text/html"/>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:trigger>
+                                    <xf:label>Go back to start</xf:label>
+                                    <xf:toggle ev:event="DOMActivate" case="firstname"/>
+                                </xf:trigger>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:case>
+            </xf:switch>
+        </xf:group>
+    </xh:body>
+</xh:html>

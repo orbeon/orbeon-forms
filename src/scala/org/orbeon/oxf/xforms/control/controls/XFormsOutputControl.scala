@@ -39,7 +39,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.exception.OrbeonFormatter
 
 /**
- * Represents an xforms:output control.
+ * Represents an xf:output control.
  */
 class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id) with FileMetadata {
@@ -174,7 +174,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             case e: Exception ⇒
                 // We don't want to fail if there is an issue proxying, for example if the resource is not found.
                 // Ideally, this would indicate some condition on the control (not found? out of range?).
-                getIndentedLogger.logWarning("xforms:output", "exception while proxing value",
+                getIndentedLogger.logWarning("xf:output", "exception while proxing value",
                     "value",     internalValue,
                     "throwable", OrbeonFormatter.format(e))
 

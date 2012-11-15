@@ -19,10 +19,10 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:fo="http://www.w3.org/1999/XSL/Format"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- The document produced by the page view XForms processing performed -->
@@ -48,7 +48,7 @@
     <!-- The container is a portlet -->
     <p:choose href="#xformed-data">
         <!-- XHTML detection. Don't transform the content. -->
-        <p:when test="/xhtml:html">
+        <p:when test="/xh:html">
             <p:processor name="oxf:identity">
                 <p:input name="data" href="#xformed-data"/>
                 <p:output name="data" id="xformed-data-2"/>

@@ -11,46 +11,46 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <head>
-        <xforms:model id="model">
-            <xforms:instance id="global-instance-1">
+        <xf:model id="model">
+            <xf:instance id="global-instance-1">
                 <global-instance-1/>
-            </xforms:instance>
-            <xforms:instance id="global-instance-2">
+            </xf:instance>
+            <xf:instance id="global-instance-2">
                 <global-instance-2/>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="fr-foobar" element="fr|foobar">
                 <xbl:template>
-                    <xforms:model id="local-model">
-                        <xforms:instance id="local-instance">
+                    <xf:model id="local-model">
+                        <xf:instance id="local-instance">
                             <local-instance/>
-                        </xforms:instance>
-                    </xforms:model>
+                        </xf:instance>
+                    </xf:model>
 
-                    <xforms:output id="output-1" value="name()"/>
-                    <xhtml:br/>
+                    <xf:output id="output-1" value="name()"/>
+                    <xh:br/>
 
-                    <xforms:group model="local-model">
-                        <xforms:output id="output-2" value="name()"/>
-                    </xforms:group>
-                    <xhtml:br/>
+                    <xf:group model="local-model">
+                        <xf:output id="output-2" value="name()"/>
+                    </xf:group>
+                    <xh:br/>
 
-                    <xforms:output id="output-3" model="local-model" value="name(instance('local-instance'))"/>
-                    <xhtml:br/>
-                    <xforms:output id="output-4" value="name(xxforms:instance('local-instance'))"/>
-                    <xhtml:br/>
-                    <xforms:output id="output-5" value="name(xxforms:instance('global-instance-1'))"/>
-                    <xhtml:br/>
-                    <xforms:output id="output-6" value="name(xxforms:instance('global-instance-2'))"/>
-                    <xhtml:br/>
+                    <xf:output id="output-3" model="local-model" value="name(instance('local-instance'))"/>
+                    <xh:br/>
+                    <xf:output id="output-4" value="name(xxf:instance('local-instance'))"/>
+                    <xh:br/>
+                    <xf:output id="output-5" value="name(xxf:instance('global-instance-1'))"/>
+                    <xh:br/>
+                    <xf:output id="output-6" value="name(xxf:instance('global-instance-2'))"/>
+                    <xh:br/>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
@@ -60,15 +60,15 @@
         <p>
             This tests for
             <a href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=313779&amp;group_id=168&amp;atid=350207">
-                [ #313779 ] RFE: Implement new xxforms:instance() scoping rules
+                [ #313779 ] RFE: Implement new xxf:instance() scoping rules
             </a>. See also corresponding unit test in tests-xforms-server.xhtml.
         </p>
 
         <fr:foobar/>
 
-        <xforms:group id="my-group" context="instance('global-instance-2')">
+        <xf:group id="my-group" context="instance('global-instance-2')">
             <fr:foobar/>
-        </xforms:group>
+        </xf:group>
 
     </body>
 </html>

@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat Table Cells</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Repeat Table Cells</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <table>
                     <tr>
                         <td>1</td>
@@ -35,159 +35,159 @@
                         <td>6</td>
                     </tr>
                 </table>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-ready">
-                <xforms:setindex repeat="row-repeat" index="2"/>
-                <xforms:setindex repeat="cell-repeat" index="3"/>
-                <xforms:setfocus control=""/>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready">
+                <xf:setindex repeat="row-repeat" index="2"/>
+                <xf:setindex repeat="cell-repeat" index="3"/>
+                <xf:setfocus control=""/>
+            </xf:action>
 
-            <xforms:instance id="variable">
+            <xf:instance id="variable">
                 <variable xmlns="">
                     <iteration-count/>
                     <column-count/>
                     <count>1</count>
                 </variable>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background: transparent }
             .xforms-repeat-selected-item-2 { background: transparent }
             .xforms-repeat-selected-item-3 { background: transparent }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:trigger>
-            <xforms:label>Insert row</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="tr"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Insert row</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="tr"/>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Insert 10 rows</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('variable')/iteration-count">10</xforms:setvalue>
-                <xforms:action while="instance('variable')/iteration-count != 0">
-                    <xforms:insert ev:event="DOMActivate" ref="tr"/>
-                    <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
-                    <xforms:action iterate="tr[last()]/td">
-                        <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
-                        <xforms:setvalue ref="." value="instance('variable')/count"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:action>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Insert 10 rows</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="instance('variable')/iteration-count">10</xf:setvalue>
+                <xf:action while="instance('variable')/iteration-count != 0">
+                    <xf:insert ev:event="DOMActivate" ref="tr"/>
+                    <xf:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                    <xf:action iterate="tr[last()]/td">
+                        <xf:setvalue ref="instance('variable')/count" value=". + 1"/>
+                        <xf:setvalue ref="." value="instance('variable')/count"/>
+                    </xf:action>
+                </xf:action>
+            </xf:action>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Insert 100 rows</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('variable')/iteration-count">100</xforms:setvalue>
-                <xforms:action while="instance('variable')/iteration-count != 0">
-                    <xforms:insert ev:event="DOMActivate" ref="tr"/>
-                    <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
-                    <xforms:action iterate="tr[last()]/td">
-                        <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
-                        <xforms:setvalue ref="." value="instance('variable')/count"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:action>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Insert 100 rows</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="instance('variable')/iteration-count">100</xf:setvalue>
+                <xf:action while="instance('variable')/iteration-count != 0">
+                    <xf:insert ev:event="DOMActivate" ref="tr"/>
+                    <xf:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                    <xf:action iterate="tr[last()]/td">
+                        <xf:setvalue ref="instance('variable')/count" value=". + 1"/>
+                        <xf:setvalue ref="." value="instance('variable')/count"/>
+                    </xf:action>
+                </xf:action>
+            </xf:action>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Insert column</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
+        <xf:trigger>
+            <xf:label>Insert column</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
 
-                <xforms:action iterate="tr">
-                    <xforms:insert ref="td"/>
-                    <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
-                    <xforms:setvalue ref="td[last()]" value="instance('variable')/count"/>
-                </xforms:action>
+                <xf:action iterate="tr">
+                    <xf:insert ref="td"/>
+                    <xf:setvalue ref="instance('variable')/count" value=". + 1"/>
+                    <xf:setvalue ref="td[last()]" value="instance('variable')/count"/>
+                </xf:action>
 
-            </xforms:action>
-        </xforms:trigger>
+            </xf:action>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Insert 10 columns</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="instance('variable')/iteration-count">10</xforms:setvalue>
+        <xf:trigger>
+            <xf:label>Insert 10 columns</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="instance('variable')/iteration-count">10</xf:setvalue>
 
                 <!-- Repeat 10 times -->
-                <xforms:action while="instance('variable')/iteration-count != 0">
+                <xf:action while="instance('variable')/iteration-count != 0">
                     <!-- Set number of cols to add  -->
-                    <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
+                    <xf:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
 
-                    <xforms:action iterate="tr">
-                        <xforms:insert ref="td"/>
-                        <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
-                        <xforms:setvalue ref="td[last()]" value="instance('variable')/count"/>
-                    </xforms:action>
+                    <xf:action iterate="tr">
+                        <xf:insert ref="td"/>
+                        <xf:setvalue ref="instance('variable')/count" value=". + 1"/>
+                        <xf:setvalue ref="td[last()]" value="instance('variable')/count"/>
+                    </xf:action>
 
-                    <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
-                </xforms:action>
-            </xforms:action>
-        </xforms:trigger>
+                    <xf:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
+                </xf:action>
+            </xf:action>
+        </xf:trigger>
 
-        <xhtml:h2>Table D&amp;D of Rows</xhtml:h2>
+        <xh:h2>Table D&amp;D of Rows</xh:h2>
 
-        <xhtml:table>
-            <xforms:repeat ref="tr" xxforms:dnd="true" id="row-repeat-dd-row">
-                <xhtml:tr>
-                    <xforms:repeat ref="td" id="row-repeat-dd-cell">
-                        <xhtml:td>
-                            (<xforms:output id="output-1" value="."/>)
-                        </xhtml:td>
-                    </xforms:repeat>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        <xh:table>
+            <xf:repeat ref="tr" xxf:dnd="true" id="row-repeat-dd-row">
+                <xh:tr>
+                    <xf:repeat ref="td" id="row-repeat-dd-cell">
+                        <xh:td>
+                            (<xf:output id="output-1" value="."/>)
+                        </xh:td>
+                    </xf:repeat>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
 
-        <xhtml:h2>Table D&amp;D of Cells</xhtml:h2>
+        <xh:h2>Table D&amp;D of Cells</xh:h2>
 
-        <xhtml:p>Legend: (count(preceding-sibling) + 1, position())</xhtml:p>
+        <xh:p>Legend: (count(preceding-sibling) + 1, position())</xh:p>
 
-        <xhtml:table>
-            <xforms:repeat ref="tr" id="cell-repeat-dd-row">
-                <xhtml:tr>
-                    <xforms:repeat ref="td" xxforms:dnd="true" id="cell-repeat-dd-cell">
-                        <xhtml:td>
-                            (<xforms:output id="output-2-1" value="count(xxforms:context('cell-repeat-dd-cell')/preceding-sibling::*) + 1"/>,
-                            <xforms:output id="output-2-2" value="position()"/>)
-                        </xhtml:td>
-                    </xforms:repeat>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        <xh:table>
+            <xf:repeat ref="tr" id="cell-repeat-dd-row">
+                <xh:tr>
+                    <xf:repeat ref="td" xxf:dnd="true" id="cell-repeat-dd-cell">
+                        <xh:td>
+                            (<xf:output id="output-2-1" value="count(xxf:context('cell-repeat-dd-cell')/preceding-sibling::*) + 1"/>,
+                            <xf:output id="output-2-2" value="position()"/>)
+                        </xh:td>
+                    </xf:repeat>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
 
-        <xhtml:h2>List</xhtml:h2>
+        <xh:h2>List</xh:h2>
 
-        <xhtml:ol>
-            <xforms:repeat ref="tr" xxforms:dnd="true">
-                <xhtml:li>
-                    Item number <xforms:output id="output-3" value="position()"/>
-                </xhtml:li>
-            </xforms:repeat>
-        </xhtml:ol>
+        <xh:ol>
+            <xf:repeat ref="tr" xxf:dnd="true">
+                <xh:li>
+                    Item number <xf:output id="output-3" value="position()"/>
+                </xh:li>
+            </xf:repeat>
+        </xh:ol>
 
-        <xhtml:h2>Nested</xhtml:h2>
+        <xh:h2>Nested</xh:h2>
 
-        <xforms:repeat ref="tr" id="outer">
-            <xhtml:div style="border: 1px solid gray; margin: 5px; float: left">
-                <xforms:repeat ref="td" xxforms:dnd="true" id="middle">
-                    <xhtml:div style="border: 1px solid gray; margin: 5px; padding: 3px">
-                        <xforms:output id="output-4-1" ref="."/>
-                        <xforms:repeat ref="../td" xxforms:dnd="true" id="inner">
-                            <xhtml:span style="border: 1px solid gray; margin: 5px">
-                                <xforms:output id="output-4-2" ref="."/>
-                            </xhtml:span>
-                        </xforms:repeat>
-                    </xhtml:div>
-                </xforms:repeat>
-            </xhtml:div>
-        </xforms:repeat>
+        <xf:repeat ref="tr" id="outer">
+            <xh:div style="border: 1px solid gray; margin: 5px; float: left">
+                <xf:repeat ref="td" xxf:dnd="true" id="middle">
+                    <xh:div style="border: 1px solid gray; margin: 5px; padding: 3px">
+                        <xf:output id="output-4-1" ref="."/>
+                        <xf:repeat ref="../td" xxf:dnd="true" id="inner">
+                            <xh:span style="border: 1px solid gray; margin: 5px">
+                                <xf:output id="output-4-2" ref="."/>
+                            </xh:span>
+                        </xf:repeat>
+                    </xh:div>
+                </xf:repeat>
+            </xh:div>
+        </xf:repeat>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

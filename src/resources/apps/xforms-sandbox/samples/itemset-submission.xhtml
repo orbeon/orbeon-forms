@@ -11,45 +11,45 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70">
 
-    <xhtml:head>
-        <xhtml:title>Itemset with submission</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Itemset with submission</xh:title>
+        <xf:model>
             <!-- Document loaded in 'instance' will be:
             <cat:OrderLine xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70">
                 <cat:BuyersID>1</cat:BuyersID>
             </cat:OrderLine>
             -->
-            <xforms:instance id="instance">
+            <xf:instance id="instance">
                 <dummy/>
-            </xforms:instance>
-            <xforms:instance id="choices">
+            </xf:instance>
+            <xf:instance id="choices">
                 <choices>
                     <choice value="true">Yes</choice>
                     <choice value="false">No</choice>
                 </choices>
-            </xforms:instance>
-            <xforms:submission id="load" method="post" action="http://localhost:8888/ops/direct/xml-to-url/doc?xml=H4sIAAAAAAAAAONSAAIuBSiwSU4ssfIvSkkt8snMS1WoyM3JK7YCitkqlRblWeUnFmcWW%2BUl5qYWW5UkW5Um5Vg55%2Bfm5uc5pqcXpaYnlqSGVBYA5Qz1DKwM9MwNlOy44IY6lVamFhV7utgZ2uij8LkgfLilED1cAEgf%2BbmYAAAA" replace="instance"/>
-            <!--<xforms:submission id="load" method="post" action="/direct/xml-to-url/doc?xml=H4sIAAAAAAAAAONSAAIuBSiwSU4ssfIvSkkt8snMS1WoyM3JK7YCitkqlRblWeUnFmcWW%2BUl5qYWW5UkW5Um5Vg55%2Bfm5uc5pqcXpaYnlqSGVBYA5Qz1DKwM9MwNlOy44IY6lVamFhV7utgZ2uij8LkgfLilED1cAEgf%2BbmYAAAA" replace="instance"/>-->
-            <xforms:action ev:event="xforms-ready">
-                <xforms:send submission="load"/>
-            </xforms:action>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:select1 ref="instance('instance')/cat:BuyersID">
-            <xforms:itemset ref="instance('choices')/choice">
-                <xforms:label ref="."/>
-                <xforms:value ref="@value"/>
-            </xforms:itemset>
-        </xforms:select1>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:submission id="load" method="post" action="http://localhost:8888/ops/direct/xml-to-url/doc?xml=H4sIAAAAAAAAAONSAAIuBSiwSU4ssfIvSkkt8snMS1WoyM3JK7YCitkqlRblWeUnFmcWW%2BUl5qYWW5UkW5Um5Vg55%2Bfm5uc5pqcXpaYnlqSGVBYA5Qz1DKwM9MwNlOy44IY6lVamFhV7utgZ2uij8LkgfLilED1cAEgf%2BbmYAAAA" replace="instance"/>
+            <!--<xf:submission id="load" method="post" action="/direct/xml-to-url/doc?xml=H4sIAAAAAAAAAONSAAIuBSiwSU4ssfIvSkkt8snMS1WoyM3JK7YCitkqlRblWeUnFmcWW%2BUl5qYWW5UkW5Um5Vg55%2Bfm5uc5pqcXpaYnlqSGVBYA5Qz1DKwM9MwNlOy44IY6lVamFhV7utgZ2uij8LkgfLilED1cAEgf%2BbmYAAAA" replace="instance"/>-->
+            <xf:action ev:event="xforms-ready">
+                <xf:send submission="load"/>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:select1 ref="instance('instance')/cat:BuyersID">
+            <xf:itemset ref="instance('choices')/choice">
+                <xf:label ref="."/>
+                <xf:value ref="@value"/>
+            </xf:itemset>
+        </xf:select1>
+    </xh:body>
+</xh:html>

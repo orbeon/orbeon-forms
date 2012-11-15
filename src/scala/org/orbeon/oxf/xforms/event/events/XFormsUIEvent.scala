@@ -45,11 +45,11 @@ abstract class XFormsUIEvent(
 private object XFormsUIEvent {
     
     val Deprecated = Map(
-        "target-ref" → "xxforms:binding",
-        "alert"      → "xxforms:alert",
-        "label"      → "xxforms:label",
-        "hint"       → "xxforms:hint",
-        "help"       → "xxforms:help"
+        "target-ref" → "xxf:binding",
+        "alert"      → "xxf:alert",
+        "label"      → "xxf:label",
+        "hint"       → "xxf:hint",
+        "help"       → "xxf:help"
     )
     
     val Getters = Map[String, XFormsUIEvent ⇒ Option[Any]](

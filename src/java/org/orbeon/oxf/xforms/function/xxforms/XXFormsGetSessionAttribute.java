@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * xxforms:get-session-attribute($a as xs:string) document-node()?
+ * xxf:get-session-attribute($a as xs:string) document-node()?
  *
  * Return the value of the given session attribute.
  */

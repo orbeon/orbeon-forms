@@ -231,9 +231,11 @@ object XFormsValueControl {
     val FormatNamespaceMapping =
         new NamespaceMapping(
             Map(
-                XSD_PREFIX      → XSD_URI,
-                XFORMS_PREFIX   → XFORMS_NAMESPACE_URI,
-                XXFORMS_PREFIX  → XXFORMS_NAMESPACE_URI,
-                EXFORMS_PREFIX  → EXFORMS_NAMESPACE_URI
+                XSD_PREFIX           → XSD_URI,
+                XFORMS_PREFIX        → XFORMS_NAMESPACE_URI,
+                XFORMS_SHORT_PREFIX  → XFORMS_NAMESPACE_URI,
+                XXFORMS_PREFIX       → XXFORMS_NAMESPACE_URI,
+                XXFORMS_SHORT_PREFIX → XXFORMS_NAMESPACE_URI,
+                EXFORMS_PREFIX       → EXFORMS_NAMESPACE_URI
             ).asJava)
 }

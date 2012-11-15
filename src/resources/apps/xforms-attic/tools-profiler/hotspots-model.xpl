@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">

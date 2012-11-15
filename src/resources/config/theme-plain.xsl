@@ -19,13 +19,13 @@
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:version="java:org.orbeon.oxf.common.Version">
 
     <!-- Orbeon Forms version -->
     <xsl:variable name="orbeon-forms-version" select="version:getVersionString()" as="xs:string"/>
 
-    <xsl:template match="xhtml:head">
+    <xsl:template match="xh:head">
         <xsl:copy>
             <xsl:call-template name="head"/>
         </xsl:copy>
@@ -34,23 +34,23 @@
     <xsl:template name="head">
         <xsl:apply-templates select="@*"/>
         <!-- Handle head elements except scripts -->
-        <xsl:apply-templates select="xhtml:meta | xhtml:link | xhtml:style"/>
+        <xsl:apply-templates select="xh:meta | xh:link | xh:style"/>
         <!-- Title -->
-        <xhtml:title>
-            <xsl:apply-templates select="xhtml:title/@*"/>
+        <xh:title>
+            <xsl:apply-templates select="xh:title/@*"/>
             <xsl:choose>
-                <xsl:when test="xhtml:title != ''">
-                    <xsl:value-of select="xhtml:title"/>
+                <xsl:when test="xh:title != ''">
+                    <xsl:value-of select="xh:title"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="(/xhtml:html/xhtml:body/xhtml:h1)[1]"/>
+                    <xsl:value-of select="(/xh:html/xh:body/xh:h1)[1]"/>
                 </xsl:otherwise>
             </xsl:choose>
-        </xhtml:title>
+        </xh:title>
         <!-- Orbeon Forms version -->
-        <xhtml:meta name="generator" content="{$orbeon-forms-version}"/>
+        <xh:meta name="generator" content="{$orbeon-forms-version}"/>
         <!-- Handle head scripts if present -->
-        <xsl:apply-templates select="xhtml:script"/>
+        <xsl:apply-templates select="xh:script"/>
     </xsl:template>
 
     <!-- Simply copy everything that's not matched -->

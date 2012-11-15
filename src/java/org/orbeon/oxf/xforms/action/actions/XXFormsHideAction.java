@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
- * Extension xxforms:hide action.
+ * Extension xxf:hide action.
  */
 public class XXFormsHideAction extends XFormsAction {
 
@@ -48,7 +48,7 @@ public class XXFormsHideAction extends XFormsAction {
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
                 if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("xxforms:hide", "dialog does not refer to an existing xxforms:dialog element, ignoring action",
+                    indentedLogger.logDebug("xxf:hide", "dialog does not refer to an existing xxf:dialog element, ignoring action",
                             "dialog id", dialogStaticId);
             }
         }

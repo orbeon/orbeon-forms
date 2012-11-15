@@ -194,9 +194,9 @@ public class XFormsActionInterpreter {
             // NOTE: If we repeat, re-evaluate the action binding.
             // For example:
             //
-            //   <xforms:delete ref="/*/foo[1]" while="/*/foo"/>
+            //   <xf:delete ref="/*/foo[1]" while="/*/foo"/>
             //
-            // In this case, in the second iteration, xforms:repeat must find an up-to-date nodeset!
+            // In this case, in the second iteration, xf:repeat must find an up-to-date nodeset!
             // TODO: function context
             _actionXPathContext.pushBinding(actionAnalysis.refJava(), null, null, null, actionAnalysis.bindJava(), actionAnalysis.element(),
                     actionAnalysis.namespaceMapping(), getSourceEffectiveId(actionAnalysis.element()), actionAnalysis.scope(), false);
@@ -389,7 +389,7 @@ public class XFormsActionInterpreter {
     }
 
     /**
-     * Find an effective object based on either the xxforms:repeat-indexes attribute, or on the current repeat indexes.
+     * Find an effective object based on either the xxf:repeat-indexes attribute, or on the current repeat indexes.
      *
      * @param actionElement             current action element
      * @param targetStaticOrAbsoluteId  static id or absolute id of the target to resolve

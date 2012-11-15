@@ -11,34 +11,34 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <field/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="field" calculate="upper-case(.)" readonly="false()"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:input ref="field" incremental="true" xxforms:autocomplete="off">
-                <xforms:label>Enter data in lowercase here: </xforms:label>
-            </xforms:input>
+            </xf:instance>
+            <xf:bind ref="field" calculate="upper-case(.)" readonly="false()"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:input ref="field" incremental="true" xxf:autocomplete="off">
+                <xf:label>Enter data in lowercase here: </xf:label>
+            </xf:input>
             <br/>
-            <xforms:output ref="field">
-                <xforms:label>Result: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            <xf:output ref="field">
+                <xf:label>Result: </xf:label>
+            </xf:output>
+        </xh:p>
+    </xh:body>
+</xh:html>

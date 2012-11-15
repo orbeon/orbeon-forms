@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,46 +21,46 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <phone1/>
                     <phone2/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="*" type="xforms:decimal"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="*" type="xf:decimal"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-group-appearance-xxforms-fieldset { padding: .5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>Minimal Input Controls</xforms:label>
-            <xforms:input ref="phone1">
-                <xforms:label>Phone 1: </xforms:label>
-            </xforms:input>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>Minimal Input Controls</xf:label>
+            <xf:input ref="phone1">
+                <xf:label>Phone 1: </xf:label>
+            </xf:input>
 
-            <xforms:input ref="phone2">
-                <xforms:label>Phone 2: </xforms:label>
-            </xforms:input>
-        </xforms:group>
+            <xf:input ref="phone2">
+                <xf:label>Phone 2: </xf:label>
+            </xf:input>
+        </xf:group>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>Custom Phone Input Controls</xforms:label>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>Custom Phone Input Controls</xf:label>
             <fr:us-phone ref="phone1" id="phone1">
-                <xforms:label>Phone 1: </xforms:label>
+                <xf:label>Phone 1: </xf:label>
             </fr:us-phone>
 
             <fr:us-phone ref="phone2" id="phone2">
-                <xforms:label>Phone 2: </xforms:label>
+                <xf:label>Phone 2: </xf:label>
             </fr:us-phone>
-        </xforms:group>
+        </xf:group>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>
 

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsModelBinds
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
 /**
- * The xxforms:bind() function.
+ * The xxf:bind() function.
  */
 class XXFormsBind extends XFormsFunction with FunctionSupport {
 

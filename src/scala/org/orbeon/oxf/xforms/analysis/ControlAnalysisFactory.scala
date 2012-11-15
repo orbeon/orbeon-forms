@@ -84,7 +84,7 @@ object ControlAnalysisFactory {
         })
 
     // Variable factories indexed by QName
-    // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xforms:var>)
+    // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xf:var>)
     private val variableFactory =
         Seq(XXFORMS_VARIABLE_QNAME, XXFORMS_VAR_QNAME, XFORMS_VARIABLE_QNAME, XFORMS_VAR_QNAME, EXFORMS_VARIABLE_QNAME) map
             (qName ⇒ qName → VariableControlFactory) toMap

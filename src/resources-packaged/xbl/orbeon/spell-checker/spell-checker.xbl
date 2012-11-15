@@ -11,46 +11,46 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exforms="http://www.exforms.org/exf/1-0" >
+         xmlns:exf="http://www.exforms.org/exf/1-0" >
 
     <xbl:binding id="fr-spell-checker" element="fr|spell-checker">
         <xxbl:global>
             <!-- Spell checking dialog -->
-            <xxforms:dialog id="fr-spell-checking-dialog" class="fr-spell-checker-dialog" close="false" model="fr-spell-checker-model">
-                <xforms:setfocus ev:event="xxforms-dialog-open" control="ignore"/>
-                <xforms:label>Spelling</xforms:label>
+            <xxf:dialog id="fr-spell-checking-dialog" class="fr-spell-checker-dialog" close="false" model="fr-spell-checker-model">
+                <xf:setfocus ev:event="xxforms-dialog-open" control="ignore"/>
+                <xf:label>Spelling</xf:label>
 
-                <xforms:model id="fr-spell-checker-model">
+                <xf:model id="fr-spell-checker-model">
 
                     <!-- Request to spell checker -->
-                    <xforms:instance id="fr-spell-checker-request">
+                    <xf:instance id="fr-spell-checker-request">
                         <spellrequest textalreadyclipped="0" ignoredups="1" ignoredigits="1" ignoreallcaps="1">
                             <text>Ths is a tst</text>
                         </spellrequest>
-                    </xforms:instance>
+                    </xf:instance>
 
                     <!-- Result of spell checking -->
-                    <xforms:instance id="fr-spell-checker-result">
+                    <xf:instance id="fr-spell-checker-result">
                         <spellresult error="0" clipped="0" charschecked="12">
                             <c o="0" l="3" s="1">This Th's Thus Th HS</c>
                             <c o="9" l="3" s="0">test tat ST St st</c>
                         </spellresult>
-                    </xforms:instance>
+                    </xf:instance>
 
-                    <xforms:instance id="fr-spell-checker-internal">
+                    <xf:instance id="fr-spell-checker-internal">
                         <internal>
                             <readonly/>         <!-- Is the node bound to this spell checker readonly -->
                             <button/>           <!-- Node to which the YUI spell checker is bound so we can make it readonly -->
@@ -61,62 +61,62 @@
                             <callback-id/>      <!-- Effective id of the component that opened this dialog -->
                             <is-change-all/>    <!-- Temporarily set to true|false to know the button pressed -->
                         </internal>
-                    </xforms:instance>
+                    </xf:instance>
 
-                    <xforms:bind ref="instance('fr-spell-checker-internal')/button" readonly="../readonly = 'true'"/>
+                    <xf:bind ref="instance('fr-spell-checker-internal')/button" readonly="../readonly = 'true'"/>
 
                     <!--  Spell checking -->
-                    <xforms:submission method="post" resource="{xxforms:property('oxf.xforms.xbl.fr.spell-checker.service')}"
+                    <xf:submission method="post" resource="{xxf:property('oxf.xforms.xbl.fr.spell-checker.service')}"
                             id="spell-check-submission" ref="instance('fr-spell-checker-request')" replace="instance" instance="fr-spell-checker-result">
-                    </xforms:submission>
+                    </xf:submission>
 
                     <!-- The button is telling us to spell check text -->
-                    <xforms:action ev:event="fr-spell-check">
-                        <xforms:setvalue ref="instance('fr-spell-checker-request')/text" value="event('fr-text')"/>
-                        <xforms:setvalue ref="instance('fr-spell-checker-internal')/callback-id" value="event('fr-callback-id')"/>
-                        <xforms:send submission="spell-check-submission"/>
+                    <xf:action ev:event="fr-spell-check">
+                        <xf:setvalue ref="instance('fr-spell-checker-request')/text" value="event('fr-text')"/>
+                        <xf:setvalue ref="instance('fr-spell-checker-internal')/callback-id" value="event('fr-callback-id')"/>
+                        <xf:send submission="spell-check-submission"/>
                         <!-- Iterate over the correction and insert <t> elements between <c> elements to represent the normal text (non-corrections) -->
-                        <xforms:action iterate="instance('fr-spell-checker-result')/c">
-                            <xforms:var name="current-c" value="."/>
-                            <xforms:var name="position" value="position()"/>
-                            <xforms:var name="following-c" value="$current-c/following-sibling::c[1]"/>
-                            <xforms:var name="offset-after-current-c" value="$current-c/@o + $current-c/@l"/>
+                        <xf:action iterate="instance('fr-spell-checker-result')/c">
+                            <xf:var name="current-c" value="."/>
+                            <xf:var name="position" value="position()"/>
+                            <xf:var name="following-c" value="$current-c/following-sibling::c[1]"/>
+                            <xf:var name="offset-after-current-c" value="$current-c/@o + $current-c/@l"/>
                             <!-- If this is the first <c>, consider inserting a <t> before -->
-                            <xforms:action if="$position = 1">
-                                <xforms:insert if="$current-c/@o > 0" ref="." position="before" origin="xxforms:element('t', (xxforms:attribute('o', '0'), xxforms:attribute('l', $current-c/@o)))"/>
-                            </xforms:action>
+                            <xf:action if="$position = 1">
+                                <xf:insert if="$current-c/@o > 0" ref="." position="before" origin="xxf:element('t', (xxf:attribute('o', '0'), xxf:attribute('l', $current-c/@o)))"/>
+                            </xf:action>
                             <!-- If we are between two <c>, consider inserting a <t> in between -->
-                            <xforms:action if="exists($following-c)">
-                                <xforms:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
-                            </xforms:action>
+                            <xf:action if="exists($following-c)">
+                                <xf:insert if="$following-c/@o > $offset-after-current-c" ref="." position="after" origin="xxf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $following-c/@o - $offset-after-current-c)))"/>
+                            </xf:action>
                             <!-- If this is the last <c>, consider insert a <t> after -->
-                            <xforms:action if="empty($following-c)">
-                                <xforms:var name="text-length" value="string-length(instance('fr-spell-checker-request')/text)"/>
-                                <xforms:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xxforms:element('t', (xxforms:attribute('o', $offset-after-current-c), xxforms:attribute('l', $text-length - $offset-after-current-c)))"/>
-                            </xforms:action>
-                        </xforms:action>
+                            <xf:action if="empty($following-c)">
+                                <xf:var name="text-length" value="string-length(instance('fr-spell-checker-request')/text)"/>
+                                <xf:insert if="$text-length > $offset-after-current-c" ref="." position="after" origin="xxf:element('t', (xxf:attribute('o', $offset-after-current-c), xxf:attribute('l', $text-length - $offset-after-current-c)))"/>
+                            </xf:action>
+                        </xf:action>
                         <!-- Populate the original value of the words -->
-                        <xforms:action iterate="instance('fr-spell-checker-result')/*">
-                            <xforms:insert context="." origin="xxforms:attribute('current', substring(instance('fr-spell-checker-request')/text, context()/@o + 1, context()/@l))"/>
-                        </xforms:action>
-                        <xxforms:show dialog="fr-spell-checking-dialog"/>
-                        <xforms:setvalue ref="instance('fr-spell-checker-internal')/current-c-index">1</xforms:setvalue>
-                        <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
-                    </xforms:action>
+                        <xf:action iterate="instance('fr-spell-checker-result')/*">
+                            <xf:insert context="." origin="xxf:attribute('current', substring(instance('fr-spell-checker-request')/text, context()/@o + 1, context()/@l))"/>
+                        </xf:action>
+                        <xxf:show dialog="fr-spell-checking-dialog"/>
+                        <xf:setvalue ref="instance('fr-spell-checker-internal')/current-c-index">1</xf:setvalue>
+                        <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
+                    </xf:action>
 
                     <!-- Prepare UI for the next correction -->
-                    <xforms:action ev:event="prepare-next-correction">
-                        <xforms:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
-                        <xforms:action if="exists($current-c)">
-                            <xforms:setvalue ref="instance('fr-spell-checker-internal')/unknown-word" value="$current-c/@current"/>
-                            <xforms:setvalue ref="instance('fr-spell-checker-internal')/correction" value="tokenize($current-c, '\s')[1]"/>
-                            <xforms:setvalue ref="instance('fr-spell-checker-internal')/context" value="concat(
+                    <xf:action ev:event="prepare-next-correction">
+                        <xf:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
+                        <xf:action if="exists($current-c)">
+                            <xf:setvalue ref="instance('fr-spell-checker-internal')/unknown-word" value="$current-c/@current"/>
+                            <xf:setvalue ref="instance('fr-spell-checker-internal')/correction" value="tokenize($current-c, '\s')[1]"/>
+                            <xf:setvalue ref="instance('fr-spell-checker-internal')/context" value="concat(
                                 string-join($current-c/preceding-sibling::*/@current, ''),
                                 '&lt;span id=''fr-spell-checker-unknown-word'' class=''unknown-word''&gt;',
                                 ../unknown-word,
                                 '&lt;/span&gt;',
                                 string-join($current-c/following-sibling::*/@current, ''))"/>
-                            <xxforms:script>
+                            <xxf:script>
                                 var YD = YAHOO.util.Dom;
                                 // Get the word we want to make visible
                                 var unknownWord = document.getElementById("fr-spell-checker-unknown-word");
@@ -125,172 +125,172 @@
                                 if (! YD.hasClass(notInDictionaryDiv, "xforms-output")) notInDictionaryDiv = notInDictionaryDiv.parentNode;
                                 // Set scrollTop on container so the word is visible
                                 notInDictionaryDiv.scrollTop = Math.max(0, unknownWord.offsetTop - unknownWord.offsetHeight);
-                            </xxforms:script>
-                        </xforms:action>
-                    </xforms:action>
+                            </xxf:script>
+                        </xf:action>
+                    </xf:action>
 
                     <!-- Send back result to the component that opened this dialog -->
-                    <xforms:action ev:event="fr-spell-check-done">
-                        <xforms:dispatch if="exists(instance('fr-spell-checker-result')/*)" name="fr-spell-check-done" targetid="{instance('fr-spell-checker-internal')/callback-id}">
-                            <xforms:property name="fr-text" value="string-join(instance('fr-spell-checker-result')/*/@current, '')"/>
-                        </xforms:dispatch>
-                        <xxforms:hide dialog="fr-spell-checking-dialog"/>
-                    </xforms:action>
+                    <xf:action ev:event="fr-spell-check-done">
+                        <xf:dispatch if="exists(instance('fr-spell-checker-result')/*)" name="fr-spell-check-done" targetid="{instance('fr-spell-checker-internal')/callback-id}">
+                            <xf:property name="fr-text" value="string-join(instance('fr-spell-checker-result')/*/@current, '')"/>
+                        </xf:dispatch>
+                        <xxf:hide dialog="fr-spell-checking-dialog"/>
+                    </xf:action>
 
-                </xforms:model>
+                </xf:model>
 
                 <!-- The currently considered correction -->
-                <xforms:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
+                <xf:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
 
                 <!-- On open, set focus -->
-                <xforms:action ev:event="xxforms-dialog-open">
-                    <xforms:setfocus if="exists($current-c)" control="suggestion"/>
-                    <xforms:setfocus if="empty($current-c)" control="close"/>
-                </xforms:action>
+                <xf:action ev:event="xxforms-dialog-open">
+                    <xf:setfocus if="exists($current-c)" control="suggestion"/>
+                    <xf:setfocus if="empty($current-c)" control="close"/>
+                </xf:action>
 
                 <!-- On close, apply replacements and do cleanup -->
-                <xforms:action ev:event="xxforms-dialog-close">
-                    <xforms:setvalue iterate="instance('fr-spell-checker-internal')/*" ref="."/>
-                </xforms:action>
+                <xf:action ev:event="xxforms-dialog-close">
+                    <xf:setvalue iterate="instance('fr-spell-checker-internal')/*" ref="."/>
+                </xf:action>
 
-                <xforms:group ref=".[exists($current-c)]" class="xbl-fr-spell-checker-correcting" id="correcting">
-                    <xhtml:table>
-                        <xhtml:tr>
-                            <xhtml:td class="label">Not in dictionary:</xhtml:td>
-                            <xhtml:td>
-                                <xforms:output value="instance('fr-spell-checker-internal')/context" mediatype="text/html" id="not-in-dictionary" class="not-in-dictionary"/>
-                            </xhtml:td>
-                            <xhtml:td rowspan="4">
+                <xf:group ref=".[exists($current-c)]" class="xbl-fr-spell-checker-correcting" id="correcting">
+                    <xh:table>
+                        <xh:tr>
+                            <xh:td class="label">Not in dictionary:</xh:td>
+                            <xh:td>
+                                <xf:output value="instance('fr-spell-checker-internal')/context" mediatype="text/html" id="not-in-dictionary" class="not-in-dictionary"/>
+                            </xh:td>
+                            <xh:td rowspan="4">
                                 <!-- Ignore -->
                                 <fr:button id="ignore">
-                                    <xforms:label>
-                                        <xhtml:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
+                                    <xf:label>
+                                        <xh:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
                                         Ignore
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
+                                    </xf:label>
+                                    <xf:action ev:event="DOMActivate">
                                         <!-- Mark this correction as handled -->
-                                        <xforms:insert context="$current-c" origin="xxforms:attribute('handled', 'true')"/>
+                                        <xf:insert context="$current-c" origin="xxf:attribute('handled', 'true')"/>
                                         <!-- Move to the next correction -->
-                                        <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
-                                    </xforms:action>
+                                        <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
+                                    </xf:action>
                                 </fr:button>
                                 <!-- Ignore all -->
                                 <fr:button id="ignore-all">
-                                    <xforms:label>
-                                        <xhtml:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
+                                    <xf:label>
+                                        <xh:img alt="" src="/apps/fr/style/images/silk/script_go.png"/>
                                         Ignore All
-                                    </xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
+                                    </xf:label>
+                                    <xf:action ev:event="DOMActivate">
                                         <!-- Mark all the correction with the same word as handled -->
-                                        <xforms:action iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
-                                            <xforms:insert context="." origin="xxforms:attribute('handled', 'true')"/>
-                                        </xforms:action>
+                                        <xf:action iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
+                                            <xf:insert context="." origin="xxf:attribute('handled', 'true')"/>
+                                        </xf:action>
                                         <!-- Move to the next correction -->
-                                        <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
-                                    </xforms:action>
+                                        <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
+                                    </xf:action>
                                 </fr:button>
-                                <xforms:group appearance="xxforms:internal">
+                                <xf:group appearance="xxf:internal">
                                     <!-- Change -->
                                     <fr:button id="change-this">
-                                        <xforms:label>
-                                            <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
+                                        <xf:label>
+                                            <xh:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
                                             Change
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
+                                        </xf:label>
+                                        <xf:action ev:event="DOMActivate">
                                             <!-- Apply replacement -->
-                                            <xforms:setvalue ref="$current-c/@current" value="instance('fr-spell-checker-internal')/correction"/>
+                                            <xf:setvalue ref="$current-c/@current" value="instance('fr-spell-checker-internal')/correction"/>
                                             <!-- Mark correction as handled -->
-                                            <xforms:insert context="$current-c" origin="xxforms:attribute('handled', 'true')"/>
+                                            <xf:insert context="$current-c" origin="xxf:attribute('handled', 'true')"/>
                                             <!-- Move to the next correction -->
-                                            <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
-                                        </xforms:action>
+                                            <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
+                                        </xf:action>
                                     </fr:button>
                                     <!-- Change all -->
                                     <fr:button id="change-all">
-                                        <xforms:label>
-                                            <xhtml:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
+                                        <xf:label>
+                                            <xh:img alt="" src="/apps/fr/style/images/silk/script_edit.png"/>
                                             Change All
-                                        </xforms:label>
-                                        <xforms:action ev:event="DOMActivate">
+                                        </xf:label>
+                                        <xf:action ev:event="DOMActivate">
                                             <!-- For the upcoming correction with the same word -->
-                                            <xforms:action iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
+                                            <xf:action iterate="$current-c | $current-c/following-sibling::c[@current = $current-c/@current and empty(@handled)]">
                                                 <!-- Apply replacement -->
-                                                <xforms:setvalue ref="@current" value="instance('fr-spell-checker-internal')/correction"/>
+                                                <xf:setvalue ref="@current" value="instance('fr-spell-checker-internal')/correction"/>
                                                 <!-- Mark correction as handled -->
-                                                <xforms:insert context="." origin="xxforms:attribute('handled', 'true')"/>
-                                            </xforms:action>
+                                                <xf:insert context="." origin="xxf:attribute('handled', 'true')"/>
+                                            </xf:action>
                                             <!-- Move to the next correction -->
-                                            <xforms:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
-                                        </xforms:action>
+                                            <xf:dispatch name="prepare-next-correction" targetid="fr-spell-checker-model"/>
+                                        </xf:action>
                                     </fr:button>
-                                </xforms:group>
+                                </xf:group>
                                 <!-- Done -->
                                 <fr:button id="done">
-                                    <xforms:label>
-                                        <xhtml:img alt="" src="/apps/fr/style/images/silk/cross.png"/>
+                                    <xf:label>
+                                        <xh:img alt="" src="/apps/fr/style/images/silk/cross.png"/>
                                         Done
-                                    </xforms:label>
-                                    <xforms:dispatch ev:event="DOMActivate" name="fr-spell-check-done" targetid="fr-spell-checker-model"/>
+                                    </xf:label>
+                                    <xf:dispatch ev:event="DOMActivate" name="fr-spell-check-done" targetid="fr-spell-checker-model"/>
                                 </fr:button>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td class="label">
-                                <xforms:label for="correction">Change to:</xforms:label>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:input ref="instance('fr-spell-checker-internal')/correction" id="correction"/>
-                            </xhtml:td>
-                        </xhtml:tr>
-                        <xhtml:tr>
-                            <xhtml:td class="label">
-                                <xforms:label for="suggestions">Suggestions:</xforms:label>
-                            </xhtml:td>
-                            <xhtml:td>
-                                <xforms:select1 id="suggestions" appearance="compact" ref="instance('fr-spell-checker-internal')/correction">
-                                    <xforms:itemset ref="tokenize(instance('fr-spell-checker-result')/c[1], '\s')">
-                                        <xforms:label value="."/>
-                                        <xforms:value value="."/>
-                                    </xforms:itemset>
-                                </xforms:select1>
-                            </xhtml:td>
-                        </xhtml:tr>
-                    </xhtml:table>
-                </xforms:group>
-                <xforms:group ref=".[empty($current-c)]" class="xbl-fr-spell-checker-close" id="close">
-                    <xforms:setfocus ev:event="xforms-enabled" control="close"/>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td class="label">
+                                <xf:label for="correction">Change to:</xf:label>
+                            </xh:td>
+                            <xh:td>
+                                <xf:input ref="instance('fr-spell-checker-internal')/correction" id="correction"/>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td class="label">
+                                <xf:label for="suggestions">Suggestions:</xf:label>
+                            </xh:td>
+                            <xh:td>
+                                <xf:select1 id="suggestions" appearance="compact" ref="instance('fr-spell-checker-internal')/correction">
+                                    <xf:itemset ref="tokenize(instance('fr-spell-checker-result')/c[1], '\s')">
+                                        <xf:label value="."/>
+                                        <xf:value value="."/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xh:td>
+                        </xh:tr>
+                    </xh:table>
+                </xf:group>
+                <xf:group ref=".[empty($current-c)]" class="xbl-fr-spell-checker-close" id="close">
+                    <xf:setfocus ev:event="xforms-enabled" control="close"/>
                     Done spell checking.
                     <fr:button id="close-dialog">
-                        <xforms:label>Done</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" name="fr-spell-check-done" targetid="fr-spell-checker-model"/>
+                        <xf:label>Done</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" name="fr-spell-check-done" targetid="fr-spell-checker-model"/>
                     </fr:button>
-                </xforms:group>
-            </xxforms:dialog>
+                </xf:group>
+            </xxf:dialog>
         </xxbl:global>
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/spell-checker/spell-checker.css"/>
         </xbl:resources>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
-            <xforms:group appearance="xxforms:internal" xsl:version="2.0">
-                <xforms:var name="binding" as="node()?">
-                    <xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
-                </xforms:var>
-                <xforms:group ref="$binding" id="container">
+            <xf:group appearance="xxf:internal" xsl:version="2.0">
+                <xf:var name="binding" as="node()?">
+                    <xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/>
+                </xf:var>
+                <xf:group ref="$binding" id="container">
                     <!-- Trigger that starts spell checking -->
                     <fr:button class="fr-spell-checker-start" id="spell-check">
                         <!-- Bind trigger so it can handle read-only -->
                         <xsl:if test="exists(/fr:spell-checker/(@ref, @bind))"><xsl:attribute name="ref">$binding</xsl:attribute></xsl:if>
-                        <xforms:label>Spell check</xforms:label>
+                        <xf:label>Spell check</xf:label>
                         <!-- Open dialog -->
-                        <xforms:dispatch ev:event="DOMActivate" targetid="fr-spell-checker-model" name="fr-spell-check" xxbl:scope="outer">
-                            <xforms:property name="fr-text" value="$binding" xxbl:scope="inner"/>
-                            <xforms:property name="fr-callback-id" value="event('xxforms:absolute-targetid')"/>
-                        </xforms:dispatch>
+                        <xf:dispatch ev:event="DOMActivate" targetid="fr-spell-checker-model" name="fr-spell-check" xxbl:scope="outer">
+                            <xf:property name="fr-text" value="$binding" xxbl:scope="inner"/>
+                            <xf:property name="fr-callback-id" value="event('xxf:absolute-targetid')"/>
+                        </xf:dispatch>
                         <!-- Dialog is calling us back with the result -->
-                        <xforms:setvalue ev:event="fr-spell-check-done" ref="$binding" value="event('fr-text')"/>
+                        <xf:setvalue ev:event="fr-spell-check-done" ref="$binding" value="event('fr-text')"/>
                     </fr:button>
-                </xforms:group>
-            </xforms:group>
+                </xf:group>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 

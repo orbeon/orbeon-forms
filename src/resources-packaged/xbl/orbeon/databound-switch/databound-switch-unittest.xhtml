@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,30 +21,30 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - Databound Switch</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL - Databound Switch</xh:title>
+        <xf:model id="main-model">
+            <xf:instance id="main-instance">
                 <ui>
                     <section>results</section>
                 </ui>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <fr:databound-switch ref="section">
-            <xforms:case id="search">
-                <xforms:trigger appearance="minimal">
-                    <xforms:label>Search</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref=".">results</xforms:setvalue>
-                </xforms:trigger>
-            </xforms:case>
-            <xforms:case id="results">
-                <xforms:trigger appearance="minimal">
-                    <xforms:label>Back to search</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref=".">search</xforms:setvalue>
-                </xforms:trigger>
-            </xforms:case>
+            <xf:case id="search">
+                <xf:trigger appearance="minimal">
+                    <xf:label>Search</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref=".">results</xf:setvalue>
+                </xf:trigger>
+            </xf:case>
+            <xf:case id="results">
+                <xf:trigger appearance="minimal">
+                    <xf:label>Back to search</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref=".">search</xf:setvalue>
+                </xf:trigger>
+            </xf:case>
         </fr:databound-switch>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

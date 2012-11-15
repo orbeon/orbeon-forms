@@ -95,7 +95,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                             sb.append(' ');
                         sb.append("xforms-required");
                         if (control instanceof XFormsValueControl) {
-                            // NOTE: Test above excludes xforms:group
+                            // NOTE: Test above excludes xf:group
                             // Combined class for IE6
                             if (((XFormsValueControl) control).isEmpty())
                                 sb.append(" xforms-required-empty");
@@ -215,7 +215,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             sb.append("xforms-");
             sb.append(elementAnalysis.element().getName());
             sb.append("-appearance-");
-            // Allow xxforms:* and *
+            // Allow xxf:* and *
             if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearance.getNamespace().getURI()))
                 sb.append("xxforms-");
             else if (!"".equals(appearance.getNamespace().getURI()))
@@ -428,7 +428,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             // Output label, except help in noscript mode since in that case help is displayed separately
             if (!(isNoscript && isHelp)) {
 
-                // We handle null attributes as well because we want a placeholder for "alert" even if there is no xforms:alert
+                // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
                 final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
                 outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), targetControlEffectiveId,
                         forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, addIds);

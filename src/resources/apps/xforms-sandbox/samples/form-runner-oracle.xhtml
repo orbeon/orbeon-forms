@@ -11,10 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -22,14 +22,14 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <xhtml:head>
-        <xhtml:title>Accessing the Oracle Database Managed by Form Runner with SQL</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Accessing the Oracle Database Managed by Form Runner with SQL</xh:title>
+        <xf:model>
 
-            <xforms:instance id="books"><dummy/></xforms:instance>
-            <xforms:instance id="dummy"><dummy/></xforms:instance>
+            <xf:instance id="books"><dummy/></xf:instance>
+            <xf:instance id="dummy"><dummy/></xf:instance>
 
-            <xforms:instance id="run-sql">
+            <xf:instance id="run-sql">
                 <p:config>
 
                     <p:param type="input" name="data"/>
@@ -44,10 +44,10 @@
 
                 </p:config>
 
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Query Oracle to get list of books -->
-            <xforms:instance id="query">
+            <xf:instance id="query">
                 <sql:config>
                     <sql:connection>
                         <sql:datasource/>
@@ -94,40 +94,40 @@
                         </sql:execute>
                     </sql:connection>
                 </sql:config>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:setvalue ref="instance('query')//sql:datasource" value="xxforms:property('oxf.fr.persistence.service.oracle.datasource')"/>
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:setvalue ref="instance('query')//sql:datasource" value="xxf:property('oxf.fr.persistence.service.oracle.datasource')"/>
                 <!-- page-flow.xml used as a dummy document, as the pipeline comes from the 'run-sql' instance. -->
-                <xforms:insert ref="instance('books')" origin="xxforms:call-xpl('oxf:/page-flow.xml',
+                <xf:insert ref="instance('books')" origin="xxf:call-xpl('oxf:/page-flow.xml',
                     ('config', 'data', 'sql-config'), (instance('run-sql'), instance('dummy'), instance('query')), 'data')"/>
-            </xforms:action>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:action>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background: none; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Document ID</xhtml:th>
-                <xhtml:th>Author</xhtml:th>
-                <xhtml:th>Title</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="/books/book">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output ref="document-id"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="author"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="title"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Document ID</xh:th>
+                <xh:th>Author</xh:th>
+                <xh:th>Title</xh:th>
+            </xh:tr>
+            <xf:repeat ref="/books/book">
+                <xh:tr>
+                    <xh:td>
+                        <xf:output ref="document-id"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="author"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="title"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -11,16 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Fixing bogus date times</title>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <record>
                         <dt>2009-05-11T17:38:00</dt>
@@ -31,17 +31,17 @@
                         <comment>Missing leading 0 on hours</comment>
                     </record>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="instance('instance')/record/dt[matches(., '.*T[0-9]:')]"
+            </xf:instance>
+            <xf:bind ref="instance('instance')/record/dt[matches(., '.*T[0-9]:')]"
                 calculate="replace(., '^(.*T)([0-9]:.*)$', '$10$2')" type="xs:dateTime"/>
-            <xforms:bind ref="instance('instance')/record/dt" type="xs:dateTime"/>
-        </xforms:model>
+            <xf:bind ref="instance('instance')/record/dt" type="xs:dateTime"/>
+        </xf:model>
     </head>
     <body>
 
         <h1>Fixing bogus date times</h1>
 
-        <p>xforms:bind statements are your friend if you need to fix bogus date time values</p>
+        <p>xf:bind statements are your friend if you need to fix bogus date time values</p>
         <table>
             <thead>
                 <tr>
@@ -50,16 +50,16 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat ref="record">
+                <xf:repeat ref="record">
                     <tr>
                         <td>
-                            <xforms:output ref="dt"/>
+                            <xf:output ref="dt"/>
                         </td>
                         <td>
-                            <xforms:output ref="comment"/>
+                            <xf:output ref="comment"/>
                         </td>
                     </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </tbody>
         </table>
 

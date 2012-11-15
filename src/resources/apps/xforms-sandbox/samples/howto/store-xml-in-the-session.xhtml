@@ -1,7 +1,7 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -11,55 +11,55 @@
     xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:howto="http://www.orbeon.com/howto">
 
-    <xhtml:head>
-        <xhtml:title>Session</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="from-session"><dummy/></xforms:instance>
-            <xforms:insert ev:event="xforms-model-construct-done" ref="instance('from-session')"
-                origin="xxforms:get-session-attribute('session-howto')"/>
-            <xforms:instance id="ui">
+    <xh:head>
+        <xh:title>Session</xh:title>
+        <xf:model>
+            <xf:instance id="from-session"><dummy/></xf:instance>
+            <xf:insert ev:event="xforms-model-construct-done" ref="instance('from-session')"
+                origin="xxf:get-session-attribute('session-howto')"/>
+            <xf:instance id="ui">
                 <instance>
                     <value/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-form div { margin-bottom: 1.5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div>
-            <xforms:var name="value-exists" value="instance('from-session')/value != ''"/>
-            <xforms:group ref=".[not($value-exists)]">No value was found in the session.</xforms:group>
-            <xforms:group ref=".[$value-exists]">The value found in the session is: <xforms:output value="instance('from-session')/value"/></xforms:group>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="instance('ui')/value">
-                <xforms:label>Value:</xforms:label>
-            </xforms:input>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:div>
+            <xf:var name="value-exists" value="instance('from-session')/value != ''"/>
+            <xf:group ref=".[not($value-exists)]">No value was found in the session.</xf:group>
+            <xf:group ref=".[$value-exists]">The value found in the session is: <xf:output value="instance('from-session')/value"/></xf:group>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="instance('ui')/value">
+                <xf:label>Value:</xf:label>
+            </xf:input>
             <fr:button>
-                <xforms:label>Store value in session</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="." origin="xxforms:set-session-attribute('session-howto', instance('ui'))"/>
-                    <xforms:toggle case="reload-page"/>
-                </xforms:action>
+                <xf:label>Store value in session</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert context="." origin="xxf:set-session-attribute('session-howto', instance('ui'))"/>
+                    <xf:toggle case="reload-page"/>
+                </xf:action>
             </fr:button>
             <fr:button>
-                <xforms:label>Reset content of session</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="." origin="xxforms:set-session-attribute('session-howto', ())"/>
-                    <xforms:toggle case="reload-page"/>
-                </xforms:action>
+                <xf:label>Reset content of session</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert context="." origin="xxf:set-session-attribute('session-howto', ())"/>
+                    <xf:toggle case="reload-page"/>
+                </xf:action>
             </fr:button>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:switch>
-                <xforms:case/>
-                <xforms:case id="reload-page">
-                    Try reloading this page to see the content of the session.<xhtml:br/>
+        </xh:div>
+        <xh:div>
+            <xf:switch>
+                <xf:case/>
+                <xf:case id="reload-page">
+                    Try reloading this page to see the content of the session.<xh:br/>
                     On Firefox: reload the page by going to the URL bar (ctrl-l) and pressing enter.
-                </xforms:case>
-            </xforms:switch>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+                </xf:case>
+            </xf:switch>
+        </xh:div>
+    </xh:body>
+</xh:html>

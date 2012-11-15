@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xforms:model>
+    <xh:head>
+        <xf:model>
 
-            <xforms:instance id="instance">
+            <xf:instance id="instance">
                 <instance>
                     <a/>
                     <b/>
@@ -38,31 +38,31 @@
                     <false>false</false>
                     <true>true</true>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="a" constraint="'false'"/>
-            <xforms:bind ref="b" constraint="false()"/>
-            <xforms:bind ref="c" constraint="'true'"/>
-            <xforms:bind ref="d" constraint="true()"/>
-            <xforms:bind ref="e" constraint="../true"/>
-            <xforms:bind ref="f" constraint="../false"/>
-            <xforms:bind ref="g" constraint="non-existing"/>
-            <xforms:bind ref="h" constraint="0"/>
-            <xforms:bind ref="i" constraint="1000"/>
-            <xforms:bind ref="j" constraint="number('NaN')"/>
+            <xf:bind ref="a" constraint="'false'"/>
+            <xf:bind ref="b" constraint="false()"/>
+            <xf:bind ref="c" constraint="'true'"/>
+            <xf:bind ref="d" constraint="true()"/>
+            <xf:bind ref="e" constraint="../true"/>
+            <xf:bind ref="f" constraint="../false"/>
+            <xf:bind ref="g" constraint="non-existing"/>
+            <xf:bind ref="h" constraint="0"/>
+            <xf:bind ref="i" constraint="1000"/>
+            <xf:bind ref="j" constraint="number('NaN')"/>
 
-            <xforms:instance id="result">
+            <xf:instance id="result">
                 <result/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-ready" iterate="*">
-                <xforms:var name="current" value="."/>
-                <xforms:insert context="instance('result')" ref="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready" iterate="*">
+                <xf:var name="current" value="."/>
+                <xf:insert context="instance('result')" ref="*" origin="xxf:element(name($current), xxf:valid($current))"/>
+            </xf:action>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

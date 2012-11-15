@@ -11,36 +11,36 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
-    <xhtml:head>
-        <xhtml:title>Anything Else</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>Anything Else</xh:title>
+        <xf:model>
+            <xf:instance>
                 <anything-else/>
-            </xforms:instance>
-            <xforms:submission id="main-submission" method="post" action="/pfc-atm/atm-anything-else"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
+            </xf:instance>
+            <xf:submission id="main-submission" method="post" action="/pfc-atm/atm-anything-else"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
             Would you like anything else?
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:submit submission="main-submission">
-                <xforms:label>Yes</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref=".">yes</xforms:setvalue>
-            </xforms:submit>
-            <xforms:submit submission="main-submission">
-                <xforms:label>No</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref=".">no</xforms:setvalue>
-            </xforms:submit>
-        </xhtml:p>
-        <xhtml:p style="margin-top: 3em">
-            <xhtml:a href="/pfc-atm/">Back</xhtml:a> to ATM home.
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        </xh:p>
+        <xh:p>
+            <xf:submit submission="main-submission">
+                <xf:label>Yes</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref=".">yes</xf:setvalue>
+            </xf:submit>
+            <xf:submit submission="main-submission">
+                <xf:label>No</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref=".">no</xf:setvalue>
+            </xf:submit>
+        </xh:p>
+        <xh:p style="margin-top: 3em">
+            <xh:a href="/pfc-atm/">Back</xh:a> to ATM home.
+        </xh:p>
+    </xh:body>
+</xh:html>

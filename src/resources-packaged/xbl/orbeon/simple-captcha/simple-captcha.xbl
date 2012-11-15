@@ -24,7 +24,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:xforms="http://www.w3.org/1999/XSL/Transform"
+         xmlns:xf="http://www.w3.org/1999/XSL/Transform"
          xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
 
     <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha">

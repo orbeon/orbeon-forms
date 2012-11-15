@@ -11,10 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<html xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns="http://www.w3.org/1999/xhtml">
@@ -31,44 +31,44 @@
             .xforms-trigger-appearance-minimal img { margin-right: 0.5em; vertical-align: middle }
             .xforms-label { font-weight: bold; margin-right: .5em }
         </style>
-        <xforms:model id="main-model">
+        <xf:model id="main-model">
 
             <!-- Load applications list and files list -->
-            <xforms:dispatch ev:event="xforms-ready" name="ops-initialize" targetid="main-model"/>
+            <xf:dispatch ev:event="xforms-ready" name="ops-initialize" targetid="main-model"/>
 
-            <xforms:action ev:event="ops-initialize">
-                <xforms:send submission="get-page-flow-submission"/>
-                <xforms:send submission="get-source-files-submission"/>
-                <xforms:setindex repeat="files-repeat" index="count((instance('source-files-instance')//file)[@path = instance('source-request-instance')/source-url]/preceding::file) + 1"/>
-                <xforms:dispatch name="ops-format-source" targetid="main-model"/>
-            </xforms:action>
+            <xf:action ev:event="ops-initialize">
+                <xf:send submission="get-page-flow-submission"/>
+                <xf:send submission="get-source-files-submission"/>
+                <xf:setindex repeat="files-repeat" index="count((instance('source-files-instance')//file)[@path = instance('source-request-instance')/source-url]/preceding::file) + 1"/>
+                <xf:dispatch name="ops-format-source" targetid="main-model"/>
+            </xf:action>
 
             <!-- Page parameters -->
-            <xforms:instance id="parameters-instance" src="input:instance"/>
+            <xf:instance id="parameters-instance" src="input:instance"/>
 
             <!-- The current application's page flow -->
-            <xforms:instance id="page-flow-instance">
+            <xf:instance id="page-flow-instance">
                 <page-flow/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:submission id="get-page-flow-submission" method="get" serialization="none"
+            <xf:submission id="get-page-flow-submission" method="get" serialization="none"
                                action="oxf:/apps/{instance('parameters-instance')/application-id}/page-flow.xml"
                                replace="instance" instance="page-flow-instance"/>
 
             <!-- The current application's files list -->
-            <xforms:instance id="source-files-instance">
+            <xf:instance id="source-files-instance">
                 <page-flow/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:submission id="get-source-files-submission" method="get" serialization="none"
+            <xf:submission id="get-source-files-submission" method="get" serialization="none"
                                action="/source-viewer/service/get-files?application-id={instance('parameters-instance')/application-id}"
                                replace="instance" instance="source-files-instance"/>
 
             <!-- The list of all applications -->
-            <xforms:instance id="apps-list-instance" src="oxf:/apps-list.xml"/>
+            <xf:instance id="apps-list-instance" src="oxf:/apps-list.xml"/>
 
             <!-- Control instance -->
-            <xforms:instance id="control-instance">
+            <xf:instance id="control-instance">
                 <control xmlns="">
                     <show-xml>false</show-xml>
                     <xml-trigger/>
@@ -76,110 +76,110 @@
                     <current-index/>
                     <application-id/>
                 </control>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Source request instance -->
-            <xforms:instance id="source-request-instance">
+            <xf:instance id="source-request-instance">
                 <form xmlns="">
                     <application-id/>
                     <source-url/>
                     <mediatype/>
                 </form>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Source response instance -->
-            <xforms:instance id="source-response-instance">
+            <xf:instance id="source-response-instance">
                 <document xmlns=""/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="instance('source-files-instance')">
+            <xf:bind ref="instance('source-files-instance')">
                 <!-- Make sure there are no backslashes in file names -->
-                <xforms:bind ref=".//file/@path" calculate="replace(., '\\', '/')"/>
+                <xf:bind ref=".//file/@path" calculate="replace(., '\\', '/')"/>
                 <!-- Make current trigger read-only -->
-                <xforms:bind ref=".//file/@path" readonly=". = instance('source-request-instance')/source-url"/>
-            </xforms:bind>
+                <xf:bind ref=".//file/@path" readonly=". = instance('source-request-instance')/source-url"/>
+            </xf:bind>
 
-            <xforms:bind ref="instance('source-request-instance')">
-                <xforms:bind ref="application-id" calculate="instance('parameters-instance')/application-id"/>
-                <xforms:bind ref="source-url" calculate="if (. = '' and instance('parameters-instance')/source-url != '')
+            <xf:bind ref="instance('source-request-instance')">
+                <xf:bind ref="application-id" calculate="instance('parameters-instance')/application-id"/>
+                <xf:bind ref="source-url" calculate="if (. = '' and instance('parameters-instance')/source-url != '')
                                                              then instance('parameters-instance')/source-url
                                                              else (instance('source-files-instance')//file)[index('files-repeat')]/@path"/>
-                <xforms:bind ref="mediatype"
+                <xf:bind ref="mediatype"
                              calculate="if (instance('control-instance')/show-xml = 'false' or ends-with(../source-url, '.txt') or ends-with(../source-url, '.java'))
                                         then 'text/plain' else 'application/xml'"/>
-            </xforms:bind>
+            </xf:bind>
 
-            <xforms:bind ref="instance('control-instance')">
-                <xforms:bind ref="xml-trigger" readonly="../show-xml = 'true'"/>
-                <xforms:bind ref="text-trigger" readonly="not(../show-xml = 'true')"/>
-            </xforms:bind>
+            <xf:bind ref="instance('control-instance')">
+                <xf:bind ref="xml-trigger" readonly="../show-xml = 'true'"/>
+                <xf:bind ref="text-trigger" readonly="not(../show-xml = 'true')"/>
+            </xf:bind>
 
-            <xforms:submission id="request-source-submission" ref="instance('source-request-instance')" method="get" separator="&amp;"
+            <xf:submission id="request-source-submission" ref="instance('source-request-instance')" method="get" separator="&amp;"
                 action="/source-viewer/service/format" replace="instance" instance="source-response-instance"/>
 
-            <xforms:action ev:event="ops-format-source">
-                <xforms:setvalue ref="instance('control-instance')/current-index" value="index('files-repeat')"/>
-                <xforms:send submission="request-source-submission"/>
-                <xforms:setindex repeat="files-repeat" index="instance('control-instance')/current-index"/>
-            </xforms:action>
+            <xf:action ev:event="ops-format-source">
+                <xf:setvalue ref="instance('control-instance')/current-index" value="index('files-repeat')"/>
+                <xf:send submission="request-source-submission"/>
+                <xf:setindex repeat="files-repeat" index="instance('control-instance')/current-index"/>
+            </xf:action>
 
-        </xforms:model>
+        </xf:model>
     </head>
     <body>
         <!-- Toolbar -->
         <table class="viewer-action-table">
             <tr>
                 <td>
-                    <xforms:select1 ref="instance('parameters-instance')/application-id">
-                        <xforms:label>Application:</xforms:label>
-                        <xforms:itemset ref="instance('apps-list-instance')//(section|application)">
-                            <xforms:label ref="@label"/>
-                            <xforms:value ref="@id"/>
-                        </xforms:itemset>
-                        <xforms:dispatch ev:event="xforms-value-changed" name="ops-initialize" targetid="main-model"/>
-                    </xforms:select1>
+                    <xf:select1 ref="instance('parameters-instance')/application-id">
+                        <xf:label>Application:</xf:label>
+                        <xf:itemset ref="instance('apps-list-instance')//(section|application)">
+                            <xf:label ref="@label"/>
+                            <xf:value ref="@id"/>
+                        </xf:itemset>
+                        <xf:dispatch ev:event="xforms-value-changed" name="ops-initialize" targetid="main-model"/>
+                    </xf:select1>
                 </td>
                 <td>
-                    <xforms:group ref="instance('control-instance')/text-trigger">
-                        <xforms:action ev:event="DOMActivate" >
-                            <xforms:setvalue ref="instance('control-instance')/show-xml">false</xforms:setvalue>
-                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" targetid="main-model"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img src="../../apps/source-viewer/images/text.gif" alt="View as text"/>
+                    <xf:group ref="instance('control-instance')/text-trigger">
+                        <xf:action ev:event="DOMActivate" >
+                            <xf:setvalue ref="instance('control-instance')/show-xml">false</xf:setvalue>
+                            <xf:dispatch ev:event="DOMActivate" name="ops-format-source" targetid="main-model"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>
+                                <xh:img src="../../apps/source-viewer/images/text.gif" alt="View as text"/>
                                 View as text
-                            </xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                            </xf:label>
+                        </xf:trigger>
+                    </xf:group>
                 </td>
                 <td>
-                    <xforms:group ref="instance('control-instance')/xml-trigger">
-                        <xforms:action ev:event="DOMActivate" >
-                            <xforms:setvalue ref="instance('control-instance')/show-xml">true</xforms:setvalue>
-                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" targetid="main-model"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img src="../../apps/source-viewer/images/view-xml.gif" alt="View as formatted XML"/>
+                    <xf:group ref="instance('control-instance')/xml-trigger">
+                        <xf:action ev:event="DOMActivate" >
+                            <xf:setvalue ref="instance('control-instance')/show-xml">true</xf:setvalue>
+                            <xf:dispatch ev:event="DOMActivate" name="ops-format-source" targetid="main-model"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>
+                                <xh:img src="../../apps/source-viewer/images/view-xml.gif" alt="View as formatted XML"/>
                                 View as formatted XML
-                            </xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                            </xf:label>
+                        </xf:trigger>
+                    </xf:group>
                 </td>
                 <td>
-                    <xforms:group>
-                        <xforms:action ev:event="DOMActivate" >
-                            <xforms:load resource="/source-viewer/service/download/{instance('parameters-instance')/application-id}/{(instance('source-files-instance')//file)[index('files-repeat')]/@path}"
-                                         f:url-type="resource" xxforms:show-progress="false"/>
-                        </xforms:action>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>
-                                <xhtml:img src="../../apps/source-viewer/images/download.gif" alt="Download"/>
+                    <xf:group>
+                        <xf:action ev:event="DOMActivate" >
+                            <xf:load resource="/source-viewer/service/download/{instance('parameters-instance')/application-id}/{(instance('source-files-instance')//file)[index('files-repeat')]/@path}"
+                                         f:url-type="resource" xxf:show-progress="false"/>
+                        </xf:action>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>
+                                <xh:img src="../../apps/source-viewer/images/download.gif" alt="Download"/>
                                 Download
-                            </xforms:label>
-                        </xforms:trigger>
-                    </xforms:group>
+                            </xf:label>
+                        </xf:trigger>
+                    </xf:group>
                 </td>
             </tr>
         </table>
@@ -189,21 +189,21 @@
             <tr>
                 <td style="vertical-align: top">
                     <table>
-                        <xforms:group>
-                            <xforms:dispatch ev:event="DOMFocusIn" name="ops-format-source" targetid="main-model"/>
-                            <xforms:repeat ref="instance('source-files-instance')//file" id="files-repeat">
+                        <xf:group>
+                            <xf:dispatch ev:event="DOMFocusIn" name="ops-format-source" targetid="main-model"/>
+                            <xf:repeat ref="instance('source-files-instance')//file" id="files-repeat">
                                 <tr>
                                     <td style="white-space: nowrap">
-                                        <xforms:trigger ref="@path" appearance="minimal">
-                                            <xforms:label ref="."/>
-                                        </xforms:trigger>
+                                        <xf:trigger ref="@path" appearance="minimal">
+                                            <xf:label ref="."/>
+                                        </xf:trigger>
                                     </td>
                                     <td style="text-align: right">
-                                        <xforms:output value="format-number(@size, '###,##0')"/>
+                                        <xf:output value="format-number(@size, '###,##0')"/>
                                     </td>
                                 </tr>
-                            </xforms:repeat>
-                        </xforms:group>
+                            </xf:repeat>
+                        </xf:group>
                         <tr/>
                     </table>
                 </td>
@@ -212,7 +212,7 @@
                         <tr>
                             <td style="padding: 0">
                                 <div class="ops-source">
-                                    <xforms:output ref="instance('source-response-instance')" mediatype="text/html"/>
+                                    <xf:output ref="instance('source-response-instance')" mediatype="text/html"/>
                                 </div>
                             </td>
                         </tr>

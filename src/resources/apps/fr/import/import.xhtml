@@ -38,8 +38,8 @@
                 xxf:set-session-attribute('org.orbeon.fr.import.cancel', ())
             </xf:action>
 
-            <xxf:var name="app" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/app)"/>
-            <xxf:var name="form" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/form)"/>
+            <xf:var name="app" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/app)"/>
+            <xf:var name="form" as="xs:string" value="xs:string(xxf:instance('fr-parameters-instance')/form)"/>
 
             <!-- Main data -->
             <xf:instance id="fr-form-instance">
@@ -64,11 +64,11 @@
             </xf:bind>
 
             <!-- Validation and import status -->
-            <xxf:var name="validation-done" context="instance('fr-validation-result')" value="exists(*)"/>
-            <xxf:var name="validation-canceled" context="instance('fr-validation-result')" value="$validation-done and total != processed"/>
+            <xf:var name="validation-done" context="instance('fr-validation-result')" value="exists(*)"/>
+            <xf:var name="validation-canceled" context="instance('fr-validation-result')" value="$validation-done and total != processed"/>
 
-            <xxf:var name="import-done" context="instance('fr-import-result')" value="exists(*)"/>
-            <xxf:var name="import-canceled" context="instance('fr-import-result')" value="$import-done and total != processed"/>
+            <xf:var name="import-done" context="instance('fr-import-result')" value="exists(*)"/>
+            <xf:var name="import-canceled" context="instance('fr-import-result')" value="$import-done and total != processed"/>
 
             <xf:instance id="fr-validation-result">
                 <dummy/>
@@ -228,8 +228,8 @@
                 <fr:section id="upload-validate-section" ref="instance()/upload">
                     <xf:label>Selection and validation</xf:label>:label>
 
-                    <xxf:var name="tab" value="."/>
-                    <xxf:var name="validating" value="xs:boolean($tab/validating)"/>
+                    <xf:var name="tab" value="."/>
+                    <xf:var name="validating" value="xs:boolean($tab/validating)"/>
 
                     <fr:grid columns="3">
                         <xf:group ref="$tab/file[not(normalize-space())]">
@@ -305,8 +305,8 @@
                         <xf:group context="instance('fr-validation-result')" ref=".[$validation-done]">
                             <!-- Validation results -->
 
-                            <xxf:var name="invalid" value="xs:integer(processed) - succeeded"/>
-                            <xxf:var name="some-invalid" value="$invalid gt 0"/>
+                            <xf:var name="invalid" value="xs:integer(processed) - succeeded"/>
+                            <xf:var name="some-invalid" value="$invalid gt 0"/>
 
                             <!-- No invalid documents -->
                             <xf:group ref=".[not($some-invalid) and not($validation-canceled)]">
@@ -365,14 +365,14 @@
 
                     <fr:grid columns="3">
 
-                        <xxf:var name="tab" value="."/>
+                        <xf:var name="tab" value="."/>
 
-                        <xxf:var name="searched" context="instance('fr-search-response')" value="exists(self::documents)"/>
-                        <xxf:var name="importing" value="xs:boolean($tab/importing)"/>
+                        <xf:var name="searched" context="instance('fr-search-response')" value="exists(self::documents)"/>
+                        <xf:var name="importing" value="xs:boolean($tab/importing)"/>
 
                         <xf:group ref=".[$searched]">
 
-                            <xxf:var name="existing" value="xs:integer(instance('fr-search-response')/@total)"/>
+                            <xf:var name="existing" value="xs:integer(instance('fr-search-response')/@total)"/>
 
                             <xf:group ref=".[not($importing or $import-done)]">
                                 <xf:group ref=".[$existing gt 0]">
@@ -452,7 +452,7 @@
                             <xf:group context="instance('fr-import-result')" ref=".[$import-done]">
                                 <!-- Validation results -->
 
-                                <xxf:var name="skipped" value="xs:integer(processed) - succeeded"/>
+                                <xf:var name="skipped" value="xs:integer(processed) - succeeded"/>
 
                                 <xf:group ref=".[not($import-canceled)]">
                                     <fr:tr>

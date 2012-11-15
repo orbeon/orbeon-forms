@@ -82,13 +82,13 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
             delegateAnalysis.analyzeXPath()
 
             if (ref.isDefined || value.isDefined) {
-                // 1. E.g. <xforms:label model="…" context="…" value|ref="…"/>
+                // 1. E.g. <xf:label model="…" context="…" value|ref="…"/>
                 assert(element.elements.isEmpty) // no children elements allowed in this case
 
                 // Use value provided by the delegate
                 delegateAnalysis.getValueAnalysis
             } else {
-                // 2. E.g. <xforms:label>…<xforms:output value|ref=""…/>…<span class="{…}">…</span></xforms:label>
+                // 2. E.g. <xf:label>…<xf:output value|ref=""…/>…<span class="{…}">…</span></xf:label>
 
                 // NOTE: We do allow @context and/or @model on LHHA element, which can change the context
 
@@ -129,10 +129,10 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 }
 
 object LHHAAnalysis {
-    // Try to figure out if we have a dynamic LHHA element, including nested xforms:output and AVTs.
+    // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
         XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPathCache.getGlobalConfiguration).wrap(lhhaElement),
-            "not(exists(descendant-or-self::xforms:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
+            "not(exists(descendant-or-self::xf:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
     }
 

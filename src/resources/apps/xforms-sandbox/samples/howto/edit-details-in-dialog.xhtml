@@ -1,16 +1,16 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Editor in a dialog</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="planets">
+    <xh:head>
+        <xh:title>Editor in a dialog</xh:title>
+        <xf:model>
+            <xf:instance id="planets">
                 <planets>
                     <planet>
                         <name>Mercury</name>
@@ -64,93 +64,93 @@
                         </description>
                     </planet>
                 </planets>
-            </xforms:instance>
-            <xforms:instance id="ui">
+            </xf:instance>
+            <xf:instance id="ui">
                 <ui>
                     <valid/>
                     <edited-planet/>
                 </ui>
-            </xforms:instance>
-            <xforms:bind ref="instance('ui')/edited-planet/planet/description" required="true()"/>
-            <xforms:action ev:event="xforms-model-construct-done" iterate="instance('planets')/planet/description">
-                <xforms:setvalue ref="." value="normalize-space(.)"/>
-            </xforms:action>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="instance('ui')/edited-planet/planet/description" required="true()"/>
+            <xf:action ev:event="xforms-model-construct-done" iterate="instance('planets')/planet/description">
+                <xf:setvalue ref="." value="normalize-space(.)"/>
+            </xf:action>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             .xforms-label { font-weight: bold; display: block; margin-top: .5em; }
             .edit-planet-textarea, .edit-planet-textarea textarea { width: 40em; height: 15em; }
             .buttons { display: block; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xxforms:dialog id="edit-planet-dialog">
-            <xforms:label>Edit Planet</xforms:label>
-            <xforms:delete ev:event="xxforms-dialog-close" ref="instance('ui')/edited-planet/planet"/>
-            <xforms:group ref="instance('ui')/edited-planet/planet" id="edit-planet-group">
-                <xforms:output value="name">
-                    <xforms:label>Planet</xforms:label>
-                </xforms:output>
-                <xforms:textarea ref="description" class="edit-planet-textarea">
-                    <xforms:label>Description</xforms:label>
-                    <xforms:alert>Required field</xforms:alert>
-                </xforms:textarea>
-                <xhtml:div class="buttons">
-                    <xforms:trigger>
-                        <xforms:label>Cancel</xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>OK</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:dispatch name="fr-visit-all" targetid="planet-error-summary"/>
-                            <xforms:refresh/>
-                            <xforms:dispatch name="fr-update" targetid="planet-error-summary"/>
-                            <xforms:action if="instance('ui')/valid = 'true'">
-                                <xforms:setvalue
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xxf:dialog id="edit-planet-dialog">
+            <xf:label>Edit Planet</xf:label>
+            <xf:delete ev:event="xxforms-dialog-close" ref="instance('ui')/edited-planet/planet"/>
+            <xf:group ref="instance('ui')/edited-planet/planet" id="edit-planet-group">
+                <xf:output value="name">
+                    <xf:label>Planet</xf:label>
+                </xf:output>
+                <xf:textarea ref="description" class="edit-planet-textarea">
+                    <xf:label>Description</xf:label>
+                    <xf:alert>Required field</xf:alert>
+                </xf:textarea>
+                <xh:div class="buttons">
+                    <xf:trigger>
+                        <xf:label>Cancel</xf:label>
+                        <xxf:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
+                    </xf:trigger>
+                    <xf:trigger>
+                        <xf:label>OK</xf:label>
+                        <xf:action ev:event="DOMActivate">
+                            <xf:dispatch name="fr-visit-all" targetid="planet-error-summary"/>
+                            <xf:refresh/>
+                            <xf:dispatch name="fr-update" targetid="planet-error-summary"/>
+                            <xf:action if="instance('ui')/valid = 'true'">
+                                <xf:setvalue
                                     ref="instance('planets')/planet[name = context()/name]/description"
                                     value="context()/description"/>
-                                <xxforms:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
-                            </xforms:action>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-            </xforms:group>
+                                <xxf:hide ev:event="DOMActivate" dialog="edit-planet-dialog"/>
+                            </xf:action>
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+            </xf:group>
             <fr:error-summary id="planet-error-summary" observer="edit-planet-group" valid-ref="instance('ui')/valid" incremental="false">
                 <fr:label>This dialog contains an error:</fr:label>
             </fr:error-summary>
-        </xxforms:dialog>
-        <xhtml:table class="gridtable">
-            <xhtml:thead>
-                <xhtml:tr>
-                    <xhtml:th>Name</xhtml:th>
-                    <xhtml:th>Description</xhtml:th>
-                    <xhtml:th/>
-                </xhtml:tr>
-            </xhtml:thead>
-            <xhtml:tbody>
-                <xforms:repeat ref="instance('planets')/planet">
-                    <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:output value="name"/>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:output value="description"/>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:trigger appearance="minimal">
-                                <xforms:label>Edit</xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:var name="current-planet" value="."/>
-                                    <xforms:insert context="instance('ui')/edited-planet"
+        </xxf:dialog>
+        <xh:table class="gridtable">
+            <xh:thead>
+                <xh:tr>
+                    <xh:th>Name</xh:th>
+                    <xh:th>Description</xh:th>
+                    <xh:th/>
+                </xh:tr>
+            </xh:thead>
+            <xh:tbody>
+                <xf:repeat ref="instance('planets')/planet">
+                    <xh:tr>
+                        <xh:td>
+                            <xf:output value="name"/>
+                        </xh:td>
+                        <xh:td>
+                            <xf:output value="description"/>
+                        </xh:td>
+                        <xh:td>
+                            <xf:trigger appearance="minimal">
+                                <xf:label>Edit</xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:var name="current-planet" value="."/>
+                                    <xf:insert context="instance('ui')/edited-planet"
                                         origin="instance('planets')/planet[name = $current-planet/name]"/>
-                                    <xxforms:show dialog="edit-planet-dialog"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xforms:repeat>
-            </xhtml:tbody>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+                                    <xxf:show dialog="edit-planet-dialog"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xh:td>
+                    </xh:tr>
+                </xf:repeat>
+            </xh:tbody>
+        </xh:table>
+    </xh:body>
+</xh:html>

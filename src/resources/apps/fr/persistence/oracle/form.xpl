@@ -19,7 +19,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
@@ -46,8 +46,8 @@
                         <sql:execute>
                             <sql:query>
                                 select
-                                    extract(xml, '/xhtml:html/xhtml:head/xforms:model/xforms:instance[@id = "fr-form-metadata"]/metadata',
-                                    'xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms"').getClobVal() metadata
+                                    extract(xml, '/xh:html/xh:head/xf:model/xf:instance[@id = "fr-form-metadata"]/metadata',
+                                    'xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"').getClobVal() metadata
                                 from (
                                     select t.*, dense_rank() over (partition by app, form order by last_modified desc) as latest
                                     from orbeon_form_definition t)

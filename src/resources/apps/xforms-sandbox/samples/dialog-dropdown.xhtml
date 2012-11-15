@@ -11,52 +11,52 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Drop-down Dialog</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Drop-down Dialog</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .show-drop-down img { border: 0; }
-        </xhtml:style>
-        <xhtml:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+        <xh:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>
+    </xh:head>
+    <xh:body>
 
-        <xforms:group id="my-group">
+        <xf:group id="my-group">
 
-            <xxforms:dialog id="dialog" appearance="minimal">
+            <xxf:dialog id="dialog" appearance="minimal">
                 Some text here.
-                <xhtml:a href="#">HTML link.</xhtml:a>
-                <xforms:trigger appearance="minimal">
-                    <xforms:label>XForms link.</xforms:label>
-                </xforms:trigger>
-            </xxforms:dialog>
+                <xh:a href="#">HTML link.</xh:a>
+                <xf:trigger appearance="minimal">
+                    <xf:label>XForms link.</xf:label>
+                </xf:trigger>
+            </xxf:dialog>
 
-            <xhtml:div>
+            <xh:div>
                 Let's start with this.
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:trigger appearance="minimal" class="show-drop-down" id="show-trigger">
-                    <xforms:label>
-                        <xhtml:span>Show drop-down dialog</xhtml:span>
-                        <xhtml:img src="/apps/xforms-sandbox/samples/images/dialog-down.png"/>
-                    </xforms:label>
-                    <xxforms:show ev:event="DOMActivate" dialog="dialog" neighbor="show-trigger" constrain="true"/>
-                </xforms:trigger>
-            </xhtml:div>
-        </xforms:group>
+            </xh:div>
+            <xh:div>
+                <xf:trigger appearance="minimal" class="show-drop-down" id="show-trigger">
+                    <xf:label>
+                        <xh:span>Show drop-down dialog</xh:span>
+                        <xh:img src="/apps/xforms-sandbox/samples/images/dialog-down.png"/>
+                    </xf:label>
+                    <xxf:show ev:event="DOMActivate" dialog="dialog" neighbor="show-trigger" constrain="true"/>
+                </xf:trigger>
+            </xh:div>
+        </xf:group>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

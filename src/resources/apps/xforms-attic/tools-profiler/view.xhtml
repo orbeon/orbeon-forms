@@ -1,91 +1,91 @@
-<xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
-    <xhtml:head>
-        <xhtml:title>Java Profiler</xhtml:title>
-        <xhtml:style type="text/css">
+        xmlns:xh="http://www.w3.org/1999/xhtml">
+    <xh:head>
+        <xh:title>Java Profiler</xh:title>
+        <xh:style type="text/css">
             .url             { padding-left: 2em; padding-top: 1em; }
             .change          { padding-left: 2em; }
             .reports         { padding-top: 1em; }
             .report-list     { padding-left: 1em; padding-top: 1em; }
             .url-input input { width: 20em; }
-        </xhtml:style>
-        <xforms:model>
-            <xforms:instance id="hprof">
+        </xh:style>
+        <xf:model>
+            <xf:instance id="hprof">
                 <config>
                     <url>http://...</url>
                     <content-type>text/plain</content-type>
                 </config>
-            </xforms:instance>
-            <xforms:instance id="ui">
+            </xf:instance>
+            <xf:instance id="ui">
                 <ui>
                     <url-set>false</url-set>
                 </ui>
-            </xforms:instance>
-            <xforms:submission method="post" action="hotspots" ref="instance('hprof')" id="hotspots"/>
-            <xforms:submission method="post" action="hotspots-data" ref="instance('hprof')" id="hotspots-data"/>
-            <xforms:submission method="post" action="functionality" ref="instance('hprof')" id="functionality"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:h1>Java Profiler</xhtml:h1>
-        <xhtml:ol>
-            <xhtml:li>
+            </xf:instance>
+            <xf:submission method="post" action="hotspots" ref="instance('hprof')" id="hotspots"/>
+            <xf:submission method="post" action="hotspots-data" ref="instance('hprof')" id="hotspots-data"/>
+            <xf:submission method="post" action="functionality" ref="instance('hprof')" id="functionality"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:h1>Java Profiler</xh:h1>
+        <xh:ol>
+            <xh:li>
                 Specify URL that point to your hprof.txt
-                <xhtml:div class="url">
-                    <xforms:group ref=".[instance('ui')/url-set = 'false']">
-                        <xforms:input ref="instance('hprof')/url" class="url-input"/>
-                        <xforms:trigger>
-                            <xforms:label>Set</xforms:label>
-                            <xforms:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">true</xforms:setvalue>
-                        </xforms:trigger>
-                    </xforms:group>
-                    <xforms:group ref=".[instance('ui')/url-set = 'true']">
-                        <xforms:output ref="instance('hprof')/url"/>
-                        <xhtml:span class="change">
+                <xh:div class="url">
+                    <xf:group ref=".[instance('ui')/url-set = 'false']">
+                        <xf:input ref="instance('hprof')/url" class="url-input"/>
+                        <xf:trigger>
+                            <xf:label>Set</xf:label>
+                            <xf:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">true</xf:setvalue>
+                        </xf:trigger>
+                    </xf:group>
+                    <xf:group ref=".[instance('ui')/url-set = 'true']">
+                        <xf:output ref="instance('hprof')/url"/>
+                        <xh:span class="change">
                             [
-                            <xforms:trigger appearance="minimal">
-                                <xforms:label>Change</xforms:label>
-                                <xforms:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">false</xforms:setvalue>
-                            </xforms:trigger>
+                            <xf:trigger appearance="minimal">
+                                <xf:label>Change</xf:label>
+                                <xf:setvalue ref="instance('ui')/url-set" ev:event="DOMActivate">false</xf:setvalue>
+                            </xf:trigger>
                             ]
-                        </xhtml:span>
-                    </xforms:group>
-                </xhtml:div>
-            </xhtml:li>
-            <xhtml:li class="reports">
+                        </xh:span>
+                    </xf:group>
+                </xh:div>
+            </xh:li>
+            <xh:li class="reports">
                 See report based on specified data:
-                <xhtml:div  class="report-list">
-                    <xforms:group ref=".[instance('ui')/url-set = 'false']">
+                <xh:div  class="report-list">
+                    <xf:group ref=".[instance('ui')/url-set = 'false']">
                         Specify URL first.
-                    </xforms:group>
-                    <xforms:group ref=".[instance('ui')/url-set = 'true']">
-                        <xhtml:ul>
-                            <xhtml:li>
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>Hotspots</xforms:label>
-                                    <xforms:send submission="hotspots" ev:event="DOMActivate"/>
-                                </xforms:trigger>
+                    </xf:group>
+                    <xf:group ref=".[instance('ui')/url-set = 'true']">
+                        <xh:ul>
+                            <xh:li>
+                                <xf:trigger appearance="minimal">
+                                    <xf:label>Hotspots</xf:label>
+                                    <xf:send submission="hotspots" ev:event="DOMActivate"/>
+                                </xf:trigger>
                                 (
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>XML</xforms:label>
-                                    <xforms:send submission="hotspots-data" ev:event="DOMActivate"/>
-                                </xforms:trigger>
+                                <xf:trigger appearance="minimal">
+                                    <xf:label>XML</xf:label>
+                                    <xf:send submission="hotspots-data" ev:event="DOMActivate"/>
+                                </xf:trigger>
                                 )
-                            </xhtml:li>
-                            <xhtml:li>
-                                <xforms:trigger appearance="minimal">
-                                    <xforms:label>Split by functionality</xforms:label>
-                                    <xforms:send submission="functionality" ev:event="DOMActivate"/>
-                                </xforms:trigger>
-                            </xhtml:li>
-                        </xhtml:ul>
-                    </xforms:group>
-                </xhtml:div>
-            </xhtml:li>
-        </xhtml:ol>
-    </xhtml:body>
-</xhtml:html>
+                            </xh:li>
+                            <xh:li>
+                                <xf:trigger appearance="minimal">
+                                    <xf:label>Split by functionality</xf:label>
+                                    <xf:send submission="functionality" ev:event="DOMActivate"/>
+                                </xf:trigger>
+                            </xh:li>
+                        </xh:ul>
+                    </xf:group>
+                </xh:div>
+            </xh:li>
+        </xh:ol>
+    </xh:body>
+</xh:html>

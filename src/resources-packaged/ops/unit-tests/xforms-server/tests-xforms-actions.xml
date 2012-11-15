@@ -96,7 +96,7 @@
     
     <test description="iterate attribute on action and context() function" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -181,7 +181,7 @@
 
     <test description="iterate and context() function on strings" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -409,7 +409,7 @@
         </output>
     </test>
 
-    <test description="Backward-compatibility for xxforms:iterate and exforms:iterate" name="oxf:pipeline">
+    <test description="Backward-compatibility for xxf:iterate and exf:iterate" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -459,7 +459,7 @@
         </output>
     </test>
 
-    <test description="xforms:setvisited" name="oxf:pipeline">
+    <test description="xf:setvisited" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>

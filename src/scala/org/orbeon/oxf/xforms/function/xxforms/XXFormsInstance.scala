@@ -19,7 +19,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
 
 /**
- * xxforms:instance() function. This function operates like the standard instance() function, except that it looks for
+ * xxf:instance() function. This function operates like the standard instance() function, except that it looks for
  * instances globally instead of using the current model.
  */
 class XXFormsInstance extends XFormsFunction with FunctionSupport {
@@ -77,7 +77,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
             case Some(iterator) ⇒
                 iterator
             case None ⇒
-                containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxforms:instance()", "instance not found", "instance id", instanceId)
+                containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY).logWarning("xxf:instance()", "instance not found", "instance id", instanceId)
                 EmptyIterator.getInstance
         }
     }

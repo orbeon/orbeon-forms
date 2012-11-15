@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,59 +21,59 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL - Select1 Button</xhtml:title>
-        <xforms:model id="main-model">
+    <xh:head>
+        <xh:title>XBL - Select1 Button</xh:title>
+        <xf:model id="main-model">
 
-            <xforms:instance id="selected-state">
+            <xf:instance id="selected-state">
                 <selected-state>
                     <state>CA</state>
                     <readonly>false</readonly>
                 </selected-state>
-            </xforms:instance>
-            <xforms:bind ref="state" readonly="../readonly = 'true'"/>
+            </xf:instance>
+            <xf:bind ref="state" readonly="../readonly = 'true'"/>
 
             <!-- New state added to be added -->
-            <xforms:instance id="utopia">
+            <xf:instance id="utopia">
                 <state abbreviation="UA" name="Utopia"/>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Instance containing list of states, loaded on page load -->
-            <xforms:instance id="states"><dummy/></xforms:instance>
-            <xforms:submission id="get-states" method="post" resource="/xforms-sandbox/service/zip-states" serialization="none" replace="instance" instance="states"/>
-            <xforms:send ev:event="xforms-model-construct-done" submission="get-states"/>
+            <xf:instance id="states"><dummy/></xf:instance>
+            <xf:submission id="get-states" method="post" resource="/xforms-sandbox/service/zip-states" serialization="none" replace="instance" instance="states"/>
+            <xf:send ev:event="xforms-model-construct-done" submission="get-states"/>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .operation { margin-bottom: 1em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
         <!-- Link to add new state -->
-        <xhtml:div class="operation">
-            Current state: <xhtml:b><xforms:output ref="state"/></xhtml:b> |
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Add new state</xforms:label>
-                <xforms:insert ev:event="DOMActivate" context="instance('states')" origin="instance('utopia')"/>
-            </xforms:trigger> |
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Set to Oregon</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="state">OR</xforms:setvalue>
-            </xforms:trigger> |
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Toggle readonly</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="not(. = 'true')"/>
-            </xforms:trigger>
-        </xhtml:div>
+        <xh:div class="operation">
+            Current state: <xh:b><xf:output ref="state"/></xh:b> |
+            <xf:trigger appearance="minimal">
+                <xf:label>Add new state</xf:label>
+                <xf:insert ev:event="DOMActivate" context="instance('states')" origin="instance('utopia')"/>
+            </xf:trigger> |
+            <xf:trigger appearance="minimal">
+                <xf:label>Set to Oregon</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="state">OR</xf:setvalue>
+            </xf:trigger> |
+            <xf:trigger appearance="minimal">
+                <xf:label>Toggle readonly</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="readonly" value="not(. = 'true')"/>
+            </xf:trigger>
+        </xh:div>
 
         <!-- Control we are testing -->
         <fr:select1-button ref="state">
-            <xforms:itemset ref="instance('states')/state">
-                <xforms:label ref="@name"/>
-                <xforms:value ref="@abbreviation"/>
-            </xforms:itemset>
+            <xf:itemset ref="instance('states')/state">
+                <xf:label ref="@name"/>
+                <xf:value ref="@abbreviation"/>
+            </xf:itemset>
         </fr:select1-button>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -11,44 +11,44 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xhtml:head>
-        <xhtml:title>Resizing Images With XForms and Flickr</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="request-instance">
+    <xh:head>
+        <xh:title>Resizing Images With XForms and Flickr</xh:title>
+        <xf:model>
+            <xf:instance id="request-instance">
                 <instanceData xmlns="">
                     <method>flickr.photos.search</method>
                     <api_key>4dbabf4e2dbdb812e99a34838e6705dd</api_key>
                     <tags>mountains</tags>
                     <per_page>12</per_page>
                 </instanceData>
-            </xforms:instance>
-            <xforms:instance id="response-instance">
+            </xf:instance>
+            <xf:instance id="response-instance">
                 <dummy xmlns=""/>
-            </xforms:instance>
-            <xforms:instance id="control-instance">
+            </xf:instance>
+            <xf:instance id="control-instance">
                 <instanceData xmlns="">
                     <size>75</size>
                 </instanceData>
-            </xforms:instance>
-            <xforms:submission id="flickr-submission"
+            </xf:instance>
+            <xf:submission id="flickr-submission"
                                method="get" action="http://www.flickr.com/services/rest/" separator="&amp;"
                                replace="instance" instance="response-instance">
-                <xforms:toggle case="case-busy" ev:event="xforms-submit"/>
-                <xforms:toggle case="case-done" ev:event="xforms-submit-done"/>
-            </xforms:submission>
-            <xforms:bind ref="instance('control-instance')/size" type="xs:integer"/>
+                <xf:toggle case="case-busy" ev:event="xforms-submit"/>
+                <xf:toggle case="case-done" ev:event="xforms-submit-done"/>
+            </xf:submission>
+            <xf:bind ref="instance('control-instance')/size" type="xs:integer"/>
 
             <!-- Perform the submission upon initialization -->
-            <xforms:send ev:event="xforms-model-construct-done" submission="flickr-submission"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            <xf:send ev:event="xforms-model-construct-done" submission="flickr-submission"/>
+        </xf:model>
+        <xh:style type="text/css">
 
             #wsrp_rewrite_flickr-main-body, #flickr-main-body {
                 background-color : #eee;
@@ -87,52 +87,52 @@
 
             .xforms-repeat-selected-item-1 { background: none; }
 
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group id="flickr-main-body">
-            <xhtml:p style="background: white; padding: 0.5em">
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:group id="flickr-main-body">
+            <xh:p style="background: white; padding: 0.5em">
                 Enter one or more Flickr tags below (for example "mountains") and press "enter" or
                 the "Find" button. You can then use the slider to resize the images returned.
-            </xhtml:p>
-            <xhtml:table class="flicker-slider-table">
-                <xhtml:tr>
-                    <xhtml:th>
+            </xh:p>
+            <xh:table class="flicker-slider-table">
+                <xh:tr>
+                    <xh:th>
                         Flickr tags:
-                    </xhtml:th>
-                    <xhtml:td colspan="2">
-                        <xforms:input ref="tags">
-                            <xforms:label>Tags:</xforms:label>
-                            <xforms:send ev:event="DOMActivate" submission="flickr-submission"/>
-                        </xforms:input>
-                        <xforms:submit submission="flickr-submission">
-                            <xforms:label>Find</xforms:label>
-                        </xforms:submit>
-                    </xhtml:td>
-                </xhtml:tr>
-                <xhtml:tr>
-                    <xhtml:th>
+                    </xh:th>
+                    <xh:td colspan="2">
+                        <xf:input ref="tags">
+                            <xf:label>Tags:</xf:label>
+                            <xf:send ev:event="DOMActivate" submission="flickr-submission"/>
+                        </xf:input>
+                        <xf:submit submission="flickr-submission">
+                            <xf:label>Find</xf:label>
+                        </xf:submit>
+                    </xh:td>
+                </xh:tr>
+                <xh:tr>
+                    <xh:th>
                         Image size:
-                    </xhtml:th>
-                    <xhtml:td>
-                        <xforms:range ref="instance('control-instance')/size" incremental="true" start="10" end="200" id="image-size">
-                            <xforms:label>Size:</xforms:label>
-                        </xforms:range>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="instance('control-instance')/size"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xhtml:table>
-            <xforms:switch>
-                <xforms:case id="case-start"/>
-                <xforms:case id="case-busy">
-                    <xhtml:img src="/images/loading.gif" alt="Busy"/>
-                </xforms:case>
-                <xforms:case id="case-done" selected="true">
-                    <xforms:group ref="instance('response-instance')">
-                        <xforms:repeat ref="photos/photo">
-                            <xforms:output
+                    </xh:th>
+                    <xh:td>
+                        <xf:range ref="instance('control-instance')/size" incremental="true" start="10" end="200" id="image-size">
+                            <xf:label>Size:</xf:label>
+                        </xf:range>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="instance('control-instance')/size"/>
+                    </xh:td>
+                </xh:tr>
+            </xh:table>
+            <xf:switch>
+                <xf:case id="case-start"/>
+                <xf:case id="case-busy">
+                    <xh:img src="/images/loading.gif" alt="Busy"/>
+                </xf:case>
+                <xf:case id="case-done" selected="true">
+                    <xf:group ref="instance('response-instance')">
+                        <xf:repeat ref="photos/photo">
+                            <xf:output
                                 value="concat(
                                         '&lt;img',
                                           ' src=&#34;http://static.flickr.com/',
@@ -150,16 +150,16 @@
                                        )"
                                     mediatype="text/html"
                                     class="flickr-image"/>
-                        </xforms:repeat>
-                    </xforms:group>
-                </xforms:case>
-            </xforms:switch>
-            <xforms:output ref="instance('response-instance')/err/@msg">
-                <xforms:label>Error:</xforms:label>
-            </xforms:output>
-            <xhtml:p style="font-size: smaller">
+                        </xf:repeat>
+                    </xf:group>
+                </xf:case>
+            </xf:switch>
+            <xf:output ref="instance('response-instance')/err/@msg">
+                <xf:label>Error:</xf:label>
+            </xf:output>
+            <xh:p style="font-size: smaller">
                 This XForms example is based on a tutorial by Mark Birbeck.
-            </xhtml:p>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+            </xh:p>
+        </xf:group>
+    </xh:body>
+</xh:html>

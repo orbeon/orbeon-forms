@@ -11,49 +11,49 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-    <xhtml:head>
-        <xhtml:title>Enter PIN</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    <xh:head>
+        <xh:title>Enter PIN</xh:title>
+        <xf:model>
+            <xf:instance>
                 <form>
                     <pin/>
                     <action/>
                 </form>
-            </xforms:instance>
-            <xforms:bind ref="pin" constraint="number(.) = 42"/>
-            <xforms:submission id="main-submission" method="post" action="."/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="pin" constraint="number(.) = 42"/>
+            <xf:submission id="main-submission" method="post" action="."/>
+        </xf:model>
+        <xh:style type="text/css">
             img.site-navigation { display: block; border: 1px solid #336; margin-top: 1em; padding: 1em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:p>
             This example emulates a very simple ATM machine and shows how to declare the site navigation logic in
             the Page Flow Controller configuration. The site navigation logic is this way kept separate from the
             pages themselves, thus achieving a better separation of concerns.
-        </xhtml:p>
-        <xhtml:p>
+        </xh:p>
+        <xh:p>
             The diagram on the right exposes the logic of the ATM. Each page in this application is very simple
             and the interesting part lies in the navigation logic between pages.
-        </xhtml:p>
-        <xforms:group>
-            <xforms:secret ref="pin">
-                <xforms:alert>Invalid PIN</xforms:alert>
-                <xforms:hint>The PIN is: 42</xforms:hint>
-            </xforms:secret>
-            <xforms:trigger>
-                <xforms:label>Access Account</xforms:label>
-            </xforms:trigger>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:setvalue ref="action">submit</xforms:setvalue>
-                <xforms:send submission="main-submission"/>
-            </xforms:action>
-        </xforms:group>
-        <xhtml:img class="site-navigation" src="/apps/pfc-atm/images/site-navigation.png" alt="Navigation logic in the ATM application"/>
-    </xhtml:body>
-</xhtml:html>
+        </xh:p>
+        <xf:group>
+            <xf:secret ref="pin">
+                <xf:alert>Invalid PIN</xf:alert>
+                <xf:hint>The PIN is: 42</xf:hint>
+            </xf:secret>
+            <xf:trigger>
+                <xf:label>Access Account</xf:label>
+            </xf:trigger>
+            <xf:action ev:event="DOMActivate">
+                <xf:setvalue ref="action">submit</xf:setvalue>
+                <xf:send submission="main-submission"/>
+            </xf:action>
+        </xf:group>
+        <xh:img class="site-navigation" src="/apps/pfc-atm/images/site-navigation.png" alt="Navigation logic in the ATM application"/>
+    </xh:body>
+</xh:html>

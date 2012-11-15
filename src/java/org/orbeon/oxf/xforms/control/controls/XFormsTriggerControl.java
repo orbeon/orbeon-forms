@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
- * Represents an xforms:trigger control.
+ * Represents an xf:trigger control.
  *
  * TODO: Use inheritance/interface to make this a single-node control that doesn't hold a value.
  */

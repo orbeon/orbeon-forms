@@ -11,34 +11,34 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Submission to protected resource</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Submission to protected resource</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <error/>
-            </xforms:instance>
-            <xforms:submission method="get" action="http://www.scdi.org/~avernet/try/protected/success.xml"
+            </xf:instance>
+            <xf:submission method="get" action="http://www.scdi.org/~avernet/try/protected/success.xml"
                     id="protected-submission" replace="instance"
-                    xxforms:username="ops" xxforms:password="ops">
-                <xforms:setvalue ref="/error" ev:event="xforms-submit-error">Submission failed.</xforms:setvalue>
-            </xforms:submission>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Run doomed submission</xforms:label>
-            <xforms:send submission="protected-submission" ev:event="DOMActivate"/>
-        </xforms:trigger>
-        <xhtml:p>
-            <xforms:output ref="/*"/>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+                    xxf:username="ops" xxf:password="ops">
+                <xf:setvalue ref="/error" ev:event="xforms-submit-error">Submission failed.</xf:setvalue>
+            </xf:submission>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:trigger>
+            <xf:label>Run doomed submission</xf:label>
+            <xf:send submission="protected-submission" ev:event="DOMActivate"/>
+        </xf:trigger>
+        <xh:p>
+            <xf:output ref="/*"/>
+        </xh:p>
+    </xh:body>
+</xh:html>

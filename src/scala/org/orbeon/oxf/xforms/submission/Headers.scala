@@ -23,9 +23,9 @@ import scala.collection.mutable
 
 object Headers {
     /**
-     * Evaluate children <xforms:header> elements.
+     * Evaluate children <xf:header> elements.
      *
-     * @param contextStack      context stack set to enclosing <xforms:*> element
+     * @param contextStack      context stack set to enclosing <xf:*> element
      * @param sourceEffectiveId effective id of the enclosing element
      * @param enclosingElement  enclosing element
      * @return map of headers or null if no header elements

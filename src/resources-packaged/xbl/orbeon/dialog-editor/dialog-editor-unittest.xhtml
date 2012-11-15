@@ -1,7 +1,7 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -11,11 +11,11 @@
     xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:howto="http://www.orbeon.com/howto">
 
-    <xhtml:head>
-        <xhtml:title>Dialog editor component</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Dialog editor component</xh:title>
+        <xf:model>
 
-            <xforms:instance>
+            <xf:instance>
                 <instance>
                     <line>
                         <text readonly="false" relevant="false">
@@ -49,16 +49,16 @@
                         </text>
                     </line>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="line/text" readonly="@readonly = 'true'" relevant="@relevant = 'true'"/>
+            <xf:bind ref="line/text" readonly="@readonly = 'true'" relevant="@relevant = 'true'"/>
 
-            <xforms:action ev:event="xforms-model-construct-done" iterate="text">
-                <xforms:setvalue ref="." value="normalize-space(.)"/>
-            </xforms:action>
-        </xforms:model>
+            <xf:action ev:event="xforms-model-construct-done" iterate="text">
+                <xf:setvalue ref="." value="normalize-space(.)"/>
+            </xf:action>
+        </xf:model>
 
-        <xhtml:style type="text/css">
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent  }
             .add { margin-top: 1em }
             .line { margin-bottom: 1em }
@@ -82,41 +82,41 @@
                 *padding-left: 9999px;
             }
 
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:repeat ref="line" id="line-repeat">
-            <xhtml:div class="line">
-                <xforms:textarea ref="text" id="excerpt">
-                    <xforms:label>Excerpt</xforms:label>
-                </xforms:textarea>
+        <xf:repeat ref="line" id="line-repeat">
+            <xh:div class="line">
+                <xf:textarea ref="text" id="excerpt">
+                    <xf:label>Excerpt</xf:label>
+                </xf:textarea>
                 <fr:dialog-editor ref="text" id="my-dialog-editor">
-                    <xforms:label>Excerpt</xforms:label>
+                    <xf:label>Excerpt</xf:label>
                 </fr:dialog-editor>
                 <fr:spell-checker ref="text" id="my-spell-checker"/>
                 <fr:button id="toggle-readonly">
-                    <xforms:label>Toggle readonly</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="text/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
+                    <xf:label>Toggle readonly</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref="text/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
                 </fr:button>
                 <fr:button id="toggle-relevant">
-                    <xforms:label>Toggle relevant</xforms:label>
-                    <xforms:setvalue ev:event="DOMActivate" ref="text/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
+                    <xf:label>Toggle relevant</xf:label>
+                    <xf:setvalue ev:event="DOMActivate" ref="text/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
                 </fr:button>
-            </xhtml:div>
-        </xforms:repeat>
+            </xh:div>
+        </xf:repeat>
 
-        <xhtml:div class="add">
+        <xh:div class="add">
             <fr:button id="add">
-                <xforms:label>Add</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert ref="line" origin="xxforms:element('line',
-                        xxforms:element('text', (
-                            xxforms:attribute('readonly', 'false'),
-                            xxforms:attribute('relevant', 'true')
+                <xf:label>Add</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert ref="line" origin="xxf:element('line',
+                        xxf:element('text', (
+                            xxf:attribute('readonly', 'false'),
+                            xxf:attribute('relevant', 'true')
                         )))"/>
-                </xforms:action>
+                </xf:action>
             </fr:button>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        </xh:div>
+    </xh:body>
+</xh:html>

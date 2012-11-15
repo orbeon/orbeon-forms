@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Date Control</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Date Control</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <node>
                         <date>2002-08-02</date>
@@ -37,63 +37,63 @@
                         <relevant>true</relevant>
                     </node>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance/node/date[../is-date-type = 'true']" type="xs:date"/>
-            <xforms:bind ref="/instance/node/date" readonly="../readonly = 'true'" relevant="../relevant = 'true'"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Type</xhtml:th>
-                <xhtml:th>Read only</xhtml:th>
-                <xhtml:th>Relevant</xhtml:th>
-                <xhtml:th>&lt;xforms:input></xhtml:th>
-                <xhtml:th>&lt;xforms:output></xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="node" id="nodes">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output value="if (is-date-type = 'true') then 'Date ' else 'No type '"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>[change]</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
+            </xf:instance>
+            <xf:bind ref="/instance/node/date[../is-date-type = 'true']" type="xs:date"/>
+            <xf:bind ref="/instance/node/date" readonly="../readonly = 'true'" relevant="../relevant = 'true'"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Type</xh:th>
+                <xh:th>Read only</xh:th>
+                <xh:th>Relevant</xh:th>
+                <xh:th>&lt;xf:input></xh:th>
+                <xh:th>&lt;xf:output></xh:th>
+            </xh:tr>
+            <xf:repeat ref="node" id="nodes">
+                <xh:tr>
+                    <xh:td>
+                        <xf:output value="if (is-date-type = 'true') then 'Date ' else 'No type '"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>[change]</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
                                 <!-- We need to do a rebuild as the XPath expressions in the bind ref are only reevaluated upon
                                      insert, delete, instance replacement, but not when a value is set. -->
-                                <xforms:rebuild/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="readonly"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>[change]</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="relevant"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>[change]</xforms:label>
-                            <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="date" id="input-control">
-                            <xforms:hint>Hint</xforms:hint>
-                        </xforms:input>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="date" id="output-control"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-            <xhtml:tr/>
-        </xhtml:table>
-        <xforms:trigger>
-            <xforms:label>Add line</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+                                <xf:rebuild/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="readonly"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>[change]</xf:label>
+                            <xf:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="relevant"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label>[change]</xf:label>
+                            <xf:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="date" id="input-control">
+                            <xf:hint>Hint</xf:hint>
+                        </xf:input>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="date" id="output-control"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+            <xh:tr/>
+        </xh:table>
+        <xf:trigger>
+            <xf:label>Add line</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

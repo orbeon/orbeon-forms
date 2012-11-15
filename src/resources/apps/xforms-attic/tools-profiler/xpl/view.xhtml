@@ -1,53 +1,53 @@
-<xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xsl:version="2.0">
-    <xhtml:head>
-        <xhtml:title>XPL Profiling</xhtml:title>
-        <xhtml:style type="text/css">
+    <xh:head>
+        <xh:title>XPL Profiling</xh:title>
+        <xh:style type="text/css">
             td { white-space: nowrap }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:h1>XPL Profiling</xhtml:h1>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Level</xhtml:th>
-                <xhtml:th>Local</xhtml:th>
-                <xhtml:th>Cumulative</xhtml:th>
-                <xhtml:th>Line</xhtml:th>
-                <xhtml:th>System ID</xhtml:th>
-            </xhtml:tr>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:h1>XPL Profiling</xh:h1>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Level</xh:th>
+                <xh:th>Local</xh:th>
+                <xh:th>Cumulative</xh:th>
+                <xh:th>Line</xh:th>
+                <xh:th>System ID</xh:th>
+            </xh:tr>
             <xsl:for-each select="/traces/trace[not(contains(@requestURI, '/profiler/xpl/'))]">
-                <xhtml:tr>
-                    <xhtml:th colspan="5">
+                <xh:tr>
+                    <xh:th colspan="5">
                         <xsl:value-of select="@requestURI"/>
-                    </xhtml:th>
-                </xhtml:tr>
+                    </xh:th>
+                </xh:tr>
                 <xsl:for-each select="entry">
-                    <xhtml:tr>
-                        <xhtml:td>
+                    <xh:tr>
+                        <xh:td>
                             <xsl:value-of select="@level"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </xh:td>
+                        <xh:td>
                             <xsl:value-of select="@local-time"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </xh:td>
+                        <xh:td>
                             <xsl:value-of select="@cumulative-time"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </xh:td>
+                        <xh:td>
                             <xsl:value-of select="@line"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </xh:td>
+                        <xh:td>
                             <xsl:value-of select="string-join(for $i in (1 to @level) return '&#160;&#160;', '')"/>
                             <xsl:value-of select="@systemId"/>
-                        </xhtml:td>
-                    </xhtml:tr>
+                        </xh:td>
+                    </xh:tr>
                     </xsl:for-each>
             </xsl:for-each>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+        </xh:table>
+    </xh:body>
+</xh:html>

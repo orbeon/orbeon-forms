@@ -11,59 +11,59 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat xforms:select1 Full</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Repeat xf:select1 Full</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <row>
                         <select>1</select>
                         <textarea/>
                     </row>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:trigger>
-            <xforms:label>Insert</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="row"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Insert</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="row"/>
+        </xf:trigger>
 
         <ul>
             <table>
-                <xforms:repeat ref="row">
+                <xf:repeat ref="row">
                     <tr>
                         <td>
-                            <xforms:select1 ref="select" appearance="full">
-                                <xforms:item>
-                                    <xforms:label>One</xforms:label>
-                                    <xforms:value>1</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Two</xforms:label>
-                                    <xforms:value>2</xforms:value>
-                                </xforms:item>
-                                <xforms:item>
-                                    <xforms:label>Three</xforms:label>
-                                    <xforms:value>3</xforms:value>
-                                </xforms:item>
-                            </xforms:select1>
+                            <xf:select1 ref="select" appearance="full">
+                                <xf:item>
+                                    <xf:label>One</xf:label>
+                                    <xf:value>1</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Two</xf:label>
+                                    <xf:value>2</xf:value>
+                                </xf:item>
+                                <xf:item>
+                                    <xf:label>Three</xf:label>
+                                    <xf:value>3</xf:value>
+                                </xf:item>
+                            </xf:select1>
                             <br/>
-                            <xforms:textarea ref="textarea" appearance="xxforms:autosize"/>
+                            <xf:textarea ref="textarea" appearance="xxf:autosize"/>
                         </td>
                     </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </table>
         </ul>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

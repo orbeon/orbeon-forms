@@ -11,70 +11,70 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Table with radio buttons in deferred mode</xhtml:title>
-        <xforms:model xxforms:client.events.mode="deferred">
-            <xforms:instance id="countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
-            <xforms:instance id="selected">
+    <xh:head>
+        <xh:title>Table with radio buttons in deferred mode</xh:title>
+        <xf:model xxf:client.events.mode="deferred">
+            <xf:instance id="countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
+            <xf:instance id="selected">
                 <selected/>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             In this example, the client only sends events to the server when you press the <i>Send</i> button. However
-            the radio buttons still toggle properly because they are grouped with the <code>xxforms:group</code>
+            the radio buttons still toggle properly because they are grouped with the <code>xxf:group</code>
             attribute.
-        </xhtml:p>
+        </xh:p>
 
-        <xhtml:p>
+        <xh:p>
             Selected country codes:
-            <xforms:output value="instance('selected')"/>
-        </xhtml:p>
+            <xf:output value="instance('selected')"/>
+        </xh:p>
 
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th/>
-                <xhtml:th>Country</xhtml:th>
-                <xhtml:th>Code</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="instance('countries')/country[position() lt 20]">
-                <xforms:var name="country" value="."/>
-                <xhtml:tr>
-                    <xhtml:td>
-                        <!-- Note the xxforms:group attribute which allows toggling the buttons in deferred events mode -->
-                        <xforms:select1 id="country-code" appearance="full" ref="instance('selected')" xxforms:group="country-code-group">
-                            <xforms:item>
-                                <xforms:label/>
-                                <xforms:value value="$country/us-code"/>
-                            </xforms:item>
-                        </xforms:select1>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="name"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="us-code"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th/>
+                <xh:th>Country</xh:th>
+                <xh:th>Code</xh:th>
+            </xh:tr>
+            <xf:repeat ref="instance('countries')/country[position() lt 20]">
+                <xf:var name="country" value="."/>
+                <xh:tr>
+                    <xh:td>
+                        <!-- Note the xxf:group attribute which allows toggling the buttons in deferred events mode -->
+                        <xf:select1 id="country-code" appearance="full" ref="instance('selected')" xxf:group="country-code-group">
+                            <xf:item>
+                                <xf:label/>
+                                <xf:value value="$country/us-code"/>
+                            </xf:item>
+                        </xf:select1>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="name"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="us-code"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
 
-        <xforms:trigger>
-            <xforms:label>Send</xforms:label>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Send</xf:label>
+        </xf:trigger>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

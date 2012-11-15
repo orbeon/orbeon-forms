@@ -20,9 +20,9 @@ import org.orbeon.oxf.xforms.control.XFormsNoSingleNodeContainerControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
- * Represents an xforms:case pseudo-control.
+ * Represents an xf:case pseudo-control.
  *
- * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xforms:switch holds this information.
+ * NOTE: This doesn't keep the "currently selected flag". Instead, the parent xf:switch holds this information.
  */
 public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl {
 
@@ -67,7 +67,7 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl {
     public void toggle() {
         // There are dependencies on toggled cases for:
         //
-        // - xxforms:case()
+        // - xxf:case()
         // - case content relevance when XForms 1.1-behavior is enabled
         //
         // Ideally, XPath dependencies should make this smarter.

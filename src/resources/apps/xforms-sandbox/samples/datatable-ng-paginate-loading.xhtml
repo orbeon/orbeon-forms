@@ -11,33 +11,33 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom">
 
     <head>
         <title>Using YUI's datatable</title>
-        <xforms:model id="model" xxforms:external-events="load-initial-data">
-            <xforms:instance id="instance">
+        <xf:model id="model" xxf:external-events="load-initial-data">
+            <xf:instance id="instance">
                 <placeholder/>
-            </xforms:instance>
-            <xforms:instance id="loading">
+            </xf:instance>
+            <xf:instance id="loading">
                 <loading>true</loading>
-            </xforms:instance>
-            <xforms:bind ref="instance('instance')/atom:entry/atom:published"
-                type="xforms:dateTime"/>
-            <xxforms:script ev:event="xforms-model-construct-done">
-                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxforms:script>
-            <xforms:submission id="twit" method="get"
+            </xf:instance>
+            <xf:bind ref="instance('instance')/atom:entry/atom:published"
+                type="xf:dateTime"/>
+            <xxf:script ev:event="xforms-model-construct-done">
+                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxf:script>
+            <xf:submission id="twit" method="get"
                 action="http://search.twitter.com/search.atom?q=xforms&amp;rpp=43"
                 replace="instance"/>
-            <xforms:action ev:event="load-initial-data">
-                <xforms:send submission="twit"/>
-                <xforms:setvalue ref="instance('loading')">false</xforms:setvalue>
-            </xforms:action>
-        </xforms:model>
+            <xf:action ev:event="load-initial-data">
+                <xf:send submission="twit"/>
+                <xf:setvalue ref="instance('loading')">false</xf:setvalue>
+            </xf:action>
+        </xf:model>
     </head>
     <body>
 
@@ -47,7 +47,7 @@
             widget.</p>
 
         <fr:datatable paginated="true" rowsPerPage="5" width="800px"
-            loading="xxforms:instance('loading') = 'true'">
+            loading="xxf:instance('loading') = 'true'">
             <thead>
                 <tr>
                     <th fr:sortable="true" fr:resizeable="true">Date</th>
@@ -58,17 +58,17 @@
             <tbody>
                 <tr repeat-ref="/atom:feed/atom:entry">
                     <td>
-                        <xforms:output ref="atom:published"
-                            xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                        <xf:output ref="atom:published"
+                            xxf:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
                         />
                     </td>
                     <td>
                         <a href="{atom:author/atom:uri}">
-                            <xforms:output value="atom:author/atom:name"/>
+                            <xf:output value="atom:author/atom:name"/>
                         </a>
                     </td>
                     <td>
-                        <xforms:output value="atom:title"/>
+                        <xf:output value="atom:title"/>
                     </td>
                 </tr>
             </tbody>

@@ -11,9 +11,9 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,30 +21,30 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <values>
                     <value/><value/>
                 </values>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
         <xbl:xbl>
             <xbl:binding id="foobar-component" element="fr|foobar">
                 <xbl:template>
-                    <xforms:repeat ref="value" id="clash">
-                        <xhtml:div>
-                            <xforms:output value="xxforms:index()"/>
-                        </xhtml:div>
-                    </xforms:repeat>
+                    <xf:repeat ref="value" id="clash">
+                        <xh:div>
+                            <xf:output value="xxf:index()"/>
+                        </xh:div>
+                    </xf:repeat>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:trigger id="clash">
-            <xforms:label>NOP</xforms:label>
-        </xforms:trigger>
+    </xh:head>
+    <xh:body>
+        <xf:trigger id="clash">
+            <xf:label>NOP</xf:label>
+        </xf:trigger>
         <fr:foobar id="my-foobar" ref="."/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

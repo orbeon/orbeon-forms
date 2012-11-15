@@ -49,14 +49,14 @@ public class CacheableSubmission extends BaseSubmission {
     public boolean isMatch(XFormsModelSubmission.SubmissionParameters p,
                            XFormsModelSubmission.SecondPassParameters p2, XFormsModelSubmission.SerializationParameters sp) {
 
-        // Match if the submission has replace="instance" and xxforms:cache="true"
+        // Match if the submission has replace="instance" and xxf:cache="true"
         return p.isReplaceInstance && p2.isCache;
     }
 
     public SubmissionResult connect(final XFormsModelSubmission.SubmissionParameters p,
                                     final XFormsModelSubmission.SecondPassParameters p2, final XFormsModelSubmission.SerializationParameters sp) throws Exception {
         // Get the instance from shared instance cache
-        // This can only happen is method="get" and replace="instance" and xxforms:cache="true"
+        // This can only happen is method="get" and replace="instance" and xxf:cache="true"
 
         // Convert URL to string
         final String absoluteResolvedURLString = getAbsoluteSubmissionURL(p2.actionOrResource, sp.queryString, submission.isURLNorewrite());

@@ -11,16 +11,16 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:exforms="http://www.exforms.org/exf/1-0"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -33,78 +33,78 @@
         </xbl:resources>
         <xxbl:global>
             <!-- Dialog to edit the value -->
-            <xxforms:dialog id="fr-dialog-editor-dialog" class="fr-dialog-editor-dialog" close="false" model="fr-dialog-editor-model">
-                <xforms:label ref="label"/>
-                <xforms:model id="fr-dialog-editor-model">
-                    <xforms:instance id="fr-dialog-editor-instance">
+            <xxf:dialog id="fr-dialog-editor-dialog" class="fr-dialog-editor-dialog" close="false" model="fr-dialog-editor-model">
+                <xf:label ref="label"/>
+                <xf:model id="fr-dialog-editor-model">
+                    <xf:instance id="fr-dialog-editor-instance">
                         <instance>
                             <readonly/>
                             <label/>
                             <text/>
                             <callback-id/>
                         </instance>
-                    </xforms:instance>
-                    <xforms:bind ref="text" readonly="../readonly = 'true'"/>
-                </xforms:model>
+                    </xf:instance>
+                    <xf:bind ref="text" readonly="../readonly = 'true'"/>
+                </xf:model>
                 <!-- The button telling to show the dialog -->
-                <xforms:action ev:event="fr-edit">
-                    <xforms:setvalue ref="readonly" value="event('fr-readonly')"/>
-                    <xforms:setvalue ref="label" value="event('fr-label')"/>
-                    <xforms:setvalue ref="text" value="event('fr-text')"/>
-                    <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
-                    <xxforms:show dialog="fr-dialog-editor-dialog"/>
-                    <xforms:setfocus control="fr-dialog-editor-textarea"/>
-                </xforms:action>
-                <xforms:textarea ref="text" id="fr-dialog-editor-textarea"/>
-                <xhtml:div class="fr-dialog-editor-buttons">
-                    <xforms:group appearance="xxforms:internal" id="fr-dialog-editor-readwrite">
-                        <xxforms:hide ev:event="DOMActivate" dialog="fr-dialog-editor-dialog"/>
+                <xf:action ev:event="fr-edit">
+                    <xf:setvalue ref="readonly" value="event('fr-readonly')"/>
+                    <xf:setvalue ref="label" value="event('fr-label')"/>
+                    <xf:setvalue ref="text" value="event('fr-text')"/>
+                    <xf:setvalue ref="callback-id" value="event('fr-callback-id')"/>
+                    <xxf:show dialog="fr-dialog-editor-dialog"/>
+                    <xf:setfocus control="fr-dialog-editor-textarea"/>
+                </xf:action>
+                <xf:textarea ref="text" id="fr-dialog-editor-textarea"/>
+                <xh:div class="fr-dialog-editor-buttons">
+                    <xf:group appearance="xxf:internal" id="fr-dialog-editor-readwrite">
+                        <xxf:hide ev:event="DOMActivate" dialog="fr-dialog-editor-dialog"/>
                         <!-- Read-write: OK / Cancel buttons -->
-                        <xforms:group ref=".[readonly = 'false']">
+                        <xf:group ref=".[readonly = 'false']">
                             <fr:button class="fr-dialog-editor-positive" id="fr-dialog-editor-positive">
-                                <xforms:label>OK</xforms:label>
-                                <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
-                                    <xforms:property name="fr-text" value="text"/>
-                                </xforms:dispatch>
+                                <xf:label>OK</xf:label>
+                                <xf:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
+                                    <xf:property name="fr-text" value="text"/>
+                                </xf:dispatch>
                             </fr:button>
                             <fr:button class="fr-dialog-editor-negative" id="fr-dialog-editor-negative">
-                                <xforms:label>Cancel</xforms:label>
+                                <xf:label>Cancel</xf:label>
                             </fr:button>
-                        </xforms:group>
+                        </xf:group>
                         <!-- Readonly: just Cancel button -->
-                        <xforms:group ref=".[readonly = 'true']" id="fr-dialog-editor-readonly">
+                        <xf:group ref=".[readonly = 'true']" id="fr-dialog-editor-readonly">
                             <fr:button class="fr-dialog-editor-close" id="fr-dialog-editor-close">
-                                <xforms:label>Close</xforms:label>
+                                <xf:label>Close</xf:label>
                             </fr:button>
-                        </xforms:group>
-                    </xforms:group>
-                </xhtml:div>
-            </xxforms:dialog>
+                        </xf:group>
+                    </xf:group>
+                </xh:div>
+            </xxf:dialog>
         </xxbl:global>
         <xbl:template>
-            <xforms:group appearance="xxforms:internal" id="container">
-                <xforms:var name="binding" as="node()?"><xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xforms:var>
-                <!-- For access to label with xxforms:label() -->
-                <xforms:group appearance="xxforms:internal" ref="$binding" id="group-with-label">
-                    <xbl:content includes=":root > xforms|label"/>
-                </xforms:group>
-                <xforms:var name="readonly" value="exforms:readonly($binding)"/>
-                <xforms:group ref="$binding" id="group-external">
+            <xf:group appearance="xxf:internal" id="container">
+                <xf:var name="binding" as="node()?"><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref bind"/></xf:var>
+                <!-- For access to label with xxf:label() -->
+                <xf:group appearance="xxf:internal" ref="$binding" id="group-with-label">
+                    <xbl:content includes=":root > xf|label"/>
+                </xf:group>
+                <xf:var name="readonly" value="exf:readonly($binding)"/>
+                <xf:group ref="$binding" id="group-external">
                     <!-- Button to open dialog -->
-                    <xforms:group appearance="xxforms:internal">
-                        <xforms:dispatch ev:event="DOMActivate" targetid="fr-dialog-editor-dialog" name="fr-edit" xxbl:scope="outer">
-                            <xforms:property name="fr-readonly" value="$readonly" xxbl:scope="inner"/>
-                            <xforms:property name="fr-label" value="xxforms:label('group-with-label')" xxbl:scope="inner"/>
-                            <xforms:property name="fr-text" value="$binding" xxbl:scope="inner"/>
-                            <xforms:property name="fr-callback-id" value="event('xxforms:absolute-targetid')"/>
-                        </xforms:dispatch>
-                        <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
+                    <xf:group appearance="xxf:internal">
+                        <xf:dispatch ev:event="DOMActivate" targetid="fr-dialog-editor-dialog" name="fr-edit" xxbl:scope="outer">
+                            <xf:property name="fr-readonly" value="$readonly" xxbl:scope="inner"/>
+                            <xf:property name="fr-label" value="xxf:label('group-with-label')" xxbl:scope="inner"/>
+                            <xf:property name="fr-text" value="$binding" xxbl:scope="inner"/>
+                            <xf:property name="fr-callback-id" value="event('xxf:absolute-targetid')"/>
+                        </xf:dispatch>
+                        <xf:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
                         <fr:button id="open" class="fr-dialog-editor-open-{if ($readonly) then 'view' else 'edit'}">
-                            <xforms:label value="if ($readonly) then 'View' else 'Edit'"/>
+                            <xf:label value="if ($readonly) then 'View' else 'Edit'"/>
                         </fr:button>
-                    </xforms:group>
-                </xforms:group>
-            </xforms:group>
+                    </xf:group>
+                </xf:group>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

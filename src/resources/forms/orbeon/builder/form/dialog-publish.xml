@@ -232,7 +232,7 @@
                 id="fr-publish-form-submission"
                 ref="instance('fb-form-to-publish-instance')"
                 method="put"
-                resource="/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml?document={xxforms:instance('fr-parameters-instance')/document}"
+                resource="/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml?document={xxf:instance('fr-parameters-instance')/document}"
                 replace="text"
                 targetref="instance('fb-publish-instance')/response">
 
@@ -240,7 +240,7 @@
             <xf:insert
                 ev:event="xforms-submit-done xforms-submit-error"
                 ref="instance('fb-form-to-publish-instance')"
-                origin="xforms:element('dummy')"/>
+                origin="xf:element('dummy')"/>
 
             <!-- Respond to successful publish submission -->
             <xf:action ev:event="xforms-submit-done">

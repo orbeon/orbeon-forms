@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:foo="http://orbeon.org/oxf/xml/foo"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -23,49 +23,49 @@
 
         lang="{'en'}">
 
-    <xhtml:head>
-        <xhtml:title><xforms:output id="output-in-title" value="'My Title'"/></xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title><xf:output id="output-in-title" value="'My Title'"/></xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance id="instance-root">
                     <value id="instance-value"/>
                 </instance>
-            </xforms:instance>
-            <xforms:setvalue ev:event="xforms-model-construct-done" ref="value1" value="current-dateTime()"/>
+            </xf:instance>
+            <xf:setvalue ev:event="xforms-model-construct-done" ref="value1" value="current-dateTime()"/>
             <xs:schema>
                 <xs:element name="form" id="schema-element">
                 </xs:element>
             </xs:schema>
-        </xforms:model>
+        </xf:model>
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="dateTime-component" element="foo|dateTime">
                 <xbl:template>
-                    <xforms:instance id="instance-in-xbl">
+                    <xf:instance id="instance-in-xbl">
                         <instance id="xbl-instance-root">
                             <value id="xbl-instance-value"/>
                         </instance>
-                    </xforms:instance>
+                    </xf:instance>
 
                     <div id="div-in-xbl"/>
 
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
         <foo:dateTime id="dateTime1-control" ref="value1"/>
         <foo:dateTime ref="value2"/>
 
-        <xforms:input id="value1-control" ref="value1"/>
-        <xforms:input ref="value2">
-            <xforms:label>
-                <xforms:output id="output-in-label" value="'My Label'"/>
-                <xhtml:img id="img-in-label" src="{'avt-image.png'}"/>
-            </xforms:label>
-        </xforms:input>
+        <xf:input id="value1-control" ref="value1"/>
+        <xf:input ref="value2">
+            <xf:label>
+                <xf:output id="output-in-label" value="'My Label'"/>
+                <xh:img id="img-in-label" src="{'avt-image.png'}"/>
+            </xf:label>
+        </xf:input>
 
-        <xhtml:span id="span" style="{'background-color: red'}"/>
+        <xh:span id="span" style="{'background-color: red'}"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

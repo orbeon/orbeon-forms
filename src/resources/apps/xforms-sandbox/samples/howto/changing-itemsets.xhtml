@@ -1,7 +1,7 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -11,88 +11,88 @@
     xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:howto="http://www.orbeon.com/howto">
 
-    <xhtml:head>
-        <xhtml:title>Out of bound</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Out of bound</xh:title>
+        <xf:model>
 
             <!-- Instance with state selected by user -->
-            <xforms:instance>
+            <xf:instance>
                 <instance>
                     <initial-state label="" valid=""/>
                     <removed-edit-state label="California" valid="">ca</removed-edit-state>
                     <removed-view-state label="California" valid="">ca</removed-view-state>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Selected state is only valid if it is in the itemset -->
-            <xforms:bind ref="*" constraint="@valid = 'true' and . != 'nv'"/>
-            <xforms:bind ref="removed-view-state" readonly="true()"/>
+            <xf:bind ref="*" constraint="@valid = 'true' and . != 'nv'"/>
+            <xf:bind ref="removed-view-state" readonly="true()"/>
 
             <!-- List of possible states -->
-            <xforms:instance id="states">
+            <xf:instance id="states">
                 <states>
                     <state value="ma">Maryland</state>
                     <state value="ca">California</state>
                     <state value="co">Colorado</state>
                     <state value="nv">Nevada</state>
                 </states>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
 
         <xbl:xbl>
             <xbl:binding id="howto-changing-itemset-select1" element="howto|changing-itemset-select1">
                 <xbl:implementation>
-                    <xforms:model>
-                        <xforms:instance>
+                    <xf:model>
+                        <xf:instance>
                             <alert user-alert=""/>
-                        </xforms:instance>
-                    </xforms:model>
+                        </xf:instance>
+                    </xf:model>
                 </xbl:implementation>
                 <xbl:template>
-                    <xforms:group appearance="xxforms:internal" id="container">
+                    <xf:group appearance="xxf:internal" id="container">
                         <!-- Pointers to nodes in the outside world -->
-                        <xforms:var name="value"><xxforms:sequence xbl:attr="value=value-ref" xxbl:scope="outer"/></xforms:var>
-                        <xforms:var name="label"><xxforms:sequence xbl:attr="value=label-ref" xxbl:scope="outer"/></xforms:var>
-                        <xforms:var name="valid"><xxforms:sequence xbl:attr="value=valid-ref" xxbl:scope="outer"/></xforms:var>
-                        <xforms:var name="alert" value="."/>
-                        <xforms:var name="is-readonly" value="exf:readonly($value)"/>
+                        <xf:var name="value"><xxf:sequence xbl:attr="value=value-ref" xxbl:scope="outer"/></xf:var>
+                        <xf:var name="label"><xxf:sequence xbl:attr="value=label-ref" xxbl:scope="outer"/></xf:var>
+                        <xf:var name="valid"><xxf:sequence xbl:attr="value=valid-ref" xxbl:scope="outer"/></xf:var>
+                        <xf:var name="alert" value="."/>
+                        <xf:var name="is-readonly" value="exf:readonly($value)"/>
                         <!-- Expose a "value" for the itemset, so we can have an event when it changes -->
-                        <xforms:group ref="xxforms:itemset('select1', 'json')" id="itemset" appearance="xxforms:internal"/>
-                        <xforms:group ref="$value[$alert/@user-alert = '']" appearance="xxforms:internal">
-                            <xbl:content includes="xforms|alert"/>
-                            <xforms:setvalue ev:event="xforms-enabled" ref="$alert/@user-alert" value="event('xxforms:alert')"/>
-                        </xforms:group>
+                        <xf:group ref="xxf:itemset('select1', 'json')" id="itemset" appearance="xxf:internal"/>
+                        <xf:group ref="$value[$alert/@user-alert = '']" appearance="xxf:internal">
+                            <xbl:content includes="xf|alert"/>
+                            <xf:setvalue ev:event="xforms-enabled" ref="$alert/@user-alert" value="event('xxf:alert')"/>
+                        </xf:group>
                         <!-- Update valid and alert when the value or the itemset changes  -->
-                        <xforms:var name="is-out-of-bound" value="not($value = xxforms:itemset('select1', 'xml')//item/value)"/>
-                        <xforms:var name="new-alert" value="if ($is-out-of-bound) then
+                        <xf:var name="is-out-of-bound" value="not($value = xxf:itemset('select1', 'xml')//item/value)"/>
+                        <xf:var name="new-alert" value="if ($is-out-of-bound) then
                             concat('A value was selected (', $label, ') and this value is not available anymore.')
                             else $alert/@user-alert"/>
-                        <xforms:action ev:event="xforms-enabled xforms-value-changed" ev:observer="select1 itemset">
-                            <xforms:var name="new-label" value="xxforms:itemset('select1', 'xml')//item[value = $value]/label"/>
-                            <xforms:setvalue if="exists($new-label)" ref="$label" value="$new-label"/>
-                            <xforms:setvalue ref="$alert" value="$new-alert"/>
-                            <xforms:setvalue ref="$valid" value="not($is-out-of-bound)"/>
-                        </xforms:action>
+                        <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="select1 itemset">
+                            <xf:var name="new-label" value="xxf:itemset('select1', 'xml')//item[value = $value]/label"/>
+                            <xf:setvalue if="exists($new-label)" ref="$label" value="$new-label"/>
+                            <xf:setvalue ref="$alert" value="$new-alert"/>
+                            <xf:setvalue ref="$valid" value="not($is-out-of-bound)"/>
+                        </xf:action>
                         <!-- If not read-only: selection control -->
-                        <xhtml:span style="{if ($is-readonly) then 'display: none' else ''}">
-                            <xforms:select1 xbl:attr="appearance" ref="$value" id="select1">
-                                <xforms:dispatch ev:event="xforms-enabled xforms-value-changed" name="itemset-or-value-changed" targetid="container"/>
-                                <xforms:alert ref="$alert"/>
-                                <xbl:content includes="xforms|item,xforms|itemset,xforms|label,xforms|help,xforms|hint"/>
-                            </xforms:select1>
-                            <xforms:output value="if ($is-out-of-bound) then $new-alert else ()"/>
-                        </xhtml:span>
+                        <xh:span style="{if ($is-readonly) then 'display: none' else ''}">
+                            <xf:select1 xbl:attr="appearance" ref="$value" id="select1">
+                                <xf:dispatch ev:event="xforms-enabled xforms-value-changed" name="itemset-or-value-changed" targetid="container"/>
+                                <xf:alert ref="$alert"/>
+                                <xbl:content includes="xf|item,xf|itemset,xf|label,xf|help,xf|hint"/>
+                            </xf:select1>
+                            <xf:output value="if ($is-out-of-bound) then $new-alert else ()"/>
+                        </xh:span>
                         <!-- If readonly: show label -->
-                        <xhtml:span style="{if (not($is-readonly)) then 'display: none' else ''}">
-                            <xforms:output value="$label"/>
-                            <xforms:group ref=".[$is-out-of-bound]">(this value is not valid anymore)</xforms:group>
-                        </xhtml:span>
-                    </xforms:group>
+                        <xh:span style="{if (not($is-readonly)) then 'display: none' else ''}">
+                            <xf:output value="$label"/>
+                            <xf:group ref=".[$is-out-of-bound]">(this value is not valid anymore)</xf:group>
+                        </xh:span>
+                    </xf:group>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
 
-        <xhtml:style type="text/css">
+        <xh:style type="text/css">
             p { margin-top: 2em }
             .previous-state { font-weight: bold }
             .xbl-fr-error-summary { margin-top: 1em; }
@@ -102,71 +102,71 @@
             .xbl-fr-error-summary .xforms-repeat-selected-item-1 { background-color: transparent }
             .xforms-alert-active { display: none }
             .xforms-invalid-visited .xforms-alert-active { display: inline-block }
-        </xhtml:style>
+        </xh:style>
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:fieldset>
-            <xhtml:legend>California is available</xhtml:legend>
-            <xforms:group ref="initial-state">
+        <xh:fieldset>
+            <xh:legend>California is available</xh:legend>
+            <xf:group ref="initial-state">
                 <howto:changing-itemset-select1 value-ref="." label-ref="@label" valid-ref="@valid" appearance="minimal" id="initial-state">
-                    <xforms:label>State: </xforms:label>
-                    <xforms:item>
-                        <xforms:label>Select...</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset ref="instance('states')/state">
-                        <xforms:value ref="@value"/>
-                        <xforms:label ref="."/>
-                    </xforms:itemset>
-                    <xforms:alert>Nevada is not a valid State</xforms:alert>
+                    <xf:label>State: </xf:label>
+                    <xf:item>
+                        <xf:label>Select...</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                    <xf:itemset ref="instance('states')/state">
+                        <xf:value ref="@value"/>
+                        <xf:label ref="."/>
+                    </xf:itemset>
+                    <xf:alert>Nevada is not a valid State</xf:alert>
                 </howto:changing-itemset-select1>
                 <fr:error-summary observer="initial-state"/>
-            </xforms:group>
-        </xhtml:fieldset>
+            </xf:group>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>California selected but not available: edit case</xhtml:legend>
-            <xforms:group ref="removed-edit-state">
+        <xh:fieldset>
+            <xh:legend>California selected but not available: edit case</xh:legend>
+            <xf:group ref="removed-edit-state">
                 <howto:changing-itemset-select1 value-ref="." label-ref="@label" valid-ref="@valid" appearance="minimal" id="removed-edit-state">
-                    <xforms:label>State: </xforms:label>
-                    <xforms:alert>Nevada is not a valid State</xforms:alert>
-                    <xforms:item>
-                        <xforms:label>Select...</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset ref="instance('states')/state[@value != 'ca']">
-                        <xforms:value ref="@value"/>
-                        <xforms:label ref="."/>
-                    </xforms:itemset>
+                    <xf:label>State: </xf:label>
+                    <xf:alert>Nevada is not a valid State</xf:alert>
+                    <xf:item>
+                        <xf:label>Select...</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                    <xf:itemset ref="instance('states')/state[@value != 'ca']">
+                        <xf:value ref="@value"/>
+                        <xf:label ref="."/>
+                    </xf:itemset>
                 </howto:changing-itemset-select1>
                 <fr:button>
-                    <xforms:label>Save</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" name="fr-visit-all" targetid="removed-edit-state-error-summary"/>
+                    <xf:label>Save</xf:label>
+                    <xf:dispatch ev:event="DOMActivate" name="fr-visit-all" targetid="removed-edit-state-error-summary"/>
                 </fr:button>
                 <fr:error-summary id="removed-edit-state-error-summary" observer="removed-edit-state"/>
-            </xforms:group>
-        </xhtml:fieldset>
+            </xf:group>
+        </xh:fieldset>
 
-        <xhtml:fieldset>
-            <xhtml:legend>California selected but not available: view case</xhtml:legend>
-            <xforms:group ref="removed-view-state">
+        <xh:fieldset>
+            <xh:legend>California selected but not available: view case</xh:legend>
+            <xf:group ref="removed-view-state">
                 <howto:changing-itemset-select1 value-ref="." label-ref="@label" valid-ref="@valid" appearance="minimal" id="removed-view-state">
-                    <xforms:label>State: </xforms:label>
-                    <xforms:alert>Nevada is not a valid State</xforms:alert>
-                    <xforms:item>
-                        <xforms:label>Select...</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset ref="instance('states')/state[@value != 'ca']">
-                        <xforms:value ref="@value"/>
-                        <xforms:label ref="."/>
-                    </xforms:itemset>
+                    <xf:label>State: </xf:label>
+                    <xf:alert>Nevada is not a valid State</xf:alert>
+                    <xf:item>
+                        <xf:label>Select...</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                    <xf:itemset ref="instance('states')/state[@value != 'ca']">
+                        <xf:value ref="@value"/>
+                        <xf:label ref="."/>
+                    </xf:itemset>
                 </howto:changing-itemset-select1>
                 <fr:error-summary id="removed-view-state-error-summary" observer="removed-view-state"/>
-            </xforms:group>
-        </xhtml:fieldset>
+            </xf:group>
+        </xh:fieldset>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

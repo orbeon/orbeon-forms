@@ -11,12 +11,12 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+<xf:model xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xforms:instance id="lorem">
+    <xf:instance id="lorem">
         <text>
             <line>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</line>
             <line>Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec,
@@ -64,13 +64,13 @@
                 ultricies lacus lorem varius purus.</line>
             <line>Curabitur eu amet.</line>
         </text>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:instance id="detailed-lorem">
+    <xf:instance id="detailed-lorem">
         <text/>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:instance id="controls">
+    <xf:instance id="controls">
         <controls>
             <maxLength>20</maxLength>
             <loading>true</loading>
@@ -80,26 +80,26 @@
             <sortedColumn>-1</sortedColumn>
             <show>true</show>
         </controls>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:insert ev:event="xforms-model-construct-done" context="instance('detailed-lorem')"
+    <xf:insert ev:event="xforms-model-construct-done" context="instance('detailed-lorem')"
         origin=" 
         for $line in instance('lorem')/line return 
-            xxforms:element( 'line', (
-                xxforms:element('position', count($line/preceding-sibling::*)), 
-                xxforms:element('text', normalize-space($line)), 
-                xxforms:element('length', string-length(normalize-space($line))),
-                xxforms:element('nb-words', string-length(normalize-space($line)) - string-length(translate(normalize-space($line), ' ', '')) + 1)
+            xxf:element( 'line', (
+                xxf:element('position', count($line/preceding-sibling::*)),
+                xxf:element('text', normalize-space($line)),
+                xxf:element('length', string-length(normalize-space($line))),
+                xxf:element('nb-words', string-length(normalize-space($line)) - string-length(translate(normalize-space($line), ' ', '')) + 1)
                 ))"/>
 
-    <xforms:bind ref="instance('detailed-lorem')/line">
-        <xforms:bind ref="position" type="xs:integer"/>
-        <xforms:bind ref="length" type="xs:integer"/>
-        <xforms:bind ref="nb-words" type="xs:integer"/>
-    </xforms:bind>
+    <xf:bind ref="instance('detailed-lorem')/line">
+        <xf:bind ref="position" type="xs:integer"/>
+        <xf:bind ref="length" type="xs:integer"/>
+        <xf:bind ref="nb-words" type="xs:integer"/>
+    </xf:bind>
 
-    <xforms:bind ref="instance('controls')/line">
-        <xforms:bind ref="maxLength" type="xs:integer"/>
-    </xforms:bind>
+    <xf:bind ref="instance('controls')/line">
+        <xf:bind ref="maxLength" type="xs:integer"/>
+    </xf:bind>
 
-</xforms:model>
+</xf:model>

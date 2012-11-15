@@ -11,32 +11,32 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Submssion Serialize</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Submssion Serialize</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance/>
-            </xforms:instance>
-            <xforms:submission id="get" method="get" serialization="none" action="http://www.google.com/"/>
-            <xforms:submission id="post" method="post" serialization="none" action="http://localhost/" replace="instance"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Go to Google</xforms:label>
-            <xforms:send submission="get" ev:event="DOMActivate"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Post to localhost</xforms:label>
-            <xforms:send submission="post" ev:event="DOMActivate"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:submission id="get" method="get" serialization="none" action="http://www.google.com/"/>
+            <xf:submission id="post" method="post" serialization="none" action="http://localhost/" replace="instance"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:trigger>
+            <xf:label>Go to Google</xf:label>
+            <xf:send submission="get" ev:event="DOMActivate"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Post to localhost</xf:label>
+            <xf:send submission="post" ev:event="DOMActivate"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

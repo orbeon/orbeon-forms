@@ -11,32 +11,32 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>XForms Hello</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>XForms Hello</xh:title>
+        <xf:model>
+            <xf:instance>
                 <first-name xmlns=""/>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xhtml:i>This example is described in details in the <xhtml:a href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial">Orbeon
-            Forms Tutorial</xhtml:a>.</xhtml:i>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="/first-name" incremental="true">
-                <xforms:label>Please enter your first name:</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xh:i>This example is described in details in the <xh:a href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial">Orbeon
+            Forms Tutorial</xh:a>.</xh:i>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="/first-name" incremental="true">
+                <xf:label>Please enter your first name:</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"/>
+        </xh:p>
+    </xh:body>
+</xh:html>

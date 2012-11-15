@@ -29,7 +29,7 @@ trait TriggerAppearanceTrait extends AppearanceTrait {
         val isModal = element.attributeValue(XXFORMS_MODAL_QNAME) == "true"
 
         // A few updates to the appearance:
-        // - In noscript mode, use xxforms:minimal instead of minimal (not 100% sure why!)
+        // - In noscript mode, use xxf:minimal instead of minimal (not 100% sure why!)
         // - When the appearance is not minimal, put a class for the full appearance, so we can style the full trigger
         //   properly without banging our head on walls due to poor CSS support in IE.
         //   We don't add xforms-trigger-appearance-full to all controls as it is usually not needed and would add more

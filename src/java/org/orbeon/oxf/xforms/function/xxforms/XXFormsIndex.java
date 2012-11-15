@@ -20,7 +20,7 @@ import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * xxforms:index() function. Behaves like the standard XForms index() function, except the repeat id is optional. When
+ * xxf:index() function. Behaves like the standard XForms index() function, except the repeat id is optional. When
  * it is not specified, the function returns the id of the closest enclosing repeat.
  */
 public class XXFormsIndex extends Index {

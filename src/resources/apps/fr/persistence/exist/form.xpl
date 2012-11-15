@@ -13,13 +13,12 @@
   -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:sql="http://orbeon.org/oxf/xml/sql"
-        xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -43,16 +42,16 @@
                 return
                     element form {
                         doc(concat('/db/orbeon/fr/', $app, '/', $form, '/form/form.xhtml'))
-                        /xhtml:html/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata/*
+                        /xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*
                     }
             </exist:text></exist:query>
         </p:input>
         <p:input name="submission">
-            <xforms:submission method="post" replace="instance"
-                               resource="{xxforms:get-request-header('orbeon-exist-uri')}">
-                <xforms:insert ev:event="xforms-submit-done" ref="/*" origin="xxforms:element('forms', *)"/>
+            <xf:submission method="post" replace="instance"
+                               resource="{xxf:get-request-header('orbeon-exist-uri')}">
+                <xf:insert ev:event="xforms-submit-done" ref="/*" origin="xxf:element('forms', *)"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
-            </xforms:submission>
+            </xf:submission>
         </p:input>
         <p:output name="response" ref="data"/>
     </p:processor>

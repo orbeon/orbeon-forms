@@ -22,7 +22,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Default xforms:output handler.
+ * Default xf:output handler.
  */
 public class XFormsOutputDefaultHandler extends XFormsOutputHandler {
 

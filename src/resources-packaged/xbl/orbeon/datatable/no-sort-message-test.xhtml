@@ -11,41 +11,41 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <xhtml:head>
-        <xhtml:title>Datatable</xhtml:title>
+    <xh:head>
+        <xh:title>Datatable</xh:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xforms:var name="basic-nodeset"
+        <xf:var name="basic-nodeset"
             select="
             for $line in line[string-length(.) &lt; 20] return 
-                xxforms:element( 'line', (
-                    xxforms:element('position', count($line/preceding-sibling::*)), 
-                    xxforms:element('text', normalize-space($line)), 
-                    xxforms:element('length', string-length(normalize-space($line)))
+                xxf:element( 'line', (
+                    xxf:element('position', count($line/preceding-sibling::*)),
+                    xxf:element('text', normalize-space($line)),
+                    xxf:element('length', string-length(normalize-space($line)))
                 ))"/>
 
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>This page should fail with a user friendly error message!</xhtml:p>
+        <xh:p>This page should fail with a user friendly error message!</xh:p>
 
        
-        <xhtml:div>
-            <xhtml:p/>
-            <xforms:group ref="instance('detailed-lorem')">
-                <xforms:var name="sortOrder" value="instance('controls')/sortOrder"/>
-                <xforms:var name="nodeset" value="line[length &lt; 20]"/>
-                <xforms:var name="class"
+        <xh:div>
+            <xh:p/>
+            <xf:group ref="instance('detailed-lorem')">
+                <xf:var name="sortOrder" value="instance('controls')/sortOrder"/>
+                <xf:var name="nodeset" value="line[length &lt; 20]"/>
+                <xf:var name="class"
                     select="if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''"/>
-                <xforms:var name="sortedNodeset"
+                <xf:var name="sortedNodeset"
                     select="
                     if ($sortOrder='none') 
                     then $nodeset
@@ -55,47 +55,47 @@
                 
                 <fr:datatable id="sortableExternal-table" debug="true"
                     sortAndPaginationMode="external">
-                    <xforms:action ev:event="fr-update-sort">
-                        <xforms:setvalue ref="instance('controls')/sortedColumn"
+                    <xf:action ev:event="fr-update-sort">
+                        <xf:setvalue ref="instance('controls')/sortedColumn"
                             value="event('fr-column')"/>
-                        <xforms:setvalue ref="$sortOrder"
+                        <xf:setvalue ref="$sortOrder"
                             value="if ($sortOrder='ascending') then 'descending' else if ($sortOrder='descending') then 'none' else 'ascending'"
                         />
-                    </xforms:action>
-                    <xhtml:thead>
-                        <xhtml:tr>
-                            <xhtml:th>Position</xhtml:th>
-                            <xforms:repeat ref="line[1]/*">
-                                <xhtml:th>
-                                    <xforms:output value="name()"/>
-                                </xhtml:th>
-                            </xforms:repeat>
-                            <xhtml:th fr:sortable="true" class="{$class}"
-                                >Characters per word</xhtml:th>
-                        </xhtml:tr>
-                    </xhtml:thead>
-                    <xhtml:tbody>
-                        <xforms:repeat ref="$sortedNodeset">
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:output value="position()"/>
-                                </xhtml:td>
-                                <xforms:repeat ref="*">
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xforms:repeat>
-                                <xhtml:td class="{$class}">
-                                    <xforms:output value="round(length div nb-words)"/>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xforms:repeat>
-                    </xhtml:tbody>
+                    </xf:action>
+                    <xh:thead>
+                        <xh:tr>
+                            <xh:th>Position</xh:th>
+                            <xf:repeat ref="line[1]/*">
+                                <xh:th>
+                                    <xf:output value="name()"/>
+                                </xh:th>
+                            </xf:repeat>
+                            <xh:th fr:sortable="true" class="{$class}"
+                                >Characters per word</xh:th>
+                        </xh:tr>
+                    </xh:thead>
+                    <xh:tbody>
+                        <xf:repeat ref="$sortedNodeset">
+                            <xh:tr>
+                                <xh:td>
+                                    <xf:output value="position()"/>
+                                </xh:td>
+                                <xf:repeat ref="*">
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xf:repeat>
+                                <xh:td class="{$class}">
+                                    <xf:output value="round(length div nb-words)"/>
+                                </xh:td>
+                            </xh:tr>
+                        </xf:repeat>
+                    </xh:tbody>
                 </fr:datatable>
-            </xforms:group>
-        </xhtml:div>
+            </xf:group>
+        </xh:div>
       
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

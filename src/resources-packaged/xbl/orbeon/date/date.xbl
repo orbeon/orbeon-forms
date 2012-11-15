@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
@@ -34,31 +34,31 @@
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xbl:content includes=":root > xforms|label"/>
+                    <xf:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xbl:content includes=":root > xf|label"/>
                         <xsl:variable name="fr-prefix" as="xs:string" select="namespace::*[. = 'http://orbeon.org/oxf/xml/form-runner']/local-name()"/>
                         <xsl:choose>
                             <!-- Inline data picker-->
                             <xsl:when test="@appearance = concat($fr-prefix, ':', 'inline')">
-                                <xhtml:div class="xbl-fr-date-calendar-div"/>
-                                <xforms:input ref="." class="xbl-fr-date-input">
-                                    <xxforms:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xxforms:script>
-                                    <xxforms:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.instance(this).valueChanged();</xxforms:script>
-                                </xforms:input>
+                                <xh:div class="xbl-fr-date-calendar-div"/>
+                                <xf:input ref="." class="xbl-fr-date-input">
+                                    <xxf:script ev:event="xforms-enabled">YAHOO.xbl.fr.Date.instance(this).init();</xxf:script>
+                                    <xxf:script ev:event="xforms-value-changed">YAHOO.xbl.fr.Date.instance(this).valueChanged();</xxf:script>
+                                </xf:input>
                             </xsl:when>
                             <!-- Standard case with text field-->
                             <xsl:otherwise>
-                                <xforms:input ref="." xbl:attr="tabindex accesskey"/>
+                                <xf:input ref="." xbl:attr="tabindex accesskey"/>
                             </xsl:otherwise>
                         </xsl:choose>
-                        <xbl:content includes=":root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+                        <xbl:content includes=":root > xf|help, :root > xf|hint, :root > xf|alert"/>
 
                         <!-- Properties -->
-                        <!-- NOTE: Put this last so that xforms:setfocus works properly on xforms:input above -->
+                        <!-- NOTE: Put this last so that xf:setfocus works properly on xf:input above -->
                         <xsl:copy-of select="xxbl:parameter(., 'mindate')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'maxdate')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'pagedate')"/>
-                    </xforms:group>
+                    </xf:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

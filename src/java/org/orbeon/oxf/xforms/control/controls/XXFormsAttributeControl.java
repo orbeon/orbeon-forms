@@ -27,7 +27,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Represents an extension xxforms:attribute control.
+ * Represents an extension xxf:attribute control.
  */
 public class XXFormsAttributeControl extends XFormsValueControl {
 
@@ -166,7 +166,7 @@ public class XXFormsAttributeControl extends XFormsValueControl {
         // Control id
         attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument(), attributeControl2.getEffectiveId()));
 
-        // The client does not store an HTML representation of the xxforms:attribute control, so we
+        // The client does not store an HTML representation of the xxf:attribute control, so we
         // have to output these attributes.
         {
             // HTML element id

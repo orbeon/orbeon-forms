@@ -82,10 +82,10 @@ public class XFormsModelBinds {
     }
 
     /**
-     * Create an instance of XFormsModelBinds if the given model has xforms:bind elements.
+     * Create an instance of XFormsModelBinds if the given model has xf:bind elements.
      *
      * @param model XFormsModel
-     * @return      XFormsModelBinds or null if the model doesn't have xforms:bind elements
+     * @return      XFormsModelBinds or null if the model doesn't have xf:bind elements
      */
     public static XFormsModelBinds create(XFormsModel model) {
         return model.getStaticModel().hasBinds() ? new XFormsModelBinds(model) : null;
@@ -156,7 +156,7 @@ public class XFormsModelBinds {
     /**
      * Apply calculate binds.
      *
-     * @param applyDefaults    whether to apply initial values (@xxforms:default="...")
+     * @param applyDefaults    whether to apply initial values (@xxf:default="...")
      */
     public void applyCalculateBinds(boolean applyDefaults) {
 
@@ -334,7 +334,7 @@ public class XFormsModelBinds {
             final String result = evaluateCalculateBind(bind, position);
             return (result != null) ? new StringValue(result) : null;
         } else if (mipType.equals(XFormsConstants.XXFORMS_DEFAULT_QNAME)) {
-            // xxforms:default
+            // xxf:default
             final String result = evaluateXXFormsDefaultBind(bind, position);
             return (result != null) ? new StringValue(result) : null;
         } else {
@@ -368,7 +368,7 @@ public class XFormsModelBinds {
     }
 
     private String evaluateXXFormsDefaultBind(Bind bind, int position) {
-        // Handle xxforms:default MIP
+        // Handle xxf:default MIP
         if (bind.staticBind.getDefaultValue() != null) {
             // Compute default value
             try {
@@ -647,7 +647,7 @@ public class XFormsModelBinds {
         // o but because type validation can be expensive, we want to optimize that if we can
         // o so requireModelMIPUpdate(Model.TYPE) actually means "do we need to update type validity"
         //
-        // xxforms:xml and xxforms:xpath2 also depend on requiredness, which is probably not a good idea. To handle
+        // xxf:xml and xxf:xpath2 also depend on requiredness, which is probably not a good idea. To handle
         // this condition (partially), if the same bind has @type and @required, we also reevaluate type validity if
         // requiredness has changed. Ideally:
         //
@@ -759,7 +759,7 @@ public class XFormsModelBinds {
             final boolean isBuiltInXFormsSchemaType = isBuiltInXFormsType && BUILTIN_XFORMS_SCHEMA_TYPES.contains(typeLocalname);
 
             if (isBuiltInXFormsSchemaType) {
-                // xforms:dayTimeDuration, xforms:yearMonthDuration, xforms:email, xforms:card-number
+                // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
                 if (xformsValidator == null) {
                     xformsValidator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd");
                     xformsValidator.loadSchemas(containingDocument);
@@ -772,7 +772,7 @@ public class XFormsModelBinds {
                 typeValid = validationError == null;
 
             } else if (isBuiltInXFormsType && nodeValue.length() == 0) {
-                // Don't consider the node invalid if the string is empty with xforms:* types
+                // Don't consider the node invalid if the string is empty with xf:* types
                 typeValid = true;
             } else if (isBuiltInSchemaType || isBuiltInXFormsType) {
                 // Built-in schema or XForms type
@@ -815,10 +815,10 @@ public class XFormsModelBinds {
                 // Built-in extension types
                 final boolean isOptionalAndEmpty = !required && "".equals(nodeValue);
                 if (typeLocalname.equals("xml")) {
-                    // xxforms:xml type
+                    // xxf:xml type
                     typeValid = isOptionalAndEmpty || XMLUtils.isWellFormedXML(nodeValue);
                 } else if (typeLocalname.equals("xpath2")) {
-                    // xxforms:xpath2 type
+                    // xxf:xpath2 type
                     typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(XPathCache.getGlobalConfiguration(), nodeValue, bind.staticBind.namespaceMapping());
                 } else {
                     throw new ValidationException("Invalid schema type '" + bind.staticBind.getType() + "'", bind.staticBind.locationData());

@@ -11,41 +11,41 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Code Mirror</xhtml:title>
-        <xforms:model xxforms:ajax.update.full.threshold="1">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Code Mirror</xh:title>
+        <xf:model xxf:ajax.update.full.threshold="1">
+            <xf:instance id="instance">
                 <instance>
                     <code readonly="true"/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="xbl" src="oxf:/apps/xforms-controls/services/countries.xml"/>
-            <xforms:bind ref="code" constraint=". != ''" readonly="@readonly = 'true'"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:instance id="xbl" src="oxf:/apps/xforms-controls/services/countries.xml"/>
+            <xf:bind ref="code" constraint=". != ''" readonly="@readonly = 'true'"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xbl-fr-code-mirror .CodeMirror { width: 50em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
         <fr:code-mirror ref="code">
-            <xforms:alert>You think you can away without coding?</xforms:alert>
+            <xf:alert>You think you can away without coding?</xf:alert>
         </fr:code-mirror>
-        <xforms:trigger>
-            <xforms:label>Reset</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="code" value="saxon:serialize(instance('xbl'), 'xml')"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Toggle readonly</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="code/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+        <xf:trigger>
+            <xf:label>Reset</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="code" value="saxon:serialize(instance('xbl'), 'xml')"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Toggle readonly</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="code/@readonly" value="if (. = 'true') then 'false' else 'true'"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

@@ -20,7 +20,7 @@
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exforms="http://www.exforms.org/exf/1-0"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -33,18 +33,18 @@
                 <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
                 <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
             </fb:icon>
-            <fb:datatype>xforms:string</fb:datatype>
+            <fb:datatype>xf:string</fb:datatype>
             <fb:editors static-itemset="false"/>
             <fb:template>
-                <fr:databound-select1 id="" appearance="minimal" ref="" resource="" xmlns:xforms="http://www.w3.org/2002/xforms">
-                    <xforms:label ref=""/>
-                    <xforms:hint ref=""/>
-                    <xforms:help ref=""/>
-                    <xforms:alert ref=""/>
-                    <xforms:itemset ref="item">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
+                <fr:databound-select1 id="" appearance="minimal" ref="" resource="" xmlns:xf="http://www.w3.org/2002/xforms">
+                    <xf:label ref=""/>
+                    <xf:hint ref=""/>
+                    <xf:help ref=""/>
+                    <xf:alert ref=""/>
+                    <xf:itemset ref="item">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
                 </fr:databound-select1>
             </fb:template>
             <fb:control-details>

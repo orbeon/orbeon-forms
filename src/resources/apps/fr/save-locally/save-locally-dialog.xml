@@ -1,72 +1,85 @@
-<xxforms:dialog
+<!--
+  Copyright (C) 2011 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxf:dialog
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:saxon="http://saxon.sf.net/"
 
         id="fr-download-save-dialog" level="modal" close="true" draggable="false" class="fr-dialog" model="fr-save-locally-model">
 
-    <xforms:label ref="$fr-resources/save-locally/dialog-title"/>
+    <xf:label ref="$fr-resources/save-locally/dialog-title"/>
 
-    <xhtml:div class="fr-dialog-message">
-        <xforms:output mediatype="text/html" value="saxon:serialize($fr-resources/save-locally/dialog-body/*, 'xml')"/>
-    </xhtml:div>
+    <xh:div class="fr-dialog-message">
+        <xf:output mediatype="text/html" value="saxon:serialize($fr-resources/save-locally/dialog-body/*, 'xml')"/>
+    </xh:div>
 
-    <xhtml:div class="fr-dialog-buttons">
-        <xforms:group>
-            <xxforms:hide ev:event="DOMActivate" dialog="fr-download-save-dialog"/>
+    <xh:div class="fr-dialog-buttons">
+        <xf:group>
+            <xxf:hide ev:event="DOMActivate" dialog="fr-download-save-dialog"/>
             <fr:href-button
                     href="/fr/service/save-locally/serve?uuid={instance('fr-uuid')}&amp;filename={
                             encode-for-uri(concat(instance('fr-save-locally-file-name'), '.html'))}">
-                <xforms:label>
-                    <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/save-document"/></xhtml:span>
-                </xforms:label>
+                <xf:label>
+                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
+                    <xh:span><xf:output value="$fr-resources/detail/labels/save-document"/></xh:span>
+                </xf:label>
             </fr:href-button>
 
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xhtml:span><xforms:output value="$fr-resources/detail/labels/cancel"/></xhtml:span>
-                </xforms:label>
-            </xforms:trigger>
-        </xforms:group>
-    </xhtml:div>
+            <xf:trigger>
+                <xf:label>
+                    <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                    <xh:span><xf:output value="$fr-resources/detail/labels/cancel"/></xh:span>
+                </xf:label>
+            </xf:trigger>
+        </xf:group>
+    </xh:div>
 
-    <xforms:model id="fr-save-locally-model">
+    <xf:model id="fr-save-locally-model">
 
-        <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
+        <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
         <!-- Contains the UUID returned after the document has been produced from us to be able to retrieve that document -->
-        <xforms:instance id="fr-uuid">
+        <xf:instance id="fr-uuid">
             <uuid/>
-        </xforms:instance>
+        </xf:instance>
 
-        <xforms:instance id="fr-save-locally-file-name">
+        <xf:instance id="fr-save-locally-file-name">
             <file-name>data</file-name>
-        </xforms:instance>
+        </xf:instance>
 
-        <xforms:action ev:observer="fr-save-locally-button" ev:event="DOMActivate">
-            <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
+        <xf:action ev:observer="fr-save-locally-button" ev:event="DOMActivate">
+            <xf:setvalue ref="xxf:instance('fr-persistence-instance')/save-attempted">true</xf:setvalue>
 
-            <xforms:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
-            <xforms:insert ref="instance('fr-uuid')" origin="xxforms:call-xpl('oxf:/apps/fr/save-locally/save-generate.xpl',
-                    ('form-instance', 'parameters', 'fr-current-resources'), (xxforms:instance('fr-form-instance'), $parameters, $fr-resources),
+            <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
+            <xf:insert ref="instance('fr-uuid')" origin="xxf:call-xpl('oxf:/apps/fr/save-locally/save-generate.xpl',
+                    ('form-instance', 'parameters', 'fr-current-resources'), (xxf:instance('fr-form-instance'), $parameters, $fr-resources),
                     'uuid')"/>
-            <xxforms:show dialog="fr-download-save-dialog"/>
-        </xforms:action>
+            <xxf:show dialog="fr-download-save-dialog"/>
+        </xf:action>
 
-        <xforms:submission id="save-locally-submission" method="post" ref="xxforms:instance('fr-form-instance')" replace="instance" instance="fr-uuid"
+        <xf:submission id="save-locally-submission" method="post" ref="xxf:instance('fr-form-instance')" replace="instance" instance="fr-uuid"
                 resource="/fr/service/save-locally/save-generate?app={$parameters/app}&amp;form={$parameters/form}" validate="false" relevant="false">
-            <xforms:action ev:event="xforms-submit-done">
-                <xxforms:show dialog="fr-download-save-dialog"/>
-            </xforms:action>
-        </xforms:submission>
+            <xf:action ev:event="xforms-submit-done">
+                <xxf:show dialog="fr-download-save-dialog"/>
+            </xf:action>
+        </xf:submission>
 
-    </xforms:model>
+    </xf:model>
 
 
-</xxforms:dialog>
+</xxf:dialog>

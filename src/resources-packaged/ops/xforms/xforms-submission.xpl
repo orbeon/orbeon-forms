@@ -18,7 +18,7 @@
 
     <p:processor name="oxf:xforms-submission">
         <p:input name="submission">
-            <xforms:submission method="post" action="/direct/xforms-translate/post"/>
+            <xf:submission method="post" action="/direct/xforms-translate/post"/>
         </p:input>
         <p:input name="request">
             <translation>
@@ -34,9 +34,9 @@
           xmlns:ev="http://www.w3.org/2001/xml-events"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-          xmlns:xhtml="http://www.w3.org/1999/xhtml">
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <p:param name="submission" type="input"/>
     <p:param name="request" type="input"/>
@@ -46,24 +46,24 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#submission"/>
         <p:input name="config">
-            <xhtml:html xsl:version="2.0">
-                <xhtml:head>
-                    <xforms:model id="fr-model" xxforms:optimize-get-all="false" xxforms:no-updates="true" xxforms:local-submission-forward="false">
+            <xh:html xsl:version="2.0">
+                <xh:head>
+                    <xf:model id="fr-model" xxf:optimize-get-all="false" xxf:no-updates="true" xxf:local-submission-forward="false">
                         <!-- Instance containing the request document, and response document in case of success -->
-                        <xforms:instance id="fr-instance" src="input:data"/>
-                        <xforms:submission id="fr-default-submission" replace="instance">
-                            <xsl:copy-of select="/xforms:submission/(@* except (@id, @replace))"/>
-                            <xsl:copy-of select="/xforms:submission/namespace::*"/>
-                            <xsl:copy-of select="/xforms:submission/*"/>
+                        <xf:instance id="fr-instance" src="input:data"/>
+                        <xf:submission id="fr-default-submission" replace="instance">
+                            <xsl:copy-of select="/xf:submission/(@* except (@id, @replace))"/>
+                            <xsl:copy-of select="/xf:submission/namespace::*"/>
+                            <xsl:copy-of select="/xf:submission/*"/>
                             <!-- Upon completion (successful or not), send the resulting document to the output -->
-                            <xforms:send ev:event="xforms-submit-done xforms-submit-error" submission="fr-send-all-submission"/>
-                        </xforms:submission>
-                        <xforms:submission id="fr-send-all-submission" action="echo:" method="post" replace="all"/>
-                        <xforms:send ev:event="xforms-ready" submission="fr-default-submission"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body/>
-            </xhtml:html>
+                            <xf:send ev:event="xforms-submit-done xforms-submit-error" submission="fr-send-all-submission"/>
+                        </xf:submission>
+                        <xf:submission id="fr-send-all-submission" action="echo:" method="post" replace="all"/>
+                        <xf:send ev:event="xforms-ready" submission="fr-default-submission"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
         </p:input>
         <p:output name="data" id="xhtml-xforms"/>
     </p:processor>

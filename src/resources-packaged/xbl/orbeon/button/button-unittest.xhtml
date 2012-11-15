@@ -11,19 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Button</xhtml:title>
-        <xforms:model xxforms:ajax.update.full.threshold="1">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Button</xh:title>
+        <xf:model xxf:ajax.update.full.threshold="1">
+            <xf:instance id="instance">
                 <instance>
                     <button/>
                     <relevant>true</relevant>
@@ -33,62 +33,62 @@
                         <button/>
                     </component-init>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="button" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
-            <xforms:bind ref="component-init/button" readonly="true()"/>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/button/button-unittest.js"/>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:fieldset>
-            <xhtml:legend>Relevant / readonly</xhtml:legend>
+            </xf:instance>
+            <xf:bind ref="button" relevant="../relevant = 'true'" readonly="../readonly = 'true'"/>
+            <xf:bind ref="component-init/button" readonly="true()"/>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/button/button-unittest.js"/>
+    </xh:head>
+    <xh:body>
+        <xh:fieldset>
+            <xh:legend>Relevant / readonly</xh:legend>
             <fr:button id="toggle-relevant">
-                <xforms:label>Toggle relevant</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
+                <xf:label>Toggle relevant</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
             </fr:button>
             <fr:button id="toggle-readonly">
-                <xforms:label>Toggle readonly</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+                <xf:label>Toggle readonly</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
             </fr:button>
             <fr:button id="trigger-full-update">
-                <xforms:label>Trigger full update</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" ref="trigger-full-update-increment" value=". + 1"/>
+                <xf:label>Trigger full update</xf:label>
+                <xf:setvalue ev:event="DOMActivate" ref="trigger-full-update-increment" value=". + 1"/>
             </fr:button>
             <fr:button ref="button" id="my-button-normal" tabindex="42">
-                <xforms:label>Normal button</xforms:label>
+                <xf:label>Normal button</xf:label>
             </fr:button>
             <fr:button ref="button" id="my-button-empty-label">
-                <xforms:label/>
+                <xf:label/>
             </fr:button>
-            <xforms:group id="full-update" xxforms:update="full">
-                <xforms:output value="trigger-full-update-increment" style="display: none"/>
+            <xf:group id="full-update" xxf:update="full">
+                <xf:output value="trigger-full-update-increment" style="display: none"/>
                 <fr:button ref="button" id="my-button-full-update">
-                    <xforms:label>Full update button</xforms:label>
+                    <xf:label>Full update button</xf:label>
                 </fr:button>
-            </xforms:group>
-            <xforms:group ref="button">
+            </xf:group>
+            <xf:group ref="button">
                 <fr:button id="my-button-in-group">
-                    <xforms:label>Button in bound group</xforms:label>
+                    <xf:label>Button in bound group</xf:label>
                 </fr:button>
-            </xforms:group>
-        </xhtml:fieldset>
-        <xhtml:fieldset>
-            <xhtml:legend>Component initialization inside repeat</xhtml:legend>
-            <xforms:group xxforms:update="full">
+            </xf:group>
+        </xh:fieldset>
+        <xh:fieldset>
+            <xh:legend>Component initialization inside repeat</xh:legend>
+            <xf:group xxf:update="full">
                 <fr:button id="init-add">
-                    <xforms:label>Add</xforms:label>
-                    <xforms:insert ev:event="DOMActivate" ref="component-init/button" position="before" at="1"/>
+                    <xf:label>Add</xf:label>
+                    <xf:insert ev:event="DOMActivate" ref="component-init/button" position="before" at="1"/>
                 </fr:button>
-                <xforms:repeat ref="component-init/button">
+                <xf:repeat ref="component-init/button">
                     <fr:button ref="." id="init-in-repeat">
-                        <xforms:label>In repeat</xforms:label>
+                        <xf:label>In repeat</xf:label>
                     </fr:button>
-                </xforms:repeat>
-            </xforms:group>
-        </xhtml:fieldset>
-    </xhtml:body>
-</xhtml:html>
+                </xf:repeat>
+            </xf:group>
+        </xh:fieldset>
+    </xh:body>
+</xh:html>

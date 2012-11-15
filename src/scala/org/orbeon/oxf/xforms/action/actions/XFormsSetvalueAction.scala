@@ -63,7 +63,7 @@ class XFormsSetvalueAction extends XFormsAction {
             case _ ⇒
                 // Node doesn't exist: NOP
                 if (indentedLogger.isDebugEnabled)
-                    indentedLogger.logDebug("xforms:setvalue", "not setting instance value", "reason", "destination node not found", "value", valueToSet)
+                    indentedLogger.logDebug("xf:setvalue", "not setting instance value", "reason", "destination node not found", "value", valueToSet)
         }
     }
 }

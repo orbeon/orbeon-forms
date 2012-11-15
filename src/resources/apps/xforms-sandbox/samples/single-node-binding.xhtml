@@ -11,47 +11,47 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:exforms="http://www.exforms.org/exf/1-0"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Single-Node Binding</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Single-Node Binding</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance>
                     <html>This is <b>bold</b> text.</html>
                     <html/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:group ref="html[1]">
-            <xforms:input ref=".">
-                <xforms:label>Part 1:</xforms:label>
-            </xforms:input>
+        <xf:group ref="html[1]">
+            <xf:input ref=".">
+                <xf:label>Part 1:</xf:label>
+            </xf:input>
 
-            <xforms:input ref="b">
-                <xforms:label>Part 2:</xforms:label>
-            </xforms:input>
+            <xf:input ref="b">
+                <xf:label>Part 2:</xf:label>
+            </xf:input>
 
             <!-- TODO: We don't yet support binding directly to text nodes, apparently! -->
-            <!--<xforms:input ref="text()[2]">-->
-                <!--<xforms:label>Part 3:</xforms:label>-->
-            <!--</xforms:input>-->
-        </xforms:group>
+            <!--<xf:input ref="text()[2]">-->
+                <!--<xf:label>Part 3:</xf:label>-->
+            <!--</xf:input>-->
+        </xf:group>
 
-        <xhtml:br/>
+        <xh:br/>
 
-        <xforms:input ref="html[2]">
-            <xforms:label>Part 1:</xforms:label>
-        </xforms:input>
-    </xhtml:body>
-</xhtml:html>
+        <xf:input ref="html[2]">
+            <xf:label>Part 1:</xf:label>
+        </xf:input>
+    </xh:body>
+</xh:html>

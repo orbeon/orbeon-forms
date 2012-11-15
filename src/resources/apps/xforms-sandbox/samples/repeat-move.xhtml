@@ -11,56 +11,56 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat with Move Buttons</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>Repeat with Move Buttons</xh:title>
+        <xf:model>
+            <xf:instance>
                 <oranges>
                     <orange>Persian orange</orange>
                     <orange>Navel orange</orange>
                     <orange>Valencia orange</orange>
                     <orange>Blood orange</orange>
                 </oranges>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:table>
-            <xforms:repeat ref="orange">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref=".">
-                            <xforms:label>Orange type:</xforms:label>
-                        </xforms:input>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:trigger ref=".[preceding-sibling::*]">
-                            <xforms:label>Up</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert origin="context()" ref="preceding-sibling::*[1]" position="before"/>
-                                <xforms:delete ref="."/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:trigger ref=".[following-sibling::*]">
-                            <xforms:label>Down</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert origin="context()" ref="following-sibling::*[1]"/>
-                                <xforms:delete ref="."/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+        <xh:table>
+            <xf:repeat ref="orange">
+                <xh:tr>
+                    <xh:td>
+                        <xf:input ref=".">
+                            <xf:label>Orange type:</xf:label>
+                        </xf:input>
+                    </xh:td>
+                    <xh:td>
+                        <xf:trigger ref=".[preceding-sibling::*]">
+                            <xf:label>Up</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:insert origin="context()" ref="preceding-sibling::*[1]" position="before"/>
+                                <xf:delete ref="."/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:trigger ref=".[following-sibling::*]">
+                            <xf:label>Down</xf:label>
+                            <xf:action ev:event="DOMActivate">
+                                <xf:insert origin="context()" ref="following-sibling::*[1]"/>
+                                <xf:delete ref="."/>
+                            </xf:action>
+                        </xf:trigger>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
+    </xh:body>
+</xh:html>

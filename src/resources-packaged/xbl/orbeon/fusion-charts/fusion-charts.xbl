@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
@@ -34,30 +34,30 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
                     <!--  Outer group -->
-                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                    <xf:group xbl:attr="model context ref bind" xxbl:scope="outer">
 
                         <!-- Inner group -->
-                        <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
+                        <xf:group xxbl:scope="inner" appearance="xxf:internal">
                             <!-- Variable pointing to external single-node binding -->
-                            <xforms:var name="result" as="node()?">
-                                <xxforms:sequence value="." xxbl:scope="outer"/>
-                            </xforms:var>
+                            <xf:var name="result" as="node()?">
+                                <xxf:sequence value="." xxbl:scope="outer"/>
+                            </xf:var>
 
                             <!-- Div in which the chart is rendered -->
-                            <xhtml:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xhtml:div>
+                            <xh:div id="chart-div" class="xbl-fr-fusion-charts-chart-div">The chart will appear within this DIV. This text will be replaced by the chart.</xh:div>
                             <!-- XML -->
-                            <xforms:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml">
-                                <xxforms:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xxforms:script>
-                            </xforms:output>
+                            <xf:output value="saxon:serialize($result, 'xml')" style="display: none" class="xbl-fr-fusion-charts-xml">
+                                <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.FusionCharts.instance(this).init();</xxf:script>
+                            </xf:output>
                             <!-- Access to parameters -->
                             <xsl:copy-of select="xxbl:parameter(., 'uri-to-swf')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'swf')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'width')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'height')"/>
                             <xsl:copy-of select="xxbl:parameter(., 'chart-id')"/>
-                            <xhtml:a f:url-type="resource" style="display: none" href="/dummy.js" class="fusion-charts-base-url"/>
-                        </xforms:group>
-                    </xforms:group>
+                            <xh:a f:url-type="resource" style="display: none" href="/dummy.js" class="fusion-charts-base-url"/>
+                        </xf:group>
+                    </xf:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

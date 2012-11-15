@@ -1,16 +1,16 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Error and warning</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main">
-            <xforms:instance>
+    <xh:head>
+        <xh:title>Error and warning</xh:title>
+        <xf:model xmlns:xf="http://www.w3.org/2002/xforms" id="main">
+            <xf:instance>
                 <instance>
                     <currency-empty/>
                     <currency-filled>42</currency-filled>
@@ -21,10 +21,10 @@
                     <textarea-empty/>
                     <textarea-filled>42</textarea-filled>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="*" required="true()"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="*" required="true()"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-label { display: inline-block; width: 15em; }
             .xforms-control, .xbl-fr-currency { line-height: 2.5em; }
 
@@ -42,69 +42,69 @@
             .xbl-fr-currency .xforms-invalid-visited
                 { background: url('../../ops/images/xforms/exclamation.png') right top no-repeat; padding-right: 0 20px 1px 0; }
 
-        </xhtml:style>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <!-- <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-control-xhtml-area.js"/> -->
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div>
+        </xh:style>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <!-- <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-control-xhtml-area.js"/> -->
+    </xh:head>
+    <xh:body>
+        <xh:div>
             <fr:currency ref="currency-empty">
-                <xforms:label>Currency initially empty</xforms:label>
+                <xf:label>Currency initially empty</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
+        </xh:div>
+        <xh:div>
             <fr:currency ref="currency-filled">
-                <xforms:label>Currency initially filled</xforms:label>
+                <xf:label>Currency initially filled</xf:label>
             </fr:currency>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="input-empty">
-                <xforms:label>Input initially empty</xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:input ref="input-filled">
-                <xforms:label>Input initially filled</xforms:label>
-            </xforms:input>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:select1 ref="select1-minimal-empty" appearance="minimal">
-                <xforms:label>Drop-down initially empty</xforms:label>
-                <xforms:item>
-                    <xforms:value/>
-                    <xforms:label>-- Make a section --</xforms:label>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:value>42</xforms:value>
-                    <xforms:label>42</xforms:label>
-                </xforms:item>
-            </xforms:select1>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:select1 ref="select1-minimal-filled" appearance="minimal">
-                <xforms:label>Drop-down initially filled</xforms:label>
-                <xforms:item>
-                    <xforms:value/>
-                    <xforms:label>-- Make a section --</xforms:label>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:value>42</xforms:value>
-                    <xforms:label>42</xforms:label>
-                </xforms:item>
-            </xforms:select1>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:textarea ref="textarea-empty">
-                <xforms:label>Textarea initially empty</xforms:label>
-            </xforms:textarea>
-        </xhtml:div>
-        <xhtml:div>
-            <xforms:textarea ref="textarea-filled">
-                <xforms:label>Textarea initially filled</xforms:label>
-            </xforms:textarea>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="input-empty">
+                <xf:label>Input initially empty</xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:input ref="input-filled">
+                <xf:label>Input initially filled</xf:label>
+            </xf:input>
+        </xh:div>
+        <xh:div>
+            <xf:select1 ref="select1-minimal-empty" appearance="minimal">
+                <xf:label>Drop-down initially empty</xf:label>
+                <xf:item>
+                    <xf:value/>
+                    <xf:label>-- Make a section --</xf:label>
+                </xf:item>
+                <xf:item>
+                    <xf:value>42</xf:value>
+                    <xf:label>42</xf:label>
+                </xf:item>
+            </xf:select1>
+        </xh:div>
+        <xh:div>
+            <xf:select1 ref="select1-minimal-filled" appearance="minimal">
+                <xf:label>Drop-down initially filled</xf:label>
+                <xf:item>
+                    <xf:value/>
+                    <xf:label>-- Make a section --</xf:label>
+                </xf:item>
+                <xf:item>
+                    <xf:value>42</xf:value>
+                    <xf:label>42</xf:label>
+                </xf:item>
+            </xf:select1>
+        </xh:div>
+        <xh:div>
+            <xf:textarea ref="textarea-empty">
+                <xf:label>Textarea initially empty</xf:label>
+            </xf:textarea>
+        </xh:div>
+        <xh:div>
+            <xf:textarea ref="textarea-filled">
+                <xf:label>Textarea initially filled</xf:label>
+            </xf:textarea>
+        </xh:div>
+    </xh:body>
+</xh:html>

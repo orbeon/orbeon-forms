@@ -20,10 +20,10 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:fo="http://www.w3.org/1999/XSL/Format"
           xmlns:svg="http://www.w3.org/2000/svg"
-          xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:xh="http://www.w3.org/1999/xhtml"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:xforms="http://www.w3.org/2002/xforms"
-          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:atom="http://www.w3.org/2005/Atom">
 
@@ -51,7 +51,7 @@
     <!-- The container is a servlet -->
     <p:choose href="#xformed-data">
         <!-- XHTML detection. Apply the theme, rewrite URLs, and serialize to HTML or XHTML. -->
-        <p:when test="/xhtml:html">
+        <p:when test="/xh:html">
 
             <!-- Pick theme -->
             <p:choose href="#request">

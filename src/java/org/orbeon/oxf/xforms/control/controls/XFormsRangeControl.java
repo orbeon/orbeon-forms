@@ -22,7 +22,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import scala.Tuple3;
 
 /**
- * Represents an xforms:range control.
+ * Represents an xf:range control.
  */
 public class XFormsRangeControl extends XFormsValueControl {
 

@@ -11,207 +11,207 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:test="http://orbeon.org/oxf/examples/test"
     xmlns:test2="http://orbeon.org/oxf/examples/test2">
 
-    <xhtml:head>
-        <xhtml:title>Schema Types</xhtml:title>
-        <xforms:model schema="oxf:/apps/xforms-sandbox/samples/schema-types.xsd">
+    <xh:head>
+        <xh:title>Schema Types</xh:title>
+        <xf:model schema="oxf:/apps/xforms-sandbox/samples/schema-types.xsd">
 
-            <xforms:instance id="lax-instance">
+            <xf:instance id="lax-instance">
                 <test2:instance test:email="BADEMAIL">
                     <test:value state="BADSTATE"/>
                     <test:state1/>
                     <test:state2>CA</test:state2>
                     <test:state3/>
                 </test2:instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="strict-instance" xxforms:validation="strict">
+            <xf:instance id="strict-instance" xxf:validation="strict">
                 <test2:instance test:email="BADEMAIL">
                     <test:value state="BADSTATE"/>
                     <test:state1/>
                     <test:state2>CA</test:state2>
                 </test2:instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="skip-instance" xxforms:validation="skip">
+            <xf:instance id="skip-instance" xxf:validation="skip">
                 <test2:instance test:email="BADEMAIL">
                     <test:value state="BADSTATE"/>
                     <test:state1/>
                     <test:state2>CA</test:state2>
                 </test2:instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:bind ref="instance('lax-instance')">
-                <xforms:bind ref="test:value/@state" type="test:state-type"/>
-                <xforms:bind ref="test:state1" type="test:state-type"/>
-                <xforms:bind ref="test:state2" type="test:state-with-attribute"/>
-                <xforms:bind ref="test:state3" type="test:state-element"/>
-            </xforms:bind>
+            <xf:bind ref="instance('lax-instance')">
+                <xf:bind ref="test:value/@state" type="test:state-type"/>
+                <xf:bind ref="test:state1" type="test:state-type"/>
+                <xf:bind ref="test:state2" type="test:state-with-attribute"/>
+                <xf:bind ref="test:state3" type="test:state-element"/>
+            </xf:bind>
 
-            <xforms:instance id="schema-instance" src="oxf:/apps/xforms-sandbox/samples/schema-types.xsd"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            <xf:instance id="schema-instance" src="oxf:/apps/xforms-sandbox/samples/schema-types.xsd"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:group ref="instance('lax-instance')">
-            <xhtml:h2>Lax Validation</xhtml:h2>
+        <xf:group ref="instance('lax-instance')">
+            <xh:h2>Lax Validation</xh:h2>
 
-            <xforms:input ref="@test:email">
-                <xforms:label>Email</xforms:label>
-            </xforms:input>
+            <xf:input ref="@test:email">
+                <xf:label>Email</xf:label>
+            </xf:input>
 
-            <xforms:select1 appearance="minimal" ref="test:value/@state">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:value/@state">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state1">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:state1">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state2">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:state2">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state3">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xforms:group>
+            <xf:select1 appearance="minimal" ref="test:state3">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
+        </xf:group>
 
-        <xforms:group ref="instance('strict-instance')">
-            <xhtml:h2>Strict Validation</xhtml:h2>
+        <xf:group ref="instance('strict-instance')">
+            <xh:h2>Strict Validation</xh:h2>
 
-            <xforms:input ref="@test:email">
-                <xforms:label>Email</xforms:label>
-            </xforms:input>
+            <xf:input ref="@test:email">
+                <xf:label>Email</xf:label>
+            </xf:input>
 
-            <xforms:select1 appearance="minimal" ref="test:value/@state">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:value/@state">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state1">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:state1">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state2">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xforms:group>
+            <xf:select1 appearance="minimal" ref="test:state2">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
+        </xf:group>
 
-        <xforms:group ref="instance('skip-instance')">
-            <xhtml:h2>Skip Validation</xhtml:h2>
+        <xf:group ref="instance('skip-instance')">
+            <xh:h2>Skip Validation</xh:h2>
 
-            <xforms:input ref="@test:email">
-                <xforms:label>Email</xforms:label>
-            </xforms:input>
+            <xf:input ref="@test:email">
+                <xf:label>Email</xf:label>
+            </xf:input>
 
-            <xforms:select1 appearance="minimal" ref="test:value/@state">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:value/@state">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state1">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
+            <xf:select1 appearance="minimal" ref="test:state1">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
 
-            <xforms:select1 appearance="minimal" ref="test:state2">
-                <xforms:label>State</xforms:label>
-                <xforms:item>
-                    <xforms:label>[Select...]</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
-                    <xforms:label ref="@value"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xforms:group>
+            <xf:select1 appearance="minimal" ref="test:state2">
+                <xf:label>State</xf:label>
+                <xf:item>
+                    <xf:label>[Select...]</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                    <xf:label ref="@value"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
+        </xf:group>
 
 
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>
 
 
 

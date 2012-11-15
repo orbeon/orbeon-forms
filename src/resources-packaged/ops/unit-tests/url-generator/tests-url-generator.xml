@@ -233,11 +233,11 @@ Le bruit persistait toujours.
              </config>
         </input>
         <output name="data">
-            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                 <head>
                     <title>Summary</title>
-                    <xforms:model>
-                        <xforms:instance id="document-infos-instance">
+                    <xf:model>
+                        <xf:instance id="document-infos-instance">
                             <form xmlns="" xml:base="oxf:/ops/unit-tests/url-generator/included-1.xml">
                                 <document-id>123456789</document-id>
                                 <include2>
@@ -248,13 +248,13 @@ Le bruit persistait toujours.
                                     </html>
                                 </include2>
                             </form>
-                        </xforms:instance>
+                        </xf:instance>
                         <html xml:base="oxf:/ops/unit-tests/url-generator/included-2.xml">
                             <head>
                                 <title>Summary</title>
                             </head>
                         </html>
-                    </xforms:model>
+                    </xf:model>
                 </head>
             </html>
         </output>
@@ -280,11 +280,11 @@ Le bruit persistait toujours.
             </p:config>
         </input>
         <output name="data">
-            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                 <head>
                     <title>Summary</title>
-                    <xforms:model>
-                        <xforms:instance id="document-infos-instance">
+                    <xf:model>
+                        <xf:instance id="document-infos-instance">
                             <form xmlns="" xml:base="oxf:/ops/unit-tests/url-generator/included-1.xml">
                                 <document-id>123456789</document-id>
                                 <include2>
@@ -295,13 +295,13 @@ Le bruit persistait toujours.
                                     </html>
                                 </include2>
                             </form>
-                        </xforms:instance>
+                        </xf:instance>
                         <html xml:base="oxf:/ops/unit-tests/url-generator/included-2.xml">
                             <head>
                                 <title>Summary</title>
                             </head>
                         </html>
-                    </xforms:model>
+                    </xf:model>
                 </head>
             </html>
         </output>

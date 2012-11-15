@@ -11,19 +11,19 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Expandable Output</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Expandable Output</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <short>Orbeon Forms is a solution to build and deploy web forms.</short>
                     <medium>Download Orbeon Forms. You can get either a developer release or a nightly build. Nightly builds are in general quite stable, and you will also be contributing to the project by using nightly builds and reporting issues on the mailing list.</medium>
@@ -32,42 +32,42 @@
                     <max-characters>80</max-characters>
                     <tolerance>10</tolerance>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-label { display: inline-block; width: 5em; font-size: larger; color: #333 }
             .xbl-fr-expandable-output { padding-right: 4em; padding-bottom: 1em;  }
             .xforms-input { display: block; margin-bottom: .5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:div>
-            <xforms:input ref="max-characters">
-                <xforms:label>max</xforms:label>
-            </xforms:input>
-            <xforms:input ref="tolerance">
-                <xforms:label>tolerance</xforms:label>
-            </xforms:input>
-            <xhtml:div>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:div>
+            <xf:input ref="max-characters">
+                <xf:label>max</xf:label>
+            </xf:input>
+            <xf:input ref="tolerance">
+                <xf:label>tolerance</xf:label>
+            </xf:input>
+            <xh:div>
                 <fr:expandable-output ref="short" id="short">
-                    <xforms:label>Short</xforms:label>
+                    <xf:label>Short</xf:label>
                 </fr:expandable-output>
                 <fr:expandable-output ref="medium" max-characters="70" tolerance="10" id="medium">
-                    <xforms:label>Medium</xforms:label>
+                    <xf:label>Medium</xf:label>
                 </fr:expandable-output>
-            </xhtml:div>
-            <xhtml:div>
+            </xh:div>
+            <xh:div>
                 <fr:expandable-output ref="long" id="long">
-                    <xforms:label>Long</xforms:label>
+                    <xf:label>Long</xf:label>
                     <fr:max-characters ref="../max-characters"/>
                     <fr:tolerance ref="../tolerance"/>
                 </fr:expandable-output>
                 <fr:expandable-output ref="number" id="number">
-                    <xforms:label>Number</xforms:label>
+                    <xf:label>Number</xf:label>
                 </fr:expandable-output>
-            </xhtml:div>
-        </xhtml:div>
+            </xh:div>
+        </xh:div>
 
         <!--<fr:xforms-inspector/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

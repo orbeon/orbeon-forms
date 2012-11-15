@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Represents an xforms:switch container control.
+ * Represents an xf:switch container control.
  *
- * NOTE: This keep the "currently selected flag" for all children xforms:case.
+ * NOTE: This keep the "currently selected flag" for all children xf:case.
  */
 public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
 
@@ -106,7 +106,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     public void setSelectedCase(XFormsCaseControl caseControlToSelect) {
 
         if (caseControlToSelect.parent() != this)
-            throw new OXFException("xforms:case is not child of current xforms:switch.");
+            throw new OXFException("xf:case is not child of current xf:switch.");
 
         final XFormsSwitchControlLocal localForUpdate = (XFormsSwitchControlLocal) getLocalForUpdate();
 
@@ -147,7 +147,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
             if (local.selectedCaseControlId != null) {
                 return XFormsUtils.getRelatedEffectiveId(getEffectiveId(), local.selectedCaseControlId);
             } else {
-                throw new OXFException("Selected case was not set for xforms:switch: " + getEffectiveId());
+                throw new OXFException("Selected case was not set for xf:switch: " + getEffectiveId());
             }
         } else {
             return null;

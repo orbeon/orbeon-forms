@@ -36,30 +36,30 @@ include "xforms-nons-11.rnc" inherit = xforms {
     attribute class { text }?,
     attribute style { text }?
   xforms.bind =
-    element xforms:bind {
+    element xf:bind {
       attribute name { text }?,
       xforms.bind.attrib,
       xforms.bind.content
     }
   xforms.instance =
-    element xforms:instance {
-      attribute xxforms:readonly { text }?,
-      attribute xxforms:exclude-result-prefixes { text }?,
-      attribute xxforms:cache { text }?,
+    element xf:instance {
+      attribute xxf:readonly { text }?,
+      attribute xxf:exclude-result-prefixes { text }?,
+      attribute xxf:cache { text }?,
       xforms.instance.attrib,
       xforms.instance.content
     }
 }
-# Start with xhtml:html
+# Start with xh:html
 start =
-  element xhtml:html {
+  element xh:html {
     (attribute * { text }
      | text
      | orbeon.element)*
   }
 orbeon.inline = (text | xforms.output | orbeon.inline.xhtml.element)*
 orbeon.inline.xhtml.element =
-  element xhtml:* {
+  element xh:* {
     (attribute * { text }
      | orbeon.inline)*
   }
@@ -77,18 +77,18 @@ orbeon.xxforms.element =
   | # TODO: dialog must be at top-level or in XBL component
     orbeon.xxforms.dialog
 orbeon.xhtml.element =
-  element xhtml:* {
+  element xh:* {
     (attribute * { text }
      | text
      | orbeon.element)*
   }
 orbeon.xxforms.dialog =
-  element xxforms:dialog {
+  element xxf:dialog {
     # XXX TEMP
     orbeon.anyContent
   }
 orbeon.xxforms.variable =
-  element xxforms:variable {
+  element xxf:variable {
     # XXX TEMP
     orbeon.anyContent
   }

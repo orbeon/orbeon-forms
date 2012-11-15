@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.{EmptyIterator, SequenceIterator}
 
-// xxforms:get-request-parameter($a as xs:string) xs:string*
+// xxf:get-request-parameter($a as xs:string) xs:string*
 class XXFormsGetRequestParameter extends RequestFunction {
 
     def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
@@ -30,7 +30,7 @@ class XXFormsGetRequestParameter extends RequestFunction {
         Option(request.getParameterMap.get(name)) map StringConversions.objectArrayToStringArray
 }
 
-// xxforms:get-request-header($a as xs:string) xs:string*
+// xxf:get-request-header($a as xs:string) xs:string*
 class XXFormsGetRequestHeader extends RequestFunction {
 
     def fromDocument(containingDocument: XFormsContainingDocument, name: String) =

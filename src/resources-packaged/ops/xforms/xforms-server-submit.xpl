@@ -36,33 +36,33 @@
             <p:processor name="oxf:xslt">
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
-                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                        <xxforms:uuid>
+                    <xxf:event-request xsl:version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                        <xxf:uuid>
                             <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
-                        </xxforms:uuid>
+                        </xxf:uuid>
                         <!-- Omit sequence number -->
-                        <xxforms:sequence/>
-                        <xxforms:static-state>
+                        <xxf:sequence/>
+                        <xxf:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
-                        </xxforms:static-state>
-                        <xxforms:dynamic-state>
+                        </xxf:static-state>
+                        <xxf:dynamic-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
-                        </xxforms:dynamic-state>
+                        </xxf:dynamic-state>
                         <!-- Only include files and omit all other parameters -->
                         <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
                         <xsl:if test="$files">
-                            <xxforms:files>
+                            <xxf:files>
                                 <xsl:copy-of select="$files"/>
-                            </xxforms:files>
+                            </xxf:files>
                         </xsl:if>
-                        <xxforms:action/>
+                        <xxf:action/>
                         <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
                         <xsl:if test="not($server-events = '')">
-                            <xxforms:server-events>
+                            <xxf:server-events>
                                 <xsl:value-of select="$server-events"/>
-                            </xxforms:server-events>
+                            </xxf:server-events>
                         </xsl:if>
-                    </xxforms:event-request>
+                    </xxf:event-request>
                 </p:input>
                 <!--<p:output name="data" id="xml-request" debug="xxxsubmit-request"/>-->
                 <p:output name="data" id="xml-request"/>
@@ -79,26 +79,26 @@
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
-                    <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                        <xxforms:uuid>
+                    <xxf:event-request xsl:version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                        <xxf:uuid>
                             <xsl:value-of select="/*/parameters/parameter[name = '$uuid']/value"/>
-                        </xxforms:uuid>
+                        </xxf:uuid>
                         <!-- Omit sequence number -->
-                        <xxforms:sequence/>
-                        <xxforms:static-state>
+                        <xxf:sequence/>
+                        <xxf:static-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
-                        </xxforms:static-state>
-                        <xxforms:dynamic-state>
+                        </xxf:static-state>
+                        <xxf:dynamic-state>
                             <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
-                        </xxforms:dynamic-state>
+                        </xxf:dynamic-state>
                         <!-- Handle files -->
                         <xsl:variable name="files" select="/*/parameters/parameter[filename and normalize-space(value)]"/>
                         <xsl:if test="$files">
-                            <xxforms:files>
+                            <xxf:files>
                                 <xsl:copy-of select="$files"/>
-                            </xxforms:files>
+                            </xxf:files>
                         </xsl:if>
-                        <xxforms:action>
+                        <xxf:action>
                             <!-- Create list of events based on parameters -->
                             <xsl:for-each select="/*/parameters/parameter[not(starts-with(name, '$') or ends-with(name, '.y') or exists(filename))]">
                                 <!-- Here we don't know the type of the control so can't create the proper type of event -->
@@ -110,11 +110,11 @@
                                 <xsl:variable name="value" as="xs:string*" select="value"/>
 
                                 <!-- For input[@type = 'image'], filter .y events above, and remove ending .x below -->
-                                <xxforms:event name="xxforms-value-or-activate"
+                                <xxf:event name="xxforms-value-or-activate"
                                                        source-control-id="{if (ends-with($name, '.x')) then substring($name, 1, string-length($name) - 2) else $name}">
                                     <xsl:choose>
                                         <xsl:when test="contains($name, '$xforms-input-1')">
-                                            <!-- Case of xforms:input, which may have two HTML input controls -->
+                                            <!-- Case of xf:input, which may have two HTML input controls -->
                                             <xsl:variable name="source-control-id" select="replace($name, '\$xforms-input-1', '')"/>
                                             <xsl:variable name="other-control-id" select="replace($name, '\$xforms-input-1', '\$xforms-input-2')"/>
                                             <xsl:attribute name="source-control-id" select="$source-control-id"/>
@@ -141,21 +141,21 @@
                                         <xsl:otherwise>
                                             <!-- Regular case -->
                                             <xsl:attribute name="source-control-id" select="$name"/>
-                                            <!-- There may be several times the same value with selection controls: keep only one so as not to confuse xforms:select1 -->
+                                            <!-- There may be several times the same value with selection controls: keep only one so as not to confuse xf:select1 -->
                                             <xsl:value-of select="string-join(distinct-values($value), ' ')"/>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                </xxforms:event>
+                                </xxf:event>
                             </xsl:for-each>
-                        </xxforms:action>
+                        </xxf:action>
                         <!-- There shouldn't be any server events, but process them if there are any (future use) -->
                         <xsl:variable name="server-events" select="/*/parameters/parameter[name = '$server-events']/value"/>
                         <xsl:if test="$server-events != ''">
-                            <xxforms:server-events>
+                            <xxf:server-events>
                                 <xsl:value-of select="$server-events"/>
-                            </xxforms:server-events>
+                            </xxf:server-events>
                         </xsl:if>
-                    </xxforms:event-request>
+                    </xxf:event-request>
                 </p:input>
                 <!--<p:output name="data" id="xml-request" debug="xxxsubmit-request"/>-->
                 <p:output name="data" id="xml-request"/>

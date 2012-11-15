@@ -274,7 +274,7 @@ object PartAnalysisImpl {
     def extractNestedModels(compactShadowTreeWrapper: DocumentWrapper, detach: Boolean, locationData: LocationData) = {
 
         // TODO: Don't use XPath here, but extract models as controls tree is visited
-        val xpathExpression = "//xforms:model[not(ancestor::xforms:instance)]"
+        val xpathExpression = "//xf:model[not(ancestor::xf:instance)]"
         val modelItems = XPathCache.evaluate(compactShadowTreeWrapper, xpathExpression,
             XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData)
 

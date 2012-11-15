@@ -273,7 +273,7 @@ var testCase = {
             thiss.checkColDebugValue(col1Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col1Div, 'nextSortOrder', 'ascending');
             //thiss.checkColDebugValue(col1Div, 'type', 'number');
-            thiss.checkColDebugValue(col1Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(position())');
+            thiss.checkColDebugValue(col1Div, 'pathToFirstNode', 'xxf:component-context()/(line[length &lt; 20])[1]/(position())');
             thiss.checkColDebugValue(col1Div, 'sortKey', 'position()');
             thiss.checkColDebugValue(col1Div, 'fr:sortable', 'true');
 
@@ -282,7 +282,7 @@ var testCase = {
             thiss.checkColDebugValue(col2Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col2Div, 'nextSortOrder', 'ascending');
             //thiss.checkColDebugValue(col2Div, 'type', 'number');
-            thiss.checkColDebugValue(col2Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[1]/.)');
+            thiss.checkColDebugValue(col2Div, 'pathToFirstNode', 'xxf:component-context()/(line[length &lt; 20])[1]/((*)[1]/.)');
             thiss.checkColDebugValue(col2Div, 'sortKey', '(*)[1]/.');
             thiss.checkColDebugValue(col2Div, 'fr:sortable', 'true');
 
@@ -291,7 +291,7 @@ var testCase = {
             thiss.checkColDebugValue(col3Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col3Div, 'nextSortOrder', 'ascending');
             //thiss.checkColDebugValue(col3Div, 'type', 'text');
-            thiss.checkColDebugValue(col3Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[2]/.)');
+            thiss.checkColDebugValue(col3Div, 'pathToFirstNode', 'xxf:component-context()/(line[length &lt; 20])[1]/((*)[2]/.)');
             thiss.checkColDebugValue(col3Div, 'sortKey', '(*)[2]/.');
             thiss.checkColDebugValue(col3Div, 'fr:sortable', 'true');
 
@@ -300,7 +300,7 @@ var testCase = {
             thiss.checkColDebugValue(col4Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col4Div, 'nextSortOrder', 'ascending');
             //thiss.checkColDebugValue(col4Div, 'type', 'number');
-            thiss.checkColDebugValue(col4Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[3]/.)');
+            thiss.checkColDebugValue(col4Div, 'pathToFirstNode', 'xxf:component-context()/(line[length &lt; 20])[1]/((*)[3]/.)');
             thiss.checkColDebugValue(col4Div, 'sortKey', '(*)[3]/.');
             thiss.checkColDebugValue(col4Div, 'fr:sortable', 'true');
 
@@ -309,7 +309,7 @@ var testCase = {
             thiss.checkColDebugValue(col5Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col5Div, 'nextSortOrder', 'ascending');
             //thiss.checkColDebugValue(col5Div, 'type', 'number');
-            thiss.checkColDebugValue(col5Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/((*)[4]/.)');
+            thiss.checkColDebugValue(col5Div, 'pathToFirstNode', 'xxf:component-context()/(line[length &lt; 20])[1]/((*)[4]/.)');
             thiss.checkColDebugValue(col5Div, 'sortKey', '(*)[4]/.');
             thiss.checkColDebugValue(col5Div, 'fr:sortable', 'true');
 
@@ -318,7 +318,7 @@ var testCase = {
             thiss.checkColDebugValue(col6Div, 'currentSortOrder', 'none');
             thiss.checkColDebugValue(col6Div, 'nextSortOrder', 'ascending');
             //thiss.checkColDebugValue(col6Div, 'type', 'number');
-            thiss.checkColDebugValue(col6Div, 'pathToFirstNode', 'xxforms:component-context()/(line[length &lt; 20])[1]/(round(length div nb-words))');
+            thiss.checkColDebugValue(col6Div, 'pathToFirstNode', 'xxf:component-context()/(line[length &lt; 20])[1]/(round(length div nb-words))');
             thiss.checkColDebugValue(col6Div, 'sortKey', 'round(length div nb-words)');
             thiss.checkColDebugValue(col6Div, 'fr:sortable', 'true');
 

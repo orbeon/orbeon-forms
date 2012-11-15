@@ -11,30 +11,30 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat Iteration Styling</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Repeat Iteration Styling</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <fruits>
                     <fruit>Apple</fruit>
                     <fruit>Orange</fruit>
                     <fruit>Pear</fruit>
                     <fruit>Banana</fruit>
                 </fruits>
-            </xforms:instance>
-            <xforms:instance id="focus">
+            </xf:instance>
+            <xf:instance id="focus">
                 <focus>false</focus>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .my-unfocused .xforms-repeat-selected-item-1,
                 .my-unfocused .xforms-repeat-selected-item-2,
                 .my-unfocused .xforms-repeat-selected-item-3,
@@ -42,26 +42,26 @@
                 background-color: transparent;
             }
             .xforms-label { display: inline; margin-right: 1em; font-weight: bold }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:p>
             This example shows how you can style iterations to initially show no row highlighted, and then start
             highlighting once a row gets keyboard focus.
-        </xhtml:p>
+        </xh:p>
         <!-- Set a different CSS class if there was focus or not -->
-        <xhtml:div class="{if (instance('focus') = 'true') then 'my-focused' else 'my-unfocused'}">
-            <xforms:repeat ref="*">
-                <xhtml:div>
-                    <xforms:input ref=".">
-                        <xforms:label>Fruit</xforms:label>
-                    </xforms:input>
-                </xhtml:div>
+        <xh:div class="{if (instance('focus') = 'true') then 'my-focused' else 'my-unfocused'}">
+            <xf:repeat ref="*">
+                <xh:div>
+                    <xf:input ref=".">
+                        <xf:label>Fruit</xf:label>
+                    </xf:input>
+                </xh:div>
                 <!-- Remember there was a focus event -->
-                <xforms:setvalue ev:event="DOMFocusIn" ref="instance('focus')">true</xforms:setvalue>
+                <xf:setvalue ev:event="DOMFocusIn" ref="instance('focus')">true</xf:setvalue>
                 <!-- De-highlight after the last DOMFocusOut -->
-                <xforms:setvalue ev:event="DOMFocusOut" ref="instance('focus')">false</xforms:setvalue>
-            </xforms:repeat>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+                <xf:setvalue ev:event="DOMFocusOut" ref="instance('focus')">false</xf:setvalue>
+            </xf:repeat>
+        </xh:div>
+    </xh:body>
+</xh:html>

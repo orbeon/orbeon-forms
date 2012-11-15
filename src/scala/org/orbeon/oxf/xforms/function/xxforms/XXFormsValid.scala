@@ -21,10 +21,10 @@ import org.orbeon.saxon.om._
 import org.orbeon.oxf.xml.AttributesAndElementsIterator
 
 /**
- * xxforms:valid() as xs:boolean
- * xxforms:valid($item as xs:item*) as xs:boolean
- * xxforms:valid($item as xs:item*, $recurse as xs:boolean) as xs:boolean
- * xxforms:valid($item as xs:item*, $recurse as xs:boolean, $relevant) as xs:boolean
+ * xxf:valid() as xs:boolean
+ * xxf:valid($item as xs:item*) as xs:boolean
+ * xxf:valid($item as xs:item*, $recurse as xs:boolean) as xs:boolean
+ * xxf:valid($item as xs:item*, $recurse as xs:boolean, $relevant) as xs:boolean
  */
 class XXFormsValid extends XXFormsMIPFunction {
 

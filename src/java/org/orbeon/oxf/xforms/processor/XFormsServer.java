@@ -145,7 +145,7 @@ public class XFormsServer extends ProcessorImpl {
         // Gather server events containers if any
         final List<Element> serverEventsElements = Dom4jUtils.elements(requestDocument.getRootElement(), XFormsConstants.XXFORMS_SERVER_EVENTS_QNAME);
 
-        // Find an output stream for xforms:submission[@replace = 'all']
+        // Find an output stream for xf:submission[@replace = 'all']
         final ExternalContext.Response response = PipelineResponse.getResponse(xmlReceiver, externalContext);
 
 
@@ -376,18 +376,18 @@ public class XFormsServer extends ProcessorImpl {
     private void outputNoscriptResponse(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                         XMLReceiver xmlReceiver, ExternalContext externalContext) throws IOException, SAXException {
         // This will also cache the containing document if needed
-        // QUESTION: Do we actually need to cache if a xforms:submission[@replace = 'all'] happened?
+        // QUESTION: Do we actually need to cache if a xf:submission[@replace = 'all'] happened?
 
         final List loads = containingDocument.getLoadsToRun();
         if (loads != null && loads.size() > 0) {
-            // Handle xforms:load response
+            // Handle xf:load response
 
             // Get first load only
             final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) loads.get(0);
 
             // Send redirect
             final String redirectResource = load.getResource();
-            indentedLogger.logDebug("response", "handling noscript redirect response for xforms:load", "url", redirectResource);
+            indentedLogger.logDebug("response", "handling noscript redirect response for xf:load", "url", redirectResource);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false);
 
@@ -517,8 +517,8 @@ public class XFormsServer extends ProcessorImpl {
                         final ControlTree currentControlTree = xformsControls.getCurrentControlTree();
                         final ControlTree initialControlTree = initialContainingDocument.getControls().getCurrentControlTree();
 
-                        // Make sure all xxforms:dynamic will send full updates during control comparison
-                        // Usually, xxforms:dynamic records structural changes at each update. Here, we don't really
+                        // Make sure all xxf:dynamic will send full updates during control comparison
+                        // Usually, xxf:dynamic records structural changes at each update. Here, we don't really
                         // know whether there were any, so we safely force structural changes. This ensures that the
                         // client will have all the necessary markup, and also prevents the comparator from choking when
                         // comparing incompatible trees.
@@ -691,7 +691,7 @@ public class XFormsServer extends ProcessorImpl {
     private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
         final String target;
 
-        // activeSubmission submission can be null when are running as a portlet and handling an <xforms:load>, which
+        // activeSubmission submission can be null when are running as a portlet and handling an <xf:load>, which
         // when executed from within a portlet is ran as very much like the replace="all" submissions.
         final String activeSubmissionReplace = activeSubmission == null ? "all" : activeSubmission.getReplace();
         final String activeSubmissionResolvedXXFormsTarget = activeSubmission == null ? null : activeSubmission.getResolvedXXFormsTarget();

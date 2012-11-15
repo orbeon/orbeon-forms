@@ -11,121 +11,121 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xforms:model id="fr-navigation-model"
+<xf:model id="fr-navigation-model"
               xmlns:xs="http://www.w3.org/2001/XMLSchema"
-              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:xf="http://www.w3.org/2002/xforms"
               xmlns:ev="http://www.w3.org/2001/xml-events"
-              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:xi="http://www.w3.org/2001/XInclude"
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
-              xmlns:xhtml="http://www.w3.org/1999/xhtml"
+              xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <xforms:instance id="fr-navigation-instance">
+    <xf:instance id="fr-navigation-instance">
         <navigation-instance>
             <orbeon-embeddable/>
         </navigation-instance>
-    </xforms:instance>
+    </xf:instance>
 
-    <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
-    <xforms:var name="common-get-parameters" value="string-join((
-        'fr-language=', xxforms:instance('fr-language-instance'),
+    <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
+    <xf:var name="common-get-parameters" value="string-join((
+        'fr-language=', xxf:instance('fr-language-instance'),
         if (instance('fr-navigation-instance')/orbeon-embeddable = '') then () else ('&amp;orbeon-embeddable=', instance('fr-navigation-instance')/orbeon-embeddable)), '')"/>
 
     <!-- NOTE: Passing the language is not strictly necessary since the current language is in the session but from a
          URL design perspective having the language better identifies the resource -->
 
     <!-- Temporarily set data-safe-override when we know we are not losing data upon navigation -->
-    <xforms:setvalue
+    <xf:setvalue
             ev:observer="fr-edit-switch-script-summary-submission fr-edit-switch-script-submission fr-workflow-edit-submission fr-workflow-review-submission"
             ev:event="xforms-submit"
-            ref="xxforms:instance('fr-persistence-instance')/data-safe-override">true</xforms:setvalue>
+            ref="xxf:instance('fr-persistence-instance')/data-safe-override">true</xf:setvalue>
 
     <!-- Reset data-safe-override -->
-    <xforms:setvalue
+    <xf:setvalue
             ev:observer="fr-edit-switch-script-summary-submission fr-edit-switch-script-submission fr-workflow-edit-submission fr-workflow-review-submission"
             ev:event="xforms-submit-done xforms-submit-error"
-            ref="xxforms:instance('fr-persistence-instance')/data-safe-override"/>
+            ref="xxf:instance('fr-persistence-instance')/data-safe-override"/>
 
-    <xforms:submission id="fr-edit-switch-script-summary-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
+    <xf:submission id="fr-edit-switch-script-summary-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}?{$common-get-parameters}{if (not(property('xxf:noscript'))) then '&amp;fr-noscript=true' else ''}"
         method="get" serialization="none" replace="all" validate="false" relevant="false"/>
 
-    <xforms:submission id="fr-edit-switch-script-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}?{$common-get-parameters}{if (not(property('xxforms:noscript'))) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"/>
+    <xf:submission id="fr-edit-switch-script-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/{$parameters/mode}/{$parameters/document}?{$common-get-parameters}{if (not(property('xxf:noscript'))) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxf:instance('fr-form-instance')" replace="all" validate="false" relevant="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
-    <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
-    <xforms:submission id="fr-print-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
-        xxforms:show-progress="false"/>
+    <!-- Don't use xxf:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
+    <xf:submission id="fr-print-submission"
+        resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
+        method="post" ref="xxf:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
+        xxf:show-progress="false"/>
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
-    <!-- Don't use xxforms:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
+    <!-- Don't use xxf:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
-    <xforms:submission id="fr-pdf-submission"
+    <xf:submission id="fr-pdf-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}?{$common-get-parameters}"
-        method="post" ref="xxforms:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
-        xxforms:show-progress="false"/>
+        method="post" ref="xxf:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
+        xxf:show-progress="false"/>
 
     <!-- Submission to go back to editing the XML form -->
-    <xforms:submission id="fr-workflow-edit-submission"
+    <xf:submission id="fr-workflow-edit-submission"
             relevant="false" validate="false" method="post"
-            ref="xxforms:instance('fr-form-instance')"
-            resource="/fr/{$parameters/app}/{$parameters/form}/edit/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+            ref="xxf:instance('fr-form-instance')"
+            resource="/fr/{$parameters/app}/{$parameters/form}/edit/{$parameters/document}?{$common-get-parameters}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all"/>
 
     <!-- Submission to preview the XML form -->
-    <xforms:submission id="fr-workflow-review-submission"
+    <xf:submission id="fr-workflow-review-submission"
             relevant="false" validate="false" method="post"
-            ref="xxforms:instance('fr-form-instance')"
-            resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxforms:noscript')) then '&amp;fr-noscript=true' else ''}"
+            ref="xxf:instance('fr-form-instance')"
+            resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
             replace="all"/>
 
     <!-- Open PDF for the current form data (dispatch from XPL) -->
-    <xforms:action ev:event="fr-open-pdf">
-        <xforms:send submission="fr-pdf-submission"/>
-    </xforms:action>
+    <xf:action ev:event="fr-open-pdf">
+        <xf:send submission="fr-pdf-submission"/>
+    </xf:action>
 
     <!-- Go back to the Form Runner summary page -->
-    <xforms:action ev:event="fr-goto-summary">
+    <xf:action ev:event="fr-goto-summary">
 
         <!-- Get close URI -->
-        <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')" as="element()"/>
-        <xforms:var name="app" value="$parameters/app" as="xs:string"/>
-        <xforms:var name="form" value="$parameters/form" as="xs:string"/>
-        <xforms:var name="close-uri" value="xxforms:property(string-join(('oxf.fr.detail.close.uri', $app, $form), '.'))" as="xs:anyURI"/>
-        <xforms:var name="have-close-uri" value="$close-uri != ''" as="xs:anyURI"/>
+        <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
+        <xf:var name="app" value="$parameters/app" as="xs:string"/>
+        <xf:var name="form" value="$parameters/form" as="xs:string"/>
+        <xf:var name="close-uri" value="xxf:property(string-join(('oxf.fr.detail.close.uri', $app, $form), '.'))" as="xs:anyURI"/>
+        <xf:var name="have-close-uri" value="$close-uri != ''" as="xs:anyURI"/>
 
         <!-- If we have a close URI, go there -->
-        <xforms:action if="$have-close-uri">
-            <xforms:load resource="{$close-uri}" xxforms:show-progress="false"/>
-        </xforms:action>
+        <xf:action if="$have-close-uri">
+            <xf:load resource="{$close-uri}" xxf:show-progress="false"/>
+        </xf:action>
 
         <!-- If we don't have a close URI, close window if we can, otherwise go to the summary -->
-        <xforms:action if="not($have-close-uri)">
-            <xxforms:script>window.close();</xxforms:script>
-            <xforms:load resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxforms:noscript')) then '?fr-noscript=true' else ''}"
-                         xxforms:show-progress="false"/>
-        </xforms:action>
+        <xf:action if="not($have-close-uri)">
+            <xxf:script>window.close();</xxf:script>
+            <xf:load resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"
+                         xxf:show-progress="false"/>
+        </xf:action>
 
-    </xforms:action>
+    </xf:action>
 
-    <xforms:action ev:event="xforms-model-construct-done">
-        <xforms:setvalue ref="orbeon-embeddable" value="(xxforms:get-request-parameter('orbeon-embeddable'), xxforms:get-request-parameter('orbeon-portlet'))"/>
-    </xforms:action>
+    <xf:action ev:event="xforms-model-construct-done">
+        <xf:setvalue ref="orbeon-embeddable" value="(xxf:get-request-parameter('orbeon-embeddable'), xxf:get-request-parameter('orbeon-portlet'))"/>
+    </xf:action>
 
     <!-- React to failed submission -->
-    <xforms:action ev:event="xforms-submit-error">
-        <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-            <xforms:property name="submission-id" value="event('xxforms:targetid')"/>
-            <xforms:property name="response-body" value="event('response-body')"/>
-            <xforms:property name="error-type" value="event('error-type')"/>
-        </xforms:dispatch>
-    </xforms:action>
+    <xf:action ev:event="xforms-submit-error">
+        <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
+            <xf:property name="submission-id" value="event('xxf:targetid')"/>
+            <xf:property name="response-body" value="event('response-body')"/>
+            <xf:property name="error-type" value="event('error-type')"/>
+        </xf:dispatch>
+    </xf:action>
 
-</xforms:model>
+</xf:model>

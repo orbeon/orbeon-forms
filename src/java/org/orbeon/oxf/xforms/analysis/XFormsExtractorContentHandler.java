@@ -45,10 +45,10 @@ import java.util.*;
  * The static state document contains only models and controls, without interleaved XHTML elements in order to save
  * memory and to facilitate visiting controls. The exceptions are:
  *
- * o The content of inline XForms instances (xforms:instance)
+ * o The content of inline XForms instances (xf:instance)
  * o The content of inline XML Schemas (xs:schema)
  * o The content of inline XBL definitions (xbl:xbl)
- * o The content of xforms:label, xforms:hint, xforms:help, xforms:alert (as they can contain XHTML)
+ * o The content of xf:label, xf:hint, xf:help, xf:alert (as they can contain XHTML)
  *
  * Notes:
  *
@@ -57,25 +57,25 @@ import java.util.*;
  *
  * Structure:
  *
- * <static-state xmlns:xxforms="..." system-id="..." is-html="..." ...>
+ * <static-state xmlns:xxf="..." system-id="..." is-html="..." ...>
  *   <root>
  *     <!-- E.g. AVT on xhtml:html -->
- *     <xxforms:attribute .../>
- *     <!-- E.g. xforms:output within xhtml:title -->
- *     <xforms:output .../>
+ *     <xxf:attribute .../>
+ *     <!-- E.g. xf:output within xhtml:title -->
+ *     <xf:output .../>
  *     <!-- E.g. XBL component definitions -->
  *     <xbl:xbl .../>
  *     <xbl:xbl .../>
  *     <!-- Top-level models -->
- *     <xforms:model ...>
- *     <xforms:model ...>
+ *     <xf:model ...>
+ *     <xf:model ...>
  *     <!-- Top-level controls including XBL-bound controls -->
- *     <xforms:group ...>
- *     <xforms:input ...>
+ *     <xf:group ...>
+ *     <xf:input ...>
  *     <foo:bar ...>
  *   </root>
  *   <!-- Global properties -->
- *   <properties xxforms:noscript="true" .../>
+ *   <properties xxf:noscript="true" .../>
  *   <!-- Last id used (for id generation in XBL after deserialization) -->
  *   <last-id id="123"/>
  *   <!-- Template (for full updates, possibly noscript) -->
@@ -222,7 +222,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             final AttributesImpl newAttributes = new AttributesImpl();
             for (final Map.Entry<String, Object> currentEntry : properties.entrySet()) {
                 final String propertyName = currentEntry.getKey();
-                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxforms:" + propertyName, ContentHandlerHelper.CDATA, currentEntry.getValue().toString());
+                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxf:" + propertyName, ContentHandlerHelper.CDATA, currentEntry.getValue().toString());
             }
 
             super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -337,7 +337,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             elementStack.push(new XMLElementDetails(id, newBase, newLang, xmlLangAvtId, newScope, isXForms && localname.equals("model")));
         }
 
-        // Handle properties of the form @xxforms:* when outside of models or controls
+        // Handle properties of the form @xxf:* when outside of models or controls
         if (! inXFormsOrExtension && ! isXFormsOrExtension) {
             handleProperties(attributes);
         }
@@ -388,11 +388,11 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             if (inXFormsOrExtension && ! inPreserve && ! inForeign) {
                 // TODO: Just warn?
                 if (isXXForms) {
-                    // Check that we are getting a valid xxforms:* element
+                    // Check that we are getting a valid xxf:* element
                     if (! XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName.get(localname, XFormsConstants.XXFORMS_NAMESPACE)))
                         throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
                 } else if (isEXForms) {
-                    // Check that we are getting a valid exforms:* element
+                    // Check that we are getting a valid exf:* element
                     if (! XFormsConstants.ALLOWED_EXFORMS_ELEMENTS.contains(localname))
                         throw new ValidationException("Invalid eXForms element in XForms document: " + qName, new LocationData(locator));
                 } else if (isXBL) {
@@ -596,7 +596,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         for (int i = 0; i < attributesCount; i++) {
             final String attributeURI = attributes.getURI(i);
             if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attributeURI)) {
-                // Found xxforms:* attribute
+                // Found xxf:* attribute
                 addProperty(attributes.getLocalName(i), attributes.getValue(i));
             }
         }

@@ -11,26 +11,26 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Select One With Hierarchy</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Select One With Hierarchy</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <selected>
                     <value1>sc1</value1>
                     <value2>sc1</value2>
                     <value3>p</value3>
                 </selected>
-            </xforms:instance>
-            <xforms:instance id="items-instance">
+            </xf:instance>
+            <xf:instance id="items-instance">
                 <items>
                     <item label="Encyclopedia">
                         <item label="Science" value="sc1"/>
@@ -41,8 +41,8 @@
                         <item label="Culture" value="cu2"/>
                     </item>
                 </items>
-            </xforms:instance>
-            <xforms:instance id="flavors-instance">
+            </xf:instance>
+            <xf:instance id="flavors-instance">
                 <flavors>
                     <flavor value="v">
                         <label>Vanilla</label>
@@ -54,8 +54,8 @@
                         <label>Chocolate</label>
                     </flavor>
                 </flavors>
-            </xforms:instance>
-            <xforms:instance id="carriers-instance">
+            </xf:instance>
+            <xf:instance id="carriers-instance">
                 <carriers>
                     <carrier value="ups">
                         <label>UPS</label>
@@ -67,99 +67,99 @@
                         <label>DHL</label>
                     </carrier>
                 </carriers>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <fr:button>
-            <xforms:label>Remove first culture</xforms:label>
-            <xforms:delete ev:event="DOMActivate" ref="instance('items-instance')//item[@value = 'cu1']"/>
+            <xf:label>Remove first culture</xf:label>
+            <xf:delete ev:event="DOMActivate" ref="instance('items-instance')//item[@value = 'cu1']"/>
         </fr:button>
-        <xhtml:p>
-            <xforms:select1 ref="value1" appearance="minimal">
-                <xforms:label>Select: </xforms:label>
-                <xforms:itemset ref="instance('items-instance')//item">
-                    <xforms:label ref="@label"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
-            <xforms:output ref="value1">
-                <xforms:label>Value selected: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:select1 ref="value2" appearance="compact">
-                <xforms:label>Select: </xforms:label>
-                <xforms:choices>
-                    <xforms:label>Encyclopedia</xforms:label>
-                    <xforms:item>
-                        <xforms:label>Science</xforms:label>
-                        <xforms:value>sc1</xforms:value>
-                    </xforms:item>
-                    <xforms:choices>
-                        <xforms:label>Culture</xforms:label>
-                        <xforms:item>
-                            <xforms:label>Art</xforms:label>
-                            <xforms:value>ar1</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label>Craft</xforms:label>
-                            <xforms:value>cr1</xforms:value>
-                        </xforms:item>
-                    </xforms:choices>
-                </xforms:choices>
-                <xforms:choices>
-                    <xforms:label>Encyclopedia</xforms:label>
-                    <xforms:item>
-                        <xforms:label>Science</xforms:label>
-                        <xforms:value>sc2</xforms:value>
-                    </xforms:item>
-                    <xforms:choices>
-                        <xforms:label>Culture</xforms:label>
-                        <xforms:item>
-                            <xforms:label>Art</xforms:label>
-                            <xforms:value>ar2</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label>Craft</xforms:label>
-                            <xforms:value>cr2</xforms:value>
-                        </xforms:item>
-                    </xforms:choices>
-                </xforms:choices>
-            </xforms:select1>
-            <xforms:output ref="value2">
-                <xforms:label>Value selected: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:select1 ref="value3" appearance="minimal">
-                <xforms:label>Select: </xforms:label>
-                <xforms:choices>
-                    <xforms:label>Flavors</xforms:label>
-                    <xforms:item>
-                        <xforms:label>Pistachio</xforms:label>
-                        <xforms:value>p</xforms:value>
-                    </xforms:item>
-                    <xforms:itemset ref="instance('flavors-instance')/flavor">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:choices>
-                <xforms:choices>
-                    <xforms:label>Carriers</xforms:label>
-                    <xforms:item>
-                        <xforms:label>USPS</xforms:label>
-                        <xforms:value>usps</xforms:value>
-                    </xforms:item>
-                    <xforms:itemset ref="instance('carriers-instance')/carrier">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="@value"/>
-                    </xforms:itemset>
-                </xforms:choices>
-            </xforms:select1>
-            <xforms:output ref="value3">
-                <xforms:label>Value selected: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        <xh:p>
+            <xf:select1 ref="value1" appearance="minimal">
+                <xf:label>Select: </xf:label>
+                <xf:itemset ref="instance('items-instance')//item">
+                    <xf:label ref="@label"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
+            <xf:output ref="value1">
+                <xf:label>Value selected: </xf:label>
+            </xf:output>
+        </xh:p>
+        <xh:p>
+            <xf:select1 ref="value2" appearance="compact">
+                <xf:label>Select: </xf:label>
+                <xf:choices>
+                    <xf:label>Encyclopedia</xf:label>
+                    <xf:item>
+                        <xf:label>Science</xf:label>
+                        <xf:value>sc1</xf:value>
+                    </xf:item>
+                    <xf:choices>
+                        <xf:label>Culture</xf:label>
+                        <xf:item>
+                            <xf:label>Art</xf:label>
+                            <xf:value>ar1</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label>Craft</xf:label>
+                            <xf:value>cr1</xf:value>
+                        </xf:item>
+                    </xf:choices>
+                </xf:choices>
+                <xf:choices>
+                    <xf:label>Encyclopedia</xf:label>
+                    <xf:item>
+                        <xf:label>Science</xf:label>
+                        <xf:value>sc2</xf:value>
+                    </xf:item>
+                    <xf:choices>
+                        <xf:label>Culture</xf:label>
+                        <xf:item>
+                            <xf:label>Art</xf:label>
+                            <xf:value>ar2</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label>Craft</xf:label>
+                            <xf:value>cr2</xf:value>
+                        </xf:item>
+                    </xf:choices>
+                </xf:choices>
+            </xf:select1>
+            <xf:output ref="value2">
+                <xf:label>Value selected: </xf:label>
+            </xf:output>
+        </xh:p>
+        <xh:p>
+            <xf:select1 ref="value3" appearance="minimal">
+                <xf:label>Select: </xf:label>
+                <xf:choices>
+                    <xf:label>Flavors</xf:label>
+                    <xf:item>
+                        <xf:label>Pistachio</xf:label>
+                        <xf:value>p</xf:value>
+                    </xf:item>
+                    <xf:itemset ref="instance('flavors-instance')/flavor">
+                        <xf:label ref="label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:choices>
+                <xf:choices>
+                    <xf:label>Carriers</xf:label>
+                    <xf:item>
+                        <xf:label>USPS</xf:label>
+                        <xf:value>usps</xf:value>
+                    </xf:item>
+                    <xf:itemset ref="instance('carriers-instance')/carrier">
+                        <xf:label ref="label"/>
+                        <xf:value ref="@value"/>
+                    </xf:itemset>
+                </xf:choices>
+            </xf:select1>
+            <xf:output ref="value3">
+                <xf:label>Value selected: </xf:label>
+            </xf:output>
+        </xh:p>
+    </xh:body>
+</xh:html>

@@ -26,7 +26,7 @@
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
-    <test description="Simple xforms:bind dependencies" name="oxf:java">
+    <test description="Simple xf:bind dependencies" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -258,7 +258,7 @@
         </output>
     </test>
 
-    <test description="MIP xforms:bind dependencies" name="oxf:java">
+    <test description="MIP xf:bind dependencies" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -1540,7 +1540,7 @@
         </output>
     </test>
 
-    <test description="Simple xxforms:instance function within models" name="oxf:java">
+    <test description="Simple xxf:instance function within models" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -5380,7 +5380,7 @@
             </xh:html>
         </input>
         <output name="response">
-            <controls xmlns:xhtml="http://www.w3.org/1999/xhtml">
+            <controls xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-empty">
                     <xh:input id="my-input$xforms-input-1" type="text" name="my-input$xforms-input-1" value="" class="xforms-input-input"/>
                     <xh:span class="xforms-alert-active xforms-alert">First name is mandatory</xh:span>
@@ -5965,7 +5965,7 @@
         </output>
     </test>
 
-    <test description="xxforms:instance id resolution across XBL scopes" name="oxf:java">
+    <test description="xxf:instance id resolution across XBL scopes" name="oxf:java">
         <input name="config">
             <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
         </input>
@@ -6639,7 +6639,7 @@
                 <xh:body>
                     <xf:group id="my-group">
                         <!-- This variable must be in scope for the xf:output placed after the model -->
-                        <xxf:var name="foo">foo</xxf:var>
+                        <xf:var name="foo">foo</xf:var>
                         <xf:model id="nested-model"/>
                         <xf:output id="my-output" value="$foo"/>
                     </xf:group>

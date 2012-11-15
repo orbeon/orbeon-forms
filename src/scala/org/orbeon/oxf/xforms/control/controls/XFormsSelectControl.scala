@@ -27,9 +27,9 @@ import scala.collection.mutable
 import collection.{Set ⇒ CSet}
 
 /**
- * Represents an xforms:select control.
+ * Represents an xf:select control.
  *
- * xforms:select represents items as a list of space-separated tokens.
+ * xf:select represents items as a list of space-separated tokens.
  */
 class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsSelect1Control(container, parent, element, id) {

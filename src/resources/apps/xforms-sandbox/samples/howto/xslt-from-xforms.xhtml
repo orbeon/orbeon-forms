@@ -1,18 +1,18 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XSLT Transformation in XForms</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>XSLT Transformation in XForms</xh:title>
+        <xf:model>
             
             <!-- Instance to be transformed through XSLT -->
-            <xforms:instance id="input" xxforms:exclude-result-prefixes="#all">
+            <xf:instance id="input" xxf:exclude-result-prefixes="#all">
                 <sites>
                     <site>
                         <name>Yahoo!</name>
@@ -26,13 +26,13 @@
                         <tag>mail</tag>
                     </site>
                 </sites>
-            </xforms:instance>
+            </xf:instance>
             
             <!-- Instance containing the output of the transformation -->
-            <xforms:instance id="output"><dummy/></xforms:instance>
+            <xf:instance id="output"><dummy/></xf:instance>
 
             <!-- The stylesheet doing the transformation; here is inline, but it will typically be an external file -->
-            <xforms:instance id="stylesheet">
+            <xf:instance id="stylesheet">
                 <xsl:stylesheet version="2.0" exclude-result-prefixes="#all">
                     <xsl:template match="site">
                         <xsl:copy>
@@ -48,41 +48,41 @@
                         </xsl:copy>
                     </xsl:template>
                 </xsl:stylesheet>
-            </xforms:instance>
+            </xf:instance>
             
-            <xforms:instance id="ui">
+            <xf:instance id="ui">
                 <ui>
                     <xsl:output method="xml" omit-xml-declaration="yes" indent="no" saxon:indent-spaces="4"/>
                 </ui>
-            </xforms:instance>
-            <xforms:delete ev:event="xforms-model-construct-done" ref="instance('input')//text()[normalize-space() = '']"/>
+            </xf:instance>
+            <xf:delete ev:event="xforms-model-construct-done" ref="instance('input')//text()[normalize-space() = '']"/>
             
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             pre { background-color: #eee; font-family: Consolas,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New; 
                   float: left; padding: .5em 2em; }
             .transform-trigger { float: left; margin: 5em 2em;  }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:pre><xforms:output value="saxon:serialize(instance('input'), instance('ui')/xsl:output)"/></xhtml:pre>
+        <xh:pre><xf:output value="saxon:serialize(instance('input'), instance('ui')/xsl:output)"/></xh:pre>
         
-        <xforms:trigger appearance="minimal" class="transform-trigger">
-            <xforms:label>Run XSLT</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:insert ref="instance('output')" origin="saxon:transform(
+        <xf:trigger appearance="minimal" class="transform-trigger">
+            <xf:label>Run XSLT</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:insert ref="instance('output')" origin="saxon:transform(
                     saxon:compile-stylesheet(instance('stylesheet')/root()), 
                     saxon:parse(saxon:serialize(instance('input'), 'xml')))"/>
-                <xforms:toggle case="show-result"/>
-            </xforms:action>
-        </xforms:trigger>
+                <xf:toggle case="show-result"/>
+            </xf:action>
+        </xf:trigger>
         
-        <xforms:switch>
-            <xforms:case/>
-            <xforms:case id="show-result">
-                <xhtml:pre><xforms:output value="saxon:serialize(instance('output'), instance('ui')/xsl:output)"/></xhtml:pre>
-            </xforms:case>
-        </xforms:switch>
-    </xhtml:body>
-</xhtml:html>
+        <xf:switch>
+            <xf:case/>
+            <xf:case id="show-result">
+                <xh:pre><xf:output value="saxon:serialize(instance('output'), instance('ui')/xsl:output)"/></xh:pre>
+            </xf:case>
+        </xf:switch>
+    </xh:body>
+</xh:html>

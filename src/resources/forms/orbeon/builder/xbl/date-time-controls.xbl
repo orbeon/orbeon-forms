@@ -14,13 +14,13 @@
 <!--
     This is the standard Form Builder standard controls library.
  -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl">
@@ -31,7 +31,7 @@
         <display-name lang="ru">[Date and time]</display-name>
     </metadata>
 
-    <xbl:binding id="fb-input-date" element="xforms|input">
+    <xbl:binding id="fb-input-date" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
             <display-name lang="fr">Date</display-name>
@@ -41,20 +41,20 @@
                 <large-icon>/apps/fr/style/images/silk/date.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:date"/>
+                <bind type="xf:date"/>
                 <view>
-                    <xforms:input id="" ref="" xmlns="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
-                    </xforms:input>
+                    <xf:input id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:input>
                 </view>
             </templates>
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-time" element="xforms|input">
+    <xbl:binding id="fb-input-time" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Time</display-name>
             <display-name lang="fr">Heure</display-name>
@@ -64,20 +64,20 @@
                 <large-icon>/apps/fr/style/images/silk/time.png</large-icon>
             </icon>type>
             <templates>
-                <bind type="xforms:time"/>
+                <bind type="xf:time"/>
                 <view>
-                    <xforms:input id="" ref="" xmlns="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
-                    </xforms:input>
+                    <xf:input id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:input>
                 </view>
             </templates>
         </metadata>
     </xbl:binding>
 
-    <xbl:binding id="fb-input-dateTime" element="xforms|input">
+    <xbl:binding id="fb-input-dateTime" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date and Time</display-name>
             <display-name lang="fr">Date et heure</display-name>
@@ -87,14 +87,14 @@
                 <large-icon>/apps/fr/style/images/silk/clock_link.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:dateTime"/>
+                <bind type="xf:dateTime"/>
                 <view>
-                    <xforms:input id="" ref="" xmlns="">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
-                    </xforms:input>
+                    <xf:input id="" ref="" xmlns="">
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                    </xf:input>
                 </view>
             </templates>
         </metadata>

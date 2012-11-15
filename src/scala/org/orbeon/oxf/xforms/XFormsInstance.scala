@@ -41,7 +41,7 @@ case class InstanceCaching(
         sourceURI: String,
         requestBodyHash: Option[String]) {
     
-    require(sourceURI ne null, """Only XForms instances externally loaded through the src attribute may have xxforms:cache="true".""")
+    require(sourceURI ne null, """Only XForms instances externally loaded through the src attribute may have xxf:cache="true".""")
 
     def debugPairs = Seq(
         "timeToLive"      → timeToLive.toString,
@@ -204,7 +204,7 @@ class XFormsInstance(
                 if newRepeatControl.getResolutionScope == instanceScope
             } yield
                 // Only update controls within same scope as modified instance
-                // NOTE: This can clearly break with e.g. xxforms:instance()
+                // NOTE: This can clearly break with e.g. xxf:instance()
                 newRepeatControl.updateNodesetForInsertDelete(insertedNodes)
         }
     }

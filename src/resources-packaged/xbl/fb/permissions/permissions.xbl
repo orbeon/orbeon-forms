@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -29,15 +29,15 @@
     <xbl:binding id="fb-permissions" element="fb|permissions">
         <xbl:handlers>
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
-                <xxforms:show dialog="dialog"/>
+                <xxf:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:resources>
             <xbl:style src="/xbl/fb/permissions/permissions.css"/>
         </xbl:resources>
         <xbl:implementation>
-            <xforms:model id="permissions-model">
-                <xforms:instance id="ui">
+            <xf:model id="permissions-model">
+                <xf:instance id="ui">
                     <ui valid="true">
                         <apply-trigger/>
                         <has-permissions/>
@@ -48,192 +48,192 @@
                             </permission>
                         </permissions>
                     </ui>
-                </xforms:instance>
+                </xf:instance>
                 <!-- Maintain validity flag -->
-                <xforms:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="@valid">false</xforms:setvalue>
-                <xforms:setvalue ev:event="xxforms-valid"   ev:observer="ui" ref="@valid">true</xforms:setvalue>
-                <xforms:bind ref="instance('ui')">
-                    <xforms:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
-                    <xforms:bind ref="readonly-checked" readonly="true()"/>
-                    <xforms:bind ref="permissions/permission/role" constraint="normalize-space()" required="true()"/>
-                </xforms:bind>
-                <xforms:instance id="permission-template">
+                <xf:setvalue ev:event="xxforms-invalid" ev:observer="ui" ref="@valid">false</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-valid"   ev:observer="ui" ref="@valid">true</xf:setvalue>
+                <xf:bind ref="instance('ui')">
+                    <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
+                    <xf:bind ref="readonly-checked" readonly="true()"/>
+                    <xf:bind ref="permissions/permission/role" constraint="normalize-space()" required="true()"/>
+                </xf:bind>
+                <xf:instance id="permission-template">
                     <permission>
                         <role/>
                         <operations/>
                     </permission>
-                </xforms:instance>
-            </xforms:model>
+                </xf:instance>
+            </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xforms:group appearance="xxforms:internal" id="container">
+            <xf:group appearance="xxf:internal" id="container">
 
-                <xforms:var name="metadata"       ><xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=metadata-ref"/></xforms:var>
-                <xforms:var name="resources"      ><xxforms:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
-                <xforms:var name="ui"             value="instance('ui')"/>
+                <xf:var name="metadata"       ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=metadata-ref"/></xf:var>
+                <xf:var name="resources"      ><xxf:sequence value="." xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="ui"             value="instance('ui')"/>
 
                 <!-- On dialog open, copy permissions from metadata into our UI representation -->
-                <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
+                <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
 
-                    <xforms:var name="has-permissions" value="exists($metadata/permissions)"/>
-                    <xforms:setvalue ref="$ui/has-permissions" value="if ($has-permissions) then 'true' else ''"/>
+                    <xf:var name="has-permissions" value="exists($metadata/permissions)"/>
+                    <xf:setvalue ref="$ui/has-permissions" value="if ($has-permissions) then 'true' else ''"/>
 
                     <!-- Clean UI permissions -->
-                    <xforms:delete ref="$ui/permissions/*"/>
-                    <xforms:insert context="$ui/permissions" origin="instance('permission-template')"/>
-                    <xforms:delete ref="$ui/permissions/permission/role"/>
+                    <xf:delete ref="$ui/permissions/*"/>
+                    <xf:insert context="$ui/permissions" origin="instance('permission-template')"/>
+                    <xf:delete ref="$ui/permissions/permission/role"/>
 
                     <!-- Populate UI permissions based metadata -->
-                    <xforms:action if="$has-permissions">
+                    <xf:action if="$has-permissions">
                         <!-- Add permissions attached to a role -->
-                        <xforms:var name="roles" value="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
-                        <xforms:action iterate="$roles">
+                        <xf:var name="roles" value="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
+                        <xf:action iterate="$roles">
                             <!-- Current role -->
-                            <xforms:var name="role" value="."/>
+                            <xf:var name="role" value="."/>
                             <!-- Permissions for the current role -->
-                            <xforms:var name="permissions" value="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
+                            <xf:var name="permissions" value="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
                             <!-- Operations for the current role -->
-                            <xforms:var name="operations-raw" value="$permissions/@operations/tokenize(., '\s')"/>
+                            <xf:var name="operations-raw" value="$permissions/@operations/tokenize(., '\s')"/>
                             <!-- Replace read and update by read-update -->
-                            <xforms:var name="operations-read-update" value="distinct-values(for $o in $operations-raw return if ($o = ('read', 'update')) then 'read-update' else $o)"/>
+                            <xf:var name="operations-read-update" value="distinct-values(for $o in $operations-raw return if ($o = ('read', 'update')) then 'read-update' else $o)"/>
                             <!-- Insert new permission in UI, and populate it -->
-                            <xforms:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
-                            <xforms:var name="new-permission" value="$ui/permissions/permission[last()]"/>
+                            <xf:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
+                            <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
                             <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xforms:setvalue if="$role != ''"  ref="$new-permission/role" value="replace($role, '%20', ' ')"/>
-                            <xforms:setvalue ref="$new-permission/operations" value="string-join($operations-read-update, ' ')"/>
-                        </xforms:action>
-                    </xforms:action>
-                </xforms:action>
+                            <xf:setvalue if="$role != ''"  ref="$new-permission/role" value="replace($role, '%20', ' ')"/>
+                            <xf:setvalue ref="$new-permission/operations" value="string-join($operations-read-update, ' ')"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
 
                 <!-- On save, copy permissions from UI representation to metadata -->
-                <xforms:action ev:event="DOMActivate" ev:observer="save-trigger">
+                <xf:action ev:event="DOMActivate" ev:observer="save-trigger">
                     <!-- Reset permissions element -->
-                    <xforms:delete ref="$metadata/permissions"/>
-                    <xforms:action if="$ui/has-permissions = 'true'">
-                        <xforms:insert context="$metadata" ref="*" origin="xxforms:element('permissions')"/>
+                    <xf:delete ref="$metadata/permissions"/>
+                    <xf:action if="$ui/has-permissions = 'true'">
+                        <xf:insert context="$metadata" ref="*" origin="xxf:element('permissions')"/>
                         <!-- In UI replace "read-update" by "read update" -->
-                        <xforms:setvalue iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
+                        <xf:setvalue iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
                         <!-- In UI replace space in role by %20 -->
-                        <xforms:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
+                        <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
                         <!-- Add "anyone" permission -->
-                        <xforms:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>
-                        <xforms:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxforms:element('permission', xxforms:attribute('operations', $anyone-operations))"/>
+                        <xf:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>
+                        <xf:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', xxf:attribute('operations', $anyone-operations))"/>
                         <!-- For each permission, get the roles that can access it, and store in metadata as a separate permission element -->
-                        <xforms:var name="permissions" value="$ui/permissions/permission[position() > 1]"/>
-                        <xforms:action iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
-                            <xforms:var name="operation" value="."/>
-                            <xforms:var name="roles" value="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
-                            <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
-                                xxforms:attribute('operations', $operation),
-                                xxforms:element('user-role', xxforms:attribute('any-of', $roles))))"/>
-                        </xforms:action>
+                        <xf:var name="permissions" value="$ui/permissions/permission[position() > 1]"/>
+                        <xf:action iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
+                            <xf:var name="operation" value="."/>
+                            <xf:var name="roles" value="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
+                            <xf:insert context="$metadata/permissions" ref="*" origin="xxf:element('permission', (
+                                xxf:attribute('operations', $operation),
+                                xxf:element('user-role', xxf:attribute('any-of', $roles))))"/>
+                        </xf:action>
                         <!-- Optional code to consolidate multiple permission for the same roles -->
-                        <xforms:var name="any-ofs" value="distinct-values($metadata/permissions/permission/user-role/@any-of)"/>
-                        <xforms:var name="operations" value="for $ao in $any-ofs return string-join($metadata/permissions/permission[user-role/@any-of = $ao]/@operations, ' ')"/>
-                        <xforms:delete ref="$metadata/permissions/permission[user-role]"/>
-                        <xforms:action iterate="1 to count($any-ofs)">
-                            <xforms:var name="i" value="position()"/>
-                            <xforms:insert context="$metadata/permissions" ref="*" origin="xxforms:element('permission', (
-                                xxforms:attribute('operations', saxon:item-at($operations, $i)),
-                                xxforms:element('user-role', xxforms:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
-                        </xforms:action>
-                    </xforms:action>
-                </xforms:action>
+                        <xf:var name="any-ofs" value="distinct-values($metadata/permissions/permission/user-role/@any-of)"/>
+                        <xf:var name="operations" value="for $ao in $any-ofs return string-join($metadata/permissions/permission[user-role/@any-of = $ao]/@operations, ' ')"/>
+                        <xf:delete ref="$metadata/permissions/permission[user-role]"/>
+                        <xf:action iterate="1 to count($any-ofs)">
+                            <xf:var name="i" value="position()"/>
+                            <xf:insert context="$metadata/permissions" ref="*" origin="xxf:element('permission', (
+                                xxf:attribute('operations', saxon:item-at($operations, $i)),
+                                xxf:element('user-role', xxf:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
 
                 <!-- Hide dialog -->
-                <xforms:action ev:event="DOMActivate" ev:observer="save-trigger cancel-trigger">
-                    <xxforms:hide dialog="dialog"/>
-                </xforms:action>
+                <xf:action ev:event="DOMActivate" ev:observer="save-trigger cancel-trigger">
+                    <xxf:hide dialog="dialog"/>
+                </xf:action>
 
-                <xxforms:dialog id="dialog" class="fb-permissions-dialog">
-                    <xforms:label ref="$resources/dialog-permissions/label"/>
+                <xxf:dialog id="dialog" class="fb-permissions-dialog">
+                    <xf:label ref="$resources/dialog-permissions/label"/>
                     <!-- Choose mode -->
-                    <xforms:select ref="$ui/has-permissions" appearance="full">
-                        <xforms:item>
-                            <xforms:label ref="$resources/dialog-permissions/role-based-permissions"/>
-                            <xforms:value>true</xforms:value>
-                        </xforms:item>
-                        <xforms:action ev:event="xforms-value-changed" if=". = 'true' and empty($ui/permissions/permission)">
-                            <xforms:insert context="$ui/permissions/permission" origin="instance('permission-template')"/>
-                        </xforms:action>
-                    </xforms:select>
-                    <xforms:group ref=".[$ui/has-permissions = 'true']">
+                    <xf:select ref="$ui/has-permissions" appearance="full">
+                        <xf:item>
+                            <xf:label ref="$resources/dialog-permissions/role-based-permissions"/>
+                            <xf:value>true</xf:value>
+                        </xf:item>
+                        <xf:action ev:event="xforms-value-changed" if=". = 'true' and empty($ui/permissions/permission)">
+                            <xf:insert context="$ui/permissions/permission" origin="instance('permission-template')"/>
+                        </xf:action>
+                    </xf:select>
+                    <xf:group ref=".[$ui/has-permissions = 'true']">
                         <!-- Edit roles -->
-                        <xhtml:table class="fb-permissions-repeat">
-                            <xhtml:tr>
-                                <xhtml:th><xforms:output value="$resources/dialog-permissions/role"/></xhtml:th>
-                                <xhtml:th><xforms:output value="$resources/dialog-permissions/operations"/></xhtml:th>
-                            </xhtml:tr>
-                            <xforms:var name="anyone-operations" value="tokenize($ui/permissions/permission[1]/operations, '\s')"/>
-                            <xforms:repeat ref="$ui/permissions/permission">
-                                <xforms:var name="is-first" value="position() = 1"/>
-                                <xhtml:tr>
-                                    <xhtml:td>
+                        <xh:table class="fb-permissions-repeat">
+                            <xh:tr>
+                                <xh:th><xf:output value="$resources/dialog-permissions/role"/></xh:th>
+                                <xh:th><xf:output value="$resources/dialog-permissions/operations"/></xh:th>
+                            </xh:tr>
+                            <xf:var name="anyone-operations" value="tokenize($ui/permissions/permission[1]/operations, '\s')"/>
+                            <xf:repeat ref="$ui/permissions/permission">
+                                <xf:var name="is-first" value="position() = 1"/>
+                                <xh:tr>
+                                    <xh:td>
                                         <!-- Role name or "anyone" -->
-                                        <xforms:group ref=".[$is-first]">
-                                            <xforms:output value="$resources/dialog-permissions/anyone"/>
-                                        </xforms:group>
-                                        <xforms:group ref=".[not($is-first)]">
-                                            <xforms:input ref="role" incremental="true">
-                                                <xforms:alert ref="$resources/dialog-permissions/invalid-role-name"/>
-                                            </xforms:input>
-                                        </xforms:group>
-                                    </xhtml:td>
-                                    <xhtml:td>
+                                        <xf:group ref=".[$is-first]">
+                                            <xf:output value="$resources/dialog-permissions/anyone"/>
+                                        </xf:group>
+                                        <xf:group ref=".[not($is-first)]">
+                                            <xf:input ref="role" incremental="true">
+                                                <xf:alert ref="$resources/dialog-permissions/invalid-role-name"/>
+                                            </xf:input>
+                                        </xf:group>
+                                    </xh:td>
+                                    <xh:td>
                                         <!-- Checkboxes for operations -->
-                                        <xforms:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations" appearance="full">
-                                            <xforms:item>
-                                                <xforms:label ref="$resources/dialog-permissions/create"/>
-                                                <xforms:value>create</xforms:value>
-                                            </xforms:item>
-                                        </xforms:select>
-                                        <xforms:select ref="if (not($is-first) and $anyone-operations = 'read-update') then $ui/readonly-checked else operations" appearance="full">
-                                            <xforms:item>
-                                                <xforms:label ref="$resources/dialog-permissions/read-update"/>
-                                                <xforms:value>read-update</xforms:value>
-                                            </xforms:item>
-                                        </xforms:select>
-                                        <xforms:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations" appearance="full">
-                                            <xforms:item>
-                                                <xforms:label ref="$resources/dialog-permissions/delete"/>
-                                                <xforms:value>delete</xforms:value>
-                                            </xforms:item>
-                                        </xforms:select>
-                                    </xhtml:td>
-                                    <xhtml:td>
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations" appearance="full">
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-permissions/create"/>
+                                                <xf:value>create</xf:value>
+                                            </xf:item>
+                                        </xf:select>
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'read-update') then $ui/readonly-checked else operations" appearance="full">
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-permissions/read-update"/>
+                                                <xf:value>read-update</xf:value>
+                                            </xf:item>
+                                        </xf:select>
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations" appearance="full">
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-permissions/delete"/>
+                                                <xf:value>delete</xf:value>
+                                            </xf:item>
+                                        </xf:select>
+                                    </xh:td>
+                                    <xh:td>
                                         <!-- Remove -->
-                                        <xforms:trigger appearance="minimal" ref=".[not($is-first)]">
-                                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/cross_bw.png" alt="Remove"/></xforms:label>
-                                            <xforms:delete ev:event="DOMActivate" ref="."/>
-                                        </xforms:trigger>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:table>
+                                        <xf:trigger appearance="minimal" ref=".[not($is-first)]">
+                                            <xf:label><xh:img src="/apps/fr/style/images/silk/cross_bw.png" alt="Remove"/></xf:label>
+                                            <xf:delete ev:event="DOMActivate" ref="."/>
+                                        </xf:trigger>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:table>
                         <!-- Add -->
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label><xhtml:img src="/apps/fr/style/images/silk/add.png" alt="Add"/></xforms:label>
-                            <xforms:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
-                        </xforms:trigger>
-                    </xforms:group>
+                        <xf:trigger appearance="minimal">
+                            <xf:label><xh:img src="/apps/fr/style/images/silk/add.png" alt="Add"/></xf:label>
+                            <xf:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
+                        </xf:trigger>
+                    </xf:group>
 
                     <!-- Buttons -->
-                    <xhtml:div class="fr-dialog-buttons">
-                        <xforms:group appearance="xxforms:internal" id="triggers">
-                            <xhtml:span>
-                                <xforms:trigger class="fr-inplace-rename" ref="$ui/apply-trigger" id="save-trigger" appearance="xxforms:primary">
-                                    <xforms:label ref="$resources/apply/label"/>
-                                </xforms:trigger>
-                                <xforms:output value="$resources/or/label"/>
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
-                                    <xforms:label ref="$resources/cancel/label"/>
-                                </xforms:trigger>
-                            </xhtml:span>
-                        </xforms:group>
-                    </xhtml:div>
-                </xxforms:dialog>
-            </xforms:group>
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group appearance="xxf:internal" id="triggers">
+                            <xh:span>
+                                <xf:trigger class="fr-inplace-rename" ref="$ui/apply-trigger" id="save-trigger" appearance="xxf:primary">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </xf:trigger>
+                                <xf:output value="$resources/or/label"/>
+                                <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xf:label ref="$resources/cancel/label"/>
+                                </xf:trigger>
+                            </xh:span>
+                        </xf:group>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

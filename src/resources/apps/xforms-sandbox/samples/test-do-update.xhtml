@@ -11,32 +11,32 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:exforms="http://www.exforms.org/exf/1-0"
+        xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance>
                     <email/>
                     <confirm/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="confirm" constraint=". = ../email"/>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+            <xf:bind ref="confirm" constraint=". = ../email"/>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -70,14 +70,14 @@
                     }
                 });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="email" id="email">
-            <xforms:label>Enter email:</xforms:label>
-        </xforms:input>
-        <xforms:input ref="confirm" id="confirm">
-            <xforms:label>Confirm email:</xforms:label>
-        </xforms:input>
-    </xhtml:body>
-</xhtml:html>
+        </xh:script>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="email" id="email">
+            <xf:label>Enter email:</xf:label>
+        </xf:input>
+        <xf:input ref="confirm" id="confirm">
+            <xf:label>Confirm email:</xf:label>
+        </xf:input>
+    </xh:body>
+</xh:html>

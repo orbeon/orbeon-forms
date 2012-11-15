@@ -37,13 +37,13 @@ class XFormsDispatchAction extends XFormsAction {
         // Mandatory attribute
         val newEventNameAttributeValue =
             Option(actionElement.attributeValue(NAME_QNAME)) getOrElse
-            (throw new OXFException("Missing mandatory name attribute on xforms:dispatch element."))
+            (throw new OXFException("Missing mandatory name attribute on xf:dispatch element."))
         
         // As of 2009-05, XForms 1.1 gives @targetid priority over @target
         val newEventTargetIdValue =
             Option(actionElement.attributeValue(TARGETID_QNAME)) orElse
             Option(actionElement.attributeValue(TARGET_QNAME))   getOrElse
-            (throw new OXFException("Missing mandatory targetid attribute on xforms:dispatch element."))
+            (throw new OXFException("Missing mandatory targetid attribute on xf:dispatch element."))
 
         val resolvedNewEventName =
             Option(actionInterpreter.resolveAVTProvideValue(actionElement, newEventNameAttributeValue)) getOrElse (return)
@@ -90,7 +90,7 @@ class XFormsDispatchAction extends XFormsAction {
                     // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
                     val indentedLogger = actionInterpreter.indentedLogger
                     if (indentedLogger.isDebugEnabled)
-                        indentedLogger.logWarning("xforms:dispatch", "cannot find target, ignoring action", "target id", resolvedNewEventTargetStaticId)
+                        indentedLogger.logWarning("xf:dispatch", "cannot find target, ignoring action", "target id", resolvedNewEventTargetStaticId)
             }
         } else {
             // Event is dispatched after a delay

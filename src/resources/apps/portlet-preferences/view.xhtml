@@ -12,17 +12,17 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
     <head>
         <title>View Portlet Preferences</title>
-        <xforms:model>
-            <xforms:instance id="preferences">
+        <xf:model>
+            <xf:instance id="preferences">
                 <xi:include href="input:data"/>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
         <style type="text/css">
             .xforms-trigger img { vertical-align: middle }
             .xforms-submit img { vertical-align: middle }
@@ -41,16 +41,16 @@
                 <th>Preference Name</th>
                 <th>Preference Values</th>
             </tr>
-            <xforms:repeat ref="instance('preferences')/preference">
+            <xf:repeat ref="instance('preferences')/preference">
                 <tr>
                     <td>
-                        <xforms:output value="name"/>
+                        <xf:output value="name"/>
                     </td>
                     <td>
-                        <xforms:output value="string-join(value, ', ')"/>
+                        <xf:output value="string-join(value, ', ')"/>
                     </td>
                 </tr>
-            </xforms:repeat>
+            </xf:repeat>
         </table>
     </body>
 </html>

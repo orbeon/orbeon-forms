@@ -50,7 +50,7 @@ abstract class XFormsAction extends Logging {
        overriddenContext: Item): Unit = ()
 
     /**
-     * Obtain context attributes based on nested xxforms:context elements.
+     * Obtain context attributes based on nested xxf:context elements.
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param actionElement     action element
@@ -63,7 +63,7 @@ abstract class XFormsAction extends Logging {
         val tuples =
             for {
                 element ← Dom4j.elements(actionElement)
-                if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // xforms:property since XForms 2.0
+                if Set(XFORMS_PROPERTY_QNAME, XXFORMS_CONTEXT_QNAME)(element.getQName) // xf:property since XForms 2.0
 
                 // Get and check attributes
                 name =

@@ -19,8 +19,8 @@
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Search instance -->
@@ -43,7 +43,7 @@
         <p:input name="data" href="#instance"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
-            <xforms:submission xsl:version="2.0" method="post"
+            <xf:submission xsl:version="2.0" method="post"
                                resource="{doc('input:request')/request/headers/header[name = 'orbeon-exist-uri']/value}/{/*/app}/{/*/form
                                             }/data/?page-size={/*/page-size
                                             }&amp;page-number={/*/page-number
@@ -53,9 +53,9 @@
                                                          return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
                                             }&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
-                <xforms:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>
+                <xf:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
-            </xforms:submission>
+            </xf:submission>
         </p:input>
         <p:output name="data" id="submission"/>
     </p:processor>

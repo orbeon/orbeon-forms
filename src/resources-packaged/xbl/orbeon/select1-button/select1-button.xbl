@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -41,57 +41,57 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
                 <xsl:template match="/*">
 
-                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
-                        <!-- TODO: why doesn't this work with a appearance="xxforms:internal"? -->
-                        <xforms:group xxbl:scope="inner" id="component-inner-group">
-                            <xforms:action ev:event="#all" ev:propagate="stop"/>
+                    <xf:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert"/>
+                        <!-- TODO: why doesn't this work with a appearance="xxf:internal"? -->
+                        <xf:group xxbl:scope="inner" id="component-inner-group">
+                            <xf:action ev:event="#all" ev:propagate="stop"/>
 
                             <!-- Variable pointing to external single-node binding -->
-                            <xforms:var name="external-value" as="node()?"><xxforms:sequence value="." xxbl:scope="outer"/></xforms:var>
+                            <xf:var name="external-value" as="node()?"><xxf:sequence value="." xxbl:scope="outer"/></xf:var>
 
                             <!-- HACK: Whether we are Form Runner-read-only -->
-                            <xforms:var name="readonly" value="xxforms:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
+                            <xf:var name="readonly" value="xxf:instance('fr-parameters-instance')/mode = ('view', 'pdf', 'email')"/>
 
                             <!-- Init event -->
-                            <xforms:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
-                                <xxforms:script if="not($readonly)" id="init">YAHOO.xbl.fr.Select1Button.instance(this).init();</xxforms:script>
-                            </xforms:action>
+                            <xf:action id="xf-en" ev:event="xforms-enabled" ev:observer="component-inner-group" ev:target="component-inner-group">
+                                <xxf:script if="not($readonly)" id="init">YAHOO.xbl.fr.Select1Button.instance(this).init();</xxf:script>
+                            </xf:action>
 
                             <!-- XForms select1 used as a datasource -->
-                            <xforms:select1 ref="$external-value" class="fr-select1-button-select1" id="hidden-select" style="display: none">
-                                <xxforms:script if="not($readonly)" ev:event="xforms-enabled xxforms-iteration-moved" id="enabled">YAHOO.xbl.fr.Select1Button.instance(this).enabled();</xxforms:script>
-                                <xxforms:script if="not($readonly)" ev:event="xforms-value-changed" id="value-changed" >YAHOO.xbl.fr.Select1Button.instance(this).valueChanged();</xxforms:script>
-                                <xxforms:script if="not($readonly)" ev:event="xforms-readonly" id="readonly">YAHOO.xbl.fr.Select1Button.instance(this).readonly();</xxforms:script>
-                                <xxforms:script if="not($readonly)" ev:event="xforms-readwrite" id="readwrite">YAHOO.xbl.fr.Select1Button.instance(this).readwrite();</xxforms:script>
+                            <xf:select1 ref="$external-value" class="fr-select1-button-select1" id="hidden-select" style="display: none">
+                                <xxf:script if="not($readonly)" ev:event="xforms-enabled xxforms-iteration-moved" id="enabled">YAHOO.xbl.fr.Select1Button.instance(this).enabled();</xxf:script>
+                                <xxf:script if="not($readonly)" ev:event="xforms-value-changed" id="value-changed" >YAHOO.xbl.fr.Select1Button.instance(this).valueChanged();</xxf:script>
+                                <xxf:script if="not($readonly)" ev:event="xforms-readonly" id="readonly">YAHOO.xbl.fr.Select1Button.instance(this).readonly();</xxf:script>
+                                <xxf:script if="not($readonly)" ev:event="xforms-readwrite" id="readwrite">YAHOO.xbl.fr.Select1Button.instance(this).readwrite();</xxf:script>
 
-                                <xsl:apply-templates select="xforms:itemset | xforms:item"/>
-                            </xforms:select1>
+                                <xsl:apply-templates select="xf:itemset | xf:item"/>
+                            </xf:select1>
 
-                            <xforms:group ref=".[$readonly]">
-                                <xforms:output value="xxforms:itemset('hidden-select', 'xml')//item[value = $external-value]/label"/>
-                            </xforms:group>
-                            <xforms:group ref=".[not($readonly)]">
+                            <xf:group ref=".[$readonly]">
+                                <xf:output value="xxf:itemset('hidden-select', 'xml')//item[value = $external-value]/label"/>
+                            </xf:group>
+                            <xf:group ref=".[not($readonly)]">
 
                                 <!-- HTML button styled by YUI as a drop-down button -->
-                                <xhtml:input type="button" id="button" value="" class="fr-select1-button-button"/>
+                                <xh:input type="button" id="button" value="" class="fr-select1-button-button"/>
 
                                 <!-- Tell user of this component a value was selected -->
-                                <xforms:trigger class="fr-select1-button-xforms-select" style="display: none">
-                                    <xforms:label/>
-                                    <xforms:dispatch ev:event="DOMActivate" name="xforms-select" targetid="fr-select1-button"/>
-                                </xforms:trigger>
+                                <xf:trigger class="fr-select1-button-xforms-select" style="display: none">
+                                    <xf:label/>
+                                    <xf:dispatch ev:event="DOMActivate" name="xforms-select" targetid="fr-select1-button"/>
+                                </xf:trigger>
 
                                 <!-- Detect change in itemset and call JavaScript -->
-                                <xforms:var id="itemset-value" name="itemset-value" value="xxforms:itemset('hidden-select', 'json')"/>
-                                <xxforms:script ev:event="xforms-value-changed" ev:target="itemset-value" id="itemset-changed">YAHOO.xbl.fr.Select1Button.instance(this).itemsetChanged();</xxforms:script>
-                            </xforms:group>
-                        </xforms:group>
-                    </xforms:group>
+                                <xf:var id="itemset-value" name="itemset-value" value="xxf:itemset('hidden-select', 'json')"/>
+                                <xxf:script ev:event="xforms-value-changed" ev:target="itemset-value" id="itemset-changed">YAHOO.xbl.fr.Select1Button.instance(this).itemsetChanged();</xxf:script>
+                            </xf:group>
+                        </xf:group>
+                    </xf:group>
                 </xsl:template>
 
-                <!-- Add xxbl:scope="outer" on copied xforms:itemset and xforms:item -->
-                <xsl:template match="xforms:itemset | xforms:item">
+                <!-- Add xxbl:scope="outer" on copied xf:itemset and xf:item -->
+                <xsl:template match="xf:itemset | xf:item">
                     <xsl:copy>
                         <xsl:attribute name="xxbl:scope">outer</xsl:attribute>
                         <xsl:apply-templates select="@* | node()"/>

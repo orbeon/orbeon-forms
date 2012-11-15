@@ -11,52 +11,52 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Conditional Actions</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XForms Conditional Actions</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <count>5</count>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="insert-template">
+            </xf:instance>
+            <xf:instance id="insert-template">
                 <element xmlns="" position=""/>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:input ref="count"/>
+        <xf:input ref="count"/>
 
-        <xforms:trigger>
-            <xforms:label>Insert</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
-            <xforms:action ev:event="DOMActivate" while="count > count(element)">
-                <xforms:insert context="instance('main-instance')" ref="element" origin="instance('insert-template')"/>
-                <xforms:setvalue ref="element[last()]/@position" value="count(../preceding-sibling::element) + 1"/>
-            </xforms:action>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Insert</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
+            <xf:action ev:event="DOMActivate" while="count > count(element)">
+                <xf:insert context="instance('main-instance')" ref="element" origin="instance('insert-template')"/>
+                <xf:setvalue ref="element[last()]/@position" value="count(../preceding-sibling::element) + 1"/>
+            </xf:action>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Delete</xforms:label>
-            <xforms:delete ev:event="DOMActivate" while="count(element) > 0"
+        <xf:trigger>
+            <xf:label>Delete</xf:label>
+            <xf:delete ev:event="DOMActivate" while="count(element) > 0"
                            context="instance('main-instance')" ref="element"/>
-        </xforms:trigger>
+        </xf:trigger>
 
         <ul>
-            <xforms:repeat ref="element">
+            <xf:repeat ref="element">
                 <li>
-                    Element at position: <xforms:output ref="@position"/>
+                    Element at position: <xf:output ref="@position"/>
                 </li>
-            </xforms:repeat>
+            </xf:repeat>
         </ul>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

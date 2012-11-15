@@ -1,17 +1,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema" >
 
     <head>
         <title>Dynamic Controls</title>
-        <xforms:model id="main-model">
+        <xf:model id="main-model">
             <!-- Currently unused instance -->
-            <xforms:instance id="instance">
+            <xf:instance id="instance">
                 <selected-configuration xmlns="">configuration1</selected-configuration>
-            </xforms:instance>
+            </xf:instance>
             <!-- Configuration instances -->
-            <xforms:instance id="configuration1">
+            <xf:instance id="configuration1">
                 <configuration xmlns="">
                     <search type="input">
                         <label>First Name</label>
@@ -37,8 +37,8 @@
                         <value/>
                     </search>
                 </configuration>
-            </xforms:instance>
-            <xforms:instance id="configuration2">
+            </xf:instance>
+            <xf:instance id="configuration2">
                 <configuration xmlns="">
                     <search type="select1">
                         <label>Language</label>
@@ -69,12 +69,12 @@
                         <value/>
                     </search>
                 </configuration>
-            </xforms:instance>
+            </xf:instance>
             <!-- Test submission, which sends out all the name/value pairs -->
-            <xforms:submission id="send" ref="." serialization="none" method="get"
+            <xf:submission id="send" ref="." serialization="none" method="get"
                                resource="http://example.org/?{string-join(for $s in instance(instance())/search
                                             return concat($s/parameter, '=', encode-for-uri($s/value)), '&amp;')}"/>
-        </xforms:model>
+        </xf:model>
         <style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent; }
             .xforms-label { font-weight: bold; margin: 1em }
@@ -83,42 +83,42 @@
     <body>
         <!-- Choose configuration -->
         <fieldset>
-            <xforms:select1 ref=".">
-                <xforms:label>Select configuration</xforms:label>
-                <xforms:item>
-                    <xforms:label>Configuration 1</xforms:label>
-                    <xforms:value>configuration1</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>Configuration 2</xforms:label>
-                    <xforms:value>configuration2</xforms:value>
-                </xforms:item>
-            </xforms:select1>
+            <xf:select1 ref=".">
+                <xf:label>Select configuration</xf:label>
+                <xf:item>
+                    <xf:label>Configuration 1</xf:label>
+                    <xf:value>configuration1</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>Configuration 2</xf:label>
+                    <xf:value>configuration2</xf:value>
+                </xf:item>
+            </xf:select1>
         </fieldset>
         <!-- Iterate over the search configuration -->
         <fieldset>
-            <xforms:repeat ref="instance(instance())/search/value">
-                <xforms:input ref=".[../@type = 'input']">
-                    <xforms:label ref="../label"/>
-                </xforms:input>
-                <xforms:select1 ref=".[../@type = 'select1']">
-                    <xforms:label ref="../label"/>
-                    <xforms:item>
-                        <xforms:label>[Select...]</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset ref="../item">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </xforms:repeat>
+            <xf:repeat ref="instance(instance())/search/value">
+                <xf:input ref=".[../@type = 'input']">
+                    <xf:label ref="../label"/>
+                </xf:input>
+                <xf:select1 ref=".[../@type = 'select1']">
+                    <xf:label ref="../label"/>
+                    <xf:item>
+                        <xf:label>[Select...]</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                    <xf:itemset ref="../item">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
+                </xf:select1>
+            </xf:repeat>
         </fieldset>
 
         <!-- Submit search -->
-        <xforms:submit submission="send">
-            <xforms:label>Search</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="send">
+            <xf:label>Search</xf:label>
+        </xf:submit>
     
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
     </body>

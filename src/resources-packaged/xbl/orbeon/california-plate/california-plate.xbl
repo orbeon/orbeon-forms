@@ -11,11 +11,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -37,10 +37,10 @@
             <templates>
                 <view>
                     <fr:california-plate>
-                         <xforms:label ref=""/>
-                         <xforms:hint ref=""/>
-                         <xforms:help ref=""/>
-                         <xforms:alert ref=""/>
+                         <xf:label ref=""/>
+                         <xf:hint ref=""/>
+                         <xf:help ref=""/>
+                         <xf:alert ref=""/>
                     </fr:california-plate>
                 </view>
             </templates>
@@ -51,35 +51,35 @@
         </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
-            <xforms:model id="model">
+            <xf:model id="model">
                 <!-- Local instance with space for 7 characters -->
-                <xforms:instance id="plate">
+                <xf:instance id="plate">
                     <plate xmlns=""><c/><c/><c/><c/><c/><c/><c/></plate>
-                </xforms:instance>
-            </xforms:model>
+                </xf:instance>
+            </xf:model>
         </xbl:implementation>
         <xbl:template>
             <!-- React to enabled/value update -->
-            <xforms:var name="value" value="xxforms:binding('fr-california-plate-binding')/string()">
-                <xforms:action ev:event="xforms-value-changed xforms-enabled">
+            <xf:var name="value" value="xxf:binding('fr-california-plate-binding')/string()">
+                <xf:action ev:event="xforms-value-changed xforms-enabled">
                     <!-- Convert to codepoints with a max length of 7 and pad with spaces -->
-                    <xforms:var name="codepoints" value="subsequence(string-to-codepoints(concat($value, '       ')), 1, 7)" as="xs:integer*"/>
+                    <xf:var name="codepoints" value="subsequence(string-to-codepoints(concat($value, '       ')), 1, 7)" as="xs:integer*"/>
                     <!-- Set values for current elements -->
-                    <xforms:action iterate="$codepoints">
-                        <xforms:var name="p" value="position()" as="xs:integer"/>
-                        <xforms:var name="c" value="." as="xs:integer"/>
-                        <xforms:setvalue ref="instance()/c[$p]" value="codepoints-to-string($c)"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:var>
+                    <xf:action iterate="$codepoints">
+                        <xf:var name="p" value="position()" as="xs:integer"/>
+                        <xf:var name="c" value="." as="xs:integer"/>
+                        <xf:setvalue ref="instance()/c[$p]" value="codepoints-to-string($c)"/>
+                    </xf:action>
+                </xf:action>
+            </xf:var>
 
-            <xforms:group class="fr-component-group">
-                <xhtml:span class="fr-plate-characters">
-                    <xforms:repeat ref="instance()/c[normalize-space(.) != '']">
-                        <xhtml:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
-                    </xforms:repeat>
-                </xhtml:span>
-            </xforms:group>
+            <xf:group class="fr-component-group">
+                <xh:span class="fr-plate-characters">
+                    <xf:repeat ref="instance()/c[normalize-space(.) != '']">
+                        <xh:img src="/xbl/orbeon/california-plate/images/_{if (string-to-codepoints(upper-case(.)) = string-to-codepoints('ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789')) then upper-case(.) else '_'}_small.gif"/>
+                    </xf:repeat>
+                </xh:span>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

@@ -24,8 +24,8 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0"
                             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                            xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xh="http://www.w3.org/1999/xhtml"
+                            xmlns:xf="http://www.w3.org/2002/xforms"
                             xmlns:xs="http://www.w3.org/2001/XMLSchema"
                             xmlns:xbl="http://www.w3.org/ns/xbl">
 
@@ -37,12 +37,12 @@
                               select="doc('input:bindings')/*/xbl:xbl/xbl:binding[p:has-class('fr-section-component')]"/>
 
                 <xsl:variable name="possible-section-element-qnames" as="xs:QName*"
-                              select="for $e in /*/xhtml:body//*:section/* return QName(namespace-uri($e), name($e))"/>
+                              select="for $e in /*/xh:body//*:section/* return QName(namespace-uri($e), name($e))"/>
 
                 <xsl:variable name="bindings-to-insert"
                               select="$available-section-bindings[resolve-QName(translate(@element, '|', ':'), .) = $possible-section-element-qnames]"/>
 
-                <xsl:template match="/*/xhtml:head/xforms:model[last()]">
+                <xsl:template match="/*/xh:head/xf:model[last()]">
                     <xsl:next-match/>
                     <xsl:copy-of select="$bindings-to-insert/parent::xbl:xbl"/>
                 </xsl:template>

@@ -11,26 +11,26 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Dialog</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Dialog</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <text>Some text here</text>
                     <tmp/>
                     <message/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
 			#myDialog_c {
 				width:60%;
 				height:50%;
@@ -57,32 +57,32 @@
 			}
             /* This doesn't work as of 2009-03-26 */
             .xforms-mediatype-text-html { width: 100% }
-        </xhtml:style>
+        </xh:style>
 
-</xhtml:head>
-    <xhtml:body>
+</xh:head>
+    <xh:body>
 
         <!-- The dialog -->
-        <xxforms:dialog id="myDialog" level="modeless" close="true" draggable="true" appearance="full">
+        <xxf:dialog id="myDialog" level="modeless" close="true" draggable="true" appearance="full">
 
-            <xforms:setvalue ev:event="xxforms-dialog-open" ref="tmp" value="context()/text"/>
+            <xf:setvalue ev:event="xxforms-dialog-open" ref="tmp" value="context()/text"/>
 
-            <xforms:label>Dialog title</xforms:label>
-            <xhtml:h3>Please complete the form</xhtml:h3>
-            <xhtml:p>
-                <xforms:group>
-                    <xxforms:hide ev:event="DOMActivate" dialog="myDialog"/>
-                    <xforms:trigger>
-                        <xforms:label>Update</xforms:label>
-                        <xforms:setvalue ref="text" value="context()/tmp" ev:event="DOMActivate"/>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>Undo</xforms:label>
-                    </xforms:trigger>
-                </xforms:group>
-            </xhtml:p>
-            <xforms:textarea ref="tmp" mediatype="text/html"/>
-            <xhtml:p>
+            <xf:label>Dialog title</xf:label>
+            <xh:h3>Please complete the form</xh:h3>
+            <xh:p>
+                <xf:group>
+                    <xxf:hide ev:event="DOMActivate" dialog="myDialog"/>
+                    <xf:trigger>
+                        <xf:label>Update</xf:label>
+                        <xf:setvalue ref="text" value="context()/tmp" ev:event="DOMActivate"/>
+                    </xf:trigger>
+                    <xf:trigger>
+                        <xf:label>Undo</xf:label>
+                    </xf:trigger>
+                </xf:group>
+            </xh:p>
+            <xf:textarea ref="tmp" mediatype="text/html"/>
+            <xh:p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut pretium, nisi non lobortis semper, elit
                 lacus lacinia arcu, sit amet elementum risus nisi a velit. In pellentesque tempus mi. Cras consectetur
                 sagittis lorem. Fusce sed sem. Morbi tristique. Vestibulum commodo porttitor quam. Sed malesuada risus
@@ -92,8 +92,8 @@
                 blandit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
                 Aliquam blandit placerat neque. Praesent feugiat eros vitae ante. Ut vitae neque in ipsum varius
                 bibendum. Morbi adipiscing malesuada nulla.
-            </xhtml:p>
-            <xhtml:p>
+            </xh:p>
+            <xh:p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut pretium, nisi non lobortis semper, elit
                 lacus lacinia arcu, sit amet elementum risus nisi a velit. In pellentesque tempus mi. Cras consectetur
                 sagittis lorem. Fusce sed sem. Morbi tristique. Vestibulum commodo porttitor quam. Sed malesuada risus
@@ -103,8 +103,8 @@
                 blandit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
                 Aliquam blandit placerat neque. Praesent feugiat eros vitae ante. Ut vitae neque in ipsum varius
                 bibendum. Morbi adipiscing malesuada nulla.
-            </xhtml:p>
-            <xhtml:p>
+            </xh:p>
+            <xh:p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut pretium, nisi non lobortis semper, elit
                 lacus lacinia arcu, sit amet elementum risus nisi a velit. In pellentesque tempus mi. Cras consectetur
                 sagittis lorem. Fusce sed sem. Morbi tristique. Vestibulum commodo porttitor quam. Sed malesuada risus
@@ -114,8 +114,8 @@
                 blandit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
                 Aliquam blandit placerat neque. Praesent feugiat eros vitae ante. Ut vitae neque in ipsum varius
                 bibendum. Morbi adipiscing malesuada nulla.
-            </xhtml:p>
-            <xhtml:p>
+            </xh:p>
+            <xh:p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut pretium, nisi non lobortis semper, elit
                 lacus lacinia arcu, sit amet elementum risus nisi a velit. In pellentesque tempus mi. Cras consectetur
                 sagittis lorem. Fusce sed sem. Morbi tristique. Vestibulum commodo porttitor quam. Sed malesuada risus
@@ -125,39 +125,39 @@
                 blandit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
                 Aliquam blandit placerat neque. Praesent feugiat eros vitae ante. Ut vitae neque in ipsum varius
                 bibendum. Morbi adipiscing malesuada nulla.
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:trigger>
-                    <xforms:label>Hide dialog</xforms:label>
-                    <xxforms:hide dialog="myDialog" ev:event="DOMActivate"/>
-                </xforms:trigger>
-            </xhtml:p>
-        </xxforms:dialog>
+            </xh:p>
+            <xh:p>
+                <xf:trigger>
+                    <xf:label>Hide dialog</xf:label>
+                    <xxf:hide dialog="myDialog" ev:event="DOMActivate"/>
+                </xf:trigger>
+            </xh:p>
+        </xxf:dialog>
 
         <!-- Button to show the dialog -->
-        <xforms:trigger id="show-dialog-center">
-            <xforms:label>Show dialog (default)</xforms:label>
-            <xxforms:show ev:event="DOMActivate" dialog="myDialog"/>
-        </xforms:trigger>
-        <xforms:trigger id="show-dialog-below-output-trigger">
-            <xforms:label>Show dialog below output</xforms:label>
-            <xxforms:show ev:event="DOMActivate" dialog="myDialog" neighbor="message-output"/>
-        </xforms:trigger>
-        <xforms:trigger id="show-dialog-below-trigger-trigger">
-            <xforms:label>Show dialog below trigger</xforms:label>
-            <xxforms:show ev:event="DOMActivate" dialog="myDialog" neighbor="show-dialog-below-trigger-trigger"/>
-        </xforms:trigger>
+        <xf:trigger id="show-dialog-center">
+            <xf:label>Show dialog (default)</xf:label>
+            <xxf:show ev:event="DOMActivate" dialog="myDialog"/>
+        </xf:trigger>
+        <xf:trigger id="show-dialog-below-output-trigger">
+            <xf:label>Show dialog below output</xf:label>
+            <xxf:show ev:event="DOMActivate" dialog="myDialog" neighbor="message-output"/>
+        </xf:trigger>
+        <xf:trigger id="show-dialog-below-trigger-trigger">
+            <xf:label>Show dialog below trigger</xf:label>
+            <xxf:show ev:event="DOMActivate" dialog="myDialog" neighbor="show-dialog-below-trigger-trigger"/>
+        </xf:trigger>
         <!-- Displays value entered in the dialog -->
-        <xhtml:p>
-            <xforms:output ref="text">
-                <xforms:label>Text:</xforms:label>
-            </xforms:output>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:output ref="message" id="message-output">
-                <xforms:label>Message:</xforms:label>
-            </xforms:output>
-        </xhtml:p>
+        <xh:p>
+            <xf:output ref="text">
+                <xf:label>Text:</xf:label>
+            </xf:output>
+        </xh:p>
+        <xh:p>
+            <xf:output ref="message" id="message-output">
+                <xf:label>Message:</xf:label>
+            </xf:output>
+        </xh:p>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

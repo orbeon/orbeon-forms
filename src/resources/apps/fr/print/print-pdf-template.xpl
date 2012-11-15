@@ -17,7 +17,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
@@ -101,7 +101,7 @@
         <p:input name="config" transform="oxf:unsafe-xslt" href="#form-document">
             <config xsl:version="2.0">
                 <url>
-                    <xsl:value-of select="xpl:rewriteServiceURI(//xforms:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
+                    <xsl:value-of select="xpl:rewriteServiceURI(//xf:instance[@id = 'fr-form-attachments']/*/pdf, true())"/>
                 </url>
                 <!-- Forward the same headers that the XForms engine forwards -->
                 <forward-headers><xsl:value-of select="xpl:property('oxf.xforms.forward-submission-headers')"/></forward-headers>

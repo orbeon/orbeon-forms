@@ -23,7 +23,7 @@ import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.StringValue;
 
 /**
- * xxforms:get-remote-user() as xs:string*
+ * xxf:get-remote-user() as xs:string*
  *
  * Returns user name of current user, or empty sequence
  */

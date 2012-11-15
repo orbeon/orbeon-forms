@@ -11,10 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -22,10 +22,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:service="http://www.webservicex.net">
 
-    <xhtml:head>
-        <xhtml:title>Weather Web Service</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="ws-request">
+    <xh:head>
+        <xh:title>Weather Web Service</xh:title>
+        <xf:model>
+            <xf:instance id="ws-request">
                 <soap-env:Envelope>
                     <soap-env:Body>
                         <service:GetWeatherByZipCode >
@@ -33,72 +33,72 @@
                         </service:GetWeatherByZipCode>
                     </soap-env:Body>
                 </soap-env:Envelope>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="ws-response">
+            <xf:instance id="ws-response">
                 <dummy/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:submission id="weather-submission" method="post"
+            <xf:submission id="weather-submission" method="post"
                     action="http://www.webservicex.net/WeatherForecast.asmx"
                     ref="instance('ws-request')" replace="instance" instance="ws-response"
                     mediatype="application/soap+xml; action=&quot;http://www.webservicex.net/GetWeatherByZipCode&quot;"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-repeat-selected-item-1 { background: white; }
             .gridtable { margin-top: 1em; }
             .gridtable td { vertical-align: middle; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
         <!-- Input zip code -->
-        <xforms:input ref="instance('ws-request')/soap-env:Body/service:GetWeatherByZipCode/service:ZipCode">
-            <xforms:label>ZIP code: </xforms:label>
-        </xforms:input>
-        <xforms:trigger>
-            <xforms:label>Get forecast</xforms:label>
-            <xforms:send submission="weather-submission" ev:event="DOMActivate"/>
-        </xforms:trigger>
+        <xf:input ref="instance('ws-request')/soap-env:Body/service:GetWeatherByZipCode/service:ZipCode">
+            <xf:label>ZIP code: </xf:label>
+        </xf:input>
+        <xf:trigger>
+            <xf:label>Get forecast</xf:label>
+            <xf:send submission="weather-submission" ev:event="DOMActivate"/>
+        </xf:trigger>
 
         <!-- Display result -->
-        <xforms:group ref="instance('ws-response')/soap-env:Body/service:GetWeatherByZipCodeResponse">
-            <xhtml:table class="gridtable">
-                <xhtml:tr>
-                    <xhtml:td/>
-                    <xhtml:td/>
-                    <xhtml:th>Minimums</xhtml:th>
-                    <xhtml:th>Maximums</xhtml:th>
-                </xhtml:tr>
-                <xforms:repeat ref="service:GetWeatherByZipCodeResult/service:Details/service:WeatherData">
-                    <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:output value="service:Day"/>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:output value="normalize-space(service:WeatherImage)" mediatype="image/jpg"/>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:output value="service:MinTemperatureF"/> &#186;F / <xforms:output value="service:MinTemperatureC"/> &#186;C
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:output value="service:MaxTemperatureF"/> &#186;F / <xforms:output value="service:MaxTemperatureC"/> &#186;C
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xforms:repeat>
-            </xhtml:table>
-        </xforms:group>
+        <xf:group ref="instance('ws-response')/soap-env:Body/service:GetWeatherByZipCodeResponse">
+            <xh:table class="gridtable">
+                <xh:tr>
+                    <xh:td/>
+                    <xh:td/>
+                    <xh:th>Minimums</xh:th>
+                    <xh:th>Maximums</xh:th>
+                </xh:tr>
+                <xf:repeat ref="service:GetWeatherByZipCodeResult/service:Details/service:WeatherData">
+                    <xh:tr>
+                        <xh:td>
+                            <xf:output value="service:Day"/>
+                        </xh:td>
+                        <xh:td>
+                            <xf:output value="normalize-space(service:WeatherImage)" mediatype="image/jpg"/>
+                        </xh:td>
+                        <xh:td>
+                            <xf:output value="service:MinTemperatureF"/> &#186;F / <xf:output value="service:MinTemperatureC"/> &#186;C
+                        </xh:td>
+                        <xh:td>
+                            <xf:output value="service:MaxTemperatureF"/> &#186;F / <xf:output value="service:MaxTemperatureC"/> &#186;C
+                        </xh:td>
+                    </xh:tr>
+                </xf:repeat>
+            </xh:table>
+        </xf:group>
 
         <!-- Information about service -->
-        <xhtml:ul>
-            <xhtml:li>
-                <xhtml:a href="http://www.webservicex.net/WeatherForecast.asmx?op=GetWeatherByZipCode">More information about this web service</xhtml:a>
-            </xhtml:li>
-            <xhtml:li>
-                <xhtml:a href="http://www.webservicex.net/WeatherForecast.asmx?WSDL">WSDL for this web service</xhtml:a>
-            </xhtml:li>
-        </xhtml:ul>
+        <xh:ul>
+            <xh:li>
+                <xh:a href="http://www.webservicex.net/WeatherForecast.asmx?op=GetWeatherByZipCode">More information about this web service</xh:a>
+            </xh:li>
+            <xh:li>
+                <xh:a href="http://www.webservicex.net/WeatherForecast.asmx?WSDL">WSDL for this web service</xh:a>
+            </xh:li>
+        </xh:ul>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -11,41 +11,41 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
             xsl:version="2.0">
-    <xhtml:head>
-        <xhtml:title>Java Properties</xhtml:title>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
+    <xh:head>
+        <xh:title>Java Properties</xh:title>
+    </xh:head>
+    <xh:body>
+        <xh:p>
             This is a list of properties of the underlying Java VM:
-        </xhtml:p>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Name</xhtml:th>
-                <xhtml:th>Value</xhtml:th>
-            </xhtml:tr>
+        </xh:p>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Name</xh:th>
+                <xh:th>Value</xh:th>
+            </xh:tr>
             <xsl:variable name="path-separator" select="/properties/property[name = 'path.separator']/value"/>
             <xsl:for-each select="/properties/property">
-                <xhtml:tr>
-                    <xhtml:td><xsl:value-of select="name"/></xhtml:td>
-                    <xhtml:td>
+                <xh:tr>
+                    <xh:td><xsl:value-of select="name"/></xh:td>
+                    <xh:td>
                         <xsl:analyze-string select="value" regex="{$path-separator}">
                             <xsl:non-matching-substring>
                                 <xsl:value-of select="."/>
                             </xsl:non-matching-substring>
                             <xsl:matching-substring>
                                 <xsl:value-of select="$path-separator"/>
-                                <xhtml:wbr/>
+                                <xh:wbr/>
                             </xsl:matching-substring>
                         </xsl:analyze-string>
-                    </xhtml:td>
-                </xhtml:tr>
+                    </xh:td>
+                </xh:tr>
             </xsl:for-each>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+        </xh:table>
+    </xh:body>
+</xh:html>

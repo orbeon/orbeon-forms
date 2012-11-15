@@ -155,7 +155,7 @@
                 <!--</xf:trigger>-->
 
                 <!-- "Save" from Form Runner -->
-                <fr:save-button appearance="xxforms:primary"/>
+                <fr:save-button appearance="xxf:primary"/>
 
             </xh:div>
         </xh:div>
@@ -256,7 +256,7 @@
                         <xf:group id="fr-form-group" class="fr-body fr-border" model="fr-form-model" ref="instance('fr-form-instance')">
                             <xh:a name="fr-form"/>
 
-                            <xxf:var name="dialogs-closed" value="instance('fb-variables')/dialogs-open = 0"/>
+                            <xf:var name="dialogs-closed" value="instance('fb-variables')/dialogs-open = 0"/>
 
                             <!-- Disable keyboard shortcuts until we can polish them, see #387 and #233 -->
 
@@ -409,12 +409,12 @@
                             <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the binding of the current node,
                                        which only works if the control exists -->
                             <xh:div class="fb-cell-editor">
-                                <xf:var name="td"            value="instance('fb-form-instance')/xhtml:body//*:td[@id = $selected-cell]"/>
+                                <xf:var name="td"            value="instance('fb-form-instance')/xh:body//*:td[@id = $selected-cell]"/>
                                 <xf:var name="grid"          value="$td/ancestor::*:grid[1]"/>
                                 <xf:var name="control"       value="$td/*[1]"/><!-- may be empty! -->
                                 <xf:var name="control-id"    value="$control/@id"/>
                                 <xf:var name="has-control"   value="exists($control-id)"/>
-                                <xxf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+                                <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
 
                                 <xh:span class="fb-grid-cell-icons">
                                     <!-- Expand cell down -->
@@ -424,7 +424,7 @@
                                         <!-- TODO: can we move these handlers up so that they are not duplicated? -->
                                         <xf:action ev:event="DOMActivate">
 
-                                            <xxf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
+                                            <xf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
 
                                             <!-- Ask confirmation -->
                                             <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">

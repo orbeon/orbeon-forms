@@ -38,7 +38,7 @@ public class XFormsSendAction extends XFormsAction {
         // Find submission object
         final String submissionId = actionElement.attributeValue(XFormsConstants.SUBMISSION_QNAME);
         if (submissionId == null)
-            throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
+            throw new OXFException("Missing mandatory submission attribute on xf:send element.");
 
         final String resolvedSubmissionStaticId;
         {
@@ -60,7 +60,7 @@ public class XFormsSendAction extends XFormsAction {
 
             final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
             if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("xforms:send", "submission does not refer to an existing xforms:submission element, ignoring action",
+                indentedLogger.logDebug("xf:send", "submission does not refer to an existing xf:submission element, ignoring action",
                         "submission id", submissionId);
         }
     }

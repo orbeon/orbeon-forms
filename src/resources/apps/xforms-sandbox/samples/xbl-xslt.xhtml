@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -25,10 +25,10 @@
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XBL</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <items xmlns="">
                     <item label="One" value="1"/>
                     <item label="Two" value="2"/>
@@ -39,8 +39,8 @@
                     <item label="Seven" value="7"/>
                     <item label="Eight" value="8"/>
                 </items>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="foo-table-alternate" element="foo|table-alternate">
@@ -55,49 +55,49 @@
                             </xsl:copy>
                         </xsl:template>
                         <xsl:template match="foo:table-alternate">
-                            <xhtml:table>
+                            <xh:table>
                                 <xsl:apply-templates select="@*|node()"/>
-                            </xhtml:table>
+                            </xh:table>
                         </xsl:template>
-                        <xsl:template match="xforms:repeat/xhtml:tr" >
-                            <xforms:var name="position" value="position()"/>
-                            <xforms:group ref=".[$position mod 2 = 1]">
-                                <xhtml:tr xbl:attr="style=style1">
+                        <xsl:template match="xf:repeat/xh:tr" >
+                            <xf:var name="position" value="position()"/>
+                            <xf:group ref=".[$position mod 2 = 1]">
+                                <xh:tr xbl:attr="style=style1">
                                     <xsl:apply-templates select="@*|node()"/>
-                                </xhtml:tr>
-                            </xforms:group>
-                            <xforms:group ref=".[not($position mod 2 = 1)]">
-                                <xhtml:tr xbl:attr="style=style2">
+                                </xh:tr>
+                            </xf:group>
+                            <xf:group ref=".[not($position mod 2 = 1)]">
+                                <xh:tr xbl:attr="style=style2">
                                     <xsl:apply-templates select="@*|node()"/>
-                                </xhtml:tr>
-                            </xforms:group>
+                                </xh:tr>
+                            </xf:group>
                         </xsl:template>
                     </xsl:transform>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:h2>Alternate table</xhtml:h2>
+        <xh:h2>Alternate table</xh:h2>
         <foo:table-alternate class="gridtable" style1="background: red" style2="background: white">
-            <xhtml:tr>
-                <xhtml:th>Label</xhtml:th>
-                <xhtml:th>Value</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="item">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output value="@label"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="@value"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
+            <xh:tr>
+                <xh:th>Label</xh:th>
+                <xh:th>Value</xh:th>
+            </xh:tr>
+            <xf:repeat ref="item">
+                <xh:tr>
+                    <xh:td>
+                        <xf:output value="@label"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="@value"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
         </foo:table-alternate>
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>
 

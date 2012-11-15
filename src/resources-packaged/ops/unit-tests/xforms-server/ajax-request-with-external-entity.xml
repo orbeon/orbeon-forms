@@ -11,11 +11,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<!DOCTYPE xxforms:event-request [<!ENTITY nbsp "&#160;"><!ENTITY foobar SYSTEM "external-entity.txt">]>
-<xxforms:event-request xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-    <xxforms:uuid>9C5314A6-4AFD-2889-C972-EFDBBB4C30E5</xxforms:uuid>
-    <xxforms:sequence>2</xxforms:sequence>
-    <xxforms:action>
-        <xxforms:event name="xxforms-value" source-control-id="my-input">The external entity should be missing: &foobar;</xxforms:event>
-    </xxforms:action>
-</xxforms:event-request>
+<!DOCTYPE xxf:event-request [<!ENTITY nbsp "&#160;"><!ENTITY foobar SYSTEM "external-entity.txt">]>
+<xxf:event-request xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    <xxf:uuid>9C5314A6-4AFD-2889-C972-EFDBBB4C30E5</xxf:uuid>
+    <xxf:sequence>2</xxf:sequence>
+    <xxf:action>
+        <xxf:event name="xxforms-value" source-control-id="my-input">The external entity should be missing: &foobar;</xxf:event>
+    </xxf:action>
+</xxf:event-request>

@@ -11,87 +11,87 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxforms:dialog xmlns:ev="http://www.w3.org/2001/xml-events"
+<xxf:dialog xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         id="fr-submission-result-dialog" level="modal" close="false" draggable="false" class="fr-dialog" model="fr-submission-result-model">
 
-    <xforms:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
+    <xf:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
 
-    <xhtml:div>
-        <xforms:var name="content-from-persistence" value="xxforms:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
-        <xforms:output ref="if ($content-from-persistence) then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
-    </xhtml:div>
-    <xhtml:div class="fr-dialog-buttons">
-        <xforms:group>
-            <xforms:repeat ref="tokenize(xxforms:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')">
+    <xh:div>
+        <xf:var name="content-from-persistence" value="xxf:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
+        <xf:output ref="if ($content-from-persistence) then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
+    </xh:div>
+    <xh:div class="fr-dialog-buttons">
+        <xf:group>
+            <xf:repeat ref="tokenize(xxf:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')">
                 <!-- Clear button -->
-                <xforms:trigger ref="instance()[context() = 'clear']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
+                <xf:trigger ref="instance()[context() = 'clear']">
+                    <xf:label>
+                        <xh:img src="/apps/fr/style/clear.gif" alt=""/>
+                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xh:span>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate">
                         <!-- Restore instance -->
-                        <xforms:dispatch name="fr-clear" targetid="fr-persistence-model"/>
+                        <xf:dispatch name="fr-clear" targetid="fr-persistence-model"/>
                         <!-- Close this dialog -->
-                        <xxforms:hide dialog="fr-submission-result-dialog"/>
+                        <xxf:hide dialog="fr-submission-result-dialog"/>
                         <!-- Make sure a new document id is created -->
-                        <xforms:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
-                    </xforms:action>
-                </xforms:trigger>
+                        <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
+                    </xf:action>
+                </xf:trigger>
                 <!-- Keep button -->
-                <xforms:trigger ref="instance()[context() = 'keep']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xxforms:hide dialog="fr-submission-result-dialog"/>
-                        <xforms:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
-                    </xforms:action>
-                </xforms:trigger>
+                <xf:trigger ref="instance()[context() = 'keep']">
+                    <xf:label>
+                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xh:span>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xxf:hide dialog="fr-submission-result-dialog"/>
+                        <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
+                    </xf:action>
+                </xf:trigger>
                 <!-- Go button -->
-                <xforms:trigger ref="instance()[context() = 'go']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-go"/></xhtml:span>
-                    </xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:var name="uri-xpath" value="xxforms:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
-                        <xforms:load context="xxforms:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
-                    </xforms:action>
-                </xforms:trigger>
+                <xf:trigger ref="instance()[context() = 'go']">
+                    <xf:label>
+                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-go"/></xh:span>
+                    </xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
+                        <xf:load context="xxf:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
+                    </xf:action>
+                </xf:trigger>
                 <!-- Close window button -->
-                <xforms:trigger ref="instance()[context() = 'close-window']">
-                    <xforms:label>
-                        <xhtml:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xhtml:span><xforms:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xhtml:span>
-                    </xforms:label>
-                    <xxforms:script ev:event="DOMActivate">window.close();</xxforms:script>
-                </xforms:trigger>
-            </xforms:repeat>
-        </xforms:group>
-    </xhtml:div>
+                <xf:trigger ref="instance()[context() = 'close-window']">
+                    <xf:label>
+                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
+                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xh:span>
+                    </xf:label>
+                    <xxf:script ev:event="DOMActivate">window.close();</xxf:script>
+                </xf:trigger>
+            </xf:repeat>
+        </xf:group>
+    </xh:div>
     <!-- Set value when dialog opens -->
-    <xforms:setvalue ev:event="xxforms-dialog-open" ref="." value="event('fr:content')"/>
+    <xf:setvalue ev:event="xxforms-dialog-open" ref="." value="event('fr:content')"/>
     <!-- Clear value when dialog closes -->
-    <xforms:setvalue ev:event="xxforms-dialog-close" ref="."/>
+    <xf:setvalue ev:event="xxforms-dialog-close" ref="."/>
     <!-- Local model -->
-    <xforms:model id="fr-submission-result-model">
-        <xforms:instance id="fr-submission-result-instance">
+    <xf:model id="fr-submission-result-model">
+        <xf:instance id="fr-submission-result-instance">
             <content xmlns=""/>
-        </xforms:instance>
+        </xf:instance>
 
-        <xforms:var name="parameters" value="xxforms:instance('fr-parameters-instance')"/>
-        <xforms:var name="app" value="$parameters/app"/>
-        <xforms:var name="form" value="$parameters/form"/>
+        <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
+        <xf:var name="app" value="$parameters/app"/>
+        <xf:var name="form" value="$parameters/form"/>
 
-    </xforms:model>
-</xxforms:dialog>
+    </xf:model>
+</xxf:dialog>

@@ -17,8 +17,8 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
@@ -81,7 +81,7 @@
         <p:input name="data" href="#after-xinclude"/>
         <p:input name="config">
             <request xsl:version="2.0">
-                <xsl:variable name="metadata" select="/xhtml:html/xhtml:head/xforms:model[@id = 'fr-form-model']/xforms:instance[@id = 'fr-form-metadata']/*" as="element(metadata)"/>
+                <xsl:variable name="metadata" select="/xh:html/xh:head/xf:model[@id = 'fr-form-model']/xf:instance[@id = 'fr-form-metadata']/*" as="element(metadata)"/>
                 <app><xsl:value-of select="$metadata/application-name"/></app>
                 <form><xsl:value-of select="$metadata/form-name"/></form>
                 <document/>

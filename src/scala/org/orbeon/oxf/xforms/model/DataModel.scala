@@ -182,7 +182,7 @@ object DataModel {
     
     private def logValueChange(indentedLogger: IndentedLogger, source: String, oldValue: String, newValue: String, instanceEffectiveId: Option[String]) =
         if (indentedLogger.isDebugEnabled)
-            indentedLogger.logDebug("xforms:setvalue", "setting instance value", "source", source,
+            indentedLogger.logDebug("xf:setvalue", "setting instance value", "source", source,
                 "old value", oldValue, "new value", newValue,
                 "instance", instanceEffectiveId getOrElse "N/A")
 

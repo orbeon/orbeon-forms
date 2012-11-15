@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
- * Represents an xforms:submit control.
+ * Represents an xf:submit control.
  */
 public class XFormsSubmitControl extends XFormsTriggerControl {
     public XFormsSubmitControl(XBLContainer container, XFormsControl parent, Element element, String id) {
@@ -42,7 +42,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
             // Find submission id
             final String submissionId =  element().attributeValue(XFormsConstants.SUBMISSION_QNAME);
             if (submissionId == null)
-                throw new ValidationException("xforms:submit requires a submission attribute.", getLocationData());
+                throw new ValidationException("xf:submit requires a submission attribute.", getLocationData());
 
             // Find submission object and dispatch submit event to it
 
@@ -55,7 +55,7 @@ public class XFormsSubmitControl extends XFormsTriggerControl {
                 // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
                 final IndentedLogger indentedLogger = containingDocument().getControls().getIndentedLogger();
                 if (indentedLogger.isDebugEnabled())
-                    indentedLogger.logDebug("xforms:submit", "submission does not refer to an existing xforms:submission element, ignoring action",
+                    indentedLogger.logDebug("xf:submit", "submission does not refer to an existing xf:submission element, ignoring action",
                             "submission id", submissionId);
             }
         }

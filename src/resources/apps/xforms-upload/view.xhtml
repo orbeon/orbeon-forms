@@ -11,18 +11,18 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>XForms Upload</title>
-        <xforms:model>
-            <xforms:instance id="files-instance">
+        <xf:model>
+            <xf:instance id="files-instance">
                 <!-- Start with placeholders for three files -->
                 <files xmlns="">
                     <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
@@ -30,31 +30,31 @@
                     <file xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                     <my-element>my-content</my-element>
                 </files>
-            </xforms:instance>
-            <xforms:instance id="selected">
+            </xf:instance>
+            <xf:instance id="selected">
                 <selected>No file selected.</selected>
-            </xforms:instance>
-            <xforms:instance id="file-template">
+            </xf:instance>
+            <xf:instance id="file-template">
                 <!-- Using xs:anyURI will cause the XForms engine to store a reference to
                      a URI instead of inlining the content of the file -->
                 <file xmlns="" xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
-            </xforms:instance>
-            <xforms:instance id="control-instance">
+            </xf:instance>
+            <xf:instance id="control-instance">
                 <control xmlns="">
                     <simple-upload-trigger/>
                     <add-upload-trigger/>
                     <remove-upload-trigger/>
                 </control>
-            </xforms:instance>
-            <xforms:bind ref="instance('control-instance')">
-                <xforms:bind ref="add-upload-trigger" readonly="false()"/>
-                <xforms:bind ref="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
-            </xforms:bind>
+            </xf:instance>
+            <xf:bind ref="instance('control-instance')">
+                <xf:bind ref="add-upload-trigger" readonly="false()"/>
+                <xf:bind ref="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
+            </xf:bind>
             <!-- Main submission which uploads the files
-                 This would be nice but is blocked by Firefox: xxforms:target="_blank" xxforms:show-progress="false"
+                 This would be nice but is blocked by Firefox: xxf:target="_blank" xxf:show-progress="false"
             -->
-            <xforms:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/test" replace="all"/>
-        </xforms:model>
+            <xf:submission id="all-submission" method="post" serialization="multipart/form-data" resource="/xforms-upload/test" replace="all"/>
+        </xf:model>
         <style type="text/css">
             .xforms-repeat-selected-item-1 { background: transparent }
             .xforms-upload-info { background: white; display: block; padding: 2px; width: 99%; margin: 1px }
@@ -77,61 +77,61 @@
             <tr>
                 <td/>
                 <td>
-                    <xforms:group ref="instance('control-instance')/add-upload-trigger">
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label><xhtml:img src="../apps/xforms-upload/images/add.gif"/></xforms:label>
-                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" ref="file" at="last()" position="after" origin="instance('file-template')"/>
-                        </xforms:trigger>
-                    </xforms:group>
+                    <xf:group ref="instance('control-instance')/add-upload-trigger">
+                        <xf:trigger appearance="minimal">
+                            <xf:label><xh:img src="../apps/xforms-upload/images/add.gif"/></xf:label>
+                            <xf:insert ev:event="DOMActivate" context="instance('files-instance')" ref="file" at="last()" position="after" origin="instance('file-template')"/>
+                        </xf:trigger>
+                    </xf:group>
                 </td>
                 <td>
-                    <xforms:group ref="instance('control-instance')/add-upload-trigger">
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label>Add One</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" ref="file" at="last()" position="after" origin="instance('file-template')"/>
-                        </xforms:trigger>
-                    </xforms:group>
+                    <xf:group ref="instance('control-instance')/add-upload-trigger">
+                        <xf:trigger appearance="minimal">
+                            <xf:label>Add One</xf:label>
+                            <xf:insert ev:event="DOMActivate" context="instance('files-instance')" ref="file" at="last()" position="after" origin="instance('file-template')"/>
+                        </xf:trigger>
+                    </xf:group>
                 </td>
                 <th>
-                    <xforms:group ref=".[(for $m in file/@mediatype return starts-with($m, 'image/')) = true()]">Image</xforms:group>
+                    <xf:group ref=".[(for $m in file/@mediatype return starts-with($m, 'image/')) = true()]">Image</xf:group>
                 </th>
             </tr>
-            <xforms:repeat ref="file" id="file-repeat">
+            <xf:repeat ref="file" id="file-repeat">
                 <tr>
                     <td>
-                        <xforms:output value="count(preceding-sibling::file) + 1"/>
+                        <xf:output value="count(preceding-sibling::file) + 1"/>
                     </td>
                     <td>
-                        <xforms:group ref="instance('control-instance')/remove-upload-trigger" id="remove-group">
-                            <xforms:trigger appearance="minimal" id="remove-trigger">
-                                <xforms:label><xhtml:img src="../apps/xforms-upload/images/remove.gif"/></xforms:label>
-                                <xforms:delete ev:event="DOMActivate" ref="instance('files-instance')/file" at="index('file-repeat')"/>
-                            </xforms:trigger>
-                        </xforms:group>
+                        <xf:group ref="instance('control-instance')/remove-upload-trigger" id="remove-group">
+                            <xf:trigger appearance="minimal" id="remove-trigger">
+                                <xf:label><xh:img src="../apps/xforms-upload/images/remove.gif"/></xf:label>
+                                <xf:delete ev:event="DOMActivate" ref="instance('files-instance')/file" at="index('file-repeat')"/>
+                            </xf:trigger>
+                        </xf:group>
                     </td>
                     <td>
                         <!-- Upload field -->
-                        <xforms:upload ref="." xxforms:size="60">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                            <xforms:setvalue ev:event="xforms-select" ref="instance('selected')">Yes! A file got selected!</xforms:setvalue>
-                        </xforms:upload>
+                        <xf:upload ref="." xxf:size="60">
+                            <xf:filename ref="@filename"/>
+                            <xf:mediatype ref="@mediatype"/>
+                            <xxf:size ref="@size"/>
+                            <xf:setvalue ev:event="xforms-select" ref="instance('selected')">Yes! A file got selected!</xf:setvalue>
+                        </xf:upload>
                         <!-- Download link -->
-                        <xforms:output ref="." appearance="xxforms:download">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xforms:label>Download</xforms:label>
-                        </xforms:output>
+                        <xf:output ref="." appearance="xxf:download">
+                            <xf:filename ref="@filename"/>
+                            <xf:mediatype ref="@mediatype"/>
+                            <xf:label>Download</xf:label>
+                        </xf:output>
                     </td>
                     <td>
                         <!-- Show image if mediatype is of an image -->
-                        <xforms:group ref=".[normalize-space() != '' and starts-with(@mediatype, 'image/')]">
-                            <xforms:output mediatype="image/*" value="."/>
-                        </xforms:group>
+                        <xf:group ref=".[normalize-space() != '' and starts-with(@mediatype, 'image/')]">
+                            <xf:output mediatype="image/*" value="."/>
+                        </xf:group>
                     </td>
                 </tr>
-            </xforms:repeat>
+            </xf:repeat>
         </table>
     </body>
 </html>

@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.trans.XPathException;
 
 /**
- * xxforms:get-request-attribute($a as xs:string) document-node()?
+ * xxf:get-request-attribute($a as xs:string) document-node()?
  *
  * Return the value of the given request attribute.
  */
@@ -49,7 +49,7 @@ public class XXFormsGetRequestAttribute extends XXFormsGetScopeAttribute {
             final Object attributeObject = NetUtils.getExternalContext().getRequest().getAttributesMap().get(attributeName);
             return convertAttributeValue(xpathContext, attributeObject, contentType, attributeName);
         } else {
-            throw new OXFException("xxforms:get-request-attribute() can only be called during XForms initialization.");
+            throw new OXFException("xxf:get-request-attribute() can only be called during XForms initialization.");
         }
     }
 }

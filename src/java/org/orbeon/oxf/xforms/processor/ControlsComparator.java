@@ -112,7 +112,7 @@ public class ControlsComparator {
                 isFullUpdateLevel = true;
                 tempCH = ch;
             } else {
-                // Handle xxforms:update="full"
+                // Handle xxf:update="full"
                 mark = getUpdateFullMark(control2);
                 isFullUpdateLevel = mark != null;
                 if (isFullUpdateLevel) {
@@ -203,7 +203,7 @@ public class ControlsComparator {
 
                         final XFormsRepeatControl repeatControl = (XFormsRepeatControl) control2;
 
-                        // Handle new sub-xforms:repeat
+                        // Handle new sub-xf:repeat
 
                         // Copy template instructions
                         final int size2 = children2.size();
@@ -249,7 +249,7 @@ public class ControlsComparator {
                 }
             }
 
-            // Handle xxforms:update="full"
+            // Handle xxf:update="full"
             if (mustDoFullUpdate && !isFullUpdateLevel) {
                 // Ancestor will process full update
                 return false;

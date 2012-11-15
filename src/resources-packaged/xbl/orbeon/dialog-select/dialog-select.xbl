@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -40,14 +40,14 @@
             <editors static-itemset="true"/>
             <template>
                  <fr:dialog-select separator=", ">
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                     <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
+                     <xf:label ref=""/>
+                     <xf:hint ref=""/>
+                     <xf:help ref=""/>
+                     <xf:alert ref=""/>
+                     <xf:itemset ref="">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
                 </fr:dialog-select>
             </template>
         </metadata>
@@ -57,21 +57,21 @@
         </xbl:resources>
 
         <xbl:implementation>
-            <xforms:model id="model">
-                <xforms:instance id="model-resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
-                                 xxforms:readonly="true" xxforms:cache="true"/>
-                <xforms:var name="resources" value="instance('model-resources')/resource[@xml:lang = 'en']" as="element()?"/>
-            </xforms:model>
+            <xf:model id="model">
+                <xf:instance id="model-resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+                                 xxf:readonly="true" xxf:cache="true"/>
+                <xf:var name="resources" value="instance('model-resources')/resource[@xml:lang = 'en']" as="element()?"/>
+            </xf:model>
         </xbl:implementation>
 
         <xxbl:global>
-            <xxforms:dialog id="fr-dialog-select-double-list-dialog" level="modal" class="fr-dialog-select-double-list-dialog" model="fr-dialog-editor-double-list-model">
-                <xforms:label ref="label"/>
+            <xxf:dialog id="fr-dialog-select-double-list-dialog" level="modal" class="fr-dialog-select-double-list-dialog" model="fr-dialog-editor-double-list-model">
+                <xf:label ref="label"/>
 
                 <!-- Don't show the 'x' in the dialog title bar, not to "confuse" users; this way they have
                      clearly two choices: confirm the selection or cancel -->
-                <xforms:model id="fr-dialog-editor-double-list-model">
-                    <xforms:instance id="fr-dialog-editor-double-list-instance">
+                <xf:model id="fr-dialog-editor-double-list-model">
+                    <xf:instance id="fr-dialog-editor-double-list-instance">
                         <instance>
                             <label/>
                             <items/>
@@ -83,205 +83,205 @@
                             <remove-trigger/>
                             <callback-id/>
                         </instance>
-                    </xforms:instance>
-                    <xforms:bind ref="add-trigger" readonly="normalize-space(../available) = ''"/>
-                    <xforms:bind ref="remove-trigger" readonly="normalize-space(../selected) = ''"/>
-                    <xforms:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
-                                     xxforms:readonly="true" xxforms:cache="true"/>
-                </xforms:model>
-                <xforms:action ev:event="fr-edit">
+                    </xf:instance>
+                    <xf:bind ref="add-trigger" readonly="normalize-space(../available) = ''"/>
+                    <xf:bind ref="remove-trigger" readonly="normalize-space(../selected) = ''"/>
+                    <xf:instance id="resources" src="oxf:/xbl/orbeon/dialog-select/dialog-select-resources.xml"
+                                     xxf:readonly="true" xxf:cache="true"/>
+                </xf:model>
+                <xf:action ev:event="fr-edit">
                     <!-- When dialog open, get list of available and selected items -->
-                    <xforms:setvalue ref="label" value="event('fr-label')"/>
-                    <xforms:var name="binding" value="tokenize(event('fr-binding'), '\s+')"/>
-                    <xforms:var name="items" value="event('fr-items')"/>
-                    <xforms:delete ref="items/*"/>
-                    <xforms:insert context="items" origin="$items"/>
-                    <xforms:setvalue ref="available-itemset" value="string-join($items/value/string()[not(. = $binding)], ' ')"/>
-                    <xforms:setvalue ref="selected-itemset"  value="string-join($items/value/string()[. = $binding], ' ')"/>
-                    <xforms:setvalue ref="available"/>
-                    <xforms:setvalue ref="selected"/>
-                    <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
-                    <xxforms:show dialog="fr-dialog-select-double-list-dialog"/>
-                    <xforms:setfocus control="fr-dialog-select-double-list-dialog"/>
-                </xforms:action>
+                    <xf:setvalue ref="label" value="event('fr-label')"/>
+                    <xf:var name="binding" value="tokenize(event('fr-binding'), '\s+')"/>
+                    <xf:var name="items" value="event('fr-items')"/>
+                    <xf:delete ref="items/*"/>
+                    <xf:insert context="items" origin="$items"/>
+                    <xf:setvalue ref="available-itemset" value="string-join($items/value/string()[not(. = $binding)], ' ')"/>
+                    <xf:setvalue ref="selected-itemset"  value="string-join($items/value/string()[. = $binding], ' ')"/>
+                    <xf:setvalue ref="available"/>
+                    <xf:setvalue ref="selected"/>
+                    <xf:setvalue ref="callback-id" value="event('fr-callback-id')"/>
+                    <xxf:show dialog="fr-dialog-select-double-list-dialog"/>
+                    <xf:setfocus control="fr-dialog-select-double-list-dialog"/>
+                </xf:action>
 
-                <xforms:var name="resources" value="instance('resources')/resource[@xml:lang = 'en']" as="element()?"/>
-                <xforms:var name="available-values" value="tokenize(available-itemset, '\s+')" as="xs:string*"/>
-                <xforms:var name="selected-values" value="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
-                <xforms:var name="items" value="items/item"/>
+                <xf:var name="resources" value="instance('resources')/resource[@xml:lang = 'en']" as="element()?"/>
+                <xf:var name="available-values" value="tokenize(available-itemset, '\s+')" as="xs:string*"/>
+                <xf:var name="selected-values" value="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
+                <xf:var name="items" value="items/item"/>
 
-                <xhtml:table>
-                    <xhtml:tr>
-                        <xhtml:td>
+                <xh:table>
+                    <xh:tr>
+                        <xh:td>
                             <!-- List of available items -->
-                            <xforms:select ref="available" id="available-list">
-                                <xforms:label value="$resources/available"/>
-                                <xforms:itemset ref="$items[value = $available-values]">
-                                    <xforms:label ref="label"/>
-                                    <xforms:value ref="value"/>
-                                </xforms:itemset>
-                            </xforms:select>
-                        </xhtml:td>
-                        <xhtml:td>
-                            <xforms:trigger ref="add-trigger" class="fr-add-button" id="add">
-                                <xforms:label>
-                                    <xhtml:span>
-                                        <xforms:output value="$resources/add"/>
-                                    </xhtml:span>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:var name="selection" value="tokenize(../available, '\s+')" as="xs:string*"/>
-                                    <xforms:setvalue ref="../selected-itemset"
+                            <xf:select ref="available" id="available-list">
+                                <xf:label value="$resources/available"/>
+                                <xf:itemset ref="$items[value = $available-values]">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select>
+                        </xh:td>
+                        <xh:td>
+                            <xf:trigger ref="add-trigger" class="fr-add-button" id="add">
+                                <xf:label>
+                                    <xh:span>
+                                        <xf:output value="$resources/add"/>
+                                    </xh:span>
+                                </xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:var name="selection" value="tokenize(../available, '\s+')" as="xs:string*"/>
+                                    <xf:setvalue ref="../selected-itemset"
                                                      value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
-                                    <xforms:setvalue ref="../available-itemset"
+                                    <xf:setvalue ref="../available-itemset"
                                                      value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
-                                    <xforms:setvalue ref="../available"/>
-                                    <xforms:setvalue ref="../selected"/>
-                                </xforms:action>
-                            </xforms:trigger>
+                                    <xf:setvalue ref="../available"/>
+                                    <xf:setvalue ref="../selected"/>
+                                </xf:action>
+                            </xf:trigger>
 
-                            <xforms:trigger ref="remove-trigger" class="fr-remove-button" id="remove">
-                                <xforms:label>
-                                    <xhtml:span>
-                                        <xforms:output value="$resources/remove"/>
-                                    </xhtml:span>
-                                </xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:var name="selection" value="tokenize(../selected, '\s+')" as="xs:string*"/>
-                                    <xforms:setvalue ref="../available-itemset"
+                            <xf:trigger ref="remove-trigger" class="fr-remove-button" id="remove">
+                                <xf:label>
+                                    <xh:span>
+                                        <xf:output value="$resources/remove"/>
+                                    </xh:span>
+                                </xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:var name="selection" value="tokenize(../selected, '\s+')" as="xs:string*"/>
+                                    <xf:setvalue ref="../available-itemset"
                                                      value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
-                                    <xforms:setvalue ref="../selected-itemset"
+                                    <xf:setvalue ref="../selected-itemset"
                                                      value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
-                                    <xforms:setvalue ref="../available"/>
-                                    <xforms:setvalue ref="../selected"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                        </xhtml:td>
-                        <xhtml:td>
+                                    <xf:setvalue ref="../available"/>
+                                    <xf:setvalue ref="../selected"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xh:td>
+                        <xh:td>
                             <!-- List of selected items -->
-                            <xforms:select ref="selected">
-                                <xforms:label value="$resources/selected"/>
-                                <xforms:itemset ref="$items[value = $selected-values]">
-                                    <xforms:label ref="label"/>
-                                    <xforms:value ref="value"/>
-                                </xforms:itemset>
-                            </xforms:select>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xhtml:table>
+                            <xf:select ref="selected">
+                                <xf:label value="$resources/selected"/>
+                                <xf:itemset ref="$items[value = $selected-values]">
+                                    <xf:label ref="label"/>
+                                    <xf:value ref="value"/>
+                                </xf:itemset>
+                            </xf:select>
+                        </xh:td>
+                    </xh:tr>
+                </xh:table>
 
-                <xhtml:div class="fr-dialog-buttons">
+                <xh:div class="fr-dialog-buttons">
                     <!-- Confirm button -->
-                    <xforms:trigger id="confirm">
-                        <xforms:label>
-                            <xhtml:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
-                            <xhtml:span><xforms:output value="$resources/confirm"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
+                    <xf:trigger id="confirm">
+                        <xf:label>
+                            <xh:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
+                            <xh:span><xf:output value="$resources/confirm"/></xh:span>
+                        </xf:label>
+                        <xf:action ev:event="DOMActivate">
                             <!-- Store values in itemset order -->
-                            <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
-                                <xforms:property name="fr-new-values" value="for $selected-itemset in instance()/selected-itemset
+                            <xf:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
+                                <xf:property name="fr-new-values" value="for $selected-itemset in instance()/selected-itemset
                                     return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
-                            </xforms:dispatch>
-                            <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
-                        </xforms:action>
-                    </xforms:trigger>
+                            </xf:dispatch>
+                            <xxf:hide dialog="fr-dialog-select-double-list-dialog"/>
+                        </xf:action>
+                    </xf:trigger>
                     <!-- Cancel button -->
-                    <xforms:trigger id="cancel">
-                        <xforms:label>
-                            <xhtml:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                            <xhtml:span><xforms:output value="$resources/cancel"/></xhtml:span>
-                        </xforms:label>
-                        <xforms:action ev:event="DOMActivate">
+                    <xf:trigger id="cancel">
+                        <xf:label>
+                            <xh:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
+                            <xh:span><xf:output value="$resources/cancel"/></xh:span>
+                        </xf:label>
+                        <xf:action ev:event="DOMActivate">
                             <!-- Just close -->
-                            <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-            </xxforms:dialog>
-            <xxforms:dialog id="fr-dialog-select-single-list-dialog" appearance="minimal" close="true" level="modeless" class="fr-dialog-select-single-list-dialog" model="fr-dialog-editor-single-list-model">
-                <xforms:label>&#160;</xforms:label>
-                <xforms:model id="fr-dialog-editor-single-list-model">
-                    <xforms:instance id="fr-dialog-editor-single-list-instance">
+                            <xxf:hide dialog="fr-dialog-select-double-list-dialog"/>
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+            </xxf:dialog>
+            <xxf:dialog id="fr-dialog-select-single-list-dialog" appearance="minimal" close="true" level="modeless" class="fr-dialog-select-single-list-dialog" model="fr-dialog-editor-single-list-model">
+                <xf:label>&#160;</xf:label>
+                <xf:model id="fr-dialog-editor-single-list-model">
+                    <xf:instance id="fr-dialog-editor-single-list-instance">
                         <instance>
                             <selected/>
                             <items/>
                             <callback-id/>
                         </instance>
-                    </xforms:instance>
-                </xforms:model>
-                <xforms:action ev:event="fr-edit">
-                    <xforms:setvalue ref="selected" value="event('fr-binding')"/>
-                    <xforms:delete ref="items/*"/>
-                    <xforms:insert context="items" origin="event('fr-items')"/>
-                    <xforms:setvalue ref="callback-id" value="event('fr-callback-id')"/>
-                    <xforms:setfocus control="fr-dialog-select-dialog"/>
-                    <xxforms:show dialog="fr-dialog-select-single-list-dialog" neighbor="{event('fr-callback-id')}"/>
-                </xforms:action>
-                <xforms:action ev:event="xxforms-dialog-close">
-                    <xforms:dispatch name="fr-edit-done" targetid="{callback-id}">
-                        <xforms:property name="fr-new-values" value="selected"/>
-                    </xforms:dispatch>
-                </xforms:action>
-                <xforms:select ref="instance()/selected" appearance="full">
-                    <xforms:itemset ref="instance()/items/item">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
-                </xforms:select>
-            </xxforms:dialog> 
+                    </xf:instance>
+                </xf:model>
+                <xf:action ev:event="fr-edit">
+                    <xf:setvalue ref="selected" value="event('fr-binding')"/>
+                    <xf:delete ref="items/*"/>
+                    <xf:insert context="items" origin="event('fr-items')"/>
+                    <xf:setvalue ref="callback-id" value="event('fr-callback-id')"/>
+                    <xf:setfocus control="fr-dialog-select-dialog"/>
+                    <xxf:show dialog="fr-dialog-select-single-list-dialog" neighbor="{event('fr-callback-id')}"/>
+                </xf:action>
+                <xf:action ev:event="xxforms-dialog-close">
+                    <xf:dispatch name="fr-edit-done" targetid="{callback-id}">
+                        <xf:property name="fr-new-values" value="selected"/>
+                    </xf:dispatch>
+                </xf:action>
+                <xf:select ref="instance()/selected" appearance="full">
+                    <xf:itemset ref="instance()/items/item">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
+                </xf:select>
+            </xxf:dialog> 
         </xxbl:global>
 
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <!-- Outer group -->
-            <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
-                <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert"/>
+            <xf:group xbl:attr="model context ref bind" xxbl:scope="outer" xsl:version="2.0">
+                <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert"/>
 
                 <!-- Stop all events dispatched to outer group -->
-                <xforms:action ev:event="#all" ev:propagate="stop" ev:target="#observer"/>
+                <xf:action ev:event="#all" ev:propagate="stop" ev:target="#observer"/>
 
                 <!-- Inner group -->
-                <xforms:group xxbl:scope="inner" appearance="xxforms:internal">
+                <xf:group xxbl:scope="inner" appearance="xxf:internal">
                     <!-- Stop events dispatched to group and variable from propagating outside the component -->
-                    <xforms:action ev:event="#all" ev:propagate="stop" ev:target="#observer binding-var"/>
+                    <xf:action ev:event="#all" ev:propagate="stop" ev:target="#observer binding-var"/>
 
                     <!-- Variable pointing to external single-node binding -->
-                    <xforms:var name="binding" id="binding-var" as="node()?">
-                        <xxforms:sequence value="." xxbl:scope="outer"/>
-                    </xforms:var>
+                    <xf:var name="binding" id="binding-var" as="node()?">
+                        <xxf:sequence value="." xxbl:scope="outer"/>
+                    </xf:var>
 
                     <!-- Variable containing the label, so we can pass it to the dialog -->
-                    <xforms:var name="label">
-                        <xxforms:sequence xxbl:scope="outer">
-                            <xsl:variable name="label" select="/fr:dialog-select/xforms:label"/>
+                    <xf:var name="label">
+                        <xxf:sequence xxbl:scope="outer">
+                            <xsl:variable name="label" select="/fr:dialog-select/xf:label"/>
                             <xsl:if test="$label/@ref"><xsl:attribute name="select" select="$label/@ref"/></xsl:if>
                             <xsl:value-of select="$label"/>
-                        </xxforms:sequence> 
-                    </xforms:var>
+                        </xxf:sequence> 
+                    </xf:var>
 
                     <!-- Internal selection control providing access to the itemset -->
                     <!-- NOTE: Events on this control will propagate out -->
-                    <xforms:select ref="$binding" appearance="xxforms:internal" id="hidden-select">
+                    <xf:select ref="$binding" appearance="xxf:internal" id="hidden-select">
                         <!-- Copy again label and alert for the error summary -->
-                        <xbl:content includes=":root > xforms|label, :root > xforms|alert"/>
+                        <xbl:content includes=":root > xf|label, :root > xf|alert"/>
                         <!-- Copy itemset information -->
-                        <xforms:choices xxbl:scope="outer">
-                            <xbl:content includes="fr|* > xforms|itemset, fr|* > xforms|item, fr|* > xforms|choices"/>
-                        </xforms:choices>
+                        <xf:choices xxbl:scope="outer">
+                            <xbl:content includes="fr|* > xf|itemset, fr|* > xf|item, fr|* > xf|choices"/>
+                        </xf:choices>
                         <!-- Redirect focus to button -->
-                        <xforms:setfocus ev:event="xforms-focus" control="select"/>
-                    </xforms:select>
+                        <xf:setfocus ev:event="xforms-focus" control="select"/>
+                    </xf:select>
 
                     <!-- Stuff within this group doesn't contribute events to the outside -->
-                    <xforms:group appearance="xxforms:internal">
+                    <xf:group appearance="xxf:internal">
                         <!-- Stop all elements dispatched to this group and its content -->
-                        <xforms:action ev:event="#all" ev:propagate="stop"/>
+                        <xf:action ev:event="#all" ev:propagate="stop"/>
 
                         <!-- All the items in the itemset specified by the user -->
-                        <xforms:var name="items" value="xxforms:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
+                        <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
 
                         <!-- Represent selected value -->
-                        <xforms:var name="selected" value="tokenize($binding, '\s+')" as="xs:string*"/>
+                        <xf:var name="selected" value="tokenize($binding, '\s+')" as="xs:string*"/>
 
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
                         <xsl:variable name="separator" select="/fr:dialog-select/@separator"/>
@@ -289,13 +289,13 @@
                             <xsl:when test="exists($separator)">
                                 <!-- Add tabindex so the element doesn't steal the focus on Firefox when styled with overflow-y: scroll.
                                      This isn't done by default, but can be done by the application, as is the case in the test-dialog-select.xthml -->
-                                <xforms:var name="separator" xbl:attr="xbl:text=separator" as="xs:string"/>
-                                <xforms:var name="joined" value="string-join($items[value = $selected]/label, $separator)"/>
-                                <xforms:output value="$joined" tabindex="-1" id="joined" class="{{if ($joined = '') then '' else 'fr-non-empty'}}"/>
+                                <xf:var name="separator" xbl:attr="xbl:text=separator" as="xs:string"/>
+                                <xf:var name="joined" value="string-join($items[value = $selected]/label, $separator)"/>
+                                <xf:output value="$joined" tabindex="-1" id="joined" class="{{if ($joined = '') then '' else 'fr-non-empty'}}"/>
                             </xsl:when>
                             <xsl:otherwise>
                                 <!-- We generate the markup and use an output instead of using a repeat to avoid repeat template on the browser -->
-                                <xforms:output id="ul" mediatype="text/html" value="concat(
+                                <xf:output id="ul" mediatype="text/html" value="concat(
                                     '&lt;ul>',
                                     string-join(
                                         for $item in $items[value = $selected] return
@@ -306,26 +306,26 @@
                             </xsl:otherwise>
                         </xsl:choose>
                         <!-- Select button -->
-                        <xforms:trigger id="select" ref="$binding">
-                            <xforms:label>
-                                <xhtml:img src="/ops/yui/menu/assets/menu_down_arrow.png" alt="Select"/>
-                            </xforms:label>
+                        <xf:trigger id="select" ref="$binding">
+                            <xf:label>
+                                <xh:img src="/ops/yui/menu/assets/menu_down_arrow.png" alt="Select"/>
+                            </xf:label>
                             <xsl:variable name="appearance" select="/fr:dialog-select/@appearance"/>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:dispatch name="fr-edit" xxbl:scope="outer"
+                            <xf:action ev:event="DOMActivate">
+                                <xf:dispatch name="fr-edit" xxbl:scope="outer"
                                                 targetid="fr-dialog-select-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
-                                    <xforms:property name="fr-label" value="$label" xxbl:scope="inner"/>
-                                    <xforms:property name="fr-binding" value="$binding" xxbl:scope="inner"/>
-                                    <xforms:property name="fr-items" value="$items" xxbl:scope="inner"/>
-                                    <xforms:property name="fr-callback-id" value="event('xxforms:absolute-targetid')"/>
-                                </xforms:dispatch>
-                            </xforms:action>
-                            <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-new-values')"/>
-                        </xforms:trigger>
-                    </xforms:group>
+                                    <xf:property name="fr-label" value="$label" xxbl:scope="inner"/>
+                                    <xf:property name="fr-binding" value="$binding" xxbl:scope="inner"/>
+                                    <xf:property name="fr-items" value="$items" xxbl:scope="inner"/>
+                                    <xf:property name="fr-callback-id" value="event('xxf:absolute-targetid')"/>
+                                </xf:dispatch>
+                            </xf:action>
+                            <xf:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-new-values')"/>
+                        </xf:trigger>
+                    </xf:group>
 
-                </xforms:group>
-            </xforms:group>
+                </xf:group>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

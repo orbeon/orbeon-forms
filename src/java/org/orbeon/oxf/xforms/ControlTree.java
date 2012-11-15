@@ -233,7 +233,7 @@ public class ControlTree implements ExternalCopyable {
 
         // NOTE: For the purpose of dispatching value change and MIP events, we used to make a
         // distinction between value controls and plain single-node controls. However it seems that it is
-        // still reasonable to dispatch those events to xforms:group, xforms:switch, and even repeat
+        // still reasonable to dispatch those events to xf:group, xf:switch, and even repeat
         // iterations if they are bound.
 
         if (XFormsControl.controlSupportsRefreshEvents(control)) {
@@ -459,7 +459,7 @@ public class ControlTree implements ExternalCopyable {
     }
 
     /**
-     * Return the list of xforms:select[@appearance = 'full'] in noscript mode.
+     * Return the list of xf:select[@appearance = 'full'] in noscript mode.
      *
      * @return LinkedHashMap<String effectiveId, XFormsSelectControl control>
      */

@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -30,164 +30,164 @@
 
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
         <xbl:template>
-            <xforms:group id="container" ref=".[relevant = 'true']" appearance="xxforms:internal">
+            <xf:group id="container" ref=".[relevant = 'true']" appearance="xxf:internal">
 
-                <xforms:var name="form"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xforms:var>
-                <xforms:var name="resources"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xforms:var>
-                <xforms:var name="components"><xxforms:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xforms:var>
-                <xforms:var name="local" value="instance('local')"/>
-                <xforms:var name="form-resources" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-resources']/* treat as element()"/>
-                <xforms:var name="binds" value="$form/xhtml:head/xforms:model/xforms:bind[@id = 'fr-form-binds'] treat as element()"/> <!-- All the binds -->
-                <xforms:var name="bind-id" value="concat($local/control-name, '-bind')"/> <!-- Id of bind for current control -->
-                <xforms:var name="metadata" value="$form/xhtml:head/xforms:model/xforms:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
-                <xforms:var name="body" value="$form/xhtml:body/fr:view/fr:body treat as element()"/>
-                <xforms:var name="is-custom-mode" value="$metadata/form-instance-mode = 'custom'"/>
+                <xf:var name="form"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
+                <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
+                <xf:var name="components"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xf:var>
+                <xf:var name="local" value="instance('local')"/>
+                <xf:var name="form-resources" value="$form/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']/* treat as element()"/>
+                <xf:var name="binds" value="$form/xh:head/xf:model/xf:bind[@id = 'fr-form-binds'] treat as element()"/> <!-- All the binds -->
+                <xf:var name="bind-id" value="concat($local/control-name, '-bind')"/> <!-- Id of bind for current control -->
+                <xf:var name="metadata" value="$form/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata treat as element()"/>
+                <xf:var name="body" value="$form/xh:body/fr:view/fr:body treat as element()"/>
+                <xf:var name="is-custom-mode" value="$metadata/form-instance-mode = 'custom'"/>
 
                 <!-- Show dialog -->
-                <xforms:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xforms:var name="bind" value="$binds//xforms:bind[@id = $bind-id] treat as element()"/>
-                    <xforms:setvalue ref="$local/control-xpath" value="$bind/(@ref, @nodeset)[1] treat as attribute()"/>
-                    <xforms:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
-                    <xforms:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
-                    <xforms:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
-                    <xforms:var name="control" value="$form//*[@id = concat($local/control-name, '-control')] treat as element()"/>
-                    <xforms:setvalue ref="$local/classes" value="$control/@class"/>
+                <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
+                    <xf:var name="bind" value="$binds//xf:bind[@id = $bind-id] treat as element()"/>
+                    <xf:setvalue ref="$local/control-xpath" value="$bind/(@ref, @nodeset)[1] treat as attribute()"/>
+                    <xf:setvalue ref="$local/is-custom-mode" value="$is-custom-mode"/>
+                    <xf:setvalue ref="$local/section-ids" value="string-join($body//fr:section/@id, ' ')"/>
+                    <xf:setvalue ref="$local/control-ids" value="string-join($body//*/@id[ends-with(., '-control')], ' ')"/>
+                    <xf:var name="control" value="$form//*[@id = concat($local/control-name, '-control')] treat as element()"/>
+                    <xf:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
-                    <xforms:insert ref="$local/*"
+                    <xf:insert ref="$local/*"
                                    origin="controlOps:findBindingsForControl($components, $control, $bind)/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHR of each details control -->
-                    <xforms:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
-                    <xforms:action iterate="$local/fb:control-details/*/(xforms:label, xforms:hint, xforms:help, xforms:alert)">
-                        <xforms:var name="lhhr" value="."/>
+                    <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
+                    <xf:action iterate="$local/fb:control-details/*/(xf:label, xf:hint, xf:help, xf:alert)">
+                        <xf:var name="lhhr" value="."/>
                         <!-- If it has a lang attribute, only keep if matches the current language -->
-                        <xforms:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" ref="$lhhr"/>
+                        <xf:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" ref="$lhhr"/>
                         <!-- If it has a ref="$resources/...", evaluate it -->
-                        <xforms:action if="starts-with($lhhr/@ref, '$resources/')">
-                            <xforms:var name="resource-path" value="substring-after($lhhr/@ref, '$resources/')"/>
-                            <xforms:setvalue ref="$lhhr" value="$resources/saxon:evaluate($resource-path)"/>
-                            <xforms:delete ref="$lhhr/@ref"/>
-                        </xforms:action>
-                    </xforms:action>
+                        <xf:action if="starts-with($lhhr/@ref, '$resources/')">
+                            <xf:var name="resource-path" value="substring-after($lhhr/@ref, '$resources/')"/>
+                            <xf:setvalue ref="$lhhr" value="$resources/saxon:evaluate($resource-path)"/>
+                            <xf:delete ref="$lhhr/@ref"/>
+                        </xf:action>
+                    </xf:action>
 
                     <!-- Create elements for additional properties, populating their initial value from the control -->
-                    <xforms:delete ref="$local/control-details/*"/>
-                    <xforms:action iterate="$local/fb:control-details/*">
-                        <xforms:var name="position" value="position()"/>
-                        <xforms:var name="xforms-control" value="."/>
-                        <xforms:insert context="$local/control-details" ref="*" origin="xxforms:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
-                    </xforms:action>
-                </xforms:action>
+                    <xf:delete ref="$local/control-details/*"/>
+                    <xf:action iterate="$local/fb:control-details/*">
+                        <xf:var name="position" value="position()"/>
+                        <xf:var name="xforms-control" value="."/>
+                        <xf:insert context="$local/control-details" ref="*" origin="xxf:element('control-detail', string($control/saxon:evaluate($xforms-control/@ref)))"/>
+                    </xf:action>
+                </xf:action>
 
                 <!-- Close dialog upon cancel -->
-                <xforms:action ev:event="DOMActivate" ev:observer="cancel-trigger">
-                    <xxforms:hide dialog="dialog"/>
-                </xforms:action>
+                <xf:action ev:event="DOMActivate" ev:observer="cancel-trigger">
+                    <xxf:hide dialog="dialog"/>
+                </xf:action>
 
                 <!-- Save data upon close -->
-                <xforms:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxforms:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
-                    <xforms:var name="instance-holder" value="$form/root()/saxon:evaluate($local/instance-holder)"/>
-                    <xforms:var name="old-name" value="name($instance-holder)"/>
-                    <xforms:var name="new-name" value="$local/control-name/string()"/>
+                <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/save-trigger = 'enabled'">
+                    <xf:var name="instance-holder" value="$form/root()/saxon:evaluate($local/instance-holder)"/>
+                    <xf:var name="old-name" value="name($instance-holder)"/>
+                    <xf:var name="new-name" value="$local/control-name/string()"/>
                     <!-- Find reference to control -->
-                    <xforms:var name="control" value="$body//*[@id = concat($old-name, '-control')]"/>
+                    <xf:var name="control" value="$body//*[@id = concat($old-name, '-control')]"/>
                     <!-- Rename if needed -->
-                    <xforms:action if="$old-name != $new-name">
+                    <xf:action if="$old-name != $new-name">
                         <!-- Rename instance holder and all resources -->
-                        <xforms:dispatch name="fb-rename-holders" targetid="fr-form-model" xxbl:scope="outer">
-                            <xforms:property name="holders" value="($instance-holder, $form-resources/resource/*[name() = $old-name])" xxbl:scope="inner"/>
-                            <xforms:property name="new-name" value="$new-name" xxbl:scope="inner"/>
-                        </xforms:dispatch>
+                        <xf:dispatch name="fb-rename-holders" targetid="fr-form-model" xxbl:scope="outer">
+                            <xf:property name="holders" value="($instance-holder, $form-resources/resource/*[name() = $old-name])" xxbl:scope="inner"/>
+                            <xf:property name="new-name" value="$new-name" xxbl:scope="inner"/>
+                        </xf:dispatch>
                         <!-- Update control id and bindings -->
-                        <xforms:dispatch name="fb-rename-control" targetid="fr-form-model" xxbl:scope="outer">
-                            <xforms:property name="control" value="$control" xxbl:scope="inner"/>
-                            <xforms:property name="new-name" value="$new-name" xxbl:scope="inner"/>
-                        </xforms:dispatch>
+                        <xf:dispatch name="fb-rename-control" targetid="fr-form-model" xxbl:scope="outer">
+                            <xf:property name="control" value="$control" xxbl:scope="inner"/>
+                            <xf:property name="new-name" value="$new-name" xxbl:scope="inner"/>
+                        </xf:dispatch>
                         <!-- Rename bind if existing -->
-                        <xforms:dispatch name="fb-rename-bind" targetid="fr-form-model" xxbl:scope="outer">
-                            <xforms:property name="old-name" value="$old-name" xxbl:scope="inner"/>
-                            <xforms:property name="new-name" value="$new-name" xxbl:scope="inner"/>
-                        </xforms:dispatch>
-                    </xforms:action>
+                        <xf:dispatch name="fb-rename-bind" targetid="fr-form-model" xxbl:scope="outer">
+                            <xf:property name="old-name" value="$old-name" xxbl:scope="inner"/>
+                            <xf:property name="new-name" value="$new-name" xxbl:scope="inner"/>
+                        </xf:dispatch>
+                    </xf:action>
                     <!-- Update XPath on bind -->
-                    <xforms:setvalue if="$is-custom-mode" ref="$binds//xforms:bind[@id = $bind-id]/(@ref, @nodeset)[1] treat as attribute()" value="$local/control-xpath"/>
+                    <xf:setvalue if="$is-custom-mode" ref="$binds//xf:bind[@id = $bind-id]/(@ref, @nodeset)[1] treat as attribute()" value="$local/control-xpath"/>
                     <!-- Set proper classes -->
-                    <xforms:var name="classes" value="tokenize($local/classes, '\s+')"/>
-                    <xforms:delete if="count($classes) = 0" ref="$control/@class"/>
-                    <xforms:insert if="count($classes) > 0" context="$control" origin="xxforms:attribute('class', $local/classes)"/>
+                    <xf:var name="classes" value="tokenize($local/classes, '\s+')"/>
+                    <xf:delete if="count($classes) = 0" ref="$control/@class"/>
+                    <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', $local/classes)"/>
                     <!-- Update custom XBL properties -->
-                    <xforms:action iterate="$local/fb:control-details/*">
-                        <xforms:var name="position" value="position()"/>
-                        <xforms:var name="bound-node" value="$local/control-details/*[$position]"/>
-                        <xforms:var name="xforms-control" value="."/>
-                        <xforms:setvalue ref="$control/saxon:evaluate($xforms-control/@ref)" value="$bound-node"/>
-                    </xforms:action>
-                    <xxforms:hide dialog="dialog"/>
-                </xforms:action>
+                    <xf:action iterate="$local/fb:control-details/*">
+                        <xf:var name="position" value="position()"/>
+                        <xf:var name="bound-node" value="$local/control-details/*[$position]"/>
+                        <xf:var name="xforms-control" value="."/>
+                        <xf:setvalue ref="$control/saxon:evaluate($xforms-control/@ref)" value="$bound-node"/>
+                    </xf:action>
+                    <xxf:hide dialog="dialog"/>
+                </xf:action>
 
                 <!-- Make ourselves non-relevant when the dialog closes -->
-                <xforms:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/relevant">false</xforms:setvalue>
+                <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/relevant">false</xf:setvalue>
 
-                <xxforms:dialog id="dialog" appearance="full" level="modal">
-                    <xforms:label ref="$resources/dialog-control-details/label"/>
-                    <xhtml:div>
-                        <xhtml:div class="fr-grid">
-                            <xhtml:div class="fr-grid-content">
+                <xxf:dialog id="dialog" appearance="full" level="modal">
+                    <xf:label ref="$resources/dialog-control-details/label"/>
+                    <xh:div>
+                        <xh:div class="fr-grid">
+                            <xh:div class="fr-grid-content">
                                 <!-- Control name -->
-                                <xforms:input ref="$local/control-name" incremental="true" id="fb-edit-details-control-name-input">
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                                        <xhtml:span><xforms:output value="$resources/dialog-control-details/control-name/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:alert ref="$resources/dialog-control-details/control-name/alert"/>
-                                    <xforms:hint ref="$resources/dialog-control-details/control-name/hint"/>
-                                </xforms:input>
+                                <xf:input ref="$local/control-name" incremental="true" id="fb-edit-details-control-name-input">
+                                    <xf:label>
+                                        <xh:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
+                                        <xh:span><xf:output value="$resources/dialog-control-details/control-name/label"/></xh:span>
+                                    </xf:label>
+                                    <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
+                                    <xf:hint ref="$resources/dialog-control-details/control-name/hint"/>
+                                </xf:input>
                                 <!-- XPath -->
-                                <xforms:input ref="$local/control-xpath" incremental="true" id="fb-edit-details-control-xpath">
-                                    <xforms:label>
-                                        <xhtml:img src="/apps/fr/style/images/silk/database.png" alt="" title=""/>
-                                        <xhtml:span><xforms:output value="$resources/dialog-control-details/control-xpath/label"/></xhtml:span>
-                                    </xforms:label>
-                                    <xforms:alert ref="$resources/dialog-control-details/control-xpath/alert"/>
-                                    <xforms:hint ref="$resources/dialog-control-details/control-xpath/hint"/>
-                                </xforms:input>
+                                <xf:input ref="$local/control-xpath" incremental="true" id="fb-edit-details-control-xpath">
+                                    <xf:label>
+                                        <xh:img src="/apps/fr/style/images/silk/database.png" alt="" title=""/>
+                                        <xh:span><xf:output value="$resources/dialog-control-details/control-xpath/label"/></xh:span>
+                                    </xf:label>
+                                    <xf:alert ref="$resources/dialog-control-details/control-xpath/alert"/>
+                                    <xf:hint ref="$resources/dialog-control-details/control-xpath/hint"/>
+                                </xf:input>
                                 <!-- Classes -->
-                                <xforms:select ref="$local/classes" appearance="full">
-                                    <xforms:label ref="$resources/dialog-control-details/classes/label"/>
-                                    <xforms:itemset ref="$resources/dialog-control-details/classes/item" xxforms:refresh-items="false">
-                                        <xforms:label ref="label"/>
-                                        <xforms:value ref="value"/>
-                                    </xforms:itemset>
-                                </xforms:select>
+                                <xf:select ref="$local/classes" appearance="full">
+                                    <xf:label ref="$resources/dialog-control-details/classes/label"/>
+                                    <xf:itemset ref="$resources/dialog-control-details/classes/item" xxf:refresh-items="false">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select>
                                 <!-- Properties specific to this control defined in the XBL metadata -->
-                                <xforms:repeat ref="$local/fb:control-details/*">
-                                    <xforms:var name="position" value="position()"/>
-                                    <xforms:var name="bound-node" value="$local/control-details/*[$position]"/>
-                                    <xforms:var name="xforms-control" value="."/>
-                                    <xforms:input ref="if ($xforms-control/self::xforms:input) then $bound-node else ()">
-                                        <xforms:label ref="$xforms-control/xforms:label"/>
-                                        <xforms:hint ref="$xforms-control/xforms:hint"/>
-                                        <xforms:help ref="$xforms-control/xforms:help"/>
-                                        <xforms:alert ref="$xforms-control/xforms:alert"/>
-                                    </xforms:input>
-                                </xforms:repeat>
-                            </xhtml:div>
-                        </xhtml:div>
-                        <xhtml:div class="fr-dialog-buttons">
-                            <xforms:group id="triggers">
-                                <xforms:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger" appearance="xxforms:primary">
-                                    <xforms:label ref="$resources/apply/label"/>
-                                </xforms:trigger>
-                                <xforms:output value="$resources/or/label"/>
-                                <xforms:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
-                                    <xforms:label ref="$resources/cancel/label"/>
-                                </xforms:trigger>
-                            </xforms:group>
-                        </xhtml:div>
-                    </xhtml:div>
-                </xxforms:dialog>
-            </xforms:group>
+                                <xf:repeat ref="$local/fb:control-details/*">
+                                    <xf:var name="position" value="position()"/>
+                                    <xf:var name="bound-node" value="$local/control-details/*[$position]"/>
+                                    <xf:var name="xforms-control" value="."/>
+                                    <xf:input ref="if ($xforms-control/self::xf:input) then $bound-node else ()">
+                                        <xf:label ref="$xforms-control/xf:label"/>
+                                        <xf:hint ref="$xforms-control/xf:hint"/>
+                                        <xf:help ref="$xforms-control/xf:help"/>
+                                        <xf:alert ref="$xforms-control/xf:alert"/>
+                                    </xf:input>
+                                </xf:repeat>
+                            </xh:div>
+                        </xh:div>
+                        <xh:div class="fr-dialog-buttons">
+                            <xf:group id="triggers">
+                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger" appearance="xxf:primary">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </xf:trigger>
+                                <xf:output value="$resources/or/label"/>
+                                <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xf:label ref="$resources/cancel/label"/>
+                                </xf:trigger>
+                            </xf:group>
+                        </xh:div>
+                    </xh:div>
+                </xxf:dialog>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

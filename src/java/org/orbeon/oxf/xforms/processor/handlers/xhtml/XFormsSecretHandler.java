@@ -21,7 +21,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:secret.
+ * Handle xf:secret.
  */
 public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
@@ -54,7 +54,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
 
                 // Output all extension attributes
                 if (isConcreteControl) {
-                    // Output xxforms:* extension attributes
+                    // Output xxf:* extension attributes
                     secretControl.addExtensionAttributes(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 

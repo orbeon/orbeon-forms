@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Help</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Help</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <show>false</show>
                     <real-message>
@@ -31,56 +31,56 @@
                     </real-message>
                     <empty-message/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-help-panel { width: 600px; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:trigger>
-            <xforms:label>Show</xforms:label>
-            <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">true</xforms:setvalue>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Hide</xforms:label>
-            <xforms:setvalue ref="/instance/show" ev:event="DOMActivate">false</xforms:setvalue>
-        </xforms:trigger>
-        <xforms:group ref=".[/instance/show = 'true']">
-            <xhtml:p>
-                <xforms:output ref="/instance/empty-message">
-                    <xforms:label>Ref to real help (should show HTML markup)</xforms:label>
-                    <xforms:help ref="/instance/real-message"/>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="/instance/empty-message">
-                    <xforms:label>Ref to real help (should show rendered HTML)</xforms:label>
-                    <xforms:help><xforms:output mediatype="text/html" value="/instance/real-message"/></xforms:help>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="/instance/empty-message">
-                    <xforms:label>Ref to empty help</xforms:label>
-                    <xforms:help ref="/instance/empty-message"/>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="/instance/empty-message">
-                    <xforms:label>Ref to empty ref</xforms:label>
-                    <xforms:help ref="inexistant-message"/>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="/instance/empty-message" id="output-with-help-handler">
-                    <xforms:label>Has xforms-help handler</xforms:label>
-                    <xforms:help>Help message</xforms:help>
-                    <xforms:action ev:event="xforms-help" ev:propagate="false">
-                        <xforms:message level="modal">Help triggered</xforms:message>
-                    </xforms:action>
-                </xforms:output>
-            </xhtml:p>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+        <xf:trigger>
+            <xf:label>Show</xf:label>
+            <xf:setvalue ref="/instance/show" ev:event="DOMActivate">true</xf:setvalue>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Hide</xf:label>
+            <xf:setvalue ref="/instance/show" ev:event="DOMActivate">false</xf:setvalue>
+        </xf:trigger>
+        <xf:group ref=".[/instance/show = 'true']">
+            <xh:p>
+                <xf:output ref="/instance/empty-message">
+                    <xf:label>Ref to real help (should show HTML markup)</xf:label>
+                    <xf:help ref="/instance/real-message"/>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="/instance/empty-message">
+                    <xf:label>Ref to real help (should show rendered HTML)</xf:label>
+                    <xf:help><xf:output mediatype="text/html" value="/instance/real-message"/></xf:help>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="/instance/empty-message">
+                    <xf:label>Ref to empty help</xf:label>
+                    <xf:help ref="/instance/empty-message"/>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="/instance/empty-message">
+                    <xf:label>Ref to empty ref</xf:label>
+                    <xf:help ref="inexistant-message"/>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="/instance/empty-message" id="output-with-help-handler">
+                    <xf:label>Has xforms-help handler</xf:label>
+                    <xf:help>Help message</xf:help>
+                    <xf:action ev:event="xforms-help" ev:propagate="false">
+                        <xf:message level="modal">Help triggered</xf:message>
+                    </xf:action>
+                </xf:output>
+            </xh:p>
+        </xf:group>
+    </xh:body>
+</xh:html>

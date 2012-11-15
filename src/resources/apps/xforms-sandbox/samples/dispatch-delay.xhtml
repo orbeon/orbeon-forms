@@ -11,67 +11,67 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Dispatch with Delay</xhtml:title>
-        <xforms:model id="my-model">
-            <xforms:instance id="my-instance">
+    <xh:head>
+        <xh:title>Dispatch with Delay</xh:title>
+        <xf:model id="my-model">
+            <xf:instance id="my-instance">
                 <instance>
                     <count>0</count>
                     <started>false</started>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep?delay=5" replace="none"/>
+            <xf:submission id="sleep" method="post" resource="/xforms-sandbox/service/sleep?delay=5" replace="none"/>
 
-            <xforms:action ev:event="my-event" if="started = 'true'">
+            <xf:action ev:event="my-event" if="started = 'true'">
                 <!-- Increment count -->
-                <xforms:setvalue ref="/instance/count" value=". + 1"/>
+                <xf:setvalue ref="/instance/count" value=". + 1"/>
                 <!-- Do long "save" -->
-                <xforms:send submission="sleep"/>
+                <xf:send submission="sleep"/>
                 <!-- Dispatch new event -->
-                <xforms:dispatch name="my-event" targetid="my-model" delay="1000"
-                                 xxforms:show-progress="true" xxforms:progress-message="Autosave"/>
-            </xforms:action>
+                <xf:dispatch name="my-event" targetid="my-model" delay="1000"
+                                 xxf:show-progress="true" xxf:progress-message="Autosave"/>
+            </xf:action>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:output ref="count">
-            <xforms:label>Count:</xforms:label>
-        </xforms:output>
-        <xhtml:br/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:output ref="count">
+            <xf:label>Count:</xf:label>
+        </xf:output>
+        <xh:br/>
 
-        <xforms:trigger>
-            <xforms:label>Start</xforms:label>
-            <xforms:action ev:event="DOMActivate">
+        <xf:trigger>
+            <xf:label>Start</xf:label>
+            <xf:action ev:event="DOMActivate">
                 <!-- Mark that we have started -->
-                <xforms:setvalue ref="started">true</xforms:setvalue>
+                <xf:setvalue ref="started">true</xf:setvalue>
                 <!-- Start dispatching -->
-                <xforms:dispatch name="my-event" targetid="my-model" delay="1000"
-                                 xxforms:show-progress="true" xxforms:progress-message="Autosave"/>
-            </xforms:action>
-        </xforms:trigger>
+                <xf:dispatch name="my-event" targetid="my-model" delay="1000"
+                                 xxf:show-progress="true" xxf:progress-message="Autosave"/>
+            </xf:action>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Stop</xforms:label>
-            <xforms:action ev:event="DOMActivate">
+        <xf:trigger>
+            <xf:label>Stop</xf:label>
+            <xf:action ev:event="DOMActivate">
                 <!-- Mark that we have stopped -->
-                <xforms:setvalue ref="started">false</xforms:setvalue>
-            </xforms:action>
-        </xforms:trigger>
+                <xf:setvalue ref="started">false</xf:setvalue>
+            </xf:action>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Manual save</xforms:label>
-            <xforms:send ev:event="DOMActivate" submission="sleep"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Manual save</xf:label>
+            <xf:send ev:event="DOMActivate" submission="sleep"/>
+        </xf:trigger>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -1,14 +1,14 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>Repeat Unit Tests</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance id="companies">
+    <xh:head>
+        <xh:title>Repeat Unit Tests</xh:title>
+        <xf:model xmlns:xf="http://www.w3.org/2002/xforms">
+            <xf:instance id="companies">
                 <companies show="true">
                     <company>
                         <name>Wal Mart</name>
@@ -23,33 +23,33 @@
                         <incorporated>1907-02-01</incorporated>
                     </company>
                 </companies>
-            </xforms:instance>
-            <xforms:instance id="company-template">
+            </xf:instance>
+            <xf:instance id="company-template">
                 <company>
                     <name/>
                     <incorporated/>
                 </company>
-            </xforms:instance>
-            <xforms:bind ref="/companies/@show" type="xs:boolean"/>
-            <xforms:bind ref="/companies/company/incorporated" type="xs:date"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="/companies/@show" type="xs:boolean"/>
+            <xf:bind ref="/companies/company/incorporated" type="xs:date"/>
+        </xf:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="identity" element="fr|identity">
                 <xbl:template>
-                    <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
-                        <xbl:content includes="xforms|repeat"/>
-                    </xforms:group>
+                    <xf:group xbl:attr="model context ref bind" xxbl:scope="outer">
+                        <xbl:content includes="xf|repeat"/>
+                    </xf:group>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
 
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-repeat.js"/>
-        <xhtml:script type="text/javascript">
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-repeat.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -125,50 +125,50 @@
                     }
                 });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="@show" id="show">
-            <xforms:label>Show</xforms:label>
-        </xforms:input>
-        <xhtml:table id="table">
-            <xforms:repeat ref=".[@show = 'true']/company" id="company-repeat">
-                <xxforms:script ev:event="DOMFocusIn">window.observerElement = this;</xxforms:script>
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref="name" id="name"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="incorporated"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        </xh:script>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="@show" id="show">
+            <xf:label>Show</xf:label>
+        </xf:input>
+        <xh:table id="table">
+            <xf:repeat ref=".[@show = 'true']/company" id="company-repeat">
+                <xxf:script ev:event="DOMFocusIn">window.observerElement = this;</xxf:script>
+                <xh:tr>
+                    <xh:td>
+                        <xf:input ref="name" id="name"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="incorporated"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
 
         <hr/>
-        <xhtml:table id="table-observer">
-            <xforms:repeat ref=".[@show = 'true']/company" >
-                <xxforms:script ev:target="#observer" ev:event="xxforms-ref-changed">window.observerElement = this;</xxforms:script>
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input ref="name" id="name-observer"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        <xh:table id="table-observer">
+            <xf:repeat ref=".[@show = 'true']/company" >
+                <xxf:script ev:target="#observer" ev:event="xxforms-ref-changed">window.observerElement = this;</xxf:script>
+                <xh:tr>
+                    <xh:td>
+                        <xf:input ref="name" id="name-observer"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
 
         <hr/>
-        <xhtml:table id="table-xbl">
+        <xh:table id="table-xbl">
             <fr:identity id="xbl-component">
-                <xforms:repeat ref=".[@show = 'true']/company">
-                    <xxforms:script ev:event="DOMFocusIn">window.observerElement = this;</xxforms:script>
-                    <xhtml:tr>
-                        <xhtml:td>
-                            <xforms:input ref="name" id="name-xbl"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xforms:repeat>
+                <xf:repeat ref=".[@show = 'true']/company">
+                    <xxf:script ev:event="DOMFocusIn">window.observerElement = this;</xxf:script>
+                    <xh:tr>
+                        <xh:td>
+                            <xf:input ref="name" id="name-xbl"/>
+                        </xh:td>
+                    </xh:tr>
+                </xf:repeat>
             </fr:identity>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+        </xh:table>
+    </xh:body>
+</xh:html>

@@ -26,9 +26,9 @@ trait ControlEventSupport {
 
     def performDefaultAction(event: XFormsEvent): Unit = event match {
         case ev @ (_: XXFormsRepeatActivateEvent | _: XFormsFocusEvent) ⇒
-            // Try to update xforms:repeat indexes based on this
+            // Try to update xf:repeat indexes based on this
 
-            // Find current path through ancestor xforms:repeat elements, if any
+            // Find current path through ancestor xf:repeat elements, if any
             val repeatIterationsToModify =
                 new AncestorOrSelfIterator(self) collect
                     { case ri: XFormsRepeatIterationControl if ! ri.isCurrentIteration ⇒ ri.getEffectiveId }
@@ -45,7 +45,7 @@ trait ControlEventSupport {
 
                     val indentedLogger = controls.getIndentedLogger
                     if (indentedLogger.isDebugEnabled)
-                        indentedLogger.logDebug("xforms:repeat", "setting index upon focus change", "new index", newRepeatIndex.toString)
+                        indentedLogger.logDebug("xf:repeat", "setting index upon focus change", "new index", newRepeatIndex.toString)
 
                     repeatIterationControl.repeat.setIndex(newRepeatIndex)
                 }
@@ -55,7 +55,7 @@ trait ControlEventSupport {
             event match {
                 case focusEvent: XFormsFocusEvent ⇒
                     
-                    // Try to update hidden xforms:case controls
+                    // Try to update hidden xf:case controls
                     // NOTE: We don't allow this behavior when events come from the client in ClientEvents
                     // NOTE: See note above on re-obtaining controls by id. Do we need to do this here as well?
                     Focus.hiddenCases(this) foreach (_.toggle())

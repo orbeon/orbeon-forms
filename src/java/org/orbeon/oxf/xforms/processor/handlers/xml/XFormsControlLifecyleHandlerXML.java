@@ -75,19 +75,19 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
 
             handleControlStart(uri, localname, qName, attributes, getEffectiveId(), getControl());
             
-            // xforms:label
+            // xf:label
             if (hasLocalLabel())
                 handleLabel();
             
-            // xforms:help
+            // xf:help
             if (hasLocalHelp())
                 handleHelp();
 
-            // xforms:hint
+            // xf:hint
             if (hasLocalHint())
                 handleHint();
             
-            // xforms:alert
+            // xf:alert
             if (hasLocalAlert())
                 handleAlert();
         }

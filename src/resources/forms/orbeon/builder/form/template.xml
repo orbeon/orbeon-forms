@@ -11,42 +11,42 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-            xmlns:exforms="http://www.exforms.org/exf/1-0"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:exf="http://www.exforms.org/exf/1-0"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
             xmlns:saxon="http://saxon.sf.net/"
             xmlns:sql="http://orbeon.org/oxf/xml/sql"
             xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
-    <xhtml:head>
-        <xhtml:title>[Give this form a title]</xhtml:title>
-        <xforms:model id="fr-form-model">
+    <xh:head>
+        <xh:title>[Give this form a title]</xh:title>
+        <xf:model id="fr-form-model">
 
             <!-- Main instance -->
-            <xforms:instance id="fr-form-instance">
+            <xf:instance id="fr-form-instance">
                 <form>
                     <section-1>
                         <control-1/>
                     </section-1>
                 </form>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Bindings -->
-            <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-                <xforms:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xforms:bind id="control-1-bind" name="control-1" ref="control-1"/>
-                </xforms:bind>
-            </xforms:bind>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                </xf:bind>
+            </xf:bind>
 
             <!-- Metadata -->
-            <xforms:instance id="fr-form-metadata" xxforms:readonly="true">
+            <xf:instance id="fr-form-metadata" xxf:readonly="true">
                 <metadata>
                     <application-name/>
                     <form-name/>
@@ -55,19 +55,19 @@
                     <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Attachments -->
-            <xforms:instance id="fr-form-attachments">
+            <xf:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- All form resources -->
             <!-- Don't make readonly by default in case a service modifies the resources -->
-            <xforms:instance id="fr-form-resources" xxforms:readonly="false">
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
                 <resources>
                     <resource xml:lang="">
                         <section-1>
@@ -82,40 +82,40 @@
                         </control-1>
                     </resource>
                 </resources>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Utility instances for services -->
-            <xforms:instance id="fr-service-request-instance" xxforms:exclude-result-prefixes="#all">
+            <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
                 <request/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="fr-service-response-instance" xxforms:exclude-result-prefixes="#all">
+            <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
                 <response/>
-            </xforms:instance>
+            </xf:instance>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <fr:view>
             <fr:body>
                 <fr:section id="section-1-control" bind="section-1-bind">
-                    <xforms:label ref="$form-resources/section-1/label"/>
-                    <xforms:help ref="$form-resources/section-1/help"/>
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <xf:help ref="$form-resources/section-1/help"/>
                     <fr:grid>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="control-1-control" bind="control-1-bind">
-                                    <xforms:label ref="$form-resources/control-1/label"/>
-                                    <xforms:hint ref="$form-resources/control-1/hint"/>
-                                    <xforms:help ref="$form-resources/control-1/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td/>
-                        </xhtml:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-1-control" bind="control-1-bind">
+                                    <xf:label ref="$form-resources/control-1/label"/>
+                                    <xf:hint ref="$form-resources/control-1/hint"/>
+                                    <xf:help ref="$form-resources/control-1/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
                     </fr:grid>
                 </fr:section>
             </fr:body>
         </fr:view>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

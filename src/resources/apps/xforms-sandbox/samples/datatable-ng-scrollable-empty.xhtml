@@ -11,19 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom">
 
     <head>
         <title>Using YUI's datatable</title>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <empty xmlns=""/>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
     </head>
     <body>
 
@@ -41,23 +41,23 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat ref="/atom:feed/atom:entry">
+                <xf:repeat ref="/atom:feed/atom:entry">
                     <tr>
                         <td>
-                            <xforms:output ref="atom:published"
-                                xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                            <xf:output ref="atom:published"
+                                xxf:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
                             />
                         </td>
                         <td>
                             <a href="{atom:author/atom:uri}">
-                                <xforms:output value="atom:author/atom:name"/>
+                                <xf:output value="atom:author/atom:name"/>
                             </a>
                         </td>
                         <td>
-                            <xforms:output value="atom:title"/>
+                            <xf:output value="atom:title"/>
                         </td>
                     </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </tbody>
         </fr:datatable>
         
@@ -71,23 +71,23 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat ref="/atom:feed/atom:entry">
+                <xf:repeat ref="/atom:feed/atom:entry">
                     <tr>
                         <td>
-                            <xforms:output ref="atom:published"
-                                xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                            <xf:output ref="atom:published"
+                                xxf:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
                             />
                         </td>
                         <td>
                             <a href="{atom:author/atom:uri}">
-                                <xforms:output value="atom:author/atom:name"/>
+                                <xf:output value="atom:author/atom:name"/>
                             </a>
                         </td>
                         <td>
-                            <xforms:output value="atom:title"/>
+                            <xf:output value="atom:title"/>
                         </td>
                     </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </tbody>
         </fr:datatable>
         
@@ -101,23 +101,23 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat ref="/atom:feed/atom:entry">
+                <xf:repeat ref="/atom:feed/atom:entry">
                     <tr>
                         <td>
-                            <xforms:output ref="atom:published"
-                                xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                            <xf:output ref="atom:published"
+                                xxf:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
                             />
                         </td>
                         <td>
                             <a href="{atom:author/atom:uri}">
-                                <xforms:output value="atom:author/atom:name"/>
+                                <xf:output value="atom:author/atom:name"/>
                             </a>
                         </td>
                         <td>
-                            <xforms:output value="atom:title"/>
+                            <xf:output value="atom:title"/>
                         </td>
                     </tr>
-                </xforms:repeat>
+                </xf:repeat>
             </tbody>
         </fr:datatable>
         

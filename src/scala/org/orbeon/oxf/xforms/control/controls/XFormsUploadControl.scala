@@ -35,7 +35,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 /**
- * Represents an xforms:upload control.
+ * Represents an xf:upload control.
  */
 class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id)
@@ -109,13 +109,13 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     val file = new File(new URI(url))
                     if (file.exists) {
                         if (file.delete())
-                            getIndentedLogger.logDebug("xforms:upload", "deleted temporary file upon upload", "path", file.getCanonicalPath)
+                            getIndentedLogger.logDebug("xf:upload", "deleted temporary file upon upload", "path", file.getCanonicalPath)
                         else
-                            getIndentedLogger.logWarning("xforms:upload", "could not delete temporary file upon upload", "path", file.getCanonicalPath)
+                            getIndentedLogger.logWarning("xf:upload", "could not delete temporary file upon upload", "path", file.getCanonicalPath)
                     }
                 } catch {
                     case e: Exception ⇒
-                        getIndentedLogger.logWarning("xforms:upload", "could not delete temporary file upon upload", "path", url)
+                        getIndentedLogger.logWarning("xf:upload", "could not delete temporary file upon upload", "path", url)
                 }
 
         // Clean values
@@ -160,7 +160,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
                 } else
                     // Only accept file or blank
-                    throw new OXFException("Unexpected incoming value for xforms:upload: " + newValue)
+                    throw new OXFException("Unexpected incoming value for xf:upload: " + newValue)
 
             // Store the value
             doStoreExternalValue(valueToStore)
@@ -250,7 +250,7 @@ object XFormsUploadControl {
     /**
      * Handle a construct of the form:
      *
-     * <xxforms:files>
+     * <xxf:files>
      *   <parameter>
      *     <name>xforms-element-27</name>
      *     <filename>my-filename.jpg</filename>
@@ -261,17 +261,17 @@ object XFormsUploadControl {
      *   <parameter>
      *     ...
      *   </parameter>
-     * </xxforms:files>
+     * </xxf:files>
      */
     def handleSubmittedFiles(containingDocument: XFormsContainingDocument, filesElement: Element): Unit =
         for {
             (name, value, filename, mediatype, size) ← iterateFileElement(filesElement)
-            // In case of xforms:repeat, the name of the template will not match an existing control
+            // In case of xf:repeat, the name of the template will not match an existing control
             // In addition, only set value on forControl control if specified
             uploadControl ← Option(containingDocument.getObjectByEffectiveId(name).asInstanceOf[XFormsUploadControl])
         } uploadControl.handleUploadedFile(value, filename, mediatype, size)
 
-    // Check if an <xxforms:files> element actually contains file uploads to process
+    // Check if an <xxf:files> element actually contains file uploads to process
     def hasSubmittedFiles(filesElement: Element) =
         iterateFileElement(filesElement).nonEmpty
 

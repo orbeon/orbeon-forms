@@ -11,65 +11,65 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxforms:dialog xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<xxf:dialog xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-confirmation-dialog" level="modal" close="false" draggable="true" model="fb-confirmation-model">
     
-    <xforms:label ref="$form-resources/dialog-confirmation/label"/>
+    <xf:label ref="$form-resources/dialog-confirmation/label"/>
 
-    <xhtml:div>
-        <xhtml:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="Question" class="fr-dialog-icon"/>
-        <xhtml:div class="fr-dialog-message">
-            <xforms:output value="message"/>
-        </xhtml:div>
-    </xhtml:div>
-    <xhtml:div class="fr-dialog-buttons">
-        <xforms:group>
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
-                    <xforms:output value="$form-resources/delete/label"/>
-                </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" targetid="{confirmation-target}"/>
-            </xforms:trigger>
-            <xforms:output value="$form-resources/or/label"/>
-            <xforms:trigger id="fb-confirmation-dialog-cancel-trigger" appearance="minimal">
-                <xforms:label>
-                    <xforms:output value="$form-resources/cancel/label"/>
-                </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" targetid="{confirmation-target}"/>
-            </xforms:trigger>
-        </xforms:group>
-    </xhtml:div>
+    <xh:div>
+        <xh:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="Question" class="fr-dialog-icon"/>
+        <xh:div class="fr-dialog-message">
+            <xf:output value="message"/>
+        </xh:div>
+    </xh:div>
+    <xh:div class="fr-dialog-buttons">
+        <xf:group>
+            <xf:trigger>
+                <xf:label>
+                    <xh:img src="/apps/fr/style/clear.gif" alt=""/>
+                    <xf:output value="$form-resources/delete/label"/>
+                </xf:label>
+                <xf:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" targetid="{confirmation-target}"/>
+            </xf:trigger>
+            <xf:output value="$form-resources/or/label"/>
+            <xf:trigger id="fb-confirmation-dialog-cancel-trigger" appearance="minimal">
+                <xf:label>
+                    <xf:output value="$form-resources/cancel/label"/>
+                </xf:label>
+                <xf:dispatch ev:event="DOMActivate" name="fb-confirmation-no" targetid="{confirmation-target}"/>
+            </xf:trigger>
+        </xf:group>
+    </xh:div>
 
     <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-confirmation-dialog"/>
+    <xxf:hide ev:event="DOMActivate" dialog="fb-confirmation-dialog"/>
 
-    <xforms:action ev:event="xxforms-dialog-open">
+    <xf:action ev:event="xxforms-dialog-open">
         <!-- Remember parameters -->
-        <xforms:setvalue ref="message" value="event('fr:message')"/>
-        <xforms:setvalue ref="confirmation-target" value="event('fr:confirmation-target')"/>
+        <xf:setvalue ref="message" value="event('fr:message')"/>
+        <xf:setvalue ref="confirmation-target" value="event('fr:confirmation-target')"/>
         <!-- Set focus on cancel button when the dialog open  -->
-        <xforms:setfocus control="fb-confirmation-dialog-cancel-trigger"/>
-    </xforms:action>
+        <xf:setfocus control="fb-confirmation-dialog-cancel-trigger"/>
+    </xf:action>
 
     <!-- Model for the confirmation dialog -->
-    <xforms:model id="fb-confirmation-model">
+    <xf:model id="fb-confirmation-model">
 
-        <xforms:instance id="fb-confirmation-instance">
+        <xf:instance id="fb-confirmation-instance">
             <confirmation>
                 <message/>
                 <confirmation-target/>
             </confirmation>
-        </xforms:instance>
+        </xf:instance>
 
-    </xforms:model>
-</xxforms:dialog>
+    </xf:model>
+</xxf:dialog>

@@ -11,17 +11,17 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
-         xmlns:exforms="http://www.exforms.org/exf/1-0"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          script-type="application/xhtml+xml">
 
@@ -41,25 +41,25 @@
                 <instance filename="" mediatype="" size=""/>
                 <view>
                      <fr:image-attachment id="" ref="" class="fr-attachment">
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
-                        <xforms:filename ref="@filename"/>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xxforms:size ref="@size"/>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
+                        <xf:filename ref="@filename"/>
+                        <xf:mediatype ref="@mediatype"/>
+                        <xxf:size ref="@size"/>
                     </fr:image-attachment>
                 </view>
             </templates>
         </metadata>
 
         <xbl:template>
-            <xforms:group appearance="xxforms:internal" xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xforms:upload ref=".">
-                    <xbl:content includes=":root > xforms|label, :root > xforms|help, :root > xforms|hint, :root > xforms|alert, :root > xforms|filename, :root > xforms|mediatype, :root > xxforms|size"/>
-                </xforms:upload>
-                <xforms:output mediatype="image/*" ref=".[normalize-space()]"/>
-            </xforms:group>
+            <xf:group appearance="xxf:internal" xbl:attr="model context ref bind" xxbl:scope="outer">
+                <xf:upload ref=".">
+                    <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert, :root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
+                </xf:upload>
+                <xf:output mediatype="image/*" ref=".[normalize-space()]"/>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

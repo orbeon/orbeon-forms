@@ -11,71 +11,71 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Alert</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Alert</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <node value="Foo" valid="1" readonly="0" required="1"/>
                     <node value="" valid="1" readonly="0" required="1"/>
                     <node value="" valid="1" readonly="0" required="0"/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance/node/@value" constraint="../@valid = 1" readonly="../@readonly = 1"
+            </xf:instance>
+            <xf:bind ref="/instance/node/@value" constraint="../@valid = 1" readonly="../@readonly = 1"
                     required="../@required = 1"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Control</xhtml:th>
-                <xhtml:th>Valid</xhtml:th>
-                <xhtml:th>Read only</xhtml:th>
-                <xhtml:th>Required</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="/instance/node">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:input id="input" ref="@value">
-                            <xforms:alert>Error message</xforms:alert>
-                        </xforms:input>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="@valid"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label> [toggle]</xforms:label>
-                            <xforms:setvalue ref="@valid" value="(. + 1) mod 2" ev:event="DOMActivate"/>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="@readonly"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label> [toggle]</xforms:label>
-                            <xforms:setvalue ref="@readonly" value="(. + 1) mod 2" ev:event="DOMActivate"/>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="@required"/>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label> [toggle]</xforms:label>
-                            <xforms:setvalue ref="@required" value="(. + 1) mod 2" ev:event="DOMActivate"/>
-                        </xforms:trigger>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-            <xhtml:tr/>
-        </xhtml:table>
-        <xforms:trigger>
-            <xforms:label>Add line</xforms:label>
-            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Control</xh:th>
+                <xh:th>Valid</xh:th>
+                <xh:th>Read only</xh:th>
+                <xh:th>Required</xh:th>
+            </xh:tr>
+            <xf:repeat ref="/instance/node">
+                <xh:tr>
+                    <xh:td>
+                        <xf:input id="input" ref="@value">
+                            <xf:alert>Error message</xf:alert>
+                        </xf:input>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="@valid"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label> [toggle]</xf:label>
+                            <xf:setvalue ref="@valid" value="(. + 1) mod 2" ev:event="DOMActivate"/>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="@readonly"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label> [toggle]</xf:label>
+                            <xf:setvalue ref="@readonly" value="(. + 1) mod 2" ev:event="DOMActivate"/>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="@required"/>
+                        <xf:trigger appearance="minimal">
+                            <xf:label> [toggle]</xf:label>
+                            <xf:setvalue ref="@required" value="(. + 1) mod 2" ev:event="DOMActivate"/>
+                        </xf:trigger>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+            <xh:tr/>
+        </xh:table>
+        <xf:trigger>
+            <xf:label>Add line</xf:label>
+            <xf:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

@@ -68,7 +68,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
 //        // TODO: Complete experimenting with outputting href value
 //        String hrefValue = "#";
 //        {
-//            // Try to compute an href value right away if we detect just a nested xforms:load
+//            // Try to compute an href value right away if we detect just a nested xf:load
 //            // TODO: Need to tell the client not to handle clicks on hyperlink
 //            // TODO: This should probably be done at the control level
 //            // TODO: This duplicates code in XFormsLoadAction

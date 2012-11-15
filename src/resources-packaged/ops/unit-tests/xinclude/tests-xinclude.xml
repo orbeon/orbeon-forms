@@ -242,7 +242,7 @@
             </p:config>
         </input>
         <output name="data">
-            <content xmlns:xforms="http://www.w3.org/2002/xforms">
+            <content xmlns:xf="http://www.w3.org/2002/xforms">
                 <xf:bind xmlns:xf="http://www.w3.org/2002/xforms" id="info-tax-bind" ref="info/tax" type="xs:decimal"/>
             </content>
         </output>

@@ -36,7 +36,7 @@ import scala.collection.mutable
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 
 /**
- * Represents an xforms:select1 control.
+ * Represents an xf:select1 control.
  */
 class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id) with FocusableTrait {

@@ -1,31 +1,31 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Selection in datatable</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="employees">
+    <xh:head>
+        <xh:title>Selection in datatable</xh:title>
+        <xf:model>
+            <xf:instance id="employees">
                 <employees>
                     <employee state="ca"/>
                     <employee state=""/>
                     <employee state=""/>
                 </employees>
-            </xforms:instance>
-            <xforms:instance id="state-itemset">
+            </xf:instance>
+            <xf:instance id="state-itemset">
                 <states label="Select state" value="">
                     <state value="ca" label="California"/>
                     <state value="md" label="Maryland"/>
                     <state value="va" label="Virginia"/>
                 </states>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
 
             /* Don't highlight the current row */
             .yui-skin-sam tr.yui-dt-selected td { background-color: #FFF; color: black }
@@ -39,53 +39,53 @@
                label to initially positioned outside of the datatable (IE bug). */
             .yui-skin-sam .yuimenubaritemlabel { position: static }
 
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xxforms:dialog id="select-state-dialog" appearance="minimal">
-            <xforms:repeat ref="instance('state-itemset')/state">
-                <xhtml:div>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label ref="@label"/>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:setvalue ref="instance('employees')/employee[index('employee-repeat')]/@state" value="context()/@value"/>
-                            <xxforms:hide dialog="select-state-dialog"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </xhtml:div>
-            </xforms:repeat>
-        </xxforms:dialog>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xxf:dialog id="select-state-dialog" appearance="minimal">
+            <xf:repeat ref="instance('state-itemset')/state">
+                <xh:div>
+                    <xf:trigger appearance="minimal">
+                        <xf:label ref="@label"/>
+                        <xf:action ev:event="DOMActivate">
+                            <xf:setvalue ref="instance('employees')/employee[index('employee-repeat')]/@state" value="context()/@value"/>
+                            <xxf:hide dialog="select-state-dialog"/>
+                        </xf:action>
+                    </xf:trigger>
+                </xh:div>
+            </xf:repeat>
+        </xxf:dialog>
         <fr:datatable>
-            <xhtml:tr>
-                <xhtml:th/>
-                <xhtml:th/>
-                <xhtml:th>Abbreviation</xhtml:th>
-                <xhtml:th>Name</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="instance('employees')/employee" id="employee-repeat">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:trigger appearance="minimal" id="select-state-trigger">
-                            <xforms:label>Select state</xforms:label>
-                            <xxforms:show ev:event="DOMActivate" dialog="select-state-dialog" neighbor="select-state-trigger"/>
-                        </xforms:trigger>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:select1 ref="@state" appearance="xxforms:menu">
-                            <xforms:itemset ref="instance('state-itemset')/(.,*)">
-                                <xforms:label ref="@label"/>
-                                <xforms:value ref="@value"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="@state"></xforms:output>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output value="instance('state-itemset')/state[@value = context()/@state]/@label"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
+            <xh:tr>
+                <xh:th/>
+                <xh:th/>
+                <xh:th>Abbreviation</xh:th>
+                <xh:th>Name</xh:th>
+            </xh:tr>
+            <xf:repeat ref="instance('employees')/employee" id="employee-repeat">
+                <xh:tr>
+                    <xh:td>
+                        <xf:trigger appearance="minimal" id="select-state-trigger">
+                            <xf:label>Select state</xf:label>
+                            <xxf:show ev:event="DOMActivate" dialog="select-state-dialog" neighbor="select-state-trigger"/>
+                        </xf:trigger>
+                    </xh:td>
+                    <xh:td>
+                        <xf:select1 ref="@state" appearance="xxf:menu">
+                            <xf:itemset ref="instance('state-itemset')/(.,*)">
+                                <xf:label ref="@label"/>
+                                <xf:value ref="@value"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="@state"></xf:output>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output value="instance('state-itemset')/state[@value = context()/@state]/@label"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
         </fr:datatable>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

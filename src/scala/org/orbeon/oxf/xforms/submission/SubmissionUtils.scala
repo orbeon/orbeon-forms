@@ -90,7 +90,7 @@ object SubmissionUtils {
             // typically would come from the client browser, including:
             //
             // - submission with replace="all"
-            // - dynamic resources loaded by xforms:output
+            // - dynamic resources loaded by xf:output
             //
             // Also useful when the target URL renders XForms in noscript mode, where some browser sniffing takes
             // place for handling the <button> vs. <submit> element.

@@ -12,76 +12,76 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 --%>
 <%@ page import="java.util.Random"%>
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <xhtml:head>
-        <xhtml:title>Guess The Number</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>Guess The Number</xh:title>
+        <xf:model>
+            <xf:instance>
                 <number>
                     <answer><%= new Random().nextInt(100) + 1 %></answer>
                     <guess/>
                 </number>
-            </xforms:instance>
-            <xforms:bind ref="guess" type="xforms:integer"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="guess" type="xf:integer"/>
+        </xf:model>
+        <xh:style type="text/css">
             .paragraph { margin-top: 1em; }
             .feedback { background-color: #ffa; margin-left: 10px; padding: 5px; }
             .guess input { width: 5em; }
             .back { display: block; margin-top: .5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:h1>Guess The Number</xhtml:h1>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:h1>Guess The Number</xh:h1>
         <!--  Ask number -->
-        <xhtml:div>
+        <xh:div>
             I picked a number between 1 and 100. Can you guess it?
-        </xhtml:div>
-        <xhtml:div>
-            <xhtml:p>
+        </xh:div>
+        <xh:div>
+            <xh:p>
                 Good, I like the spirit.
-            </xhtml:p>
-            <xforms:input ref="guess" class="guess" incremental="true">
-                <xforms:label>Try your best guess:</xforms:label>
-            </xforms:input>
-            <xforms:trigger>
-                <xforms:label>Go</xforms:label>
-            </xforms:trigger>
+            </xh:p>
+            <xf:input ref="guess" class="guess" incremental="true">
+                <xf:label>Try your best guess:</xf:label>
+            </xf:input>
+            <xf:trigger>
+                <xf:label>Go</xf:label>
+            </xf:trigger>
             <!-- Feedback -->
-            <xforms:group ref="if (guess != '' and guess castable as xs:integer) then . else ()">
-                <xhtml:span class="feedback">
-                    <xforms:group ref="if (xs:integer(answer) > xs:integer(guess)) then . else ()">
-                        <xforms:output value="/number/guess"/>&#160;is a bit too low.</xforms:group>
-                    <xforms:group ref="if (xs:integer(guess) > xs:integer(answer)) then . else ()">
-                        <xforms:output value="/number/guess"/>&#160;is a tad too high.
-                    </xforms:group>
-                    <xforms:group ref="if (guess = answer) then . else ()">
-                        <xforms:output value="/number/guess"/>
+            <xf:group ref="if (guess != '' and guess castable as xs:integer) then . else ()">
+                <xh:span class="feedback">
+                    <xf:group ref="if (xs:integer(answer) > xs:integer(guess)) then . else ()">
+                        <xf:output value="/number/guess"/>&#160;is a bit too low.</xf:group>
+                    <xf:group ref="if (xs:integer(guess) > xs:integer(answer)) then . else ()">
+                        <xf:output value="/number/guess"/>&#160;is a tad too high.
+                    </xf:group>
+                    <xf:group ref="if (guess = answer) then . else ()">
+                        <xf:output value="/number/guess"/>
                         &#160;is the right answer. Congratulations!
-                    </xforms:group>
-                </xhtml:span>
-            </xforms:group>
-        </xhtml:div>
+                    </xf:group>
+                </xh:span>
+            </xf:group>
+        </xh:div>
         <!-- Cheat -->
-        <xhtml:div class="paragraph">
-            <xforms:trigger>
-                <xforms:label>I'm a cheater!</xforms:label>
-                <xforms:toggle case="answer-shown" ev:event="DOMActivate"/>
-            </xforms:trigger>
-            <xforms:switch>
-                <xforms:case id="answer-hidden"/>
-                <xforms:case id="answer-shown">
-                    <xhtml:span class="feedback">
-                        Tired already? OK, then. The answer is <xforms:output value="answer"/>.
-                    </xhtml:span>
-                </xforms:case>
-            </xforms:switch>
-        </xhtml:div>
-        <xhtml:a class="back" href="/">Back to Orbeon Forms Examples</xhtml:a>
-    </xhtml:body>
-</xhtml:html>
+        <xh:div class="paragraph">
+            <xf:trigger>
+                <xf:label>I'm a cheater!</xf:label>
+                <xf:toggle case="answer-shown" ev:event="DOMActivate"/>
+            </xf:trigger>
+            <xf:switch>
+                <xf:case id="answer-hidden"/>
+                <xf:case id="answer-shown">
+                    <xh:span class="feedback">
+                        Tired already? OK, then. The answer is <xf:output value="answer"/>.
+                    </xh:span>
+                </xf:case>
+            </xf:switch>
+        </xh:div>
+        <xh:a class="back" href="/">Back to Orbeon Forms Examples</xh:a>
+    </xh:body>
+</xh:html>

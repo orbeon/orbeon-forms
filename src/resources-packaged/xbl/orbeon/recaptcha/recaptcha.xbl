@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -34,78 +34,78 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
-                <xforms:dispatch name="fr-verify" targetid="component-inner-group"/>
+                <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
             </xbl:handler>
             <xbl:handler event="fr-reload" phase="target">
-                <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxforms:script>
+                <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxf:script>
             </xbl:handler>
             <xbl:handler event="xforms-focus" phase="target">
-                <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).focus();</xxforms:script>
+                <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).focus();</xxf:script>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <!-- Local model -->
-            <xforms:model id="recaptcha-model">
-                <xforms:instance id="verify-request">
+            <xf:model id="recaptcha-model">
+                <xf:instance id="verify-request">
                     <verify-request>
                         <privatekey/>
                         <remoteip>127.0.0.1</remoteip>
                         <challenge/>
                         <response/>
                     </verify-request>
-                </xforms:instance>
-                <xforms:instance id="verify-response-text"><verify-response/></xforms:instance>
+                </xf:instance>
+                <xf:instance id="verify-response-text"><verify-response/></xf:instance>
                 <!-- Calls reCAPTCHA API: http://code.google.com/apis/recaptcha/docs/verify.html -->
-                <xforms:submission id="verify-submission" resource="http://api-verify.recaptcha.net/verify"
+                <xf:submission id="verify-submission" resource="http://api-verify.recaptcha.net/verify"
                         ref="instance('verify-request')" method="post" serialization="application/x-www-form-urlencoded"
                         replace="text" target="instance('verify-response-text')"/>
-            </xforms:model>
+            </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xforms:group id="component-inner-group">
+                    <xf:group id="component-inner-group">
 
                         <!-- Init event -->
-                        <xforms:action id="xf-en" ev:event="xforms-enabled">
-                            <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxforms:script>
+                        <xf:action id="xf-en" ev:event="xforms-enabled">
+                            <xxf:script>YAHOO.xbl.fr.Recaptcha.instance(this).init();</xxf:script>
                             <!-- Copy value of private key to local model -->
                             <!-- NOTE: We don't use xxbl:parameter() as we don't want the private key to get to the client -->
-                            <xforms:var name="private-key">
-                                <xxforms:sequence value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxforms:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
-                            </xforms:var>
-                            <xforms:setvalue ref="privatekey" value="$private-key" xxbl:scope="inner"/>
-                        </xforms:action>
+                            <xf:var name="private-key">
+                                <xxf:sequence value="{if (fr:private-key/@ref) then fr:private-key/@ref else 'xxf:property(''oxf.xforms.xbl.fr.recaptcha.private-key'')'}" xxbl:scope="outer"/>
+                            </xf:var>
+                            <xf:setvalue ref="privatekey" value="$private-key" xxbl:scope="inner"/>
+                        </xf:action>
 
-                        <xforms:action ev:event="fr-verify">
-                            <xforms:var name="did-entered-value" value="response != ''"/>
+                        <xf:action ev:event="fr-verify">
+                            <xf:var name="did-entered-value" value="response != ''"/>
                             <!-- Do verification if user entered a value -->
-                            <xforms:action if="$did-entered-value">
-                                <xforms:message level="xxforms:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
+                            <xf:action if="$did-entered-value">
+                                <xf:message level="xxf:log-debug" value="saxon:serialize(instance('verify-request'), 'xml')"/>
                                 <!-- Call API doing the verification -->
-                                <xforms:send submission="verify-submission"/>
+                                <xf:send submission="verify-submission"/>
                                 <!-- Reset challenge and response, so the next time they are changed we only run the verification when both new values are updated -->
-                                <xforms:setvalue ref="challenge"/>
-                                <xforms:setvalue ref="response"/>
+                                <xf:setvalue ref="challenge"/>
+                                <xf:setvalue ref="response"/>
                                 <!-- Parse the response -->
-                                <xforms:var name="lines" value="tokenize(instance('verify-response-text'), '\n')"/>
-                                <xforms:var name="is-success" value="$lines[1] = 'true'"/>
+                                <xf:var name="lines" value="tokenize(instance('verify-response-text'), '\n')"/>
+                                <xf:var name="is-success" value="$lines[1] = 'true'"/>
                                 <!-- Dispatch success event -->
-                                <xforms:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
+                                <xf:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
                                 <!-- Dispatch failure event -->
-                                <xforms:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
-                                    <xforms:property name="fr-error-code" value="$lines[2]"/>
-                                </xforms:dispatch>
-                            </xforms:action>
+                                <xf:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
+                                    <xf:property name="fr-error-code" value="$lines[2]"/>
+                                </xf:dispatch>
+                            </xf:action>
                             <!-- When no response is provided, just dispatch an error -->
-                            <xforms:action if="not($did-entered-value)">
-                                <xforms:dispatch targetid="fr-recaptcha" name="fr-verify-error">
-                                    <xforms:property name="fr-error-code" value="'empty'"/>
-                                </xforms:dispatch>
-                            </xforms:action>
-                        </xforms:action>
+                            <xf:action if="not($did-entered-value)">
+                                <xf:dispatch targetid="fr-recaptcha" name="fr-verify-error">
+                                    <xf:property name="fr-error-code" value="'empty'"/>
+                                </xf:dispatch>
+                            </xf:action>
+                        </xf:action>
 
                         <!-- Configuration -->
                         <xsl:copy-of select="xxbl:parameter(., 'public-key')"/>
@@ -114,13 +114,13 @@
 
                         <!-- Provides access the reCAPTCHA challenge/response exposed by the JavaScript API
                              http://code.google.com/apis/recaptcha/docs/display.html#recaptcha_methods -->
-                        <xforms:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
-                        <xforms:input ref="response" class="xbl-fr-recaptcha-response" style="display: none"/>
+                        <xf:input ref="challenge" class="xbl-fr-recaptcha-challenge" style="display: none"/>
+                        <xf:input ref="response" class="xbl-fr-recaptcha-response" style="display: none"/>
 
                         <!-- Div in which the reCAPTCHA is rendered-->
-                        <xhtml:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
+                        <xh:div id="recaptcha-div" class="xbl-fr-recaptcha-div"/>
 
-                    </xforms:group>
+                    </xf:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

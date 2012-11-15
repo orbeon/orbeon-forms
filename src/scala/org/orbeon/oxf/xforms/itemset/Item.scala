@@ -25,7 +25,7 @@ import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import org.orbeon.oxf.xml.dom4j.LocationData
 
 /**
- * Represents an item (xforms:item, xforms:choice, or item in itemset).
+ * Represents an item (xf:item, xf:choice, or item in itemset).
  */
 case class Item(label: Label, value: String, attributes: Map[QName, String])(val position: Int, encode: Boolean)
         extends ItemContainer {
@@ -34,11 +34,11 @@ case class Item(label: Label, value: String, attributes: Map[QName, String])(val
 
     // NOTE: As of 2010-08-18, label can be null in these cases:
     //
-    // - xforms:choice with (see XFormsUtils.getElementValue())
+    // - xf:choice with (see XFormsUtils.getElementValue())
     //   - single-node binding that doesn't point to an acceptable item
     //   - value attribute but the evaluation context is empty
     //   - exception when dereferencing an @src attribute
-    // - xforms|input:xxforms-type(xs:boolean)
+    // - xf|input:xxforms-type(xs:boolean)
 
     def jAttributes = attributes.asJava
 

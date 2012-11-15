@@ -25,22 +25,22 @@
                             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                             xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
                             xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-                            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                            xmlns:xforms="http://www.w3.org/2002/xforms"
-                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:xh="http://www.w3.org/1999/xhtml"
+                            xmlns:xf="http://www.w3.org/2002/xforms"
+                            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
                             xmlns:ev="http://www.w3.org/2001/xml-events"
                             xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
-                <xsl:variable name="model" select="/*/xhtml:head/xforms:model[@id = 'fr-form-model']"/>
+                <xsl:variable name="model" select="/*/xh:head/xf:model[@id = 'fr-form-model']"/>
 
                 <!-- Duplicated from model.xml, but we have to right now as the form hasn't been loaded yet at this point -->
                 <xsl:variable name="is-custom-instance"
-                              select="$model/xforms:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
+                              select="$model/xf:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
 
                 <!-- Custom instance: add dataModel namespace binding to top-level bind -->
-                <xsl:template match="xforms:bind[@id = 'fr-form-binds']">
+                <xsl:template match="xf:bind[@id = 'fr-form-binds']">
                     <xsl:copy>
                         <!-- NOTE: add even if not($is-custom-instance) so that things work if we switch to $is-custom-instance -->
                         <xsl:namespace name="dataModel" select="'java:org.orbeon.oxf.fb.DataModel'"/>
@@ -48,20 +48,20 @@
                     </xsl:copy>
                 </xsl:template>
                 <!-- Custom instance: for nested binds, rewrite @ref/@nodeset -->
-                <xsl:template match="xforms:bind[$is-custom-instance and @id and @id != 'fr-form-binds']/@ref | xforms:bind[$is-custom-instance and @id and @id != 'fr-form-binds']/@nodeset">
+                <xsl:template match="xf:bind[$is-custom-instance and @id and @id != 'fr-form-binds']/@ref | xf:bind[$is-custom-instance and @id and @id != 'fr-form-binds']/@nodeset">
                     <xsl:attribute name="{name()}" select="dataModel:annotatedBindRef(../@id, .)"/>
                 </xsl:template>
 
                 <!-- Temporarily mark read-only instances as read-write -->
-                <xsl:template match="xforms:instance[@xxforms:readonly = 'true']">
+                <xsl:template match="xf:instance[@xxf:readonly = 'true']">
                     <xsl:copy>
                         <xsl:attribute name="fb:readonly" select="'true'"/><!-- so we remember to set the value back -->
-                        <xsl:apply-templates select="@* except @xxforms:readonly | node()"/>
+                        <xsl:apply-templates select="@* except @xxf:readonly | node()"/>
                     </xsl:copy>
                 </xsl:template>
 
                 <!-- Update namespace on actions and services so that they don't run at design time -->
-                <xsl:template match="xforms:model/xforms:*[p:classes() = ('fr-service', 'fr-database-service')] | xforms:model/xforms:action[ends-with(@id, '-binding')]">
+                <xsl:template match="xf:model/xf:*[p:classes() = ('fr-service', 'fr-database-service')] | xf:model/xf:action[ends-with(@id, '-binding')]">
                     <xsl:element name="fb:{local-name()}">
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:element>
@@ -80,48 +80,48 @@
                 -->
 
                 <!-- fr:body → xf:group -->
-                <xsl:template match="xhtml:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
-                    <xforms:group class="fb-body">
+                <xsl:template match="xh:body//fr:body[not(parent::fr:repeat) and not (parent::fr:grid)]">
+                    <xf:group class="fb-body">
                         <!-- Scope $lang which is the language of the form being edited -->
-                        <xforms:var name="lang" value="xxforms:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
+                        <xf:var name="lang" value="xxf:get-variable('fr-form-model', 'fb-lang')" as="element()" class="fb-annotation"/>
                         <!-- Scope $form-resources: resources of the form being edited.
                              Use the same logic as in resources-model. In the builder, we don't have a resources-model running
                              for the form being edited, so we duplicate this here. -->
-                        <xforms:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
+                        <xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = $lang], resource[1])[1]" as="element(resource)?" class="fb-annotation"/>
                         <!-- Scope $fr-resources for Form Runner resources -->
-                        <xforms:var name="fr-resources" value="xxforms:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>
+                        <xf:var name="fr-resources" value="xxf:get-variable('fr-resources-model', 'fr-fr-resources')" as="element(resource)?" class="fb-annotation"/>
                         <!-- Scope $fb-resources for Form Builder resources -->
-                        <xforms:var name="fb-resources" value="xxforms:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
+                        <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
 
                         <!-- Apply all the content -->
                         <xsl:apply-templates select="node()"/>
 
                         <!-- Listen to activations on grid cells -->
-                        <xforms:action ev:event="DOMActivate" xxforms:phantom="true" class="fb-annotation">
-                            <xforms:var name="control-element" value="xxforms:control-element(event('xxforms:absolute-targetid'))"/>
-                            <xforms:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
-                                <xforms:var name="th-column" value="count($control-element/preceding-sibling::*[@xxforms:element = 'xh:th']) + 1"/>
-                                <xforms:var name="new-selected-cell" value="if ($control-element/@xxforms:element = 'xh:th') then
-                                    ($control-element/following-sibling::xforms:repeat//*[@xxforms:element = 'xh:td'])[$th-column]/@id
+                        <xf:action ev:event="DOMActivate" xxf:phantom="true" class="fb-annotation">
+                            <xf:var name="control-element" value="xxf:control-element(event('xxf:absolute-targetid'))"/>
+                            <xf:action if="tokenize($control-element/@class, '\s+') = 'xforms-activable'">
+                                <xf:var name="th-column" value="count($control-element/preceding-sibling::*[@xxf:element = 'xh:th']) + 1"/>
+                                <xf:var name="new-selected-cell" value="if ($control-element/@xxf:element = 'xh:th') then
+                                    ($control-element/following-sibling::xf:repeat//*[@xxf:element = 'xh:td'])[$th-column]/@id
                                     else $control-element/@id"/>
-                                <xforms:setvalue ref="xxforms:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
-                            </xforms:action>
-                        </xforms:action>
+                                <xf:setvalue ref="xxf:get-variable('fr-form-model', 'selected-cell')" value="$new-selected-cell"/>
+                            </xf:action>
+                        </xf:action>
 
-                    </xforms:group>
+                    </xf:group>
                 </xsl:template>
 
                 <!-- fr:section → fr:section/(@edit-ref, @xxf:update) -->
-                <xsl:template match="xhtml:body//fr:section">
+                <xsl:template match="xh:body//fr:section">
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
-                        <xsl:attribute name="xxforms:update" select="'full'"/>
+                        <xsl:attribute name="xxf:update" select="'full'"/>
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:copy>
                 </xsl:template>
 
                 <!-- fr:grid → fr:grid/@edit-ref -->
-                <xsl:template match="xhtml:body//fr:grid">
+                <xsl:template match="xh:body//fr:grid">
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
                         <xsl:apply-templates select="@* | node()"/>
@@ -129,26 +129,26 @@
                 </xsl:template>
 
                 <!-- Convert MIP names -->
-                <xsl:template match="xforms:bind/@relevant | xforms:bind/@readonly | xforms:bind/@required | xforms:bind/@constraint | xforms:bind/@calculate | xforms:bind/@xxforms:default">
+                <xsl:template match="xf:bind/@relevant | xf:bind/@readonly | xf:bind/@required | xf:bind/@constraint | xf:bind/@calculate | xf:bind/@xxf:default">
                     <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
 
                 <!-- Add model actions -->
-                <xsl:template match="xhtml:head/xforms:model[@id = 'fr-form-model']">
+                <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']">
                     <xsl:copy>
                         <xsl:apply-templates select="@* | node()"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
                         <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">
-                            <xforms:action ev:event="{.}" ev:target="#observer" class="fb-annotation">
+                            <xf:action ev:event="{.}" ev:target="#observer" class="fb-annotation">
                                 <!-- Upon MIP XPath error cancel the default error behavior (which otherwise can open an
                                      error dialog at inopportune times.) -->
                                 <xsl:if test=". = 'xxforms-xpath-error'">
                                     <xsl:attribute name="ev:defaultAction">cancel</xsl:attribute>
                                 </xsl:if>
                                 <!-- Dispatch custom event to FB model -->
-                                <xforms:dispatch name="fb-{.}" targetid="|fr-form-model|"/>
-                            </xforms:action>
+                                <xf:dispatch name="fb-{.}" targetid="|fr-form-model|"/>
+                            </xf:action>
                         </xsl:for-each>
 
                     </xsl:copy>
@@ -157,7 +157,7 @@
                 <!-- TODO: convert legacy fr:repeat -->
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->
-                <xsl:template match="xhtml:head/meta[@http-equiv = 'Content-Type']"/>
+                <xsl:template match="xh:head/meta[@http-equiv = 'Content-Type']"/>
 
             </xsl:stylesheet>
         </p:input>

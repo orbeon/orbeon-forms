@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -32,17 +32,17 @@
         </xbl:resources>
         <xbl:template>
             <!-- Local model -->
-            <xforms:model id="model">
+            <xf:model id="model">
                 <!-- Local instance -->
-                <xforms:instance id="instance">
+                <xf:instance id="instance">
                     <!-- Copy configuration parameters -->
                     <parameters>
                         <id xbl:attr="xbl:text=username"/>
                         <count xbl:attr="xbl:text=count">5</count>
                     </parameters>
-                </xforms:instance>
+                </xf:instance>
 
-                <xforms:instance id="twitter-user-timeline-instance">
+                <xf:instance id="twitter-user-timeline-instance">
                     <statuses>
                         <!-- Example status:
                         <status>
@@ -70,91 +70,91 @@
                         </status>
                         -->
                     </statuses>
-                </xforms:instance>
+                </xf:instance>
 
                 <!-- Submission to call the twitter API -->
-                <xforms:submission id="user-timeline-submission"
+                <xf:submission id="user-timeline-submission"
                        serialization="none"
                        resource="http://twitter.com/statuses/user_timeline/{id}.xml?count={count}"
                        method="get"
                        replace="instance"
                        targetref="instance('twitter-user-timeline-instance')"
-                       xxforms:username="orbeon_test"
-                       xxforms:password="orbeon">
-                </xforms:submission>
+                       xxf:username="orbeon_test"
+                       xxf:password="orbeon">
+                </xf:submission>
 
                 <!-- Load timeline upon initialization -->
-                <xforms:send submission="user-timeline-submission" ev:event="xforms-model-construct-done"/>
+                <xf:send submission="user-timeline-submission" ev:event="xforms-model-construct-done"/>
 
-            </xforms:model>
+            </xf:model>
             <!-- Local controls -->
-            <xforms:group>
+            <xf:group>
                 <!-- DIV to help styling -->
-                <xhtml:div class="fr-top-shadow"/>
-                <xhtml:div class="fr-container">
+                <xh:div class="fr-top-shadow"/>
+                <xh:div class="fr-container">
 
-                    <!--<xforms:submit submission="user-timeline-submission">-->
-                        <!--<xforms:label>-->
-                            <!--Update Timeline for <xforms:output value="id"/>-->
-                        <!--</xforms:label>-->
-                    <!--</xforms:submit>-->
+                    <!--<xf:submit submission="user-timeline-submission">-->
+                        <!--<xf:label>-->
+                            <!--Update Timeline for <xf:output value="id"/>-->
+                        <!--</xf:label>-->
+                    <!--</xf:submit>-->
                     <fr:button class="button">
-                        <xforms:label>
-                            Update Timeline for <xforms:output value="id"/>
-                        </xforms:label>
-                        <xforms:send ev:event="DOMActivate" submission="user-timeline-submission"/>
+                        <xf:label>
+                            Update Timeline for <xf:output value="id"/>
+                        </xf:label>
+                        <xf:send ev:event="DOMActivate" submission="user-timeline-submission"/>
                     </fr:button>
 
                     <!-- Repeat over status -->
-                    <xhtml:div class="statuses">
-                        <xforms:repeat ref="instance('twitter-user-timeline-instance')/status">
+                    <xh:div class="statuses">
+                        <xf:repeat ref="instance('twitter-user-timeline-instance')/status">
                             <!-- DIV around one status -->
-                            <xhtml:div class="status">
+                            <xh:div class="status">
                                 <!-- User info -->
-                                <xhtml:div class="user">
-                                    <xhtml:a title="{user/name}" href="http://twitter.com/{user/screen_name}">
-                                        <xhtml:img src="{user/profile_image_url}" alt="{user/name}"/>
-                                        <xforms:output value="user/screen_name"/>
-                                    </xhtml:a>
-                                </xhtml:div>
+                                <xh:div class="user">
+                                    <xh:a title="{user/name}" href="http://twitter.com/{user/screen_name}">
+                                        <xh:img src="{user/profile_image_url}" alt="{user/name}"/>
+                                        <xf:output value="user/screen_name"/>
+                                    </xh:a>
+                                </xh:div>
                                 <!-- Entry -->
-                                <xhtml:div class="entry">
-                                    <xhtml:div>
+                                <xh:div class="entry">
+                                    <xh:div>
                                         <!-- Message -->
-                                        <xhtml:span class="message">
+                                        <xh:span class="message">
                                             <!-- Bunch of regexps to escape, parse links, users, and hash tags with the message -->
-                                            <xforms:var name="markup-replaced" as="xs:string"
+                                            <xf:var name="markup-replaced" as="xs:string"
                                                               select="replace(replace(text, '&lt;', '&amp;lt;'), '&quot;', '&amp;quot;')"/>
-                                            <xforms:var name="url-replaced" as="xs:string"
+                                            <xf:var name="url-replaced" as="xs:string"
                                                               select="replace($markup-replaced, '([A-Za-z]+://[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_:%&amp;\?/.=]+)',
                                                                         '&lt;a href=''$1''>$1&lt;/a>')"/>
-                                            <xforms:var name="user-replaced" as="xs:string"
+                                            <xf:var name="user-replaced" as="xs:string"
                                                               select="replace($url-replaced, '[@]+([A-Za-z0-9\-_]+)',
                                                                         '&lt;a href=''http://twitter.com/$1'' rel=''nofollow''>@$1&lt;/a>')"/>
-                                            <xforms:var name="hash-replaced" as="xs:string"
+                                            <xf:var name="hash-replaced" as="xs:string"
                                                               select="replace($user-replaced, '[##]+([A-Za-z0-9\-_]+)',
                                                                         '&lt;a href=''http://search.twitter.com/search?q=%23$1'' rel=''nofollow''>#$1&lt;/a>')"/>
 
                                             <!-- Output the resulting HTML -->
-                                            <xforms:output mediatype="text/html" value="$hash-replaced"/>
-                                        </xhtml:span>
+                                            <xf:output mediatype="text/html" value="$hash-replaced"/>
+                                        </xh:span>
                                         <!-- Link to tweet -->
-                                        <xhtml:a class="link" rel="bookmark" href="http://twitter.com/{user/screen_name}/status/{id}">
-                                            <xhtml:img src="/apps/fr/style/images/silk/link.png" alt="Link to this tweet"/>
-                                        </xhtml:a>
+                                        <xh:a class="link" rel="bookmark" href="http://twitter.com/{user/screen_name}/status/{id}">
+                                            <xh:img src="/apps/fr/style/images/silk/link.png" alt="Link to this tweet"/>
+                                        </xh:a>
                                         <!-- Source of the tweet -->
-                                        <xhtml:span class="meta">
-                                            <xhtml:span>posted  from <xforms:output mediatype="text/html" value="source"/></xhtml:span>
-                                        </xhtml:span>
-                                    </xhtml:div>
-                                </xhtml:div>
-                                <xhtml:div class="clear"/>
-                            </xhtml:div>
-                        </xforms:repeat>
-                    </xhtml:div>
-                </xhtml:div>
-                <xhtml:div class="fr-bottom-shadow"/>
-            </xforms:group>
+                                        <xh:span class="meta">
+                                            <xh:span>posted  from <xf:output mediatype="text/html" value="source"/></xh:span>
+                                        </xh:span>
+                                    </xh:div>
+                                </xh:div>
+                                <xh:div class="clear"/>
+                            </xh:div>
+                        </xf:repeat>
+                    </xh:div>
+                </xh:div>
+                <xh:div class="fr-bottom-shadow"/>
+            </xf:group>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

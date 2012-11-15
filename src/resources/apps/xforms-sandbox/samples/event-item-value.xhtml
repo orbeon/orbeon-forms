@@ -11,56 +11,56 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>event('xxforms:item-value')</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="ui">
+    <xh:head>
+        <xh:title>event('xxf:item-value')</xh:title>
+        <xf:model>
+            <xf:instance id="ui">
                 <ui>
                     <item>2</item>
                     <selected>1</selected>
                     <operation/>
                 </ui>
-            </xforms:instance>
-            <xforms:instance id="items">
+            </xf:instance>
+            <xf:instance id="items">
                 <items>
                     <item>1</item>
                     <item>2</item>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>Add new checkbox</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="instance('ui')/item" value=". + 1"/>
-                    <xforms:insert ref="instance('items')/item" origin="instance('ui')/item"/>
-                    <xforms:setvalue ref="instance('ui')/selected" value="../item"/>                    
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:select1 appearance="full" ref="instance('ui')/selected">
-                <xforms:action ev:event="xforms-value-changed">
-                    <xforms:setvalue ref="instance('ui')/operation" value="concat('Checkbox #', instance('ui')/selected, ' selected ', exists(event('xxforms:item-value')))"/>
-                </xforms:action>
-                <xforms:itemset ref="instance('items')/item">
-                    <xforms:label ref="."/>
-                    <xforms:value ref="."/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:output ref="instance('ui')/operation"/>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:trigger>
+                <xf:label>Add new checkbox</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="instance('ui')/item" value=". + 1"/>
+                    <xf:insert ref="instance('items')/item" origin="instance('ui')/item"/>
+                    <xf:setvalue ref="instance('ui')/selected" value="../item"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:select1 appearance="full" ref="instance('ui')/selected">
+                <xf:action ev:event="xforms-value-changed">
+                    <xf:setvalue ref="instance('ui')/operation" value="concat('Checkbox #', instance('ui')/selected, ' selected ', exists(event('xxf:item-value')))"/>
+                </xf:action>
+                <xf:itemset ref="instance('items')/item">
+                    <xf:label ref="."/>
+                    <xf:value ref="."/>
+                </xf:itemset>
+            </xf:select1>
+        </xh:p>
+        <xh:p>
+            <xf:output ref="instance('ui')/operation"/>
+        </xh:p>
+    </xh:body>
+</xh:html>

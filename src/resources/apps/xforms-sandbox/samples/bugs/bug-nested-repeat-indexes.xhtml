@@ -11,14 +11,14 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <head>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <department>
                         <employee/>
@@ -30,8 +30,8 @@
                         <employee/>
                     </department>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
     </head>
     <body>
 
@@ -45,7 +45,7 @@
             different nested repeat.
         </p>
 
-        <xforms:repeat ref="department" id="repeat-department">
+        <xf:repeat ref="department" id="repeat-department">
             <table class="gridtable">
                 <thead>
                     <tr>
@@ -55,23 +55,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <xforms:var name="department-position" value="position()"/>
-                    <xforms:repeat ref="employee" id="repeat-employee">
-                        <xforms:var name="employee-position" value="position()"/>
+                    <xf:var name="department-position" value="position()"/>
+                    <xf:repeat ref="employee" id="repeat-employee">
+                        <xf:var name="employee-position" value="position()"/>
                         <tr>
                             <td>
-                                <xforms:output id="my-output-1" value="concat($department-position, ' ', $employee-position)"/>
+                                <xf:output id="my-output-1" value="concat($department-position, ' ', $employee-position)"/>
                             </td>
                             <td>
-                                <xforms:output id="my-output-2" value="index('repeat-department')"/>
+                                <xf:output id="my-output-2" value="index('repeat-department')"/>
                             </td>
                             <td>
-                                <xforms:output id="my-output-3" value="index('repeat-employee')"/>
+                                <xf:output id="my-output-3" value="index('repeat-employee')"/>
                             </td>
                         </tr>
-                    </xforms:repeat>
+                    </xf:repeat>
                 </tbody>
             </table>
-        </xforms:repeat>
+        </xf:repeat>
     </body>
 </html>

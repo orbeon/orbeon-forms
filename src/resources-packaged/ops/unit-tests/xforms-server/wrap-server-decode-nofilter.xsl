@@ -13,12 +13,12 @@
   -->
 <xsl:stylesheet version="2.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
                 xmlns:saxon="http://saxon.sf.net/"
                 xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-    <xsl:template match="xxforms:dynamic-state">
+    <xsl:template match="xxf:dynamic-state">
         <xsl:copy>
             <xsl:apply-templates select="xpl:decodeDynamicStateString(normalize-space(.))"/>
         </xsl:copy>

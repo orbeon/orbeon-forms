@@ -11,16 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Using YUI's datatable</title>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <record>
                         <AAA>1</AAA>
@@ -38,8 +38,8 @@
                         <CCC>ccc</CCC>
                     </record>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="new-row">
+            </xf:instance>
+            <xf:instance id="new-row">
                 <instance at="1" xmlns="">
                     <record>
                         <AAA>0</AAA>
@@ -47,9 +47,9 @@
                         <CCC/>
                     </record>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+        </xf:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="fr.tsttable" element="fr|tsttable">
@@ -65,37 +65,37 @@
 
         <h1>Using the datatable widget (new generation)</h1>
 
-        <xforms:group ref="instance('new-row')">
+        <xf:group ref="instance('new-row')">
             <h2>New record</h2>
             <p>
-                <xforms:input ref="@at">
-                    <xforms:label>At: </xforms:label>
-                </xforms:input>
+                <xf:input ref="@at">
+                    <xf:label>At: </xf:label>
+                </xf:input>
             </p>
             <p>
-                <xforms:input ref="record/AAA">
-                    <xforms:label>AAA: </xforms:label>
-                </xforms:input>
+                <xf:input ref="record/AAA">
+                    <xf:label>AAA: </xf:label>
+                </xf:input>
             </p>
             <p>
-                <xforms:input ref="record/BBB">
-                    <xforms:label>BBB: </xforms:label>
-                </xforms:input>
+                <xf:input ref="record/BBB">
+                    <xf:label>BBB: </xf:label>
+                </xf:input>
             </p>
             <p>
-                <xforms:input ref="record/CCC">
-                    <xforms:label>CCC: </xforms:label>
-                </xforms:input>
+                <xf:input ref="record/CCC">
+                    <xf:label>CCC: </xf:label>
+                </xf:input>
             </p>
             <p>
-                <xforms:trigger>
-                    <xforms:label>Insert</xforms:label>
-                    <xforms:insert ev:event="DOMActivate" origin="instance('new-row')/record"
+                <xf:trigger>
+                    <xf:label>Insert</xf:label>
+                    <xf:insert ev:event="DOMActivate" origin="instance('new-row')/record"
                         context="instance('instance')" ref="record" at="instance('new-row')/@at"
                         position="before"/>
-                </xforms:trigger>
+                </xf:trigger>
             </p>
-        </xforms:group>
+        </xf:group>
 
         <table>
             <tr>
@@ -111,22 +111,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <xforms:repeat ref="record" id="r1">
+                            <xf:repeat ref="record" id="r1">
                                 <tr>
                                     <td>
-                                        <xforms:output ref="AAA"/>
+                                        <xf:output ref="AAA"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="BBB"/>
+                                        <xf:output ref="BBB"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="CCC"/>
+                                        <xf:output ref="CCC"/>
                                     </td>
                                     <td>
-                                        <xforms:output value="index('r1')"/>
+                                        <xf:output value="index('r1')"/>
                                     </td>
                                 </tr>
-                            </xforms:repeat>
+                            </xf:repeat>
                         </tbody>
                     </fr:datatable>
                 </td>
@@ -143,22 +143,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <xforms:repeat ref="record" id="r2">
+                            <xf:repeat ref="record" id="r2">
                                 <tr>
                                     <td>
-                                        <xforms:output ref="AAA"/>
+                                        <xf:output ref="AAA"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="BBB"/>
+                                        <xf:output ref="BBB"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="CCC"/>
+                                        <xf:output ref="CCC"/>
                                     </td>
                                     <td>
-                                        <xforms:output value="index('r2')"/>
+                                        <xf:output value="index('r2')"/>
                                     </td>
                                 </tr>
-                            </xforms:repeat>
+                            </xf:repeat>
                         </tbody>
                     </fr:tsttable>
                 </td>
@@ -175,22 +175,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <xforms:repeat ref="record" id="r3">
+                            <xf:repeat ref="record" id="r3">
                                 <tr>
                                     <td>
-                                        <xforms:output ref="AAA"/>
+                                        <xf:output ref="AAA"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="BBB"/>
+                                        <xf:output ref="BBB"/>
                                     </td>
                                     <td>
-                                        <xforms:output ref="CCC"/>
+                                        <xf:output ref="CCC"/>
                                     </td>
                                     <td>
-                                        <xforms:output value="index('r3')"/>
+                                        <xf:output value="index('r3')"/>
                                     </td>
                                 </tr>
-                            </xforms:repeat>
+                            </xf:repeat>
                         </tbody>
                     </table>
                 </td>

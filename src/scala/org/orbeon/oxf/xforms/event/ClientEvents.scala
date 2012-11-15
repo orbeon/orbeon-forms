@@ -414,7 +414,7 @@ object ClientEvents extends Logging {
                 // We used to check simply by effective id, but this is not enough in some cases. We want to handle
                 // controls that just "move" in a repeat. Scenario:
                 //
-                // o repeat with 2 iterations has xforms:input and xforms:trigger
+                // o repeat with 2 iterations has xf:input and xf:trigger
                 // o assume repeat is sorted on input value
                 // o use changes value in input and clicks trigger
                 // o client sends 2 events to server
@@ -486,7 +486,7 @@ object ClientEvents extends Logging {
 
             // 3. Recalculate, revalidate and refresh are handled with the automatic deferred updates.
 
-            // 4. We used to do special handling for xforms:output: upon click on xforms:output, the client would send
+            // 4. We used to do special handling for xf:output: upon click on xf:output, the client would send
             //    xforms-focus. We would translate that into DOMActivate. As of 2012-03-09 there doesn't seem to be a
             //    need for this so we are removing this behavior.
 

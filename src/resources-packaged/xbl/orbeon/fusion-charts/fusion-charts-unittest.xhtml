@@ -11,19 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>FusionCharts</xhtml:title>
-        <xforms:model id="my-model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>FusionCharts</xh:title>
+        <xf:model id="my-model">
+            <xf:instance id="instance">
                 <charts>
                     <column-3d>
                         <graph caption="Yearly Sales" xAxisName="Month" yAxisName="Sales" numberPrefix="$">
@@ -40,37 +40,37 @@
                         </graph>
                     </doughnut-3d>
                 </charts>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="add-month" context="column-3d/graph">
-                <xforms:insert context="." origin="xxforms:attribute('animation', '0')"/>
-                <xforms:var name="current" value="set[last()]"/>
-                <xforms:insert ref="set"/>
-                <xforms:setvalue ref="set[last()]/@name" value="$current/@name + 1"/>
-                <xforms:setvalue ref="set[last()]/@value" value="$current/@value * 1.5"/>
-                <xforms:dispatch if="10 > count(set)" name="add-month" targetid="my-model" delay="1000"/>
-            </xforms:action>
+            <xf:action ev:event="add-month" context="column-3d/graph">
+                <xf:insert context="." origin="xxf:attribute('animation', '0')"/>
+                <xf:var name="current" value="set[last()]"/>
+                <xf:insert ref="set"/>
+                <xf:setvalue ref="set[last()]/@name" value="$current/@name + 1"/>
+                <xf:setvalue ref="set[last()]/@value" value="$current/@value * 1.5"/>
+                <xf:dispatch if="10 > count(set)" name="add-month" targetid="my-model" delay="1000"/>
+            </xf:action>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             legend { font-weight: bold }
-        </xhtml:style>
+        </xh:style>
 
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:fieldset>
-            <xhtml:legend>Column 3D</xhtml:legend>
+    </xh:head>
+    <xh:body>
+        <xh:fieldset>
+            <xh:legend>Column 3D</xh:legend>
             <fr:fusion-charts id="column-chart" ref="column-3d/graph" swf="Column3D" width="600" height="400"/>
-            <xforms:trigger>
-                <xforms:label>Show me the future</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:dispatch name="add-month" targetid="my-model"/>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:fieldset>
-        <xhtml:fieldset>
-            <xhtml:legend>Doughnut 3D</xhtml:legend>
+            <xf:trigger>
+                <xf:label>Show me the future</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:dispatch name="add-month" targetid="my-model"/>
+                </xf:action>
+            </xf:trigger>
+        </xh:fieldset>
+        <xh:fieldset>
+            <xh:legend>Doughnut 3D</xh:legend>
             <fr:fusion-charts id="doughnut-chart" ref="doughnut-3d/graph" swf="Doughnut2D" width="400" height="300"/>
-        </xhtml:fieldset>
-    </xhtml:body>
-</xhtml:html>
+        </xh:fieldset>
+    </xh:body>
+</xh:html>

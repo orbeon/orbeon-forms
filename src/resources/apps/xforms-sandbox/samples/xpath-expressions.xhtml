@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XPath Expressions</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XPath Expressions</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <salary>1</salary>
                     <salary>2</salary>
@@ -31,22 +31,22 @@
                     <result2/>
                     <result3/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="result1" calculate="sum(for $i in ../salary return number($i))"
+            </xf:instance>
+            <xf:bind ref="result1" calculate="sum(for $i in ../salary return number($i))"
                          relevant="string(sum(for $i in ../salary return number($i))) != 'NaN'"/>
-            <xforms:bind ref="result2" calculate="9999 * 9999"/>
-            <xforms:bind ref="result3" calculate="9999 * 9999" type="xs:integer"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            Result 1: <xforms:output ref="result1"/>
-        </xhtml:p>
-        <xhtml:p>
-            Result 2: <xforms:output ref="result2"/>
-        </xhtml:p>
-        <xhtml:p>
-            Result 3: <xforms:output ref="result3"/>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            <xf:bind ref="result2" calculate="9999 * 9999"/>
+            <xf:bind ref="result3" calculate="9999 * 9999" type="xs:integer"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            Result 1: <xf:output ref="result1"/>
+        </xh:p>
+        <xh:p>
+            Result 2: <xf:output ref="result2"/>
+        </xh:p>
+        <xh:p>
+            Result 3: <xf:output ref="result3"/>
+        </xh:p>
+    </xh:body>
+</xh:html>

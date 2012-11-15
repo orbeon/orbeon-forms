@@ -148,7 +148,7 @@
             <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#request-params"/>
                 <p:input name="config">
-                    <xxforms:event-response xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                    <xxf:event-response xsl:version="2.0" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                         <!-- Only include files and omit all other parameters -->
                         <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
 
@@ -166,21 +166,21 @@
 
                         <!-- Create server events -->
                         <xsl:variable name="events">
-                            <xxforms:events>
+                            <xxf:events>
                                 <xsl:for-each select="$files">
-                                    <xxforms:event name="xxforms-upload-done" source-control-id="{name}" file="{value}" filename="{filename}" content-type="{content-type}" content-length="{content-length}"/>
+                                    <xxf:event name="xxforms-upload-done" source-control-id="{name}" file="{value}" filename="{filename}" content-type="{content-type}" content-length="{content-length}"/>
                                 </xsl:for-each>
-                            </xxforms:events>
+                            </xxf:events>
                         </xsl:variable>
 
                         <!-- Encode them -->
-                        <xxforms:action>
-                            <xxforms:server-events delay="0">
+                        <xxf:action>
+                            <xxf:server-events delay="0">
                                 <xsl:value-of select="xpl:encodeXML($events)" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"/>
-                            </xxforms:server-events>
-                        </xxforms:action>
+                            </xxf:server-events>
+                        </xxf:action>
 
-                    </xxforms:event-response>
+                    </xxf:event-response>
                 </p:input>
                 <p:output name="data" id="xforms-response"/>
             </p:processor>

@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ContentHandler that gathers namespace information on XForms elements (xforms:* and xxforms:*).
+ * ContentHandler that gathers namespace information on XForms elements (xf:* and xxf:*).
  */
 public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceiver {
 
@@ -70,7 +70,7 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceive
                 namespaceMappings.put(idAttribute, namespaces);
             }
 
-            if ("instance".equals(localname)) { // NOTE: this catches xforms:instance AND xxforms:instance (shouldn't be a problem...)
+            if ("instance".equals(localname)) { // NOTE: this catches xf:instance AND xxf:instance (shouldn't be a problem...)
                 // Remember we are inside an instance
                 xformsInstanceLevel = level;
             }
@@ -80,7 +80,7 @@ public class XFormsNamespaceExtractorContentHandler extends ForwardingXMLReceive
     public void endElement(String uri, String localname, String qName) throws SAXException {
 
         if (level == xformsInstanceLevel) {
-            // Exiting xforms:instance
+            // Exiting xf:instance
             xformsInstanceLevel = -1;
         }
 

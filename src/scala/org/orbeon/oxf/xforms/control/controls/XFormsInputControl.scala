@@ -35,7 +35,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xml.XMLConstants._
 
 /**
- * Represents an xforms:input control.
+ * Represents an xf:input control.
  */
 class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsValueControl(container, parent, element, id) with FocusableTrait {

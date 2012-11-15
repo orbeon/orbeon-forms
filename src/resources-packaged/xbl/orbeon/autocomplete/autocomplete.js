@@ -24,10 +24,10 @@
 
         dynamicItemset: null,       // Do we need to wait for the itemset to change before we update the auto-complete?
         yuiAutoComplete: null,      // YUI object for the auto-complete
-        searchControl: null,        // xforms:input control in which users type
+        searchControl: null,        // xf:input control in which users type
         searchField: null,          // Form field in which users type
         valueSelectedTrigger: null,  // Bridge to tell XForms users selected a value
-        externalValueInput : null,  // xforms:input containing the external value
+        externalValueInput : null,  // xf:input containing the external value
         justMadeSelection: false,   // Reset to false when an Ajax response arrives
         suggestionRequested: false, // Whether users requested the suggestion menu to open by clicking on the button
 

@@ -11,27 +11,27 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Tree Widget</xhtml:title>
-        <xhtml:style type="text/css">
+    <xh:head>
+        <xh:title>Tree Widget</xh:title>
+        <xh:style type="text/css">
             table td, table th { vertical-align: top }
             .xforms-label { font-weight: bold; padding-right: 1em }
-        </xhtml:style>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+        </xh:style>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance>
                     <select1>ar</select1>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="encyclopedia-instance">
+            </xf:instance>
+            <xf:instance id="encyclopedia-instance">
                 <items>
                     <item label="Encyclopedia" folder="true" value="en">
                         <item label="Science" folder="true" value="sc"/>
@@ -41,20 +41,20 @@
                         </item>
                     </item>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .node-folder, .node-document { background-repeat: no-repeat; padding: 2px 0 0 18px; line-height: 18px;  }
             .node-folder { background-image: url('../../../apps/fr/style/images/silk/folder.png') }
             .node-document { background-image: url('../../../apps/fr/style/images/silk/page.png') }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-            <xforms:itemset ref="instance('encyclopedia-instance')//item" class="{if (@folder = 'true') then 'node-folder' else 'node-document'}">
-                <xforms:label ref="@label"/>
-                <xforms:value ref="@value"/>
-            </xforms:itemset>
-        </xforms:select1>
-    </xhtml:body>
-</xhtml:html>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:select1 ref="select1" appearance="xxf:tree" id="tree1" incremental="true">
+            <xf:itemset ref="instance('encyclopedia-instance')//item" class="{if (@folder = 'true') then 'node-folder' else 'node-document'}">
+                <xf:label ref="@label"/>
+                <xf:value ref="@value"/>
+            </xf:itemset>
+        </xf:select1>
+    </xh:body>
+</xh:html>

@@ -11,36 +11,36 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Bug</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Bug</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <a id="a1"/>
                     <a id="a2"/>
                     <b id="b1"/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:trigger>
-            <xforms:label>Try it</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:variable name="b" select="b"/>
-                <xforms:insert ref="$b" position="before" origin="/*/a[1]"/>
-                <xforms:message>There are now <xforms:output value="count($b/preceding-sibling::a)"/> preceding "a" elements (should be <xforms:output value="count(/*/b/preceding-sibling::a)"/>).</xforms:message>
-            </xforms:action>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Try it</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:variable name="b" select="b"/>
+                <xf:insert ref="$b" position="before" origin="/*/a[1]"/>
+                <xf:message>There are now <xf:output value="count($b/preceding-sibling::a)"/> preceding "a" elements (should be <xf:output value="count(/*/b/preceding-sibling::a)"/>).</xf:message>
+            </xf:action>
+        </xf:trigger>
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

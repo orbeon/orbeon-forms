@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * xxforms:properties-starts-with() function.
+ * xxf:properties-starts-with() function.
  *
  * Return the name of all the properties from properties.xml that start with the given name.
  */

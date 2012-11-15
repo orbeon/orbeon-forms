@@ -11,65 +11,65 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <xhtml:head>
-        <xhtml:title>XForms Output with Image Mediatype</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Output with Image Mediatype</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <anyURI xsi:type="xs:anyURI" filename="" mediatype="" size=""/>
                     <base64Binary xsi:type="xs:base64Binary" filename="" mediatype="" size=""/>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:observer="upload-anyURI upload-base64Binary" ev:event="xforms-select">
-                <xforms:send submission="upload-submission"/>
-            </xforms:action>
+            <xf:action ev:observer="upload-anyURI upload-base64Binary" ev:event="xforms-select">
+                <xf:send submission="upload-submission"/>
+            </xf:action>
 
-            <xforms:submission id="upload-submission" ref="." method="post" replace="none" resource="echo:"/>
+            <xf:submission id="upload-submission" ref="." method="post" replace="none" resource="echo:"/>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
         <h2>Image stored as a URI</h2>
 
-        <xforms:group ref="anyURI[normalize-space() != '']">
-            <xforms:output ref="." mediatype="image/*">
-                <xforms:label>Image:</xforms:label>
-            </xforms:output>
-        </xforms:group>
+        <xf:group ref="anyURI[normalize-space() != '']">
+            <xf:output ref="." mediatype="image/*">
+                <xf:label>Image:</xf:label>
+            </xf:output>
+        </xf:group>
         <!-- File chooser -->
-        <xforms:upload ref="anyURI" id="upload-anyURI">
-            <xforms:label>Upload an image:</xforms:label>
-            <xforms:filename ref="@filename"/>
-            <xforms:mediatype ref="@mediatype"/>
-            <xxforms:size ref="@size"/>
-        </xforms:upload>
+        <xf:upload ref="anyURI" id="upload-anyURI">
+            <xf:label>Upload an image:</xf:label>
+            <xf:filename ref="@filename"/>
+            <xf:mediatype ref="@mediatype"/>
+            <xxf:size ref="@size"/>
+        </xf:upload>
 
         <h2>Image stored as a base64-encoded binary</h2>
 
-        <xforms:group ref="base64Binary[normalize-space() != '']">
-            <xforms:output ref="." mediatype="image/*">
-                <xforms:label>Image:</xforms:label>
-            </xforms:output>
-        </xforms:group>
+        <xf:group ref="base64Binary[normalize-space() != '']">
+            <xf:output ref="." mediatype="image/*">
+                <xf:label>Image:</xf:label>
+            </xf:output>
+        </xf:group>
         <!-- File chooser -->
-        <xforms:upload ref="base64Binary" id="upload-base64Binary">
-            <xforms:label>Upload an image:</xforms:label>
-            <xforms:filename ref="@filename"/>
-            <xforms:mediatype ref="@mediatype"/>
-            <xxforms:size ref="@size"/>
-        </xforms:upload>
+        <xf:upload ref="base64Binary" id="upload-base64Binary">
+            <xf:label>Upload an image:</xf:label>
+            <xf:filename ref="@filename"/>
+            <xf:mediatype ref="@mediatype"/>
+            <xxf:size ref="@size"/>
+        </xf:upload>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

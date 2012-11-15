@@ -69,7 +69,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
     private final XFormsModel model;
     private boolean submissionElementExtracted = false;
 
-    private String avtActionOrResource; // required unless there is a nested xforms:resource element;
+    private String avtActionOrResource; // required unless there is a nested xf:resource element;
     private String avtMethod; // required
 
     private String avtValidate;
@@ -177,16 +177,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             if (avtActionOrResource == null) // @resource has precedence over @action
                 avtActionOrResource = submissionElement.attributeValue("action");
             if (avtActionOrResource == null) {
-                // TODO: support XForms 1.1 nested xforms:resource element
-                throw new XFormsSubmissionException(this, "xforms:submission: action attribute or resource attribute is missing.",
-                        "processing xforms:submission attributes");
+                // TODO: support XForms 1.1 nested xf:resource element
+                throw new XFormsSubmissionException(this, "xf:submission: action attribute or resource attribute is missing.",
+                        "processing xf:submission attributes");
             }
 
             avtMethod = submissionElement.attributeValue("method");
             if (avtMethod == null) {
-                // TODO: support XForms 1.1 nested xforms:method element
-                throw new XFormsSubmissionException(this, "xforms:submission: method attribute is missing.",
-                        "processing xforms:submission attributes");
+                // TODO: support XForms 1.1 nested xf:method element
+                throw new XFormsSubmissionException(this, "xf:submission: method attribute is missing.",
+                        "processing xf:submission attributes");
             }
             avtValidate = submissionElement.attributeValue("validate");
             avtRelevant = submissionElement.attributeValue("relevant");
@@ -338,7 +338,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // We can do this first, because the check just depends on the controls, instance to submit, and pending
                 // submissions if any. This does not depend on the actual state of the instance.
                 if (p.serialize && p.resolvedXXFormsUploads && XFormsSubmissionUtils.hasBoundRelevantPendingUploadControls(containingDocument, p.refInstance)) {
-                    throw new XFormsSubmissionException(this, "xforms:submission: instance to submit has at least one pending upload.",
+                    throw new XFormsSubmissionException(this, "xf:submission: instance to submit has at least one pending upload.",
                         "checking pending uploads",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.XXFORMS_PENDING_UPLOADS(), null));
                 }
@@ -352,7 +352,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     if (modelForInstance != null) {
                         // NOTE: XForms 1.1 says that we should rebuild/recalculate the "model containing this submission".
                         // Here, we rebuild/recalculate instead the model containing the submission's single-node binding.
-                        // This can be different than the model containing the submission if using e.g. xxforms:instance().
+                        // This can be different than the model containing the submission if using e.g. xxf:instance().
 
                         // NOTE: XForms 1.1 seems to say this should happen regardless of whether we serialize or not. If
                         // the instance is not serialized and if no instance data is otherwise used for the submission,
@@ -400,7 +400,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 // Get serialization requested from @method and @serialization attributes
                 final String requestedSerialization = XFormsSubmissionUtils.getRequestedSerialization(p.serialization, p.resolvedMethod);
                 if (requestedSerialization == null)
-                    throw new XFormsSubmissionException(this, "xforms:submission: invalid submission method requested: " + p.resolvedMethod, "serializing instance");
+                    throw new XFormsSubmissionException(this, "xf:submission: invalid submission method requested: " + p.resolvedMethod, "serializing instance");
 
                 final Document documentToSubmit;
                 if (p.serialize) {
@@ -476,7 +476,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     public void run() {
                         if (pVal != null && pVal.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
                             // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
-                            throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xforms:submission", "processing submission");
+                            throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xf:submission", "processing submission");
                         } else {
                             // Any exception will cause an error event to be dispatched
                             sendSubmitError(resolvedActionOrResourceVal, throwable);
@@ -680,7 +680,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                     } else if (p.isReplaceNone) {
                         replacer = new NoneReplacer(this, containingDocument);
                     } else {
-                        throw new XFormsSubmissionException(this, "xforms:submission: invalid replace attribute: " + replace, "processing instance replacement",
+                        throw new XFormsSubmissionException(this, "xf:submission: invalid replace attribute: " + replace, "processing instance replacement",
                                 new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.XXFORMS_INTERNAL_ERROR(), connectionResult));
                     }
                 } else {
@@ -702,14 +702,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                 // Currently we don't know how to handle a redirect for replace != "all"
                 if (!p.isReplaceAll)
-                    throw new XFormsSubmissionException(this, "xforms:submission for submission id: " + id + ", redirect code received with replace=\"" + replace + "\"", "processing submission response",
+                    throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", redirect code received with replace=\"" + replace + "\"", "processing submission response",
                             new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
 
                 replacer = new RedirectReplacer(this, containingDocument);
 
             } else {
                 // Error code received
-                throw new XFormsSubmissionException(this, "xforms:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
                         new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
             }
 
@@ -727,7 +727,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isReplaceText = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_TEXT);
         final boolean isReplaceNone = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE);
 
-        // Current node for xforms:submission and instance containing the node to submit
+        // Current node for xf:submission and instance containing the node to submit
         NodeInfo refNodeInfo;
         XFormsInstance refInstance;
         Item submissionElementContextItem;
@@ -786,11 +786,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             // Check that we have a current node and that it is pointing to a document or an element
             if (refNodeInfo == null)
-                throw new XFormsSubmissionException(XFormsModelSubmission.this, "Empty single-node binding on xforms:submission for submission id: " + id, "getting submission single-node binding",
+                throw new XFormsSubmissionException(XFormsModelSubmission.this, "Empty single-node binding on xf:submission for submission id: " + id, "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.NO_DATA(), null));
 
             if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
-                throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
+                throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.NO_DATA(), null));
             }
 
@@ -881,7 +881,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtActionOrResource);
                 if (temp == null) {
                     // This can be null if, e.g. you have an AVT like resource="{()}"
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
+                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
                             "resolving resource URI");
                 }
                 actionOrResource = NetUtils.encodeHRRI(temp, true);
@@ -943,14 +943,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Check read-only and cache hints
             if (isCache) {
                 if (!(p.actualHttpMethod.equals("GET") || p.actualHttpMethod.equals("POST") || p.actualHttpMethod.equals("PUT")))
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with method=\"get|post|put\".",
+                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: xxf:cache=\"true\" or xxf:shared=\"application\" can be set only with method=\"get|post|put\".",
                             "checking read-only and shared hints");
                 if (!p.isReplaceInstance)
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:cache=\"true\" or xxforms:shared=\"application\" can be set only with replace=\"instance\".",
+                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: xxf:cache=\"true\" or xxf:shared=\"application\" can be set only with replace=\"instance\".",
                             "checking read-only and shared hints");
             } else if (isReadonly) {
                 if (!p.isReplaceInstance)
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: xxforms:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
+                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: xxf:readonly=\"true\" can be \"true\" only with replace=\"instance\".",
                             "checking read-only and shared hints");
             }
 
@@ -960,7 +960,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             isAsynchronous = !p.isReplaceAll && isRequestedAsynchronousMode;
             if (isRequestedAsynchronousMode && p.isReplaceAll) {
                 // For now we don't support replace="all"
-                throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: mode=\"asynchronous\" cannot be \"true\" with replace=\"all\".", "checking asynchronous mode");
+                throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: mode=\"asynchronous\" cannot be \"true\" with replace=\"all\".", "checking asynchronous mode");
             }
         }
 
@@ -1030,13 +1030,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
                         messageBody = os.toByteArray();
                     } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to XML.", "serializing instance");
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xf:submission: exception while serializing instance to XML.", "serializing instance");
                     }
                     defaultMediatypeForSerialization = "application/xml";
                     queryString = null;
                 } else if (requestedSerialization.equals("multipart/related")) {
                     // TODO
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
+                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: submission serialization not yet implemented: " + requestedSerialization, "serializing instance");
                 } else if (requestedSerialization.equals("multipart/form-data")) {
                     // Build multipart/form-data body
 
@@ -1058,7 +1058,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
                     if (XMLConstants.XS_BASE64BINARY_QNAME.equals(nodeType)) {
                         // TODO
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: binary serialization with base64Binary type is not yet implemented.", "serializing instance");
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: binary serialization with base64Binary type is not yet implemented.", "serializing instance");
                     } else {
                         // Default to anyURI
                         // TODO: PERFORMANCE: Must pass InputStream all the way to the submission instead of storing into byte[] in memory!
@@ -1089,7 +1089,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
                         messageBody = os.toByteArray();
                     } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to HTML or XHTML.", "serializing instance");
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xf:submission: exception while serializing instance to HTML or XHTML.", "serializing instance");
                     }
                     defaultMediatypeForSerialization = requestedSerialization;
                     queryString = null;
@@ -1104,12 +1104,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                         identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
                         messageBody = os.toByteArray();
                     } catch (Exception e) {
-                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xforms:submission: exception while serializing instance to text.", "serializing instance");
+                        throw new XFormsSubmissionException(XFormsModelSubmission.this, e, "xf:submission: exception while serializing instance to text.", "serializing instance");
                     }
                     defaultMediatypeForSerialization = requestedSerialization;
                     queryString = null;
                 } else {
-                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xforms:submission: invalid submission serialization requested: " + requestedSerialization, "serializing instance");
+                    throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: invalid submission serialization requested: " + requestedSerialization, "serializing instance");
                 }
 
                 // Actual request mediatype: the one specified by @mediatype, or the default mediatype for the serialization otherwise
@@ -1140,7 +1140,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final Object destinationObject;
         if (targetref == null) {
             // There is no explicit @targetref, so the target is implicitly the root element of either the instance
-            // pointed to by @ref, or the instance specified by @instance or @xxforms:instance.
+            // pointed to by @ref, or the instance specified by @instance or @xxf:instance.
             destinationObject = defaultReplaceInstance.instanceRoot();
         } else {
             // There is an explicit @targetref, which must be evaluated.
@@ -1200,7 +1200,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 indentedLogger.logDebug("", "instance document or subset thereof cannot be submitted",
                         "document", documentString);
             }
-            throw new XFormsSubmissionException(this, "xforms:submission: instance to submit does not satisfy valid and/or required model item properties.",
+            throw new XFormsSubmissionException(this, "xf:submission: instance to submit does not satisfy valid and/or required model item properties.",
                     "checking instance validity",
                     new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.VALIDATION_ERROR(), null));
         }

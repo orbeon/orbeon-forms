@@ -11,13 +11,13 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -41,47 +41,47 @@
             <templates>
                 <view>
                     <fr:map>
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
                     </fr:map>
                 </view>
             </templates>
         </metadata>
 
         <xbl:template>
-            <xforms:group xxbl:scope="outer">
+            <xf:group xxbl:scope="outer">
 
-                <xforms:group xbl:attr="model context ref bind">
+                <xf:group xbl:attr="model context ref bind">
 
                     <!-- Constructor -->
-                    <xforms:group xxbl:scope="inner">
-                        <xxforms:script id="xf-en" ev:event="xforms-enabled">ORBEON.widget.MapEvents.mapContainerXFormsEnabled.call(this, event.target);</xxforms:script>
-                    </xforms:group>
+                    <xf:group xxbl:scope="inner">
+                        <xxf:script id="xf-en" ev:event="xforms-enabled">ORBEON.widget.MapEvents.mapContainerXFormsEnabled.call(this, event.target);</xxf:script>
+                    </xf:group>
 
                     <!-- Variables for attributes on the control -->
-                    <xforms:var name="class" xbl:attr="xbl:text=class"/>
+                    <xf:var name="class" xbl:attr="xbl:text=class"/>
 
                     <!-- Div in which Google Maps does its rendering -->
-                    <xhtml:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"/>
+                    <xh:div class="fb-map-gmap-div{if ($class = '') then '' else concat(' ', $class)}" id="gmap-div" xbl:attr="style"/>
 
-                </xforms:group>
+                </xf:group>
 
                 <!-- Evaluate other @*-ref attributes in same context as @ref -->
                 <!-- XForms controls to expose XForms values to JavaScript -->
-                <xforms:output class="fb-map-address" xbl:attr="context model ref=address-ref bind=address-bind" style="display: none">
+                <xf:output class="fb-map-address" xbl:attr="context model ref=address-ref bind=address-bind" style="display: none">
                     <!-- React to change of address -->
-                    <xxforms:script id="xf-vc" ev:event="xforms-value-changed">ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this, event.target);</xxforms:script>
-                </xforms:output>
-                <xforms:input class="fb-map-longitude" xbl:attr="context model ref=longitude-ref bind=longitude-bind" style="display: none"/>
-                <xforms:input class="fb-map-latitude" xbl:attr="context model ref=latitude-ref bind=latitude-bind" style="display: none"/>
-            </xforms:group>
+                    <xxf:script id="xf-vc" ev:event="xforms-value-changed">ORBEON.widget.MapEvents.addressXFormsValueChanged.call(this, event.target);</xxf:script>
+                </xf:output>
+                <xf:input class="fb-map-longitude" xbl:attr="context model ref=longitude-ref bind=longitude-bind" style="display: none"/>
+                <xf:input class="fb-map-latitude" xbl:attr="context model ref=latitude-ref bind=latitude-bind" style="display: none"/>
+            </xf:group>
             <!-- Load script depending on configuration properties -->
-            <xhtml:script src="http{if (xxforms:property('oxf.xforms.xbl.fr.map.ssl')) then 's://maps-api-ssl' else '://maps'}.google.com/maps?file=api&amp;v=2&amp;{
-                                        if (normalize-space(xxforms:property('oxf.xforms.xbl.fr.map.clientid')))
-                                        then concat('client=gme-', xxforms:property('oxf.xforms.xbl.fr.map.clientid'))
-                                        else concat('key=', xxforms:property('oxf.xforms.xbl.fr.map.key'))
+            <xh:script src="http{if (xxf:property('oxf.xforms.xbl.fr.map.ssl')) then 's://maps-api-ssl' else '://maps'}.google.com/maps?file=api&amp;v=2&amp;{
+                                        if (normalize-space(xxf:property('oxf.xforms.xbl.fr.map.clientid')))
+                                        then concat('client=gme-', xxf:property('oxf.xforms.xbl.fr.map.clientid'))
+                                        else concat('key=', xxf:property('oxf.xforms.xbl.fr.map.key'))
                                     }&amp;sensor=false" type="text/javascript"/>
         </xbl:template>
     </xbl:binding>

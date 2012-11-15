@@ -105,7 +105,7 @@ trait ControlAjaxSupport {
             added
         }
 
-        // By default, diff only attributes in the xxforms:* namespace
+        // By default, diff only attributes in the xxf:* namespace
         val extensionAttributes = getExtensionAttributes
         (extensionAttributes ne null) && addAttributesDiffs(extensionAttributes, XXFORMS_NAMESPACE_URI)
     }

@@ -11,26 +11,26 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Updatable Tree</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Updatable Tree</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <select>cu1 cr1 sc2</select>
                     <select1>en1</select1>
                     <operation>delete</operation>
                     <purgatory/>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="items">
+            </xf:instance>
+            <xf:instance id="items">
                 <items>
                     <item label="Encyclopedia" value="en1">
                         <item label="Science" value="sc1"/>
@@ -40,97 +40,97 @@
                         </item>
                     </item>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .section { margin-bottom: 1em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
         <!-- Operation -->
-        <xhtml:div class="section">
-            <xhtml:b>1. Select which operation you want to perform.</xhtml:b>
-        </xhtml:div>
-        <xhtml:div class="section">
-            <xforms:select1 ref="instance('instance')/operation" appearance="full">
-                <xforms:item>
-                    <xforms:label>Delete</xforms:label>
-                    <xforms:value>delete</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>Copy</xforms:label>
-                    <xforms:value>copy</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>Move</xforms:label>
-                    <xforms:value>move</xforms:value>
-                </xforms:item>
-            </xforms:select1>
-        </xhtml:div>
+        <xh:div class="section">
+            <xh:b>1. Select which operation you want to perform.</xh:b>
+        </xh:div>
+        <xh:div class="section">
+            <xf:select1 ref="instance('instance')/operation" appearance="full">
+                <xf:item>
+                    <xf:label>Delete</xf:label>
+                    <xf:value>delete</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>Copy</xf:label>
+                    <xf:value>copy</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>Move</xf:label>
+                    <xf:value>move</xf:value>
+                </xf:item>
+            </xf:select1>
+        </xh:div>
         <!-- Select node on which to operate -->
-        <xhtml:div class="section">
-            <xhtml:b>2. Select nodes on which the operation functions.</xhtml:b>
-        </xhtml:div>
-        <xhtml:div class="section">
-            <xforms:group ref=".[select = '']">
+        <xh:div class="section">
+            <xh:b>2. Select nodes on which the operation functions.</xh:b>
+        </xh:div>
+        <xh:div class="section">
+            <xf:group ref=".[select = '']">
                 You haven't selected any node.
-            </xforms:group>
-            <xforms:group ref=".[select != '']">
-                You selected <xforms:output value="select"/>.
-            </xforms:group>
-        </xhtml:div>
-        <xhtml:div class="section">
-            <xforms:select ref="select" appearance="xxforms:tree" id="select-tree" incremental="true">
-                <xforms:itemset ref="instance('items')//item">
-                    <xforms:label ref="@label"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select>
-        </xhtml:div>
+            </xf:group>
+            <xf:group ref=".[select != '']">
+                You selected <xf:output value="select"/>.
+            </xf:group>
+        </xh:div>
+        <xh:div class="section">
+            <xf:select ref="select" appearance="xxf:tree" id="select-tree" incremental="true">
+                <xf:itemset ref="instance('items')//item">
+                    <xf:label ref="@label"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select>
+        </xh:div>
         <!-- Select target -->
-        <xforms:group ref=".[instance('instance')/operation = ('move', 'copy')]">
-            <xhtml:div class="section">
-                <xhtml:b>3. Select point where to insert or move the selected nodes.</xhtml:b>
-            </xhtml:div>
-            <xhtml:div class="section">
-                You selected <xforms:output value="select1"/> (click on node in tree below to change selection).
-            </xhtml:div>
-            <!-- appearance="xxforms:tree"  -->
-            <xforms:select1 ref="select1" appearance="xxforms:tree" id="select1-tree" incremental="true">
-                <xforms:itemset ref="instance('items')//item">
-                    <xforms:label ref="@label"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xforms:group>
+        <xf:group ref=".[instance('instance')/operation = ('move', 'copy')]">
+            <xh:div class="section">
+                <xh:b>3. Select point where to insert or move the selected nodes.</xh:b>
+            </xh:div>
+            <xh:div class="section">
+                You selected <xf:output value="select1"/> (click on node in tree below to change selection).
+            </xh:div>
+            <!-- appearance="xxf:tree"  -->
+            <xf:select1 ref="select1" appearance="xxf:tree" id="select1-tree" incremental="true">
+                <xf:itemset ref="instance('items')//item">
+                    <xf:label ref="@label"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+            </xf:select1>
+        </xf:group>
         <!-- Do it -->
-        <xhtml:div class="section">
-            <xforms:trigger>
-                <xforms:label>Do it</xforms:label>
-                <xforms:action ev:event="DOMActivate">
+        <xh:div class="section">
+            <xf:trigger>
+                <xf:label>Do it</xf:label>
+                <xf:action ev:event="DOMActivate">
                     <!-- Copy -->
-                    <xforms:action if="instance('instance')/operation = 'copy'">
-                        <xforms:insert context="instance('items')//item[@value = instance('instance')/select1]"
+                    <xf:action if="instance('instance')/operation = 'copy'">
+                        <xf:insert context="instance('items')//item[@value = instance('instance')/select1]"
                             origin="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
-                    </xforms:action>
+                    </xf:action>
                     <!-- Move to purgatory -->
-                    <xforms:action if="instance('instance')/operation = 'move'">
-                        <xforms:insert context="instance('instance')/purgatory"
+                    <xf:action if="instance('instance')/operation = 'move'">
+                        <xf:insert context="instance('instance')/purgatory"
                             origin="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
-                    </xforms:action>
+                    </xf:action>
                     <!-- Delete -->
-                    <xforms:action if="instance('instance')/operation = ('delete', 'move')">
-                        <xforms:delete ref="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
-                        <xforms:setvalue ref="instance('instance')/select"/>
-                    </xforms:action>
+                    <xf:action if="instance('instance')/operation = ('delete', 'move')">
+                        <xf:delete ref="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
+                        <xf:setvalue ref="instance('instance')/select"/>
+                    </xf:action>
                     <!-- Move from purgatory -->
-                    <xforms:action if="instance('instance')/operation = 'move'">
-                        <xforms:insert context="instance('items')//item[@value = instance('instance')/select1]"
+                    <xf:action if="instance('instance')/operation = 'move'">
+                        <xf:insert context="instance('items')//item[@value = instance('instance')/select1]"
                             origin="instance('instance')/purgatory/*"/>
-                        <xforms:delete ref="instance('instance')/purgatory/*"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:trigger>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+                        <xf:delete ref="instance('instance')/purgatory/*"/>
+                    </xf:action>
+                </xf:action>
+            </xf:trigger>
+        </xh:div>
+    </xh:body>
+</xh:html>

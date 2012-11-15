@@ -11,47 +11,47 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Exclusive Checkboxes</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Exclusive Checkboxes</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance xmlns="">
                     <value1/>
                     <value2/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:select ref="value1" appearance="full">
-                <xforms:action ev:event="xforms-value-changed">
-                    <xforms:setvalue ref="../value2" value="if (../value1 = '') then ../value2 else ''"/>
-                </xforms:action>
-                <xforms:label>Value1: </xforms:label>
-                <xforms:item>
-                    <xforms:name/>
-                    <xforms:value>x</xforms:value>
-                </xforms:item>
-            </xforms:select>
-            <xforms:select ref="value2" appearance="full">
-                <xforms:action ev:event="xforms-value-changed">
-                    <xforms:setvalue ref="../value1" value="if (../value2 = '') then ../value1 else ''"/>
-                </xforms:action>
-                <xforms:label>Value2: </xforms:label>
-                <xforms:item>
-                    <xforms:name/>
-                    <xforms:value>x</xforms:value>
-                </xforms:item>
-            </xforms:select>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:select ref="value1" appearance="full">
+                <xf:action ev:event="xforms-value-changed">
+                    <xf:setvalue ref="../value2" value="if (../value1 = '') then ../value2 else ''"/>
+                </xf:action>
+                <xf:label>Value1: </xf:label>
+                <xf:item>
+                    <xf:name/>
+                    <xf:value>x</xf:value>
+                </xf:item>
+            </xf:select>
+            <xf:select ref="value2" appearance="full">
+                <xf:action ev:event="xforms-value-changed">
+                    <xf:setvalue ref="../value1" value="if (../value2 = '') then ../value1 else ''"/>
+                </xf:action>
+                <xf:label>Value2: </xf:label>
+                <xf:item>
+                    <xf:name/>
+                    <xf:value>x</xf:value>
+                </xf:item>
+            </xf:select>
+        </xh:p>
+    </xh:body>
+</xh:html>

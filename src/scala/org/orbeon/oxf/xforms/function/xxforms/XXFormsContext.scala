@@ -19,9 +19,9 @@ import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**
- * The xxforms:context() function allows you to obtain the single-node binding for an enclosing xforms:group,
- * xforms:repeat, or xforms:switch. It takes one mandatory string parameter containing the id of an enclosing grouping
- * XForms control. For xforms:repeat, the context returned is the context of the current iteration.
+ * The xxf:context() function allows you to obtain the single-node binding for an enclosing xf:group,
+ * xf:repeat, or xf:switch. It takes one mandatory string parameter containing the id of an enclosing grouping
+ * XForms control. For xf:repeat, the context returned is the context of the current iteration.
  */
 class XXFormsContext extends XFormsFunction with MatchSimpleAnalysis {
 

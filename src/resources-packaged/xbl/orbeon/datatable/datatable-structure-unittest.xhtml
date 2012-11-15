@@ -11,181 +11,181 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <xhtml:head>
-        <xhtml:title>Datatable structure</xhtml:title>
+    <xh:head>
+        <xh:title>Datatable structure</xh:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-structure-unittest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
-    </xhtml:head>
-    <xhtml:body>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-structure-unittest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Datatable test events</xhtml:legend>
-            <xhtml:ol>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-all">
-                        <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-all">
-                        <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-            </xhtml:ol>
-        </xhtml:fieldset>
+        <xh:fieldset>
+            <xh:legend>Datatable test events</xh:legend>
+            <xh:ol>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-all">
+                        <xf:label>Open all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-all">
+                        <xf:label>Close all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+            </xh:ol>
+        </xh:fieldset>
 
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
 
             <fr:case selected="true" id="complete">
                 <fr:label>Datatable completely defined</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This datatable is completely defined (without any minimization)</xhtml:p>
+                <xh:div>
+                    <xh:p>This datatable is completely defined (without any minimization)</xh:p>
                     <fr:datatable id="table-complete">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Position</xhtml:th>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Position</xh:th>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="tr-repeat-nodeset">
                 <fr:label>Using tr/@repeat-nodeset</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This datatable uses the tr/@repeat-nodeset shortcut</xhtml:p>
+                <xh:div>
+                    <xh:p>This datatable uses the tr/@repeat-nodeset shortcut</xh:p>
                     <fr:datatable id="table-tr-repeat-nodeset">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xhtml:th>Position</xhtml:th>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xhtml:tr repeat-ref="line[string-length(.) &lt; 20]">
-                                <xhtml:td>
-                                    <xforms:output value="position()"/>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:output value="."/>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xh:th>Position</xh:th>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xh:tr repeat-ref="line[string-length(.) &lt; 20]">
+                                <xh:td>
+                                    <xf:output value="position()"/>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:output value="."/>
+                                </xh:td>
+                            </xh:tr>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="no-header">
                 <fr:label>Without table header</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This datatable ommits its table header which is derived from the body</xhtml:p>
+                <xh:div>
+                    <xh:p>This datatable ommits its table header which is derived from the body</xh:p>
                     <fr:datatable id="table-no-header">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()">
-                                            <xforms:label>Position</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value=".">
-                                            <xforms:label>Text</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()">
+                                            <xf:label>Position</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value=".">
+                                            <xf:label>Text</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="no-header-tr-repeat-nodeset">
                 <fr:label>Without table header and tr/@repeat-nodeset</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This datatable ommits its table header which is derived from the body and uses the tr/@repeat-nodeset shortcut</xhtml:p>
+                <xh:div>
+                    <xh:p>This datatable ommits its table header which is derived from the body and uses the tr/@repeat-nodeset shortcut</xh:p>
                     <fr:datatable id="table-no-header-tr-repeat-nodeset">
-                        <xhtml:tbody>
-                            <xhtml:tr repeat-ref="line[string-length(.) &lt; 20]">
-                                <xhtml:td>
-                                    <xforms:output value="position()">
-                                        <xforms:label>Position</xforms:label>
-                                    </xforms:output>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:output value=".">
-                                        <xforms:label>Text</xforms:label>
-                                    </xforms:output>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xhtml:tbody>
+                        <xh:tbody>
+                            <xh:tr repeat-ref="line[string-length(.) &lt; 20]">
+                                <xh:td>
+                                    <xf:output value="position()">
+                                        <xf:label>Position</xf:label>
+                                    </xf:output>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:output value=".">
+                                        <xf:label>Text</xf:label>
+                                    </xf:output>
+                                </xh:td>
+                            </xh:tr>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="variables">
                 <fr:label>Datatable completely defined with variables</fr:label>
-                <xhtml:div>
-                    <xhtml:p>This datatable is completely defined (without any minimization) and include variable definitions in its xhtml:tr
-                        elements</xhtml:p>
+                <xh:div>
+                    <xh:p>This datatable is completely defined (without any minimization) and include variable definitions in its xh:tr
+                        elements</xh:p>
                     <fr:datatable id="table-variables">
-                        <xhtml:thead>
-                            <xhtml:tr>
-                                <xforms:var name="pos">position</xforms:var>
-                                <xhtml:th>
-                                    <xforms:output value="$pos"/>
-                                </xhtml:th>
-                                <xhtml:th>Text</xhtml:th>
-                            </xhtml:tr>
-                        </xhtml:thead>
-                        <xhtml:tbody>
-                            <xforms:repeat ref="line[string-length(.) &lt; 20]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position()"/>
-                                    </xhtml:td>
-                                    <xforms:var name="val" value="."/>
-                                    <xhtml:td>
-                                        <xforms:output value="$val"/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        <xh:thead>
+                            <xh:tr>
+                                <xf:var name="pos">position</xf:var>
+                                <xh:th>
+                                    <xf:output value="$pos"/>
+                                </xh:th>
+                                <xh:th>Text</xh:th>
+                            </xh:tr>
+                        </xh:thead>
+                        <xh:tbody>
+                            <xf:repeat ref="line[string-length(.) &lt; 20]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position()"/>
+                                    </xh:td>
+                                    <xf:var name="val" value="."/>
+                                    <xh:td>
+                                        <xf:output value="$val"/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
         </fr:accordion>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -11,8 +11,8 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xbl:xbl xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xi="http://www.w3.org/2001/XInclude"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
@@ -31,13 +31,13 @@
                 <large-icon>/apps/fr/style/images/silk/money_dollar.png</large-icon>
             </icon>
             <templates>
-                <bind type="xforms:decimal"/>
+                <bind type="xf:decimal"/>
                 <view>
                     <fr:currency>
-                        <xforms:label ref=""/>
-                        <xforms:hint ref=""/>
-                        <xforms:help ref=""/>
-                        <xforms:alert ref=""/>
+                        <xf:label ref=""/>
+                        <xf:hint ref=""/>
+                        <xf:help ref=""/>
+                        <xf:alert ref=""/>
                     </fr:currency>
                 </view>
             </templates>
@@ -48,7 +48,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-focus" phase="target" defaultAction="cancel">
-                <xxforms:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxforms:script>
+                <xxf:script id="xf-sf">YAHOO.xbl.fr.Currency.instance(this).setfocus();</xxf:script>
             </xbl:handler>
         </xbl:handlers>
         <!-- Delegate to fr:number -->

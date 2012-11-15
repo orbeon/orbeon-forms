@@ -11,30 +11,30 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Modal Trigger</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Modal Trigger</xh:title>
+        <xf:model id="main-model">
+            <xf:instance id="instance">
                 <instance>
                     <input/>
                     <count>0</count>
                 </instance>
-            </xforms:instance>
-            <xforms:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+            <xf:submission id="sleep-5-seconds" method="post" action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
@@ -81,32 +81,32 @@
                     }
                 });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:output ref="count" id="click-count">
-                <xforms:label>Number of clicks: </xforms:label>
-            </xforms:output>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="input" id="input">
-                <xforms:label>Input: </xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:group>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="count" value="number(.) + 1"/>
-                    <xforms:send submission="sleep-5-seconds"/>
-                </xforms:action>
-                <xforms:trigger id="modal-trigger-button" xxforms:modal="true">
-                    <xforms:label>Do long operation</xforms:label>
-                </xforms:trigger>
-                <xforms:trigger id="modal-trigger-link" xxforms:modal="true" appearance="minimal">
-                    <xforms:label>Do long operation</xforms:label>
-                </xforms:trigger>
-            </xforms:group>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        </xh:script>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:output ref="count" id="click-count">
+                <xf:label>Number of clicks: </xf:label>
+            </xf:output>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="input" id="input">
+                <xf:label>Input: </xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:group>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="count" value="number(.) + 1"/>
+                    <xf:send submission="sleep-5-seconds"/>
+                </xf:action>
+                <xf:trigger id="modal-trigger-button" xxf:modal="true">
+                    <xf:label>Do long operation</xf:label>
+                </xf:trigger>
+                <xf:trigger id="modal-trigger-link" xxf:modal="true" appearance="minimal">
+                    <xf:label>Do long operation</xf:label>
+                </xf:trigger>
+            </xf:group>
+        </xh:p>
+    </xh:body>
+</xh:html>

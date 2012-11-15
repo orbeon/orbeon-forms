@@ -11,55 +11,55 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Bug</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>Bug</xh:title>
+        <xf:model>
+            <xf:instance>
                 <instance>
                     <entry>
                         <value1/>
                         <value2/>
                     </entry>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="entry/value1" type="xs:nonNegativeInteger"/>
-            <xforms:bind ref="entry/value2" type="xs:nonNegativeInteger"
+            </xf:instance>
+            <xf:bind ref="entry/value1" type="xs:nonNegativeInteger"/>
+            <xf:bind ref="entry/value2" type="xs:nonNegativeInteger"
                          constraint="xs:integer(.) ge xs:integer(../value1[. castable as xs:integer])"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             Validation works fine on the first line. But add a second line, and enter invalid values, e.g. "3" and "2":
             the alert doesn't appear, even though the control is invalid.
-        </xhtml:p>
+        </xh:p>
 
-        <xforms:repeat ref="entry">
-            <xhtml:div>
-                <xforms:input ref="value1">
-                    <xforms:alert>Alert 1</xforms:alert>
-                </xforms:input>
-                <xforms:input ref="value2">
-                    <xforms:alert>Alert 2</xforms:alert>
-                </xforms:input>
-            </xhtml:div>
-        </xforms:repeat>
+        <xf:repeat ref="entry">
+            <xh:div>
+                <xf:input ref="value1">
+                    <xf:alert>Alert 1</xf:alert>
+                </xf:input>
+                <xf:input ref="value2">
+                    <xf:alert>Alert 2</xf:alert>
+                </xf:input>
+            </xh:div>
+        </xf:repeat>
 
-        <xforms:trigger>
-            <xforms:label>Add</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:insert ref="entry"/>
-            </xforms:action>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Add</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:insert ref="entry"/>
+            </xf:action>
+        </xf:trigger>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

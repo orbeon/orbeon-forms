@@ -11,89 +11,89 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xh="http://www.w3.org/1999/xhtml"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:widget="http://orbeon.org/oxf/xml/widget"
       xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
-    <xhtml:head>
-        <xhtml:title>
-            <xforms:output ref="$fr-resources/home/title"/>
-        </xhtml:title>
-        <xhtml:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
-        <xforms:model id="fr-form-model" xxforms:xpath-analysis="true">
+    <xh:head>
+        <xh:title>
+            <xf:output ref="$fr-resources/home/title"/>
+        </xh:title>
+        <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
+        <xf:model id="fr-form-model" xxf:xpath-analysis="true">
             <!-- NOTE: Necessary as referenced in view.xsl -->
-            <xforms:instance id="fr-form-instance">
+            <xf:instance id="fr-form-instance">
                 <ui>
                     <user-roles/>
                 </ui>
-            </xforms:instance>
-            <xforms:instance id="fr-forms"><forms/></xforms:instance>       <!-- Forms metadata returned by service -->
+            </xf:instance>
+            <xf:instance id="fr-forms"><forms/></xf:instance>       <!-- Forms metadata returned by service -->
 
-            <xforms:submission id="get-forms" method="get" resource="/fr/service/persistence/form" replace="instance" instance="fr-forms"/>
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:send submission="get-forms"/>
-                <xforms:action iterate="instance('fr-forms')/form">
-                    <xforms:insert context="." origin="xxforms:attribute('operations', string-join(form-runner:authorizedOperationsOnForm(permissions), ' '))"/>
-                </xforms:action>
-            </xforms:action>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            <xf:submission id="get-forms" method="get" resource="/fr/service/persistence/form" replace="instance" instance="fr-forms"/>
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:send submission="get-forms"/>
+                <xf:action iterate="instance('fr-forms')/form">
+                    <xf:insert context="." origin="xxf:attribute('operations', string-join(form-runner:authorizedOperationsOnForm(permissions), ' '))"/>
+                </xf:action>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <fr:navbar/>
-        <xhtml:div class="container">
+        <xh:div class="container">
             <fr:row>
                 <fr:body>
-                    <xhtml:table class="table table-bordered table-condensed table-striped table-hover">
-                        <xhtml:tr>
+                    <xh:table class="table table-bordered table-condensed table-striped table-hover">
+                        <xh:tr>
                             <!-- TODO: i18n -->
-                            <xhtml:th>Application</xhtml:th>
-                            <xhtml:th>Form</xhtml:th>
-                            <xhtml:th>Title</xhtml:th>
-                            <xhtml:th>View</xhtml:th>
-                            <xhtml:th>New</xhtml:th>
-                        </xhtml:tr>
-                        <xforms:repeat ref="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
-                            <xhtml:tr>
-                                <xhtml:td>
-                                    <xforms:output value="application-name"/>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:output value="form-name"/>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:output value="title"/>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
-                                        <xhtml:a href="/fr/{application-name}/{form-name}/summary">
-                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
-                                        </xhtml:a>
-                                    </xforms:group>
-                                </xhtml:td>
-                                <xhtml:td>
-                                    <xforms:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
-                                        <xhtml:a href="/fr/{application-name}/{form-name}/new">
-                                            <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
-                                        </xhtml:a>
-                                    </xforms:group>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xforms:repeat>
-                    </xhtml:table>
+                            <xh:th>Application</xh:th>
+                            <xh:th>Form</xh:th>
+                            <xh:th>Title</xh:th>
+                            <xh:th>View</xh:th>
+                            <xh:th>New</xh:th>
+                        </xh:tr>
+                        <xf:repeat ref="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
+                            <xh:tr>
+                                <xh:td>
+                                    <xf:output value="application-name"/>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:output value="form-name"/>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:output value="title"/>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
+                                        <xh:a href="/fr/{application-name}/{form-name}/summary">
+                                            <xh:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
+                                        </xh:a>
+                                    </xf:group>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
+                                        <xh:a href="/fr/{application-name}/{form-name}/new">
+                                            <xh:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
+                                        </xh:a>
+                                    </xf:group>
+                                </xh:td>
+                            </xh:tr>
+                        </xf:repeat>
+                    </xh:table>
                 </fr:body>
             </fr:row>
             <fr:row>
                 <fr:version/>
             </fr:row>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+        </xh:div>
+    </xh:body>
+</xh:html>

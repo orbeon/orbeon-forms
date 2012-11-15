@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.event
 import scala.collection.Seq
 
 /**
- * Represents an event observer. Implemented by controls, xforms:model, xforms:instance, xforms:submission.
+ * Represents an event observer. Implemented by controls, xf:model, xf:instance, xf:submission.
  */
 trait XFormsEventObserver extends XFormsEventTarget {
     def addListener(eventName: String, listener: EventListener)

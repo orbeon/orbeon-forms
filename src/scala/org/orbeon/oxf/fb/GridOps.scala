@@ -103,9 +103,9 @@ object GridOps {
 
     def newTdElement(grid: NodeInfo, id: String, rowspan: Option[Int] = None): NodeInfo = rowspan match {
         case Some(rowspan) ⇒
-            <xhtml:td xmlns:xhtml="http://www.w3.org/1999/xhtml" id={id} rowspan={rowspan.toString}/>
+            <xh:td xmlns:xh="http://www.w3.org/1999/xhtml" id={id} rowspan={rowspan.toString}/>
         case _ ⇒
-            <xhtml:td xmlns:xhtml="http://www.w3.org/1999/xhtml" id={id}/>
+            <xh:td xmlns:xh="http://www.w3.org/1999/xhtml" id={id}/>
     }
 
     private def trAtRowPos(gridId: String, rowPos: Int): NodeInfo = {
@@ -157,9 +157,9 @@ object GridOps {
         // Get as many fresh ids as there are tds
         val ids = nextIds(grid, "tmp", size).toIterator
 
-        <xhtml:tr xmlns:xhtml="http://www.w3.org/1999/xhtml">{
-            (1 to size) map (_ ⇒ <xhtml:td id={ids.next()}/>)
-        }</xhtml:tr>
+        <xh:tr xmlns:xh="http://www.w3.org/1999/xhtml">{
+            (1 to size) map (_ ⇒ <xh:td id={ids.next()}/>)
+        }</xh:tr>
     }
 
     // Delete a row and contained controls

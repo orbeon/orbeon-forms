@@ -11,16 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <head>
         <title>Table overflow</title>
-        <xforms:model id="model">
-            <xforms:instance id="control">
+        <xf:model id="model">
+            <xf:instance id="control">
                 <control xmlns="">
                     <text-length>100</text-length>
                     <rows>5</rows>
@@ -58,44 +58,44 @@
                         Curabitur iaculis, lorem vel rhoncus faucibus, felis magna fermentum augue,
                         et ultricies lacus lorem varius purus. Curabitur eu amet.</text>
                 </control>
-            </xforms:instance>
-            <xforms:bind ref="text-length" datatatype="xs:integer"/>
-            <xforms:bind ref="rows" datatatype="xs:integer"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="text-length" datatatype="xs:integer"/>
+            <xf:bind ref="rows" datatatype="xs:integer"/>
+        </xf:model>
     </head>
     <body>
 
         <h1>Testing how a large table overflows</h1>
 
         <p>
-            <xforms:input ref="text-length">
-                <xforms:label>Length of the text column: </xforms:label>
-            </xforms:input>
+            <xf:input ref="text-length">
+                <xf:label>Length of the text column: </xf:label>
+            </xf:input>
         </p>
         <p>
-            <xforms:input ref="rows">
-                <xforms:label>Number of rows: </xforms:label>
-            </xforms:input>
+            <xf:input ref="rows">
+                <xf:label>Number of rows: </xf:label>
+            </xf:input>
         </p>
         <p>
-            <xforms:textarea ref="container-style">
-                <xforms:label>Container style: </xforms:label>
-            </xforms:textarea>
+            <xf:textarea ref="container-style">
+                <xf:label>Container style: </xf:label>
+            </xf:textarea>
         </p>
         <p>
-            <xforms:textarea ref="table-style">
-                <xforms:label>Table style: </xforms:label>
-            </xforms:textarea>
+            <xf:textarea ref="table-style">
+                <xf:label>Table style: </xf:label>
+            </xf:textarea>
         </p>
         <p>
-            <xforms:textarea ref="td-style[1]">
-                <xforms:label>First column style: </xforms:label>
-            </xforms:textarea>
+            <xf:textarea ref="td-style[1]">
+                <xf:label>First column style: </xf:label>
+            </xf:textarea>
         </p>
         <p>
-            <xforms:textarea ref="td-style[2]">
-                <xforms:label>Second column style: </xforms:label>
-            </xforms:textarea>
+            <xf:textarea ref="td-style[2]">
+                <xf:label>Second column style: </xf:label>
+            </xf:textarea>
         </p>
         <hr/>
         <div style="{container-style}">
@@ -107,24 +107,24 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <xforms:repeat
+                    <xf:repeat
                         ref="
-                        for $n in 1 to rows return xxforms:element('row', (
-                            xxforms:element('number', $n),    
-                            xxforms:element('text', substring(normalize-space(text), 1, text-length))
+                        for $n in 1 to rows return xxf:element('row', (
+                            xxf:element('number', $n),
+                            xxf:element('text', substring(normalize-space(text), 1, text-length))
                         ))
                         
                         
                         ">
                         <tr>
                             <td style="{td-style[1]}">
-                                <xforms:output value="number"/>
+                                <xf:output value="number"/>
                             </td>
                             <td style="{td-style[2]}">
-                                <xforms:output value="text"/>
+                                <xf:output value="text"/>
                             </td>
                         </tr>
-                    </xforms:repeat>
+                    </xf:repeat>
                 </tbody>
             </table>
         </div>

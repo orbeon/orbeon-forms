@@ -11,60 +11,60 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xforms:model id="fr-roles-model"
+<xf:model id="fr-roles-model"
               xmlns:xs="http://www.w3.org/2001/XMLSchema"
-              xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:xf="http://www.w3.org/2002/xforms"
               xmlns:ev="http://www.w3.org/2001/xml-events"
-              xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
               xmlns:xi="http://www.w3.org/2001/XInclude"
               xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
               xmlns:f="http://orbeon.org/oxf/xml/formatting"
-              xmlns:xhtml="http://www.w3.org/1999/xhtml"
+              xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- Model initialization -->
-    <xforms:action ev:event="xforms-model-construct-done">
+    <xf:action ev:event="xforms-model-construct-done">
         <!-- Special treatment for Form Builder if roles are configured -->
 
-        <xforms:var name="fb-roles"
+        <xf:var name="fb-roles"
                           value="if (doc-available('oxf:/config/form-builder-permissions.xml')) then doc('oxf:/config/form-builder-permissions.xml')
                                  else if (doc-available('oxf:/config/form-runner-roles.xml')) then doc('oxf:/config/form-runner-roles.xml')
                                  else ()"/>
 
-        <xforms:action if="exists($fb-roles)">
+        <xf:action if="exists($fb-roles)">
 
             <!-- Process permissions -->
-            <xforms:insert ref="instance('fr-permissions')" origin="form-runner:getFormBuilderPermissionsAsXML($fb-roles)"/>
+            <xf:insert ref="instance('fr-permissions')" origin="form-runner:getFormBuilderPermissionsAsXML($fb-roles)"/>
 
-            <xforms:message level="xxforms:log-debug">
+            <xf:message level="xxf:log-debug">
                 ORBEON ROLES DEBUG INFORMATION:
-                Resulting permissions: <xforms:output value="saxon:serialize(instance('fr-permissions'), 'xml')"/>
-            </xforms:message>
+                Resulting permissions: <xf:output value="saxon:serialize(instance('fr-permissions'), 'xml')"/>
+            </xf:message>
 
             <!--
                 Ok this is tricky:
 
                 - At this point fr-form-model has already been recalculated
-                - fr-form-model may use us (through $fr-roles) using xforms:bind/@calculate or other MIPs
+                - fr-form-model may use us (through $fr-roles) using xf:bind/@calculate or other MIPs
                 - But we just set the value of all-roles here
                 - So we must recalculate/revalidate fr-form-model after setting roles here
-                - NOTE: We now also use xxforms:defaults="true" so that xxforms:default can evaluate properly. Note that
+                - NOTE: We now also use xxf:defaults="true" so that xxf:default can evaluate properly. Note that
                   in case the form data is loaded from the persistence layer in "edit" mode, loading occurs after the
                   recalculate below so the initial values if any will not be taken into account, by design. But in case
                   of "new", they will be.
 
             -->
-            <xforms:action if="instance('fr-permissions')/@all-roles != ''">
-                <xforms:recalculate model="fr-form-model" xxforms:defaults="true"/>
-                <xforms:revalidate model="fr-form-model"/>
-            </xforms:action>
-        </xforms:action>
-    </xforms:action>
+            <xf:action if="instance('fr-permissions')/@all-roles != ''">
+                <xf:recalculate model="fr-form-model" xxf:defaults="true"/>
+                <xf:revalidate model="fr-form-model"/>
+            </xf:action>
+        </xf:action>
+    </xf:action>
 
     <!-- Instance to specify user permissions for app/form -->
-    <xforms:instance id="fr-permissions">
+    <xf:instance id="fr-permissions">
         <apps xmlns="" has-roles="false" all-roles="">
             <!--<app name="orbeon">-->
                 <!--<form name="bookshelf"/>-->
@@ -77,6 +77,6 @@
                 <!--<form name="*"/>-->
             <!--</app>-->
         </apps>
-    </xforms:instance>
+    </xf:instance>
 
-</xforms:model>
+</xf:model>

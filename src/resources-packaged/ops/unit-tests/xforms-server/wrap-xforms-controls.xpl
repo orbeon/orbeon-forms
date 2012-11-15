@@ -15,9 +15,9 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
@@ -30,11 +30,11 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="xforms:model[1]">
+                <xsl:template match="xf:model[1]">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>
                         <!-- Force client state mode -->
-                        <xsl:attribute name="xxforms:state-handling">client</xsl:attribute>
+                        <xsl:attribute name="xxf:state-handling">client</xsl:attribute>
                         <xsl:apply-templates/>
                     </xsl:copy>
                 </xsl:template>
@@ -60,7 +60,7 @@
                 <!-- All elements which mark the start of a repeat/switch/group -->
                 <xsl:variable
                         name="start-repeat-group"
-                        select="//xhtml:*[p:classes() = 'xforms-repeat-begin-end' and starts-with(@id, 'repeat-begin-')
+                        select="//xh:*[p:classes() = 'xforms-repeat-begin-end' and starts-with(@id, 'repeat-begin-')
                                        or p:classes() = 'xforms-group-begin-end'  and starts-with(@id, 'group-begin-')]"/>
 
                 <!-- All elements which are contained within repeat/switch/group delimiters (excluding begin/end markers)-->
@@ -72,13 +72,13 @@
                 <!-- Handle body content only -->
                 <xsl:template match="/">
                     <controls>
-                        <xsl:apply-templates select="/xhtml:html/xhtml:body/*"/>
+                        <xsl:apply-templates select="/xh:html/xh:body/*"/>
                     </controls>
                 </xsl:template>
 
                 <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables
                      Also keep content of elements with class xxforms-test-preserve-content and content of repeats. -->
-                <xsl:template match="xhtml:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
+                <xsl:template match="xh:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
                                         'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end',
                                         'xforms-invalid', 'xforms-required', 'xforms-readonly', 'xxforms-test-preserve-content',
                                         'xforms-repeat-begin-end', 'xforms-repeat-delimiter', 'xforms-repeat-selected-item-1', 'xforms-repeat-selected-item-2',

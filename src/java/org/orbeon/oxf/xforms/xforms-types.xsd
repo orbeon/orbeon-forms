@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xforms="http://www.w3.org/2002/xforms"
+           xmlns:xf="http://www.w3.org/2002/xforms"
            targetNamespace="http://www.w3.org/2002/xforms"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">

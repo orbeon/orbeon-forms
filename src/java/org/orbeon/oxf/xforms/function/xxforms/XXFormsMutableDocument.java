@@ -25,8 +25,8 @@ import org.orbeon.saxon.trans.XPathException;
 
 
 /**
- * xxforms:mutable-document() takes a document as input and produces a mutable document as output, i.g. a document on
- * which you can use xforms:setvalue, for example.
+ * xxf:mutable-document() takes a document as input and produces a mutable document as output, i.g. a document on
+ * which you can use xf:setvalue, for example.
  */
 public class XXFormsMutableDocument extends XFormsFunction {
 

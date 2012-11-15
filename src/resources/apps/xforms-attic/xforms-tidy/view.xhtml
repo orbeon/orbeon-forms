@@ -11,27 +11,27 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>XForms HTML to XHTML Converter</title>
-        <xforms:model>
-            <xforms:instance id="files-instance">
+        <xf:model>
+            <xf:instance id="files-instance">
                 <file filename="" mediatype="" size="" selected="false"/>
-            </xforms:instance>
-            <xforms:instance id="triggers-instance">
+            </xf:instance>
+            <xf:instance id="triggers-instance">
                 <triggers xmlns="">
                     <upload/>
                 </triggers>
-            </xforms:instance>
-            <xforms:bind ref="instance('triggers-instance')/upload" readonly="instance('files-instance')/@selected = 'false'"/>
-            <xforms:submission id="convert-submission" method="post" action="/xforms-tidy/convert" replace="all"/>
-        </xforms:model>
+            </xf:instance>
+            <xf:bind ref="instance('triggers-instance')/upload" readonly="instance('files-instance')/@selected = 'false'"/>
+            <xf:submission id="convert-submission" method="post" action="/xforms-tidy/convert" replace="all"/>
+        </xf:model>
         <style type="text/css">
             .converter-note { font-style: italic }
         </style>
@@ -50,17 +50,17 @@
         <table>
             <tr>
                 <td>
-                    <xforms:upload ref="." xxforms:size="40">
-                        <xforms:filename ref="@filename"/>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xxforms:size ref="@size"/>
-                        <xforms:setvalue ev:event="xforms-select" ref="@selected">true</xforms:setvalue>
-                    </xforms:upload>
+                    <xf:upload ref="." xxf:size="40">
+                        <xf:filename ref="@filename"/>
+                        <xf:mediatype ref="@mediatype"/>
+                        <xxf:size ref="@size"/>
+                        <xf:setvalue ev:event="xforms-select" ref="@selected">true</xf:setvalue>
+                    </xf:upload>
                 </td>
                 <td>
-                    <xforms:submit submission="convert-submission" ref="instance('triggers-instance')/upload">
-                        <xforms:label>Convert</xforms:label>
-                    </xforms:submit>
+                    <xf:submit submission="convert-submission" ref="instance('triggers-instance')/upload">
+                        <xf:label>Convert</xf:label>
+                    </xf:submit>
                 </td>
             </tr>
         </table>

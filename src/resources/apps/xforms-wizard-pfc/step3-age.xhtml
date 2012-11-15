@@ -11,44 +11,44 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <xhtml:head>
-        <xhtml:title>XForms Wizard - Step 3</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
-            <xforms:instance src="input:instance"/>
-            <xforms:submission id="previous-submission" resource="/xforms-wizard-pfc/lastname" method="post" replace="all"/>
-            <xforms:submission id="next-submission" resource="/xforms-wizard-pfc/summary" method="post" replace="all"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:table cellpadding="3">
-            <xhtml:tr>
-                <xhtml:td rowspan="3" style="background-color: #fce5b6"><font size="5">3</font></xhtml:td>
-                <xhtml:td colspan="1"><b>Step 3 of 4</b></xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:input ref="user/age">
-                        <xforms:label class="fixed-width">Age:</xforms:label>
-                    </xforms:input>
-                </xhtml:td>
-            </xhtml:tr>
-            <xhtml:tr>
-                <xhtml:td>
-                    <xforms:trigger>
-                        <xforms:label>&lt; Previous</xforms:label>
-                        <xforms:send ev:event="DOMActivate" submission="previous-submission"/>
-                    </xforms:trigger>
-                    <xforms:trigger>
-                        <xforms:label>Finish ></xforms:label>
-                        <xforms:send ev:event="DOMActivate" submission="next-submission"/>
-                    </xforms:trigger>
-                </xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
-    </xhtml:body>
-</xhtml:html>
+    <xh:head>
+        <xh:title>XForms Wizard - Step 3</xh:title>
+        <xf:model xmlns:xf="http://www.w3.org/2002/xforms">
+            <xf:instance src="input:instance"/>
+            <xf:submission id="previous-submission" resource="/xforms-wizard-pfc/lastname" method="post" replace="all"/>
+            <xf:submission id="next-submission" resource="/xforms-wizard-pfc/summary" method="post" replace="all"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:table cellpadding="3">
+            <xh:tr>
+                <xh:td rowspan="3" style="background-color: #fce5b6"><font size="5">3</font></xh:td>
+                <xh:td colspan="1"><b>Step 3 of 4</b></xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xf:input ref="user/age">
+                        <xf:label class="fixed-width">Age:</xf:label>
+                    </xf:input>
+                </xh:td>
+            </xh:tr>
+            <xh:tr>
+                <xh:td>
+                    <xf:trigger>
+                        <xf:label>&lt; Previous</xf:label>
+                        <xf:send ev:event="DOMActivate" submission="previous-submission"/>
+                    </xf:trigger>
+                    <xf:trigger>
+                        <xf:label>Finish ></xf:label>
+                        <xf:send ev:event="DOMActivate" submission="next-submission"/>
+                    </xf:trigger>
+                </xh:td>
+            </xh:tr>
+        </xh:table>
+    </xh:body>
+</xh:html>

@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,39 +21,39 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL Currency</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL Currency</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <auction>
                     <start-price>2</start-price>
                     <reserve-price>42</reserve-price>
                     <price-increment>1</price-increment>
                 </auction>
-            </xforms:instance>
-        </xforms:model>
-      </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+      </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             <fr:us-currency-thousands ref="start-price">
-                <xforms:label class="fixed-width">Start price</xforms:label>
+                <xf:label class="fixed-width">Start price</xf:label>
             </fr:us-currency-thousands>
             <fr:us-currency-thousands ref="reserve-price">
-                <xforms:label class="fixed-width">Reserve price</xforms:label>
+                <xf:label class="fixed-width">Reserve price</xf:label>
             </fr:us-currency-thousands>
             <fr:us-currency-thousands ref="price-increment">
-                <xforms:label class="fixed-width">Price increment</xforms:label>
+                <xf:label class="fixed-width">Price increment</xf:label>
             </fr:us-currency-thousands>
-        </xhtml:p>
+        </xh:p>
 
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label>Increase start price by $1K</xforms:label>
-                <xforms:setvalue ev:event="DOMActivate" if="start-price castable as xs:decimal" ref="start-price" value=". + 1"/>
-            </xforms:trigger>
-        </xhtml:p>
+        <xh:p>
+            <xf:trigger appearance="minimal">
+                <xf:label>Increase start price by $1K</xf:label>
+                <xf:setvalue ev:event="DOMActivate" if="start-price castable as xs:decimal" ref="start-price" value=". + 1"/>
+            </xf:trigger>
+        </xh:p>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

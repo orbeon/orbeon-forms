@@ -37,7 +37,7 @@ import org.orbeon.saxon.value.StringValue;
 import java.util.List;
 
 /**
- * Represents an exforms:variable / xxforms:variable element.
+ * Represents an exf:variable / xxf:variable element.
  *
  * TODO: Use more static information.
  */
@@ -62,9 +62,9 @@ public class Variable {
 
         this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
         if (variableName == null)
-            throw new ValidationException("xforms:var, xxforms:variable or exforms:variable element must have a \"name\" attribute", getLocationData());
+            throw new ValidationException("xf:var, xxf:variable or exf:variable element must have a \"name\" attribute", getLocationData());
 
-        // Handle xxforms:sequence
+        // Handle xxf:sequence
         final Element sequenceElement = variableElement.element(XFormsConstants.XXFORMS_SEQUENCE_QNAME);
         if (sequenceElement == null) {
             this.valueElement = variableElement;
@@ -77,7 +77,7 @@ public class Variable {
 
     private void evaluate(String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
         if (selectAttribute == null) {
-            // Inline constructor (for now, only textual content, but in the future, we could allow xforms:output in it? more?)
+            // Inline constructor (for now, only textual content, but in the future, we could allow xf:output in it? more?)
             variableValue = new StringValue(valueElement.getStringValue());
         } else {
             // There is a select attribute

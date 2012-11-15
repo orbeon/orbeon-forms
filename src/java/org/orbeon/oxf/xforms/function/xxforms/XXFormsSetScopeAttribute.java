@@ -25,7 +25,7 @@ import org.orbeon.saxon.value.StringValue;
 import java.util.Map;
 
 /**
- * Base class for xxforms:set-*-attribute() functions.
+ * Base class for xxf:set-*-attribute() functions.
  */
 public class XXFormsSetScopeAttribute extends XFormsFunction {
 
@@ -51,7 +51,7 @@ public class XXFormsSetScopeAttribute extends XFormsFunction {
                 final NodeInfo nodeInfoValue = (NodeInfo) item;
                 value = TransformerUtils.tinyTreeToSAXStore(nodeInfoValue);
             } else {
-                throw new OXFException("xxforms:set-*-attribute() does not support storing objects of type: "
+                throw new OXFException("xxf:set-*-attribute() does not support storing objects of type: "
                         + item.getClass().getName());
             }
 

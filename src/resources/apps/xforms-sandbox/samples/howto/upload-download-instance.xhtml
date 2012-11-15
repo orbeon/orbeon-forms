@@ -11,10 +11,10 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -24,66 +24,66 @@
     xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:howto="http://www.orbeon.com/howto">
 
-    <xhtml:head>
-        <xhtml:title>Upload / download instance</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Upload / download instance</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance>
                     <first-name>Tom</first-name>
                 </instance>
-            </xforms:instance>
-            <xforms:instance id="download">
+            </xf:instance>
+            <xf:instance id="download">
                 <serialized mediatype="application/xml" filename="instance.xml"/>
-            </xforms:instance>
-            <xforms:instance id="upload">
+            </xf:instance>
+            <xf:instance id="upload">
                 <serialized mediatype="application/xml" filename="instance.xml"/>
-            </xforms:instance>
-            <xforms:bind ref="instance('download')" type="xs:base64Binary"/>
-            <xforms:bind ref="instance('upload')" type="xs:base64Binary"/>
-            <xforms:submission id="upload-submission" ref="instance('upload')" validate="false"
+            </xf:instance>
+            <xf:bind ref="instance('download')" type="xs:base64Binary"/>
+            <xf:bind ref="instance('upload')" type="xs:base64Binary"/>
+            <xf:submission id="upload-submission" ref="instance('upload')" validate="false"
                                relevant="false" method="post" replace="none" resource="echo:">
-                <xforms:insert ev:event="xforms-submit-done" ref="instance('main-instance')"
+                <xf:insert ev:event="xforms-submit-done" ref="instance('main-instance')"
                                origin="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary(instance('upload')), 'UTF-8'))"/>
-            </xforms:submission>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:submission>
+        </xf:model>
+        <xh:style type="text/css">
             #upload-download-dialog { width: 30em }
             #upload-download-dialog .yui-content { padding: 1em 1.5em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:fieldset>
-            <xhtml:legend>Form fields to edit the instance</xhtml:legend>
-            <xforms:input ref="first-name">
-                <xforms:label>First name: </xforms:label>
-            </xforms:input>
-        </xhtml:fieldset>
-        <xforms:trigger appearance="minimal" id="upload-download-trigger">
-            <xforms:label>Upload / download XML data</xforms:label>
-            <xxforms:show ev:event="DOMActivate" dialog="upload-download-dialog"/>
-        </xforms:trigger>
-        <xxforms:dialog id="upload-download-dialog" appearance="minimal" neighbor="upload-download-trigger">
-            <xforms:setvalue ev:event="xxforms-dialog-open" ref="instance('download')"
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:fieldset>
+            <xh:legend>Form fields to edit the instance</xh:legend>
+            <xf:input ref="first-name">
+                <xf:label>First name: </xf:label>
+            </xf:input>
+        </xh:fieldset>
+        <xf:trigger appearance="minimal" id="upload-download-trigger">
+            <xf:label>Upload / download XML data</xf:label>
+            <xxf:show ev:event="DOMActivate" dialog="upload-download-dialog"/>
+        </xf:trigger>
+        <xxf:dialog id="upload-download-dialog" appearance="minimal" neighbor="upload-download-trigger">
+            <xf:setvalue ev:event="xxforms-dialog-open" ref="instance('download')"
                              value="saxon:string-to-base64Binary(saxon:serialize(instance('main-instance'), 'xml'), 'UTF-8')"/>
             <fr:tabview>
                 <fr:tab>
                     <fr:label>Download</fr:label>
-                    <xforms:output ref="instance('download')" appearance="xxforms:download">
-                        <xforms:label>Download instance</xforms:label>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xforms:filename ref="@filename"/>
-                    </xforms:output>
+                    <xf:output ref="instance('download')" appearance="xxf:download">
+                        <xf:label>Download instance</xf:label>
+                        <xf:mediatype ref="@mediatype"/>
+                        <xf:filename ref="@filename"/>
+                    </xf:output>
                 </fr:tab>
                 <fr:tab>
                     <fr:label>Upload</fr:label>
-                    <xforms:upload ref="instance('upload')">
-                        <xforms:label>Select file:</xforms:label>
-                        <xforms:filename ref="@filename"/>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xforms:send ev:event="xforms-select" submission="upload-submission"/>
-                    </xforms:upload>
+                    <xf:upload ref="instance('upload')">
+                        <xf:label>Select file:</xf:label>
+                        <xf:filename ref="@filename"/>
+                        <xf:mediatype ref="@mediatype"/>
+                        <xf:send ev:event="xforms-select" submission="upload-submission"/>
+                    </xf:upload>
                 </fr:tab>
             </fr:tabview>
-        </xxforms:dialog>
-    </xhtml:body>
-</xhtml:html>
+        </xxf:dialog>
+    </xh:body>
+</xh:html>

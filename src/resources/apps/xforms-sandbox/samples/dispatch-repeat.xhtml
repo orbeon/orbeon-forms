@@ -13,47 +13,47 @@
   -->
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-      xmlns:xforms="http://www.w3.org/2002/xforms">
+      xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms">
     <head>
         <title>XForms tip: how to dispatch events to all iterations of repeated controls</title>
-        <xforms:model>
-            <xforms:instance xmlns="">
+        <xf:model>
+            <xf:instance xmlns="">
                 <values>
                     <value/>
                     <value/>
                     <value/>
                     <value/>
                 </values>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
     </head>
     <body>
         <!-- Iterate over all the values -->
-        <xforms:repeat ref="value" id="my-repeat">
+        <xf:repeat ref="value" id="my-repeat">
             <div>
-                <xforms:input id="my-input" ref=".">
+                <xf:input id="my-input" ref=".">
                     <!-- Upon receiving event "my-event", set the value of the control -->
-                    <xforms:setvalue ev:event="my-event" ref="." value="count(preceding-sibling::*) + 1"/>
-                </xforms:input>
+                    <xf:setvalue ev:event="my-event" ref="." value="count(preceding-sibling::*) + 1"/>
+                </xf:input>
             </div>
-        </xforms:repeat>
+        </xf:repeat>
 
-        <xforms:trigger>
-            <xforms:label>Dispatch</xforms:label>
-            <xforms:action ev:event="DOMActivate">
+        <xf:trigger>
+            <xf:label>Dispatch</xf:label>
+            <xf:action ev:event="DOMActivate">
                 <!-- Save current index -->
-                <xforms:var name="initial-index" value="index('my-repeat')"/>
+                <xf:var name="initial-index" value="index('my-repeat')"/>
                 <!-- Iterate through all values -->
-                <xforms:action iterate="value">
+                <xf:action iterate="value">
                     <!-- Set index and dispatch event -->
-                    <xforms:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
-                    <xforms:dispatch name="my-event" targetid="my-input"/>
-                </xforms:action>
+                    <xf:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
+                    <xf:dispatch name="my-event" targetid="my-input"/>
+                </xf:action>
                 <!-- Restore index -->
-                <xforms:setindex repeat="my-repeat" index="$initial-index"/>
-            </xforms:action>
-        </xforms:trigger>
+                <xf:setindex repeat="my-repeat" index="$initial-index"/>
+            </xf:action>
+        </xf:trigger>
     </body>
 </html>

@@ -1,43 +1,43 @@
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>XForms Hello</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>XForms Hello</xh:title>
+        <xf:model>
+            <xf:instance>
                 <instance>
                     <html>Initial</html>
                     <readonly>false</readonly>
                     <relevant>true</relevant>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="html" readonly="../readonly = 'true'" relevant="../relevant= 'true'"/>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+            <xf:bind ref="html" readonly="../readonly = 'true'" relevant="../relevant= 'true'"/>
+        </xf:model>
+        <xh:style type="text/css">
             .xbl-fr-tinymce { width: 600px; margin-top: 2em }
             .xforms-form fieldset { width: 600px; margin-top: 2em; box-sizing: border-box; border: 1px solid #ccc }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:trigger>
-            <xforms:label>Add length</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="html" value="concat(string-length(.), ' ',.)"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Toggle readonly</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
-        </xforms:trigger>
-        <xforms:trigger>
-            <xforms:label>Toggle relevant</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
-        </xforms:trigger>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:trigger>
+            <xf:label>Add length</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="html" value="concat(string-length(.), ' ',.)"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Toggle readonly</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="readonly" value="if (. = 'true') then 'false' else 'true'"/>
+        </xf:trigger>
+        <xf:trigger>
+            <xf:label>Toggle relevant</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="relevant" value="if (. = 'true') then 'false' else 'true'"/>
+        </xf:trigger>
 		<fr:tinymce ref="html" id="unittest-tinymce"/>
-        <xhtml:fieldset>
-            <xhtml:legend>HTML</xhtml:legend>
-    		<xforms:output value="html" id="unittest-output"/>
-        </xhtml:fieldset>
-    </xhtml:body>
-</xhtml:html>
+        <xh:fieldset>
+            <xh:legend>HTML</xh:legend>
+    		<xf:output value="html" id="unittest-output"/>
+        </xh:fieldset>
+    </xh:body>
+</xh:html>

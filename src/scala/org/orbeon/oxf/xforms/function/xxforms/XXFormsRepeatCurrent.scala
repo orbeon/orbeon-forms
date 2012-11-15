@@ -20,10 +20,10 @@ import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.oxf.xforms.XFormsContextStack
 
 /**
- * Return the current node of one of the enclosing xforms:repeat iteration, either the closest
+ * Return the current node of one of the enclosing xf:repeat iteration, either the closest
  * iteration if no argument is passed, or the iteration for the repeat id passed.
  *
- * This function must be called from within an xforms:repeat.
+ * This function must be called from within an xf:repeat.
  */
 class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
 

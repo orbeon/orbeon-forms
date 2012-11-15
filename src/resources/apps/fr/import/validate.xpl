@@ -51,7 +51,7 @@
                 <xf:action ev:event="xforms-ready" xxf:xpath-analysis="true">
                     <!-- Remember original empty data -->
                     <xf:insert ref="instance('fr-empty-data')" origin="xxf:instance('fr-form-instance')"/>
-                    <xxf:var name="headers" value="instance()/row[1]/c"/>
+                    <xf:var name="headers" value="instance()/row[1]/c"/>
 
                     <!-- TODO: validate that headers match data -->
 
@@ -67,20 +67,20 @@
 
                     <!-- Iterate over all rows -->
                     <xf:action iterate="instance()/row[position() gt 1]">
-                        <xxf:var name="p" value="position()"/>
+                        <xf:var name="p" value="position()"/>
 
                         <!-- Check at each iteration whether to stop -->
                         <xf:action if="not(xxf:get-session-attribute('org.orbeon.fr.import.cancel'))">
 
                             <!-- Start with empty data -->
-                            <xxf:var name="new" value="xxf:create-document()"/>
+                            <xf:var name="new" value="xxf:create-document()"/>
                             <xf:insert context="$new" origin="instance('fr-empty-data')"/>
 
                             <!-- Fill data -->
                             <xf:action iterate="c">
-                                <xxf:var name="p" value="position()"/>
-                                <xxf:var name="v" value="xs:string(.)"/>
-                                <xxf:var name="raw-header" value="normalize-space($headers[$p])"/>
+                                <xf:var name="p" value="position()"/>
+                                <xf:var name="v" value="xs:string(.)"/>
+                                <xf:var name="raw-header" value="normalize-space($headers[$p])"/>
 
                                 <!-- Only set value if header name is not blank -->
                                 <xf:setvalue ref="$new//*[not(*) and $raw-header != '' and name() = utils:makeNCName($raw-header)]" value="$v"/>

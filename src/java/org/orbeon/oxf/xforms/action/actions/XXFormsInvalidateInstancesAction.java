@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
 
 /**
- * Extension xxforms:invalidate-instances action.
+ * Extension xxf:invalidate-instances action.
  */
 public class XXFormsInvalidateInstancesAction extends XFormsAction {
     public void execute(XFormsActionInterpreter actionInterpreter, Element actionElement,

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 
 /**
- * Handle xforms:repeat.
+ * Handle xf:repeat.
  */
 class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // This is a repeating element
 
@@ -113,7 +113,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                     outputInterceptor.flushCharacters(true, true)
             } catch {
                 case e: Exception ⇒
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xforms:repeat control", repeatControl.element))
+                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element))
             }
             handlerContext.popRepeatContext()
 

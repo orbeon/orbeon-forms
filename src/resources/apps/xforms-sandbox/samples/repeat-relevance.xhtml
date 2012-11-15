@@ -11,42 +11,42 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Relevance used in repeat</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="cities-instance">
+    <xh:head>
+        <xh:title>Relevance used in repeat</xh:title>
+        <xf:model>
+            <xf:instance id="cities-instance">
                 <cities index="1">
                     <city relevant="true">San Francisco</city>
                     <city relevant="false">Los Angeles</city>
                     <city relevant="true">San Diego</city>
                 </cities>
-            </xforms:instance>
-            <xforms:bind ref="/cities/city" relevant="@relevant = 'true'"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="@index">
-            <xforms:label>Index: </xforms:label>
-        </xforms:input>
-        <xforms:trigger>
-            <xforms:label>Toggle relevance</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="/cities/city[number(/cities/@index)]/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
-        </xforms:trigger>
-        <xforms:repeat ref="city">
-            <xhtml:div>
-                <xforms:input ref=".">
-                    <xforms:label>City: </xforms:label>
-                </xforms:input>
-            </xhtml:div>
-        </xforms:repeat>
+            </xf:instance>
+            <xf:bind ref="/cities/city" relevant="@relevant = 'true'"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="@index">
+            <xf:label>Index: </xf:label>
+        </xf:input>
+        <xf:trigger>
+            <xf:label>Toggle relevance</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="/cities/city[number(/cities/@index)]/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
+        </xf:trigger>
+        <xf:repeat ref="city">
+            <xh:div>
+                <xf:input ref=".">
+                    <xf:label>City: </xf:label>
+                </xf:input>
+            </xh:div>
+        </xf:repeat>
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

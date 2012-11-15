@@ -11,419 +11,419 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <xhtml:head>
-        <xhtml:title>Datatable</xhtml:title>
+    <xh:head>
+        <xh:title>Datatable</xh:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xforms:var name="basic-nodeset"
+        <xf:var name="basic-nodeset"
             select="
             for $line in line[string-length(.) &lt; 20] return
-                xxforms:element( 'line', (
-                    xxforms:element('position', count($line/preceding-sibling::*)),
-                    xxforms:element('text', normalize-space($line)),
-                    xxforms:element('length', string-length(normalize-space($line)))
+                xxf:element( 'line', (
+                    xxf:element('position', count($line/preceding-sibling::*)),
+                    xxf:element('text', normalize-space($line)),
+                    xxf:element('length', string-length(normalize-space($line)))
                 ))"/>
 
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-dynamic-unittest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-dynamic-unittest.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>Make sure you do a "shift reload" to restart the tests to get a fresh instance, otherwise tests on sortable features will
-            fail.</xhtml:p>
+        <xh:p>Make sure you do a "shift reload" to restart the tests to get a fresh instance, otherwise tests on sortable features will
+            fail.</xh:p>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Datatable test controls</xhtml:legend>
-            <xforms:group ref="instance('controls')">
-                <xhtml:p>
-                    <xforms:input ref="maxLength" id="maxLength">
-                        <xforms:label>Maximum length: </xforms:label>
-                        <xforms:help>Used by tests that check instance updates.</xforms:help>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="page" id="page">
-                        <xforms:label>Current page: </xforms:label>
-                        <xforms:help>Used by tests that check external pagination.</xforms:help>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="rowsPerPage" id="rowsPerPage">
-                        <xforms:label>Number of rows per page: </xforms:label>
-                        <xforms:help>Used by tests that check external pagination.</xforms:help>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="sortOrder" id="sortOrder">
-                        <xforms:label>Sort order: </xforms:label>
-                        <xforms:help>Used by tests that check external sort.</xforms:help>
-                    </xforms:input>
-                </xhtml:p>
-                <xhtml:p>
-                    <xforms:input ref="sortedColumn" id="sortedColumn">
-                        <xforms:label>Sorted column: </xforms:label>
-                        <xforms:help>Used by tests that check external sort.</xforms:help>
-                    </xforms:input>
-                </xhtml:p>
-                <xforms:input ref="loading" id="loading" appearance="full">
+        <xh:fieldset>
+            <xh:legend>Datatable test controls</xh:legend>
+            <xf:group ref="instance('controls')">
+                <xh:p>
+                    <xf:input ref="maxLength" id="maxLength">
+                        <xf:label>Maximum length: </xf:label>
+                        <xf:help>Used by tests that check instance updates.</xf:help>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="page" id="page">
+                        <xf:label>Current page: </xf:label>
+                        <xf:help>Used by tests that check external pagination.</xf:help>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="rowsPerPage" id="rowsPerPage">
+                        <xf:label>Number of rows per page: </xf:label>
+                        <xf:help>Used by tests that check external pagination.</xf:help>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="sortOrder" id="sortOrder">
+                        <xf:label>Sort order: </xf:label>
+                        <xf:help>Used by tests that check external sort.</xf:help>
+                    </xf:input>
+                </xh:p>
+                <xh:p>
+                    <xf:input ref="sortedColumn" id="sortedColumn">
+                        <xf:label>Sorted column: </xf:label>
+                        <xf:help>Used by tests that check external sort.</xf:help>
+                    </xf:input>
+                </xh:p>
+                <xf:input ref="loading" id="loading" appearance="full">
                     <!--TODO: replace by a select1 when #314362 will be fixed -->
-                    <!--<xforms:item>
-                        <xforms:label>true</xforms:label>
-                        <xforms:value>true</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                        <xforms:label>false</xforms:label>
-                        <xforms:value>false</xforms:value>
-                        </xforms:item>-->
-                    <xforms:label>Loading in progress: </xforms:label>
-                    <xforms:help>Used by tests that check the loading indicator feature</xforms:help>
-                </xforms:input>
-            </xforms:group>
-            <xhtml:ol>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-all">
-                        <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-all">
-                        <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-            </xhtml:ol>
-        </xhtml:fieldset>
+                    <!--<xf:item>
+                        <xf:label>true</xf:label>
+                        <xf:value>true</xf:value>
+                        </xf:item>
+                        <xf:item>
+                        <xf:label>false</xf:label>
+                        <xf:value>false</xf:value>
+                        </xf:item>-->
+                    <xf:label>Loading in progress: </xf:label>
+                    <xf:help>Used by tests that check the loading indicator feature</xf:help>
+                </xf:input>
+            </xf:group>
+            <xh:ol>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-all">
+                        <xf:label>Open all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-all">
+                        <xf:label>Close all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+            </xh:ol>
+        </xh:fieldset>
 
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
 
             <fr:case selected="false" id="hello_world">
                 <fr:label>A first basic dynamic datatable</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="hello_world-table" debug="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="mixed">
                 <fr:label>An example of datatable mixing static and dynamic columns</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="mixed-table" debug="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
 
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="mixed-variables">
                 <fr:label>An example of datatable mixing static and dynamic columns with variables</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="mixed-table-variables" debug="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:var name="cpw">Characters per word</xforms:var>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>
-                                        <xforms:output value="$cpw"/>
-                                    </xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xforms:var name="position" value="position()"/>
-                                        <xforms:var name="cpw" value="round(length div nb-words)"/>
-                                        <xhtml:td>
-                                            <xforms:output value="$position"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="$cpw"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:var name="cpw">Characters per word</xf:var>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>
+                                        <xf:output value="$cpw"/>
+                                    </xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xf:var name="position" value="position()"/>
+                                        <xf:var name="cpw" value="round(length div nb-words)"/>
+                                        <xh:td>
+                                            <xf:output value="$position"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="$cpw"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="mixed-two-columnsets">
                 <fr:label>An example of datatable mixing static and dynamic columns with 2 column sets</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="mixed-two-columnsets-table" debug="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*[position() &lt; 3]">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*[position() >= 3]">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*[position() &lt; 3]">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*[position() >= 3]">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*[position() &lt; 3]">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                    <xf:repeat ref="line[1]/*[position() >= 3]">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*[position() &lt; 3]">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*[position() >= 3]">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="static">
                 <fr:label>An example of datatable with static columns using the dynamic code</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="static-table" debug="true" dynamic="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xhtml:th>text</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position"/>
-                                        </xhtml:td>
-                                        <xhtml:td>
-                                            <xforms:output value="text"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xh:th>text</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position"/>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output value="text"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="resize">
                 <fr:label>Testing resizeable columns on a mixed datatable</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="resize-table">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th fr:resizeable="true">Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th fr:resizeable="true">
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th fr:resizeable="true">Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th fr:resizeable="true">Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th fr:resizeable="true">
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th fr:resizeable="true">Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="sortable">
                 <fr:label>Testing sortable columns on a mixed datatable</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="sortable-table" debug="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th fr:sortable="true">Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th fr:sortable="true" id="sortable-th-dyn">
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th fr:sortable="true">Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th fr:sortable="true" id="sortable-th-dyn">
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
                                     <!-- TODO: see why we need fr:sortType="number" -->
-                                    <xhtml:th fr:sortable="true" fr:sortType="number">Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                                    <xh:th fr:sortable="true" fr:sortType="number">Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="sorted">
                 <fr:label>Testing sortable columns on a mixed datatable with a sorted column</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="sorted-table" debug="true">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*[not(self::position)]">
-                                        <xhtml:th fr:sortable="true">
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th fr:sortable="true" fr:sorted="ascending">position</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*[not(self::position)]">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="position"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*[not(self::position)]">
+                                        <xh:th fr:sortable="true">
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th fr:sortable="true" fr:sorted="ascending">position</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*[not(self::position)]">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="position"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="sortableExternal">
                 <fr:label>Testing sortable columns on a mixed datatable processed by the application</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
-                        <xforms:var name="sortOrder" value="instance('controls')/sortOrder"/>
-                        <xforms:var name="nodeset" value="line[length &lt; 20]"/>
-                        <xforms:var name="class"
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
+                        <xf:var name="sortOrder" value="instance('controls')/sortOrder"/>
+                        <xf:var name="nodeset" value="line[length &lt; 20]"/>
+                        <xf:var name="class"
                             select="if ($sortOrder='ascending') then 'yui-dt-asc' else if ($sortOrder='descending') then 'yui-dt-desc' else ''"/>
-                        <xforms:var name="sortedNodeset"
+                        <xf:var name="sortedNodeset"
                             select="
                                     if ($sortOrder='none')
                                         then $nodeset
@@ -432,290 +432,290 @@
 
 
                         <fr:datatable id="sortableExternal-table" debug="true" sortAndPaginationMode="external">
-                            <xforms:action ev:event="fr-update-sort">
-                                <xforms:setvalue ref="instance('controls')/sortedColumn" value="event('fr-column')"/>
-                                <xforms:setvalue ref="$sortOrder"
+                            <xf:action ev:event="fr-update-sort">
+                                <xf:setvalue ref="instance('controls')/sortedColumn" value="event('fr-column')"/>
+                                <xf:setvalue ref="$sortOrder"
                                     value="if ($sortOrder='ascending') then 'descending' else if ($sortOrder='descending') then 'none' else 'ascending'"
                                 />
-                            </xforms:action>
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th fr:sortable="true" class="{$class}"
+                            </xf:action>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th fr:sortable="true" class="{$class}"
                                         fr:sortMessage="if ($sortOrder='ascending') then 'Hey you, click to sort descending' else if ($sortOrder='descending') then 'Hey you, click to cancel sort' else 'Hey you, click to sort ascending'"
-                                        >Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="$sortedNodeset">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td class="{$class}">
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                                        >Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="$sortedNodeset">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td class="{$class}">
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="scrollH">
                 <fr:label>Testing a mixed datatable that is horizontally scrollable</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="scrollH-table" debug="false" scrollable="horizontal" width="800px">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th fr:sortable="true">Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &gt; 60]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th fr:sortable="true">Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &gt; 60]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="update">
                 <fr:label>Testing instance updates</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="update-table" debug="false">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; xxforms:instance('controls')/maxLength cast as xs:integer]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; xxf:instance('controls')/maxLength cast as xs:integer]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="paginate">
                 <fr:label>Testing paginated tables</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="paginate-table" debug="false" paginated="true" rowsPerPage="5">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="paginateMaxPage">
                 <fr:label>Testing paginated tables with a maximum number of pages to display</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="paginateMaxPage-table" debug="false" paginated="true" maxNbPagesToDisplay="7" rowsPerPage="4">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="paginateExternal">
                 <fr:label>Testing paginated tables supported by the application</fr:label>
-                <xhtml:div>
-                    <xhtml:p/>
-                    <xforms:group ref="instance('detailed-lorem')">
-                        <xforms:var name="nbRows" value="count(line)"/>
-                        <xforms:var name="rowsPerPage" value="instance('controls')/rowsPerPage"/>
-                        <xforms:var name="nbPages" value="ceiling($nbRows div $rowsPerPage)"/>
-                        <xforms:var name="page" value="instance('controls')/page"/>
+                <xh:div>
+                    <xh:p/>
+                    <xf:group ref="instance('detailed-lorem')">
+                        <xf:var name="nbRows" value="count(line)"/>
+                        <xf:var name="rowsPerPage" value="instance('controls')/rowsPerPage"/>
+                        <xf:var name="nbPages" value="ceiling($nbRows div $rowsPerPage)"/>
+                        <xf:var name="page" value="instance('controls')/page"/>
 
                         <fr:datatable id="paginateExternal-table" debug="false" paginated="true" maxNbPagesToDisplay="7"
                             sortAndPaginationMode="external" page="$page" nbPages="$nbPages">
-                            <xforms:action ev:event="fr-goto-page">
-                                <xforms:setvalue ref="$page" value="event('fr-new-page')"/>
-                            </xforms:action>
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xhtml:th>Position</xhtml:th>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[position() >= ($page - 1) * $rowsPerPage + 1 and position() &lt;= $page * $rowsPerPage]">
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xforms:output value="position()"/>
-                                        </xhtml:td>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            <xf:action ev:event="fr-goto-page">
+                                <xf:setvalue ref="$page" value="event('fr-new-page')"/>
+                            </xf:action>
+                            <xh:thead>
+                                <xh:tr>
+                                    <xh:th>Position</xh:th>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[position() >= ($page - 1) * $rowsPerPage + 1 and position() &lt;= $page * $rowsPerPage]">
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xf:output value="position()"/>
+                                        </xh:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="false" id="_314379">
                 <fr:label>Bug #314379</fr:label>
-                <xhtml:div>
-                    <xhtml:p>Bug <xhtml:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
-                            >#314379</xhtml:a>: Scrollable datatables with dynamic columns get desynchronized after de hide/show cycle</xhtml:p>
-                    <xforms:group ref="instance('detailed-lorem')">
-                        <fr:datatable id="table-314379" scrollable="both" height="200px" width="600px" loading="xxforms:instance('controls')/loading = 'true'">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th fr:resizeable="true">
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length > 60]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                <xh:div>
+                    <xh:p>Bug <xh:a href="https://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314379&amp;group_id=168&amp;atid=350207"
+                            >#314379</xh:a>: Scrollable datatables with dynamic columns get desynchronized after de hide/show cycle</xh:p>
+                    <xf:group ref="instance('detailed-lorem')">
+                        <fr:datatable id="table-314379" scrollable="both" height="200px" width="600px" loading="xxf:instance('controls')/loading = 'true'">
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th fr:resizeable="true">
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length > 60]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
         </fr:accordion>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

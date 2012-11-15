@@ -1,16 +1,16 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <p:param type="input" name="model"/>
     <p:param type="input" name="view"/>
     <p:param type="output" name="instance"/>
 
     <p:processor name="oxf:identity">
-        <p:input name="data" href="#model#xpointer(/xforms:model/xforms:instance/*)"/>
+        <p:input name="data" href="#model#xpointer(/xf:model/xf:instance/*)"/>
         <p:output name="data" id="instance"/>
     </p:processor>
 
@@ -36,7 +36,7 @@
                 <xsl:template match="/">
                     <request>
                         <parameters>
-                            <xsl:for-each select="//xhtml:input">
+                            <xsl:for-each select="//xh:input">
                                 <parameter>
                                     <name>
                                         <xsl:value-of select="@name"/>

@@ -41,7 +41,7 @@ public class XFormsToggleAction extends XFormsAction {
 
         final String caseAttribute = actionElement.attributeValue("case");
         if (caseAttribute == null)
-            throw new OXFException("Missing mandatory case attribute on xforms:toggle element.");
+            throw new OXFException("Missing mandatory case attribute on xf:toggle element.");
 
         final String caseStaticId;
         if (bindingContext.getSingleItem() != null) {
@@ -65,7 +65,7 @@ public class XFormsToggleAction extends XFormsAction {
 
                 final XFormsControl focusedBefore = containingDocument.getControls().getFocusedControl();
 
-                // Actually toggle the xforms:case
+                // Actually toggle the xf:case
                 caseControl.toggle();// this will dispatch events
 
                 // Handle focus changes
@@ -76,7 +76,7 @@ public class XFormsToggleAction extends XFormsAction {
             // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
             final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
             if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("xforms:toggle", "case does not refer to an existing xforms:case element, ignoring action",
+                indentedLogger.logDebug("xf:toggle", "case does not refer to an existing xf:case element, ignoring action",
                         "case id", caseStaticId);
         }
     }

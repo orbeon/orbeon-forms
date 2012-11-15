@@ -32,7 +32,7 @@
         <div class="portal-note">
             <p>
                 <b>Note:</b> This example shows how you can include a form in a HTML page, and have
-                <code>&lt;xforms:submission replace="all"></code> work in that example using Ajax to replace the
+                <code>&lt;xf:submission replace="all"></code> work in that example using Ajax to replace the
                 embedded form by the target page. For this example to work, you need to add the following property to
                 your <code>config/properties-local.xml</code>.
             </p>

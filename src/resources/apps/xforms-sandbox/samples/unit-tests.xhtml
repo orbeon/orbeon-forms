@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Unit Tests</xhtml:title>
-        <xforms:model id="main-model" xxforms:external-events="page-complete">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Unit Tests</xh:title>
+        <xf:model id="main-model" xxf:external-events="page-complete">
+            <xf:instance id="instance">
                 <instance>
                     <in-progress>true</in-progress>
                     <page/>
@@ -36,11 +36,11 @@
                     <page-duration/>
 
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Compute durations -->
-            <xforms:bind ref="all-start | page-start" calculate="if (. = '') then current-dateTime() else ."/>
-            <xforms:bind ref="*[ends-with(local-name(), '-duration')]"
+            <xf:bind ref="all-start | page-start" calculate="if (. = '') then current-dateTime() else ."/>
+            <xf:bind ref="*[ends-with(local-name(), '-duration')]"
                          calculate="for $start-name in concat(substring-before(local-name(), '-duration'), '-start') return
                                     for $start in ../*[local-name() = $start-name] return
                                     for $duration in current-dateTime() - xs:dateTime($start) return
@@ -51,92 +51,92 @@
                                             ), ':')"/>
 
             <!-- Get the time to be updated every second -->
-            <xforms:action ev:event="my-update xforms-ready" if="in-progress = 'true'">
-                <xforms:recalculate/>
-                <xforms:refresh/>
-                <xforms:dispatch  name="my-update" targetid="main-model" delay="1000"/>
-            </xforms:action>
+            <xf:action ev:event="my-update xforms-ready" if="in-progress = 'true'">
+                <xf:recalculate/>
+                <xf:refresh/>
+                <xf:dispatch  name="my-update" targetid="main-model" delay="1000"/>
+            </xf:action>
 
-            <xforms:action ev:event="page-complete">
-                <xforms:delete ref="reports/in-progress"/>
-                <xforms:insert context="reports" ref="report" origin="saxon:parse(/instance/report-text)"/>
-                <xforms:insert context="reports/report[last()]" origin="xxforms:attribute('page', /instance/page)"/>
-                <xforms:setvalue ref="reports/report[last()]/@page" value="tokenize(., '/')[last()]"/>
-                <xforms:setvalue ref="page-start" value="current-dateTime()"/>
-            </xforms:action>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/unit-tests.js"/>
-        <xhtml:style type="text/css">
+            <xf:action ev:event="page-complete">
+                <xf:delete ref="reports/in-progress"/>
+                <xf:insert context="reports" ref="report" origin="saxon:parse(/instance/report-text)"/>
+                <xf:insert context="reports/report[last()]" origin="xxf:attribute('page', /instance/page)"/>
+                <xf:setvalue ref="reports/report[last()]/@page" value="tokenize(., '/')[last()]"/>
+                <xf:setvalue ref="page-start" value="current-dateTime()"/>
+            </xf:action>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/unit-tests.js"/>
+        <xh:style type="text/css">
             .progress { margin-bottom: 2em; }
             .progress img { vertical-align: middle; padding-bottom: 1em; }
             .test-pass { background-color: #efe; }
             .test-fail { background-color: #fee; }
             .xforms-repeat-selected-item-1, .xforms-repeat-selected-item-2, .xforms-repeat-selected-item-3 { background-color: transparent; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="in-progress" id="in-progress" style="display: none"/>
-        <xforms:input ref="page" id="page" style="display: none"/>
-        <xforms:input ref="report-text" id="report-text" style="display: none"/>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="in-progress" id="in-progress" style="display: none"/>
+        <xf:input ref="page" id="page" style="display: none"/>
+        <xf:input ref="report-text" id="report-text" style="display: none"/>
 
-        <xhtml:div class="progress">
-            <xforms:group ref=".[in-progress = 'true']">
-                <xhtml:img src="/apps/fr/style/progress_bar.gif" alt="In progress" class="progress-bar"/>
-                <xforms:group ref=".[page != '']">
-                    <xhtml:div>Running page: <xhtml:b><xforms:output value="substring-before(tokenize(page, '/')[last()], '?')"/></xhtml:b></xhtml:div>
-                    <xhtml:div>Time for this page: <xhtml:b><xforms:output value="page-duration"/></xhtml:b></xhtml:div>
-                </xforms:group>
-            </xforms:group>
-            <xforms:group ref=".[in-progress != 'true']">
-                <xhtml:div>
-                    <xhtml:b>Done</xhtml:b> running all the test cases
-                </xhtml:div>
-            </xforms:group>
-            <xhtml:div>Total tests ran: <xhtml:b><xforms:output value="count(reports/report/testcase/test)"/></xhtml:b></xhtml:div>
-            <xhtml:div>Total time: <xhtml:b><xforms:output value="all-duration"/></xhtml:b></xhtml:div>
-        </xhtml:div>
+        <xh:div class="progress">
+            <xf:group ref=".[in-progress = 'true']">
+                <xh:img src="/apps/fr/style/progress_bar.gif" alt="In progress" class="progress-bar"/>
+                <xf:group ref=".[page != '']">
+                    <xh:div>Running page: <xh:b><xf:output value="substring-before(tokenize(page, '/')[last()], '?')"/></xh:b></xh:div>
+                    <xh:div>Time for this page: <xh:b><xf:output value="page-duration"/></xh:b></xh:div>
+                </xf:group>
+            </xf:group>
+            <xf:group ref=".[in-progress != 'true']">
+                <xh:div>
+                    <xh:b>Done</xh:b> running all the test cases
+                </xh:div>
+            </xf:group>
+            <xh:div>Total tests ran: <xh:b><xf:output value="count(reports/report/testcase/test)"/></xh:b></xh:div>
+            <xh:div>Total time: <xh:b><xf:output value="all-duration"/></xh:b></xh:div>
+        </xh:div>
 
-        <xforms:group ref=".[exists(reports/report/testcase/test[@result = 'fail'])]">
-            <xhtml:table class="gridtable">
-                <xhtml:tr>
-                    <xhtml:th>Page</xhtml:th>
-                    <xhtml:th>Test case</xhtml:th>
-                    <xhtml:th>Test</xhtml:th>
-                    <xhtml:th>Result</xhtml:th>
-                </xhtml:tr>
-                <xforms:repeat ref="reports/report">
-                    <xforms:var name="report" value="."/>
-                    <xforms:repeat ref="testcase">
-                        <xforms:var name="testcase" value="."/>
-                        <xforms:var name="testcase-position" value="position()"/>
-                        <xforms:repeat ref="test[@result = 'fail']">
-                            <xhtml:tr>
-                                <xforms:var name="test" value="."/>
-                                <xforms:var name="test-position" value="position()"/>
+        <xf:group ref=".[exists(reports/report/testcase/test[@result = 'fail'])]">
+            <xh:table class="gridtable">
+                <xh:tr>
+                    <xh:th>Page</xh:th>
+                    <xh:th>Test case</xh:th>
+                    <xh:th>Test</xh:th>
+                    <xh:th>Result</xh:th>
+                </xh:tr>
+                <xf:repeat ref="reports/report">
+                    <xf:var name="report" value="."/>
+                    <xf:repeat ref="testcase">
+                        <xf:var name="testcase" value="."/>
+                        <xf:var name="testcase-position" value="position()"/>
+                        <xf:repeat ref="test[@result = 'fail']">
+                            <xh:tr>
+                                <xf:var name="test" value="."/>
+                                <xf:var name="test-position" value="position()"/>
                                 <!-- Page -->
-                                <xhtml:td>
-                                    <xforms:output value="substring-before($report/@page, '?orbeon-theme=plain')"/>
-                                </xhtml:td>
+                                <xh:td>
+                                    <xf:output value="substring-before($report/@page, '?orbeon-theme=plain')"/>
+                                </xh:td>
                                 <!-- Test case -->
-                                <xhtml:td>
-                                    <xforms:output value="$testcase/@name"/>
-                                </xhtml:td>
+                                <xh:td>
+                                    <xf:output value="$testcase/@name"/>
+                                </xh:td>
                                 <!-- Test -->
-                                <xhtml:td>
-                                    <xforms:output value="$test/@name"/>
-                                </xhtml:td>
-                                <xhtml:td class="test-fail">
-                                    <xforms:output value="$test/@message"/>
-                                </xhtml:td>
-                            </xhtml:tr>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xforms:repeat>
-            </xhtml:table>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+                                <xh:td>
+                                    <xf:output value="$test/@name"/>
+                                </xh:td>
+                                <xh:td class="test-fail">
+                                    <xf:output value="$test/@message"/>
+                                </xh:td>
+                            </xh:tr>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xf:repeat>
+            </xh:table>
+        </xf:group>
+    </xh:body>
+</xh:html>

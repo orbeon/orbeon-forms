@@ -12,33 +12,33 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
     <head>
         <title>Edit Portlet Preferences</title>
-        <xforms:model>
-            <xforms:instance id="preferences">
+        <xf:model>
+            <xf:instance id="preferences">
                 <xi:include href="input:data" xxi:omit-xml-base="true"/>
-            </xforms:instance>
-            <xforms:bind ref="preference">
-                <xforms:bind ref="name" type="xs:NCName" required="true()"/>
-                <xforms:bind ref="value" type="xs:string" required="true()"/>
-            </xforms:bind>
-            <xforms:instance id="preference-template">
+            </xf:instance>
+            <xf:bind ref="preference">
+                <xf:bind ref="name" type="xs:NCName" required="true()"/>
+                <xf:bind ref="value" type="xs:string" required="true()"/>
+            </xf:bind>
+            <xf:instance id="preference-template">
                 <preference xmlns="">
                     <name/>
                     <value/>
                 </preference>
-            </xforms:instance>
-            <xforms:submission id="save-preferences-submission" ref="instance('preferences')"
+            </xf:instance>
+            <xf:submission id="save-preferences-submission" ref="instance('preferences')"
                                replace="all" action="/portlet-preferences/save-preferences" method="post"/>
-        </xforms:model>
+        </xf:model>
         <style type="text/css">
             .xforms-trigger img { vertical-align: middle }
             .xforms-submit img { vertical-align: middle }
@@ -49,40 +49,40 @@
     <body>
         <p>
             <a class="ops-link" href="/portlet-preferences/" f:portlet-mode="view"><img src="/apps/portlet-preferences/images/back.gif" alt="Done Editing"/> Done Editing</a>
-            <xforms:submit submission="save-preferences-submission" appearance="minimal">
-                <xforms:label><img src="/apps/portlet-preferences/images/save.gif" alt="Save"/> Save</xforms:label>
-            </xforms:submit>
+            <xf:submit submission="save-preferences-submission" appearance="minimal">
+                <xf:label><img src="/apps/portlet-preferences/images/save.gif" alt="Save"/> Save</xf:label>
+            </xf:submit>
         </p>
         <table class="preferences-table">
             <tr>
                 <td>
-                    <xforms:trigger appearance="minimal">
-                        <xforms:label><img src="/apps/portlet-preferences/images/add.gif"/></xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('preferences')"
+                    <xf:trigger appearance="minimal">
+                        <xf:label><img src="/apps/portlet-preferences/images/add.gif"/></xf:label>
+                        <xf:insert ev:event="DOMActivate" context="instance('preferences')"
                                        ref="preference" origin="instance('preference-template')"
                                        at="index('preference-repeat')"/>
-                    </xforms:trigger>
+                    </xf:trigger>
                 </td>
                 <th>Preference Name</th>
                 <th>Preference Values</th>
             </tr>
-            <xforms:repeat ref="instance('preferences')/preference" id="preference-repeat">
+            <xf:repeat ref="instance('preferences')/preference" id="preference-repeat">
                 <tr>
                     <td>
-                        <xforms:trigger appearance="minimal">
-                            <xforms:label><img src="/apps/portlet-preferences/images/remove.gif" alt="Remove"/></xforms:label>
-                            <xforms:delete ev:event="DOMActivate" context="instance('preferences')"
+                        <xf:trigger appearance="minimal">
+                            <xf:label><img src="/apps/portlet-preferences/images/remove.gif" alt="Remove"/></xf:label>
+                            <xf:delete ev:event="DOMActivate" context="instance('preferences')"
                                            ref="preference" ad="index('preference-repeat')"/>
-                        </xforms:trigger>
+                        </xf:trigger>
                     </td>
                     <td style="white-space: nowrap">
-                        <xforms:input ref="name"/>
+                        <xf:input ref="name"/>
                     </td>
                     <td style="white-space: nowrap">
-                        <xforms:input ref="value"/>
+                        <xf:input ref="value"/>
                     </td>
                 </tr>
-            </xforms:repeat>
+            </xf:repeat>
         </table>
     </body>
 </html>

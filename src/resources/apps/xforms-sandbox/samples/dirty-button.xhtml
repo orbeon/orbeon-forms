@@ -11,56 +11,56 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Dirty Button</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Dirty Button</xh:title>
+        <xf:model>
             <!-- Main form instance -->
-            <xforms:instance id="my-instance">
+            <xf:instance id="my-instance">
                 <name/>
-            </xforms:instance>
+            </xf:instance>
             <!-- Control instance -->
-            <xforms:instance id="control-instance">
+            <xf:instance id="control-instance">
                 <control xmlns="">
                     <dirty>false</dirty>
                     <save-trigger/>
                 </control>
-            </xforms:instance>
+            </xf:instance>
             <!-- Disable the save button when the data is dirty -->
-            <xforms:bind ref="instance('control-instance')/save-trigger" readonly="not(../dirty = 'true')"/>
+            <xf:bind ref="instance('control-instance')/save-trigger" readonly="not(../dirty = 'true')"/>
             <!-- Mark data as dirty upon insert/delete -->
-            <xforms:setvalue ev:event="xforms-insert xforms-delete" ref="instance('control-instance')/dirty">true</xforms:setvalue>
+            <xf:setvalue ev:event="xforms-insert xforms-delete" ref="instance('control-instance')/dirty">true</xf:setvalue>
 
-            <xforms:submission id="save-submission" method="post" replace="none" resource="echo:">
+            <xf:submission id="save-submission" method="post" replace="none" resource="echo:">
                 <!-- Mark data as clean when submission completes -->
-                <xforms:setvalue ev:event="xforms-submit-done" ref="instance('control-instance')/dirty">false</xforms:setvalue>
-            </xforms:submission>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+                <xf:setvalue ev:event="xforms-submit-done" ref="instance('control-instance')/dirty">false</xf:setvalue>
+            </xf:submission>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:group>
+        <xf:group>
             <!-- Mark data as dirty upon value change -->
-            <xforms:setvalue ev:event="xforms-value-changed" ref="instance('control-instance')/dirty">true</xforms:setvalue>
+            <xf:setvalue ev:event="xforms-value-changed" ref="instance('control-instance')/dirty">true</xf:setvalue>
 
             <!-- Controls -->
-            <xforms:input ref=".">
-                <xforms:label>First name:</xforms:label>
-            </xforms:input>
-        </xforms:group>
+            <xf:input ref=".">
+                <xf:label>First name:</xf:label>
+            </xf:input>
+        </xf:group>
 
         <!-- Save button -->
-        <xforms:trigger ref="instance('control-instance')/save-trigger">
-            <xforms:label>Save</xforms:label>
-            <xforms:send ev:event="DOMActivate" submission="save-submission"/>
-        </xforms:trigger>
+        <xf:trigger ref="instance('control-instance')/save-trigger">
+            <xf:label>Save</xf:label>
+            <xf:send ev:event="DOMActivate" submission="save-submission"/>
+        </xf:trigger>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

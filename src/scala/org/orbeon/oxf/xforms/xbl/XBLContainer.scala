@@ -348,7 +348,7 @@ trait ContainerResolver {
         findInSelfAndDescendants[XFormsObject](m ⇒ Option(m.getObjectByEffectiveId(effectiveId)), Some(c ⇒ Option(c.getObjectByEffectiveId(effectiveId)))) orNull
 
     /**
-     * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
+     * Return the current repeat index for the given xf:repeat id, -1 if the id is not found.
      *
      * The repeat must be in the scope of this container.
      *

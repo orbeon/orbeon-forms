@@ -1,19 +1,19 @@
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-            xmlns:exforms="http://www.exforms.org/exf/1-0"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:exf="http://www.exforms.org/exf/1-0"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>Untitled Form</xhtml:title>
-        <xforms:model id="fr-form-model">
+    <xh:head>
+        <xh:title>Untitled Form</xh:title>
+        <xf:model id="fr-form-model">
 
             <!-- Main instance -->
-            <xforms:instance id="fr-form-instance">
+            <xf:instance id="fr-form-instance">
                 <form>
                     <section-1>
                         <control-1/>
@@ -28,26 +28,26 @@
                         </section-3>
                     </section-1>
                 </form>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Bindings -->
-            <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-                <xforms:bind id="section-1-bind" name="section-1" ref="section-1">
-                    <xforms:bind id="control-1-bind" name="control-1" ref="control-1"/>
-                    <xforms:bind name="section-3" id="section-3-bind" ref="section-3">
-                        <xforms:bind name="control-6" id="control-6-bind" ref="control-6"/>
-                        <xforms:bind name="grid-7" id="grid-7-bind" ref="grid-7">
-                            <xforms:bind name="control-8" id="control-8-bind" ref="control-8"/>
-                        </xforms:bind>
-                    </xforms:bind>
-                    <xforms:bind name="grid-4" id="grid-4-bind" ref="grid-4">
-                        <xforms:bind name="control-5" id="control-5-bind" ref="control-5"/>
-                    </xforms:bind>
-                </xforms:bind>
-            </xforms:bind>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="section-1-bind" name="section-1" ref="section-1">
+                    <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
+                    <xf:bind name="section-3" id="section-3-bind" ref="section-3">
+                        <xf:bind name="control-6" id="control-6-bind" ref="control-6"/>
+                        <xf:bind name="grid-7" id="grid-7-bind" ref="grid-7">
+                            <xf:bind name="control-8" id="control-8-bind" ref="control-8"/>
+                        </xf:bind>
+                    </xf:bind>
+                    <xf:bind name="grid-4" id="grid-4-bind" ref="grid-4">
+                        <xf:bind name="control-5" id="control-5-bind" ref="control-5"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
 
             <!-- Metadata -->
-            <xforms:instance xxforms:readonly="true" id="fr-form-metadata">
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
                 <metadata>
                     <application-name/>
                     <form-name/>
@@ -56,19 +56,19 @@
                     <author/>
                     <logo mediatype="" filename="" size=""/>
                 </metadata>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Attachments -->
-            <xforms:instance id="fr-form-attachments">
+            <xf:instance id="fr-form-attachments">
                 <attachments>
                     <css mediatype="text/css" filename="" size=""/>
                     <pdf mediatype="application/pdf" filename="" size=""/>
                 </attachments>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- All form resources -->
             <!-- Don't make readonly by default in case a service modifies the resources -->
-            <xforms:instance xxforms:readonly="true" id="fr-form-resources">
+            <xf:instance xxf:readonly="true" id="fr-form-resources">
                 <resources>
                     <resource xml:lang="en">
                         <control-8>
@@ -105,84 +105,84 @@
                         </section-3>
                     </resource>
                 </resources>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance xxforms:readonly="true" id="grid-4-template">
+            <xf:instance xxf:readonly="true" id="grid-4-template">
                 <grid-4>
                     <control-5/>
                 </grid-4>
-            </xforms:instance>
-            <xforms:instance xxforms:readonly="true" id="grid-7-template">
+            </xf:instance>
+            <xf:instance xxf:readonly="true" id="grid-7-template">
                 <grid-7>
                     <control-8/>
                 </grid-7>
-            </xforms:instance>
+            </xf:instance>
 
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+        </xf:model>
+    </xh:head>
+    <xh:body>
         <fr:view>
             <fr:body>
                 <fr:section id="section-1-section" bind="section-1-bind">
-                    <xforms:label ref="$form-resources/section-1/label"/>
-                    <xforms:help ref="$form-resources/section-1/help"/>
+                    <xf:label ref="$form-resources/section-1/label"/>
+                    <xf:help ref="$form-resources/section-1/help"/>
                     <fr:grid>
-                        <xhtml:tr>
-                            <xhtml:td>
-                                <xforms:input id="control-1-control" bind="control-1-bind">
-                                    <xforms:label ref="$form-resources/control-1/label"/>
-                                    <xforms:hint ref="$form-resources/control-1/hint"/>
-                                    <xforms:help ref="$form-resources/control-1/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                            <xhtml:td/>
-                        </xhtml:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="control-1-control" bind="control-1-bind">
+                                    <xf:label ref="$form-resources/control-1/label"/>
+                                    <xf:hint ref="$form-resources/control-1/hint"/>
+                                    <xf:help ref="$form-resources/control-1/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
                     </fr:grid>
                     <fr:grid repeat="true" id="grid-4-grid" bind="grid-4-bind"
                              origin="instance('grid-4-template')">
-                        <xhtml:tr>
-                            <xhtml:td id="td-5-td">
-                                <xforms:input id="control-5-control" bind="control-5-bind">
-                                    <xforms:label ref="$form-resources/control-5/label"/>
-                                    <xforms:hint ref="$form-resources/control-5/hint"/>
-                                    <xforms:help ref="$form-resources/control-5/help"/>
-                                    <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                </xforms:input>
-                            </xhtml:td>
-                        </xhtml:tr>
+                        <xh:tr>
+                            <xh:td id="td-5-td">
+                                <xf:input id="control-5-control" bind="control-5-bind">
+                                    <xf:label ref="$form-resources/control-5/label"/>
+                                    <xf:hint ref="$form-resources/control-5/hint"/>
+                                    <xf:help ref="$form-resources/control-5/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
                     </fr:grid>
                     <fr:section id="section-3-section" bind="section-3-bind">
-                        <xforms:label ref="$form-resources/section-3/label"/>
-                        <xforms:help ref="$form-resources/section-3/help"/>
+                        <xf:label ref="$form-resources/section-3/label"/>
+                        <xf:help ref="$form-resources/section-3/help"/>
                         <fr:grid>
-                            <xhtml:tr>
-                                <xhtml:td id="td-3-td">
-                                    <xforms:input id="control-6-control" bind="control-6-bind">
-                                        <xforms:label ref="$form-resources/control-6/label"/>
-                                        <xforms:hint ref="$form-resources/control-6/hint"/>
-                                        <xforms:help ref="$form-resources/control-6/help"/>
-                                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                            </xhtml:tr>
+                            <xh:tr>
+                                <xh:td id="td-3-td">
+                                    <xf:input id="control-6-control" bind="control-6-bind">
+                                        <xf:label ref="$form-resources/control-6/label"/>
+                                        <xf:hint ref="$form-resources/control-6/hint"/>
+                                        <xf:help ref="$form-resources/control-6/help"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    </xf:input>
+                                </xh:td>
+                            </xh:tr>
                         </fr:grid>
                         <fr:grid repeat="true" id="grid-7-grid" bind="grid-7-bind"
                                  origin="instance('grid-7-template')">
-                            <xhtml:tr>
-                                <xhtml:td id="td-9-td">
-                                    <xforms:input id="control-8-control" bind="control-8-bind">
-                                        <xforms:label ref="$form-resources/control-8/label"/>
-                                        <xforms:hint ref="$form-resources/control-8/hint"/>
-                                        <xforms:help ref="$form-resources/control-8/help"/>
-                                        <xforms:alert ref="$fr-resources/detail/labels/alert"/>
-                                    </xforms:input>
-                                </xhtml:td>
-                            </xhtml:tr>
+                            <xh:tr>
+                                <xh:td id="td-9-td">
+                                    <xf:input id="control-8-control" bind="control-8-bind">
+                                        <xf:label ref="$form-resources/control-8/label"/>
+                                        <xf:hint ref="$form-resources/control-8/hint"/>
+                                        <xf:help ref="$form-resources/control-8/help"/>
+                                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    </xf:input>
+                                </xh:td>
+                            </xh:tr>
                         </fr:grid>
                     </fr:section>
                 </fr:section>
             </fr:body>
         </fr:view>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

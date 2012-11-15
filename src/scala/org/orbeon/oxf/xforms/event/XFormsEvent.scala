@@ -170,9 +170,9 @@ object XFormsEvent {
     def xxformsName(name: String) = buildExplodedQName(XXFORMS_NAMESPACE_URI, name)
     
     private val Deprecated = Map(
-        "target"         → "xxforms:targetid",
-        "event"          → "xxforms:type",
-        "repeat-indexes" → "xxforms:repeat-indexes"
+        "target"         → "xxf:targetid",
+        "event"          → "xxf:type",
+        "repeat-indexes" → "xxf:repeat-indexes"
     )
     
     private val Getters = Map[String, XFormsEvent ⇒ Option[Any]](

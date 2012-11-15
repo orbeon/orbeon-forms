@@ -28,7 +28,7 @@ import org.xml.sax.InputSource;
 import java.io.StringReader;
 
 /**
- * Base class for xxforms:get-*-attribute() functions.
+ * Base class for xxf:get-*-attribute() functions.
  */
 public abstract class XXFormsGetScopeAttribute extends XFormsFunction {
 

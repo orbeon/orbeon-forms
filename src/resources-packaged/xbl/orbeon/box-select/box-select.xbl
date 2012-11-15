@@ -11,11 +11,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
@@ -41,14 +41,14 @@
             <editors static-itemset="true"/>
             <template>
                  <fr:box-select>
-                     <xforms:label ref=""/>
-                     <xforms:hint ref=""/>
-                     <xforms:help ref=""/>
-                     <xforms:alert ref=""/>
-                     <xforms:itemset ref="">
-                        <xforms:label ref="label"/>
-                        <xforms:value ref="value"/>
-                    </xforms:itemset>
+                     <xf:label ref=""/>
+                     <xf:hint ref=""/>
+                     <xf:help ref=""/>
+                     <xf:alert ref=""/>
+                     <xf:itemset ref="">
+                        <xf:label ref="label"/>
+                        <xf:value ref="value"/>
+                    </xf:itemset>
                 </fr:box-select>
             </template>
         </metadata>
@@ -72,9 +72,9 @@
             </xbl:style>
         </xbl:resources>
         <xbl:template>
-            <xforms:select appearance="full" ref="xxforms:binding('fr-box-select-binding')">
-                <xbl:content include=":root > xforms|itemset, :root > xforms|item, :root > xforms|choice"/>
-            </xforms:select>
+            <xf:select appearance="full" ref="xxf:binding('fr-box-select-binding')">
+                <xbl:content include=":root > xf|itemset, :root > xf|item, :root > xf|choice"/>
+            </xf:select>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

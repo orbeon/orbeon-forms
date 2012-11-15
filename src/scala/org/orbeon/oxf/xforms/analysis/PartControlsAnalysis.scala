@@ -61,7 +61,7 @@ trait PartControlsAnalysis extends TransientState {
                 appearancesForControlName ++= elementWithAppearance.appearances
 
                 if (controlName == "textarea" && elementWithAppearance.mediatype == Some("text/html")) {
-                    // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxforms:richtext
+                    // Special appearance: when text/html mediatype is found on <textarea>, do as if an xxf:richtext
                     // appearance had been set, so that we can decide on feature usage based on appearance only.
                     appearancesForControlName += XXFORMS_RICH_TEXT_APPEARANCE_QNAME
                 }

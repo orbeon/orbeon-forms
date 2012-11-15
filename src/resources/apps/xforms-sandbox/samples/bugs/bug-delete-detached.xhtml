@@ -1,7 +1,7 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:xi="http://www.w3.org/2001/XInclude"
             xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -10,28 +10,28 @@
             xmlns:xdt="http://www.w3.org/2005/xpath-datatypes"
             xmlns:xbl="http://www.w3.org/ns/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner" lang="en">
-    <xhtml:head>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance>
                     <company>
                         <employee>Mary</employee>
                     </company>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:repeat ref="company">
-            <xforms:input ref="employee">
-                <xforms:delete ev:event="xforms-disabled" ref=".."/>
-            </xforms:input>
-            <xforms:trigger>
-                <xforms:label>Delete</xforms:label>
-                <xforms:delete ev:event="DOMActivate" ref="."/>
-            </xforms:trigger>
-        </xforms:repeat>
+        <xf:repeat ref="company">
+            <xf:input ref="employee">
+                <xf:delete ev:event="xforms-disabled" ref=".."/>
+            </xf:input>
+            <xf:trigger>
+                <xf:label>Delete</xf:label>
+                <xf:delete ev:event="DOMActivate" ref="."/>
+            </xf:trigger>
+        </xf:repeat>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -11,34 +11,34 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Invalid Group</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Invalid Group</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <a>Foo</a>
                     <b>Bar</b>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance" constraint="false()"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group ref="/instance">
-            <xhtml:p>
-                <xforms:input ref="a"/>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:input ref="b"/>
-            </xhtml:p>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:bind ref="/instance" constraint="false()"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:group ref="/instance">
+            <xh:p>
+                <xf:input ref="a"/>
+            </xh:p>
+            <xh:p>
+                <xf:input ref="b"/>
+            </xh:p>
+        </xf:group>
+    </xh:body>
+</xh:html>

@@ -25,9 +25,9 @@ import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNo
 import org.orbeon.oxf.xforms.BindingContext
 
 /**
- * Represents xforms:repeat iteration information.
+ * Represents xf:repeat iteration information.
  *
- * This is not really a control, but an abstraction for xforms:repeat iterations.
+ * This is not really a control, but an abstraction for xf:repeat iterations.
  *
  * TODO: Use inheritance to make this a single-node control that doesn't hold a value.
  */

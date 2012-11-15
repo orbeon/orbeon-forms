@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 /**
- * Handler which just swallows xxforms:attribute content.
+ * Handler which just swallows xxf:attribute content.
  */
 public class XXFormsAttributeHandler extends XFormsBaseHandlerXHTML {
     public XXFormsAttributeHandler() {

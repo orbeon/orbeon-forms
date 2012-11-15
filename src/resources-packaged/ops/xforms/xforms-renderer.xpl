@@ -27,7 +27,7 @@
     * Handle HTML tag soup input
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xh="http://www.w3.org/1999/xhtml">
 
     <!-- Extract XForms document from request -->
     <p:processor name="oxf:scope-generator">
@@ -68,13 +68,13 @@
         <p:otherwise>
             <p:choose href="#extracted-document">
                 <!-- Seems reasonable to assume that forms with a fr:view root want to be run by Form Runner... -->
-                <p:when test="/xhtml:html/xhtml:body/fr:view">
+                <p:when test="/xh:html/xh:body/fr:view">
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#extracted-document"/>
                         <p:input name="config">
-                            <parameters xsl:version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                            <parameters xsl:version="2.0" xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
                                 <xsl:variable name="metadata"
-                                    select="/xhtml:html/xhtml:head/xforms:model[1]/xforms:instance[@id='fr-form-metadata']/metadata"/>
+                                    select="/xh:html/xh:head/xf:model[1]/xf:instance[@id='fr-form-metadata']/metadata"/>
                                 <app>
                                     <xsl:value-of select="if ($metadata/application-name) then $metadata/application-name else 'no-name'"/>
                                 </app>

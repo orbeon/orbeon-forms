@@ -23,7 +23,7 @@ trait SelectAppearanceTrait extends AppearanceTrait {
 
     // Normalize appearances
     override val appearances = {
-        // NOTE: Ignore no longer supported xxforms:autocomplete (which would require selection="open" anyway)
+        // NOTE: Ignore no longer supported xxf:autocomplete (which would require selection="open" anyway)
         // Ideally we would like to do this but we can't, see:
         // https://issues.scala-lang.org/browse/SI-1938?focusedCommentId=55131#comment-55131
         // val initialAppearances = super.appearances
@@ -37,9 +37,9 @@ trait SelectAppearanceTrait extends AppearanceTrait {
             case _ if size > 0 ⇒
                 initialAppearances
             case _ if isMultiple ⇒
-                Set(XFORMS_COMPACT_APPEARANCE_QNAME) // default for xforms:select
+                Set(XFORMS_COMPACT_APPEARANCE_QNAME) // default for xf:select
             case _ ⇒
-                Set(XFORMS_MINIMAL_APPEARANCE_QNAME) // default for xforms:select1
+                Set(XFORMS_MINIMAL_APPEARANCE_QNAME) // default for xf:select1
         }
     }
 

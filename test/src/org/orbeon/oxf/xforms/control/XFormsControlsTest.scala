@@ -111,7 +111,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
 //
 //        final Document document = Dom4jUtils.readFromURL("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", false, false);
 //        final DocumentWrapper documentWrapper = new DocumentWrapper(document, null, new Configuration());
-//        final Element outputElement = (Element) ((NodeWrapper) XPathCache.evaluateSingle(new PipelineContext(), documentWrapper, "(//xhtml:body//xforms:output)[1]", XFormsDocumentAnnotatorContentHandlerTest.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, null)).getUnderlyingNode();
+//        final Element outputElement = (Element) ((NodeWrapper) XPathCache.evaluateSingle(new PipelineContext(), documentWrapper, "(//xh:body//xf:output)[1]", XFormsDocumentAnnotatorContentHandlerTest.BASIC_NAMESPACE_MAPPINGS, null, null, null, null, null)).getUnderlyingNode();
 //
 //        final PipelineContext pipelineContext = new PipelineContext();
 //

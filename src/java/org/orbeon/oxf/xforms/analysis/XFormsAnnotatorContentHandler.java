@@ -35,11 +35,11 @@ import java.util.*;
  * ContentHandler that:
  *
  * o adds ids on all the XForms elements which don't have one
- * o gathers namespace information on XForms elements (xforms:*, xxforms:*, exforms:*, xbl:*).
+ * o gathers namespace information on XForms elements (xf:*, xxf:*, exf:*, xbl:*).
  * o finds AVTs on non-XForms elements
  *   o adds ids to those elements
- *   o produces xxforms:attribute elements
- * o finds title information and produces xxforms:text elements
+ *   o produces xxf:attribute elements
+ * o finds title information and produces xxf:text elements
  *
  * NOTE: There was a thought of merging this with XFormsExtractorContentHandler but we need a separate annotated
  * document in XFormsToXHTML to produce the output. So if we modify this, we should modify it so that two separate
@@ -152,7 +152,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             if (inLHHA) {
                 // Gather id and namespace information about content of LHHA
                 if (isXForms) {
-                    // Must be xforms:output
+                    // Must be xf:output
                     attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
                 } else if (hostLanguageAVTs && hasAVT(attributes)) {
                     // Must be an AVT on an host language element
@@ -186,7 +186,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // Add a class to help the client
                  attributes = XMLUtils.appendToClassAttribute(attributes, "xforms-update-full");
             } else if (templateSAXStore != null) {
-                // Remember mark if xxforms:update="full"
+                // Remember mark if xxf:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
                     // Remember this subtree has a full update
@@ -198,14 +198,14 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
             // Rewrite elements / add appearances
             if (inTitle && "output".equals(localname)) {
-                // Special case of xforms:output within title, which produces an xxforms:text control
+                // Special case of xf:output within title, which produces an xxf:text control
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text", attributes);
+                startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
             } else if (("group".equals(localname) || "switch".equals(localname)) && isClosestXHTMLAncestorTableContainer()) {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
 
-                // Append the new xxforms:separator appearance
+                // Append the new xxf:separator appearance
                 final String existingAppearance = attributes.getValue("appearance");
                 // See: https://github.com/orbeon/orbeon-forms/issues/418
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
@@ -219,11 +219,11 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                             (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 }
 
-                // Start xforms:repeat
+                // Start xf:repeat
                 startElement(true, uri, localname, qName, attributes);
 
-                // Start xforms:repeat-iteration
-                // NOTE: Use xforms:repeat-iteration instead of xxforms:iteration so we don't have to deal with a new namespace
+                // Start xf:repeat-iteration
+                // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
                 reusableAttributes.clear();
                 reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsElementId + "~iteration");
                 final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, 0);
@@ -240,7 +240,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             final String xformsElementId = reusableStringArray[0];
 
             if (templateSAXStore != null) {
-                // Remember mark if xxforms:update="full"
+                // Remember mark if xxf:update="full"
                 final String xxformsUpdate = attributes.getValue(XFormsConstants.XXFORMS_UPDATE_QNAME.getNamespaceURI(), XFormsConstants.XXFORMS_UPDATE_QNAME.getName());
                 if (XFormsConstants.XFORMS_FULL_UPDATE.equals(xxformsUpdate)) {
                     // Remember this subtree has a full update
@@ -277,7 +277,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 if (inHead && "title".equals(localname)) {
                     // Entering title
                     inTitle = true;
-                    // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xforms:output)
+                    // Make sure there will be an id on the title element (ideally, we would do this only if there is a nested xf:output)
                     attributes = getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex);
                     htmlElementId = reusableStringArray[0];
                     htmlTitleElementId = htmlElementId;
@@ -289,13 +289,13 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             if ("true".equals(attributes.getValue(XFormsConstants.XXFORMS_NAMESPACE_URI, "control"))) {
                 // Non-XForms element which we want to turn into a control (specifically, into a group)
 
-                // Create a new xforms:group control which specifies the element name to use. Namespace mappings for the
+                // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
                 // given QName must be in scope as that QName is the original element name.
                 final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespaces(qName, attributes, reusableStringArray, idIndex));
-                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxforms:element", ContentHandlerHelper.CDATA, qName);
+                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxf:element", ContentHandlerHelper.CDATA, qName);
 
                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                startElement(true, XFormsConstants.XFORMS_NAMESPACE_URI, "group", "xforms:group", newAttributes);
+                startElement(true, XFormsConstants.XFORMS_NAMESPACE_URI, "group", "xf:group", newAttributes);
             } else if (hostLanguageAVTs) {
                 // This is a non-XForms element and we allow AVTs
                 final int attributesCount = attributes.getLength();
@@ -324,7 +324,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                                     elementOutput = true;
                                 }
 
-                                // Create a new xxforms:attribute control
+                                // Create a new xxf:attribute control
                                 reusableAttributes.clear();
 
                                 final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(qName, reusableAttributes, reusableStringArray, -1);
@@ -350,8 +350,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                                 }
 
                                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                                startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute", newAttributes);
-                                endElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxforms:attribute");
+                                startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxf:attribute", newAttributes);
+                                endElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "attribute", "xxf:attribute");
                                 endPrefixMapping(true, "xxforms");
                             }
                         }
@@ -374,10 +374,10 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         if (!inPreserve) {
             if (inXForms) {
                 // Preserve as is the content of labels, etc., instances, and schemas
-                // Within other XForms: check for labels, xforms:instance, and xs:schema
+                // Within other xf: check for labels, xf:instance, and xs:schema
                 if (isXForms) {
                     inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname); // labels, etc. may contain XHTML
-                    if (inLHHA || "instance".equals(localname)) {                                  // xforms:instance
+                    if (inLHHA || "instance".equals(localname)) {                                  // xf:instance
                         inPreserve = true;
                         preserveLevel = level;
                     }
@@ -421,7 +421,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         if (inXForms) {
 
             if (!inPreserve && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && "repeat".equals(localname)) {
-                // Close xforms:repeat-iteration
+                // Close xf:repeat-iteration
                 endElement(true, uri, localname + "-iteration", qName + "-iteration");
             }
 
@@ -467,8 +467,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         }
 
         if (inTitle && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && "output".equals(localname)) {
-            // Closing xforms:output within xhtml:title
-            endElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxforms:text");
+            // Closing xf:output within xhtml:title
+            endElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text");
             endPrefixMapping(true, "xxforms");// for resolving appearance
         } else {
             // Leave element untouched

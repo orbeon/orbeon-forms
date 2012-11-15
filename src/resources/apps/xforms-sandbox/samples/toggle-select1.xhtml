@@ -11,46 +11,46 @@
   
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <xhtml:head>
-        <xhtml:title>Toggling between cases using a dropdown list</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="selection">
+    <xh:head>
+        <xh:title>Toggling between cases using a dropdown list</xh:title>
+        <xf:model>
+            <xf:instance id="selection">
                 <selection>1</selection>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:select1 ref="instance('selection')" appearance="minimal">
-            <xforms:label>Select: </xforms:label>
-            <xforms:item>
-                <xforms:label>First</xforms:label>
-                <xforms:value>1</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Second</xforms:label>
-                <xforms:value>2</xforms:value>
-            </xforms:item>
+        <xf:select1 ref="instance('selection')" appearance="minimal">
+            <xf:label>Select: </xf:label>
+            <xf:item>
+                <xf:label>First</xf:label>
+                <xf:value>1</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>Second</xf:label>
+                <xf:value>2</xf:value>
+            </xf:item>
             <!-- Solution with AVT -->
-            <xforms:toggle ev:event="xforms-value-changed" case="case{.}"/>
+            <xf:toggle ev:event="xforms-value-changed" case="case{.}"/>
             <!-- Solution with nested case element-->
-            <!--<xforms:toggle ev:event="xforms-value-changed">-->
-                <!--<xforms:case value="concat('case', .)"/>-->
-            <!--</xforms:toggle>-->
-        </xforms:select1>
+            <!--<xf:toggle ev:event="xforms-value-changed">-->
+                <!--<xf:case value="concat('case', .)"/>-->
+            <!--</xf:toggle>-->
+        </xf:select1>
 
-        <xforms:switch>
-            <xforms:case id="case1">
+        <xf:switch>
+            <xf:case id="case1">
                 Case 1
-            </xforms:case>
-            <xforms:case id="case2">
+            </xf:case>
+            <xf:case id="case2">
                 Case 2
-            </xforms:case>
-        </xforms:switch>
+            </xf:case>
+        </xf:switch>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

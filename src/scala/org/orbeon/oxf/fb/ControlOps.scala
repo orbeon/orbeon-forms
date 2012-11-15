@@ -46,8 +46,8 @@ object ControlOps {
     private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
 
     private val topLevelBindTemplate: NodeInfo =
-        <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')"
-                     xmlns:xforms="http://www.w3.org/2002/xforms"/>
+        <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
+                     xmlns:xf="http://www.w3.org/2002/xforms"/>
 
     // Get the control name based on the control, bind, grid, section or template id
     def controlName(controlOrBindId: String) = controlOrBindId match {
@@ -177,10 +177,10 @@ object ControlOps {
                     case _ ⇒
 
                         val newBind: Seq[NodeInfo] =
-                            <xforms:bind id={bindId(bindName)}
+                            <xf:bind id={bindId(bindName)}
                                          ref={annotatedBindRefIfNeeded(bindId(bindName), bindName)}
                                          name={bindName}
-                                         xmlns:xforms="http://www.w3.org/2002/xforms"/>
+                                         xmlns:xf="http://www.w3.org/2002/xforms"/>
 
                         insert(into = container, after = container \ "*:bind", origin = newBind).head
                 }
@@ -240,7 +240,7 @@ object ControlOps {
         // Make the control point to its template if @origin is present
         setvalue(controlElement \@ "origin", makeInstanceExpression(templateId(newName)))
 
-        // Set xforms:label, xforms:hint, xforms:help and xforms:alert @ref if present
+        // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
         // FIXME: This code is particularly ugly!
         controlElement \ * filter (e ⇒ Set("label", "help", "hint", "alert")(localname(e))) map
             (e ⇒ (e \@ "ref", localname(e))) filter
@@ -251,7 +251,7 @@ object ControlOps {
                     setvalue(e._1, "$form-resources/" + newName + '/' + e._2)
                 }
 
-        // If using a static itemset editor, set xforms:itemset/@ref xforms:itemset/@nodeset value
+        // If using a static itemset editor, set xf:itemset/@ref xf:itemset/@nodeset value
         if (hasEditor(controlElement, "static-itemset"))
             for (attName ← Seq("ref", "nodeset"))
                 setvalue(controlElement \ "*:itemset" \@ attName, "$form-resources/" + newName + "/item")
@@ -545,7 +545,7 @@ object ControlOps {
     def appearanceOption(e: NodeInfo) =
         e \@ "appearance" map (_.stringValue) headOption
 
-    // Given a control (e.g. xforms:input) and its xforms:bind, find the corresponding xbl:binding elements
+    // Given a control (e.g. xf:input) and its xf:bind, find the corresponding xbl:binding elements
     def findBindingsForControl(components: NodeInfo, control: NodeInfo, bind: NodeInfo) = {
 
         val stringQName = XMLConstants.XS_STRING_QNAME
@@ -557,7 +557,7 @@ object ControlOps {
                 case None ⇒ stringQName
             }
 
-        // Support both xs:foo and xforms:foo as they are considered to be equivalent when looking up the metadata. So
+        // Support both xs:foo and xf:foo as they are considered to be equivalent when looking up the metadata. So
         // here we ignore the namespace URI to achieve this (could be more restrictive if needed).
         val controlTypeLocalname = controlTypeQName.getName
         val controlQName = qname(control)

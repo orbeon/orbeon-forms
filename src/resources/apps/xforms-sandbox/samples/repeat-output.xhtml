@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:widget="http://orbeon.org/oxf/xml/widget"
             xmlns:ev="http://www.w3.org/2001/xml-events"
             xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Repeat with Output</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="config">
+    <xh:head>
+        <xh:title>Repeat with Output</xh:title>
+        <xf:model>
+            <xf:instance id="config">
                 <form>
                     <param>
                         <value/>
@@ -35,15 +35,15 @@
                         <help>This is help 2!</help>
                     </param>
                 </form>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:repeat ref="instance('config')/param">
-            <xforms:input ref="value">
-                <xforms:label><xforms:output ref="../label"/></xforms:label>
-                <xforms:help><xforms:output ref="../help"/></xforms:help>
-            </xforms:input>
-        </xforms:repeat>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:repeat ref="instance('config')/param">
+            <xf:input ref="value">
+                <xf:label><xf:output ref="../label"/></xf:label>
+                <xf:help><xf:output ref="../help"/></xf:help>
+            </xf:input>
+        </xf:repeat>
+    </xh:body>
+</xh:html>

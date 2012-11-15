@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Event Context</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Event Context</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <name/>
                     <description/>
@@ -38,79 +38,79 @@
                         <child>Child 2</child>
                     </children>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group>
-            <xforms:setvalue ev:event="DOMFocusIn" ref="dom-focus-in-target" value="event('xxforms:targetid')"/>
-            <xforms:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('xxforms:targetid')"/>
-            <xforms:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('xxforms:targetid')"/>
-            <xforms:action ev:event="DOMFocusIn">
-                <xforms:insert context="event-names" ref="event-name"/>
-                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
-            </xforms:action>
-            <xforms:action ev:event="DOMFocusOut">
-                <xforms:insert context="event-names" ref="event-name"/>
-                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
-            </xforms:action>
-            <xforms:action ev:event="xforms-value-changed">
-                <xforms:insert context="event-names" ref="event-name"/>
-                <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
-            </xforms:action>
-            <xhtml:p>
-                <xforms:input ref="name" id="name-control">
-                    <xforms:label>Name:</xforms:label>
-                </xforms:input>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:textarea ref="description" id="description-control">
-                    <xforms:label>Description:</xforms:label>
-                </xforms:textarea>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:select1 ref="gender" id="gender-control">
-                    <xforms:label>Gender:</xforms:label>
-                    <xforms:item>
-                        <xforms:label>M</xforms:label>
-                        <xforms:value>m</xforms:value>
-                    </xforms:item>
-                    <xforms:item>
-                        <xforms:label>F</xforms:label>
-                        <xforms:value>F</xforms:value>
-                    </xforms:item>
-                </xforms:select1>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="dom-focus-in-target" id="dom-focus-in-control">
-                    <xforms:label>DOMFocusIn:</xforms:label>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="dom-focus-out-target" id="dom-focus-out-control">
-                    <xforms:label>DOMFocusOut:</xforms:label>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:output ref="value-changed-target" id="value-changed-control">
-                    <xforms:label>xforms-value-changed:</xforms:label>
-                </xforms:output>
-            </xhtml:p>
-            <xforms:repeat ref="children/child">
-                <xhtml:div>
-                    <xforms:input ref="." id="child-control">
-                        <xforms:label>Child:</xforms:label>
-                    </xforms:input>
-                </xhtml:div>
-            </xforms:repeat>
-            <xforms:repeat ref="event-names/event-name[position() != last()]" id="event-names-repeat">
-                <xhtml:div>
-                    <xforms:output ref="." id="event-name-control">
-                        <xforms:label>Event name:</xforms:label>
-                    </xforms:output>
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:group>
+            <xf:setvalue ev:event="DOMFocusIn" ref="dom-focus-in-target" value="event('xxf:targetid')"/>
+            <xf:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('xxf:targetid')"/>
+            <xf:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('xxf:targetid')"/>
+            <xf:action ev:event="DOMFocusIn">
+                <xf:insert context="event-names" ref="event-name"/>
+                <xf:setvalue ref="event-names/event-name[last() - 1]" value="event('xxf:type')"/>
+            </xf:action>
+            <xf:action ev:event="DOMFocusOut">
+                <xf:insert context="event-names" ref="event-name"/>
+                <xf:setvalue ref="event-names/event-name[last() - 1]" value="event('xxf:type')"/>
+            </xf:action>
+            <xf:action ev:event="xforms-value-changed">
+                <xf:insert context="event-names" ref="event-name"/>
+                <xf:setvalue ref="event-names/event-name[last() - 1]" value="event('xxf:type')"/>
+            </xf:action>
+            <xh:p>
+                <xf:input ref="name" id="name-control">
+                    <xf:label>Name:</xf:label>
+                </xf:input>
+            </xh:p>
+            <xh:p>
+                <xf:textarea ref="description" id="description-control">
+                    <xf:label>Description:</xf:label>
+                </xf:textarea>
+            </xh:p>
+            <xh:p>
+                <xf:select1 ref="gender" id="gender-control">
+                    <xf:label>Gender:</xf:label>
+                    <xf:item>
+                        <xf:label>M</xf:label>
+                        <xf:value>m</xf:value>
+                    </xf:item>
+                    <xf:item>
+                        <xf:label>F</xf:label>
+                        <xf:value>F</xf:value>
+                    </xf:item>
+                </xf:select1>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="dom-focus-in-target" id="dom-focus-in-control">
+                    <xf:label>DOMFocusIn:</xf:label>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="dom-focus-out-target" id="dom-focus-out-control">
+                    <xf:label>DOMFocusOut:</xf:label>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:output ref="value-changed-target" id="value-changed-control">
+                    <xf:label>xforms-value-changed:</xf:label>
+                </xf:output>
+            </xh:p>
+            <xf:repeat ref="children/child">
+                <xh:div>
+                    <xf:input ref="." id="child-control">
+                        <xf:label>Child:</xf:label>
+                    </xf:input>
+                </xh:div>
+            </xf:repeat>
+            <xf:repeat ref="event-names/event-name[position() != last()]" id="event-names-repeat">
+                <xh:div>
+                    <xf:output ref="." id="event-name-control">
+                        <xf:label>Event name:</xf:label>
+                    </xf:output>
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

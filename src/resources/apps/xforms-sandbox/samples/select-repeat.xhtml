@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Select One Row From Repeat</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Select One Row From Repeat</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <fruits>
                     <fruit id="1">
                         <name>Apple</name>
@@ -45,72 +45,72 @@
                         <quantity/>
                     </fruit>
                 </fruits>
-            </xforms:instance>
-            <xforms:instance id="selection-instance">
+            </xf:instance>
+            <xf:instance id="selection-instance">
                 <selected>1</selected>
-            </xforms:instance>
-            <xforms:instance id="ui">
+            </xf:instance>
+            <xf:instance id="ui">
                 <ui>
                     <show-fruit-selection>false</show-fruit-selection>
                 </ui>
-            </xforms:instance>
-            <xforms:bind ref="instance('main-instance')/fruit" relevant="@id = instance('selection-instance')"/>
-            <xforms:bind ref="instance('main-instance')/fruit/quantity" type="xs:nonNegativeInteger"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p style="color: red">
+            </xf:instance>
+            <xf:bind ref="instance('main-instance')/fruit" relevant="@id = instance('selection-instance')"/>
+            <xf:bind ref="instance('main-instance')/fruit/quantity" type="xs:nonNegativeInteger"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p style="color: red">
             This example doesn't work as intended because non-relevant fruits don't show up as items.
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:select1 ref="instance('ui')/show-fruit-selection" appearance="full">
-                <xforms:label>Show fruit selection: </xforms:label>
-                <xforms:item>
-                    <xforms:label>Yes</xforms:label>
-                    <xforms:value>true</xforms:value>
-                </xforms:item>
-                <xforms:item>
-                    <xforms:label>No</xforms:label>
-                    <xforms:value>false</xforms:value>
-                </xforms:item>
-            </xforms:select1>
-        </xhtml:p>
-        <xforms:group ref=".[instance('ui')/show-fruit-selection = 'true']">
-            <xhtml:p>
-                <xforms:select1 ref="instance('selection-instance')">
-                    <xforms:label>Please select a fruit: </xforms:label>
-                    <xforms:item>
-                        <xforms:label>Select fruit</xforms:label>
-                        <xforms:value/>
-                    </xforms:item>
-                    <xforms:itemset ref="instance('main-instance')/fruit">
-                        <xforms:label ref="name"/>
-                        <xforms:value ref="@id"/>
-                    </xforms:itemset>
-                </xforms:select1>
-            </xhtml:p>
-        </xforms:group>
-        <xhtml:table class="gridtable">
-            <xhtml:tr>
-                <xhtml:th>Name</xhtml:th>
-                <xhtml:th>Color</xhtml:th>
-                <xhtml:th>Quantity</xhtml:th>
-            </xhtml:tr>
-            <xforms:repeat ref="fruit" id="fruit">
-                <xhtml:tr>
-                    <xhtml:td>
-                        <xforms:output ref="name"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:output ref="color"/>
-                    </xhtml:td>
-                    <xhtml:td>
-                        <xforms:input ref="quantity"/>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xforms:repeat>
-        </xhtml:table>
+        </xh:p>
+        <xh:p>
+            <xf:select1 ref="instance('ui')/show-fruit-selection" appearance="full">
+                <xf:label>Show fruit selection: </xf:label>
+                <xf:item>
+                    <xf:label>Yes</xf:label>
+                    <xf:value>true</xf:value>
+                </xf:item>
+                <xf:item>
+                    <xf:label>No</xf:label>
+                    <xf:value>false</xf:value>
+                </xf:item>
+            </xf:select1>
+        </xh:p>
+        <xf:group ref=".[instance('ui')/show-fruit-selection = 'true']">
+            <xh:p>
+                <xf:select1 ref="instance('selection-instance')">
+                    <xf:label>Please select a fruit: </xf:label>
+                    <xf:item>
+                        <xf:label>Select fruit</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                    <xf:itemset ref="instance('main-instance')/fruit">
+                        <xf:label ref="name"/>
+                        <xf:value ref="@id"/>
+                    </xf:itemset>
+                </xf:select1>
+            </xh:p>
+        </xf:group>
+        <xh:table class="gridtable">
+            <xh:tr>
+                <xh:th>Name</xh:th>
+                <xh:th>Color</xh:th>
+                <xh:th>Quantity</xh:th>
+            </xh:tr>
+            <xf:repeat ref="fruit" id="fruit">
+                <xh:tr>
+                    <xh:td>
+                        <xf:output ref="name"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:output ref="color"/>
+                    </xh:td>
+                    <xh:td>
+                        <xf:input ref="quantity"/>
+                    </xh:td>
+                </xh:tr>
+            </xf:repeat>
+        </xh:table>
         Total number of fruits:
-        <xforms:output value="sum(fruit/quantity[. castable as xs:integer])"/>
-    </xhtml:body>
-</xhtml:html>
+        <xf:output value="sum(fruit/quantity[. castable as xs:integer])"/>
+    </xh:body>
+</xh:html>

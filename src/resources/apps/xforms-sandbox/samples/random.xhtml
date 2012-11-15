@@ -11,37 +11,37 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms 1.1 random() Function</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms 1.1 random() Function</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <value/>
                     <value/>
                     <value/>
                     <value/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="value">
-                <xforms:bind ref="." calculate="random()"/>
-            </xforms:bind>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:ul>
-            <xforms:repeat ref="value" id="nodes">
-                <xhtml:li>
-                    <xforms:output ref="."/>
-                </xhtml:li>
-            </xforms:repeat>
-        </xhtml:ul>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:bind ref="value">
+                <xf:bind ref="." calculate="random()"/>
+            </xf:bind>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:ul>
+            <xf:repeat ref="value" id="nodes">
+                <xh:li>
+                    <xf:output ref="."/>
+                </xh:li>
+            </xf:repeat>
+        </xh:ul>
+    </xh:body>
+</xh:html>

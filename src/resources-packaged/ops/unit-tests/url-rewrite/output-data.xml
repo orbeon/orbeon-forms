@@ -11,7 +11,7 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
     <!-- Make sure text from foreign elements is untouched.  Added because Erik noticed we were -->
     <!-- actually dropping text in this case. -->
     <p>
@@ -21,45 +21,45 @@
         <a/>c
         <a/>c
     </p>
-    <xhtml:body background="/orbeon/images/body-background1.png">
+    <xh:body background="/orbeon/images/body-background1.png">
         <!-- Simple rewrites -->
-        <xhtml:div>
-            <xhtml:form action="/orbeon/my-action" method="post">
-                <xhtml:a href="/orbeon/path">Click Here!</xhtml:a>
-                <xhtml:img src="/orbeon/my-image1.png"/>
-                <xhtml:a href="path">Click Here!</xhtml:a>
-                <xhtml:img src="my-image2.png"/>
-                <xhtml:img src="/orbeon/doc/home-welcome?a=1&amp;b=1"/>
-                <xhtml:input type="image" src="/orbeon/my-image3.png"/>
-                <xhtml:input type="text" src="/my-image4.png"/>
-            </xhtml:form>
-        </xhtml:div>
+        <xh:div>
+            <xh:form action="/orbeon/my-action" method="post">
+                <xh:a href="/orbeon/path">Click Here!</xh:a>
+                <xh:img src="/orbeon/my-image1.png"/>
+                <xh:a href="path">Click Here!</xh:a>
+                <xh:img src="my-image2.png"/>
+                <xh:img src="/orbeon/doc/home-welcome?a=1&amp;b=1"/>
+                <xh:input type="image" src="/orbeon/my-image3.png"/>
+                <xh:input type="text" src="/my-image4.png"/>
+            </xh:form>
+        </xh:div>
         <!-- Check f:url-norewrite -->
-        <xhtml:div>
-            <xhtml:form action="/my-action">
-                <xhtml:a href="/path">Click Here!</xhtml:a>
-                <xhtml:img src="/orbeon/my-image5.png"/>
-                <xhtml:a href="path">Click Here!</xhtml:a>
-                <xhtml:img src="my-image6.png"/>
-                <xhtml:img src="?a=1&amp;b=2"/>
-            </xhtml:form>
-        </xhtml:div>
+        <xh:div>
+            <xh:form action="/my-action">
+                <xh:a href="/path">Click Here!</xh:a>
+                <xh:img src="/orbeon/my-image5.png"/>
+                <xh:a href="path">Click Here!</xh:a>
+                <xh:img src="my-image6.png"/>
+                <xh:img src="?a=1&amp;b=2"/>
+            </xh:form>
+        </xh:div>
         <!-- Text handling -->
-        <xhtml:div>
-            <xhtml:p>123wsrp_rewrite456</xhtml:p>
-            <xhtml:script>
-                <xhtml:p>123wsrp_rewrite456</xhtml:p>
-            </xhtml:script>
+        <xh:div>
+            <xh:p>123wsrp_rewrite456</xh:p>
+            <xh:script>
+                <xh:p>123wsrp_rewrite456</xh:p>
+            </xh:script>
             <SCRIPT>
-                <xhtml:p>123wsrp_rewrite456</xhtml:p>
+                <xh:p>123wsrp_rewrite456</xh:p>
             </SCRIPT>
-        </xhtml:div>
+        </xh:div>
         <!-- Table background -->
-        <xhtml:table>
-            <xhtml:tr>
-                <xhtml:td background="/orbeon/images/td-background.png">Hello</xhtml:td>
-            </xhtml:tr>
-        </xhtml:table>
-    </xhtml:body>
+        <xh:table>
+            <xh:tr>
+                <xh:td background="/orbeon/images/td-background.png">Hello</xh:td>
+            </xh:tr>
+        </xh:table>
+    </xh:body>
     <brody background="/images/body-background2.png"/>
-</xhtml:html>
+</xh:html>

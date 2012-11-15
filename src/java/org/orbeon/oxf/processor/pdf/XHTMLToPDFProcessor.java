@@ -110,7 +110,7 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                 protected InputStream resolveAndOpenStream(String uri) {
 
                     final String resolvedURI = resolveURI(uri);
-                    // TODO: Use xforms:submission code instead
+                    // TODO: Use xf:submission code instead
 
                     // Tell callee we are loading that we are a servlet environment, as in effect we act like
                     // a browser retrieving resources directly, not like a portlet. This is the case also if we are

@@ -42,7 +42,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * xxforms:call-xpl() function.
+ * xxf:call-xpl() function.
  */
 public class XXFormsCallXPL extends XFormsFunction {
 

@@ -23,6 +23,6 @@ class ContainerControl(staticStateContext: StaticStateContext, element: Element,
     extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
     with ViewTrait {
 
-    // For <xforms:group xxforms:element="xhtml:div">. Can be null.
+    // For <xf:group xxf:element="xh:div">. Can be null.
     val elementQName = Dom4jUtils.extractAttributeValueQName(element, XFormsConstants.XXFORMS_ELEMENT_QNAME)
 }

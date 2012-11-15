@@ -11,17 +11,17 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:foo="http://orbeon.org/oxf/xml/foo"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xbl="http://www.w3.org/ns/xbl">
 
-    <xhtml:head>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <value0/>
                     <value1>
@@ -33,59 +33,59 @@
                         <time>t2</time>
                     </value2>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:setvalue ev:event="xforms-model-construct-done" ref="value0" value="42"/>
-        </xforms:model>
+            <xf:setvalue ev:event="xforms-model-construct-done" ref="value0" value="42"/>
+        </xf:model>
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="test-component" element="foo|test">
                 <xbl:template>
                     <!-- Local models for testing-->
-                    <xforms:model id="my-nested-model-a">
-                        <xforms:instance id="my-nested-instance-a">
+                    <xf:model id="my-nested-model-a">
+                        <xf:instance id="my-nested-instance-a">
                             <instance-a>nested value a</instance-a>
-                        </xforms:instance>
-                    </xforms:model>
-                    <xforms:model id="my-nested-model-b">
-                        <xforms:instance id="my-nested-instance-b">
+                        </xf:instance>
+                    </xf:model>
+                    <xf:model id="my-nested-model-b">
+                        <xf:instance id="my-nested-instance-b">
                             <instance-b>nested value b</instance-b>
-                        </xforms:instance>
-                    </xforms:model>
+                        </xf:instance>
+                    </xf:model>
                     <!-- Variable test -->
-                    <xforms:var name="foobar" xbl:attr="xbl:text=foobar"/>
+                    <xf:var name="foobar" xbl:attr="xbl:text=foobar"/>
                     <!-- Controls -->
-                    <xhtml:div class="test-class">
-                        <xforms:input ref="."/>
-                        <xhtml:br/>
-                        <xforms:input model="my-nested-model-b" ref="."/>
-                        <xhtml:br/>
-                        <xforms:group ref="xxforms:component-context()">
+                    <xh:div class="test-class">
+                        <xf:input ref="."/>
+                        <xh:br/>
+                        <xf:input model="my-nested-model-b" ref="."/>
+                        <xh:br/>
+                        <xf:group ref="xxf:component-context()">
 
-                            <xforms:group xbl:attr="context=myref">
-                                <!--<xbl:content includes="xforms|label,xforms|help,xforms|hint"/>-->
-                                <xforms:input ref="date">
-                                    <xforms:label>Value 2:</xforms:label>
-                                </xforms:input>
-                                <xhtml:br/>
-                                <xforms:input ref="time">
-                                    <xforms:label>Value 3:</xforms:label>
-                                </xforms:input>
-                            </xforms:group>
-                        </xforms:group>
-                        <xhtml:br/>
-                        <xforms:output value="string-join(tokenize($foobar, '\s'), ' - ')">
-                            <xforms:label>Languages:</xforms:label>
-                        </xforms:output>
-                    </xhtml:div>
+                            <xf:group xbl:attr="context=myref">
+                                <!--<xbl:content includes="xf|label,xf|help,xf|hint"/>-->
+                                <xf:input ref="date">
+                                    <xf:label>Value 2:</xf:label>
+                                </xf:input>
+                                <xh:br/>
+                                <xf:input ref="time">
+                                    <xf:label>Value 3:</xf:label>
+                                </xf:input>
+                            </xf:group>
+                        </xf:group>
+                        <xh:br/>
+                        <xf:output value="string-join(tokenize($foobar, '\s'), ' - ')">
+                            <xf:label>Languages:</xf:label>
+                        </xf:output>
+                    </xh:div>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xforms:input ref="value0">
-            <xforms:label>Value 0: </xforms:label>
-        </xforms:input>
+        <xf:input ref="value0">
+            <xf:label>Value 0: </xf:label>
+        </xf:input>
 
         <!-- Instanciate components -->
         <foo:test id="my-test-1" myref="value1" foobar="en fr"/>
@@ -93,5 +93,5 @@
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

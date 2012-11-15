@@ -93,7 +93,7 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
                 (getAppearances.asScala flatMap (appearance ⇒ BootstrapAppearances.get(appearance)) toList))
 
 
-        // xhtml:button or xhtml:input
+        // xh:button or xh:input
         val spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
         xmlReceiver.startElement(XHTML_NAMESPACE_URI, elementName, spanQName, appendClasses(containerAttributes, bootstrapClasses))
 
@@ -119,7 +119,7 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         if (isHTMLLabel) {
             // Only output character content within input
             containingDocument.getControls.getIndentedLogger.logWarning(
-                "xforms:trigger",
+                "xf:trigger",
                 "IE 6 does not support <button> elements properly. Only text within HTML content will appear garbled.",
                 "control id", effectiveId)
 

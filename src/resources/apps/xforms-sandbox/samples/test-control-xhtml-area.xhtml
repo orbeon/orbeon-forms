@@ -1,64 +1,64 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>HTML Editor</xhtml:title>
-        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main">
-            <xforms:instance>
+    <xh:head>
+        <xh:title>HTML Editor</xh:title>
+        <xf:model xmlns:xf="http://www.w3.org/2002/xforms" id="main">
+            <xf:instance>
                 <instance>
                     <xhtml-editor-1>Some &lt;b>text&lt;/b> here</xhtml-editor-1>
                     <xhtml-editor-2>Second</xhtml-editor-2>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-control-xhtml-area.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript" src="/apps/xforms-sandbox/samples/test-control-xhtml-area.js"/>
+        <xh:script type="text/javascript">
             // Set smaller width for RTE so they can be shown side-by-side
             YUI_RTE_CUSTOM_CONFIG = ORBEON.xforms.control.RTEConfig
             YUI_RTE_CUSTOM_CONFIG.width = "400px";
             YUI_RTE_CUSTOM_CONFIG.height = "50px";
-        </xhtml:script>
-        <xhtml:style type="text/css">
+        </xh:script>
+        <xh:style type="text/css">
             td { vertical-align: top }
             .xforms-repeat-selected-item-1 { background-color: transparent }
             .xbl-fr-button .yui-button { margin-bottom: 1em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:fieldset>
-            <xhtml:legend>Update and focus</xhtml:legend>
-            <xhtml:table>
-                <xhtml:tr>
-                    <xhtml:td><xforms:textarea id="xhtml-editor-1" mediatype="text/html" ref="xhtml-editor-1"/></xhtml:td>
-                    <xhtml:td><xforms:textarea id="xhtml-editor-2" mediatype="text/html" ref="xhtml-editor-2"/></xhtml:td>
-                    <xhtml:td><xforms:textarea ref="xhtml-editor-1" id="xhtml-textarea"/></xhtml:td>
-                </xhtml:tr>
-            </xhtml:table>
-        </xhtml:fieldset>
-        <xhtml:fieldset>
-            <xhtml:legend>In repeat</xhtml:legend>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+        <xh:fieldset>
+            <xh:legend>Update and focus</xh:legend>
+            <xh:table>
+                <xh:tr>
+                    <xh:td><xf:textarea id="xhtml-editor-1" mediatype="text/html" ref="xhtml-editor-1"/></xh:td>
+                    <xh:td><xf:textarea id="xhtml-editor-2" mediatype="text/html" ref="xhtml-editor-2"/></xh:td>
+                    <xh:td><xf:textarea ref="xhtml-editor-1" id="xhtml-textarea"/></xh:td>
+                </xh:tr>
+            </xh:table>
+        </xh:fieldset>
+        <xh:fieldset>
+            <xh:legend>In repeat</xh:legend>
             <fr:button id="add-iteration">
-                <xforms:label>Add iteration</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="instance()" origin="xxforms:element('iteration')"/>
-                    <xforms:setvalue ref="iteration">Inside iteration</xforms:setvalue>
-                </xforms:action>
+                <xf:label>Add iteration</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:insert context="instance()" origin="xxf:element('iteration')"/>
+                    <xf:setvalue ref="iteration">Inside iteration</xf:setvalue>
+                </xf:action>
             </fr:button>
-            <xforms:repeat ref="iteration">
-                <xhtml:div>
-                    <xforms:textarea mediatype="text/html" ref="." id="rte-in-iteration"/>
-                </xhtml:div>
-            </xforms:repeat>
-        </xhtml:fieldset>
-    </xhtml:body>
-</xhtml:html>
+            <xf:repeat ref="iteration">
+                <xh:div>
+                    <xf:textarea mediatype="text/html" ref="." id="rte-in-iteration"/>
+                </xh:div>
+            </xf:repeat>
+        </xh:fieldset>
+    </xh:body>
+</xh:html>

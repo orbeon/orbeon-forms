@@ -11,9 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xi="http://www.w3.org/2001/XInclude"
@@ -21,48 +21,48 @@
         xmlns:xbl="http://www.w3.org/ns/xbl"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <xhtml:head>
-        <xhtml:title>XBL Components in Repeat</xhtml:title>
-        <xforms:model id="main-model">
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>XBL Components in Repeat</xh:title>
+        <xf:model id="main-model">
+            <xf:instance id="main-instance">
                 <instance xmlns="">
                     <date/>
                     <date/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="date[1]" xxforms:default="current-date()"/>
-            <xforms:bind ref="date[2]" xxforms:default="current-date() - xs:dayTimeDuration('P1D')"/>
-            <xforms:bind ref="date" type="xforms:date"/>
-        </xforms:model>
-     </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+            <xf:bind ref="date[1]" xxf:default="current-date()"/>
+            <xf:bind ref="date[2]" xxf:default="current-date() - xs:dayTimeDuration('P1D')"/>
+            <xf:bind ref="date" type="xf:date"/>
+        </xf:model>
+     </xh:head>
+    <xh:body>
 
-        <xhtml:p>
+        <xh:p>
             This example shows how you can use XBL to build reusable custom controls. Here we use a date made of
             separate dropdowns. The first date is today's date, the second one yesterday's date. You can add and remove
             dates with the buttons.
-        </xhtml:p>
+        </xh:p>
 
-        <xforms:trigger>
-            <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" context="." ref="date" at="index('date-repeat')" origin="xxforms:element('date')"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Add</xf:label>
+            <xf:insert ev:event="DOMActivate" context="." ref="date" at="index('date-repeat')" origin="xxf:element('date')"/>
+        </xf:trigger>
 
-        <xforms:trigger>
-            <xforms:label>Remove</xforms:label>
-            <xforms:delete ev:event="DOMActivate" ref="date" at="index('date-repeat')"/>
-        </xforms:trigger>
+        <xf:trigger>
+            <xf:label>Remove</xf:label>
+            <xf:delete ev:event="DOMActivate" ref="date" at="index('date-repeat')"/>
+        </xf:trigger>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:repeat ref="date" id="date-repeat">
+        <xf:repeat ref="date" id="date-repeat">
             <fr:dropdown-date ref="." id="fr-dropdown-date">
-                <xforms:label>Date: </xforms:label>
+                <xf:label>Date: </xf:label>
             </fr:dropdown-date>
-            <xhtml:hr/>
-        </xforms:repeat>
+            <xh:hr/>
+        </xf:repeat>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

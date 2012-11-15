@@ -21,7 +21,7 @@ import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.util.ScalaUtils._
 
 /**
- * Extension xxforms:case($switch-id as xs:string) as xs:string? function.
+ * Extension xxf:case($switch-id as xs:string) as xs:string? function.
  */
 class XXFormsCase extends XFormsFunction with FunctionSupport {
     override def evaluateItem(xpathContext: XPathContext): Item =

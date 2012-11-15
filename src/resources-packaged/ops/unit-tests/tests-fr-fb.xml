@@ -15,7 +15,7 @@
        xmlns:p="http://www.orbeon.com/oxf/pipeline"
        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-       xmlns:xforms="http://www.w3.org/2002/xforms"
+       xmlns:xf="http://www.w3.org/2002/xforms"
        xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <test description="Oracle view column names" name="oxf:xslt">
@@ -24,28 +24,28 @@
                 <!-- "Normal" case, where we were right to be optimistic -->
                 <document>
                     <fr:section id="personal-information">
-                        <xforms:input bind="" id="first-name"/>
-                        <xforms:input bind="" id="last-name"/>
-                        <xforms:input bind="" id="address"/>
+                        <xf:input bind="" id="first-name"/>
+                        <xf:input bind="" id="last-name"/>
+                        <xf:input bind="" id="address"/>
                     </fr:section>
                     <fr:section id="company">
-                        <xforms:input bind="" id="name"/>
-                        <xforms:input bind="" id="industry"/>
+                        <xf:input bind="" id="name"/>
+                        <xf:input bind="" id="industry"/>
                     </fr:section>
                 </document>
                 <!-- Conflict because of combination -->
                 <document>
                     <fr:section id="a">
-                        <xforms:input bind="" id="b-c"/>
+                        <xf:input bind="" id="b-c"/>
                     </fr:section>
                     <fr:section id="a-b">
-                        <xforms:input bind="" id="c"/>
+                        <xf:input bind="" id="c"/>
                     </fr:section>
                 </document>
                 <!-- Conflict with metadata -->
                 <document>
                     <fr:section id="metadata">
-                        <xforms:input bind="" id="document-id"/>
+                        <xf:input bind="" id="document-id"/>
                     </fr:section>
                 </document>
             </root>

@@ -1,25 +1,25 @@
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>XForms Hello</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>XForms Hello</xh:title>
+        <xf:model>
+            <xf:instance>
                 <instance/>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-trigger { display: block; padding-top: .5em; }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
         <fr:simple-captcha id="my-simple-captcha"/>
-        <xforms:trigger>
-            <xforms:label>Verify</xforms:label>
-            <xforms:dispatch ev:event="DOMActivate" name="fr-verify" targetid="my-simple-captcha"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+        <xf:trigger>
+            <xf:label>Verify</xf:label>
+            <xf:dispatch ev:event="DOMActivate" name="fr-verify" targetid="my-simple-captcha"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

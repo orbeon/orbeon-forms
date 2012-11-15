@@ -13,42 +13,42 @@
   -->
 <grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
          xmlns="http://relaxng.org/ns/structure/1.0"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <start>
-        <element name="xxforms:event-request">
-            <element name="xxforms:uuid">
+        <element name="xxf:event-request">
+            <element name="xxf:uuid">
                 <data type="string"/>
             </element>
             <!-- Can be empty in case of non-Ajax request -->
-            <element name="xxforms:sequence">
+            <element name="xxf:sequence">
                 <choice>
                     <data type="integer"/>
                     <empty/>
                 </choice>
             </element>
             <optional>
-                <element name="xxforms:static-state">
+                <element name="xxf:static-state">
                     <data type="string"/>
                 </element>
-                <element name="xxforms:dynamic-state">
+                <element name="xxf:dynamic-state">
                     <data type="string"/>
                 </element>
             </optional>
             <optional>
-                <element name="xxforms:initial-dynamic-state">
+                <element name="xxf:initial-dynamic-state">
                     <data type="string"/>
                 </element>
             </optional>
             <zeroOrMore>
-                <element name="xxforms:server-events">
+                <element name="xxf:server-events">
                     <data type="string"/>
                 </element>
             </zeroOrMore>
             <optional>
-                <element name="xxforms:files">
+                <element name="xxf:files">
                     <oneOrMore>
                         <element name="parameter">
                             <element name="name">
@@ -83,9 +83,9 @@
                     </oneOrMore>
                 </element>
             </optional>
-            <element name="xxforms:action">
+            <element name="xxf:action">
                 <zeroOrMore>
-                    <element name="xxforms:event">
+                    <element name="xxf:event">
                         <choice>
                             <!-- Most events -->
                             <optional>
@@ -136,7 +136,7 @@
             </element>
             <!-- Client may send more than one if needed (e.g. multiple delayed server events to be sent at the same time) -->
             <zeroOrMore>
-                <element name="xxforms:server-events">
+                <element name="xxf:server-events">
                     <data type="string"/>
                 </element>
             </zeroOrMore>
@@ -145,7 +145,7 @@
 
     <define name="properties">
         <zeroOrMore>
-            <element name="xxforms:property">
+            <element name="xxf:property">
                 <attribute name="name">
                     <data type="string"/>
                 </attribute>

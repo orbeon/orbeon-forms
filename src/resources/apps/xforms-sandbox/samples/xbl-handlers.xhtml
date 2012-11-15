@@ -11,29 +11,29 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xbl="http://www.w3.org/ns/xbl"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xhtml:head>
-        <xforms:model id="model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xf:model id="model">
+            <xf:instance id="instance">
                 <instance xmlns=""/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:action ev:event="xforms-ready">
-                <xforms:dispatch name="my-event" targetid="my-bar-1">
-                    <xforms:property name="fr:one" value="'Red'"/>
-                    <xforms:property name="fr:two" value="'Blue'"/>
-                </xforms:dispatch>
-                <xforms:dispatch name="my-event" targetid="my-bar-2">
-                    <xforms:property name="fr:one" value="'Cat'"/>
-                    <xforms:property name="fr:two" value="'Mouse'"/>
-                </xforms:dispatch>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready">
+                <xf:dispatch name="my-event" targetid="my-bar-1">
+                    <xf:property name="fr:one" value="'Red'"/>
+                    <xf:property name="fr:two" value="'Blue'"/>
+                </xf:dispatch>
+                <xf:dispatch name="my-event" targetid="my-bar-2">
+                    <xf:property name="fr:one" value="'Cat'"/>
+                    <xf:property name="fr:two" value="'Mouse'"/>
+                </xf:dispatch>
+            </xf:action>
 
-        </xforms:model>
+        </xf:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
             <xbl:binding id="fr-bar" element="fr|bar">
@@ -41,67 +41,67 @@
                 <xbl:handlers>
                     <!-- Handlers are attached to the bound node -->
                     <xbl:handler event="my-event" phase="target">
-                        <xforms:setvalue model="model" ref="value1" value="event('fr:one')"/>
-                        <xforms:setvalue model="model" ref="value2" value="event('fr:two')"/>
+                        <xf:setvalue model="model" ref="value1" value="event('fr:one')"/>
+                        <xf:setvalue model="model" ref="value2" value="event('fr:two')"/>
                     </xbl:handler>
 
                     <!-- TEST: Record all events -->
                     <xbl:handler event="#all" phase="target">
-                        <xforms:insert model="model"
+                        <xf:insert model="model"
                            context="instance('events')" ref="*"
-                           origin="xxforms:element('event',
-                                    (xxforms:attribute('type', event('xxforms:type')),
-                                     xxforms:attribute('target', event('xxforms:targetid')),
-                                     xxforms:attribute('phase', 'bubbling'),
-                                     xxforms:attribute('original-target', event('xxforms:targetid')),
-                                     xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' ')),
-                                     xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+                           origin="xxf:element('event',
+                                    (xxf:attribute('type', event('xxf:type')),
+                                     xxf:attribute('target', event('xxf:targetid')),
+                                     xxf:attribute('phase', 'bubbling'),
+                                     xxf:attribute('original-target', event('xxf:targetid')),
+                                     xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' ')),
+                                     xxf:attribute('original-indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
                     </xbl:handler>
                 </xbl:handlers>
 
                 <!-- Test model placement within xbl:implementation -->
                 <xbl:implementation>
                     <!-- Local model with local data -->
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance xmlns="">
                                 <value1/>
                                 <value2/>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
-                    </xforms:model>
+                        </xf:instance>
+                    </xf:model>
                 </xbl:implementation>
 
                 <!-- Template with just the controls -->
                 <xbl:template>
-                    <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
-                        <xforms:input id="input1" ref="value1"/>
-                        <xforms:input id="input2" ref="value2"/>
-                    </xforms:group>
+                    <xf:group id="bar-group" model="model" appearance="xxf:internal">
+                        <xf:input id="input1" ref="value1"/>
+                        <xf:input id="input2" ref="value2"/>
+                    </xf:group>
                 </xbl:template>
             </xbl:binding>
         </xbl:xbl>
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
         <fr:bar id="my-bar-1"/>
         <fr:bar id="my-bar-2"/>
 
-        <xforms:trigger>
-            <xforms:label>Update</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch name="my-event" targetid="my-bar-1">
-                    <xforms:property name="fr:one" value="'Sun'"/>
-                    <xforms:property name="fr:two" value="'Moon'"/>
-                </xforms:dispatch>
-                <xforms:dispatch name="my-event" targetid="my-bar-2">
-                    <xforms:property name="fr:one" value="'Yin'"/>
-                    <xforms:property name="fr:two" value="'Yang'"/>
-                </xforms:dispatch>
-            </xforms:action>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+        <xf:trigger>
+            <xf:label>Update</xf:label>
+            <xf:action ev:event="DOMActivate">
+                <xf:dispatch name="my-event" targetid="my-bar-1">
+                    <xf:property name="fr:one" value="'Sun'"/>
+                    <xf:property name="fr:two" value="'Moon'"/>
+                </xf:dispatch>
+                <xf:dispatch name="my-event" targetid="my-bar-2">
+                    <xf:property name="fr:one" value="'Yin'"/>
+                    <xf:property name="fr:two" value="'Yang'"/>
+                </xf:dispatch>
+            </xf:action>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

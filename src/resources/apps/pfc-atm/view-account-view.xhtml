@@ -11,44 +11,44 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:ev="http://www.w3.org/2001/xml-events"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-    <xhtml:head>
-        <xhtml:title>View Account</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="balance-instance" src="input:data"/>
-            <xforms:instance id="withdraw-instance">
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+    <xh:head>
+        <xh:title>View Account</xh:title>
+        <xf:model>
+            <xf:instance id="balance-instance" src="input:data"/>
+            <xf:instance id="withdraw-instance">
                 <amount/>
-            </xforms:instance>
-            <xforms:bind ref="instance('withdraw-instance')" constraint="number(.) > 0"/>
-            <xforms:submission id="main-submission" ref="instance('withdraw-instance')" method="post"
+            </xf:instance>
+            <xf:bind ref="instance('withdraw-instance')" constraint="number(.) > 0"/>
+            <xf:submission id="main-submission" ref="instance('withdraw-instance')" method="post"
                                action="/pfc-atm/atm-view-account"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group>
-            <xhtml:p>
-                <xforms:output ref="instance('balance-instance')">
-                    <xforms:label>The current balance is: </xforms:label>
-                </xforms:output>
-            </xhtml:p>
-            <xhtml:p>
-                <xforms:group>
-                    <xforms:input ref="instance('withdraw-instance')">
-                        <xforms:label>Amount to withdraw: </xforms:label>
-                        <xforms:alert>Amount must be a positive number</xforms:alert>
-                    </xforms:input>
-                    <xforms:trigger>
-                        <xforms:label>Withdraw</xforms:label>
-                    </xforms:trigger>
-                    <xforms:send ev:event="DOMActivate" submission="main-submission"/>
-                </xforms:group>
-            </xhtml:p>
-        </xforms:group>
-        <xhtml:p style="margin-top: 3em">
-            <xhtml:a href="/pfc-atm/">Back</xhtml:a> to ATM home.
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:group>
+            <xh:p>
+                <xf:output ref="instance('balance-instance')">
+                    <xf:label>The current balance is: </xf:label>
+                </xf:output>
+            </xh:p>
+            <xh:p>
+                <xf:group>
+                    <xf:input ref="instance('withdraw-instance')">
+                        <xf:label>Amount to withdraw: </xf:label>
+                        <xf:alert>Amount must be a positive number</xf:alert>
+                    </xf:input>
+                    <xf:trigger>
+                        <xf:label>Withdraw</xf:label>
+                    </xf:trigger>
+                    <xf:send ev:event="DOMActivate" submission="main-submission"/>
+                </xf:group>
+            </xh:p>
+        </xf:group>
+        <xh:p style="margin-top: 3em">
+            <xh:a href="/pfc-atm/">Back</xh:a> to ATM home.
+        </xh:p>
+    </xh:body>
+</xh:html>

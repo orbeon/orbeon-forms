@@ -12,11 +12,11 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <html xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -24,14 +24,14 @@
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>Orbeon Forms XForms Sandbox - Run XForms Everywhere!</title>
-        <xforms:model>
-            <!--xxforms:state-handling="client" -->
+        <xf:model>
+            <!--xxf:state-handling="client" -->
 
-            <xforms:action ev:event="xforms-ready">
-                <xforms:send submission="samples-submission"/>
-            </xforms:action>
+            <xf:action ev:event="xforms-ready">
+                <xf:send submission="samples-submission"/>
+            </xf:action>
 
-            <xforms:instance id="main-instance">
+            <xf:instance id="main-instance">
                 <form xmlns="">
                     <action>upload</action>
                     <file filename="" mediatype="" size="" selected="false"/>
@@ -41,26 +41,26 @@
                     <download-trigger/>
                     <sample-trigger/>
                 </form>
-            </xforms:instance>
-            <xforms:bind ref="instance('main-instance')">
-                <xforms:bind ref="file[2]/@valid" calculate="../../action = 'upload' or
+            </xf:instance>
+            <xf:bind ref="instance('main-instance')">
+                <xf:bind ref="file[2]/@valid" calculate="../../action = 'upload' or
                         (../../action = 'download' and starts-with(normalize-space(..), 'http://'))"/>
-                <xforms:bind ref="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
+                <xf:bind ref="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
 
-                <xforms:bind ref="upload-trigger" readonly="not(property('xxforms:noscript')) and ../file[1]/@selected = 'false'"/>
-                <xforms:bind ref="download-trigger" readonly="not(property('xxforms:noscript')) and ../file[2]/@valid = 'false'"/>
-                <xforms:bind ref="sample-trigger" readonly="not(property('xxforms:noscript')) and ../sample = ''"/>
-            </xforms:bind>
-            <xforms:instance id="samples-instance">
+                <xf:bind ref="upload-trigger" readonly="not(property('xxf:noscript')) and ../file[1]/@selected = 'false'"/>
+                <xf:bind ref="download-trigger" readonly="not(property('xxf:noscript')) and ../file[2]/@valid = 'false'"/>
+                <xf:bind ref="sample-trigger" readonly="not(property('xxf:noscript')) and ../sample = ''"/>
+            </xf:bind>
+            <xf:instance id="samples-instance">
                 <directory xmlns=""/>
-            </xforms:instance>
-            <xforms:submission id="upload-submission" method="post" replace="all" action="/xforms-sandbox/run"/>
-            <xforms:submission id="samples-submission" method="get" replace="instance" instance="samples-instance"
+            </xf:instance>
+            <xf:submission id="upload-submission" method="post" replace="all" action="/xforms-sandbox/run"/>
+            <xf:submission id="samples-submission" method="get" replace="instance" instance="samples-instance"
                     action="/xforms-sandbox/service/get-files" serialization="none"/>
-        </xforms:model>
+        </xf:model>
         <!-- Just put grids CSS otherwise overall style differs from that of other examples -->
-        <xhtml:link rel="stylesheet" href="/ops/yui/grids/grids-min.css" type="text/css" media="all"/>
-        <xhtml:style type="text/css">
+        <xh:link rel="stylesheet" href="/ops/yui/grids/grids-min.css" type="text/css" media="all"/>
+        <xh:style type="text/css">
             /* Not sure why the YUI resets this to center */
             body { text-align: left }
             .xbl-fr-tabview .xforms-label { display: block; font-weight: bold; margin-bottom: .5em }
@@ -68,10 +68,10 @@
             .xbl-fr-tabview .html-note { color: orange; font-style: italic }
             .xforms-hint { display: block; color: #333; font-size: 93%; padding-top: .5em }
             .upload-trigger { padding-left: 1em }
-        </xhtml:style>
+        </xh:style>
     </head>
     <body>
-        <xhtml:div id="doc" class="fr-doc">
+        <xh:div id="doc" class="fr-doc">
             <p>
                 The Orbeon Forms XForms Sandbox powers XForms documents everywhere: it allows you to easily try your
                 own XForms documents, as well as XForms documents located anywhere on the web.
@@ -79,60 +79,60 @@
             <fr:tabview>
                 <fr:tab id="upload-case" class="upload-case">
                     <fr:label>Upload Local File</fr:label>
-                    <xforms:setvalue ev:event="xforms-select" ref="action">upload</xforms:setvalue>
-                    <xforms:upload ref="file[1]" xxforms:size="45">
-                        <xforms:label>Select a local XHTML + XForms file</xforms:label>
-                        <xforms:filename ref="@filename"/>
-                        <xforms:mediatype ref="@mediatype"/>
-                        <xxforms:size ref="@size"/>
-                        <xforms:action ev:event="xxforms-upload-done">
-                            <xforms:setvalue ref="@selected">true</xforms:setvalue>
-                            <xforms:setfocus control="upload-trigger"/>
-                        </xforms:action>
-                    </xforms:upload>
-                    <xforms:trigger ref="upload-trigger" class="upload-trigger" id="upload-trigger">
-                        <xforms:label>Run XForms</xforms:label>
-                        <xforms:send ev:event="DOMActivate" submission="upload-submission"/>
-                    </xforms:trigger>
+                    <xf:setvalue ev:event="xforms-select" ref="action">upload</xf:setvalue>
+                    <xf:upload ref="file[1]" xxf:size="45">
+                        <xf:label>Select a local XHTML + XForms file</xf:label>
+                        <xf:filename ref="@filename"/>
+                        <xf:mediatype ref="@mediatype"/>
+                        <xxf:size ref="@size"/>
+                        <xf:action ev:event="xxforms-upload-done">
+                            <xf:setvalue ref="@selected">true</xf:setvalue>
+                            <xf:setfocus control="upload-trigger"/>
+                        </xf:action>
+                    </xf:upload>
+                    <xf:trigger ref="upload-trigger" class="upload-trigger" id="upload-trigger">
+                        <xf:label>Run XForms</xf:label>
+                        <xf:send ev:event="DOMActivate" submission="upload-submission"/>
+                    </xf:trigger>
                     <p>Your document has to be in the XHTML namespace; plain HTML won't work.</p>
                 </fr:tab>
                 <fr:tab id="download-case">
                     <fr:label>Run From the Web</fr:label>
-                    <xforms:setvalue ev:event="xforms-select" ref="action">download</xforms:setvalue>
-                    <xforms:group>
-                        <xforms:load ev:event="DOMActivate" if="file[2]/@valid = 'true'" resource="/xforms-sandbox/run?url={file[2]}"/>
-                        <xforms:input ref="file[2]" xxforms:size="65" incremental="true">
-                            <xforms:label>Please enter the HTTP URL of the XHTML + XForms to download from the web and run</xforms:label>
-                            <xforms:alert>Please enter a valid HTTP URL (starting with "http://")</xforms:alert>
-                        </xforms:input>
+                    <xf:setvalue ev:event="xforms-select" ref="action">download</xf:setvalue>
+                    <xf:group>
+                        <xf:load ev:event="DOMActivate" if="file[2]/@valid = 'true'" resource="/xforms-sandbox/run?url={file[2]}"/>
+                        <xf:input ref="file[2]" xxf:size="65" incremental="true">
+                            <xf:label>Please enter the HTTP URL of the XHTML + XForms to download from the web and run</xf:label>
+                            <xf:alert>Please enter a valid HTTP URL (starting with "http://")</xf:alert>
+                        </xf:input>
                         <fr:button ref="download-trigger">
-                            <xforms:label>Run XForms</xforms:label>
+                            <xf:label>Run XForms</xf:label>
                         </fr:button>
-                    </xforms:group>
+                    </xf:group>
                     <p>Your document has to be in the XHTML namespace. Plain HTML won't work.</p>
                 </fr:tab>
                 <fr:tab id="samples-case">
                     <fr:label>Test Samples</fr:label>
-                    <xforms:setvalue ev:event="xforms-select" ref="action">download</xforms:setvalue>
-                    <xforms:group>
-                        <xforms:load ev:event="DOMActivate" if="sample != ''" resource="/xforms-sandbox/sample/{sample}"/>
-                        <xforms:select1 ref="sample">
-                            <xforms:label>Please select one of the <xforms:output value="count(instance('samples-instance')/file)"/> existing XForms test samples from the list</xforms:label>
-                            <xforms:item>
-                                <xforms:label/>
-                                <xforms:value/>
-                            </xforms:item>
-                            <xforms:itemset ref="xxforms:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
-                                <xforms:label><xforms:output value="substring(@name, 1, string-length(@name) - 6)"/></xforms:label>
-                                <xforms:value value="substring(@name, 1, string-length(@name) - 6)"/>
-                            </xforms:itemset>
-                        </xforms:select1>
+                    <xf:setvalue ev:event="xforms-select" ref="action">download</xf:setvalue>
+                    <xf:group>
+                        <xf:load ev:event="DOMActivate" if="sample != ''" resource="/xforms-sandbox/sample/{sample}"/>
+                        <xf:select1 ref="sample">
+                            <xf:label>Please select one of the <xf:output value="count(instance('samples-instance')/file)"/> existing XForms test samples from the list</xf:label>
+                            <xf:item>
+                                <xf:label/>
+                                <xf:value/>
+                            </xf:item>
+                            <xf:itemset ref="xxf:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
+                                <xf:label><xf:output value="substring(@name, 1, string-length(@name) - 6)"/></xf:label>
+                                <xf:value value="substring(@name, 1, string-length(@name) - 6)"/>
+                            </xf:itemset>
+                        </xf:select1>
                         <fr:button ref="sample-trigger">
-                            <xforms:label>Run XForms</xforms:label>
+                            <xf:label>Run XForms</xf:label>
                         </fr:button>
-                    </xforms:group>
+                    </xf:group>
                 </fr:tab>
             </fr:tabview>
-    </xhtml:div>
+    </xh:div>
     </body>
 </html>

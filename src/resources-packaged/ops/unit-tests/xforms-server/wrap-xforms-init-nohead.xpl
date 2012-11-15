@@ -15,9 +15,9 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
@@ -36,7 +36,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="/xhtml:html/xhtml:head"/>
+                <xsl:template match="/xh:html/xh:head"/>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" ref="response"/>

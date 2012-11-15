@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Handle xforms:select and xforms:select1.
+ * Handle xf:select and xf:select1.
  *
  * TODO: Subclasses per appearance.
  */
@@ -99,7 +99,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 outputFull(uri, localname, attributes, effectiveId, xformsSelect1Control, itemset, isMultiple, isBooleanInput);
             } else {
                 if (appearanceTrait != null && appearanceTrait.isTree()) {
-                    // xxforms:tree appearance
+                    // xxf:tree appearance
 
                     // Create xhtml:div with tree info
                     final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
@@ -113,7 +113,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName);
 
                 } else if (appearanceTrait != null && appearanceTrait.isMenu()) {
-                    // xxforms:menu appearance
+                    // xxf:menu appearance
 
                     // Create enclosing xhtml:div
                     final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");

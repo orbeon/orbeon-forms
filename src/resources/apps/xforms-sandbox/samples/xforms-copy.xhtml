@@ -11,21 +11,21 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Select One With Hierarchy</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Select One With Hierarchy</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <selected value=""/>
-            </xforms:instance>
-            <xforms:instance id="items-instance">
+            </xf:instance>
+            <xf:instance id="items-instance">
                 <items>
                     <item label="Science" value="sc">
                         <item label="Physics" value="ph"/>
@@ -36,29 +36,29 @@
                         <item label="Craft" value="cr"/>
                     </item>
                 </items>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:select1 ref="instance('main-instance')/@value" appearance="minimal">
-                <xforms:label>Select: </xforms:label>
-                <xforms:item>
-                    <xforms:label>-- Select one --</xforms:label>
-                    <xforms:value/>
-                </xforms:item>
-                <xforms:itemset ref="instance('items-instance')/item">
-                    <xforms:label ref="@label"/>
-                    <xforms:value ref="@value"/>
-                </xforms:itemset>
-                <xforms:action ev:event="xforms-value-changed">
-                    <xforms:delete ref="../item"/>
-                    <xforms:action if=". != ''" >
-                        <xforms:insert context=".." origin="instance('items-instance')/item[@value = context()/@value]"/>
-                    </xforms:action>
-                </xforms:action>
-            </xforms:select1>
-        </xhtml:p>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:select1 ref="instance('main-instance')/@value" appearance="minimal">
+                <xf:label>Select: </xf:label>
+                <xf:item>
+                    <xf:label>-- Select one --</xf:label>
+                    <xf:value/>
+                </xf:item>
+                <xf:itemset ref="instance('items-instance')/item">
+                    <xf:label ref="@label"/>
+                    <xf:value ref="@value"/>
+                </xf:itemset>
+                <xf:action ev:event="xforms-value-changed">
+                    <xf:delete ref="../item"/>
+                    <xf:action if=". != ''" >
+                        <xf:insert context=".." origin="instance('items-instance')/item[@value = context()/@value]"/>
+                    </xf:action>
+                </xf:action>
+            </xf:select1>
+        </xh:p>
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

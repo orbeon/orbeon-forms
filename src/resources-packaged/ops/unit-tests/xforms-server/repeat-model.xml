@@ -11,8 +11,8 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" id="main-model">
-    <xforms:instance id="main-instance">
+<xf:model xmlns:xf="http://www.w3.org/2002/xforms" id="main-model">
+    <xf:instance id="main-instance">
         <form>
             <company>
                 <department>
@@ -30,5 +30,5 @@
                 </department>
             </company>
         </form>
-    </xforms:instance>
-</xforms:model>
+    </xf:instance>
+</xf:model>

@@ -28,7 +28,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import scala.Tuple3;
 
 /**
- * Represents an xforms:textarea control.
+ * Represents an xf:textarea control.
  */
 public class XFormsTextareaControl extends XFormsValueControl implements FocusableTrait {
 
@@ -70,12 +70,12 @@ public class XFormsTextareaControl extends XFormsValueControl implements Focusab
             final IndentedLogger indentedLogger = containingDocument().getControls().getIndentedLogger();
             final boolean isDebugEnabled = indentedLogger.isDebugEnabled();
             if (isDebugEnabled)
-                indentedLogger.startHandleOperation("xforms:textarea", "cleaning-up HTML", "value", externalValue);
+                indentedLogger.startHandleOperation("xf:textarea", "cleaning-up HTML", "value", externalValue);
 
             // Do TagSoup and XSLT cleaning
             final Document tagSoupedDocument = XFormsUtils.htmlStringToDom4jTagSoup(externalValue, null);
             if (isDebugEnabled)
-                indentedLogger.logDebug("xforms:textarea", "after TagSoup cleanup", "value", Dom4jUtils.domToString(tagSoupedDocument));
+                indentedLogger.logDebug("xf:textarea", "after TagSoup cleanup", "value", Dom4jUtils.domToString(tagSoupedDocument));
             final Document cleanedDocument = XMLUtils.cleanXML(tagSoupedDocument, "oxf:/ops/xforms/clean-html.xsl");
 
             // Remove dummy tags (the dummy tags are added by the XSLT, as we need a root element for XSLT processing)

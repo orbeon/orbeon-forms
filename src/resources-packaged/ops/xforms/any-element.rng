@@ -13,8 +13,8 @@
 -->
 <grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
          xmlns="http://relaxng.org/ns/structure/1.0"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
     <define name="anyElement">
         <interleave>

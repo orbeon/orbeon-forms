@@ -24,7 +24,7 @@ import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContext}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 /**
- * xxforms:extract-document() takes an element as parameter and extracts a document.
+ * xxf:extract-document() takes an element as parameter and extracts a document.
  */
 class XXFormsExtractDocument extends XFormsFunction {
     override def evaluateItem(xpathContext: XPathContext): Item = {

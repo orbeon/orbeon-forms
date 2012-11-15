@@ -438,7 +438,7 @@ public class XFormsToXHTML extends ProcessorImpl {
             // NOP: Response already sent out by a submission
             indentedLogger.logDebug("", "handling response for submission with replace=\"all\"");
         } else if (loads != null && loads.size() > 0) {
-            // 2. Got at least one xforms:load
+            // 2. Got at least one xf:load
 
             // Send redirect out
 
@@ -447,7 +447,7 @@ public class XFormsToXHTML extends ProcessorImpl {
 
             // Send redirect
             final String redirectResource = load.getResource();
-            indentedLogger.logDebug("", "handling redirect response for xforms:load", "url", redirectResource);
+            indentedLogger.logDebug("", "handling redirect response for xf:load", "url", redirectResource);
             // Set isNoRewrite to true, because the resource is either a relative path or already contains the servlet context
             externalContext.getResponse().sendRedirect(redirectResource, null, false, false);
 

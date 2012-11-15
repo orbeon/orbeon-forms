@@ -11,36 +11,36 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Setting the value of an xforms:input with JavaScript</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Setting the value of an xf:input with JavaScript</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance/>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:p>
-            <xforms:input id="input" ref="." incremental="true">
-                <xforms:label/>
-            </xforms:input>
-            <xhtml:script type="text/javascript">
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:p>
+            <xf:input id="input" ref="." incremental="true">
+                <xf:label/>
+            </xf:input>
+            <xh:script type="text/javascript">
                 function setTextfieldValue() {
                     document.getElementById("input").value = "42";
                 }
-            </xhtml:script>
-            <xhtml:a href="#" onclick="setTextfieldValue()">Set textfield value</xhtml:a>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:output ref="."/>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            </xh:script>
+            <xh:a href="#" onclick="setTextfieldValue()">Set textfield value</xh:a>
+        </xh:p>
+        <xh:p>
+            <xf:output ref="."/>
+        </xh:p>
+    </xh:body>
+</xh:html>

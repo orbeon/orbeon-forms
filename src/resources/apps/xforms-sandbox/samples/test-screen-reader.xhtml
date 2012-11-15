@@ -11,72 +11,72 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-    <xhtml:head>
-        <xhtml:title>Test with screen reader</xhtml:title>
-        <xforms:model>
-            <xforms:instance>
+    <xh:head>
+        <xh:title>Test with screen reader</xh:title>
+        <xf:model>
+            <xf:instance>
                 <instance>
                     <tweet>Testing #JAWS screen reader with Orbeon Forms.</tweet>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:style type="text/css">
+            </xf:instance>
+        </xf:model>
+        <xh:style type="text/css">
             .dialog textarea { width: 20em; display: block; margin-bottom: .5em }
             .dialog .dialog-message { margin-bottom: 1em }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
         <fr:accordion id="my-accordion" class="fr-accordion-lnf">
             <fr:case selected="false" id="message-action">
                 <fr:label>Message</fr:label>
                 <fr:button>
-                    <xforms:label>Save, failure</xforms:label>
-                    <xforms:message ev:event="DOMActivate">Document could not be saved.</xforms:message>
+                    <xf:label>Save, failure</xf:label>
+                    <xf:message ev:event="DOMActivate">Document could not be saved.</xf:message>
                 </fr:button>
                 <fr:button>
-                    <xforms:label>Save, success</xforms:label>
-                    <xforms:message ev:event="DOMActivate">The document was saved.</xforms:message>
+                    <xf:label>Save, success</xf:label>
+                    <xf:message ev:event="DOMActivate">The document was saved.</xf:message>
                 </fr:button>
             </fr:case>
             <fr:case selected="false" id="dialog-section">
                 <fr:label>Dialog</fr:label>
-                <xxforms:dialog id="dialog" class="dialog">
-                    <xforms:setfocus ev:event="xxforms-dialog-open" control="dialog-close"/>
-                    <xforms:label>Please note</xforms:label>
-                    <xhtml:div class="dialog-message">
-                        <xhtml:table>
-                            <xforms:repeat ref="dialog-message">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output ref="."/>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:table>
-                    </xhtml:div>
+                <xxf:dialog id="dialog" class="dialog">
+                    <xf:setfocus ev:event="xxforms-dialog-open" control="dialog-close"/>
+                    <xf:label>Please note</xf:label>
+                    <xh:div class="dialog-message">
+                        <xh:table>
+                            <xf:repeat ref="dialog-message">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output ref="."/>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:table>
+                    </xh:div>
                     <fr:button id="dialog-close">
-                        <xforms:label>Close</xforms:label>
-                        <xxforms:hide ev:event="DOMActivate" dialog="dialog"/>
+                        <xf:label>Close</xf:label>
+                        <xxf:hide ev:event="DOMActivate" dialog="dialog"/>
                     </fr:button>
-                </xxforms:dialog>
+                </xxf:dialog>
                 <fr:button>
-                    <xforms:label>Show, initial</xforms:label>
-                    <xxforms:show ev:event="DOMActivate" dialog="dialog"/>
+                    <xf:label>Show, initial</xf:label>
+                    <xxf:show ev:event="DOMActivate" dialog="dialog"/>
                 </fr:button>
                 <fr:button>
-                    <xforms:label>Show, new</xforms:label>
-                    <xforms:action ev:event="DOMActivate">
-                        <xforms:insert context="." origin="xxforms:element('dialog-message', 'This is the new message you will see/hear.')"/>
-                        <xxforms:show dialog="dialog"/>
-                    </xforms:action>
+                    <xf:label>Show, new</xf:label>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:insert context="." origin="xxf:element('dialog-message', 'This is the new message you will see/hear.')"/>
+                        <xxf:show dialog="dialog"/>
+                    </xf:action>
                 </fr:button>
             </fr:case>
         </fr:accordion>
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

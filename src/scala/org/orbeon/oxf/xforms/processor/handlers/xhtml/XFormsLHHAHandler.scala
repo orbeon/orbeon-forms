@@ -107,7 +107,7 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                 }
             case _ ⇒
                 // Don't output markup for the LHHA
-                // This can happen if the author forgot a @for attribute, but also for xforms:group/xforms:label[not(@for)]
+                // This can happen if the author forgot a @for attribute, but also for xf:group/xf:label[not(@for)]
                 // Q: Can this also happen if we don't find the LHHAAnalysis?
         }
     }

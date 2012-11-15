@@ -1,28 +1,28 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xforms:model id="main-model">
-            <xforms:instance>
+    <xh:head>
+        <xf:model id="main-model">
+            <xf:instance>
                 <instance>
                     <first/>
                     <second/>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
-        <xforms:textarea appearance="xxforms:autosize" ref="first"/>
-        <xforms:textarea ref="second"/>
-        <xforms:trigger>
-            <xforms:label>Copy</xforms:label>
-            <xforms:setvalue ev:event="DOMActivate" ref="first" value="../second"/>
-        </xforms:trigger>
-    </xhtml:body>
-</xhtml:html>
+        <xf:textarea appearance="xxf:autosize" ref="first"/>
+        <xf:textarea ref="second"/>
+        <xf:trigger>
+            <xf:label>Copy</xf:label>
+            <xf:setvalue ev:event="DOMActivate" ref="first" value="../second"/>
+        </xf:trigger>
+    </xh:body>
+</xh:html>

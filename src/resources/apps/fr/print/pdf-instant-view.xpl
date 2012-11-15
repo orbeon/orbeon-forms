@@ -17,10 +17,10 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
     <!-- PDF document in binary form -->
     <p:param type="output" name="data"/>
@@ -44,16 +44,16 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#parameters"/>
         <p:input name="config">
-            <xxforms:event-request xsl:version="2.0">
+            <xxf:event-request xsl:version="2.0">
                 <!-- UUID is passed in the URL -->
-                <xxforms:uuid><xsl:value-of select="/*/uuid"/></xxforms:uuid>
+                <xxf:uuid><xsl:value-of select="/*/uuid"/></xxf:uuid>
                 <!-- No sequence number indicates we don't want to increment it -->
-                <xxforms:sequence/>
+                <xxf:sequence/>
                 <!-- Event is authorized explicitly in view/edit modes -->
-                <xxforms:action>
-                    <xxforms:event name="fr-open-pdf" source-control-id="fr-navigation-model"/>
-                </xxforms:action>
-            </xxforms:event-request>
+                <xxf:action>
+                    <xxf:event name="fr-open-pdf" source-control-id="fr-navigation-model"/>
+                </xxf:action>
+            </xxf:event-request>
         </p:input>
         <p:output name="data" id="xforms-request"/>
     </p:processor>

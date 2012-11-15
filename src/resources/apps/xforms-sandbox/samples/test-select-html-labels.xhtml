@@ -11,18 +11,18 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Test xforms:select1 with appearance full and HTML lables</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xh:title>Test xf:select1 with appearance full and HTML lables</xh:title>
+        <xf:model>
+            <xf:instance id="main-instance">
 				<drinks only-caffeinated="false">
                     <drink id="1">
                         <name>Beer</name>
@@ -41,22 +41,22 @@
                         <img>images/dietcoke.png</img>
                     </drink>
                 </drinks>
-            </xforms:instance>
-            <xforms:bind ref="@only-caffeinated" type="xs:boolean"/>
-            <xforms:instance id="selection-instance">
+            </xf:instance>
+            <xf:bind ref="@only-caffeinated" type="xs:boolean"/>
+            <xf:instance id="selection-instance">
                 <selected/>
-            </xforms:instance>
-        </xforms:model>
+            </xf:instance>
+        </xf:model>
         
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
                 YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-                    name: "Test xforms:select1 with appearance full and HTML lables",
+                    name: "Test xf:select1 with appearance full and HTML lables",
                     
                     getSelect: function(controlId) {
 					        var control = YAHOO.util.Dom.get(controlId);
@@ -106,44 +106,44 @@
                     }
                 });
             ]]>
-        </xhtml:script>
+        </xh:script>
         
-        <xhtml:style type="text/css">
+        <xh:style type="text/css">
             .xforms-select1-appearance-full label { display: block; }
             .xforms-select1-appearance-full label img {  height:120px; width:120px; vertical-align: middle; }
             .label { font-size: 150%; font-style:italic;}
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
-    	<xhtml:p>
-            <xforms:input ref="@only-caffeinated">
-                <xforms:label>Only caffeinated</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:select1 ref="instance('selection-instance')" appearance="full" id="select1">
-                <xforms:label>Please select a drink: </xforms:label>
-                <xforms:itemset ref="instance()/drink[instance()/@only-caffeinated = 'false' or @caffeinated = 'true']">
-                    <xforms:label><img src="/apps/xforms-sandbox/samples/{img}"/> <span class="label"><xforms:output value="name"/></span></xforms:label>
-                    <xforms:value ref="@id"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xhtml:p>
+        </xh:style>
+    </xh:head>
+    <xh:body>
+    	<xh:p>
+            <xf:input ref="@only-caffeinated">
+                <xf:label>Only caffeinated</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:select1 ref="instance('selection-instance')" appearance="full" id="select1">
+                <xf:label>Please select a drink: </xf:label>
+                <xf:itemset ref="instance()/drink[instance()/@only-caffeinated = 'false' or @caffeinated = 'true']">
+                    <xf:label><img src="/apps/xforms-sandbox/samples/{img}"/> <span class="label"><xf:output value="name"/></span></xf:label>
+                    <xf:value ref="@id"/>
+                </xf:itemset>
+            </xf:select1>
+        </xh:p>
 
-        <xforms:group ref=".[normalize-space(instance('selection-instance'))]">
-            <xforms:label>Selected drink:</xforms:label>
+        <xf:group ref=".[normalize-space(instance('selection-instance'))]">
+            <xf:label>Selected drink:</xf:label>
             <img src="/apps/xforms-sandbox/samples/{drink[@id = instance('selection-instance')]/img}" style="vertical-align: middle;"/>
-        </xforms:group>
+        </xf:group>
         
-        <xhtml:p>
-            <xforms:select1 ref="instance('selection-instance')" appearance="compact" id="select1-compact">
-                <xforms:label>Please select a drink: </xforms:label>
-                <xforms:itemset ref="instance()/drink[instance()/@only-caffeinated = 'false' or @caffeinated = 'true']">
-                    <xforms:label ref="name"/>
-                    <xforms:value ref="@id"/>
-                </xforms:itemset>
-            </xforms:select1>
-        </xhtml:p>
+        <xh:p>
+            <xf:select1 ref="instance('selection-instance')" appearance="compact" id="select1-compact">
+                <xf:label>Please select a drink: </xf:label>
+                <xf:itemset ref="instance()/drink[instance()/@only-caffeinated = 'false' or @caffeinated = 'true']">
+                    <xf:label ref="name"/>
+                    <xf:value ref="@id"/>
+                </xf:itemset>
+            </xf:select1>
+        </xh:p>
         
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

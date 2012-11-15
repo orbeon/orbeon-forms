@@ -11,11 +11,11 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xbl:xbl xmlns:xhtml="http://www.w3.org/1999/xhtml"
-         xmlns:xforms="http://www.w3.org/2002/xforms"
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
          xmlns:ev="http://www.w3.org/2001/xml-events"
-         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:saxon="http://saxon.sf.net/"
@@ -27,8 +27,8 @@
             <xbl:style src="/xbl/orbeon/expandable-output/expandable-output.css"/>
         </xbl:resources>
         <xbl:implementation>
-            <xforms:model>
-                <xforms:instance>
+            <xf:model>
+                <xf:instance>
                     <state>
                         <full-value/>
                         <short-value/>
@@ -36,52 +36,52 @@
                         <max-characters/>
                         <tolerance/>
                     </state>
-                </xforms:instance>
-                <xforms:var name="model-max-characters" value="(max-characters, 0)[. castable as xs:integer][1]"/>
-                <xforms:var name="model-tolerance" value="(tolerance, 0)[. castable as xs:integer][1]"/>
-                <xforms:var name="short-value" value="
+                </xf:instance>
+                <xf:var name="model-max-characters" value="(max-characters, 0)[. castable as xs:integer][1]"/>
+                <xf:var name="model-tolerance" value="(tolerance, 0)[. castable as xs:integer][1]"/>
+                <xf:var name="short-value" value="
                     if (string-length(full-value) le $model-max-characters + $model-tolerance) then full-value                        (: Not too long, just show it :)
                     else for $around-cut-point in substring(full-value, $model-max-characters, $model-tolerance) return               (: Look for space around max-chars with tolerance :)
                     if (contains($around-cut-point, ' '))                                                                             (: If we find a space in the tolerance zone, :)
                     then concat(substring(full-value, 1, $model-max-characters - 1), substring-before($around-cut-point, ' '), '…')   (: then cut there :)
                     else concat(substring(full-value, 1, $model-max-characters), '…')                                                 (: Else cut at max-chars and add ellipsis :)"/>
-                <xforms:bind ref="short-value" calculate="$short-value"/>
-                <xforms:bind ref="show-full" calculate="if (string-length(../full-value) gt string-length(../short-value)) then 'false' else 'true'"/>
-            </xforms:model>
+                <xf:bind ref="short-value" calculate="$short-value"/>
+                <xf:bind ref="show-full" calculate="if (string-length(../full-value) gt string-length(../short-value)) then 'false' else 'true'"/>
+            </xf:model>
         </xbl:implementation>
         <xbl:template xxbl:transform="oxf:unsafe-xslt">
             <xsl:transform version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/xbl.xsl"/>
                 <xsl:template match="/*">
-                    <xforms:group appearance="xxforms:internal">
+                    <xf:group appearance="xxf:internal">
                         <!-- Copy parameter values to state -->
-                        <xforms:group appearance="xxforms:internal">
+                        <xf:group appearance="xxf:internal">
                             <xsl:copy-of select="xxbl:parameter(., 'max-characters')"/>
-                            <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance()/max-characters" value="$max-characters"/>
-                        </xforms:group>
-                        <xforms:group appearance="xxforms:internal">
+                            <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance()/max-characters" value="$max-characters"/>
+                        </xf:group>
+                        <xf:group appearance="xxf:internal">
                             <xsl:copy-of select="xxbl:parameter(., 'tolerance')"/>
-                            <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance()/tolerance" value="$tolerance"/>
-                        </xforms:group>
+                            <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance()/tolerance" value="$tolerance"/>
+                        </xf:group>
 
                         <!-- Update local value when needed -->
-                        <xforms:var name="value" value="xxforms:binding('fr-expandable-output')">
-                            <xforms:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance()/full-value" value="$value"/>
-                        </xforms:var>
+                        <xf:var name="value" value="xxf:binding('fr-expandable-output')">
+                            <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance()/full-value" value="$value"/>
+                        </xf:var>
 
-                        <xhtml:span class="xbl-fr-expandable-output-output">
-                            <xforms:output ref="if (instance()/show-full = 'false') then instance()/short-value else instance()/full-value"/>
-                            <xforms:var name="full-different-than-short" value="string-length(instance()/full-value) != string-length(instance()/short-value)"/>
-                            <xforms:trigger ref=".[$full-different-than-short and instance()/show-full = 'false']" appearance="minimal">
-                                <xforms:label>Show more</xforms:label>
-                                <xforms:setvalue ev:event="DOMActivate" ref="instance()/show-full">true</xforms:setvalue>
-                            </xforms:trigger>
-                            <xforms:trigger ref=".[$full-different-than-short and instance()/show-full = 'true']" appearance="minimal">
-                                <xforms:label>Show less</xforms:label>
-                                <xforms:setvalue ev:event="DOMActivate" ref="instance()/show-full">false</xforms:setvalue>
-                            </xforms:trigger>
-                        </xhtml:span>
-                    </xforms:group>
+                        <xh:span class="xbl-fr-expandable-output-output">
+                            <xf:output ref="if (instance()/show-full = 'false') then instance()/short-value else instance()/full-value"/>
+                            <xf:var name="full-different-than-short" value="string-length(instance()/full-value) != string-length(instance()/short-value)"/>
+                            <xf:trigger ref=".[$full-different-than-short and instance()/show-full = 'false']" appearance="minimal">
+                                <xf:label>Show more</xf:label>
+                                <xf:setvalue ev:event="DOMActivate" ref="instance()/show-full">true</xf:setvalue>
+                            </xf:trigger>
+                            <xf:trigger ref=".[$full-different-than-short and instance()/show-full = 'true']" appearance="minimal">
+                                <xf:label>Show less</xf:label>
+                                <xf:setvalue ev:event="DOMActivate" ref="instance()/show-full">false</xf:setvalue>
+                            </xf:trigger>
+                        </xh:span>
+                    </xf:group>
                 </xsl:template>
             </xsl:transform>
         </xbl:template>

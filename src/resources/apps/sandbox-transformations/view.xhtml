@@ -11,88 +11,88 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:saxon="http://saxon.sf.net/">
 
-    <xhtml:head>
-        <xhtml:title>Transformations Sandbox</xhtml:title>
-        <xforms:model>
+    <xh:head>
+        <xh:title>Transformations Sandbox</xh:title>
+        <xf:model>
             <!-- Perform initial transformation -->
-            <xforms:send ev:event="xforms-ready" submission="run-submission"/>
+            <xf:send ev:event="xforms-ready" submission="run-submission"/>
             <!-- Parameters from the URL (i.e. type of sandbox) -->
-            <xforms:instance id="parameters" src="input:instance"/>
+            <xf:instance id="parameters" src="input:instance"/>
             <!-- Initial input document -->
-            <xforms:instance id="input" src="input"/>
+            <xf:instance id="input" src="input"/>
             <!-- Initial transformation -->
-            <xforms:instance id="transformation" src="transformation"/>
+            <xf:instance id="transformation" src="transformation"/>
             <!-- Request -->
-            <xforms:instance id="request">
+            <xf:instance id="request">
                 <sandbox-instance/>
-            </xforms:instance>
+            </xf:instance>
             <!-- Response -->
-            <xforms:instance id="response">
+            <xf:instance id="response">
                 <div/>
-            </xforms:instance>
+            </xf:instance>
             <!-- Message -->
-            <xforms:instance id="message">
+            <xf:instance id="message">
                 <message/>
-            </xforms:instance>
+            </xf:instance>
             <!-- Submission to run transformation -->
-            <xforms:submission id="run-submission" method="post" action="run"
+            <xf:submission id="run-submission" method="post" action="run"
                     ref="instance('request')" replace="instance" instance="response">
                 <!-- Prepare request -->
-                <xforms:action ev:event="xforms-submit">
-                    <xforms:delete context="instance('request')" while="*" ref="*"/>
-                    <xforms:insert context="instance('request')" ref="*" origin="instance('input')"/>
-                    <xforms:insert context="instance('request')" ref="*" origin="instance('transformation')"/>
-                </xforms:action>
+                <xf:action ev:event="xforms-submit">
+                    <xf:delete context="instance('request')" while="*" ref="*"/>
+                    <xf:insert context="instance('request')" ref="*" origin="instance('input')"/>
+                    <xf:insert context="instance('request')" ref="*" origin="instance('transformation')"/>
+                </xf:action>
                 <!-- Handle success -->
-                <xforms:setvalue ev:event="xforms-submit-done" ref="instance('message')"/>
+                <xf:setvalue ev:event="xforms-submit-done" ref="instance('message')"/>
                 <!-- Handle failure -->
-                <xforms:setvalue ev:event="xforms-submit-error" ref="instance('message')">There is an error in one of the input documents.</xforms:setvalue>
-            </xforms:submission>
-        </xforms:model>
-        <xhtml:style type="text/css">
+                <xf:setvalue ev:event="xforms-submit-error" ref="instance('message')">There is an error in one of the input documents.</xf:setvalue>
+            </xf:submission>
+        </xf:model>
+        <xh:style type="text/css">
             .xforms-label, .xforms-group legend { font-weight: bold }
             .sandbox-error { color: red }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
         <!-- Display messages -->
-        <xhtml:p class="sandbox-error">
-            <xforms:output value="instance('message')"/>
-        </xhtml:p>
+        <xh:p class="sandbox-error">
+            <xf:output value="instance('message')"/>
+        </xh:p>
         <!-- Inputs -->
-        <xforms:group>
-            <xhtml:div>
-                <xforms:textarea ref="instance('input')" appearance="xxforms:autosize" incremental="true">
-                    <xforms:label>Input:</xforms:label>
-                </xforms:textarea>
-            </xhtml:div>
-            <xhtml:div>
-                <xforms:textarea ref="instance('transformation')" appearance="xxforms:autosize" incremental="true">
-                    <xforms:label>
-                        <xforms:output value="if (instance('parameters')/name = 'xpath') then 'XPath'
+        <xf:group>
+            <xh:div>
+                <xf:textarea ref="instance('input')" appearance="xxf:autosize" incremental="true">
+                    <xf:label>Input:</xf:label>
+                </xf:textarea>
+            </xh:div>
+            <xh:div>
+                <xf:textarea ref="instance('transformation')" appearance="xxf:autosize" incremental="true">
+                    <xf:label>
+                        <xf:output value="if (instance('parameters')/name = 'xpath') then 'XPath'
                                               else if (instance('parameters')/name = 'schema') then 'XML Schema or Relax NG'
                                               else if (instance('parameters')/name = 'xpath') then 'XPath'
                                               else if (instance('parameters')/name = 'xpl') then 'XPL'
                                               else if (instance('parameters')/name = 'xquery') then 'XQuery'
                                               else if (instance('parameters')/name = 'xslt') then 'XSLT'
                                               else ''"/>:
-                    </xforms:label>
-                </xforms:textarea>
-            </xhtml:div>
+                    </xf:label>
+                </xf:textarea>
+            </xh:div>
             <!-- Run the transformation everytime a value changes -->
-            <xforms:send ev:event="xforms-value-changed" submission="run-submission"/>
-        </xforms:group>
+            <xf:send ev:event="xforms-value-changed" submission="run-submission"/>
+        </xf:group>
         <!-- Display result -->
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>Output</xforms:label>
-            <xforms:output value="saxon:serialize(instance('response'), 'html')" mediatype="text/html"/>
-        </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>Output</xf:label>
+            <xf:output value="saxon:serialize(instance('response'), 'html')" mediatype="text/html"/>
+        </xf:group>
+    </xh:body>
+</xh:html>

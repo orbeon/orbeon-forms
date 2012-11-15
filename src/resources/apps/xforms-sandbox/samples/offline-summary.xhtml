@@ -11,26 +11,26 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Offline Summary</xhtml:title>
-        <xforms:model xxforms:offline="true" id="main-model">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Offline Summary</xh:title>
+        <xf:model xxf:offline="true" id="main-model">
+            <xf:instance id="instance">
                 <instance>
                     <is-offline/>
                     <loading>false</loading>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="/instance/loading" relevant=". = 'true'"/>
-        </xforms:model>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+            <xf:bind ref="/instance/loading" relevant=". = 'true'"/>
+        </xf:model>
+        <xh:script type="text/javascript">
             var FORM_URL = window.location.href.substring(0, window.location.href.lastIndexOf("/")) + "/offline-mips";
             ORBEON.xforms.Offline.reset();
             ORBEON.xforms.Events.orbeonLoadedEvent.subscribe(function() {
@@ -42,67 +42,67 @@
                 checkOffline();
                 window.setInterval(checkOffline, 1000);
             });
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:input ref="is-offline" id="is-offline" style="display: none"/>
-        <xhtml:p>
+        </xh:script>
+    </xh:head>
+    <xh:body>
+        <xf:input ref="is-offline" id="is-offline" style="display: none"/>
+        <xh:p>
             Form offline-mips is
-            <xhtml:b>
-                <xforms:output value="if (is-offline = 'true') then 'offline' else 'online'"/>
-            </xhtml:b>
-        </xhtml:p>
-        <xhtml:p>
+            <xh:b>
+                <xf:output value="if (is-offline = 'true') then 'offline' else 'online'"/>
+            </xh:b>
+        </xh:p>
+        <xh:p>
             <!-- Go offline -->
-            <xforms:trigger ref=".[is-offline = 'false']" id="take-offline-from-summary">
-                <xforms:label>Take offline-mips offline</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="/instance/loading" value="'true'"/>
-                    <xxforms:script>
+            <xf:trigger ref=".[is-offline = 'false']" id="take-offline-from-summary">
+                <xf:label>Take offline-mips offline</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/instance/loading" value="'true'"/>
+                    <xxf:script>
                         ORBEON.xforms.Document.takeOfflineFromSummary(FORM_URL, function() {
                             ORBEON.xforms.Document.setValue("loading", "false")
                         });
-                    </xxforms:script>
-                </xforms:action>
-            </xforms:trigger>
+                    </xxf:script>
+                </xf:action>
+            </xf:trigger>
             <!-- Back online, succeeding -->
-            <xforms:trigger ref=".[is-offline = 'true']" id="take-online-from-summary-succeed">
-                <xforms:label>Take online-mips online and succeed</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="/instance/loading" value="'true'"/>
-                    <xxforms:script>
+            <xf:trigger ref=".[is-offline = 'true']" id="take-online-from-summary-succeed">
+                <xf:label>Take online-mips online and succeed</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/instance/loading" value="'true'"/>
+                    <xxf:script>
                         ORBEON.xforms.Document.takeOnlineFromSummary(FORM_URL, function(formWindow) {
                             formWindow.ORBEON.xforms.Document.dispatchEvent("main-model", "go-online-and-succeed");
                         }, function(formWindow) {
                             console.log("Is form offline: ", formWindow.ORBEON.xforms.Document.isFormOffline(FORM_URL));
                             ORBEON.xforms.Document.setValue("loading", "false")
                         });
-                    </xxforms:script>
-                </xforms:action>
-            </xforms:trigger>
+                    </xxf:script>
+                </xf:action>
+            </xf:trigger>
             <!-- Back online, failing -->
-            <xforms:trigger ref=".[is-offline = 'true']" id="take-online-from-summary-fail">
-                <xforms:label>Take online-mips online and fail</xforms:label>
-                <xforms:action ev:event="DOMActivate">
-                    <xforms:setvalue ref="/instance/loading" value="'true'"/>
-                    <xxforms:script>
+            <xf:trigger ref=".[is-offline = 'true']" id="take-online-from-summary-fail">
+                <xf:label>Take online-mips online and fail</xf:label>
+                <xf:action ev:event="DOMActivate">
+                    <xf:setvalue ref="/instance/loading" value="'true'"/>
+                    <xxf:script>
                         ORBEON.xforms.Document.takeOnlineFromSummary(FORM_URL, function(formWindow) {
                             formWindow.ORBEON.xforms.Document.dispatchEvent("main-model", "go-online-and-fail");
                         }, function() {
                             ORBEON.xforms.Document.setValue("loading", "false")
                         });
-                    </xxforms:script>
-                </xforms:action>
-            </xforms:trigger>
-            <xforms:group ref="/instance/loading" style="vertical-align: bottom">
-                <xforms:input ref="/instance/loading" style="display: none" id="loading"/>
-                <xhtml:span>
-                    <xhtml:img src="/ops/images/yui/loading.gif"/>
-                </xhtml:span>
-            </xforms:group>
+                    </xxf:script>
+                </xf:action>
+            </xf:trigger>
+            <xf:group ref="/instance/loading" style="vertical-align: bottom">
+                <xf:input ref="/instance/loading" style="display: none" id="loading"/>
+                <xh:span>
+                    <xh:img src="/ops/images/yui/loading.gif"/>
+                </xh:span>
+            </xf:group>
                 
-        </xhtml:p>
+        </xh:p>
 
         <!--<fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>-->
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

@@ -11,17 +11,17 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:foo="http://orbeon.org/oxf/xml/foo"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xbl="http://www.w3.org/ns/xbl">
 
-    <xhtml:head>
-        <xforms:model>
-            <xforms:instance id="main-instance">
+    <xh:head>
+        <xf:model>
+            <xf:instance id="main-instance">
                 <instance>
                     <age>35</age>
                     <secret>42</secret>
@@ -43,166 +43,166 @@
                     </range>
                     <country/>
                 </instance>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="text-result">
+            <xf:instance id="text-result">
                 <text/>
-            </xforms:instance>
+            </xf:instance>
             
-            <xforms:instance id="instance-result-1">
+            <xf:instance id="instance-result-1">
                 <dummy/>
-            </xforms:instance>
+            </xf:instance>
             
-            <xforms:instance id="instance-result-2">
+            <xf:instance id="instance-result-2">
                 <dummy/>
-            </xforms:instance>
+            </xf:instance>
 
-            <xforms:instance id="instance-delays">
+            <xf:instance id="instance-delays">
                 <delays>
                     <delay/>
                     <delay/>
                     <delay/>
                 </delays>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Response information -->
-            <xforms:instance id="instance-response">
+            <xf:instance id="instance-response">
                 <response>
                     <error-type/>
                     <status-code/>
                     <response-body/>
                 </response>
-            </xforms:instance>
+            </xf:instance>
 
             <!-- Clear before submitting -->
-            <xforms:setvalue ev:event="xforms-submit" iterate="instance('instance-response')/*" ref="."/>
+            <xf:setvalue ev:event="xforms-submit" iterate="instance('instance-response')/*" ref="."/>
 
             <!-- Fill-out response info -->
-            <xforms:action ev:event="xforms-submit-done xforms-submit-error" context="instance('instance-response')">
-                <xforms:setvalue ref="error-type" value="event('error-type')"/>
-                <xforms:setvalue ref="status-code" value="event('response-status-code')"/>
-                <xforms:setvalue ref="response-body" value="event('response-body')"/>
-            </xforms:action>
+            <xf:action ev:event="xforms-submit-done xforms-submit-error" context="instance('instance-response')">
+                <xf:setvalue ref="error-type" value="event('error-type')"/>
+                <xf:setvalue ref="status-code" value="event('response-status-code')"/>
+                <xf:setvalue ref="response-body" value="event('response-body')"/>
+            </xf:action>
 
-            <xforms:submission id="replace-none" mode="asynchronous"
+            <xf:submission id="replace-none" mode="asynchronous"
                 method="get" resource="http://www.google.com/"
                 serialization="none"
                 replace="none"/>
 
-            <xforms:submission id="replace-text" mode="asynchronous"
+            <xf:submission id="replace-text" mode="asynchronous"
                 method="get" resource="http://www.google.com/"
                 serialization="none"
                 replace="text" targetref="instance('text-result')"/>
 
-            <xforms:submission id="replace-instance-1" mode="asynchronous"
+            <xf:submission id="replace-instance-1" mode="asynchronous"
                 method="get" resource="http://www.orbeon.com/ops/xforms-sandbox/service/zip-states"
-                serialization="none" xxforms:cache="false"
+                serialization="none" xxf:cache="false"
                 replace="instance" targetref="instance('instance-result-1')">
-                <xforms:send ev:event="xforms-submit-done" submission="replace-instance-2"/>
-            </xforms:submission>
+                <xf:send ev:event="xforms-submit-done" submission="replace-instance-2"/>
+            </xf:submission>
 
-            <xforms:submission id="replace-instance-2" mode="asynchronous"
+            <xf:submission id="replace-instance-2" mode="asynchronous"
                 method="get" resource="http://www.orbeon.com/ops/xforms-sandbox/service/zip-states"
-                serialization="none" xxforms:cache="false"
+                serialization="none" xxf:cache="false"
                 replace="instance" targetref="instance('instance-result-2')"/>
 
-            <xforms:submission id="replace-delay" mode="asynchronous"
+            <xf:submission id="replace-delay" mode="asynchronous"
                 method="get" resource="/xforms-sandbox/service/sleep?delay={event('my-delay')}"
                 serialization="none"
                 replace="instance" targetref="instance('instance-delays')/delay[. = '']"/>
 
-            <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:send submission="replace-none"/>
-                <xforms:send submission="replace-text"/>
-                <xforms:send submission="replace-instance-1"/>
-                <!--<xxforms:join-submissions/>-->
-            </xforms:action>
+            <xf:action ev:event="xforms-model-construct-done">
+                <xf:send submission="replace-none"/>
+                <xf:send submission="replace-text"/>
+                <xf:send submission="replace-instance-1"/>
+                <!--<xxf:join-submissions/>-->
+            </xf:action>
 
             <!-- Test 404 -->
-            <xforms:submission id="not-found-submission" mode="asynchronous"
+            <xf:submission id="not-found-submission" mode="asynchronous"
                 method="get" resource="http://example.org/this/must/not/exist"
                 serialization="none" replace="instance" targetref="instance('instance-result-1')">
-            </xforms:submission>
+            </xf:submission>
 
             <!-- Test text parsing error -->
-            <xforms:submission id="bad-text-submission" mode="asynchronous"
+            <xf:submission id="bad-text-submission" mode="asynchronous"
                 method="get" resource="http://www.orbeon.com/images/form-runner-250.png"
                 serialization="none" replace="text" targetref="instance('instance-result-1')">
-            </xforms:submission>
+            </xf:submission>
 
             <!-- Test XML parsing error -->
-            <xforms:submission id="bad-xml-submission" mode="asynchronous"
+            <xf:submission id="bad-xml-submission" mode="asynchronous"
                 method="get" resource="/xforms-sandbox/service/bad-xml"
                 serialization="none" replace="instance" targetref="instance('instance-result-1')">
-            </xforms:submission>
+            </xf:submission>
 
-        </xforms:model>
-        <xhtml:style type="text/css">
+        </xf:model>
+        <xh:style type="text/css">
             .response .xforms-label { font-weight: bold }
             .response .xforms-output { background-color: #ccc }
-        </xhtml:style>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:style>
+    </xh:head>
+    <xh:body>
 
-        <xforms:submit submission="replace-none">
-            <xforms:label>Test replace="none"</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="replace-none">
+            <xf:label>Test replace="none"</xf:label>
+        </xf:submit>
 
-        <xforms:submit submission="replace-text">
-            <xforms:label>Test replace="text"</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="replace-text">
+            <xf:label>Test replace="text"</xf:label>
+        </xf:submit>
 
-        <xforms:submit submission="replace-instance-1">
-            <xforms:label>Test replace="instance"</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="replace-instance-1">
+            <xf:label>Test replace="instance"</xf:label>
+        </xf:submit>
 
-        <xforms:submit submission="not-found-submission">
-            <xforms:label>Test non-existing site</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="not-found-submission">
+            <xf:label>Test non-existing site</xf:label>
+        </xf:submit>
 
-        <xforms:submit submission="bad-text-submission">
-            <xforms:label>Test binary response for replace="text"</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="bad-text-submission">
+            <xf:label>Test binary response for replace="text"</xf:label>
+        </xf:submit>
 
-        <xforms:submit submission="bad-xml-submission">
-            <xforms:label>Test XML parse error for replace="instance"</xforms:label>
-        </xforms:submit>
+        <xf:submit submission="bad-xml-submission">
+            <xf:label>Test XML parse error for replace="instance"</xf:label>
+        </xf:submit>
 
-        <xforms:trigger>
-            <xforms:label>Test order of responses</xforms:label>
-            <xforms:action ev:event="DOMActivate">
+        <xf:trigger>
+            <xf:label>Test order of responses</xf:label>
+            <xf:action ev:event="DOMActivate">
                 <!-- Clear values -->
-                <xforms:setvalue iterate="instance('instance-delays')/*" ref="."/>
+                <xf:setvalue iterate="instance('instance-delays')/*" ref="."/>
                 <!-- Send submission in reverse order of expected responses -->
-                <xforms:send submission="replace-delay">
-                    <xforms:property name="my-delay" value="5"/>
-                </xforms:send>
-                <xforms:send submission="replace-delay">
-                    <xforms:property name="my-delay" value="3"/>
-                </xforms:send>
-                <xforms:send submission="replace-delay">
-                    <xforms:property name="my-delay" value="1"/>
-                </xforms:send>
-            </xforms:action>
-        </xforms:trigger>
+                <xf:send submission="replace-delay">
+                    <xf:property name="my-delay" value="5"/>
+                </xf:send>
+                <xf:send submission="replace-delay">
+                    <xf:property name="my-delay" value="3"/>
+                </xf:send>
+                <xf:send submission="replace-delay">
+                    <xf:property name="my-delay" value="1"/>
+                </xf:send>
+            </xf:action>
+        </xf:trigger>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:group context="instance('instance-response')" class="response">
-            <xforms:output ref="error-type">
-                <xforms:label>Error type</xforms:label>
-            </xforms:output>
-            <xhtml:br/>
-            <xforms:output ref="status-code">
-                <xforms:label>Status code</xforms:label>
-            </xforms:output>
-            <xhtml:br/>
-            <xforms:output ref="response-body">
-                <xforms:label>Response body</xforms:label>
-            </xforms:output>
-        </xforms:group>
+        <xf:group context="instance('instance-response')" class="response">
+            <xf:output ref="error-type">
+                <xf:label>Error type</xf:label>
+            </xf:output>
+            <xh:br/>
+            <xf:output ref="status-code">
+                <xf:label>Status code</xf:label>
+            </xf:output>
+            <xh:br/>
+            <xf:output ref="response-body">
+                <xf:label>Response body</xf:label>
+            </xf:output>
+        </xf:group>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

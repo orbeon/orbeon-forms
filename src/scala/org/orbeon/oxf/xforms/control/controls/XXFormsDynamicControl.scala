@@ -36,10 +36,10 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 
 /**
- * xxforms:dynamic control
+ * xxf:dynamic control
  *
  * This control must bind to an XHTML+XForms document held in an instance. The document is processed as an XForms
- * sub-document and handle as a shadow tree of xxforms:dynamic. Changes taking place in the document are dynamically
+ * sub-document and handle as a shadow tree of xxf:dynamic. Changes taking place in the document are dynamically
  * reported into the shadow tree.
  *
  * The following changes are handled specially:

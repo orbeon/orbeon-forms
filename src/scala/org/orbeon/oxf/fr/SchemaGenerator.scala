@@ -106,7 +106,7 @@ class SchemaGenerator extends ProcessorImpl {
             None
     }
 
-    // Recursive function generating an xs:element from an xforms:bind
+    // Recursive function generating an xs:element from an xf:bind
     private def handleBind(libraries: Libraries, bind: NodeInfo): Elem = {
 
         case class BindInfo(elemName: String, elemType: Option[QName], repeated: Boolean, min: Option[String], max: Option[String])

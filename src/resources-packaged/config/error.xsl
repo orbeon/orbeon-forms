@@ -21,7 +21,7 @@
                 saxon:allow-all-built-in-types="yes"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                xmlns:xh="http://www.w3.org/1999/xhtml"
                 xmlns:saxon="http://saxon.sf.net/"
                 xmlns:f="http://orbeon.org/oxf/xml/formatting"
                 xmlns:version="java:org.orbeon.oxf.common.Version"

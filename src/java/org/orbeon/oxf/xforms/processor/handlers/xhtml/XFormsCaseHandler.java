@@ -23,7 +23,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
- * Handle xforms:case.
+ * Handle xf:case.
  *
  * TODO: This currently is based on delimiters. This is wrong: should be the case, like group, only around <tr>, etc.
  */

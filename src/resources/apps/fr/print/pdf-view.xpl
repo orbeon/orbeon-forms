@@ -17,8 +17,8 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <!-- Page detail (app, form, document, and mode) -->
@@ -37,7 +37,7 @@
     </p:processor>
 
     <p:choose href="#unrolled-form">
-        <p:when test="normalize-space(/*/xhtml:head//xforms:instance[@id = 'fr-form-attachments']/*/pdf) != ''">
+        <p:when test="normalize-space(/*/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf) != ''">
             <!-- A PDF template is attached to the form -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="print-pdf-template.xpl"/>

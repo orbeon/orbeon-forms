@@ -104,7 +104,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     // Transient URI resolver for initialization
     private XFormsURIResolver uriResolver;
 
-    // Transient OutputStream for xforms:submission[@replace = 'all'], or null if not available
+    // Transient OutputStream for xf:submission[@replace = 'all'], or null if not available
     private ExternalContext.Response response;
 
     // Asynchronous submission manager
@@ -612,7 +612,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             throw new ValidationException("There is already an active submission.", submission.getLocationData());
 
         if (loadsToRun != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", submission.getLocationData());
+            throw new ValidationException("Unable to run a two-pass submission and xf:load within a same action sequence.", submission.getLocationData());
 
         // NOTE: It seems reasonable to run scripts, messages, focus, and help up to the point where the submission takes place.
 
@@ -665,7 +665,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     /**
-     * Schedule an event for delayed execution, following xforms:dispatch/@delay semantics.
+     * Schedule an event for delayed execution, following xf:dispatch/@delay semantics.
      *
      * @param eventName         name of the event to dispatch
      * @param targetStaticId    static id of the target to dispatch to
@@ -799,7 +799,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         if (activeSubmissionFirstPass != null && StringUtils.isBlank(activeSubmissionFirstPass.getResolvedXXFormsTarget())) {
             // Scripts occurring after a submission without a target takes place should not run
             // TODO: Should we allow scripts anyway? Don't we allow value changes updates on the client anyway?
-            indentedLogger.logWarning("", "xxforms:script will be ignored because two-pass submission started", "script id", script.prefixedId());
+            indentedLogger.logWarning("", "xxf:script will be ignored because two-pass submission started", "script id", script.prefixedId());
             return;
         }
 
@@ -834,7 +834,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     public void addLoadToRun(String resource, String target, String urlType, boolean isReplace, boolean isShowProgress) {
 
         if (activeSubmissionFirstPass != null)
-            throw new ValidationException("Unable to run a two-pass submission and xforms:load within a same action sequence.", activeSubmissionFirstPass.getLocationData());
+            throw new ValidationException("Unable to run a two-pass submission and xf:load within a same action sequence.", activeSubmissionFirstPass.getLocationData());
 
         if (loadsToRun == null)
             loadsToRun = new ArrayList<Load>();
@@ -982,7 +982,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     /**
      * Prepare the document for a sequence of external events.
      *
-     * @param response          ExternalContext.Response for xforms:submission[@replace = 'all'], or null
+     * @param response          ExternalContext.Response for xf:submission[@replace = 'all'], or null
      */
     public void beforeExternalEvents(ExternalContext.Response response) {
 
@@ -1027,7 +1027,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     }
 
     /**
-     * Return an OutputStream for xforms:submission[@replace = 'all']. Used by submission.
+     * Return an OutputStream for xf:submission[@replace = 'all']. Used by submission.
      *
      * @return OutputStream
      */

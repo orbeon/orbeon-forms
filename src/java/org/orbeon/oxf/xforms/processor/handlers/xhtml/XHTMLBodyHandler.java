@@ -185,12 +185,12 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
                 // HACK: We would be ok with just one template, but IE 6 doesn't allow setting the input/@type attribute properly
 
-                // xforms:select[@appearance = 'full'], xforms:input[@type = 'xs:boolean']
+                // xf:select[@appearance = 'full'], xf:input[@type = 'xs:boolean']
                 XFormsSelect1Handler.outputItemFullTemplate(this, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
                         "xforms-select-full-template", "$xforms-item-name$", true, "checkbox");
 
-                // xforms:select1[@appearance = 'full']
+                // xf:select1[@appearance = 'full']
                 XFormsSelect1Handler.outputItemFullTemplate(this, xmlReceiver, htmlPrefix, spanQName,
                         containingDocument, reusableAttributes, attributes,
                         "xforms-select1-full-template", "$xforms-item-name$", false, "radio");
@@ -246,10 +246,10 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
     public static void registerHandlers(final ElementHandlerController controller, final XFormsContainingDocument containingDocument) {
 
-        // xforms:input
+        // xf:input
         controller.registerHandler(XFormsInputHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "input", ANY_MATCHER);
 
-        // xforms:output
+        // xf:output
         controller.registerHandler(XFormsOutputTextHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_TEXT_APPEARANCE_QNAME));
         controller.registerHandler(XFormsOutputDownloadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output",
@@ -272,7 +272,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         });
         controller.registerHandler(XFormsOutputDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "output", ANY_MATCHER);
 
-        // xforms:trigger
+        // xf:trigger
         final Matcher triggerSubmitMinimalMatcher = new Matcher() {
             public ElementAnalysis match(Attributes attributes, Object handlerContext) {
                 final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
@@ -284,11 +284,11 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", triggerSubmitMinimalMatcher);
         controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "trigger", ANY_MATCHER);
 
-        // xforms:submit
+        // xf:submit
         controller.registerHandler(XFormsTriggerMinimalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", triggerSubmitMinimalMatcher);
         controller.registerHandler(XFormsTriggerFullHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "submit", ANY_MATCHER);
 
-        // xforms:group
+        // xf:group
         controller.registerHandler(XFormsGroupInternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
         controller.registerHandler(XFormsGroupFieldsetHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group",
@@ -305,7 +305,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         });
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "group", ANY_MATCHER);
 
-        // xforms:switch
+        // xf:switch
         // NOTE: We use the same handlers for switch as we do for group
         controller.registerHandler(XFormsGroupSeparatorHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", new Matcher() {
             public Object match(Attributes attributes, Object handlerContext) {
@@ -313,7 +313,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
                 // XFormsAnnotatorContentHandler adds this appearance if needed
                 // NOTE: we just check on the attribute value instead of resolving the QName, so that XFormsAnnotatorContentHandler
-                // doesn't have to declare the xxforms:* prefix.
+                // doesn't have to declare the xxf:* prefix.
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
                 return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue) ? elementAnalysis : null;
             }
@@ -321,17 +321,17 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsGroupDefaultHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "switch", ANY_MATCHER);
         controller.registerHandler(XFormsCaseHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "case", ANY_MATCHER);
 
-        // xforms:repeat
+        // xf:repeat
         controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat", ANY_MATCHER);
         controller.registerHandler(NullContentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat-iteration", ANY_MATCHER);
 
-        // xforms:secret
+        // xf:secret
         controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret", ANY_MATCHER);
 
-        // xforms:upload
+        // xf:upload
         controller.registerHandler(XFormsUploadHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "upload", ANY_MATCHER);
 
-        // xforms:range
+        // xf:range
         controller.registerHandler(XFormsRangeHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "range", ANY_MATCHER);
 
         // Other controls
@@ -341,7 +341,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         else
             controller.registerHandler(NullHandler.class.getName(), XFormsConstants.XXFORMS_NAMESPACE_URI, "dialog", ANY_MATCHER);
 
-        // xforms:select and xforms:select1
+        // xf:select and xf:select1
         controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select",
                 new AppearanceMatcher(XFormsConstants.XXFORMS_INTERNAL_APPEARANCE_QNAME));
         controller.registerHandler(XFormsSelect1InternalHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "select1",

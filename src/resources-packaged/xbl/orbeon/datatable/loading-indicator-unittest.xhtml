@@ -11,431 +11,431 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xi="http://www.w3.org/2001/XInclude">
 
-    <xhtml:head>
-        <xhtml:title>Datatable</xhtml:title>
+    <xh:head>
+        <xh:title>Datatable</xh:title>
 
         <xi:include href="datatable-unittest-model.xml"/>
 
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript"
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript"
             src="/xbl/orbeon/datatable/loading-indicator-unittest.js"/>
-        <xhtml:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
+        <xh:script type="text/javascript" src="/xbl/orbeon/datatable/datatable-unittest-lib.js"/>
 
-    </xhtml:head>
-    <xhtml:body>
+    </xh:head>
+    <xh:body>
 
-        <xhtml:p>Testing the <xhtml:a
+        <xh:p>Testing the <xh:a
                 href="http://wiki.orbeon.com/forms/doc/developer-guide/xbl-existing-xbl-components#TOC-Loading-indicator"
-                >loading indicator feature</xhtml:a></xhtml:p>
-        <xhtml:p>See also bug <xhtml:a
+                >loading indicator feature</xh:a></xh:p>
+        <xh:p>See also bug <xh:a
                 href="http://forge.ow2.org/tracker/index.php?func=detail&amp;aid=314361&amp;group_id=168&amp;atid=350207"
-                >#314361</xhtml:a>.</xhtml:p>
+                >#314361</xh:a>.</xh:p>
 
-        <xhtml:fieldset>
-            <xhtml:legend>Datatable test controls</xhtml:legend>
-            <xhtml:p>
-                <xforms:group ref="instance('controls')">
-                    <xforms:input ref="loading" id="loading" appearance="full">
+        <xh:fieldset>
+            <xh:legend>Datatable test controls</xh:legend>
+            <xh:p>
+                <xf:group ref="instance('controls')">
+                    <xf:input ref="loading" id="loading" appearance="full">
                         <!--TODO: replace by a select1 when #314362 will be fixed -->
-                        <!--<xforms:item>
-                            <xforms:label>true</xforms:label>
-                            <xforms:value>true</xforms:value>
-                        </xforms:item>
-                        <xforms:item>
-                            <xforms:label>false</xforms:label>
-                            <xforms:value>false</xforms:value>
-                        </xforms:item>-->
-                        <xforms:label>Loading in progress: </xforms:label>
-                        <xforms:help>Used by tests that check the loading indicator
-                            feature</xforms:help>
-                    </xforms:input>
-                </xforms:group>
-            </xhtml:p>
-            <xhtml:ol>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="open-all">
-                        <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion"
+                        <!--<xf:item>
+                            <xf:label>true</xf:label>
+                            <xf:value>true</xf:value>
+                        </xf:item>
+                        <xf:item>
+                            <xf:label>false</xf:label>
+                            <xf:value>false</xf:value>
+                        </xf:item>-->
+                        <xf:label>Loading in progress: </xf:label>
+                        <xf:help>Used by tests that check the loading indicator
+                            feature</xf:help>
+                    </xf:input>
+                </xf:group>
+            </xh:p>
+            <xh:ol>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="open-all">
+                        <xf:label>Open all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion"
                             name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="true()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-                <xhtml:li>
-                    <xforms:trigger appearance="minimal" id="close-all">
-                        <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion"
+                            <xf:property name="selected" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+                <xh:li>
+                    <xf:trigger appearance="minimal" id="close-all">
+                        <xf:label>Close all</xf:label>
+                        <xf:dispatch ev:event="DOMActivate" targetid="my-accordion"
                             name="fr-accordion-toggle-all">
-                            <xforms:property name="selected" value="false()"/>
-                        </xforms:dispatch>
-                    </xforms:trigger>
-                </xhtml:li>
-            </xhtml:ol>
-        </xhtml:fieldset>
+                            <xf:property name="selected" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:li>
+            </xh:ol>
+        </xh:fieldset>
 
-        <xhtml:p/>
+        <xh:p/>
 
         <fr:accordion class="fr-accordion-lnf" id="my-accordion">
 
             <fr:case selected="true" id="noscroll">
                 <fr:label>Without any scrolling and no width indication</fr:label>
-                <xhtml:div>
+                <xh:div>
                     <fr:datatable id="table-noscroll"
-                        loading="xxforms:instance('controls')/loading = 'true'">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position">
-                                            <xforms:label>Position of the line in the
-                                                instance</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="text">
-                                            <xforms:label>Texte</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="length">
-                                            <xforms:label>Number of characters</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="nb-words">
-                                            <xforms:label>Number of words</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        loading="xxf:instance('controls')/loading = 'true'">
+                        <xh:tbody>
+                            <xf:repeat ref="instance('detailed-lorem')/line[length > 100]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position">
+                                            <xf:label>Position of the line in the
+                                                instance</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="text">
+                                            <xf:label>Texte</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="length">
+                                            <xf:label>Number of characters</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="nb-words">
+                                            <xf:label>Number of words</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollH">
                 <fr:label>Horizontal scrolling</fr:label>
-                <xhtml:div>
+                <xh:div>
 
                     <fr:datatable id="table-scrollH" scrollable="horizontal" width="400px"
-                        loading="xxforms:instance('controls')/loading = 'true'">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position">
-                                            <xforms:label>Position of the line in the
-                                                instance</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="text">
-                                            <xforms:label>Texte</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="length">
-                                            <xforms:label>Number of characters</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="nb-words">
-                                            <xforms:label>Number of words</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        loading="xxf:instance('controls')/loading = 'true'">
+                        <xh:tbody>
+                            <xf:repeat ref="instance('detailed-lorem')/line[length > 100]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position">
+                                            <xf:label>Position of the line in the
+                                                instance</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="text">
+                                            <xf:label>Texte</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="length">
+                                            <xf:label>Number of characters</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="nb-words">
+                                            <xf:label>Number of words</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollH-thin">
                 <fr:label>Horizontal scrolling with "thin" header labels</fr:label>
-                <xhtml:div>
+                <xh:div>
 
                     <fr:datatable id="table-scrollH-thin" scrollable="horizontal" width="600px"
-                        loading="xxforms:instance('controls')/loading = 'true'">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position">
-                                            <xforms:label>Position</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="text">
-                                            <xforms:label>Texte</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        loading="xxf:instance('controls')/loading = 'true'">
+                        <xh:tbody>
+                            <xf:repeat ref="instance('detailed-lorem')/line[length > 100]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position">
+                                            <xf:label>Position</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="text">
+                                            <xf:label>Texte</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollV">
                 <fr:label>Vertical scrolling</fr:label>
-                <xhtml:div>
+                <xh:div>
 
                     <fr:datatable id="table-scrollV" scrollable="vertical" height="200px"
-                        loading="xxforms:instance('controls')/loading = 'true'">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 60]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position">
-                                            <xforms:label>Position</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="text">
-                                            <xforms:label>Texte</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="length">
-                                            <xforms:label>Length</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="nb-words">
-                                            <xforms:label>Words</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        loading="xxf:instance('controls')/loading = 'true'">
+                        <xh:tbody>
+                            <xf:repeat ref="instance('detailed-lorem')/line[length > 60]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position">
+                                            <xf:label>Position</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="text">
+                                            <xf:label>Texte</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="length">
+                                            <xf:label>Length</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="nb-words">
+                                            <xf:label>Words</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollVH">
                 <fr:label>Both vertical and horizontal scrolling</fr:label>
-                <xhtml:div>
+                <xh:div>
 
                     <fr:datatable id="table-scrollVH" scrollable="both" height="200px" width="600px"
-                        loading="xxforms:instance('controls')/loading = 'true'">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 60]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position">
-                                            <xforms:label>Position</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="text">
-                                            <xforms:label>Texte</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="length">
-                                            <xforms:label>Length</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="nb-words">
-                                            <xforms:label>Words</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        loading="xxf:instance('controls')/loading = 'true'">
+                        <xh:tbody>
+                            <xf:repeat ref="instance('detailed-lorem')/line[length > 60]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position">
+                                            <xf:label>Position</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="text">
+                                            <xf:label>Texte</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="length">
+                                            <xf:label>Length</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="nb-words">
+                                            <xf:label>Words</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="noscroll-dyn">
                 <fr:label>Without any scrolling and no width indication forcing the dynamic column
                     set algorithm</fr:label>
-                <xhtml:div>
+                <xh:div>
                     <fr:datatable id="table-noscroll-dyn"
-                        loading="xxforms:instance('controls')/loading = 'true'" dynamic="true">
-                        <xhtml:tbody>
-                            <xforms:repeat ref="instance('detailed-lorem')/line[length > 100]">
-                                <xhtml:tr>
-                                    <xhtml:td>
-                                        <xforms:output value="position">
-                                            <xforms:label>Position of the line in the
-                                                instance</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="text">
-                                            <xforms:label>Texte</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="length">
-                                            <xforms:label>Number of characters</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                    <xhtml:td>
-                                        <xforms:output value="nb-words">
-                                            <xforms:label>Number of words</xforms:label>
-                                        </xforms:output>
-                                    </xhtml:td>
-                                </xhtml:tr>
-                            </xforms:repeat>
-                        </xhtml:tbody>
+                        loading="xxf:instance('controls')/loading = 'true'" dynamic="true">
+                        <xh:tbody>
+                            <xf:repeat ref="instance('detailed-lorem')/line[length > 100]">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="position">
+                                            <xf:label>Position of the line in the
+                                                instance</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="text">
+                                            <xf:label>Texte</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="length">
+                                            <xf:label>Number of characters</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="nb-words">
+                                            <xf:label>Number of words</xf:label>
+                                        </xf:output>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:tbody>
                     </fr:datatable>
-                </xhtml:div>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="noscroll-dyn2">
                 <fr:label>Without any scrolling and no width indication with a purely dynamic column
                     set</fr:label>
-                <xhtml:div>
+                <xh:div>
 
-                    <xforms:group ref="instance('detailed-lorem')">
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="noscroll-dyn2-table"
-                            loading="xxforms:instance('controls')/loading = 'true'">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length &lt; 20]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            loading="xxf:instance('controls')/loading = 'true'">
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length &lt; 20]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollH-dyn">
                 <fr:label>Horizontal scrolling and dynamic columnset</fr:label>
-                <xhtml:div>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="table-scrollH-dyn" scrollable="horizontal" width="400px"
-                            loading="xxforms:instance('controls')/loading = 'true'">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length> 100]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            loading="xxf:instance('controls')/loading = 'true'">
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length> 100]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollV-dyn">
                 <fr:label>Vertical scrolling and dynamic column sets</fr:label>
-                <xhtml:div>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="table-scrollV-dyn" scrollable="vertical" height="200px"
-                            loading="xxforms:instance('controls')/loading = 'true'">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length > 60]">
-                                    <xhtml:tr>
+                            loading="xxf:instance('controls')/loading = 'true'">
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length > 60]">
+                                    <xh:tr>
 
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
 
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
             <fr:case selected="true" id="scrollVH-dyn">
                 <fr:label>Both vertical and horizontal scrolling with a dynamic column
                     set</fr:label>
-                <xhtml:div>
-                    <xforms:group ref="instance('detailed-lorem')">
+                <xh:div>
+                    <xf:group ref="instance('detailed-lorem')">
                         <fr:datatable id="table-scrollVH-dyn" scrollable="both" height="200px"
-                            width="600px" loading="xxforms:instance('controls')/loading = 'true'">
-                            <xhtml:thead>
-                                <xhtml:tr>
-                                    <xforms:repeat ref="line[1]/*">
-                                        <xhtml:th>
-                                            <xforms:output value="name()"/>
-                                        </xhtml:th>
-                                    </xforms:repeat>
-                                    <xhtml:th>Characters per word</xhtml:th>
-                                </xhtml:tr>
-                            </xhtml:thead>
-                            <xhtml:tbody>
-                                <xforms:repeat ref="line[length > 60]">
-                                    <xhtml:tr>
-                                        <xforms:repeat ref="*">
-                                            <xhtml:td>
-                                                <xforms:output value="."/>
-                                            </xhtml:td>
-                                        </xforms:repeat>
-                                        <xhtml:td>
-                                            <xforms:output value="round(length div nb-words)"/>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:tbody>
+                            width="600px" loading="xxf:instance('controls')/loading = 'true'">
+                            <xh:thead>
+                                <xh:tr>
+                                    <xf:repeat ref="line[1]/*">
+                                        <xh:th>
+                                            <xf:output value="name()"/>
+                                        </xh:th>
+                                    </xf:repeat>
+                                    <xh:th>Characters per word</xh:th>
+                                </xh:tr>
+                            </xh:thead>
+                            <xh:tbody>
+                                <xf:repeat ref="line[length > 60]">
+                                    <xh:tr>
+                                        <xf:repeat ref="*">
+                                            <xh:td>
+                                                <xf:output value="."/>
+                                            </xh:td>
+                                        </xf:repeat>
+                                        <xh:td>
+                                            <xf:output value="round(length div nb-words)"/>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:tbody>
                         </fr:datatable>
-                    </xforms:group>
-                </xhtml:div>
+                    </xf:group>
+                </xh:div>
             </fr:case>
 
         </fr:accordion>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

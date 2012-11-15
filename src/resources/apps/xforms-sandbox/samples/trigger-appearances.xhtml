@@ -11,130 +11,130 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Trigger Appearances</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Trigger Appearances</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <label>Label</label>
                     <message>Triggered</message>
                     <help>Help</help>
                     <hint>Hint</hint>
                 </instance>
-            </xforms:instance>
-            <xforms:submission method="post" id="submission"/>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xhtml:h2>Trigger</xhtml:h2>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label ref="label"/>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger>
-                <xforms:label>
-                    <xhtml:img src="../../apps/xforms-sandbox/samples/images/save.gif"/>
-                    <xhtml:span>
-                        <xforms:output value="label"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label>
-                    <xhtml:img src="../../apps/xforms-sandbox/samples/images/submit.gif"/>
-                </xforms:label>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:trigger appearance="minimal">
-                <xforms:label ref="label"/>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-                <xforms:load ev:event="DOMActivate" resource="http://www.google.com/"/>
-            </xforms:trigger>
-        </xhtml:p>
-        <xhtml:h2>Submit</xhtml:h2>
-        <xhtml:p>
-            <xforms:submit submission="submission">
-                <xforms:label ref="label"/>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:submit>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:submit submission="submission">
-                <xforms:label>
-                    <xhtml:img src="../../apps/xforms-sandbox/samples/images/save.gif"/>
-                    <xhtml:span>
-                        <xforms:output value="label"/>
-                    </xhtml:span>
-                </xforms:label>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:submit>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:submit submission="submission" appearance="minimal">
-                <xforms:label>
-                    <xhtml:img src="../../apps/xforms-sandbox/samples/images/submit.gif"/>
-                </xforms:label>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:submit>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:submit submission="submission" appearance="minimal">
-                <xforms:label ref="label"/>
-                <xforms:message level="modal" ref="message" ev:event="DOMActivate"/>
-                <xforms:help ref="help"/>
-                <xforms:hint ref="hint"/>
-            </xforms:submit>
-        </xhtml:p>
-        <xhtml:h2>Change</xhtml:h2>
-        <xhtml:p>
-            <xforms:input ref="label">
-                <xforms:label class="fixed-width">Label:</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="message">
-                <xforms:label class="fixed-width">Message:</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="help">
-                <xforms:label class="fixed-width">Help:</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-        <xhtml:p>
-            <xforms:input ref="hint">
-                <xforms:label class="fixed-width">Hint:</xforms:label>
-            </xforms:input>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+            </xf:instance>
+            <xf:submission method="post" id="submission"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xh:h2>Trigger</xh:h2>
+        <xh:p>
+            <xf:trigger>
+                <xf:label ref="label"/>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger>
+                <xf:label>
+                    <xh:img src="../../apps/xforms-sandbox/samples/images/save.gif"/>
+                    <xh:span>
+                        <xf:output value="label"/>
+                    </xh:span>
+                </xf:label>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger appearance="minimal">
+                <xf:label>
+                    <xh:img src="../../apps/xforms-sandbox/samples/images/submit.gif"/>
+                </xf:label>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:trigger>
+        </xh:p>
+        <xh:p>
+            <xf:trigger appearance="minimal">
+                <xf:label ref="label"/>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+                <xf:load ev:event="DOMActivate" resource="http://www.google.com/"/>
+            </xf:trigger>
+        </xh:p>
+        <xh:h2>Submit</xh:h2>
+        <xh:p>
+            <xf:submit submission="submission">
+                <xf:label ref="label"/>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:submit>
+        </xh:p>
+        <xh:p>
+            <xf:submit submission="submission">
+                <xf:label>
+                    <xh:img src="../../apps/xforms-sandbox/samples/images/save.gif"/>
+                    <xh:span>
+                        <xf:output value="label"/>
+                    </xh:span>
+                </xf:label>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:submit>
+        </xh:p>
+        <xh:p>
+            <xf:submit submission="submission" appearance="minimal">
+                <xf:label>
+                    <xh:img src="../../apps/xforms-sandbox/samples/images/submit.gif"/>
+                </xf:label>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:submit>
+        </xh:p>
+        <xh:p>
+            <xf:submit submission="submission" appearance="minimal">
+                <xf:label ref="label"/>
+                <xf:message level="modal" ref="message" ev:event="DOMActivate"/>
+                <xf:help ref="help"/>
+                <xf:hint ref="hint"/>
+            </xf:submit>
+        </xh:p>
+        <xh:h2>Change</xh:h2>
+        <xh:p>
+            <xf:input ref="label">
+                <xf:label class="fixed-width">Label:</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="message">
+                <xf:label class="fixed-width">Message:</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="help">
+                <xf:label class="fixed-width">Help:</xf:label>
+            </xf:input>
+        </xh:p>
+        <xh:p>
+            <xf:input ref="hint">
+                <xf:label class="fixed-width">Hint:</xf:label>
+            </xf:input>
+        </xh:p>
+    </xh:body>
+</xh:html>

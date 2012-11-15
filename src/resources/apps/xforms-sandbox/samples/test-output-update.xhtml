@@ -1,31 +1,31 @@
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:f="http://orbeon.org/oxf/xml/formatting"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:widget="http://orbeon.org/oxf/xml/widget"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>xforms:output Server Update</xhtml:title>
-        <xforms:model id="main">
-            <xforms:instance>
+    <xh:head>
+        <xh:title>xf:output Server Update</xh:title>
+        <xf:model id="main">
+            <xf:instance>
                 <instance>
                     <input/>
                     <output/>
                 </instance>
-            </xforms:instance>
-            <xforms:bind ref="output" calculate="../input"/>
-        </xforms:model>
-        <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
-        <xhtml:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+            <xf:bind ref="output" calculate="../input"/>
+        </xf:model>
+        <xh:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
+        <xh:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/event-simulate/event-simulate.js"/>
+        <xh:script type="text/javascript" src="/ops/yui/yuitest/yuitest.js"/>
+        <xh:script type="text/javascript">
             <![CDATA[
             YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
-                name: "xforms:output Server Update",
+                name: "xf:output Server Update",
 
                 testServerUpdate: function() {
 
@@ -47,16 +47,16 @@
                 }
             });
             ]]>
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body>
+        </xh:script>
+    </xh:head>
+    <xh:body>
 
-        <xforms:input ref="input" id="value-input">
-            <xforms:label>Input: </xforms:label>
-        </xforms:input>
+        <xf:input ref="input" id="value-input">
+            <xf:label>Input: </xf:label>
+        </xf:input>
 
-        <xforms:input ref="output" id="value-output">
-            <xforms:label>Output: </xforms:label>
-        </xforms:input>
-    </xhtml:body>
-</xhtml:html>
+        <xf:input ref="output" id="value-output">
+            <xf:label>Output: </xf:label>
+        </xf:input>
+    </xh:body>
+</xh:html>

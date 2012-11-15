@@ -21,7 +21,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Handle xforms:trigger and xforms:submit.
+ * Handle xf:trigger and xf:submit.
  */
 public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler {
 

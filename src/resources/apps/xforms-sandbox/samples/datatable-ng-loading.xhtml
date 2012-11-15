@@ -11,19 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Using YUI's datatable</xhtml:title>
-        <xforms:model id="model" xxforms:external-events="load-initial-data">
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>Using YUI's datatable</xh:title>
+        <xf:model id="model" xxf:external-events="load-initial-data">
+            <xf:instance id="instance">
                 <placeholder loading="true"/>
-            </xforms:instance>
-            <xforms:instance id="datasource">
+            </xf:instance>
+            <xf:instance id="datasource">
                 <instance>
                     <record>
                         <AAA>1</AAA>
@@ -41,40 +41,40 @@
                         <CCC>ccc</CCC>
                     </record>
                 </instance>
-            </xforms:instance>
-            <xforms:submission id="sleep-5-seconds" method="post"
+            </xf:instance>
+            <xf:submission id="sleep-5-seconds" method="post"
                 action="/xforms-sandbox/service/sleep-5-seconds" replace="none"/>
-            <xxforms:script ev:event="xforms-model-construct-done">
-                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxforms:script>
-            <xforms:action ev:event="load-initial-data">
-                <xforms:send submission="sleep-5-seconds"/>
-                <xforms:insert ref="instance('instance')" origin="instance('datasource')"/>
-            </xforms:action>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
+            <xxf:script ev:event="xforms-model-construct-done">
+                ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxf:script>
+            <xf:action ev:event="load-initial-data">
+                <xf:send submission="sleep-5-seconds"/>
+                <xf:insert ref="instance('instance')" origin="instance('datasource')"/>
+            </xf:action>
+        </xf:model>
+    </xh:head>
+    <xh:body>
 
         <fr:datatable id="table-repeat2" loading="@loading = 'true'">
-            <xhtml:tr repeat-ref="record">
-                <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
-                    <xforms:output ref="AAA">
-                        <xforms:label>AAA (imp)</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-                <xhtml:td fr:sortable="true" fr:resizeable="true">
-                    <xforms:output ref="BBB">
+            <xh:tr repeat-ref="record">
+                <xh:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
+                    <xf:output ref="AAA">
+                        <xf:label>AAA (imp)</xf:label>
+                    </xf:output>
+                </xh:td>
+                <xh:td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="BBB">
                         <!-- Optional label used if there is no <head> -->
-                        <xforms:label>BBB (imp)</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-                <xhtml:td fr:sortable="true" fr:resizeable="true">
-                    <xforms:output ref="CCC">
+                        <xf:label>BBB (imp)</xf:label>
+                    </xf:output>
+                </xh:td>
+                <xh:td fr:sortable="true" fr:resizeable="true">
+                    <xf:output ref="CCC">
                         <!-- Optional label used if there is no <head> -->
-                        <xforms:label>CCC (imp)</xforms:label>
-                    </xforms:output>
-                </xhtml:td>
-            </xhtml:tr>
+                        <xf:label>CCC (imp)</xf:label>
+                    </xf:output>
+                </xh:td>
+            </xh:tr>
         </fr:datatable>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

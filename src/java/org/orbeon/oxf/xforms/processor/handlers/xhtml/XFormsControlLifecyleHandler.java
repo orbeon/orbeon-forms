@@ -142,19 +142,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
                     }
                     break;
                 } else if ("label".equals(current)) {
-                    // xforms:label
+                    // xf:label
                     if (hasLocalLabel())
                         handleLabel();
                 } else if ("alert".equals(current)) {
-                    // xforms:alert
+                    // xf:alert
                     if (hasLocalAlert())
                         handleAlert();
                 } else if ("hint".equals(current)) {
-                    // xforms:hint
+                    // xf:hint
                     if (hasLocalHint())
                         handleHint();
                 } else {
-                    // xforms:help
+                    // xf:help
                     if (hasLocalHelp())
                         handleHelp();
                 }
@@ -173,19 +173,19 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
                         // Handle control
                         handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), getControl());
                     } else if ("label".equals(current)) {
-                        // xforms:label
+                        // xf:label
                         if (hasLocalLabel())
                             handleLabel();
                     } else if ("alert".equals(current)) {
-                        // xforms:alert
+                        // xf:alert
                         if (hasLocalAlert())
                             handleAlert();
                     } else if ("hint".equals(current)) {
-                        // xforms:hint
+                        // xf:hint
                         if (hasLocalHint())
                             handleHint();
                     } else {
-                        // xforms:help
+                        // xf:help
                         if (hasLocalHelp())
                             handleHelp();
                     }

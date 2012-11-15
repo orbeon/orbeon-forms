@@ -11,24 +11,24 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>XForms Dialog</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="instance">
+    <xh:head>
+        <xh:title>XForms Dialog</xh:title>
+        <xf:model>
+            <xf:instance id="instance">
                 <instance>
                     <text>Some text here</text>
                 </instance>
-            </xforms:instance>
-        </xforms:model>
-        <xhtml:script type="text/javascript">
+            </xf:instance>
+        </xf:model>
+        <xh:script type="text/javascript">
 
             function loaded() {
 
@@ -57,35 +57,35 @@
                 document.myPanel.render();
                 document.myPanel.show();
             }
-        </xhtml:script>
-    </xhtml:head>
-    <xhtml:body onload="loaded()">
+        </xh:script>
+    </xh:head>
+    <xh:body onload="loaded()">
 
         <!-- The dialog -->
-        <xhtml:div id="myDialog">
-            <xhtml:div class="hd">Dialog title</xhtml:div>
-            <xhtml:div class="bd">
-                <xhtml:h3>Please complete the form</xhtml:h3>
-                <xforms:input ref="text" incremental="true">
-                    <xforms:label>Name:</xforms:label>
-                </xforms:input>
-                <xhtml:button onclick="document.myDialog.hide()">Hide</xhtml:button>
-            </xhtml:div>
-        </xhtml:div>
+        <xh:div id="myDialog">
+            <xh:div class="hd">Dialog title</xh:div>
+            <xh:div class="bd">
+                <xh:h3>Please complete the form</xh:h3>
+                <xf:input ref="text" incremental="true">
+                    <xf:label>Name:</xf:label>
+                </xf:input>
+                <xh:button onclick="document.myDialog.hide()">Hide</xh:button>
+            </xh:div>
+        </xh:div>
         <!-- Button to show the dialog -->
-        <xhtml:button onclick="document.myDialog.show()">Show dialog</xhtml:button>
+        <xh:button onclick="document.myDialog.show()">Show dialog</xh:button>
         <!-- Displays value entered in the dialog -->
-        <xhtml:p>
-            <xforms:output ref="text">
-                <xforms:label>Text:</xforms:label>
-            </xforms:output>
-        </xhtml:p>
+        <xh:p>
+            <xf:output ref="text">
+                <xf:label>Text:</xf:label>
+            </xf:output>
+        </xh:p>
 
         <!-- What the server generates for the help -->
-        <xhtml:img id="control-id--help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" alt="Some help here."/>
-        <xhtml:div id="control-id--help-div" class="xforms-help-div" style="visibility: hidden">
-            <xhtml:div class="hd">Label of control - Help</xhtml:div>
-            <xhtml:div class="bd">
+        <xh:img id="control-id--help-image" class="xforms-help-image" src="/ops/images/xforms/help.png" alt="Some help here."/>
+        <xh:div id="control-id--help-div" class="xforms-help-div" style="visibility: hidden">
+            <xh:div class="hd">Label of control - Help</xh:div>
+            <xh:div class="bd">
                 Preschool Puberty, and a Search for the Causes
                 By DARSHAK M. SANGHAVI
 
@@ -117,7 +117,7 @@
                 problems. Sex hormones are potent because they are easily absorbed through the skin and resist
                 degradation better than many other hormones. Unlike protein-based hormones like insulin, sex hormones
                 like testosterone and estrogen are technically steroids, meaning they are derived from cholesterol.
-            </xhtml:div>
-        </xhtml:div>
-    </xhtml:body>
-</xhtml:html>
+            </xh:div>
+        </xh:div>
+    </xh:body>
+</xh:html>

@@ -11,19 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+<xh:html xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:exforms="http://www.exforms.org/exf/1-0"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+    xmlns:exf="http://www.exforms.org/exf/1-0"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xhtml:head>
-        <xhtml:title>Sort</xhtml:title>
-        <xforms:model>
-            <xforms:instance id="composers">
+    <xh:head>
+        <xh:title>Sort</xh:title>
+        <xf:model>
+            <xf:instance id="composers">
                 <composers>
                     <composer date="1842-05-12">Massenet</composer>
                     <composer date="1844-03-06">Rimsky-Korsakov</composer>
@@ -40,99 +40,99 @@
                     <composer date="1863-12-07">mascagni</composer>
                     <composer date="1864-06-11">strauss</composer>
                 </composers>
-            </xforms:instance>
-            <xforms:instance id="control">
+            </xf:instance>
+            <xf:instance id="control">
                 <control>
                     <order>ascending</order>
                     <case>lower-first</case>
                 </control>
-            </xforms:instance>
-        </xforms:model>
-    </xhtml:head>
-    <xhtml:body>
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>exforms:sort()</xforms:label>
-            <xforms:repeat ref="exforms:sort(composer, '.', 'text', instance('control')/order, instance('control')/case)">
-                <xhtml:div>
-                    <xforms:output ref="."/>
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>exf:sort()</xf:label>
+            <xf:repeat ref="exf:sort(composer, '.', 'text', instance('control')/order, instance('control')/case)">
+                <xh:div>
+                    <xf:output ref="."/>
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>xxforms:sort()</xforms:label>
-            <xforms:repeat ref="xxforms:sort(composer, ., 'text', instance('control')/order, instance('control')/case)">
-                <xhtml:div>
-                    <xforms:output ref="."/>
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>xxf:sort()</xf:label>
+            <xf:repeat ref="xxf:sort(composer, ., 'text', instance('control')/order, instance('control')/case)">
+                <xh:div>
+                    <xf:output ref="."/>
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>exforms:sort()</xforms:label>
-            <xforms:repeat ref="exforms:sort(composer, '@date', 'text', instance('control')/order, instance('control')/case)">
-                <xhtml:div>
-                    <xforms:output value="."/> (<xforms:output value="@date"/>)
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>exf:sort()</xf:label>
+            <xf:repeat ref="exf:sort(composer, '@date', 'text', instance('control')/order, instance('control')/case)">
+                <xh:div>
+                    <xf:output value="."/> (<xf:output value="@date"/>)
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>xxforms:sort()</xforms:label>
-            <xforms:repeat ref="xxforms:sort(composer, @date, 'text', instance('control')/order, instance('control')/case)">
-                <xhtml:div>
-                    <xforms:output value="."/> (<xforms:output value="@date"/>)
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>xxf:sort()</xf:label>
+            <xf:repeat ref="xxf:sort(composer, @date, 'text', instance('control')/order, instance('control')/case)">
+                <xh:div>
+                    <xf:output value="."/> (<xf:output value="@date"/>)
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>exforms:sort()</xforms:label>
-            <xforms:repeat ref="exforms:sort(composer, '.', 'text')">
-                <xhtml:div>
-                    <xforms:output ref="."/>
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>exf:sort()</xf:label>
+            <xf:repeat ref="exf:sort(composer, '.', 'text')">
+                <xh:div>
+                    <xf:output ref="."/>
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-        <xforms:group appearance="xxforms:fieldset">
-            <xforms:label>xxforms:sort()</xforms:label>
-            <xforms:repeat ref="xxforms:sort(composer, ., 'text')">
-                <xhtml:div>
-                    <xforms:output ref="."/>
-                </xhtml:div>
-            </xforms:repeat>
-        </xforms:group>
+        <xf:group appearance="xxf:fieldset">
+            <xf:label>xxf:sort()</xf:label>
+            <xf:repeat ref="xxf:sort(composer, ., 'text')">
+                <xh:div>
+                    <xf:output ref="."/>
+                </xh:div>
+            </xf:repeat>
+        </xf:group>
 
-        <xhtml:hr/>
+        <xh:hr/>
 
-        <xforms:select1 ref="instance('control')/order">
-            <xforms:label>Sort order</xforms:label>
-            <xforms:item>
-                <xforms:label>Ascending</xforms:label>
-                <xforms:value>ascending</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Descending</xforms:label>
-                <xforms:value>descending</xforms:value>
-            </xforms:item>
-        </xforms:select1>
+        <xf:select1 ref="instance('control')/order">
+            <xf:label>Sort order</xf:label>
+            <xf:item>
+                <xf:label>Ascending</xf:label>
+                <xf:value>ascending</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>Descending</xf:label>
+                <xf:value>descending</xf:value>
+            </xf:item>
+        </xf:select1>
 
-        <xforms:select1 ref="instance('control')/case">
-            <xforms:label>Case order</xforms:label>
-            <xforms:item>
-                <xforms:label>Lower first</xforms:label>
-                <xforms:value>lower-first</xforms:value>
-            </xforms:item>
-            <xforms:item>
-                <xforms:label>Upper first</xforms:label>
-                <xforms:value>upper-first</xforms:value>
-            </xforms:item>
-        </xforms:select1>
+        <xf:select1 ref="instance('control')/case">
+            <xf:label>Case order</xf:label>
+            <xf:item>
+                <xf:label>Lower first</xf:label>
+                <xf:value>lower-first</xf:value>
+            </xf:item>
+            <xf:item>
+                <xf:label>Upper first</xf:label>
+                <xf:value>upper-first</xf:value>
+            </xf:item>
+        </xf:select1>
 
-    </xhtml:body>
-</xhtml:html>
+    </xh:body>
+</xh:html>

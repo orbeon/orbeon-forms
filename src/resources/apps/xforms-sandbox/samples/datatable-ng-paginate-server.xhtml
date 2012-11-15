@@ -11,31 +11,31 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns="http://www.w3.org/1999/xhtml" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+<html xmlns:xf="http://www.w3.org/2002/xforms" xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns="http://www.w3.org/1999/xhtml" xmlns:xh="http://www.w3.org/1999/xhtml"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:twit="http://www.orbeon.com/sandbox/twitter">
 
     <head>
         <title>Using YUI's datatable</title>
-        <xforms:model id="model">
-            <xforms:instance id="twitter"
+        <xf:model id="model">
+            <xf:instance id="twitter"
                 src="/xforms-sandbox/service/twitter?sortBy=published&amp;sortOrder=descending"/>
-            <xforms:bind ref="instance('twitter')/atom:entry/atom:published"
-                type="xforms:dateTime"/>
-            <xforms:instance id="params">
+            <xf:bind ref="instance('twitter')/atom:entry/atom:published"
+                type="xf:dateTime"/>
+            <xf:instance id="params">
                 <params xmlns="">
                     <page>1</page>
                     <sortBy>published</sortBy>
                     <sortOrder>descending</sortOrder>
                 </params>
-            </xforms:instance>
-            <xforms:var name="params" value="instance('params')"/>
-            <xforms:submission id="load" ref="instance('params')" instance="twitter"
+            </xf:instance>
+            <xf:var name="params" value="instance('params')"/>
+            <xf:submission id="load" ref="instance('params')" instance="twitter"
                 replace="instance" method="get" resource="/xforms-sandbox/service/twitter"/>
-        </xforms:model>
+        </xf:model>
 
     </head>
     <body>
@@ -45,27 +45,27 @@
         <p>This sample demonstratres the pagination feature of the datatable widget with sort and
             pagination handled server side.</p>
 
-        <xforms:var name="params" value="instance('params')"/>
+        <xf:var name="params" value="instance('params')"/>
         <fr:datatable paginated="true" sortAndPaginationMode="external" modal="true"
             nbPages="ceiling(/atom:feed/twit:nbResults div /atom:feed/twit:rpp)" page="$params/page">
-            <xforms:action ev:event="fr-goto-page">
-                <xforms:setvalue ref="$params/page" value="event('fr-new-page')"/>
-                <xforms:send submission="load"/>
-            </xforms:action>
-            <xforms:action ev:event="fr-update-sort">
-                <xforms:var name="column" value="event('fr-column')"/>
-                <xforms:var name="nextSort"
+            <xf:action ev:event="fr-goto-page">
+                <xf:setvalue ref="$params/page" value="event('fr-new-page')"/>
+                <xf:send submission="load"/>
+            </xf:action>
+            <xf:action ev:event="fr-update-sort">
+                <xf:var name="column" value="event('fr-column')"/>
+                <xf:var name="nextSort"
                     select="('published', 'author/name', 'title')[$column]"/>
-                <xforms:setvalue ref="$params/sortOrder"
+                <xf:setvalue ref="$params/sortOrder"
                     value="if ($params/sortBy = $nextSort)
                         then if ($params/sortOrder = 'ascending')
                             then 'descending'
                             else 'ascending'
                         else 'ascending'"/>
-                <xforms:setvalue ref="$params/sortBy" value="$nextSort"/>
-                <xforms:setvalue ref="$params/page" value="1"/>
-                <xforms:send submission="load"/>
-            </xforms:action>
+                <xf:setvalue ref="$params/sortBy" value="$nextSort"/>
+                <xf:setvalue ref="$params/page" value="1"/>
+                <xf:send submission="load"/>
+            </xf:action>
             <thead>
                 <tr>
                     <th fr:sortable="true"
@@ -94,17 +94,17 @@
             <tbody>
                 <tr repeat-ref="/atom:feed/atom:entry">
                     <td>
-                        <xforms:output ref="atom:published"
-                            xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
+                        <xf:output ref="atom:published"
+                            xxf:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"
                         />
                     </td>
                     <td>
                         <a href="{atom:author/atom:uri}">
-                            <xforms:output value="atom:author/atom:name"/>
+                            <xf:output value="atom:author/atom:name"/>
                         </a>
                     </td>
                     <td>
-                        <xforms:output value="atom:title"/>
+                        <xf:output value="atom:title"/>
                     </td>
                 </tr>
             </tbody>

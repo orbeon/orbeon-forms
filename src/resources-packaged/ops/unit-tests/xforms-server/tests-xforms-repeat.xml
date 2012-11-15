@@ -16,12 +16,10 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xh="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
@@ -29,18 +27,18 @@
     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <test description="xforms:repeat initialization" name="oxf:pipeline">
+    <test description="xf:repeat initialization" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xf="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model>
-                                    <xforms:instance>
+                        <xh:html>
+                            <xh:head>
+                                <xf:model>
+                                    <xf:instance>
                                         <form>
                                             <company>
                                                 <department>
@@ -58,36 +56,36 @@
                                                 </department>
                                             </company>
                                         </form>
-                                    </xforms:instance>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:repeat ref="/form/company/department" id="id123">
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:insert ref="../department" at="2" position="after"/>
-                                    </xforms:action>
-                                    <xhtml:tr>
-                                        <xhtml:td>
-                                            <xhtml:table>
-                                                <xforms:repeat ref="employee" id="id124" startindex="2">
-                                                    <xforms:action ev:event="DOMActivate">
-                                                        <xforms:insert ref="../../department[index('id123')]/employee" at="2" position="after"/>
-                                                    </xforms:action>
-                                                    <xhtml:tr>
-                                                        <xhtml:td>
-                                                            <xforms:output ref="@first" id="id125"/>
-                                                        </xhtml:td>
-                                                        <xhtml:td>
-                                                            <xforms:output ref="@last" id="id126"/>
-                                                        </xhtml:td>
-                                                    </xhtml:tr>
-                                                </xforms:repeat>
-                                            </xhtml:table>
-                                        </xhtml:td>
-                                    </xhtml:tr>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
+                                    </xf:instance>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                                <xf:repeat ref="/form/company/department" id="id123">
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:insert ref="../department" at="2" position="after"/>
+                                    </xf:action>
+                                    <xh:tr>
+                                        <xh:td>
+                                            <xh:table>
+                                                <xf:repeat ref="employee" id="id124" startindex="2">
+                                                    <xf:action ev:event="DOMActivate">
+                                                        <xf:insert ref="../../department[index('id123')]/employee" at="2" position="after"/>
+                                                    </xf:action>
+                                                    <xh:tr>
+                                                        <xh:td>
+                                                            <xf:output ref="@first" id="id125"/>
+                                                        </xh:td>
+                                                        <xh:td>
+                                                            <xf:output ref="@last" id="id126"/>
+                                                        </xh:td>
+                                                    </xh:tr>
+                                                </xf:repeat>
+                                            </xh:table>
+                                        </xh:td>
+                                    </xh:tr>
+                                </xf:repeat>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -128,34 +126,34 @@
         </output>
     </test>
 
-    <test description="xforms:repeat insert action" name="oxf:pipeline">
+    <test description="xf:repeat insert action" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
                     <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group id="my-dummy-group">
-                        <xforms:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxforms:repeat-indexes="1 1"/>
-                    </xforms:group>
-                    <xforms:repeat ref="company/department" id="id123">
-                        <xforms:action id="my-action-1" ev:event="DOMActivate">
-                            <xforms:insert id="my-insert-1" ref="../department" at="2" position="after"/>
-                        </xforms:action>
-                        <xforms:repeat ref="employee" id="id124" startindex="2">
-                            <xforms:trigger id="id127">
-                                <xforms:label>Insert</xforms:label>
-                                <xforms:action id="my-action-2" ev:event="DOMActivate">
-                                    <xforms:insert id="my-insert-2" ref="../../department[index('id123')]/employee" at="2" position="after"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                            <xforms:output ref="@first" id="id125"/>
-                            <xforms:output ref="@last" id="id126"/>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-dummy-group">
+                        <xf:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxf:repeat-indexes="1 1"/>
+                    </xf:group>
+                    <xf:repeat ref="company/department" id="id123">
+                        <xf:action id="my-action-1" ev:event="DOMActivate">
+                            <xf:insert id="my-insert-1" ref="../department" at="2" position="after"/>
+                        </xf:action>
+                        <xf:repeat ref="employee" id="id124" startindex="2">
+                            <xf:trigger id="id127">
+                                <xf:label>Insert</xf:label>
+                                <xf:action id="my-action-2" ev:event="DOMActivate">
+                                    <xf:insert id="my-insert-2" ref="../../department[index('id123')]/employee" at="2" position="after"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:output ref="@first" id="id125"/>
+                            <xf:output ref="@last" id="id126"/>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -242,31 +240,31 @@
         </output>
     </test>
 
-     <test description="xforms:repeat delete action" name="oxf:pipeline">
+     <test description="xf:repeat delete action" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
                     <xi:include href="repeat-model.xml" xxi:omit-xml-base="true"/>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group id="my-dummy-group">
-                        <xforms:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxforms:repeat-indexes="1 1"/>
-                    </xforms:group>
-                    <xforms:repeat ref="company/department" id="id123">
-                        <xforms:repeat ref="employee" id="id124" startindex="2">
-                            <xforms:trigger id="id127">
-                                <xforms:label>Delete</xforms:label>
-                                <xforms:action ev:event="DOMActivate">
-                                    <xforms:delete ref="../../department[index('id123')]/employee" at="2"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                            <xforms:output ref="@first" id="id125"/>
-                            <xforms:output ref="@last" id="id126"/>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-dummy-group">
+                        <xf:dispatch ev:observer="main-model" ev:event="xforms-ready" name="DOMActivate" targetid="id127" xxf:repeat-indexes="1 1"/>
+                    </xf:group>
+                    <xf:repeat ref="company/department" id="id123">
+                        <xf:repeat ref="employee" id="id124" startindex="2">
+                            <xf:trigger id="id127">
+                                <xf:label>Delete</xf:label>
+                                <xf:action ev:event="DOMActivate">
+                                    <xf:delete ref="../../department[index('id123')]/employee" at="2"/>
+                                </xf:action>
+                            </xf:trigger>
+                            <xf:output ref="@first" id="id125"/>
+                            <xf:output ref="@last" id="id126"/>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -326,13 +324,13 @@
         </output>
     </test>
 
-    <test description="Simple xforms:repeat startindex" name="oxf:pipeline">
+    <test description="Simple xf:repeat startindex" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <company>
                                 <department>
                                     <employee/>
@@ -348,16 +346,16 @@
                                     <employee/>
                                 </department>
                             </company>
-                        </xforms:instance>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat ref="department" id="department-repeat" startindex="4">
-                        <xforms:repeat ref="employee" id="employee-repeat" startindex="2">
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="department" id="department-repeat" startindex="4">
+                        <xf:repeat ref="employee" id="employee-repeat" startindex="2">
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -378,13 +376,13 @@
         </output>
     </test>
 
-    <test description="xforms:repeat setindex action in reaction to event dispatched to nested repeat" name="oxf:pipeline">
+    <test description="xf:repeat setindex action in reaction to event dispatched to nested repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="main-model">
-                        <xforms:instance id="main-instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="main-model">
+                        <xf:instance id="main-instance">
                             <company>
                                 <department>
                                     <employee/>
@@ -400,26 +398,26 @@
                                     <employee/>
                                 </department>
                             </company>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- Initial indexes are all "1"; dispatching will cause the nested repeat in position 3 to change, not that in position 2 -->
-                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-trigger" xxforms:repeat-indexes="3 2"/>
+                        <xf:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="my-trigger" xxf:repeat-indexes="3 2"/>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat ref="department" id="department-repeat">
-                        <xforms:repeat ref="employee" id="employee-repeat">
-                            <xforms:trigger id="my-trigger">
-                                <xforms:action id="a1" ev:event="DOMActivate">
-                                    <xforms:setindex id="a2" repeat="department-repeat" index="2"/>
-                                    <xforms:setindex id="a3" repeat="employee-repeat" index="4"/>
-                                </xforms:action>
-                            </xforms:trigger>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="department" id="department-repeat">
+                        <xf:repeat ref="employee" id="employee-repeat">
+                            <xf:trigger id="my-trigger">
+                                <xf:action id="a1" ev:event="DOMActivate">
+                                    <xf:setindex id="a2" repeat="department-repeat" index="2"/>
+                                    <xf:setindex id="a3" repeat="employee-repeat" index="4"/>
+                                </xf:action>
+                            </xf:trigger>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -443,18 +441,18 @@
     <test description="Repeat index change upon focus change" name="oxf:pipeline">
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action>
-                <xxforms:event name="DOMActivate" source-control-id="id125·3-2"/>
-            </xxforms:action>
+            <xxf:action>
+                <xxf:event name="DOMActivate" source-control-id="id125·3-2"/>
+            </xxf:action>
         </input>
         <input name="controls">
             <controls>
-                <xforms:repeat ref="/form/company/department" id="id123">
-                    <xforms:repeat ref="employee" id="id124">
-                        <xforms:output ref="@first" id="id125" class="xforms-activable"/>
-                        <xforms:output ref="@last" id="id126"/>
-                    </xforms:repeat>
-                </xforms:repeat>
+                <xf:repeat ref="/form/company/department" id="id123">
+                    <xf:repeat ref="employee" id="id124">
+                        <xf:output ref="@first" id="id125" class="xforms-activable"/>
+                        <xf:output ref="@last" id="id126"/>
+                    </xf:repeat>
+                </xf:repeat>
             </controls>
         </input>
         <input name="models">
@@ -508,51 +506,51 @@
         </output>
     </test>
 
-    <test description="xforms:insert with @context and @origin" name="oxf:pipeline">
+    <test description="xf:insert with @context and @origin" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="main-model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="main-model">
+                        <xf:instance id="instance">
                             <form>
                                 <employees/>
                             </form>
-                        </xforms:instance>
-                        <xforms:instance id="template">
+                        </xf:instance>
+                        <xf:instance id="template">
                             <employee>
                                 <first-name/>
                             </employee>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
+                        <xf:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="test-trigger"/>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:trigger id="test-trigger">
-                        <xforms:label id="test-trigger-label">Add</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:trigger id="test-trigger">
+                        <xf:label id="test-trigger-label">Add</xf:label>
+                        <xf:action ev:event="DOMActivate">
                             <!-- For the first insert, there is no employee element yet -->
-                            <xforms:setvalue ref="instance('template')/first-name">Joe</xforms:setvalue>
-                            <xforms:insert context="employees" ref="employee"
+                            <xf:setvalue ref="instance('template')/first-name">Joe</xf:setvalue>
+                            <xf:insert context="employees" ref="employee"
                                            origin="instance('template')"/>
                             <!-- For the second insert, there is an employee element, and we insert after that element -->
-                            <xforms:setvalue ref="instance('template')/first-name">Mary</xforms:setvalue>
-                            <xforms:insert context="employees" ref="employee"
+                            <xf:setvalue ref="instance('template')/first-name">Mary</xf:setvalue>
+                            <xf:insert context="employees" ref="employee"
                                            origin="instance('template')"/>
                             <!-- This should insert between the two existing employees -->
-                            <xforms:setvalue ref="instance('template')/first-name">Billy</xforms:setvalue>
-                            <xforms:insert context="employees" ref="employee" at="index('employee-repeat')" position="before"
+                            <xf:setvalue ref="instance('template')/first-name">Billy</xf:setvalue>
+                            <xf:insert context="employees" ref="employee" at="index('employee-repeat')" position="before"
                                            origin="instance('template')"/>
-                        </xforms:action>
+                        </xf:action>
 
-                    </xforms:trigger>
-                    <xforms:repeat ref="employees/employee" id="employee-repeat">
-                        <xforms:input id="first-name-input" ref="first-name"/>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                    </xf:trigger>
+                    <xf:repeat ref="employees/employee" id="employee-repeat">
+                        <xf:input id="first-name-input" ref="first-name"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -599,15 +597,15 @@
 
     <test description="Index initialization" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="main-model">
-                                    <xforms:instance>
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="main-model">
+                                    <xf:instance>
                                        <instance model-id="main-model">
                                            <r1/>
                                            <r1>
@@ -623,22 +621,22 @@
                                            </r4>
                                            <r4/>
                                        </instance>
-                                    </xforms:instance>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
+                                    </xf:instance>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
                                 <!-- Check startindex in bounds, out of bounds, and 0 -->
-                                <xforms:repeat ref="r1" id="repeat1" startindex="2">
-                                    <xforms:repeat ref="r2" id="repeat2" startindex="4">
-                                    </xforms:repeat>
-                                </xforms:repeat>
-                                <xforms:repeat ref="r3" id="repeat3">
-                                </xforms:repeat>
-                                <xforms:repeat ref="r4" id="repeat4">
-                                    <xforms:repeat ref="r5" id="repeat5"/>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
+                                <xf:repeat ref="r1" id="repeat1" startindex="2">
+                                    <xf:repeat ref="r2" id="repeat2" startindex="4">
+                                    </xf:repeat>
+                                </xf:repeat>
+                                <xf:repeat ref="r3" id="repeat3">
+                                </xf:repeat>
+                                <xf:repeat ref="r4" id="repeat4">
+                                    <xf:repeat ref="r5" id="repeat5"/>
+                                </xf:repeat>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" id="repeat-response"/>
                 </p:processor>
@@ -671,16 +669,16 @@
 
     <test description="Reference to nested binds from repeat" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="main-model">
-                                    <xforms:instance id="main-instance">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="main-model">
+                                    <xf:instance id="main-instance">
                                         <instance xmlns="">
                                             <book>
                                                 <title>Don Quixote de la Mancha</title>
@@ -695,25 +693,25 @@
                                                 <author>Arthur C. Clarke</author>
                                             </book>
                                         </instance>
-                                    </xforms:instance>
+                                    </xf:instance>
 
-                                    <xforms:bind ref="book">
-                                        <xforms:bind id="title-bind" ref="title" required="true()"/>
-                                        <xforms:bind id="author-bind" ref="author" required="true()"/>
-                                    </xforms:bind>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:repeat ref="book" id="book-repeat">
-                                    <xforms:input id="title-control" bind="title-bind">
-                                        <xforms:label>Title</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input id="author-control" bind="author-bind">
-                                        <xforms:label>Author</xforms:label>
-                                    </xforms:input>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
+                                    <xf:bind ref="book">
+                                        <xf:bind id="title-bind" ref="title" required="true()"/>
+                                        <xf:bind id="author-bind" ref="author" required="true()"/>
+                                    </xf:bind>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                                <xf:repeat ref="book" id="book-repeat">
+                                    <xf:input id="title-control" bind="title-bind">
+                                        <xf:label>Title</xf:label>
+                                    </xf:input>
+                                    <xf:input id="author-control" bind="author-bind">
+                                        <xf:label>Author</xf:label>
+                                    </xf:input>
+                                </xf:repeat>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -745,35 +743,35 @@
 
     <test description="position() function within repeat" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model>
-                                    <xforms:instance id="cities-instance" xxforms:readonly="true">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model>
+                                    <xf:instance id="cities-instance" xxf:readonly="true">
                                         <cities>
                                             <city>San Francisco</city>
                                             <city>Los Angeles</city>
                                             <city>San Diego</city>
                                         </cities>
-                                    </xforms:instance>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:repeat ref="city" id="city-repeat">
-                                    <xforms:input id="my-input" ref=".">
-                                        <xforms:label>City: </xforms:label>
-                                    </xforms:input>
-                                    <xforms:output id="my-output" value="position()">
-                                        <xforms:label>Position: </xforms:label>
-                                    </xforms:output>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
+                                    </xf:instance>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                                <xf:repeat ref="city" id="city-repeat">
+                                    <xf:input id="my-input" ref=".">
+                                        <xf:label>City: </xf:label>
+                                    </xf:input>
+                                    <xf:output id="my-output" value="position()">
+                                        <xf:label>Position: </xf:label>
+                                    </xf:output>
+                                </xf:repeat>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -805,49 +803,49 @@
 
     <test description="UI events upon repeat update" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
+                        <xh:html>
+                            <xh:head>
 
-                                <xforms:model xxforms:server.events.initial-refresh-events="true" id="model">
+                                <xf:model xxf:server.events.initial-refresh-events="true" id="model">
 
                                     <!-- Insert new iteration -->
-                                    <xforms:insert ev:event="xforms-ready"
+                                    <xf:insert ev:event="xforms-ready"
                                         ref="*" at="1" position="after" origin="instance('fruit-template')"/>
 
-                                    <xforms:instance id="fruits">
+                                    <xf:instance id="fruits">
                                         <fruits>
                                             <orange>bloody</orange>
                                             <apple>green</apple>
                                         </fruits>
-                                    </xforms:instance>
+                                    </xf:instance>
 
-                                    <xforms:instance id="fruit-template">
+                                    <xf:instance id="fruit-template">
                                         <pear>yellow</pear>
-                                    </xforms:instance>
+                                    </xf:instance>
 
-                                    <xforms:instance id="events">
+                                    <xf:instance id="events">
                                         <events/>
-                                    </xforms:instance>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:repeat ref="*" id="my-repeat">
-                                    <xforms:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled xforms-required xforms-optional xforms-valid xforms-invalid xforms-readonly xforms-readwrite"
+                                    </xf:instance>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                                <xf:repeat ref="*" id="my-repeat">
+                                    <xf:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled xforms-required xforms-optional xforms-valid xforms-invalid xforms-readonly xforms-readwrite"
                                                    context="instance('events')" ref="*"
-                                                   origin="xxforms:element('event',
-                                                            (xxforms:attribute('type', event('xxforms:type')),
-                                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
-                                    <xforms:input ref="." id="my-input"/>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
+                                                   origin="xxf:element('event',
+                                                            (xxf:attribute('type', event('xxf:type')),
+                                                             xxf:attribute('target', event('xxf:targetid')),
+                                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
+                                    <xf:input ref="." id="my-input"/>
+                                </xf:repeat>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -894,28 +892,28 @@
     <test description="Repeat iteration relevance" name="oxf:pipeline" only="false">
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action>
-                <xxforms:event name="xxforms-value" source-control-id="approvalStatus-input·2">bbb</xxforms:event>
-            </xxforms:action>
+            <xxf:action>
+                <xxf:event name="xxforms-value" source-control-id="approvalStatus-input·2">bbb</xxf:event>
+            </xxf:action>
         </input>
         <input name="controls">
             <controls>
-                <xforms:group ref="authorizations" id="authorization-group">
-                    <xforms:repeat ref="authorization" id="authorization-repeat">
-                        <xforms:input ref="approvalStatus" id="approvalStatus-input"><xforms:label>Approval Status:</xforms:label></xforms:input>
-                        <xforms:repeat ref="conditions/condition" id="condition-repeat">
-                            <xforms:textarea ref="description" id="description-textarea"><xforms:label>Condition:</xforms:label></xforms:textarea>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xforms:group>
+                <xf:group ref="authorizations" id="authorization-group">
+                    <xf:repeat ref="authorization" id="authorization-repeat">
+                        <xf:input ref="approvalStatus" id="approvalStatus-input"><xf:label>Approval Status:</xf:label></xf:input>
+                        <xf:repeat ref="conditions/condition" id="condition-repeat">
+                            <xf:textarea ref="description" id="description-textarea"><xf:label>Condition:</xf:label></xf:textarea>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xf:group>
             </controls>
         </input>
         <input name="models">
             <models>
-                <xforms:model id="main-model">
-                    <xforms:instance id="main-instance"/>
-                    <xforms:bind id="bind1" ref="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
-                </xforms:model>
+                <xf:model id="main-model">
+                    <xf:instance id="main-instance"/>
+                    <xf:bind id="bind1" ref="authorizations/authorization/conditions" relevant="../approvalStatus ne ''"/>
+                </xf:model>
             </models>
         </input>
         <input name="instances">
@@ -1017,43 +1015,43 @@
 
     <test description="Simple master-detail repeat initialization" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
-                                    <xforms:instance id="instance">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="model">
+                                    <xf:instance id="instance">
                                         <oranges>
                                             <orange><type>Persian</type><id>1</id></orange>
                                             <orange><type>Navel</type><id>2</id></orange>
                                         </oranges>
-                                    </xforms:instance>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
+                                    </xf:instance>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
 
-                                <xforms:repeat ref="orange" id="orange-repeat">
-                                    <xforms:output ref="type" id="orange-repeat-output">
-                                        <xforms:label>Orange type:</xforms:label>
-                                    </xforms:output>
-                                </xforms:repeat>
+                                <xf:repeat ref="orange" id="orange-repeat">
+                                    <xf:output ref="type" id="orange-repeat-output">
+                                        <xf:label>Orange type:</xf:label>
+                                    </xf:output>
+                                </xf:repeat>
 
                                 <!-- This is the key of this test: index() here must return 1, not 0 -->
-                                <xforms:group ref="orange[index('orange-repeat')]" id="my-group">
-                                    <xforms:input ref="type" id="detail-type">
-                                        <xforms:label>Orange type:</xforms:label>
-                                    </xforms:input>
-                                    <xforms:input ref="id" id="detail-id">
-                                        <xforms:label>Orange id:</xforms:label>
-                                    </xforms:input>
-                                </xforms:group>
-                            </xhtml:body>
+                                <xf:group ref="orange[index('orange-repeat')]" id="my-group">
+                                    <xf:input ref="type" id="detail-type">
+                                        <xf:label>Orange type:</xf:label>
+                                    </xf:input>
+                                    <xf:input ref="id" id="detail-id">
+                                        <xf:label>Orange id:</xf:label>
+                                    </xf:input>
+                                </xf:group>
+                            </xh:body>
 
-                        </xhtml:html>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1083,43 +1081,43 @@
 
     <test description="Repeat iterations updating only at time of refresh" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model>
-                                    <xforms:instance id="books-instance">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model>
+                                    <xf:instance id="books-instance">
                                         <books/>
-                                    </xforms:instance>
-                                    <xforms:instance id="templates">
+                                    </xf:instance>
+                                    <xf:instance id="templates">
                                         <book xmlns="">
                                             <title/>
                                             <author/>
                                         </book>
-                                    </xforms:instance>
+                                    </xf:instance>
 
-                                    <xforms:action ev:event="xforms-ready">
-                                        <xforms:insert context="." ref="book" origin="instance('templates')"/>
-                                        <xforms:setvalue ref="book[last()]/title" value="'T3'"/>
-                                        <xforms:setvalue ref="book[last()]/author" value="'A3'"/>
-                                    </xforms:action>
+                                    <xf:action ev:event="xforms-ready">
+                                        <xf:insert context="." ref="book" origin="instance('templates')"/>
+                                        <xf:setvalue ref="book[last()]/title" value="'T3'"/>
+                                        <xf:setvalue ref="book[last()]/author" value="'A3'"/>
+                                    </xf:action>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:group ref=".[exists(book)]" id="my-group">
-                                <!--<xforms:group ref=".">-->
-                                    <xforms:repeat ref="book" id="my-repeat">
-                                        <xforms:output value="title" id="my-title"/>
-                                        <xforms:output value="author" id="my-author"/>
-                                    </xforms:repeat>
-                                </xforms:group>
-                            </xhtml:body>
-                        </xhtml:html>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                                <xf:group ref=".[exists(book)]" id="my-group">
+                                <!--<xf:group ref=".">-->
+                                    <xf:repeat ref="book" id="my-repeat">
+                                        <xf:output value="title" id="my-title"/>
+                                        <xf:output value="author" id="my-author"/>
+                                    </xf:repeat>
+                                </xf:group>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1157,49 +1155,49 @@
 
     <test description="Dispatch events to all iterations of repeated controls" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
-                                    <xforms:instance xmlns="" id="instance">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="model">
+                                    <xf:instance xmlns="" id="instance">
                                         <values>
                                             <value/>
                                             <value/>
                                             <value/>
                                             <value/>
                                         </values>
-                                    </xforms:instance>
-                                    <xforms:action ev:event="xforms-ready">
+                                    </xf:instance>
+                                    <xf:action ev:event="xforms-ready">
                                         <!-- Set initial index -->
-                                        <xforms:setindex repeat="my-repeat" index="3"/>
+                                        <xf:setindex repeat="my-repeat" index="3"/>
                                         <!-- Save current index -->
-                                        <xforms:var name="initial-index" value="index('my-repeat')"/>
+                                        <xf:var name="initial-index" value="index('my-repeat')"/>
                                         <!-- Iterate through all values -->
-                                        <xforms:action iterate="value">
+                                        <xf:action iterate="value">
                                             <!-- Set index and dispatch event -->
-                                            <xforms:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
-                                            <xforms:dispatch name="my-event" targetid="my-input"/>
-                                        </xforms:action>
+                                            <xf:setindex repeat="my-repeat" index="count(preceding-sibling::*) + 1"/>
+                                            <xf:dispatch name="my-event" targetid="my-input"/>
+                                        </xf:action>
                                         <!-- Restore index -->
-                                        <xforms:setindex repeat="my-repeat" index="$initial-index"/>
-                                    </xforms:action>
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
+                                        <xf:setindex repeat="my-repeat" index="$initial-index"/>
+                                    </xf:action>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
                                 <!-- Iterate over all the values -->
-                                <xforms:repeat ref="value" id="my-repeat">
-                                    <xforms:input id="my-input" ref=".">
+                                <xf:repeat ref="value" id="my-repeat">
+                                    <xf:input id="my-input" ref=".">
                                         <!-- Upon receiving event "my-event", set the value of the control -->
-                                        <xforms:setvalue ev:event="my-event" ref="." value="count(preceding-sibling::*) + 1"/>
-                                    </xforms:input>
-                                </xforms:repeat>
-                            </xhtml:body>
-                        </xhtml:html>
+                                        <xf:setvalue ev:event="my-event" ref="." value="count(preceding-sibling::*) + 1"/>
+                                    </xf:input>
+                                </xf:repeat>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1239,54 +1237,54 @@
 
     <test description="xxforms-nodeset-changed event" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
-                                    <xforms:instance xmlns="" id="instance">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="model">
+                                    <xf:instance xmlns="" id="instance">
                                         <values order="ascending">
                                             <value>1</value>
                                             <value>2</value>
                                             <value>3</value>
                                             <value>4</value>
                                         </values>
-                                    </xforms:instance>
-                                    <xforms:instance xmlns="" id="changes">
+                                    </xf:instance>
+                                    <xf:instance xmlns="" id="changes">
                                         <changes/>
-                                    </xforms:instance>
+                                    </xf:instance>
 
-                                    <xforms:action ev:event="xforms-ready">
+                                    <xf:action ev:event="xforms-ready">
                                         <!-- Insert a node: this will immediately cause a repeat nodeset change -->
-                                        <xforms:insert ref="value" origin="xxforms:element('value', count(../value) + 1)"/>
+                                        <xf:insert ref="value" origin="xxf:element('value', count(../value) + 1)"/>
                                         <!-- Delete a node: this will immediately cause a repeat nodeset change  -->
-                                        <xforms:delete ref="value[1]"/>
+                                        <xf:delete ref="value[1]"/>
                                         <!-- Change repeat nodeset order without changing instance: this will cause change during refresh -->
-                                        <xforms:setvalue ref="@order">descending</xforms:setvalue>
-                                        <xforms:refresh/>
+                                        <xf:setvalue ref="@order">descending</xf:setvalue>
+                                        <xf:refresh/>
                                         <!-- Remove all items ("going to 0" condition) must not dispatch event -->
-                                        <xforms:delete ref="value"/>
+                                        <xf:delete ref="value"/>
                                         <!-- Insert a new item ("going from 0" condition) must not dispatch event  -->
-                                        <xforms:insert context="." ref="value" origin="xxforms:element('value', 1)"/>
-                                    </xforms:action>
+                                        <xf:insert context="." ref="value" origin="xxf:element('value', 1)"/>
+                                    </xf:action>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
-                                <xforms:group id="my-group">
-                                    <xforms:action ev:event="xxforms-nodeset-changed" ev:target="my-repeat">
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('change', count(instance('instance')/value))"/>
-                                    </xforms:action>
-                                    <xforms:repeat ref="xxforms:sort(value, string(.), 'text', @order)" id="my-repeat">
-                                        <xforms:output id="my-output" value="."/>
-                                    </xforms:repeat>
-                                </xforms:group>
-                            </xhtml:body>
-                        </xhtml:html>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                                <xf:group id="my-group">
+                                    <xf:action ev:event="xxforms-nodeset-changed" ev:target="my-repeat">
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('change', count(instance('instance')/value))"/>
+                                    </xf:action>
+                                    <xf:repeat ref="xxf:sort(value, string(.), 'text', @order)" id="my-repeat">
+                                        <xf:output id="my-output" value="."/>
+                                    </xf:repeat>
+                                </xf:group>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1327,57 +1325,57 @@
 
     <test description="No dispatch of xxforms-nodeset-changed upon control becoming relevant" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="wrap-xforms-state.xpl"/>
                     <p:input name="document">
-                        <xhtml:html>
-                            <xhtml:head>
-                                <xforms:model id="model">
-                                    <xforms:instance xmlns="" id="instance">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="model">
+                                    <xf:instance xmlns="" id="instance">
                                         <values show="false">
                                             <value>1</value>
                                             <value>2</value>
                                             <value>3</value>
                                             <value>4</value>
                                         </values>
-                                    </xforms:instance>
-                                    <xforms:instance xmlns="" id="changes">
+                                    </xf:instance>
+                                    <xf:instance xmlns="" id="changes">
                                         <changes/>
-                                    </xforms:instance>
+                                    </xf:instance>
 
-                                    <xforms:action ev:event="xforms-ready">
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('before-refresh')"/>
-                                        <xforms:refresh/>
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('after-refresh')"/>
+                                    <xf:action ev:event="xforms-ready">
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('before-refresh')"/>
+                                        <xf:refresh/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('after-refresh')"/>
                                         <!-- Cause the group and its content to become relevant upon next refresh -->
-                                        <xforms:setvalue ref="@show">true</xforms:setvalue>
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('before-refresh')"/>
-                                        <xforms:refresh/>
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('after-refresh')"/>
+                                        <xf:setvalue ref="@show">true</xf:setvalue>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('before-refresh')"/>
+                                        <xf:refresh/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('after-refresh')"/>
                                         <!-- Cause the group and its content to become non-relevant upon next refresh -->
-                                        <xforms:setvalue ref="@show">false</xforms:setvalue>
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('before-refresh')"/>
-                                        <xforms:refresh/>
-                                        <xforms:insert context="instance('changes')" ref="*" origin="xxforms:element('after-refresh')"/>
-                                    </xforms:action>
+                                        <xf:setvalue ref="@show">false</xf:setvalue>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('before-refresh')"/>
+                                        <xf:refresh/>
+                                        <xf:insert context="instance('changes')" ref="*" origin="xxf:element('after-refresh')"/>
+                                    </xf:action>
 
-                                </xforms:model>
-                            </xhtml:head>
-                            <xhtml:body>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
 
-                                <xforms:action ev:event="xforms-enabled xforms-disabled xxforms-nodeset-changed xxforms-index-changed">
-                                    <xforms:insert context="instance('changes')" ref="*"
-                                                   origin="xxforms:element(event('xxforms:type'), xxforms:attribute('id', event('xxforms:target')))"/>
-                                </xforms:action>
+                                <xf:action ev:event="xforms-enabled xforms-disabled xxforms-nodeset-changed xxforms-index-changed">
+                                    <xf:insert context="instance('changes')" ref="*"
+                                                   origin="xxf:element(event('xxf:type'), xxf:attribute('id', event('xxf:target')))"/>
+                                </xf:action>
 
-                                <xforms:group id="my-group" ref=".[@show = 'true']">
-                                    <xforms:repeat ref="value" id="my-repeat"/>
-                                </xforms:group>
-                            </xhtml:body>
-                        </xhtml:html>
+                                <xf:group id="my-group" ref=".[@show = 'true']">
+                                    <xf:repeat ref="value" id="my-repeat"/>
+                                </xf:group>
+                            </xh:body>
+                        </xh:html>
                     </p:input>
                     <p:output name="response" ref="response"/>
                 </p:processor>
@@ -1426,10 +1424,10 @@
     <test description="Simple event dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance>
                                 <outer>
                                     <value/>
@@ -1441,53 +1439,53 @@
                                     </inner>
                                 </outer>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:dispatch name="my-event-1" targetid="my-outer-input" xxforms:repeat-indexes="1"/>
-                        </xforms:action>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:dispatch name="my-event-1" targetid="my-outer-input" xxf:repeat-indexes="1"/>
+                        </xf:action>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
                     <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
-                    <xforms:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
+                    <xf:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
                                    context="instance('events')" ref="*"
-                                   origin="xxforms:element('event',
-                                            (xxforms:attribute('type', event('xxforms:type')),
-                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+                                   origin="xxf:element('event',
+                                            (xxf:attribute('type', event('xxf:type')),
+                                             xxf:attribute('target', event('xxf:targetid')),
+                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                     <!-- Outer repeat -->
-                    <xforms:repeat id="my-outer-repeat" ref="outer">
+                    <xf:repeat id="my-outer-repeat" ref="outer">
                         <!-- This receives the event on xforms-ready -->
-                        <xforms:input id="my-outer-input" ref="value">
-                            <xforms:action ev:event="my-event-1">
+                        <xf:input id="my-outer-input" ref="value">
+                            <xf:action ev:event="my-event-1">
                                 <!-- Dispatch to inner control following indexes -->
-                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                 <!-- Move inner index -->
-                                <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                <xf:setindex repeat="my-inner-repeat" index="2"/>
                                 <!-- Event must reach new index -->
-                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                 <!-- Dispatch to next control -->
-                                <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
-                            </xforms:action>
-                        </xforms:input>
-                        <xforms:output id="my-outer-output" ref="value"/>
+                                <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
+                            </xf:action>
+                        </xf:input>
+                        <xf:output id="my-outer-output" ref="value"/>
 
                         <!-- Inner repeat -->
-                        <xforms:repeat id="my-inner-repeat" ref="inner">
-                            <xforms:input id="my-inner-input" ref="value"/>
-                            <xforms:output id="my-inner-output" ref="value"/>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                        <xf:repeat id="my-inner-repeat" ref="inner">
+                            <xf:input id="my-inner-input" ref="value"/>
+                            <xf:output id="my-inner-output" ref="value"/>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1519,10 +1517,10 @@
     <test description="Complex dispatch to nested repeats following correct id resolution" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance>
                                 <value/>
                                 <outer>
@@ -1556,115 +1554,115 @@
                                     </inner>
                                 </outer>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
+                        <xf:action ev:event="xforms-ready">
                             <!-- Event #1 -->
-                            <xforms:setindex repeat="my-inner-repeat" index="1"/>
-                            <xforms:setindex repeat="my-outer-repeat" index="1"/>
-                            <xforms:dispatch name="my-event-1" targetid="my-inner-input" xxforms:repeat-indexes="3 2"/>
+                            <xf:setindex repeat="my-inner-repeat" index="1"/>
+                            <xf:setindex repeat="my-outer-repeat" index="1"/>
+                            <xf:dispatch name="my-event-1" targetid="my-inner-input" xxf:repeat-indexes="3 2"/>
 
                             <!-- Event #2 -->
-                            <xforms:setindex repeat="my-inner-repeat" index="1"/>
-                            <xforms:setindex repeat="my-outer-repeat" index="1"/>
-                            <xforms:dispatch name="my-event-1" targetid="my-outer-input" xxforms:repeat-indexes="2"/>
+                            <xf:setindex repeat="my-inner-repeat" index="1"/>
+                            <xf:setindex repeat="my-outer-repeat" index="1"/>
+                            <xf:dispatch name="my-event-1" targetid="my-outer-input" xxf:repeat-indexes="2"/>
 
                             <!-- Event #3 -->
-                            <xforms:setindex repeat="my-inner-repeat" index="1"/>
-                            <xforms:setindex repeat="my-outer-repeat" index="1"/>
-                            <xforms:dispatch name="my-event-1" targetid="my-top-level-input"/>
-                        </xforms:action>
+                            <xf:setindex repeat="my-inner-repeat" index="1"/>
+                            <xf:setindex repeat="my-outer-repeat" index="1"/>
+                            <xf:dispatch name="my-event-1" targetid="my-top-level-input"/>
+                        </xf:action>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group id="my-group">
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
                         <!-- TEST: Gather events. Insert on capture phase so we have sensible order -->
-                        <xforms:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
+                        <xf:insert ev:event="my-event-1 my-event-2 my-event-3 my-event-4" ev:phase="capture"
                                        context="instance('events')" ref="*"
-                                       origin="xxforms:element('event',
-                                                (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid')),
-                                                 xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
+                                       origin="xxf:element('event',
+                                                (xxf:attribute('type', event('xxf:type')),
+                                                 xxf:attribute('target', event('xxf:targetid')),
+                                                 xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))))"/>
 
                         <!-- Top-level -->
 
                         <!-- This receives event #3 -->
-                        <xforms:input id="my-top-level-input" ref="value">
-                            <xforms:action ev:event="my-event-1">
+                        <xf:input id="my-top-level-input" ref="value">
+                            <xf:action ev:event="my-event-1">
                                 <!-- Dispatch to inner control following indexes -->
-                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                 <!-- Move inner index -->
-                                <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                <xf:setindex repeat="my-inner-repeat" index="2"/>
                                 <!-- Event must reach new index -->
-                                <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                 <!-- Dispatch to outer control following indexes -->
-                                <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
                                 <!-- Move outer index  -->
-                                <xforms:setindex repeat="my-outer-repeat" index="3"/>
+                                <xf:setindex repeat="my-outer-repeat" index="3"/>
                                 <!-- Event must reach new index -->
-                                <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
                                 <!-- Dispatch to top-level -->
-                                <xforms:dispatch name="my-event-4" targetid="my-top-level-output"/>
-                            </xforms:action>
-                        </xforms:input>
-                        <xforms:output id="my-top-level-output" ref="value"/>
+                                <xf:dispatch name="my-event-4" targetid="my-top-level-output"/>
+                            </xf:action>
+                        </xf:input>
+                        <xf:output id="my-top-level-output" ref="value"/>
 
                         <!-- Outer repeat -->
-                        <xforms:repeat id="my-outer-repeat" ref="outer">
+                        <xf:repeat id="my-outer-repeat" ref="outer">
                             <!-- This receives event #2 -->
-                            <xforms:input id="my-outer-input" ref="value">
-                                <xforms:action ev:event="my-event-1">
+                            <xf:input id="my-outer-input" ref="value">
+                                <xf:action ev:event="my-event-1">
                                     <!-- Dispatch to inner control following indexes -->
-                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                    <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                     <!-- Move inner index -->
-                                    <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                    <xf:setindex repeat="my-inner-repeat" index="2"/>
                                     <!-- Event must reach new index -->
-                                    <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                    <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                     <!-- Dispatch to next control -->
-                                    <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                    <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
                                     <!-- Move outer index  -->
-                                    <xforms:setindex repeat="my-outer-repeat" index="3"/>
+                                    <xf:setindex repeat="my-outer-repeat" index="3"/>
                                     <!-- Even though the index moved, event must reach the same outer control -->
-                                    <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                    <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
                                     <!-- Dispatch to top-level -->
-                                    <xforms:dispatch name="my-event-4" targetid="my-top-level-output"/>
-                                </xforms:action>
-                            </xforms:input>
-                            <xforms:output id="my-outer-output" ref="value"/>
+                                    <xf:dispatch name="my-event-4" targetid="my-top-level-output"/>
+                                </xf:action>
+                            </xf:input>
+                            <xf:output id="my-outer-output" ref="value"/>
 
                             <!-- Inner repeat -->
-                            <xforms:repeat id="my-inner-repeat" ref="inner">
+                            <xf:repeat id="my-inner-repeat" ref="inner">
                                 <!-- This receives event #1 -->
-                                <xforms:input id="my-inner-input" ref="value">
-                                    <xforms:action ev:event="my-event-1">
+                                <xf:input id="my-inner-input" ref="value">
+                                    <xf:action ev:event="my-event-1">
                                         <!-- Dispatch to next control -->
-                                        <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                        <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                         <!-- Move inner index -->
-                                        <xforms:setindex repeat="my-inner-repeat" index="2"/>
+                                        <xf:setindex repeat="my-inner-repeat" index="2"/>
                                         <!-- Even though the index moved, event must reach the same inner control -->
-                                        <xforms:dispatch name="my-event-2" targetid="my-inner-output"/>
+                                        <xf:dispatch name="my-event-2" targetid="my-inner-output"/>
                                         <!-- Dispatch to outer -->
-                                        <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                        <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
                                         <!-- Move outer index  -->
-                                        <xforms:setindex repeat="my-outer-repeat" index="2"/>
+                                        <xf:setindex repeat="my-outer-repeat" index="2"/>
                                         <!-- Even though the index moved, event must reach the same outer control -->
-                                        <xforms:dispatch name="my-event-3" targetid="my-outer-output"/>
+                                        <xf:dispatch name="my-event-3" targetid="my-outer-output"/>
                                         <!-- Dispatch to top-level -->
-                                        <xforms:dispatch name="my-event-4" targetid="my-top-level-output"/>
-                                    </xforms:action>
-                                </xforms:input>
-                                <xforms:output id="my-inner-output" ref="value"/>
-                            </xforms:repeat>
-                        </xforms:repeat>
-                    </xforms:group>
-                </xhtml:body>
-            </xhtml:html>
+                                        <xf:dispatch name="my-event-4" targetid="my-top-level-output"/>
+                                    </xf:action>
+                                </xf:input>
+                                <xf:output id="my-inner-output" ref="value"/>
+                            </xf:repeat>
+                        </xf:repeat>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1709,13 +1707,13 @@
         </output>
     </test>
 
-    <test description="xxforms:repeat-nodeset() function" name="oxf:pipeline">
+    <test description="xxf:repeat-nodeset() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <company>
                                 <department>
                                     <employee/>
@@ -1731,33 +1729,33 @@
                                     <employee/>
                                 </department>
                             </company>
-                        </xforms:instance>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="department-repeat" ref="department">
-                        <xforms:var name="department-nodeset-1" value="xxforms:repeat-nodeset()" as="element*"/>
-                        <xforms:var name="department-nodeset-2" value="xxforms:repeat-nodeset('department-repeat')" as="element*"/>
-                        <xforms:output id="department-output-1" value="count($department-nodeset-1)"/>
-                        <xforms:output id="department-output-2" value="count($department-nodeset-2)"/>
-                        <xforms:repeat id="employee-repeat" ref="employee">
-                            <xforms:var name="employee-nodeset-1" value="xxforms:repeat-nodeset()" as="element*"/>
-                            <xforms:var name="employee-nodeset-2" value="xxforms:repeat-nodeset('employee-repeat')" as="element*"/>
-                            <xforms:output id="employee-output-1" value="count($employee-nodeset-1)"/>
-                            <xforms:output id="employee-output-2" value="count($employee-nodeset-2)"/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="department-repeat" ref="department">
+                        <xf:var name="department-nodeset-1" value="xxf:repeat-nodeset()" as="element*"/>
+                        <xf:var name="department-nodeset-2" value="xxf:repeat-nodeset('department-repeat')" as="element*"/>
+                        <xf:output id="department-output-1" value="count($department-nodeset-1)"/>
+                        <xf:output id="department-output-2" value="count($department-nodeset-2)"/>
+                        <xf:repeat id="employee-repeat" ref="employee">
+                            <xf:var name="employee-nodeset-1" value="xxf:repeat-nodeset()" as="element*"/>
+                            <xf:var name="employee-nodeset-2" value="xxf:repeat-nodeset('employee-repeat')" as="element*"/>
+                            <xf:output id="employee-output-1" value="count($employee-nodeset-1)"/>
+                            <xf:output id="employee-output-2" value="count($employee-nodeset-2)"/>
 
-                            <xforms:var name="department-nodeset-3" value="xxforms:repeat-nodeset('department-repeat')" as="element*"/>
-                            <xforms:output id="department-output-3" value="count($department-nodeset-3)"/>
+                            <xf:var name="department-nodeset-3" value="xxf:repeat-nodeset('department-repeat')" as="element*"/>
+                            <xf:output id="department-output-3" value="count($department-nodeset-3)"/>
 
                             <!-- Make sure the function work from within an action as well -->
-                            <xforms:action ev:event="xforms-enabled">
-                                <xforms:var name="test-nodeset" value="xxforms:repeat-nodeset()"/>
-                                <xforms:setvalue ref="." value="count($test-nodeset)"/>
-                            </xforms:action>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                            <xf:action ev:event="xforms-enabled">
+                                <xf:var name="test-nodeset" value="xxf:repeat-nodeset()"/>
+                                <xf:setvalue ref="." value="count($test-nodeset)"/>
+                            </xf:action>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1825,13 +1823,13 @@
         </output>
     </test>
 
-    <test description="xxforms:index() function" name="oxf:pipeline">
+    <test description="xxf:index() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html>
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <company>
                                 <department>
                                     <employee/>
@@ -1847,42 +1845,42 @@
                                     <employee/>
                                 </department>
                             </company>
-                        </xforms:instance>
-                    </xforms:model>
-                    <xforms:model id="model2">
-                        <xforms:instance id="instance2">
+                        </xf:instance>
+                    </xf:model>
+                    <xf:model id="model2">
+                        <xf:instance id="instance2">
                             <form2/>
-                        </xforms:instance>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
                     <!-- Top-level variable with model change tests that source id for resolution doesn't break -->
-                    <xforms:var name="top-level-1" model="model2" value="." as="element()"/>
+                    <xf:var name="top-level-1" model="model2" value="." as="element()"/>
 
-                    <xforms:repeat id="department-repeat" ref="department" startindex="4">
-                        <xforms:var name="department-index-1" value="xxforms:index()" as="element*"/>
-                        <xforms:var name="department-index-2" value="xxforms:index('department-repeat')" as="element*"/>
-                        <xforms:output id="department-output-1" value="$department-index-1"/>
-                        <xforms:output id="department-output-2" value="$department-index-2"/>
+                    <xf:repeat id="department-repeat" ref="department" startindex="4">
+                        <xf:var name="department-index-1" value="xxf:index()" as="element*"/>
+                        <xf:var name="department-index-2" value="xxf:index('department-repeat')" as="element*"/>
+                        <xf:output id="department-output-1" value="$department-index-1"/>
+                        <xf:output id="department-output-2" value="$department-index-2"/>
 
-                        <xforms:repeat id="employee-repeat" ref="employee" startindex="3">
-                            <xforms:var name="employee-index-1" value="xxforms:index()" as="element*"/>
-                            <xforms:var name="employee-index-2" value="xxforms:index('employee-repeat')" as="element*"/>
-                            <xforms:output id="employee-output-1" value="$employee-index-1"/>
-                            <xforms:output id="employee-output-2" value="$employee-index-2"/>
+                        <xf:repeat id="employee-repeat" ref="employee" startindex="3">
+                            <xf:var name="employee-index-1" value="xxf:index()" as="element*"/>
+                            <xf:var name="employee-index-2" value="xxf:index('employee-repeat')" as="element*"/>
+                            <xf:output id="employee-output-1" value="$employee-index-1"/>
+                            <xf:output id="employee-output-2" value="$employee-index-2"/>
 
-                            <xforms:var name="department-index-3" value="xxforms:index('department-repeat')" as="element*"/>
-                            <xforms:output id="department-output-3" value="$department-index-3"/>
+                            <xf:var name="department-index-3" value="xxf:index('department-repeat')" as="element*"/>
+                            <xf:output id="department-output-3" value="$department-index-3"/>
 
                             <!-- Make sure the function work from within an action as well -->
-                            <xforms:action ev:event="xforms-enabled" ev:target="department-output-3">
-                                <xforms:var name="test-nodeset" value="xxforms:index()"/>
-                                <xforms:setvalue ref="." value="$test-nodeset"/>
-                            </xforms:action>
-                        </xforms:repeat>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                            <xf:action ev:event="xforms-enabled" ev:target="department-output-3">
+                                <xf:var name="test-nodeset" value="xxf:index()"/>
+                                <xf:setvalue ref="." value="$test-nodeset"/>
+                            </xf:action>
+                        </xf:repeat>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -1950,41 +1948,41 @@
         </output>
     </test>
 
-    <test description="xxforms:index() function" name="oxf:pipeline">
+    <test description="xxf:index() function" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model>
-                        <xforms:instance id="item-instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model>
+                        <xf:instance id="item-instance">
                             <item xmlns="">
                                 <name>New item</name>
                             </item>
-                        </xforms:instance>
-                        <xforms:instance id="items-instance">
+                        </xf:instance>
+                        <xf:instance id="items-instance">
                             <items xmlns=""/>
-                        </xforms:instance>
+                        </xf:instance>
                         <!-- Insert upon initialization -->
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:insert origin="instance( 'item-instance' )" context="instance( 'items-instance' )" ref="*" />
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group id="outer-group" ref=".[count(instance('items-instance')/item) gt 0]">
-                        <xforms:repeat ref="instance('items-instance')/item" id="items-item-repeat">
-                            <xforms:output id="position-output" value="count(preceding-sibling::item) + 1" />
-                            <xforms:output id="index-output-1" value="index('items-item-repeat')"/>
-                            <xforms:group id="input-group" ref=".[count(preceding-sibling::item) + 1 = index('items-item-repeat')]">
-                                <xforms:input id="input" ref="name"/>
-                            </xforms:group>
-                            <xforms:group id="output-group" ref=".[not(count(preceding-sibling::item) + 1 = index('items-item-repeat'))]">
-                                <xforms:output id="output" ref="name"/>
-                            </xforms:group>
-                       </xforms:repeat>
-                    </xforms:group>
-                </xhtml:body>
-            </xhtml:html>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:insert origin="instance( 'item-instance' )" context="instance( 'items-instance' )" ref="*" />
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="outer-group" ref=".[count(instance('items-instance')/item) gt 0]">
+                        <xf:repeat ref="instance('items-instance')/item" id="items-item-repeat">
+                            <xf:output id="position-output" value="count(preceding-sibling::item) + 1" />
+                            <xf:output id="index-output-1" value="index('items-item-repeat')"/>
+                            <xf:group id="input-group" ref=".[count(preceding-sibling::item) + 1 = index('items-item-repeat')]">
+                                <xf:input id="input" ref="name"/>
+                            </xf:group>
+                            <xf:group id="output-group" ref=".[not(count(preceding-sibling::item) + 1 = index('items-item-repeat'))]">
+                                <xf:output id="output" ref="name"/>
+                            </xf:group>
+                       </xf:repeat>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
 
         </input>
         <output name="response">
@@ -2021,41 +2019,41 @@
     <test description="Repeat iteration update upon nodeset shuffle with exf:sort()" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance xmlns="">
                                 <event>000000000000</event>
                                 <event>000000000001</event>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:instance id="other">
+                        <xf:instance id="other">
                             <instance xmlns="">
                                 <order>ascending</order>
                                 <selection/>
                                 <index/>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:refresh/>
-                            <xforms:setvalue ref="instance('other')/order">descending</xforms:setvalue>
-                        </xforms:action>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:refresh/>
+                            <xf:setvalue ref="instance('other')/order">descending</xf:setvalue>
+                        </xf:action>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat ref="exf:sort(event, 'string(.)', 'text', instance('other')/order)" id="my-repeat">
-                        <xforms:action ev:event="xxforms-nodeset-changed">
-                            <xforms:setvalue ref="instance('other')/selection" value="xxforms:repeat-nodeset('my-repeat')[index('my-repeat')]"/>
-                            <xforms:setvalue ref="instance('other')/index" value="index('my-repeat')"/>
-                        </xforms:action>
-                        <xforms:output ref="." id="my-output"/>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="exf:sort(event, 'string(.)', 'text', instance('other')/order)" id="my-repeat">
+                        <xf:action ev:event="xxforms-nodeset-changed">
+                            <xf:setvalue ref="instance('other')/selection" value="xxf:repeat-nodeset('my-repeat')[index('my-repeat')]"/>
+                            <xf:setvalue ref="instance('other')/index" value="index('my-repeat')"/>
+                        </xf:action>
+                        <xf:output ref="." id="my-output"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2088,42 +2086,42 @@
     <test description="xxforms-index-changed event" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values><value>1</value><value>2</value><value>3</value><value>4</value></values>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:setindex repeat="my-repeat" index="2"/>
-                            <xforms:insert ref="value" origin="(xxforms:element('value', 5), xxforms:element('value', 6))"/>
-                            <xforms:delete ref="value" at="6"/>
-                            <xforms:delete ref="value"/>
-                        </xforms:action>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:setindex repeat="my-repeat" index="2"/>
+                            <xf:insert ref="value" origin="(xxf:element('value', 5), xxf:element('value', 6))"/>
+                            <xf:delete ref="value" at="6"/>
+                            <xf:delete ref="value"/>
+                        </xf:action>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group id="my-group">
-                        <xforms:insert ev:event="xxforms-index-changed"
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <xf:insert ev:event="xxforms-index-changed"
                                        context="instance('events')" ref="*"
-                                       origin="xxforms:element('event',
-                                                (xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid')),
-                                                 xxforms:attribute('old', event('xxforms:old-index')),
-                                                 xxforms:attribute('new', event('xxforms:new-index'))
+                                       origin="xxf:element('event',
+                                                (xxf:attribute('type', event('xxf:type')),
+                                                 xxf:attribute('target', event('xxf:targetid')),
+                                                 xxf:attribute('old', event('xxf:old-index')),
+                                                 xxf:attribute('new', event('xxf:new-index'))
                                                  ))"/>
 
-                        <xforms:repeat ref="value" id="my-repeat"/>
-                    </xforms:group>
-                </xhtml:body>
-            </xhtml:html>
+                        <xf:repeat ref="value" id="my-repeat"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2150,81 +2148,81 @@
         </output>
     </test>
 
-    <test description="xforms-enabled event on xforms:repeat" name="oxf:pipeline">
+    <test description="xforms-enabled event on xf:repeat" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="model">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xh:head>
+                    <xf:model id="model">
                         <!-- All relevant -->
-                        <xforms:instance id="instance-1">
+                        <xf:instance id="instance-1">
                             <values><value>1</value><value>2</value><value>3</value><value>4</value></values>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- All non-relevant -->
-                        <xforms:instance id="instance-2">
+                        <xf:instance id="instance-2">
                             <values><value>1</value><value>2</value><value>3</value><value>4</value></values>
-                        </xforms:instance>
-                        <xforms:bind ref="instance('instance-2')/value" relevant="false()"/>
+                        </xf:instance>
+                        <xf:bind ref="instance('instance-2')/value" relevant="false()"/>
 
                         <!-- All non-relevant except last value -->
-                        <xforms:instance id="instance-3">
+                        <xf:instance id="instance-3">
                             <values><value>1</value><value>2</value><value>3</value><value>4</value></values>
-                        </xforms:instance>
-                        <xforms:bind ref="instance('instance-3')/value[position() != last()]" relevant="false()"/>
+                        </xf:instance>
+                        <xf:bind ref="instance('instance-3')/value[position() != last()]" relevant="false()"/>
 
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
+                        </xf:instance>
 
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:group id="my-group">
-                        <xforms:insert ev:event="xforms-enabled"
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:group id="my-group">
+                        <xf:insert ev:event="xforms-enabled"
                                        context="instance('events')" ref="*"
-                                       origin="xxforms:element('event',
-                                                (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                 xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid'))
+                                       origin="xxf:element('event',
+                                                (xxf:attribute('observer', event('xxf:observerid')),
+                                                 xxf:attribute('type', event('xxf:type')),
+                                                 xxf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <!-- Repeat has iterations so is relevant -->
-                        <xforms:repeat ref="value" id="my-repeat-1a"/>
+                        <xf:repeat ref="value" id="my-repeat-1a"/>
                         <!-- Repeat has no iteration so is not relevant -->
-                        <xforms:repeat ref="()" id="my-repeat-1b"/>
+                        <xf:repeat ref="()" id="my-repeat-1b"/>
                         <!-- Repeat has no iteration so is not relevant -->
-                        <xforms:repeat ref="instance('instance-2')/value" id="my-repeat-2"/>
+                        <xf:repeat ref="instance('instance-2')/value" id="my-repeat-2"/>
                         <!-- Repeat has one relevant iteration so is relevant -->
-                        <xforms:repeat ref="instance('instance-3')/value" id="my-repeat-3">
+                        <xf:repeat ref="instance('instance-3')/value" id="my-repeat-3">
                             <!-- Test handler with ev:target="#observer" -->
                             <!-- NOTE: Since 2012-05-18, the observer is (again) the repeat object -->
-                            <xforms:insert ev:event="xforms-enabled" ev:target="#observer"
+                            <xf:insert ev:event="xforms-enabled" ev:target="#observer"
                                        context="instance('events')" ref="*"
-                                       origin="xxforms:element('event',
-                                                (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                 xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid'))
+                                       origin="xxf:element('event',
+                                                (xxf:attribute('observer', event('xxf:observerid')),
+                                                 xxf:attribute('type', event('xxf:type')),
+                                                 xxf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
-                        </xforms:repeat>
+                        </xf:repeat>
 
                         <!-- Test handler with ev:observer and ev:target -->
-                        <xforms:insert ev:event="xforms-enabled" ev:observer="my-repeat-3" ev:target="my-repeat-3"
+                        <xf:insert ev:event="xforms-enabled" ev:observer="my-repeat-3" ev:target="my-repeat-3"
                                        context="instance('events')" ref="*"
-                                       origin="xxforms:element('event',
-                                                (xxforms:attribute('observer', event('xxforms:observerid')),
-                                                 xxforms:attribute('type', event('xxforms:type')),
-                                                 xxforms:attribute('target', event('xxforms:targetid'))
+                                       origin="xxf:element('event',
+                                                (xxf:attribute('observer', event('xxf:observerid')),
+                                                 xxf:attribute('type', event('xxf:type')),
+                                                 xxf:attribute('target', event('xxf:targetid'))
                                                  ))"/>
 
                         <!-- Group and nested repeat are non-relevant -->
-                        <xforms:group id="my-group-2" ref="()">
-                            <xforms:repeat ref="instance('instance-1')/value" id="my-repeat-4"/>
-                        </xforms:group>
-                    </xforms:group>
-                </xhtml:body>
-            </xhtml:html>
+                        <xf:group id="my-group-2" ref="()">
+                            <xf:repeat ref="instance('instance-1')/value" id="my-repeat-4"/>
+                        </xf:group>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2266,27 +2264,27 @@
     <test description="Repeat bound to items" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance>
                                 <order>ascending</order>
                             </instance>
-                        </xforms:instance>
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:refresh/>
-                            <xforms:setvalue ref="order">descending</xforms:setvalue>
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat" ref="if (order = 'ascending') then (1 to 2) else reverse(1 to 2)">
-                        <xforms:output id="my-position" value="position()"/>
-                        <xforms:output id="my-value" ref="."/>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                        </xf:instance>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:refresh/>
+                            <xf:setvalue ref="order">descending</xf:setvalue>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="my-repeat" ref="if (order = 'ascending') then (1 to 2) else reverse(1 to 2)">
+                        <xf:output id="my-position" value="position()"/>
+                        <xf:output id="my-value" ref="."/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2319,48 +2317,48 @@
     <test description="xforms-enabled dispatch when new iteration appears upon refresh" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values size="1">
                                 <value>1</value>
                                 <value>2</value>
                                 <value>3</value>
                                 <value>4</value>
                             </values>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:insert ev:event="xforms-refresh" context="instance('events')" ref="*"
-                                       origin="xxforms:element('refresh')"/>
+                        <xf:insert ev:event="xforms-refresh" context="instance('events')" ref="*"
+                                       origin="xxf:element('refresh')"/>
 
-                        <xforms:action ev:event="xforms-ready">
+                        <xf:action ev:event="xforms-ready">
                             <!-- Clear until now -->
-                            <xforms:refresh/>
+                            <xf:refresh/>
                             <!-- This causes a change of repeat nodeset upon next refresh -->
-                            <xforms:setvalue ref="@size">2</xforms:setvalue>
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:insert ev:event="xforms-enabled"
+                            <xf:setvalue ref="@size">2</xf:setvalue>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:insert ev:event="xforms-enabled"
                                    context="instance('events')" ref="*"
-                                   origin="xxforms:element('event',
-                                            (xxforms:attribute('type', event('xxforms:type')),
-                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))
+                                   origin="xxf:element('event',
+                                            (xxf:attribute('type', event('xxf:type')),
+                                             xxf:attribute('target', event('xxf:targetid')),
+                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
                                              ))"/>
 
-                    <xforms:repeat id="my-repeat" ref="value[position() le xs:integer(../@size)]">
-                        <xforms:input id="my-input" ref="."/>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                    <xf:repeat id="my-repeat" ref="value[position() le xs:integer(../@size)]">
+                        <xf:input id="my-input" ref="."/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2402,10 +2400,10 @@
     <test description="xxforms-iteration-changed event" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:exf="http://www.exforms.org/exf/1-0">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance order="0">
                                 <state>
                                     <name>CA</name>
@@ -2416,38 +2414,38 @@
                                     <value>111</value>
                                 </state>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
 
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
+                        <xf:action ev:event="xforms-ready">
                             <!-- Clear until now -->
-                            <xforms:refresh/>
+                            <xf:refresh/>
                             <!-- This causes a change of repeat nodeset upon next refresh -->
-                            <xforms:setvalue ev:event="DOMActivate" ref="@order" value="(. + 1) mod 2"/>
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat ref="if (@order = '0') then (state[1], state[2]) else (state[2], state[1])">
-                        <xhtml:div>
-                            <xforms:output id="my-name" value="name">
-                                <xforms:insert ev:event="xxforms-iteration-moved"
+                            <xf:setvalue ev:event="DOMActivate" ref="@order" value="(. + 1) mod 2"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat ref="if (@order = '0') then (state[1], state[2]) else (state[2], state[1])">
+                        <xh:div>
+                            <xf:output id="my-name" value="name">
+                                <xf:insert ev:event="xxforms-iteration-moved"
                                    context="instance('events')" ref="*"
-                                   origin="xxforms:element('event',
-                                            (xxforms:attribute('type', event('xxforms:type')),
-                                             xxforms:attribute('target', event('xxforms:targetid')),
-                                             xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))
+                                   origin="xxf:element('event',
+                                            (xxf:attribute('type', event('xxf:type')),
+                                             xxf:attribute('target', event('xxf:targetid')),
+                                             xxf:attribute('indexes', string-join(event('xxf:repeat-indexes'), ' '))
                                              ))"/>
-                            </xforms:output>
-                            <xforms:output id="my-value" value="value"/>
-                        </xhtml:div>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                            </xf:output>
+                            <xf:output id="my-value" value="value"/>
+                        </xh:div>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2494,10 +2492,10 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=313774&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance xmlns="">
                                 <department>
                                     <employee/>
@@ -2509,27 +2507,27 @@
                                     <employee/>
                                 </department>
                             </instance>
-                        </xforms:instance>
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:setindex repeat="repeat-department" index="1"/>
-                            <xforms:setindex repeat="repeat-employee" index="2"/>
-                            <xforms:setindex repeat="repeat-department" index="2"/>
-                            <xforms:setindex repeat="repeat-employee" index="3"/>
-                        </xforms:action>
-                    </xforms:model>
+                        </xf:instance>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:setindex repeat="repeat-department" index="1"/>
+                            <xf:setindex repeat="repeat-employee" index="2"/>
+                            <xf:setindex repeat="repeat-department" index="2"/>
+                            <xf:setindex repeat="repeat-employee" index="3"/>
+                        </xf:action>
+                    </xf:model>
                 </head>
                 <body>
-                    <xforms:repeat ref="department" id="repeat-department">
-                        <xforms:var name="department-position" value="position()"/>
-                        <xforms:repeat ref="employee" id="repeat-employee">
-                            <xforms:var name="employee-position" value="position()"/>
-                            <xforms:output id="my-output"
+                    <xf:repeat ref="department" id="repeat-department">
+                        <xf:var name="department-position" value="position()"/>
+                        <xf:repeat ref="employee" id="repeat-employee">
+                            <xf:var name="employee-position" value="position()"/>
+                            <xf:output id="my-output"
                                            value="string-join(for $v in ($department-position, $employee-position,
                                                     index('repeat-department'), index('repeat-employee')) return xs:string($v), ' ')"/>
-                        </xforms:repeat>
-                    </xforms:repeat>
+                        </xf:repeat>
+                    </xf:repeat>
                 </body>
-            </xhtml:html>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2559,31 +2557,31 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314760&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <instance>
                                 <company>
                                     <employee>Mary</employee>
                                 </company>
                             </instance>
-                        </xforms:instance>
+                        </xf:instance>
                         <!-- Delete company element -->
-                        <xforms:delete ev:event="xforms-ready" ref="company"/>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
+                        <xf:delete ev:event="xforms-ready" ref="company"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
 
-                    <xforms:repeat id="my-repeat" ref="company">
-                        <xforms:input id="my-input" ref="employee">
+                    <xf:repeat id="my-repeat" ref="company">
+                        <xf:input id="my-input" ref="employee">
                             <!-- Attempt to re-delete company element when we disappear -->
-                            <xforms:delete ev:event="xforms-disabled" ref=".."/>
-                        </xforms:input>
-                    </xforms:repeat>
+                            <xf:delete ev:event="xforms-disabled" ref=".."/>
+                        </xf:input>
+                    </xf:repeat>
 
-                </xhtml:body>
-            </xhtml:html>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2603,32 +2601,32 @@
         </output>
     </test>
 
-    <test description="AVT on xforms:insert/@position" name="oxf:pipeline">
+    <test description="AVT on xf:insert/@position" name="oxf:pipeline">
         <!-- See http://forge.ow2.org/tracker/?func=detail&atid=350207&aid=314804&group_id=168 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values>
                                 <value>1</value>
                                 <value>3</value>
                                 <value>5</value>
                             </values>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:insert ref="value[. = 3]" position="{'before'}" origin="xxforms:element('value', 2)"/>
-                            <xforms:insert ref="value[. = 3]" position="{'after'}" origin="xxforms:element('value', 4)"/>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:insert ref="value[. = 3]" position="{'before'}" origin="xxf:element('value', 2)"/>
+                            <xf:insert ref="value[. = 3]" position="{'after'}" origin="xxf:element('value', 4)"/>
                             <!-- Invalid position defaults to "after" -->
-                            <xforms:insert ref="value[. = 5]" position="{''}" origin="xxforms:element('value', '6')"/>
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                </xhtml:body>
-            </xhtml:html>
+                            <xf:insert ref="value[. = 5]" position="{''}" origin="xxf:element('value', '6')"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2659,31 +2657,31 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=314831&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values mode="string">
                                 <value>1</value>
                             </values>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:setvalue ref="@mode">number</xforms:setvalue>
-                            <xforms:refresh/>
-                            <xforms:setvalue ref="@mode">node</xforms:setvalue>
-                            <xforms:refresh/>
-                            <xforms:setvalue ref="@mode">number</xforms:setvalue>
-                            <xforms:refresh/>
-                            <xforms:setvalue ref="@mode">string</xforms:setvalue>
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="my-repeat"
+                        <xf:action ev:event="xforms-ready">
+                            <xf:setvalue ref="@mode">number</xf:setvalue>
+                            <xf:refresh/>
+                            <xf:setvalue ref="@mode">node</xf:setvalue>
+                            <xf:refresh/>
+                            <xf:setvalue ref="@mode">number</xf:setvalue>
+                            <xf:refresh/>
+                            <xf:setvalue ref="@mode">string</xf:setvalue>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="my-repeat"
                                    ref="if (@mode = 'string') then ('1') else if (@mode = 'number') then 1 else value"/>
-                </xhtml:body>
-            </xhtml:html>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2712,25 +2710,25 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315081&group_id=168&atid=350207 -->
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
-            <xxforms:action>
-                <xxforms:event name="DOMActivate" source-control-id="insert-trigger"/>
-            </xxforms:action>
+            <xxf:action>
+                <xxf:event name="DOMActivate" source-control-id="insert-trigger"/>
+            </xxf:action>
         </input>
         <input name="controls">
             <controls>
-                <xforms:repeat id="company-repeat" ref="company"/>
+                <xf:repeat id="company-repeat" ref="company"/>
 
-                <xforms:trigger id="insert-trigger">
-                    <xforms:label/>
-                    <xforms:insert id="insert" ev:event="DOMActivate" context="instance()" origin="xxforms:element('company')"/>
-                </xforms:trigger>
+                <xf:trigger id="insert-trigger">
+                    <xf:label/>
+                    <xf:insert id="insert" ev:event="DOMActivate" context="instance()" origin="xxf:element('company')"/>
+                </xf:trigger>
             </controls>
         </input>
         <input name="models">
             <models>
-                <xforms:model id="model">
-                    <xforms:instance id="instance"/>
-                </xforms:model>
+                <xf:model id="model">
+                    <xf:instance id="instance"/>
+                </xf:model>
             </models>
         </input>
         <input name="instances">
@@ -2772,25 +2770,25 @@
         <!-- See http://forge.ow2.org/tracker/index.php?func=detail&aid=315434&group_id=168&atid=350207 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <values>
                                 <value>1</value>
                             </values>
-                        </xforms:instance>
+                        </xf:instance>
 
-                        <xforms:action ev:event="xforms-ready">
-                            <xforms:insert ref="*"/>
-                        </xforms:action>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:var name="values" value="value"/>
-                    <xforms:repeat id="my-repeat" ref="$values"/>
-                </xhtml:body>
-            </xhtml:html>
+                        <xf:action ev:event="xforms-ready">
+                            <xf:insert ref="*"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:var name="values" value="value"/>
+                    <xf:repeat id="my-repeat" ref="$values"/>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
@@ -2819,24 +2817,24 @@
     <test description="Listener XPath context within repeat is the closest from the target" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html>
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <company>
                                 <department id="1"/>
                                 <department id="2"/>
                             </company>
-                        </xforms:instance>
-                    </xforms:model>
-                </xhtml:head>
-                <xhtml:body>
-                    <xforms:repeat id="department-repeat" ref="department">
-                        <xforms:output id="my-output" value="."/>
-                        <xforms:setvalue ev:event="xforms-enabled" ev:target="my-output" ref="." value="@id"/>
-                    </xforms:repeat>
-                </xhtml:body>
-            </xhtml:html>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:repeat id="department-repeat" ref="department">
+                        <xf:output id="my-output" value="."/>
+                        <xf:setvalue ev:event="xforms-enabled" ev:target="my-output" ref="." value="@id"/>
+                    </xf:repeat>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response>
@@ -2868,63 +2866,63 @@
     <test description="Listener child of repeat iteration with different XBL scopes" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
-            <xhtml:html>
-                <xhtml:head>
-                    <xforms:model id="model">
-                        <xforms:instance id="instance">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
                             <company>
                                 <department id="1"/>
                                 <department id="2"/>
                             </company>
-                        </xforms:instance>
+                        </xf:instance>
                         <!-- TEST: Events to gather -->
-                        <xforms:instance id="events">
+                        <xf:instance id="events">
                             <events/>
-                        </xforms:instance>
-                    </xforms:model>
+                        </xf:instance>
+                    </xf:model>
                     <xbl:xbl>
                         <xbl:binding id="fr-bar" element="fr|bar">
                             <xbl:template>
-                                <xforms:group>
+                                <xf:group>
                                     <!-- Upon group becoming relevant -->
-                                    <xforms:action ev:event="xforms-enabled" ev:target="#observer">
+                                    <xf:action ev:event="xforms-enabled" ev:target="#observer">
                                         <!-- Dispatch an event to the repeat itself -->
-                                        <xforms:dispatch name="my-event" xbl:attr="targetid=repeatid" xxbl:scope="outer"/>
+                                        <xf:dispatch name="my-event" xbl:attr="targetid=repeatid" xxbl:scope="outer"/>
                                         <!-- Dispatch an event to the (first) output control -->
-                                        <xforms:dispatch name="my-event" targetid="my-output"/>
-                                    </xforms:action>
+                                        <xf:dispatch name="my-event" targetid="my-output"/>
+                                    </xf:action>
 
                                     <!-- Repeat is in outer scope -->
-                                    <xforms:repeat xbl:attr="ref id=repeatid" xxbl:scope="outer">
+                                    <xf:repeat xbl:attr="ref id=repeatid" xxbl:scope="outer">
                                         <!-- Event handler in inner scope observes the repeat -->
-                                        <xforms:action ev:event="xforms-enabled my-event" xxbl:scope="inner">
-                                            <xforms:insert xxbl:scope="outer"
+                                        <xf:action ev:event="xforms-enabled my-event" xxbl:scope="inner">
+                                            <xf:insert xxbl:scope="outer"
                                                context="instance('events')" ref="*"
-                                               origin="xxforms:element('event',
-                                                        (xxforms:attribute('observer', event('xxforms:absolute-observerid')),
-                                                         xxforms:attribute('type', event('xxforms:type')),
-                                                         xxforms:attribute('target', event('xxforms:absolute-targetid'))
+                                               origin="xxf:element('event',
+                                                        (xxf:attribute('observer', event('xxf:absolute-observerid')),
+                                                         xxf:attribute('type', event('xxf:type')),
+                                                         xxf:attribute('target', event('xxf:absolute-targetid'))
                                                          ))"/>
 
-                                        </xforms:action>
+                                        </xf:action>
 
                                         <!-- Output control in inner scope -->
-                                        <xforms:output id="my-output" value="'42'" xxbl:scope="inner"/>
+                                        <xf:output id="my-output" value="'42'" xxbl:scope="inner"/>
 
-                                    </xforms:repeat>
+                                    </xf:repeat>
 
-                                </xforms:group>
+                                </xf:group>
                             </xbl:template>
                         </xbl:binding>
                     </xbl:xbl>
-                </xhtml:head>
-                <xhtml:body>
+                </xh:head>
+                <xh:body>
                     <!-- Listener will run as there are iterations -->
                     <fr:bar id="my-bar-1" ref="department" repeatid="my-department-repeat"/>
                     <!-- Listener won't run as there are no iterations -->
                     <fr:bar id="my-bar-2" ref="()" repeatid="my-empty-repeat"/>
-                </xhtml:body>
-            </xhtml:html>
+                </xh:body>
+            </xh:html>
         </input>
         <output name="response">
             <xxf:event-response>

@@ -11,82 +11,82 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xxforms:dialog  xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xforms="http://www.w3.org/2002/xforms"
+<xxf:dialog  xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ev="http://www.w3.org/2001/xml-events"
       xmlns:xi="http://www.w3.org/2001/XInclude"
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
       id="fb-add-language-dialog" appearance="minimal" level="modeless">
 
-    <xforms:label ref="$form-resources/dialog-add-language/label"/>
+    <xf:label ref="$form-resources/dialog-add-language/label"/>
 
-    <xforms:var name="resources" value="$resources" model="fr-form-model"/>
+    <xf:var name="resources" value="$resources" model="fr-form-model"/>
 
-    <xhtml:div>
-        <xforms:group>
-            <xforms:group class="fb-hide-alert">
-                <xhtml:div class="fr-grid">
-                    <xhtml:div class="fr-grid-content">
-                        <xforms:select1 ref="$variables/new-language" id="fb-add-language-select1">
-                            <xforms:label ref="$form-resources/dialog-add-language/new-language/label"/>
-                            <xforms:item>
-                                <xforms:label ref="$form-resources/select/label"/>
-                                <xforms:value/>
-                            </xforms:item>
+    <xh:div>
+        <xf:group>
+            <xf:group class="fb-hide-alert">
+                <xh:div class="fr-grid">
+                    <xh:div class="fr-grid-content">
+                        <xf:select1 ref="$variables/new-language" id="fb-add-language-select1">
+                            <xf:label ref="$form-resources/dialog-add-language/new-language/label"/>
+                            <xf:item>
+                                <xf:label ref="$form-resources/select/label"/>
+                                <xf:value/>
+                            </xf:item>
                             <!-- All the languages except the languages already selected -->
-                            <xforms:itemset model="fr-resources-model"
+                            <xf:itemset model="fr-resources-model"
                                             ref="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
-                                <xforms:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                                <xforms:value ref="@code"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:div>
-                </xhtml:div>
-            </xforms:group>
-            <xhtml:span>
-                <xforms:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
-                    <xforms:label ref="$form-resources/add/label"/>
-                    <xforms:action ev:event="DOMActivate">
+                                <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                <xf:value ref="@code"/>
+                            </xf:itemset>
+                        </xf:select1>
+                    </xh:div>
+                </xh:div>
+            </xf:group>
+            <xh:span>
+                <xf:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
+                    <xf:label ref="$form-resources/add/label"/>
+                    <xf:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->
-                        <xforms:action context="$resources">
-                            <xforms:insert context="." ref="resource" origin="resource[1]"/>
-                            <xforms:setvalue ref="resource[last()]/@xml:lang" value="$variables/new-language"/>
-                        </xforms:action>
+                        <xf:action context="$resources">
+                            <xf:insert context="." ref="resource" origin="resource[1]"/>
+                            <xf:setvalue ref="resource[last()]/@xml:lang" value="$variables/new-language"/>
+                        </xf:action>
                         <!-- Copy form metadata and set new language -->
-                        <xforms:action context="$metadata-instance">
-                            <xforms:insert context="." ref="title | description" origin="title[1] | description[1]"/>
-                            <xforms:setvalue ref="title[last()]/@xml:lang" value="$variables/new-language"/>
-                            <xforms:setvalue ref="description[last()]/@xml:lang" value="$variables/new-language"/>
-                        </xforms:action>
+                        <xf:action context="$metadata-instance">
+                            <xf:insert context="." ref="title | description" origin="title[1] | description[1]"/>
+                            <xf:setvalue ref="title[last()]/@xml:lang" value="$variables/new-language"/>
+                            <xf:setvalue ref="description[last()]/@xml:lang" value="$variables/new-language"/>
+                        </xf:action>
                         <!-- Change current language -->
-                        <xforms:setvalue ref="$fb-lang" value="$variables/new-language"/>
+                        <xf:setvalue ref="$fb-lang" value="$variables/new-language"/>
 
                         <!-- Force RRR when the value changes. The value change doesn't cause a rebuild, therefore the binds don't update. -->
-                        <xforms:action model="fr-form-model">
-                            <xforms:rebuild/>
-                            <xforms:recalculate/>
-                            <xforms:revalidate/>
-                        </xforms:action>
-                    </xforms:action>
-                </xforms:trigger>
-                <xforms:output value="$form-resources/or/label"/>
-                <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
-                    <xforms:label ref="$form-resources/cancel/label"/>
-                </xforms:trigger>
-            </xhtml:span>
-        </xforms:group>
-    </xhtml:div>
+                        <xf:action model="fr-form-model">
+                            <xf:rebuild/>
+                            <xf:recalculate/>
+                            <xf:revalidate/>
+                        </xf:action>
+                    </xf:action>
+                </xf:trigger>
+                <xf:output value="$form-resources/or/label"/>
+                <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+                    <xf:label ref="$form-resources/cancel/label"/>
+                </xf:trigger>
+            </xh:span>
+        </xf:group>
+    </xh:div>
     <!-- Hide dialog -->
-    <xxforms:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
+    <xxf:hide ev:event="DOMActivate" dialog="fb-add-language-dialog"/>
     <!-- Clear selection list when the dialog opens -->
-    <xforms:action ev:event="xxforms-dialog-open">
-        <xforms:setvalue ref="$variables/new-language"/>
-    </xforms:action>
-</xxforms:dialog>
+    <xf:action ev:event="xxforms-dialog-open">
+        <xf:setvalue ref="$variables/new-language"/>
+    </xf:action>
+</xxf:dialog>

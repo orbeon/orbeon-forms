@@ -282,7 +282,7 @@
                 <xforms:var name="form" value="$parameters/form" as="xs:string"/>
                 <xsl:if test="$has-captcha">
                     <xforms:action if="xxforms:instance('fr-persistence-instance')/captcha = 'false'">
-                        <xforms:dispatch target="captcha" name="fr-verify"/>
+                        <xforms:dispatch targetid="captcha" name="fr-verify"/>
                     </xforms:action>
                 </xsl:if>
 

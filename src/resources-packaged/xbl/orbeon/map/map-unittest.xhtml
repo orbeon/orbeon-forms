@@ -38,7 +38,7 @@
                 </map>
             </xforms:instance>
             <xforms:action ev:event="xforms-model-construct-done">
-                <xforms:dispatch if="/map/longitude = '' and /map/latitude = ''" name="local-update-address" target="main-model"/>
+                <xforms:dispatch if="/map/longitude = '' and /map/latitude = ''" name="local-update-address" targetid="main-model"/>
             </xforms:action>
             <xforms:action ev:event="local-update-address">
                 <!-- Reset address, so the component gets a value changed event, even if the address hasn't changed -->
@@ -74,7 +74,7 @@
         <xhtml:p>
             <xforms:trigger appearance="minimal">
                 <xforms:label>Update map with this address</xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="local-update-address" target="main-model"/>
+                <xforms:dispatch ev:event="DOMActivate" name="local-update-address" targetid="main-model"/>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:p>

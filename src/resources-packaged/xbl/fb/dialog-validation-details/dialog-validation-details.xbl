@@ -304,7 +304,7 @@
                             <xforms:trigger ref="save-trigger" class="fr-inplace-rename" appearance="xxforms:primary">
                                 <xforms:label ref="$resources/apply/label"/>
                                 <!-- Close and save upon DOMActivate -->
-                                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
+                                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
                                     <xforms:property name="fb:save" value="true()"/>
                                 </xforms:dispatch>
                             </xforms:trigger>
@@ -312,7 +312,7 @@
                             <xforms:trigger appearance="minimal" class="fr-inplace-cancel">
                                 <xforms:label ref="$resources/cancel/label"/>
                                 <!-- Close and cancel upon DOMActivate -->
-                                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
+                                <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
                                     <xforms:property name="fb:save" value="false()"/>
                                 </xforms:dispatch>
                             </xforms:trigger>

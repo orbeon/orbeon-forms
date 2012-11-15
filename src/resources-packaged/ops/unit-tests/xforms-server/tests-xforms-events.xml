@@ -52,7 +52,7 @@
                         </xforms:input>
 
                         <xforms:action ev:observer="my-model" ev:event="xforms-ready">
-                            <xforms:dispatch name="DOMFocusIn" target="my-input"/>
+                            <xforms:dispatch name="DOMFocusIn" targetid="my-input"/>
                         </xforms:action>
 
                     </xforms:group>
@@ -197,27 +197,27 @@
                         </xforms:instance>
 
                         <xforms:action ev:event="xforms-ready">
-                            <xforms:dispatch target="repeat1" name="xxforms-dnd">
+                            <xforms:dispatch targetid="repeat1" name="xxforms-dnd">
                                 <xforms:property name="dnd-start" value="'1'"/>
                                 <xforms:property name="dnd-end" value="'2'"/>
                             </xforms:dispatch>
-                            <xforms:dispatch target="repeat2" name="xxforms-dnd">
+                            <xforms:dispatch targetid="repeat2" name="xxforms-dnd">
                                 <xforms:property name="dnd-start" value="'1'"/>
                                 <xforms:property name="dnd-end" value="'3'"/>
                             </xforms:dispatch>
-                            <xforms:dispatch target="repeat3" name="xxforms-dnd">
+                            <xforms:dispatch targetid="repeat3" name="xxforms-dnd">
                                 <xforms:property name="dnd-start" value="'2'"/>
                                 <xforms:property name="dnd-end" value="'1'"/>
                             </xforms:dispatch>
-                            <xforms:dispatch target="repeat4" name="xxforms-dnd">
+                            <xforms:dispatch targetid="repeat4" name="xxforms-dnd">
                                 <xforms:property name="dnd-start" value="'2'"/>
                                 <xforms:property name="dnd-end" value="'3'"/>
                             </xforms:dispatch>
-                            <xforms:dispatch target="repeat5" name="xxforms-dnd">
+                            <xforms:dispatch targetid="repeat5" name="xxforms-dnd">
                                 <xforms:property name="dnd-start" value="'3'"/>
                                 <xforms:property name="dnd-end" value="'1'"/>
                             </xforms:dispatch>
-                            <xforms:dispatch target="repeat6" name="xxforms-dnd">
+                            <xforms:dispatch targetid="repeat6" name="xxforms-dnd">
                                 <xforms:property name="dnd-start" value="'3'"/>
                                 <xforms:property name="dnd-end" value="'2'"/>
                             </xforms:dispatch>
@@ -2106,12 +2106,12 @@
                             the target of the dispatch action, not the incoming XML Events target. In this case to specify the incoming
                             XML Events target, the attribute must be qualified as `ev:target`.
                         -->
-                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" ev:target="my-trigger" name="setvalue" target="model">
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" ev:target="my-trigger" name="setvalue" targetid="model">
                             <xf:property name="value">Use `ev:target` and `target`</xf:property>
                             <xf:property name="index" value="1"/>
                         </xf:dispatch>
                         
-                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" name="setvalue" target="model">
+                        <xf:dispatch ev:event="foo" ev:observer="my-trigger" name="setvalue" targetid="model">
                             <xf:property name="value">Use only `target`</xf:property>
                             <xf:property name="index" value="2"/>
                         </xf:dispatch>

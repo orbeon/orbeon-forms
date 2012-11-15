@@ -33,7 +33,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
-                <xf:dispatch name="fr-verify" target="component-inner-group"/>
+                <xf:dispatch name="fr-verify" targetid="component-inner-group"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
@@ -66,8 +66,8 @@
                 </xf:action>
                 <xf:action ev:event="fr-verify">
                     <xf:var name="correct" value="instance()/user-answer = instance()/expected-answer"/>
-                    <xf:dispatch if="not($correct)" name="fr-verify-error" target="fr-simple-captcha"/>
-                    <xf:dispatch if="$correct" name="fr-verify-done" target="fr-simple-captcha"/>
+                    <xf:dispatch if="not($correct)" name="fr-verify-error" targetid="fr-simple-captcha"/>
+                    <xf:dispatch if="$correct" name="fr-verify-done" targetid="fr-simple-captcha"/>
                 </xf:action>
                 <xh:div>
                     <xf:output ref="instance()/image" mediatype="image/png"/>

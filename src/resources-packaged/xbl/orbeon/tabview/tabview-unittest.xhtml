@@ -68,7 +68,7 @@
                 <xforms:var name="position" value="position()"/>
                 <fr:button id="toggle">
                     <xforms:label>Toggle tab <xforms:output value="$position"/></xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="tab-{$position}" name="fr-toggle"/>
+                    <xforms:dispatch ev:event="DOMActivate" targetid="tab-{$position}" name="fr-toggle"/>
                 </fr:button>
             </xforms:repeat>
             <fr:button id="focus1">

@@ -63,9 +63,9 @@
                 </xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
-                    <xforms:dispatch name="fr-data-save-prepare" target="fr-form-model"/>
+                    <xforms:dispatch name="fr-data-save-prepare" targetid="fr-form-model"/>
                     <!-- Invalidate and reload the toolbox -->
-                    <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>
+                    <xforms:dispatch name="xxforms-instance-invalidate" targetid="fb-components-instance"/>
                     <xforms:send submission="fb-load-toolbox">
                         <xforms:property name="app"  value="xxforms:bind('application-name-bind')"/>
                         <xforms:property name="form" value="xxforms:bind('form-name-bind')"/>
@@ -171,8 +171,8 @@
                             <xhtml:img src="/apps/fr/style/images/silk/brick_edit.png" alt=""/>
                             <xforms:output ref="$form-resources/custom-xml/label"/>
                         </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" target="fb-custom-xml"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-custom-xml"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xforms:group>
                 <xforms:group ref="instance('fb-metadata-instance')/toolbox/schema">
@@ -185,7 +185,7 @@
                             </xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-schema-upload-dialog"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xforms:group>
                 <xforms:group ref="instance('fb-metadata-instance')/toolbox/css">
@@ -210,7 +210,7 @@
                             </xhtml:span>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-pdf-upload-dialog"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xforms:group>
                 <xforms:group ref="instance('fb-metadata-instance')/toolbox/permissions">
@@ -222,8 +222,8 @@
                             <xhtml:img src="/apps/fr/style/images/silk/lock.png" alt=""/>
                             <xforms:output ref="$form-resources/permissions/label"/>
                         </xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" target="fb-permissions"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="$is-pe" name="fb-show-dialog" targetid="fb-permissions"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xforms:group>
             </xhtml:div>
@@ -257,7 +257,7 @@
                             <xforms:output value="$form-resources/add/label"/>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-service-dialog"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xhtml:div>
             </xforms:group>
@@ -287,7 +287,7 @@
                             <xforms:output value="$form-resources/add/label"/>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-database-service-dialog"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xhtml:div>
             </xforms:group>
@@ -317,7 +317,7 @@
                             <xforms:output value="$form-resources/add/label"/>
                         </xforms:label>
                         <xxforms:show ev:event="DOMActivate" if="$is-pe" dialog="fb-action-dialog"/>
-                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" target="fb-pe-dialog" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" if="not($is-pe)" targetid="fb-pe-dialog" name="fr-show"/>
                     </xforms:trigger>
                 </xhtml:div>
             </xforms:group>

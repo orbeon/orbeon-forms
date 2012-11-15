@@ -142,7 +142,7 @@
                 <!-- Model / instance -->
                 <xh:div class="fr-xforms-inspector-block fr-xforms-inspector-{if (instance('inspector-instance')/function = ('view-instance', 'evaluate-xpath')) then 'enabled' else 'disabled'}-function">
                     <xf:group appearance="xxf:internal">
-                        <xf:dispatch ev:event="xforms-value-changed" name="DOMActivate" target="inspector-xpath"/>
+                        <xf:dispatch ev:event="xforms-value-changed" name="DOMActivate" targetid="inspector-xpath"/>
                         <!-- Model -->
                         <xf:var name="models" value="instance('inspector-itemset')/model"/>
                         <xf:group ref=".[count($models) gt 1]" class="fr-xforms-inspector-model">

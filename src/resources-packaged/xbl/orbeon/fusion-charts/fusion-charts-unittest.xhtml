@@ -48,7 +48,7 @@
                 <xforms:insert ref="set"/>
                 <xforms:setvalue ref="set[last()]/@name" value="$current/@name + 1"/>
                 <xforms:setvalue ref="set[last()]/@value" value="$current/@value * 1.5"/>
-                <xforms:dispatch if="10 > count(set)" name="add-month" target="my-model" delay="1000"/>
+                <xforms:dispatch if="10 > count(set)" name="add-month" targetid="my-model" delay="1000"/>
             </xforms:action>
 
         </xforms:model>
@@ -64,7 +64,7 @@
             <xforms:trigger>
                 <xforms:label>Show me the future</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:dispatch name="add-month" target="my-model"/>
+                    <xforms:dispatch name="add-month" targetid="my-model"/>
                 </xforms:action>
             </xforms:trigger>
         </xhtml:fieldset>

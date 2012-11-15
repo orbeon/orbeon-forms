@@ -46,7 +46,7 @@
             <xforms:action ev:event="xforms-value-changed">
                 <xforms:insert context="." origin="xxforms:set-session-attribute('language', .)"/>
                 <xforms:var name="session-language" value="xxforms:get-session-attribute('language')"/>
-                <xforms:dispatch target="main-model" name="load-resources"/>
+                <xforms:dispatch targetid="main-model" name="load-resources"/>
             </xforms:action>
             <xforms:label ref="$resources/language/change"/>
             <xforms:itemset ref="instance('all-resources')/resources">

@@ -47,7 +47,7 @@
             </xbl:handler>
             <!-- Handler for backward compatibility: prefer dispatching fr-toggle/fr-show/fr-hide directly to fr:case by id. -->
             <xbl:handler event="fr-toggle fr-accordion-toggle" phase="target" xxbl:scope="outer">
-                <xforms:dispatch target="{event('case-id')}" name="{if (event('selected')) then 'fr-show' else 'fr-hide'}"/>
+                <xforms:dispatch targetid="{event('case-id')}" name="{if (event('selected')) then 'fr-show' else 'fr-hide'}"/>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>

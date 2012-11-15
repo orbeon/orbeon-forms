@@ -95,17 +95,17 @@
                     <!-- Rename if needed -->
                     <xforms:action if="$old-name != $new-name">
                         <!-- Rename instance holder and all resources -->
-                        <xforms:dispatch name="fb-rename-holders" target="fr-form-model" xxbl:scope="outer">
+                        <xforms:dispatch name="fb-rename-holders" targetid="fr-form-model" xxbl:scope="outer">
                             <xforms:property name="holders" value="($instance-holder, $form-resources/resource/*[name() = $old-name])" xxbl:scope="inner"/>
                             <xforms:property name="new-name" value="$new-name" xxbl:scope="inner"/>
                         </xforms:dispatch>
                         <!-- Update control id and bindings -->
-                        <xforms:dispatch name="fb-rename-control" target="fr-form-model" xxbl:scope="outer">
+                        <xforms:dispatch name="fb-rename-control" targetid="fr-form-model" xxbl:scope="outer">
                             <xforms:property name="control" value="$control" xxbl:scope="inner"/>
                             <xforms:property name="new-name" value="$new-name" xxbl:scope="inner"/>
                         </xforms:dispatch>
                         <!-- Rename bind if existing -->
-                        <xforms:dispatch name="fb-rename-bind" target="fr-form-model" xxbl:scope="outer">
+                        <xforms:dispatch name="fb-rename-bind" targetid="fr-form-model" xxbl:scope="outer">
                             <xforms:property name="old-name" value="$old-name" xxbl:scope="inner"/>
                             <xforms:property name="new-name" value="$new-name" xxbl:scope="inner"/>
                         </xforms:dispatch>

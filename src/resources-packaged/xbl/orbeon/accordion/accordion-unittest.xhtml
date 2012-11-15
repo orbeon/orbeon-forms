@@ -71,7 +71,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all">
                         <xforms:label>Open all (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
                             <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
@@ -79,7 +79,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-all">
                         <xforms:label>Close all (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle-all">
                             <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
@@ -87,7 +87,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-third">
                         <xforms:label>Open third (currency) section (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
                             <xforms:property name="case-id" value="'my-case-currency'"/>
                             <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
@@ -96,7 +96,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-third">
                         <xforms:label>Close third (currency) section (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
                             <xforms:property name="case-id" value="'my-case-currency'"/>
                             <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>
@@ -105,7 +105,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-states">
                         <xforms:label>Open states (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
                             <xforms:property name="case-id" value="'my-case-repeat'"/>
                             <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
@@ -114,7 +114,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-states">
                         <xforms:label>Close states (legacy)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-accordion-toggle">
                             <xforms:property name="case-id" value="'my-case-repeat'"/>
                             <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>
@@ -124,37 +124,37 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all-new">
                         <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-show-all"/>
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-show-all"/>
                     </xforms:trigger>
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-all-new">
                         <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-hide-all"/>
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion" name="fr-hide-all"/>
                     </xforms:trigger>
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-third-new">
                         <xforms:label>Open third section (currency)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-case-currency" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-currency" name="fr-show"/>
                     </xforms:trigger>
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-third-new">
                         <xforms:label>Close third section (currency)</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-case-currency" name="fr-hide"/>
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-currency" name="fr-hide"/>
                     </xforms:trigger>
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-states-new">
                         <xforms:label>Open states</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-case-repeat" name="fr-show"/>
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-repeat" name="fr-show"/>
                     </xforms:trigger>
                 </xhtml:li>
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-states-new">
                         <xforms:label>Close states</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-case-repeat" name="fr-hide"/>
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-case-repeat" name="fr-hide"/>
                     </xforms:trigger>
                 </xhtml:li>
 

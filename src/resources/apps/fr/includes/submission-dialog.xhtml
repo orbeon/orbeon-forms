@@ -43,7 +43,7 @@
                         <!-- Close this dialog -->
                         <xxforms:hide dialog="fr-submission-result-dialog"/>
                         <!-- Make sure a new document id is created -->
-                        <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
+                        <xforms:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
                     </xforms:action>
                 </xforms:trigger>
                 <!-- Keep button -->
@@ -54,7 +54,7 @@
                     </xforms:label>
                     <xforms:action ev:event="DOMActivate">
                         <xxforms:hide dialog="fr-submission-result-dialog"/>
-                        <xforms:dispatch name="fr-new-document" target="fr-persistence-model"/>
+                        <xforms:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
                     </xforms:action>
                 </xforms:trigger>
                 <!-- Go button -->

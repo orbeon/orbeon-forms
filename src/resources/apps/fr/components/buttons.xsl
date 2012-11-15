@@ -47,7 +47,7 @@
                 <xhtml:span><xforms:output value="$fr-resources/detail/labels/close"/></xhtml:span>
             </xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:dispatch target="fr-navigation-model" name="fr-goto-summary"/>
+                <xforms:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>
             </xforms:action>
         </xforms:trigger>
         <!-- Trigger shown to go back if the data is dirty -->
@@ -57,7 +57,7 @@
                 <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/discard"/></xhtml:span>-->
             <!--</xforms:label>-->
             <!--<xforms:action ev:event="DOMActivate">-->
-                <!--<xforms:dispatch target="fr-navigation-model" name="fr-goto-summary"/>-->
+                <!--<xforms:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>-->
             <!--</xforms:action>-->
         <!--</xforms:trigger>-->
         <!-- Trigger shown to go back if the data is clean -->
@@ -67,7 +67,7 @@
                 <!--<xhtml:span><xforms:output value="$fr-resources/detail/labels/return"/></xhtml:span>-->
             <!--</xforms:label>-->
             <!--<xforms:action ev:event="DOMActivate">-->
-                <!--<xforms:dispatch target="fr-navigation-model" name="fr-goto-summary"/>-->
+                <!--<xforms:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>-->
             <!--</xforms:action>-->
         <!--</xforms:trigger>-->
     </xsl:template>
@@ -199,7 +199,7 @@
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt="{{$fr-resources/detail/labels/collapse-all}}"/>
                 </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fr-collapse-all" target="fr-sections-model"/>
+                <xforms:dispatch ev:event="DOMActivate" name="fr-collapse-all" targetid="fr-sections-model"/>
             </xforms:trigger>
         </xsl:if>
     </xsl:template>
@@ -211,7 +211,7 @@
                 <xforms:label>
                     <xhtml:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt="{{$fr-resources/detail/labels/expand-all}}"/>
                 </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fr-expand-all" target="fr-sections-model"/>
+                <xforms:dispatch ev:event="DOMActivate" name="fr-expand-all" targetid="fr-sections-model"/>
             </xforms:trigger>
         </xsl:if>
     </xsl:template>

@@ -195,7 +195,7 @@
     <!-- Respond to save button activation -->
     <xf:action ev:event="DOMActivate" ev:observer="fr-save-button">
         <xf:setvalue ref="$persistence-instance/submit-or-save-or-send">save</xf:setvalue>
-        <xf:dispatch name="fr-save-action" target="fr-persistence-model">
+        <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
             <!-- Check validity based on property -->
             <xf:property
                 name="fr:check-data-valid"
@@ -206,7 +206,7 @@
     <!-- Respond to submit button activation -->
     <xf:action ev:event="DOMActivate" ev:observer="fr-submit-button">
         <xf:setvalue ref="$persistence-instance/submit-or-save-or-send">submit</xf:setvalue>
-        <xf:dispatch name="fr-save-action" target="fr-persistence-model">
+        <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
             <xf:property name="fr:check-data-valid" value="true()"/>
         </xf:dispatch>
     </xf:action>
@@ -244,7 +244,7 @@
     <!-- Respond to send button activation -->
     <xf:action ev:event="DOMActivate" ev:observer="fr-workflow-send-button">
         <xf:setvalue ref="$persistence-instance/submit-or-save-or-send">send</xf:setvalue>
-        <xf:dispatch name="fr-save-action" target="fr-persistence-model">
+        <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
             <xf:property name="fr:check-data-valid" value="true()"/>
         </xf:dispatch>
     </xf:action>
@@ -547,7 +547,7 @@
                         <xf:var name="pdf-uri" value="xpl:rewriteServiceURI(instance('fr-workflow-send-instance'), true())" as="xs:anyURI"/>
 
                         <!-- Send everything to Alfresco -->
-                        <xf:dispatch target="fr-alfresco-model" name="alfresco-send-document">
+                        <xf:dispatch targetid="fr-alfresco-model" name="alfresco-send-document">
                             <xf:property name="fr:name" value="concat($form-title, ' (#', $document, ').pdf')"/>
                             <xf:property name="fr:title" value="$form-title"/>
                             <xf:property name="fr:description" value="$form-description"/>
@@ -562,7 +562,7 @@
                         <xf:message level="xxf:log-debug">Sending XML to Alfresco...</xf:message>
 
                         <!-- Send data to Alfresco -->
-                        <xf:dispatch target="fr-alfresco-model" name="alfresco-send-document">
+                        <xf:dispatch targetid="fr-alfresco-model" name="alfresco-send-document">
                             <xf:property name="fr:name" value="concat($form-title, ' (#', $document, ').xml')"/>
                             <xf:property name="fr:title" value="$form-title"/>
                             <xf:property name="fr:description" value="$form-description"/>
@@ -670,9 +670,9 @@
         <!-- case validation-error => update UI and open error dialog -->
         <xf:action if="event('error-type') = 'validation-error'">
             <!-- Mark all active alerts as visited -->
-            <xf:dispatch name="fr-visit-alerts" target="fr-persistence-model"/>
+            <xf:dispatch name="fr-visit-alerts" targetid="fr-persistence-model"/>
             <!-- Open all sections -->
-            <xf:dispatch name="fr-expand-all" target="fr-sections-model"/>
+            <xf:dispatch name="fr-expand-all" targetid="fr-sections-model"/>
             <!-- Open error dialog -->
             <xf:dispatch name="fr-show" targetid="fr-error-dialog">
                 <xf:property name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>

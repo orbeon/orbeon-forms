@@ -38,7 +38,7 @@
                         <xhtml:html>
                             <xhtml:head>
                                 <xforms:model id="main-model">
-                                    <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" target="3"/>
+                                    <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="3"/>
                                     <xforms:instance id="instance">
                                         <equation xmlns="">
                                             <screen>0</screen>

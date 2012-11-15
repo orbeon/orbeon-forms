@@ -64,7 +64,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="open-all">
                         <xforms:label>Open all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion"
                             name="fr-accordion-toggle-all">
                             <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
@@ -73,7 +73,7 @@
                 <xhtml:li>
                     <xforms:trigger appearance="minimal" id="close-all">
                         <xforms:label>Close all</xforms:label>
-                        <xforms:dispatch ev:event="DOMActivate" target="my-accordion"
+                        <xforms:dispatch ev:event="DOMActivate" targetid="my-accordion"
                             name="fr-accordion-toggle-all">
                             <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>

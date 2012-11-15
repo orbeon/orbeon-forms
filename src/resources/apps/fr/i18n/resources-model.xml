@@ -76,13 +76,13 @@
 
     <!-- Respond to language change in the UI -->
     <xf:action ev:observer="fr-language-selector" ev:event="xforms-value-changed DOMActivate">
-        <xf:dispatch name="fr-update-language" target="fr-resources-model"/>
+        <xf:dispatch name="fr-update-language" targetid="fr-resources-model"/>
     </xf:action>
 
     <!-- Initialization: get Form Runner resources and set the initial language -->
     <xf:action ev:event="xforms-model-construct-done">
         <xf:send submission="fr-get-fr-resources"/>
-        <xf:dispatch name="fr-update-language" target="fr-resources-model"/>
+        <xf:dispatch name="fr-update-language" targetid="fr-resources-model"/>
     </xf:action>
 
 </xf:model>

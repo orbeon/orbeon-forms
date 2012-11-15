@@ -54,7 +54,7 @@
             <xforms:action ev:event="my-update xforms-ready" if="in-progress = 'true'">
                 <xforms:recalculate/>
                 <xforms:refresh/>
-                <xforms:dispatch  name="my-update" target="main-model" delay="1000"/>
+                <xforms:dispatch  name="my-update" targetid="main-model" delay="1000"/>
             </xforms:action>
 
             <xforms:action ev:event="page-complete">

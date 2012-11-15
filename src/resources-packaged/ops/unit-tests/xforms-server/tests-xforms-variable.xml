@@ -59,7 +59,7 @@
 
                                     <xforms:action ev:event="xforms-ready" iterate="item">
                                         <xforms:setindex repeat="items-repeat" index="position()"/>
-                                        <xforms:dispatch name="my-event" target="my-count"/>
+                                        <xforms:dispatch name="my-event" targetid="my-count"/>
                                     </xforms:action>
 
                                 </xforms:model>
@@ -198,7 +198,7 @@
                                             <value2/>
                                         </instance>
                                     </xforms:instance>
-                                    <xforms:dispatch ev:event="xforms-ready" name="foobar" target="test-group"/>
+                                    <xforms:dispatch ev:event="xforms-ready" name="foobar" targetid="test-group"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>

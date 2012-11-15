@@ -210,7 +210,7 @@
                             <xforms:refresh/>
                         </xforms:action>
                         <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
-                        <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" target="captcha" name="fr-reload"/>
+                        <xforms:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
                         <xsl:if test="$captcha = 'reCAPTCHA'">
                             <fr:recaptcha id="captcha" theme="clean"/>
                         </xsl:if>

@@ -182,7 +182,7 @@
         <xforms:action ev:event="DOMActivate">
             <!-- Always dispatch the fr-goto-page; with external pagination, it used by the user of the datatable to load
                  the corresponding data, but it can also be useful with internal paging -->
-            <xforms:dispatch name="fr-goto-page" target="fr.datatable">
+            <xforms:dispatch name="fr-goto-page" targetid="fr.datatable">
                 <xforms:property name="fr-new-page" value="{$fr-new-page}"/>
             </xforms:dispatch>
         </xforms:action>
@@ -692,7 +692,7 @@
                                         <xforms:hint>
                                             <xforms:output value="{@fr:sortMessage}"/>
                                         </xforms:hint>
-                                        <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort" target="fr.datatable" xxbl:scope="inner">
+                                        <xforms:dispatch ev:event="DOMActivate" name="fr-update-sort" targetid="fr.datatable" xxbl:scope="inner">
                                             <xforms:property name="fr-column" value="xs:integer($columnDesc/@index)"/>
                                         </xforms:dispatch>
                                     </xsl:when>
@@ -1047,7 +1047,7 @@
                 <xxforms:sequence value="index(event('xxforms:targetid'))" xxbl:scope="outer"/>
             </xforms:var>
 
-            <xforms:dispatch name="fr-selection-changed" target="fr.datatable" xxbl:scope="inner">
+            <xforms:dispatch name="fr-selection-changed" targetid="fr.datatable" xxbl:scope="inner">
                 <xforms:property name="index" value="$index"/>
                 <xforms:property name="selected" value="$context"/>
             </xforms:dispatch>

@@ -79,7 +79,7 @@
                                 <!-- Tell user of this component a value was selected -->
                                 <xforms:trigger class="fr-select1-button-xforms-select" style="display: none">
                                     <xforms:label/>
-                                    <xforms:dispatch ev:event="DOMActivate" name="xforms-select" target="fr-select1-button"/>
+                                    <xforms:dispatch ev:event="DOMActivate" name="xforms-select" targetid="fr-select1-button"/>
                                 </xforms:trigger>
 
                                 <!-- Detect change in itemset and call JavaScript -->

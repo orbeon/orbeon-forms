@@ -60,7 +60,7 @@
                             <xh:span><xf:output value="$form-resources/dialog-publish/publish/label"/></xh:span>
                         </xf:label>
                         <!-- Dispatch publish event -->
-                        <xf:dispatch ev:event="DOMActivate" name="fb-publish-form" target="fb-publish-model">
+                        <xf:dispatch ev:event="DOMActivate" name="fb-publish-form" targetid="fb-publish-model">
                             <xf:property name="app" value="$app"/>
                             <xf:property name="form" value="$form"/>
                         </xf:dispatch>

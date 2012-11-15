@@ -34,13 +34,13 @@
         <xforms:model id="main-model">
 
             <!-- Load applications list and files list -->
-            <xforms:dispatch ev:event="xforms-ready" name="ops-initialize" target="main-model"/>
+            <xforms:dispatch ev:event="xforms-ready" name="ops-initialize" targetid="main-model"/>
 
             <xforms:action ev:event="ops-initialize">
                 <xforms:send submission="get-page-flow-submission"/>
                 <xforms:send submission="get-source-files-submission"/>
                 <xforms:setindex repeat="files-repeat" index="count((instance('source-files-instance')//file)[@path = instance('source-request-instance')/source-url]/preceding::file) + 1"/>
-                <xforms:dispatch name="ops-format-source" target="main-model"/>
+                <xforms:dispatch name="ops-format-source" targetid="main-model"/>
             </xforms:action>
 
             <!-- Page parameters -->
@@ -136,14 +136,14 @@
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@id"/>
                         </xforms:itemset>
-                        <xforms:dispatch ev:event="xforms-value-changed" name="ops-initialize" target="main-model"/>
+                        <xforms:dispatch ev:event="xforms-value-changed" name="ops-initialize" targetid="main-model"/>
                     </xforms:select1>
                 </td>
                 <td>
                     <xforms:group ref="instance('control-instance')/text-trigger">
                         <xforms:action ev:event="DOMActivate" >
                             <xforms:setvalue ref="instance('control-instance')/show-xml">false</xforms:setvalue>
-                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" target="main-model"/>
+                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" targetid="main-model"/>
                         </xforms:action>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>
@@ -157,7 +157,7 @@
                     <xforms:group ref="instance('control-instance')/xml-trigger">
                         <xforms:action ev:event="DOMActivate" >
                             <xforms:setvalue ref="instance('control-instance')/show-xml">true</xforms:setvalue>
-                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" target="main-model"/>
+                            <xforms:dispatch ev:event="DOMActivate" name="ops-format-source" targetid="main-model"/>
                         </xforms:action>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>
@@ -190,7 +190,7 @@
                 <td style="vertical-align: top">
                     <table>
                         <xforms:group>
-                            <xforms:dispatch ev:event="DOMFocusIn" name="ops-format-source" target="main-model"/>
+                            <xforms:dispatch ev:event="DOMFocusIn" name="ops-format-source" targetid="main-model"/>
                             <xforms:repeat ref="instance('source-files-instance')//file" id="files-repeat">
                                 <tr>
                                     <td style="white-space: nowrap">

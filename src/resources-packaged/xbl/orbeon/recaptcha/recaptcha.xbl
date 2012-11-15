@@ -34,7 +34,7 @@
         </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="fr-verify" phase="target">
-                <xforms:dispatch name="fr-verify" target="component-inner-group"/>
+                <xforms:dispatch name="fr-verify" targetid="component-inner-group"/>
             </xbl:handler>
             <xbl:handler event="fr-reload" phase="target">
                 <xxforms:script>YAHOO.xbl.fr.Recaptcha.instance(this).reload();</xxforms:script>

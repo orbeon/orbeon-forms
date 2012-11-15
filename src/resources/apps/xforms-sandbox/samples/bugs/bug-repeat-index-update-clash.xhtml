@@ -27,7 +27,7 @@
             <xforms:action ev:event="xforms-ready">
                 <xforms:insert ref="instance('instance')/record" at="1"/>
                 <xforms:refresh/>
-                <xforms:dispatch name="xxforms-repeat-activate" target="my-output" xxforms:repeat-indexes="1"/>
+                <xforms:dispatch name="xxforms-repeat-activate" targetid="my-output" xxforms:repeat-indexes="1"/>
             </xforms:action>
 
         </xforms:model>
@@ -56,7 +56,7 @@
                             <xforms:insert ref="instance('instance')/record"/>
                         </xforms:action>
                         <xforms:action ev:event="xforms-ready">
-                            <xforms:dispatch name="xxforms-repeat-activate" target="my-output" xxforms:repeat-indexes="2"/>
+                            <xforms:dispatch name="xxforms-repeat-activate" targetid="my-output" xxforms:repeat-indexes="2"/>
                         </xforms:action>
                     </xforms:model>
                     <xforms:group id="bar-group" model="model" appearance="xxforms:internal">

@@ -43,28 +43,28 @@
                     <!-- Local model -->
                     <xforms:model id="internal-model">
                         <xforms:action ev:event="xforms-ready">
-                            <xforms:dispatch name="DOMActivate" target="internal-trigger-1"/>
-                            <xforms:dispatch name="DOMActivate" target="internal-trigger-2"/>
-                            <xforms:dispatch name="DOMActivate" target="internal-trigger-3"/>
+                            <xforms:dispatch name="DOMActivate" targetid="internal-trigger-1"/>
+                            <xforms:dispatch name="DOMActivate" targetid="internal-trigger-2"/>
+                            <xforms:dispatch name="DOMActivate" targetid="internal-trigger-3"/>
                         </xforms:action>
                     </xforms:model>
                     <!-- Local controls -->
                     <xforms:group id="internal-group">
                         <xforms:trigger id="internal-trigger-1">
                             <xforms:label>Dispatch outside</xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="foobar-component">
+                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="foobar-component">
                                 <xforms:property name="fr:my-context" value="42"/>
                             </xforms:dispatch>
                         </xforms:trigger>
                         <xforms:trigger id="internal-trigger-2">
                             <xforms:label>Dispatch inside group</xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-group">
+                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="internal-group">
                                 <xforms:property name="fr:my-context" value="43"/>
                             </xforms:dispatch>
                         </xforms:trigger>
                         <xforms:trigger id="internal-trigger-3">
                             <xforms:label>Dispatch inside model</xforms:label>
-                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-model">
+                            <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="internal-model">
                                 <xforms:property name="fr:my-context" value="44"/>
                             </xforms:dispatch>
                         </xforms:trigger>

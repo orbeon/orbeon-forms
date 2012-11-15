@@ -443,7 +443,7 @@
                                 <xforms:model id="model1">
 
                                     <xforms:action ev:event="xforms-ready">
-                                        <xforms:dispatch name="xxforms-repeat-activate" target="my-trigger" xxforms:repeat-indexes="2"/>
+                                        <xforms:dispatch name="xxforms-repeat-activate" targetid="my-trigger" xxforms:repeat-indexes="2"/>
                                     </xforms:action>
 
                                 </xforms:model>

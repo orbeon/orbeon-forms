@@ -76,7 +76,7 @@
                         <!-- If not read-only: selection control -->
                         <xhtml:span style="{if ($is-readonly) then 'display: none' else ''}">
                             <xforms:select1 xbl:attr="appearance" ref="$value" id="select1">
-                                <xforms:dispatch ev:event="xforms-enabled xforms-value-changed" name="itemset-or-value-changed" target="container"/>
+                                <xforms:dispatch ev:event="xforms-enabled xforms-value-changed" name="itemset-or-value-changed" targetid="container"/>
                                 <xforms:alert ref="$alert"/>
                                 <xbl:content includes="xforms|item,xforms|itemset,xforms|label,xforms|help,xforms|hint"/>
                             </xforms:select1>

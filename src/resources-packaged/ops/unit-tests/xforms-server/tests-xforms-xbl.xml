@@ -136,7 +136,7 @@
                                         <xforms:refresh/>
                                         <xforms:refresh/>
                                         <xforms:delete ref="instance('events')/*"/>
-                                        <xforms:dispatch name="DOMActivate" target="add-row-trigger"/>
+                                        <xforms:dispatch name="DOMActivate" targetid="add-row-trigger"/>
                                     </xforms:action>
 
                                     <!-- TEST: Events to gather -->
@@ -586,7 +586,7 @@
                                                     <value/>
                                                 </xforms:instance>
                                                 <!-- Dispatch event -->
-                                                <xforms:dispatch ev:event="xforms-model-construct-done" name="doit" target="xbl-model"/>
+                                                <xforms:dispatch ev:event="xforms-model-construct-done" name="doit" targetid="xbl-model"/>
                                                 <!-- React to dispatched event -->
                                                 <xforms:setvalue ev:event="doit" ref=".">gotit</xforms:setvalue>
                                             </xforms:model>
@@ -1163,7 +1163,7 @@
                                         <xforms:insert ref="instance('instance')/record" at="1"/>
                                         <xforms:refresh/>
                                         <!-- Dispatch repeat focus to change the index back to 1 -->
-                                        <xforms:dispatch name="xxforms-repeat-activate" target="my-output" xxforms:repeat-indexes="1"/>
+                                        <xforms:dispatch name="xxforms-repeat-activate" targetid="my-output" xxforms:repeat-indexes="1"/>
                                     </xforms:action>
 
                                 </xforms:model>
@@ -1192,7 +1192,7 @@
                                                 </xforms:action>
                                                 <xforms:action ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group">
                                                     <!-- Dispatch repeat focus to change the index back to 2 -->
-                                                    <xforms:dispatch name="xxforms-repeat-activate" target="my-output-bar" xxforms:repeat-indexes="2"/>
+                                                    <xforms:dispatch name="xxforms-repeat-activate" targetid="my-output-bar" xxforms:repeat-indexes="2"/>
                                                 </xforms:action>
                                             </xforms:model>
                                             <xforms:group id="bar-group" model="model" appearance="xxforms:internal">

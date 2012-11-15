@@ -38,14 +38,14 @@
                     <xhtml:img src="/apps/fr/style/clear.gif" alt=""/>
                     <xforms:output value="$form-resources/delete/label"/>
                 </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" target="{confirmation-target}"/>
+                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-yes" targetid="{confirmation-target}"/>
             </xforms:trigger>
             <xforms:output value="$form-resources/or/label"/>
             <xforms:trigger id="fb-confirmation-dialog-cancel-trigger" appearance="minimal">
                 <xforms:label>
                     <xforms:output value="$form-resources/cancel/label"/>
                 </xforms:label>
-                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" target="{confirmation-target}"/>
+                <xforms:dispatch ev:event="DOMActivate" name="fb-confirmation-no" targetid="{confirmation-target}"/>
             </xforms:trigger>
         </xforms:group>
     </xhtml:div>

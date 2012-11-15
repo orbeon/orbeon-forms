@@ -53,7 +53,7 @@
                 </fr:recaptcha>
                 <fr:button>
                     <xforms:label>Verify</xforms:label>
-                    <xforms:dispatch ev:event="DOMActivate" target="recaptcha" name="fr-verify"/>
+                    <xforms:dispatch ev:event="DOMActivate" targetid="recaptcha" name="fr-verify"/>
                 </fr:button>
             </xforms:case>
             <xforms:case id="success-case">
@@ -62,7 +62,7 @@
                 <xforms:trigger appearance="minimal">
                     <xforms:label>try again</xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch target="recaptcha" name="fr-reload"/>
+                        <xforms:dispatch targetid="recaptcha" name="fr-reload"/>
                         <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
                     </xforms:action>
                 </xforms:trigger>.
@@ -74,7 +74,7 @@
                 <xforms:trigger appearance="minimal">
                     <xforms:label>another shot</xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:dispatch if="instance('ui')/error-code != 'empty'" target="recaptcha" name="fr-reload"/>
+                        <xforms:dispatch if="instance('ui')/error-code != 'empty'" targetid="recaptcha" name="fr-reload"/>
                         <xforms:toggle ev:event="DOMActivate" case="recaptcha-case"/>
                     </xforms:action>
                 </xforms:trigger>.

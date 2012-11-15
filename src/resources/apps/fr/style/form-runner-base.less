@@ -510,14 +510,16 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
     noscript { display: none }
 
     form.xforms-form {
-        .fr-status-icons { display: none }
-        .xforms-loading-loading { display: none }
-        // Upload remove button
-        .xforms-upload-remove { display: none }
+        .fr-status-icons,                                              // no status icons
+        .xforms-loading-loading,                                       // no loading icon
+        .xforms-upload-remove,                                         // upload remove button
+        .xbl-fr-attachment .xforms-output-appearance-xxforms-download, // no download link
+        .xforms-help-image, .fr-section-title .xforms-help-image,      // no help
+        .xforms-hint                                                   // no hints
+        { display: none }
+
         // Remove background attachment image
         .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }
-        // Don't show download link
-        .xbl-fr-attachment .xforms-output-appearance-xxforms-download { display: none }
 
         // Since only value is shown, no need for special height
         .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: auto }

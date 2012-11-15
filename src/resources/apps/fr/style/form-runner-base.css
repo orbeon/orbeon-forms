@@ -656,21 +656,18 @@ span.xforms-textarea pre {
   noscript {
     display: none;
   }
-  form.xforms-form .fr-status-icons {
-    display: none;
-  }
-  form.xforms-form .xforms-loading-loading {
-    display: none;
-  }
-  form.xforms-form .xforms-upload-remove {
+  form.xforms-form .fr-status-icons,
+  form.xforms-form .xforms-loading-loading,
+  form.xforms-form .xforms-upload-remove,
+  form.xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
+  form.xforms-form .xforms-help-image,
+  form.xforms-form .fr-section-title .xforms-help-image,
+  form.xforms-form .xforms-hint {
     display: none;
   }
   form.xforms-form .xforms-upload-info {
     background: transparent none repeat scroll 0 0;
     padding-left: 2px;
-  }
-  form.xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download {
-    display: none;
   }
   form.xforms-form .fr-grid .xforms-select1-appearance-compact,
   form.xforms-form .fr-grid .xforms-select-appearance-compact {

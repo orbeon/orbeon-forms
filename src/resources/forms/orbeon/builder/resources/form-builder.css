@@ -97,9 +97,6 @@ body {
 .xforms-dialog fieldset {
   border: 1px solid #CCCCCC;
 }
-.xbl-fr-section > label {
-  display: none;
-}
 .fb-section-editor {
   position: absolute;
   display: none;
@@ -151,17 +148,8 @@ body {
 .fb-nowrap {
   white-space: nowrap;
 }
-.fb-xforms-disabled {
-  display: none;
-}
 .fb-hide-alert .xforms-alert {
   display: none;
-}
-.fr-section-container span.fr-section-content {
-  padding: 10px;
-}
-.fb div.xbl-fr-grid {
-  padding: 22px 0 0 22px;
 }
 /* ***** Toolbox **************************************************************************************************** */
 .fb-toolbox {
@@ -497,21 +485,6 @@ body {
 .xbl-fr-alert-dialog-message .xforms-label {
   font-weight: normal;
 }
-/* ***** Header ***************************************************************************************************** */
-.fr-header .fb-form-settings-trigger {
-  display: inline-block;
-  float: right;
-  margin-left: 0.5em;
-}
-.fr-header .fb-language-triggers {
-  display: inline-block;
-  float: right;
-  margin-left: 1em;
-}
-/* ***** Footer ***************************************************************************************************** */
-.fr-footer div {
-  height: 1em;
-}
 /* ***** In-Place Editing ******************************************************************************************* */
 .fr-grid .xforms-label input,
 .fr-grid .xforms-hint input {
@@ -528,6 +501,12 @@ h2 .fr-section-label {
   height: 36px;
 }
 /* ***** Grid ******************************************************************************************************* */
+.fb .fr-section-container .fr-section-content {
+  padding: 10px;
+}
+.fb .xbl-fr-grid {
+  padding: 22px 0 0 22px;
+}
 .fb-cell-editor {
   display: none;
 }
@@ -556,13 +535,6 @@ h2 .fr-section-label {
   width: 16px;
   height: 60px;
   text-align: center;
-}
-.fb-grid-top-left-td {
-  text-align: center;
-  width: 24px;
-}
-.fr-grid .fb-grid-top-left-td img {
-  display: none;
 }
 .fb-grid-cell-icons {
   position: absolute;

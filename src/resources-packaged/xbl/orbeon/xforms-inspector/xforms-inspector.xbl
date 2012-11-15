@@ -28,7 +28,6 @@
             <xbl:handler event="fr-log" phase="target" defaultAction="cancel">
                 <xf:action if="instance('inspector-instance')/function = 'view-console'">
                     <xf:var name="shown-output" value="instance('inspector-instance')/shown-output"/>
-                    <xf:var name="xml-indent" value="instance('inspector-instance')/xsl:output"/>
                     <!-- Add newline if we already have content shown -->
                     <xf:setvalue ref="$shown-output" value="concat(., if (. = '') then '' else '&#x0a;')"/>
 
@@ -41,7 +40,7 @@
                         <xf:setvalue ref="$shown-output" value="concat(., if ($is-xml) then
                             if (instance('inspector-instance')/mode = 'formatted')
                                 then ../xpath-output/*/saxon:serialize($current, $xml-indent)
-                                else ../xpath-output/*/saxon:serialize($current, 'xml')
+                                else ../xpath-output/*/saxon:serialize($current, $xml-noindent)
                             else $current)"/>
                     </xf:action>
                 </xf:action>
@@ -88,10 +87,12 @@
                         <input/>
                         <shown-output/>
                         <xsl:output method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
+                        <xsl:output method="xml" omit-xml-declaration="yes"/>
                     </instance>
                 </xf:instance>
 
-                <xf:var name="xml-indent" value="instance('inspector-instance')/xsl:output"/>
+                <xf:var name="xml-indent"   value="instance('inspector-instance')/xsl:output[1]"/>
+                <xf:var name="xml-noindent" value="instance('inspector-instance')/xsl:output[2]"/>
                 <xf:bind ref="instance('inspector-instance')">
                     <xf:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset') /model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
                     <xf:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
@@ -221,13 +222,13 @@
                                 if (function = 'view-instance') then
                                     if (mode = 'formatted')
                                         then saxon:serialize($current-instance, $xml-indent)
-                                        else saxon:serialize($current-instance, 'xml')
+                                        else saxon:serialize($current-instance, $xml-noindent)
                                 else if (function = 'evaluate-xpath') then
                                     if (exists(xpath-output/*))
                                         then string-join(
                                             if (mode = 'formatted')
                                                 then xpath-output/*/saxon:serialize(., $xml-indent)
-                                                else xpath-output/*/saxon:serialize(., 'xml')
+                                                else xpath-output/*/saxon:serialize(., $xml-noindent)
                                             , '&#x0a;')
                                         else xpath-output
                                 else shown-output">

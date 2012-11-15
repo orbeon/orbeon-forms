@@ -52,8 +52,6 @@
                     <form-name/>
                     <title xml:lang=""/>
                     <description xml:lang=""/>
-                    <author/>
-                    <logo mediatype="" filename="" size=""/>
                 </metadata>
             </xf:instance>
 

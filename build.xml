@@ -921,15 +921,14 @@
 
     </target>
 
-    <target name="exist-task" depends="jars">
+    <target name="exist-task" depends="classpath">
         <!-- eXist tasks -->
         <!-- http://exist-db.org/ant-tasks.html -->
         <typedef resource="org/exist/ant/antlib.xml" uri="http://exist-db.org/ant">
             <classpath>
                 <path refid="class.path"/>
-                <fileset dir="${build.dir}/lib">
-                    <include name="orbeon.jar"/>
-                </fileset>
+                <pathelement location="build/lib/orbeon.jar"/>
+                <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->
             </classpath>
         </typedef>
     </target>
@@ -965,13 +964,12 @@
         <xdb:shutdown configuration="${basedir}/descriptors/ant-exist-conf.xml" uri="xmldb:exist:///db" user="admin" password=""/>
     </target>
 
-    <target name="exist-import-sample-data-to-www" depends="exist-task">
-        <!-- Store data -->
-        <xdb:store uri="xmldb:exist://www.orbeon.com/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="orbeon" password="secret">
+    <!-- NOTE: You need to comment out the eXist security filter for this to work -->
+    <target name="exist-import-sample-data-to-localhost" depends="exist-task">
+        <!-- Store data only -->
+        <xdb:store uri="xmldb:exist://localhost:8080/orbeon/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="guest" password="guest">
             <fileset dir="data">
                 <include name="orbeon/**"/>
-                <!-- TODO: Some examples forms in the builder -->
-                <exclude name="orbeon/fr/orbeon/builder/**"/>
             </fileset>
         </xdb:store>
     </target>

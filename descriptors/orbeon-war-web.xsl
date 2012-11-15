@@ -95,7 +95,7 @@
             <xsl:comment>Set context listener processors</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'context listener processors'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <context-param>
                         <param-name>oxf.context-initialized-processor.name</param-name>
@@ -119,7 +119,7 @@
             <xsl:comment>Set session listener processors</xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'session listener processors'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <context-param>
                         <param-name>oxf.session-created-processor.name</param-name>
@@ -163,17 +163,23 @@
                 <dispatcher>FORWARD</dispatcher>
             </filter-mapping>
 
-            <filter>
-                <filter-name>orbeon-exist-filter</filter-name>
-                <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
-            </filter>
-            <filter-mapping>
-                <filter-name>orbeon-exist-filter</filter-name>
-                <url-pattern>/exist/*</url-pattern>
-                <xsl:comment>Security filter for eXist</xsl:comment>
-                <dispatcher>REQUEST</dispatcher>
-                <dispatcher>FORWARD</dispatcher>
-            </filter-mapping>
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'eXist security filter'"/>
+                <xsl:with-param name="commented" select="$target = 'devel'"/>
+                <xsl:with-param name="content">
+                    <filter>
+                        <filter-name>orbeon-exist-filter</filter-name>
+                        <filter-class>org.orbeon.oxf.servlet.TokenSecurityFilter</filter-class>
+                    </filter>
+                    <filter-mapping>
+                        <filter-name>orbeon-exist-filter</filter-name>
+                        <url-pattern>/exist/*</url-pattern>
+                        <xsl:comment>Security filter for eXist</xsl:comment>
+                        <dispatcher>REQUEST</dispatcher>
+                        <dispatcher>FORWARD</dispatcher>
+                    </filter-mapping>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:comment>Orbeon context listener</xsl:comment>
             <listener>
@@ -222,7 +228,7 @@
                 <xsl:comment>Set servlet initialization and destruction listeners</xsl:comment>
                 <xsl:call-template name="comment">
                     <xsl:with-param name="caption" select="'servlet listener processors'"/>
-                    <xsl:with-param name="commented" select="$target = 'war'"/>
+                    <xsl:with-param name="commented" select="$target != 'devel'"/>
                     <xsl:with-param name="content">
                         <init-param>
                             <param-name>oxf.servlet-initialized-processor.name</param-name>
@@ -299,7 +305,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <servlet>
                         <servlet-name>exist-xmlrpc-servlet</servlet-name>
@@ -327,7 +333,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist WebDAV support'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <servlet>
                         <servlet-name>exist-webdav-servlet</servlet-name>
@@ -342,7 +348,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <servlet>
                         <servlet-name>hsqldb-servlet</servlet-name>
@@ -377,7 +383,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
                         <servlet-name>exist-xmlrpc-servlet</servlet-name>
@@ -388,7 +394,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist WebDAV support'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
                         <servlet-name>exist-webdav-servlet</servlet-name>
@@ -399,7 +405,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
                         <servlet-name>hsqldb-servlet</servlet-name>
@@ -415,7 +421,7 @@
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'SQL examples'"/>
-                <xsl:with-param name="commented" select="$target = 'war'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <resource-ref>
                         <description>DataSource</description>

@@ -420,10 +420,10 @@ button.btn-link {
 }
 .fr-section-container .fr-section-content {
   display: block;
-  padding-left: 22px;
-  padding-right: 22px;
-  padding-top: 22px;
-  padding-bottom: 22px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 .fr-captcha {
   display: block;
@@ -438,6 +438,7 @@ button.btn-link {
 .fr-grid {
   table-layout: fixed;
   width: 100%;
+  margin-bottom: 10px;
 }
 .fr-grid select,
 .fr-grid textarea,

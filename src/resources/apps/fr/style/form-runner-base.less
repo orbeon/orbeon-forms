@@ -15,7 +15,6 @@
 // NOTE: IE em factor: 0.9759
 
 @import "form-runner-common";
-@border: #DDDDEE;
 
 .fr-logo img {
     float: left;
@@ -167,7 +166,7 @@ button.btn-link {
 .xforms-help-panel-message {
     padding: .5em 0;
     margin-bottom: .5em;
-    border-bottom: 2px solid @border;
+    border-bottom: 2px solid @frBorderColor;
 }
 
 /* ***** General Layout ********************************************************************************************* */
@@ -286,14 +285,13 @@ button.btn-link {
     .hd { background-color: #666699 }
     .bd { margin: 0 .5em .5em .5em }
     .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
-    .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid @border; clear: both }
+    .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid @frBorderColor; clear: both }
 }
 
 #fr-submission-result-dialog { width: 800px }
 
 /* ***** Sections *************************************************************************************************** */
 
-// Sections
 .fr-section-container {
     display: block; clear: both;
 
@@ -316,10 +314,10 @@ button.btn-link {
 
     .fr-section-content {
         display: block;
-        padding-left: 22px;                     // To be aligned with the start of the text of the titles
-        padding-right: 22px;                    // To have the same margin on both side, especially visible with tables
-        padding-top: 22px;                      // At the top/bottom of a section, same as padding left/right for sense of alignment
-        padding-bottom: 22px;
+        padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding; // To be aligned with the start of the text of the titles
+        padding-right: @frSectionTitleLeftPadding - @frGridCellPadding; // To have the same margin on both side, especially visible with tables
+        padding-top: 10px;                                              // At the top/bottom of a section, less space
+        padding-bottom: 10px;
     }
 }
 
@@ -359,6 +357,7 @@ button.btn-link {
 
     table-layout: fixed;
     width: 100%;
+    margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
 
     .xforms-textarea textarea {
         width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
@@ -405,7 +404,7 @@ button.btn-link {
 
     // Cell content
     .fr-grid-content {
-        padding: 4px;                               // Add some space around control
+        padding: @frGridCellPadding;                // Add some space around control
         *padding-right: 6px;                        // To help IE move back controls within .fr-grid-content
     }
 }

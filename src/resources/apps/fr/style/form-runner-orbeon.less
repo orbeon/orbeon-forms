@@ -194,7 +194,7 @@ html, body { background-color: @frBackground }
         button.btn-link { text-decoration: none }
 
         .fr-section-opened, .fr-section-closed {
-            padding-left: 20px;
+            padding-left: @frSectionTitleLeftPadding;
             background-repeat: no-repeat;
             background-position: 5px 17px;                          // 17 is (40-7)/7, to vertically align on the middle of the first line of the section title
                                                                     // We use 17px, an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close

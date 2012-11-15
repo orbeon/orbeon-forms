@@ -501,7 +501,6 @@ button.btn-link {
 }
 .fr-grid .xforms-label {
   margin-bottom: .5em;
-  display: block;
   overflow: hidden;
   zoom: 1;
 }

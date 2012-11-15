@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exf="http://www.exforms.org/exf/1-0">
     <xh:head>
         <xf:model id="fr-form-model" xxf:noscript-support="false">
             <xf:instance id="fr-form-instance">
@@ -45,7 +45,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <typed-controls>
                         <email>info@orbeon.com</email>
                         <us-phone>5555555555</us-phone>
-                        <number>888</number>
+                        <number>299792458</number>
                         <currency>10.99</currency>
                         <us-state>CA</us-state>
                     </typed-controls>
@@ -746,18 +746,18 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                 <country/>
             </xf:instance>
             <xf:submission id="autocomplete-submission" ref="instance('autocomplete-search-instance')" validate="false" method="post" resource="/fr/service/custom/orbeon/controls/countries" replace="instance" instance="autocomplete-itemset-instance"/>
-        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps" xmlns:exf="http://www.exforms.org/exf/1-0" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline"><metadata xmlns="http://orbeon.org/oxf/xml/form-builder"><display-name lang="en">Global Library</display-name><display-name lang="fr">Bibliothèque globale</display-name><display-name lang="ru">Шаблоны разделов</display-name><icon lang="en"><small-icon>/forms/orbeon/builder/images/input.png</small-icon><large-icon>/forms/orbeon/builder/images/input.png</large-icon></icon></metadata><xbl:binding id="address-component" element="component|address" class="fr-section-component"><metadata xmlns="http://orbeon.org/oxf/xml/form-builder"><display-name lang="en">US Address</display-name><description lang="en"/><icon lang="en"><small-icon>/apps/fr/style/images/silk/plugin.png</small-icon><large-icon>/apps/fr/style/images/silk/plugin.png</large-icon></icon><display-name lang="fr">Adresse US</display-name><description lang="fr"/><icon lang="fr"><small-icon>/apps/fr/style/images/silk/plugin.png</small-icon><large-icon>/apps/fr/style/images/silk/plugin.png</large-icon></icon><templates><view><component:address/></view></templates></metadata><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance"><address>
+        </xf:model><xbl:xbl xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions" xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps" xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:p="http://www.orbeon.com/oxf/pipeline"><metadata xmlns="http://orbeon.org/oxf/xml/form-builder"><display-name lang="en">Global Library</display-name><display-name lang="fr">Bibliothèque globale</display-name><display-name lang="ru">Шаблоны разделов</display-name><icon lang="en"><small-icon>/forms/orbeon/builder/images/input.png</small-icon><large-icon>/forms/orbeon/builder/images/input.png</large-icon></icon></metadata><xbl:binding id="address-component" element="component|address" class="fr-section-component"><metadata xmlns="http://orbeon.org/oxf/xml/form-builder"><display-name lang="en">US Address</display-name><description lang="en"/><icon lang="en"><small-icon>/apps/fr/style/images/silk/plugin.png</small-icon><large-icon>/apps/fr/style/images/silk/plugin.png</large-icon></icon><display-name lang="fr">Adresse US</display-name><description lang="fr"/><icon lang="fr"><small-icon>/apps/fr/style/images/silk/plugin.png</small-icon><large-icon>/apps/fr/style/images/silk/plugin.png</large-icon></icon><templates><view><component:address/></view></templates></metadata><xbl:implementation><xf:model id="address-model"><xf:instance id="fr-form-instance"><address>
                         <street-number/>
                         <street-name/>
                         <apt-suite/>
-                        <city>a</city>
+                        <city/>
                         <state/>
                         <zip/>
                     </address></xf:instance><xf:instance id="fr-form-template"><address>
                         <street-number/>
                         <street-name/>
                         <apt-suite/>
-                        <city>a</city>
+                        <city/>
                         <state/>
                         <zip/>
                     </address></xf:instance><xf:bind><xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="street-number-bind" name="street-number" required="true()" ref="street-number"/><xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="street-name-bind" name="street-name" ref="street-name" required="true()"/><xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="apt-suite-bind" name="apt-suite" ref="apt-suite"/><xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="city-bind" name="city" ref="city" required="true()"/><xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="state-bind" name="state" ref="state" required="true()"/><xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="zip-bind" name="zip" required="true()" ref="zip"/></xf:bind><xf:instance id="fr-form-resources"><resources><resource xml:lang="en"><address>
@@ -826,7 +826,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <hint/>
                             <help/>
                             <alert/>
-                        </zip></resource></resources></xf:instance><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" xxbl:scope="outer"><xf:group appearance="xxf:internal" xxbl:scope="inner"><xf:var id="binding" name="binding" as="node()?"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:group appearance="xxf:internal"><xf:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(event('xxf:binding'))"><xf:var name="source-binding" value="event('xxf:binding')" as="element()"/><xf:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/></xf:action><fr:grid xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
+                        </zip></resource></resources></xf:instance><xf:var name="form-resources" value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/><xf:instance id="readonly"><readonly/></xf:instance><xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode"/><xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/></xf:model></xbl:implementation><xbl:template><xf:group appearance="xxf:internal" xxbl:scope="outer"><xf:group appearance="xxf:internal" xxbl:scope="inner"><xf:var id="binding" name="binding" as="node()?"><xxf:sequence value="." xxbl:scope="outer"/></xf:var><xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding"><xf:action><xf:action if="$binding/*"><xf:delete ref="instance()/*"/><xf:insert context="instance()" origin="$binding/*"/></xf:action><xf:action if="not($binding/*)"><xf:insert context="$binding" origin="instance('fr-form-template')/*"/><xf:insert context="instance()" origin="instance('fr-form-template')/*"/></xf:action></xf:action></xf:action><xf:var name="readonly" as="xs:boolean" value="exf:readonly($binding)"><xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/></xf:var><xf:var name="fr-resources" as="element()?"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xf:var><xf:group appearance="xxf:internal"><xf:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(event('xxf:binding'))"><xf:var name="source-binding" value="event('xxf:binding')" as="element()"/><xf:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/></xf:action><fr:grid xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:oxf="http://www.orbeon.com/oxf/processors" columns="3">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="street-number-control" bind="street-number-bind">
@@ -863,7 +863,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xf:input>
                             </xh:td>
                             <xh:td>
-                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" xmlns:xf="http://www.w3.org/2002/xforms" id="state-control" bind="state-bind">
+                                <fr:us-state xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:pipeline="java:org.orbeon.oxf.processor.pipeline.PipelineFunctionLibrary" id="state-control" bind="state-bind">
                                     <xf:label ref="$form-resources/state/label"/>
                                     <xf:hint ref="$form-resources/state/hint"/>
                                     <xf:help ref="$form-resources/state/help"/>
@@ -959,7 +959,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </fr:us-phone>
                             </xh:td>
                             <xh:td>
-                                <fr:number id="number-control" grouping-separator="'" digits-after-decimal="2" decimal-separator="," bind="number-bind" class="fr-width-10em">
+                                <fr:number id="number-control" grouping-separator="'" digits-after-decimal="0" decimal-separator="," bind="number-bind" class="fr-width-10em" suffix="m/s">
                                     <xf:label ref="$form-resources/number/label"/>
                                     <xf:hint ref="$form-resources/number/hint"/>
                                     <xf:help ref="$form-resources/number/help"/>
@@ -1106,7 +1106,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xf:select1>
                             </xh:td>
                             <xh:td>
-                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:exf="http://www.exforms.org/exf/1-0" bind="multiple-list-bind" id="multiple-list-control">
+                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" bind="multiple-list-bind" id="multiple-list-control">
                                     <xf:label ref="$form-resources/multiple-list/label"/>
                                     <xf:hint ref="$form-resources/multiple-list/hint"/>
                                     <xf:help ref="$form-resources/multiple-list/help"/>

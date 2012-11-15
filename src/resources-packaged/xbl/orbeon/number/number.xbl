@@ -76,6 +76,8 @@
 
                         <!-- Access to parameters -->
                         <xsl:copy-of select="xxbl:parameter(., 'prefix')"/>
+                        <xsl:copy-of select="xxbl:parameter(., 'suffix')"/>
+
                         <xsl:copy-of select="xxbl:parameter(., 'decimal-separator')"/>
                         <xsl:copy-of select="xxbl:parameter(., 'grouping-separator')"/>
 
@@ -101,22 +103,14 @@
                         <xf:var name="binding" value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
                         <xf:var name="formatted"
                             value="if ($binding castable as xs:decimal)
-                                   then concat(normalize-space($prefix),
-                                             if (normalize-space($prefix)) then ' ' else '',
-                                             translate(format-number(xs:decimal($binding), $picture-string), ',.', concat($grouping-separator, $decimal-separator)))
+                                   then translate(format-number(xs:decimal($binding), $picture-string), ',.', concat($grouping-separator, $decimal-separator))
                                    else $binding"/>
                         <xf:group ref="$binding[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]">
                             <xf:input
                                     ref="."
-                                    class="xbl-fr-number-xforms-input"
+                                    class="xbl-fr-number-xforms-input fr-hidden"
                                     xxf:format="$formatted"
-                                    xxf:unformat="
-                                        for $r1 in
-                                            replace(., concat('[\s', $grouping-separator, ']'), '')
-                                        return
-                                            if (normalize-space($prefix))
-                                            then replace($r1, concat('^', string-join(for $p in string-to-codepoints($prefix) return concat('[', codepoints-to-string($p), ']'), '')), '')
-                                            else $r1">
+                                    xxf:unformat="translate(translate(., $grouping-separator, ''), $decimal-separator, '.')">
 
                                 <xxf:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxf:script>
                                 <xxf:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxf:script>
@@ -125,10 +119,14 @@
 
                             <!-- The visible HTML input -->
                             <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid-visited -->
-                            <xh:input
-                                class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
-                                type="text"
-                                xbl:attr="tabindex tabindex=navindex"/>
+                            <xh:span class="{{(if ($prefix) then 'input-prepend' else (), if ($suffix) then 'input-append' else ())}}">
+                                <xf:group class="add-on" ref=".[$prefix]"><xf:output value="$prefix"/></xf:group>
+                                <xh:input
+                                    class="xbl-fr-number-visible-input xbl-html-input xforms-input-input"
+                                    type="text"
+                                    xbl:attr="tabindex tabindex=navindex"/>
+                                <xf:group class="add-on" ref=".[$suffix]"><xf:output value="$suffix"/></xf:group>
+                            </xh:span>
                         </xf:group>
                         <!-- Static readonly mode -->
                         <xf:group ref="$binding[exf:readonly() and property('xxf:readonly-appearance') = 'static']">

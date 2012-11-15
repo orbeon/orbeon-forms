@@ -105,9 +105,9 @@
                             <xf:label>Please enter the HTTP URL of the XHTML + XForms to download from the web and run</xf:label>
                             <xf:alert>Please enter a valid HTTP URL (starting with "http://")</xf:alert>
                         </xf:input>
-                        <fr:button ref="download-trigger">
+                        <xf:trigger ref="download-trigger">
                             <xf:label>Run XForms</xf:label>
-                        </fr:button>
+                        </xf:trigger>
                     </xf:group>
                     <p>Your document has to be in the XHTML namespace. Plain HTML won't work.</p>
                 </fr:tab>
@@ -127,9 +127,9 @@
                                 <xf:value value="substring(@name, 1, string-length(@name) - 6)"/>
                             </xf:itemset>
                         </xf:select1>
-                        <fr:button ref="sample-trigger">
+                        <xf:trigger ref="sample-trigger">
                             <xf:label>Run XForms</xf:label>
-                        </fr:button>
+                        </xf:trigger>
                     </xf:group>
                 </fr:tab>
             </fr:tabview>

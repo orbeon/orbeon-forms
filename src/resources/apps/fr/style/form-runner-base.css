@@ -472,6 +472,12 @@ button.btn-link {
 .fr-grid .xbl-fr-autocomplete .xforms-input input {
   width: 140px;
 }
+.fr-grid .xbl-fr-inplace-input {
+  width: 100%;
+}
+.fr-grid .xbl-fr-inplace-input input {
+  width: 100%;
+}
 .fr-grid .xforms-mediatype-text-html textarea {
   height: 10.1em;
 }

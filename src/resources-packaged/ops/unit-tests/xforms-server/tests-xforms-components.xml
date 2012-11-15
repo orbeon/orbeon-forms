@@ -562,15 +562,22 @@
                     <xxf:control-values>
                         <xxf:control id="my-currency$xf-10" class="xbl-fr-currency-prefix">$</xxf:control>
                         <xxf:attribute id="my-currency$xf-10" for="my-currency$xf-10" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-13" class="xbl-fr-currency-decimal-separator">.</xxf:control>
+                        <xxf:control id="my-currency$xf-13" class="xbl-fr-currency-suffix"/>
                         <xxf:attribute id="my-currency$xf-13" for="my-currency$xf-13" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-16" class="xbl-fr-currency-grouping-separator">,</xxf:control>
+                        <xxf:control id="my-currency$xf-16" class="xbl-fr-currency-decimal-separator">.</xxf:control>
                         <xxf:attribute id="my-currency$xf-16" for="my-currency$xf-16" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-19" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
+                        <xxf:control id="my-currency$xf-19" class="xbl-fr-currency-grouping-separator">,</xxf:control>
                         <xxf:attribute id="my-currency$xf-19" for="my-currency$xf-19" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-24" class="xbl-fr-number-xforms-input">$ 12.34</xxf:control>
-                        <xxf:control id="my-currency$xf-25" relevant="false"/>
-                        <xxf:control id="my-currency$xf-26" relevant="false"/>
+                        <xxf:control id="my-currency$xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
+                        <xxf:attribute id="my-currency$xf-22" for="my-currency$xf-22" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency$xf-27" class="xbl-fr-number-xforms-input fr-hidden">12.34</xxf:control>
+                        <xxf:attribute id="my-currency$xf-29" for="my-currency$xf-28" name="class">input-prepend</xxf:attribute>
+                        <xxf:control id="my-currency$xf-30" class="add-on"/>
+                        <xxf:control id="my-currency$xf-31">$</xxf:control>
+                        <xxf:control id="my-currency$xf-32" class="add-on" relevant="false"/>
+                        <xxf:control id="my-currency$xf-33" relevant="false"/>
+                        <xxf:control id="my-currency$xf-34" relevant="false"/>
+                        <xxf:control id="my-currency$xf-35" relevant="false"/>
                     </xxf:control-values>
                     <xxf:script name="xf_bb240fc3ea943af5cb3019cdb5d43148021201ec" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
                     <xxf:script name="xf_ee48e71b3ea5811ae186431b61fae15a32a302b5" target-id="my-currency" observer-id="my-currency"/>

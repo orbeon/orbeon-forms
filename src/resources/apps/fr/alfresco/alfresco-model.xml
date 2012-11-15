@@ -101,9 +101,9 @@
         <!--<xforms:setvalue ref="instance('alfresco-error')/message" value="event('body')"/>-->
         <!-- Notify persistence model -->
         <xforms:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-            <xxforms:context name="submission-id" select="event('xxforms:targetid')"/>
-            <xxforms:context name="response-body" select="event('response-body')"/>
-            <xxforms:context name="error-type" select="event('error-type')"/>
+            <xforms:property name="submission-id" value="event('xxforms:targetid')"/>
+            <xforms:property name="response-body" value="event('response-body')"/>
+            <xforms:property name="error-type" value="event('error-type')"/>
         </xforms:dispatch>
     </xforms:action>
 

@@ -24,12 +24,12 @@
 
             <xforms:action ev:event="xforms-ready">
                 <xforms:dispatch name="my-event" targetid="my-bar-1">
-                    <xxforms:context name="fr:one" select="'Red'"/>
-                    <xxforms:context name="fr:two" select="'Blue'"/>
+                    <xforms:property name="fr:one" value="'Red'"/>
+                    <xforms:property name="fr:two" value="'Blue'"/>
                 </xforms:dispatch>
                 <xforms:dispatch name="my-event" targetid="my-bar-2">
-                    <xxforms:context name="fr:one" select="'Cat'"/>
-                    <xxforms:context name="fr:two" select="'Mouse'"/>
+                    <xforms:property name="fr:one" value="'Cat'"/>
+                    <xforms:property name="fr:two" value="'Mouse'"/>
                 </xforms:dispatch>
             </xforms:action>
 
@@ -94,12 +94,12 @@
             <xforms:label>Update</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:dispatch name="my-event" targetid="my-bar-1">
-                    <xxforms:context name="fr:one" select="'Sun'"/>
-                    <xxforms:context name="fr:two" select="'Moon'"/>
+                    <xforms:property name="fr:one" value="'Sun'"/>
+                    <xforms:property name="fr:two" value="'Moon'"/>
                 </xforms:dispatch>
                 <xforms:dispatch name="my-event" targetid="my-bar-2">
-                    <xxforms:context name="fr:one" select="'Yin'"/>
-                    <xxforms:context name="fr:two" select="'Yang'"/>
+                    <xforms:property name="fr:one" value="'Yin'"/>
+                    <xforms:property name="fr:two" value="'Yang'"/>
                 </xforms:dispatch>
             </xforms:action>
         </xforms:trigger>

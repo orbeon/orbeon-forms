@@ -147,9 +147,9 @@
                     <!--<xf:action ev:event="DOMActivate">-->
                         <!--&lt;!&ndash; Open the dialog in "save-as" mode &ndash;&gt;-->
                         <!--<xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">-->
-                            <!--<xxf:context name="title" value="xxf:bind('title-bind')"/>-->
-                            <!--<xxf:context name="description" value="xxf:bind('description-bind')"/>-->
-                            <!--<xxf:context name="mode" value="'save-as'"/>-->
+                            <!--<xf:property name="title" value="xxf:bind('title-bind')"/>-->
+                            <!--<xf:property name="description" value="xxf:bind('description-bind')"/>-->
+                            <!--<xf:property name="mode" value="'save-as'"/>-->
                         <!--</xf:dispatch>-->
                     <!--</xf:action>-->
                 <!--</xf:trigger>-->
@@ -181,12 +181,12 @@
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Open the dialog in "edit" mode -->
                                     <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
-                                        <xxf:context name="app" value="xxf:bind('application-name-bind')"/>
-                                        <xxf:context name="form" value="xxf:bind('form-name-bind')"/>
-                                        <xxf:context name="title" value="xxf:bind('title-bind')"/>
-                                        <xxf:context name="description" value="xxf:bind('description-bind')"/>
-                                        <xxf:context name="logo" value="xxf:bind('logo-bind')"/>
-                                        <xxf:context name="mode" value="'edit'"/>
+                                        <xf:property name="app" value="xxf:bind('application-name-bind')"/>
+                                        <xf:property name="form" value="xxf:bind('form-name-bind')"/>
+                                        <xf:property name="title" value="xxf:bind('title-bind')"/>
+                                        <xf:property name="description" value="xxf:bind('description-bind')"/>
+                                        <xf:property name="logo" value="xxf:bind('logo-bind')"/>
+                                        <xf:property name="mode" value="'edit'"/>
                                     </xf:dispatch>
                                 </xf:action>
                             </xf:trigger>
@@ -203,11 +203,11 @@
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Ask confirmation -->
                                         <xxf:show dialog="fb-confirmation-dialog">
-                                            <xxf:context name="fr:message"
+                                            <xf:property name="fr:message"
                                                              value="concat($form-resources/messages/delete-resources, ' ''',
                                                                          xxf:instance('fr-languages-instance')/language[@code = $fb-lang]/(if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name),
                                                                          '''?')"/>
-                                            <xxf:context name="fr:confirmation-target" value="'fb-language-remove'"/>
+                                            <xf:property name="fr:confirmation-target" value="'fb-language-remove'"/>
                                         </xxf:show>
                                     </xf:action>
                                     <xf:action ev:event="fb-confirmation-yes">
@@ -357,8 +357,8 @@
                                         <!-- De-annotate the form, as it will be re-annotated once the toolbox is loaded -->
                                         <xf:dispatch targetid="fr-form-model" name="fr-data-save-prepare"/>
                                         <xf:send submission="fb-load-toolbox">
-                                            <xxf:context name="app"  value="event('app')"/>
-                                            <xxf:context name="form" value="event('form')"/>
+                                            <xf:property name="app"  value="event('app')"/>
+                                            <xf:property name="form" value="event('form')"/>
                                         </xf:send>
                                     </xf:action>
                                     <!-- "Save as" -->
@@ -369,7 +369,7 @@
                                         <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="secure:randomHexId()"/>
                                         <!-- Actually save -->
                                         <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
-                                            <xxf:context name="fr:check-data-valid" value="true()"/>
+                                            <xf:property name="fr:check-data-valid" value="true()"/>
                                         </xf:dispatch>
                                         <!-- Change URL to have new document id -->
                                         <xxf:script>
@@ -428,8 +428,8 @@
 
                                             <!-- Ask confirmation -->
                                             <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">
-                                                <xxf:context name="message" value="$fb-resources/messages/expand-cell"/>
-                                                <xxf:context name="positive-targetid" value="xxf:absolute-id('fb-expand-trigger')"/>
+                                                <xf:property name="message" value="$fb-resources/messages/expand-cell"/>
+                                                <xf:property name="positive-targetid" value="xxf:absolute-id('fb-expand-trigger')"/>
                                             </xf:dispatch>
                                             <xf:action if="not($confirm)">
                                                 <!-- We are automatically confirmed as there is no control to delete -->
@@ -460,7 +460,7 @@
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-details-trigger">
                                         <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>
                                         <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
-                                            <xxf:context name="control-id" value="$control/@id"/>
+                                            <xf:property name="control-id" value="$control/@id"/>
                                         </xf:dispatch>
                                     </xf:trigger>
 
@@ -468,7 +468,7 @@
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-validation-trigger">
                                         <xf:label><xh:img class="fb-control-alert" alt="{$fb-resources/validation-settings-icon/label}" title="{$fb-resources/validation-settings-icon/label}" src="/apps/fr/style/images/silk/exclamation.png"/></xf:label>
                                         <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-validation-details">
-                                            <xxf:context name="control-id" value="$control/@id"/>
+                                            <xf:property name="control-id" value="$control/@id"/>
                                         </xf:dispatch>
                                     </xf:trigger>
                                 </xh:span>
@@ -496,8 +496,8 @@
                                         <xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>
                                     </xf:label>
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
-                                        <xxf:context name="control-id" value="$control/@id"/>
-                                        <xxf:context name="control-type" value="$control/local-name()"/>
+                                        <xf:property name="control-id" value="$control/@id"/>
+                                        <xf:property name="control-type" value="$control/local-name()"/>
                                     </xf:dispatch>
                                 </xf:trigger>
 
@@ -532,12 +532,12 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-section-icon/label}" title="{$fb-resources/delete-section-icon/label}"/></xf:label>
                                     <!-- Ask confirmation -->
                                     <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
-                                        <xxf:context name="message"
+                                        <xf:property name="message"
                                              value="concat($fb-resources/messages/delete-section, ' ',
                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted,
                                                                               containerOps:controlsInContainer(event('section-id'))))"/>
-                                        <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
-                                        <xxf:context name="context" value="event('section-id')"/>
+                                        <xf:property name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
+                                        <xf:property name="context" value="event('section-id')"/>
                                     </xf:dispatch>
                                     <xf:action ev:event="fr-positive" type="xpath">sectionOps:deleteSectionById(event('context'))</xf:action>
                                 </xf:trigger>
@@ -546,14 +546,14 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/section-details-icon/label}" title="{$fb-resources/section-details-icon/label}"/></xf:label>
                                     <!-- Show section details dialog -->
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-section-details">
-                                        <xxf:context name="section" value="containerOps:containerById(event('section-id'))"/>
+                                        <xf:property name="section" value="containerOps:containerById(event('section-id'))"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Edit help for section -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-section-help-trigger" id="fb-edit-section-help-trigger">
                                     <xf:label><xh:img alt="{$fb-resources/help-icon/label}" title="{$fb-resources/help-icon/label}" src="/ops/images/xforms/help.png"/></xf:label>
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-help">
-                                        <xxf:context name="control-id" value="event('section-id')"/>
+                                        <xf:property name="control-id" value="event('section-id')"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Move up -->
@@ -595,12 +595,12 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-grid-icon/label}" title="{$fb-resources/delete-grid-icon/label}"/></xf:label>
                                     <!-- Ask confirmation -->
                                     <xf:dispatch ev:event="DOMActivate" name="fr-show" targetid="dialog-confirmation">
-                                        <xxf:context name="message"
+                                        <xf:property name="message"
                                              value="concat($fb-resources/messages/delete-grid, ' ',
                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted,
                                                                               containerOps:controlsInContainer(event('grid-id'))))"/>
-                                        <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
-                                        <xxf:context name="context" value="event('grid-id')"/>
+                                        <xf:property name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
+                                        <xf:property name="context" value="event('grid-id')"/>
                                     </xf:dispatch>
                                     <xf:action ev:event="fr-positive" type="xpath">gridOps:deleteGridById(event('context'))</xf:action>
                                 </xf:trigger>
@@ -608,7 +608,7 @@
                                 <xf:trigger tabindex="-1" appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-grid-details">
-                                        <xxf:context name="grid" select="containerOps:containerById(event('grid-id'))"/>
+                                        <xf:property name="grid" value="containerOps:containerById(event('grid-id'))"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Insert column to the left -->
@@ -626,15 +626,15 @@
 
                                         <!-- Ask confirmation -->
                                         <xf:dispatch if="$count > 0" name="fr-show" targetid="dialog-confirmation">
-                                            <xxf:context name="message"
+                                            <xf:property name="message"
                                                  value="concat($fb-resources/messages/delete-column, ' ',
                                                                 xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                             <xxf:context name="context" value="$context"/>
-                                             <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-col-trigger')"/>
+                                             <xf:property name="context" value="$context"/>
+                                             <xf:property name="positive-targetid" value="xxf:absolute-id('delete-col-trigger')"/>
                                         </xf:dispatch>
                                         <!-- We are automatically confirmed-->
                                         <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-col-trigger">
-                                            <xxf:context name="context" value="$context"/>
+                                            <xf:property name="context" value="$context"/>
                                         </xf:dispatch>
                                     </xf:action>
                                     <xf:action ev:event="fr-positive">
@@ -662,15 +662,15 @@
 
                                         <!-- Ask confirmation -->
                                         <xf:dispatch if="$count > 0" name="fr-show" targetid="dialog-confirmation">
-                                            <xxf:context name="message"
+                                            <xf:property name="message"
                                                  value="concat($fb-resources/messages/delete-row, ' ',
                                                                 xxf:format-message($fb-resources/messages/controls-will-be-deleted, $count))"/>
-                                            <xxf:context name="positive-targetid" value="xxf:absolute-id('delete-row-trigger')"/>
-                                            <xxf:context name="context" value="$context"/>
+                                            <xf:property name="positive-targetid" value="xxf:absolute-id('delete-row-trigger')"/>
+                                            <xf:property name="context" value="$context"/>
                                         </xf:dispatch>
                                         <!-- We are automatically confirmed-->
                                         <xf:dispatch if="$count = 0" name="fr-positive" targetid="delete-row-trigger">
-                                            <xxf:context name="context" value="$context"/>
+                                            <xf:property name="context" value="$context"/>
                                         </xf:dispatch>
                                     </xf:action>
                                     <xf:action ev:event="fr-positive">

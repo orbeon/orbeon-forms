@@ -61,8 +61,8 @@
                         </xf:label>
                         <!-- Dispatch publish event -->
                         <xf:dispatch ev:event="DOMActivate" name="fb-publish-form" target="fb-publish-model">
-                            <xxf:context name="app" value="$app"/>
-                            <xxf:context name="form" value="$form"/>
+                            <xf:property name="app" value="$app"/>
+                            <xf:property name="form" value="$form"/>
                         </xf:dispatch>
                     </xf:trigger>
                     <!-- Cancel button -->
@@ -179,8 +179,8 @@
 
                 <!-- Publish attachment -->
                 <xf:send submission="fr-publish-attachment-submission">
-                    <xxf:context name="holder" value="$holder"/>
-                    <xxf:context name="resource" value="$resource"/>
+                    <xf:property name="holder" value="$holder"/>
+                    <xf:property name="resource" value="$resource"/>
                 </xf:send>
 
                 <!-- Update attachment path in form to submit -->
@@ -193,8 +193,8 @@
 
             <!-- Publish form -->
             <xf:send submission="fr-publish-form-submission" if="instance('fb-publish-instance')/is-error = 'false'">
-                <xxf:context name="app" value="event('app')"/>
-                <xxf:context name="form" value="event('form')"/>
+                <xf:property name="app" value="event('app')"/>
+                <xf:property name="form" value="event('form')"/>
             </xf:send>
         </xf:action>
 

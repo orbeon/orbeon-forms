@@ -39,7 +39,7 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- Parse the XML, annotate and save it -->
                     <xforms:dispatch targetid="fr-form-model" name="fr-annotate-data">
-                        <xxforms:context name="data" value="saxon:parse(instance('fb-source-editor-instance')/source)"/>
+                        <xforms:property name="data" value="saxon:parse(instance('fb-source-editor-instance')/source)"/>
                     </xforms:dispatch>
                 </xforms:action>
             </xforms:trigger>

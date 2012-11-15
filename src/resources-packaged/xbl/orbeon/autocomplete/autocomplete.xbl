@@ -92,7 +92,7 @@
                     <!-- Dispatch value change event so we dispatch the fr-search-changed to have the itemset updated right away -->
                     <xf:dispatch name="xforms-value-changed" targetid="search"/>
                     <xf:dispatch name="update-external-value" targetid="component-inner-group">
-                        <xxf:context name="ajax-response-processed" value="true()"/>
+                        <xf:property name="ajax-response-processed" value="true()"/>
                     </xf:dispatch>
                 </xf:action>
             </xbl:handler>
@@ -168,7 +168,7 @@
                         <!-- Look for value based on label and update external value (e.g. on tab out) -->
                         <xf:action ev:event="update-external-value">
                             <xf:var name="value" value="xxf:element('value')"/>
-                            <xf:dispatch name="get-value-from-itemset" targetid="component-inner-group"><xxf:context name="fr-value" value="$value"/></xf:dispatch>
+                            <xf:dispatch name="get-value-from-itemset" targetid="component-inner-group"><xf:property name="fr-value" value="$value"/></xf:dispatch>
                             <xf:setvalue ref="$binding" value="$value"/>
                             <!-- If no value is found, clear the search field -->
                             <xf:setvalue if="$value = ''" ref="$local/textfield-value"/>
@@ -205,7 +205,7 @@
                             <xf:action ev:event="xforms-value-changed" ev:observer="resource-variable">
                                 <!-- Update itemset based on resource -->
                                 <xf:send submission="get-itemset">
-                                    <xxf:context name="resource" value="$resource"/>
+                                    <xf:property name="resource" value="$resource"/>
                                 </xf:send>
                             </xf:action>
                         </xsl:if>
@@ -221,7 +221,7 @@
                         <!-- As the user types, dispatch event to notify the external world about the value entered by the user so far -->
                         <xf:action ev:event="xforms-value-changed" ev:observer="search" if="$dynamic-itemset">
                             <xf:dispatch targetid="fr-autocomplete" name="fr-search-changed">
-                                <xxf:context name="fr-search-value" value="$local/textfield-value"/>
+                                <xf:property name="fr-search-value" value="$local/textfield-value"/>
                             </xf:dispatch>
                         </xf:action>
                         <xsl:if test="not(@show-suggestions-button = 'false')">
@@ -236,7 +236,7 @@
                         <!-- In static mode, when the external value changes, search for an item with that value, and set search value to the item's label -->
                         <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="external-value" if="not($dynamic-itemset)">
                             <xf:var name="select1-current-label" value="xxf:element('label')"/>
-                            <xf:dispatch name="get-label-from-itemset" targetid="component-inner-group"><xxf:context name="fr-label" value="$select1-current-label"/></xf:dispatch>
+                            <xf:dispatch name="get-label-from-itemset" targetid="component-inner-group"><xf:property name="fr-label" value="$select1-current-label"/></xf:dispatch>
                             <xf:setvalue ref="$local/textfield-value" value="$select1-current-label"/>
                         </xf:action>
                         <!-- For the dynamic and resource mode, just reset the search field if the external value becomes empty -->

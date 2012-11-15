@@ -132,7 +132,7 @@
                     <!-- Send back result to the component that opened this dialog -->
                     <xforms:action ev:event="fr-spell-check-done">
                         <xforms:dispatch if="exists(instance('fr-spell-checker-result')/*)" name="fr-spell-check-done" targetid="{instance('fr-spell-checker-internal')/callback-id}">
-                            <xxforms:context name="fr-text" select="string-join(instance('fr-spell-checker-result')/*/@current, '')"/>
+                            <xforms:property name="fr-text" value="string-join(instance('fr-spell-checker-result')/*/@current, '')"/>
                         </xforms:dispatch>
                         <xxforms:hide dialog="fr-spell-checking-dialog"/>
                     </xforms:action>
@@ -283,8 +283,8 @@
                         <xforms:label>Spell check</xforms:label>
                         <!-- Open dialog -->
                         <xforms:dispatch ev:event="DOMActivate" targetid="fr-spell-checker-model" name="fr-spell-check" xxbl:scope="outer">
-                            <xxforms:context name="fr-text" select="$binding" xxbl:scope="inner"/>
-                            <xxforms:context name="fr-callback-id" select="event('xxforms:absolute-targetid')"/>
+                            <xforms:property name="fr-text" value="$binding" xxbl:scope="inner"/>
+                            <xforms:property name="fr-callback-id" value="event('xxforms:absolute-targetid')"/>
                         </xforms:dispatch>
                         <!-- Dialog is calling us back with the result -->
                         <xforms:setvalue ev:event="fr-spell-check-done" ref="$binding" value="event('fr-text')"/>

@@ -53,19 +53,19 @@
                         <xforms:trigger id="internal-trigger-1">
                             <xforms:label>Dispatch outside</xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="foobar-component">
-                                <xxforms:context name="fr:my-context" select="42"/>
+                                <xforms:property name="fr:my-context" value="42"/>
                             </xforms:dispatch>
                         </xforms:trigger>
                         <xforms:trigger id="internal-trigger-2">
                             <xforms:label>Dispatch inside group</xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-group">
-                                <xxforms:context name="fr:my-context" select="43"/>
+                                <xforms:property name="fr:my-context" value="43"/>
                             </xforms:dispatch>
                         </xforms:trigger>
                         <xforms:trigger id="internal-trigger-3">
                             <xforms:label>Dispatch inside model</xforms:label>
                             <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" target="internal-model">
-                                <xxforms:context name="fr:my-context" select="44"/>
+                                <xforms:property name="fr:my-context" value="44"/>
                             </xforms:dispatch>
                         </xforms:trigger>
                     </xforms:group>

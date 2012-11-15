@@ -97,7 +97,7 @@
                                 <!-- Save -->
                                 <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
                                 <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
-                                    <xxf:context name="fr:check-data-valid" select="false()"/>
+                                    <xf:property name="fr:check-data-valid" value="false()"/>
                                 </xf:dispatch>
 
                                 <xf:setvalue ref="instance('fr-import-stats')/succeeded" value="xs:integer(.) + 1"/>

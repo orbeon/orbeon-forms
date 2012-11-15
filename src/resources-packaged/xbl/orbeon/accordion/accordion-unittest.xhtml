@@ -72,7 +72,7 @@
                     <xforms:trigger appearance="minimal" id="open-all">
                         <xforms:label>Open all (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
-                            <xxforms:context name="selected" select="true()"/>
+                            <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>
@@ -80,7 +80,7 @@
                     <xforms:trigger appearance="minimal" id="close-all">
                         <xforms:label>Close all (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle-all">
-                            <xxforms:context name="selected" select="false()"/>
+                            <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>
@@ -88,8 +88,8 @@
                     <xforms:trigger appearance="minimal" id="open-third">
                         <xforms:label>Open third (currency) section (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
-                            <xxforms:context name="case-id" select="'my-case-currency'"/>
-                            <xxforms:context name="selected" select="true()"/>
+                            <xforms:property name="case-id" value="'my-case-currency'"/>
+                            <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>
@@ -97,8 +97,8 @@
                     <xforms:trigger appearance="minimal" id="close-third">
                         <xforms:label>Close third (currency) section (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
-                            <xxforms:context name="case-id" select="'my-case-currency'"/>
-                            <xxforms:context name="selected" select="false()"/>
+                            <xforms:property name="case-id" value="'my-case-currency'"/>
+                            <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>
@@ -106,8 +106,8 @@
                     <xforms:trigger appearance="minimal" id="open-states">
                         <xforms:label>Open states (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
-                            <xxforms:context name="case-id" select="'my-case-repeat'"/>
-                            <xxforms:context name="selected" select="true()"/>
+                            <xforms:property name="case-id" value="'my-case-repeat'"/>
+                            <xforms:property name="selected" value="true()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>
@@ -115,8 +115,8 @@
                     <xforms:trigger appearance="minimal" id="close-states">
                         <xforms:label>Close states (legacy)</xforms:label>
                         <xforms:dispatch ev:event="DOMActivate" target="my-accordion" name="fr-accordion-toggle">
-                            <xxforms:context name="case-id" select="'my-case-repeat'"/>
-                            <xxforms:context name="selected" select="false()"/>
+                            <xforms:property name="case-id" value="'my-case-repeat'"/>
+                            <xforms:property name="selected" value="false()"/>
                         </xforms:dispatch>
                     </xforms:trigger>
                 </xhtml:li>

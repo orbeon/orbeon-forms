@@ -180,7 +180,7 @@
                         <xforms:action ev:event="DOMActivate">
                             <!-- Store values in itemset order -->
                             <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
-                                <xxforms:context name="fr-new-values" select="for $selected-itemset in instance()/selected-itemset
+                                <xforms:property name="fr-new-values" value="for $selected-itemset in instance()/selected-itemset
                                     return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
                             </xforms:dispatch>
                             <xxforms:hide dialog="fr-dialog-select-double-list-dialog"/>
@@ -220,7 +220,7 @@
                 </xforms:action>
                 <xforms:action ev:event="xxforms-dialog-close">
                     <xforms:dispatch name="fr-edit-done" targetid="{callback-id}">
-                        <xxforms:context name="fr-new-values" select="selected"/>
+                        <xforms:property name="fr-new-values" value="selected"/>
                     </xforms:dispatch>
                 </xforms:action>
                 <xforms:select ref="instance()/selected" appearance="full">
@@ -314,10 +314,10 @@
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:dispatch name="fr-edit" xxbl:scope="outer"
                                                 targetid="fr-dialog-select-{if ($appearance = 'double-list') then 'double-list' else 'single-list'}-dialog">
-                                    <xxforms:context name="fr-label" select="$label" xxbl:scope="inner"/>
-                                    <xxforms:context name="fr-binding" select="$binding" xxbl:scope="inner"/>
-                                    <xxforms:context name="fr-items" select="$items" xxbl:scope="inner"/>
-                                    <xxforms:context name="fr-callback-id" select="event('xxforms:absolute-targetid')"/>
+                                    <xforms:property name="fr-label" value="$label" xxbl:scope="inner"/>
+                                    <xforms:property name="fr-binding" value="$binding" xxbl:scope="inner"/>
+                                    <xforms:property name="fr-items" value="$items" xxbl:scope="inner"/>
+                                    <xforms:property name="fr-callback-id" value="event('xxforms:absolute-targetid')"/>
                                 </xforms:dispatch>
                             </xforms:action>
                             <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-new-values')"/>

@@ -109,10 +109,10 @@
                     <!-- Catch error in action handler and do not let propagation occur -->
                     <xf:action ev:event="xxforms-action-error" ev:observer="#document" ev:propagate="stop">
                         <xf:dispatch name="fr-log" targetid="fr-xforms-inspector" xxbl:scope="inner">
-                            <xxf:context name="fr-messages" value="concat('Error: ', normalize-space(event('message')))"/>
+                            <xf:property name="fr-messages" value="concat('Error: ', normalize-space(event('message')))"/>
                         </xf:dispatch>
                         <xf:dispatch name="fr-log" targetid="fr-xforms-inspector" xxbl:scope="inner">
-                            <xxf:context name="fr-messages" value="event('element')"/>
+                            <xf:property name="fr-messages" value="event('element')"/>
                         </xf:dispatch>
                     </xf:action>
                 </xf:group>

@@ -241,13 +241,13 @@ Inserting error information into error list:
 
                                     <!-- Insert error -->
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <xxf:context name="prefixed-id" value="$prefixed-id"/>
-                                        <xxf:context name="control-position" value="event('xxf:control-position')"/>
-                                        <xxf:context name="fr-repeat-indexes" value="$repeat-indexes"/>
-                                        <xxf:context name="fr-repeat-ancestors" value="event('xxf:repeat-ancestors')"/>
-                                        <xxf:context name="alert" value="event('xxf:alert')"/>
-                                        <xxf:context name="label" value="event('xxf:label')"/>
-                                        <xxf:context name="invalid-binds" value="string-join(xxf:invalid-binds(event('xxf:binding')), ' ')"/>
+                                        <xf:property name="prefixed-id" value="$prefixed-id"/>
+                                        <xf:property name="control-position" value="event('xxf:control-position')"/>
+                                        <xf:property name="fr-repeat-indexes" value="$repeat-indexes"/>
+                                        <xf:property name="fr-repeat-ancestors" value="event('xxf:repeat-ancestors')"/>
+                                        <xf:property name="alert" value="event('xxf:alert')"/>
+                                        <xf:property name="label" value="event('xxf:label')"/>
+                                        <xf:property name="invalid-binds" value="string-join(xxf:invalid-binds(event('xxf:binding')), ' ')"/>
                                     </xf:dispatch>
 
                                 </xf:action>
@@ -324,16 +324,16 @@ Inserting error information into error list:
 
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
                                         <!-- Unchanged -->
-                                        <xxf:context name="prefixed-id" value="$error/@id"/>
-                                        <xxf:context name="control-position" value="$error/@position"/>
+                                        <xf:property name="prefixed-id" value="$error/@id"/>
+                                        <xf:property name="control-position" value="$error/@position"/>
                                         <!-- Replace old iteration by new iteration and keep the rest the same -->
-                                        <xxf:context name="fr-repeat-indexes"
+                                        <xf:property name="fr-repeat-indexes"
                                                      value="($repeat-indexes, xs:string($to-position), subsequence($current-indexes, $prefix-size + 1))"/>
                                         <!-- Unchanged -->
-                                        <xxf:context name="fr-repeat-ancestors" value="$error/@repeats"/>
-                                        <xxf:context name="alert" value="$error/@alert"/>
-                                        <xxf:context name="label" value="$error/@label"/>
-                                        <xxf:context name="invalid-binds" value="$error/@invalid-binds"/>
+                                        <xf:property name="fr-repeat-ancestors" value="$error/@repeats"/>
+                                        <xf:property name="alert" value="$error/@alert"/>
+                                        <xf:property name="label" value="$error/@label"/>
+                                        <xf:property name="invalid-binds" value="$error/@invalid-binds"/>
                                     </xf:dispatch>
                                 </xf:action>
 

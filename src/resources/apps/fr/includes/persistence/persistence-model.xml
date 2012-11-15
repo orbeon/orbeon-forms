@@ -183,7 +183,7 @@
     <!-- Delete operation -->
     <xf:action ev:event="fr-delete-data">
         <xf:send submission="fr-delete-document-submission">
-            <xxf:context name="document-id" value="event('document-id')"/>
+            <xf:property name="document-id" value="event('document-id')"/>
         </xf:send>
     </xf:action>
 
@@ -197,7 +197,7 @@
         <xf:setvalue ref="$persistence-instance/submit-or-save-or-send">save</xf:setvalue>
         <xf:dispatch name="fr-save-action" target="fr-persistence-model">
             <!-- Check validity based on property -->
-            <xxf:context
+            <xf:property
                 name="fr:check-data-valid"
                 value="xxf:property(string-join(('oxf.fr.detail.save.validate', $app, $form), '.'))"/>
         </xf:dispatch>
@@ -207,7 +207,7 @@
     <xf:action ev:event="DOMActivate" ev:observer="fr-submit-button">
         <xf:setvalue ref="$persistence-instance/submit-or-save-or-send">submit</xf:setvalue>
         <xf:dispatch name="fr-save-action" target="fr-persistence-model">
-            <xxf:context name="fr:check-data-valid" value="true()"/>
+            <xf:property name="fr:check-data-valid" value="true()"/>
         </xf:dispatch>
     </xf:action>
 
@@ -219,14 +219,14 @@
         <!-- Show error if validation did not pass -->
         <xf:action if="not($validity-passed)">
             <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-                <xxf:context name="error-type">validation-error</xxf:context>
+                <xf:property name="error-type">validation-error</xf:property>
             </xf:dispatch>
         </xf:action>
 
         <!-- Show error if there is at least one upload in progress -->
         <xf:action if="$validity-passed and xxf:pending-uploads() > 0">
             <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-                <xxf:context name="error-type">xxforms-pending-uploads</xxf:context>
+                <xf:property name="error-type">xxforms-pending-uploads</xf:property>
             </xf:dispatch>
         </xf:action>
 
@@ -245,7 +245,7 @@
     <xf:action ev:event="DOMActivate" ev:observer="fr-workflow-send-button">
         <xf:setvalue ref="$persistence-instance/submit-or-save-or-send">send</xf:setvalue>
         <xf:dispatch name="fr-save-action" target="fr-persistence-model">
-            <xxf:context name="fr:check-data-valid" value="true()"/>
+            <xf:property name="fr:check-data-valid" value="true()"/>
         </xf:dispatch>
     </xf:action>
 
@@ -272,14 +272,14 @@
             <!-- Show error if validation did not pass -->
             <xf:action if="not($validity-passed)">
                 <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-                    <xxf:context name="error-type">validation-error</xxf:context>
+                    <xf:property name="error-type">validation-error</xf:property>
                 </xf:dispatch>
             </xf:action>
 
             <!-- Show error if there is at least one upload in progress -->
             <xf:action if="$validity-passed and xxf:pending-uploads() > 0">
                 <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-                    <xxf:context name="error-type">xxforms-pending-uploads</xxf:context>
+                    <xf:property name="error-type">xxforms-pending-uploads</xf:property>
                 </xf:dispatch>
             </xf:action>
 
@@ -325,8 +325,8 @@
 
                     <!-- Save attachment -->
                     <xf:send submission="fr-create-update-attachment-submission">
-                        <xxf:context name="holder" value="$holder"/>
-                        <xxf:context name="resource" value="$resource"/>
+                        <xf:property name="holder" value="$holder"/>
+                        <xf:property name="resource" value="$resource"/>
                     </xf:send>
 
                     <!-- Update the path -->
@@ -338,9 +338,9 @@
 
                     <!-- Save XML document -->
                     <xf:send submission="fr-create-update-submission" >
-                        <xxf:context name="holder" value="xxf:instance('fr-form-instance')"/>
+                        <xf:property name="holder" value="xxf:instance('fr-form-instance')"/>
                         <!-- We always store form data as "data.xml" -->
-                        <xxf:context name="resource" value="'data.xml'"/>
+                        <xf:property name="resource" value="'data.xml'"/>
                     </xf:send>
 
                     <!-- If we were in new mode, now we must be in edit mode -->
@@ -349,8 +349,8 @@
 
                 <!-- Notify that the data is saved -->
                 <xf:dispatch if="$persistence-instance/is-error = 'false'" targetid="fr-form-model" name="fr-data-save-done">
-                    <xxf:context name="before-urls" value="$before-urls"/>
-                    <xxf:context name="after-urls" value="$after-urls"/>
+                    <xf:property name="before-urls" value="$before-urls"/>
+                    <xf:property name="after-urls" value="$after-urls"/>
                 </xf:dispatch>
             </xf:action>
         </xf:action>
@@ -505,7 +505,7 @@
         <xf:action if="$persistence-instance/submit-or-save-or-send = 'submit'">
             <!-- Show the submission result dialog -->
             <xxf:show dialog="fr-submission-result-dialog">
-                <xxf:context name="fr:content" value="instance('fr-create-update-submission-response')"/>
+                <xf:property name="fr:content" value="instance('fr-create-update-submission-response')"/>
             </xxf:show>
         </xf:action>
 
@@ -548,12 +548,12 @@
 
                         <!-- Send everything to Alfresco -->
                         <xf:dispatch target="fr-alfresco-model" name="alfresco-send-document">
-                            <xxf:context name="fr:name" value="concat($form-title, ' (#', $document, ').pdf')"/>
-                            <xxf:context name="fr:title" value="$form-title"/>
-                            <xxf:context name="fr:description" value="$form-description"/>
-                            <xxf:context name="fr:mimetype" value="'application/pdf'"/>
+                            <xf:property name="fr:name" value="concat($form-title, ' (#', $document, ').pdf')"/>
+                            <xf:property name="fr:title" value="$form-title"/>
+                            <xf:property name="fr:description" value="$form-description"/>
+                            <xf:property name="fr:mimetype" value="'application/pdf'"/>
                             <!-- Content as Base64 -->
-                            <xxf:context name="fr:content" value="xxf:doc-base64($pdf-uri)"/>
+                            <xf:property name="fr:content" value="xxf:doc-base64($pdf-uri)"/>
                         </xf:dispatch>
                     </xf:action>
                     <!-- Send XML data if requested -->
@@ -563,12 +563,12 @@
 
                         <!-- Send data to Alfresco -->
                         <xf:dispatch target="fr-alfresco-model" name="alfresco-send-document">
-                            <xxf:context name="fr:name" value="concat($form-title, ' (#', $document, ').xml')"/>
-                            <xxf:context name="fr:title" value="$form-title"/>
-                            <xxf:context name="fr:description" value="$form-description"/>
-                            <xxf:context name="fr:mimetype" value="'application/xml'"/>
+                            <xf:property name="fr:name" value="concat($form-title, ' (#', $document, ').xml')"/>
+                            <xf:property name="fr:title" value="$form-title"/>
+                            <xf:property name="fr:description" value="$form-description"/>
+                            <xf:property name="fr:mimetype" value="'application/xml'"/>
                             <!-- XML data -> string -> Base64 -->
-                            <xxf:context name="fr:content" value="saxon:string-to-base64Binary(saxon:serialize(xxf:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
+                            <xf:property name="fr:content" value="saxon:string-to-base64Binary(saxon:serialize(xxf:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
                         </xf:dispatch>
                     </xf:action>
                 </xf:action>
@@ -654,9 +654,9 @@
     <xf:action ev:event="xforms-submit-error"
                    ev:target="fr-create-update-submission fr-create-update-attachment-submission fr-get-document-submission fr-pdf-service-submission fr-email-service-submission">
         <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
-            <xxf:context name="submission-id" value="event('xxf:targetid')"/>
-            <xxf:context name="response-body" value="event('response-body')"/>
-            <xxf:context name="error-type" value="event('error-type')"/>
+            <xf:property name="submission-id" value="event('xxf:targetid')"/>
+            <xf:property name="response-body" value="event('response-body')"/>
+            <xf:property name="error-type" value="event('error-type')"/>
         </xf:dispatch>
     </xf:action>
 
@@ -675,14 +675,14 @@
             <xf:dispatch name="fr-expand-all" target="fr-sections-model"/>
             <!-- Open error dialog -->
             <xf:dispatch name="fr-show" targetid="fr-error-dialog">
-                <xxf:context name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
+                <xf:property name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/form-validation-error"/>
             </xf:dispatch>
         </xf:action>
 
         <!-- case xxforms-pending-uploads => open error dialog -->
         <xf:action if="event('error-type') = 'xxforms-pending-uploads'">
             <xf:dispatch name="fr-show" targetid="fr-error-dialog">
-                <xxf:context name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
+                <xf:property name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/upload-in-progress"/>
             </xf:dispatch>
         </xf:action>
 
@@ -692,7 +692,7 @@
             <xf:send if="$workflow-error-uri != ''" submission="fr-workflow-error-submission"/>
             <!-- Open error dialog -->
             <xf:dispatch if="$workflow-error-uri = ''" name="fr-show" targetid="fr-error-dialog">
-                <xxf:context name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
+                <xf:property name="message" model="fr-resources-model" value="$fr-fr-resources/detail/messages/database-error"/>
             </xf:dispatch>
         </xf:action>
     </xf:action>

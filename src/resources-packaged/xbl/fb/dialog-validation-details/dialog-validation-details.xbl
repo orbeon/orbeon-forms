@@ -305,7 +305,7 @@
                                 <xforms:label ref="$resources/apply/label"/>
                                 <!-- Close and save upon DOMActivate -->
                                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
-                                    <xxforms:context name="fb:save" value="true()"/>
+                                    <xforms:property name="fb:save" value="true()"/>
                                 </xforms:dispatch>
                             </xforms:trigger>
                             <xforms:output value="$resources/or/label"/>
@@ -313,7 +313,7 @@
                                 <xforms:label ref="$resources/cancel/label"/>
                                 <!-- Close and cancel upon DOMActivate -->
                                 <xforms:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" target="dialog">
-                                    <xxforms:context name="fb:save" value="false()"/>
+                                    <xforms:property name="fb:save" value="false()"/>
                                 </xforms:dispatch>
                             </xforms:trigger>
                         </xhtml:div>

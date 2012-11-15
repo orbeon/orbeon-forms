@@ -221,11 +221,11 @@
                 <xforms:action ev:event="DOMActivate">
                     <!-- Ask confirmation -->
                     <xxforms:show dialog="fb-confirmation-dialog">
-                        <xxforms:context name="fr:message"
+                        <xforms:property name="fr:message"
                                          value="concat($form-resources/messages/delete-service, ' ''',
                                                      $instance/name,
                                                      '''?')"/>
-                        <xxforms:context name="fr:confirmation-target" value="'fb-service-delete'"/>
+                        <xforms:property name="fr:confirmation-target" value="'fb-service-delete'"/>
                     </xxforms:show>
                 </xforms:action>
                 <xforms:action ev:event="fb-confirmation-yes">

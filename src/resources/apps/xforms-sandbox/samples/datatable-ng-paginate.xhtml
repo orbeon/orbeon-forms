@@ -31,7 +31,7 @@
         <fr:button id="go-to-page-2">
             <xforms:label>Go to page 2</xforms:label>
             <xforms:dispatch ev:event="DOMActivate" target="my-datatable" name="fr-goto-page">
-                <xxforms:context name="fr-new-page" select="2"/>
+                <xforms:property name="fr-new-page" value="2"/>
             </xforms:dispatch>
         </fr:button>
 

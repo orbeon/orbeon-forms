@@ -96,13 +96,13 @@
                                 <xforms:dispatch if="$is-success" targetid="fr-recaptcha" name="fr-verify-done"/>
                                 <!-- Dispatch failure event -->
                                 <xforms:dispatch if="not($is-success)" targetid="fr-recaptcha" name="fr-verify-error">
-                                    <xxforms:context name="fr-error-code" select="$lines[2]"/>
+                                    <xforms:property name="fr-error-code" value="$lines[2]"/>
                                 </xforms:dispatch>
                             </xforms:action>
                             <!-- When no response is provided, just dispatch an error -->
                             <xforms:action if="not($did-entered-value)">
                                 <xforms:dispatch targetid="fr-recaptcha" name="fr-verify-error">
-                                    <xxforms:context name="fr-error-code" select="'empty'"/>
+                                    <xforms:property name="fr-error-code" value="'empty'"/>
                                 </xforms:dispatch>
                             </xforms:action>
                         </xforms:action>

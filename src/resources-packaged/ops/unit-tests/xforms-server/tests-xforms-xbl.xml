@@ -861,21 +861,21 @@
                                                     <xforms:label>Dispatch outside</xforms:label>
                                                     <!-- Dispatch to bound node -->
                                                     <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="foobar-component">
-                                                        <xxforms:context name="fr:my-context" select="42"/>
+                                                        <xforms:property name="fr:my-context" value="42"/>
                                                     </xforms:dispatch>
                                                 </xforms:trigger>
                                                 <xforms:trigger id="internal-trigger-2">
                                                     <xforms:label>Dispatch inside group</xforms:label>
                                                     <!-- Dispatch to local group -->
                                                     <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="internal-group">
-                                                        <xxforms:context name="fr:my-context" select="43"/>
+                                                        <xforms:property name="fr:my-context" value="43"/>
                                                     </xforms:dispatch>
                                                 </xforms:trigger>
                                                 <xforms:trigger id="internal-trigger-3">
                                                     <xforms:label>Dispatch inside model</xforms:label>
                                                     <!-- Dispatch to local model -->
                                                     <xforms:dispatch ev:event="DOMActivate" name="fr:my-event" targetid="internal-model">
-                                                        <xxforms:context name="fr:my-context" select="44"/>
+                                                        <xforms:property name="fr:my-context" value="44"/>
                                                     </xforms:dispatch>
                                                 </xforms:trigger>
                                             </xforms:group>
@@ -1369,12 +1369,12 @@
 
                                     <xforms:action ev:event="xforms-ready">
                                         <xforms:dispatch name="my-event" targetid="my-bar-1">
-                                            <xxforms:context name="fr:one" select="'Red'"/>
-                                            <xxforms:context name="fr:two" select="'Blue'"/>
+                                            <xforms:property name="fr:one" value="'Red'"/>
+                                            <xforms:property name="fr:two" value="'Blue'"/>
                                         </xforms:dispatch>
                                         <xforms:dispatch name="my-event" targetid="my-bar-2">
-                                            <xxforms:context name="fr:one" select="'Cat'"/>
-                                            <xxforms:context name="fr:two" select="'Mouse'"/>
+                                            <xforms:property name="fr:one" value="'Cat'"/>
+                                            <xforms:property name="fr:two" value="'Mouse'"/>
                                         </xforms:dispatch>
                                     </xforms:action>
 
@@ -1575,7 +1575,7 @@
                             <xhtml:head>
                                 <xforms:model id="model">
                                     <xforms:dispatch ev:event="xforms-ready" name="up-value1" targetid="level1-component">
-                                        <xxforms:context name="title-value1" select="'Cool title'"/>
+                                        <xforms:property name="title-value1" value="'Cool title'"/>
                                     </xforms:dispatch>
 
                                     <!-- TEST: Events to gather -->
@@ -1612,7 +1612,7 @@
                                             </xbl:handler>
                                             <xbl:handler event="up-value1" phase="target" xxbl:scope="outer">
                                                 <xforms:dispatch name="up-value2" targetid="level2-component">
-                                                    <xxforms:context name="title-value2" select="event('title-value1')"/>
+                                                    <xforms:property name="title-value2" value="event('title-value1')"/>
                                                 </xforms:dispatch>
                                             </xbl:handler>
                                         </xbl:handlers>
@@ -1640,7 +1640,7 @@
                                             </xbl:handler>
                                             <xbl:handler event="up-value2" phase="target" xxbl:scope="outer">
                                                 <xforms:dispatch name="up-value3" targetid="level3-component">
-                                                    <xxforms:context name="title-value3" select="event('title-value2')"/>
+                                                    <xforms:property name="title-value3" value="event('title-value2')"/>
                                                 </xforms:dispatch>
                                             </xbl:handler>
                                         </xbl:handlers>
@@ -2978,10 +2978,10 @@
                                         <!-- Action in outer scope -->
                                         <xforms:action ev:event="xforms-enabled" if="xxforms:index() = $p" xxbl:scope="outer">
                                             <xforms:dispatch name="foobar" targetid="my-group" xxbl:scope="inner">
-                                                <xxforms:context name="index" select="xxforms:index()" xxbl:scope="outer"/>
+                                                <xforms:property name="index" value="xxforms:index()" xxbl:scope="outer"/>
                                             </xforms:dispatch>
                                             <xforms:dispatch name="foobar" targetid="my-other-group" xxbl:scope="inner">
-                                                <xxforms:context name="index" select="xxforms:index()" xxbl:scope="outer"/>
+                                                <xforms:property name="index" value="xxforms:index()" xxbl:scope="outer"/>
                                             </xforms:dispatch>
                                         </xforms:action>
 
@@ -3639,7 +3639,7 @@
                                     <xforms:action ev:event="xxforms-dialog-open">
                                         <xforms:setvalue ref="instance()" value="xs:integer(.) + 1"/>
                                         <xforms:dispatch name="my-callback" targetid="{event('my-id')}">
-                                            <xxforms:context name="my-value" select="instance()"/>
+                                            <xforms:property name="my-value" value="instance()"/>
                                         </xforms:dispatch>
                                     </xforms:action>
 
@@ -3656,7 +3656,7 @@
                                     <xforms:label>Open me</xforms:label>
                                     <!-- Open global dialog upon click -->
                                     <xxforms:show ev:event="DOMActivate" dialog="my-dialog" xxbl:scope="outer">
-                                        <xxforms:context name="my-id" select="event('xxforms:absolute-targetid')"/>
+                                        <xforms:property name="my-id" value="event('xxforms:absolute-targetid')"/>
                                     </xxforms:show>
                                     <!-- Upon callback, store value received -->
                                     <xforms:setvalue ev:event="my-callback" ref="instance()" value="event('my-value')"/>

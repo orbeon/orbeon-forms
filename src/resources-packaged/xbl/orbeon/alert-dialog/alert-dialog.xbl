@@ -157,7 +157,7 @@
                         <!-- NOTE: For now target must be an absolute or effective id -->
                         <xforms:action ev:event="DOMActivate">
                             <xforms:dispatch if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner">
-                                <xxforms:context name="context" value="$local/context"/>
+                                <xforms:property name="context" value="$local/context"/>
                             </xforms:dispatch>
                         </xforms:action>
                     </xforms:trigger>

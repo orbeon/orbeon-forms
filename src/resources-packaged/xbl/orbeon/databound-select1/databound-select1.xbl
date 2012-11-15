@@ -95,7 +95,7 @@
                 <xf:action ev:event="xforms-enabled xforms-value-changed">
                     <!-- Update itemset based on resource if not blank (can be blank e.g. in builder) -->
                     <xf:send if="normalize-space($resource)" submission="get-itemset">
-                        <xxf:context name="resource" value="$resource"/>
+                        <xf:property name="resource" value="$resource"/>
                     </xf:send>
                     <!-- Get sequence of values in the new itemset -->
                     <xf:var

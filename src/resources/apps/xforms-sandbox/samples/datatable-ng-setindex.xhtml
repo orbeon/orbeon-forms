@@ -42,7 +42,7 @@
             <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
             <xforms:dispatch ev:event="xforms-ready" name="fr-datatable-set-index-in-current-page"
                 target="dt">
-                <xxforms:context name="index" select="2"/>
+                <xforms:property name="index" value="2"/>
             </xforms:dispatch>
         </xforms:model>
     </head>

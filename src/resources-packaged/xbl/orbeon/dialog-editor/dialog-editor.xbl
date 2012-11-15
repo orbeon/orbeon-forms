@@ -64,7 +64,7 @@
                             <fr:button class="fr-dialog-editor-positive" id="fr-dialog-editor-positive">
                                 <xforms:label>OK</xforms:label>
                                 <xforms:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
-                                    <xxforms:context name="fr-text" select="text"/>
+                                    <xforms:property name="fr-text" value="text"/>
                                 </xforms:dispatch>
                             </fr:button>
                             <fr:button class="fr-dialog-editor-negative" id="fr-dialog-editor-negative">
@@ -93,10 +93,10 @@
                     <!-- Button to open dialog -->
                     <xforms:group appearance="xxforms:internal">
                         <xforms:dispatch ev:event="DOMActivate" targetid="fr-dialog-editor-dialog" name="fr-edit" xxbl:scope="outer">
-                            <xxforms:context name="fr-readonly" select="$readonly" xxbl:scope="inner"/>
-                            <xxforms:context name="fr-label" select="xxforms:label('group-with-label')" xxbl:scope="inner"/>
-                            <xxforms:context name="fr-text" select="$binding" xxbl:scope="inner"/>
-                            <xxforms:context name="fr-callback-id" select="event('xxforms:absolute-targetid')"/>
+                            <xforms:property name="fr-readonly" value="$readonly" xxbl:scope="inner"/>
+                            <xforms:property name="fr-label" value="xxforms:label('group-with-label')" xxbl:scope="inner"/>
+                            <xforms:property name="fr-text" value="$binding" xxbl:scope="inner"/>
+                            <xforms:property name="fr-callback-id" value="event('xxforms:absolute-targetid')"/>
                         </xforms:dispatch>
                         <xforms:setvalue ev:event="fr-edit-done" ref="$binding" value="event('fr-text')"/>
                         <fr:button id="open" class="fr-dialog-editor-open-{if ($readonly) then 'view' else 'edit'}">

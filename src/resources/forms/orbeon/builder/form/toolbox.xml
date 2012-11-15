@@ -67,8 +67,8 @@
                     <!-- Invalidate and reload the toolbox -->
                     <xforms:dispatch name="xxforms-instance-invalidate" target="fb-components-instance"/>
                     <xforms:send submission="fb-load-toolbox">
-                        <xxforms:context name="app"  value="xxforms:bind('application-name-bind')"/>
-                        <xxforms:context name="form" value="xxforms:bind('form-name-bind')"/>
+                        <xforms:property name="app"  value="xxforms:bind('application-name-bind')"/>
+                        <xforms:property name="form" value="xxforms:bind('form-name-bind')"/>
                     </xforms:send>
                 </xforms:action>
             </xforms:trigger>
@@ -245,7 +245,7 @@
                         <xforms:trigger>
                             <xforms:label value="$submission-name"/>
                             <xxforms:show ev:event="DOMActivate" dialog="fb-service-dialog">
-                                <xxforms:context name="submission-name" value="$submission-name"/>
+                                <xforms:property name="submission-name" value="$submission-name"/>
                             </xxforms:show>
                         </xforms:trigger>
                     </xhtml:div>
@@ -275,7 +275,7 @@
                             <xforms:trigger>
                                 <xforms:label value="$submission-name"/>
                                 <xxforms:show ev:event="DOMActivate" dialog="fb-database-service-dialog">
-                                    <xxforms:context name="submission-name" value="$submission-name"/>
+                                    <xforms:property name="submission-name" value="$submission-name"/>
                                 </xxforms:show>
                             </xforms:trigger>
                         </xhtml:div>
@@ -305,7 +305,7 @@
                         <xforms:trigger>
                             <xforms:label value="$binding-name"/>
                             <xxforms:show ev:event="DOMActivate" dialog="fb-action-dialog">
-                                <xxforms:context name="binding-name" value="$binding-name"/>
+                                <xforms:property name="binding-name" value="$binding-name"/>
                             </xxforms:show>
                         </xforms:trigger>
                     </xhtml:div>

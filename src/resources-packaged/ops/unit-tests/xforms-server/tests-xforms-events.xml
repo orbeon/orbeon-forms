@@ -198,28 +198,28 @@
 
                         <xforms:action ev:event="xforms-ready">
                             <xforms:dispatch target="repeat1" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="'1'"/>
-                                <xxforms:context name="dnd-end" select="'2'"/>
+                                <xforms:property name="dnd-start" value="'1'"/>
+                                <xforms:property name="dnd-end" value="'2'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat2" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="'1'"/>
-                                <xxforms:context name="dnd-end" select="'3'"/>
+                                <xforms:property name="dnd-start" value="'1'"/>
+                                <xforms:property name="dnd-end" value="'3'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat3" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="'2'"/>
-                                <xxforms:context name="dnd-end" select="'1'"/>
+                                <xforms:property name="dnd-start" value="'2'"/>
+                                <xforms:property name="dnd-end" value="'1'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat4" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="'2'"/>
-                                <xxforms:context name="dnd-end" select="'3'"/>
+                                <xforms:property name="dnd-start" value="'2'"/>
+                                <xforms:property name="dnd-end" value="'3'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat5" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="'3'"/>
-                                <xxforms:context name="dnd-end" select="'1'"/>
+                                <xforms:property name="dnd-start" value="'3'"/>
+                                <xforms:property name="dnd-end" value="'1'"/>
                             </xforms:dispatch>
                             <xforms:dispatch target="repeat6" name="xxforms-dnd">
-                                <xxforms:context name="dnd-start" select="'3'"/>
-                                <xxforms:context name="dnd-end" select="'2'"/>
+                                <xforms:property name="dnd-start" value="'3'"/>
+                                <xforms:property name="dnd-end" value="'2'"/>
                             </xforms:dispatch>
                         </xforms:action>
 
@@ -1309,16 +1309,16 @@
                         <xforms:action ev:event="xforms-ready">
                             <!-- Dispatch custom keypress events -->
                             <xforms:dispatch name="keypress" targetid="my-group">
-                                <xxforms:context name="modifiers" select="'control alt'"/>
-                                <xxforms:context name="text" select="'v'"/>
+                                <xforms:property name="modifiers" value="'control alt'"/>
+                                <xforms:property name="text" value="'v'"/>
                             </xforms:dispatch>
                             <xforms:dispatch name="keypress" targetid="my-group">
-                                <xxforms:context name="modifiers" select="'control alt'"/>
-                                <xxforms:context name="text" select="'w'"/>
+                                <xforms:property name="modifiers" value="'control alt'"/>
+                                <xforms:property name="text" value="'w'"/>
                             </xforms:dispatch>
                             <xforms:dispatch name="keypress" targetid="my-group">
-                                <xxforms:context name="modifiers" select="'shift'"/>
-                                <xxforms:context name="text" select="'v'"/>
+                                <xforms:property name="modifiers" value="'shift'"/>
+                                <xforms:property name="text" value="'v'"/>
                             </xforms:dispatch>
                         </xforms:action>
 
@@ -2107,28 +2107,28 @@
                             XML Events target, the attribute must be qualified as `ev:target`.
                         -->
                         <xf:dispatch ev:event="foo" ev:observer="my-trigger" ev:target="my-trigger" name="setvalue" target="model">
-                            <xxf:context name="value">Use `ev:target` and `target`</xxf:context>
-                            <xxf:context name="index" value="1"/>
+                            <xf:property name="value">Use `ev:target` and `target`</xf:property>
+                            <xf:property name="index" value="1"/>
                         </xf:dispatch>
                         
                         <xf:dispatch ev:event="foo" ev:observer="my-trigger" name="setvalue" target="model">
-                            <xxf:context name="value">Use only `target`</xxf:context>
-                            <xxf:context name="index" value="2"/>
+                            <xf:property name="value">Use only `target`</xf:property>
+                            <xf:property name="index" value="2"/>
                         </xf:dispatch>
                         
                         <xf:dispatch ev:event="foo" ev:observer="my-trigger" ev:target="my-trigger" name="setvalue" targetid="model">
-                            <xxf:context name="value">Use `ev:target` and `targetid`</xxf:context>
-                            <xxf:context name="index" value="3"/>
+                            <xf:property name="value">Use `ev:target` and `targetid`</xf:property>
+                            <xf:property name="index" value="3"/>
                         </xf:dispatch>
                         
                         <xf:dispatch ev:event="foo" ev:observer="my-trigger" name="setvalue" targetid="model">
-                            <xxf:context name="value">Use only `targetid`</xxf:context>
-                            <xxf:context name="index" value="4"/>
+                            <xf:property name="value">Use only `targetid`</xf:property>
+                            <xf:property name="index" value="4"/>
                         </xf:dispatch>
                         
                         <xf:dispatch ev:event="foo" ev:observer="my-trigger" target="my-trigger" name="setvalue" targetid="model">
-                            <xxf:context name="value">Use `target` and `targetid`</xxf:context>
-                            <xxf:context name="index" value="5"/>
+                            <xf:property name="value">Use `target` and `targetid`</xf:property>
+                            <xf:property name="index" value="5"/>
                         </xf:dispatch>
 
                     </xf:model>

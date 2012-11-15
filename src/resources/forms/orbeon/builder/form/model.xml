@@ -87,8 +87,8 @@
                                xforms:instance[@id = 'fr-form-metadata']/
                                    *"/>
         <xforms:send submission="fb-load-toolbox">
-            <xxforms:context name="app"  value="$metadata/application-name"/>
-            <xxforms:context name="form" value="$metadata/form-name"/>
+            <xforms:property name="app"  value="$metadata/application-name"/>
+            <xforms:property name="form" value="$metadata/form-name"/>
         </xforms:send>
 
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
@@ -121,7 +121,7 @@
 
         <!-- Annotate data -->
         <xforms:dispatch targetid="fr-form-model" name="fr-annotate-data">
-            <xxforms:context name="data" value="$template"/>
+            <xforms:property name="data" value="$template"/>
         </xforms:dispatch>
 
         <!-- RRR so that all binds are up to date for the rest of the initialization -->
@@ -193,7 +193,7 @@
         <!-- Open form settings if mode is "new" -->
         <xforms:var name="is-new" value="xxforms:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
         <xforms:dispatch if="$is-new" ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-form-settings">
-            <xxforms:context name="mode" value="'new'"/>
+            <xforms:property name="mode" value="'new'"/>
         </xforms:dispatch>
     </xforms:action>
 
@@ -426,7 +426,7 @@
         <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
              NOTE: The data in fr-form-instance must be up to date! -->
         <xforms:dispatch ev:event="xforms-submit-done" targetid="fr-form-model" name="fr-annotate-data">
-            <xxforms:context name="data" value="instance('fr-form-instance')"/>
+            <xforms:property name="data" value="instance('fr-form-instance')"/>
         </xforms:dispatch>
 
     </xforms:submission>

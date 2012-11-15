@@ -231,12 +231,12 @@
 
                         <!-- Dispatch event with result -->
                         <xf:dispatch name="fb-update-metadata" targetid="fb-dialog-form-settings">
-                            <xxf:context name="app"         value="instance()/app"/>
-                            <xxf:context name="form"        value="instance()/form"/>
-                            <xxf:context name="title"       value="instance()/title"/>
-                            <xxf:context name="description" value="instance()/description"/>
-                            <xxf:context name="logo" value="instance()/logo"/>
-                            <xxf:context name="mode"        value="instance()/mode"/>
+                            <xf:property name="app"         value="instance()/app"/>
+                            <xf:property name="form"        value="instance()/form"/>
+                            <xf:property name="title"       value="instance()/title"/>
+                            <xf:property name="description" value="instance()/description"/>
+                            <xf:property name="logo" value="instance()/logo"/>
+                            <xf:property name="mode"        value="instance()/mode"/>
                         </xf:dispatch>
 
                         <!-- Hide this dialog -->

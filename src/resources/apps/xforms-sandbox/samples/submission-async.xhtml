@@ -175,13 +175,13 @@
                 <xforms:setvalue iterate="instance('instance-delays')/*" ref="."/>
                 <!-- Send submission in reverse order of expected responses -->
                 <xforms:send submission="replace-delay">
-                    <xxforms:context name="my-delay" select="5"/>
+                    <xforms:property name="my-delay" value="5"/>
                 </xforms:send>
                 <xforms:send submission="replace-delay">
-                    <xxforms:context name="my-delay" select="3"/>
+                    <xforms:property name="my-delay" value="3"/>
                 </xforms:send>
                 <xforms:send submission="replace-delay">
-                    <xxforms:context name="my-delay" select="1"/>
+                    <xforms:property name="my-delay" value="1"/>
                 </xforms:send>
             </xforms:action>
         </xforms:trigger>

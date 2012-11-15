@@ -847,7 +847,7 @@
                     <xforms:action iterate="tokenize(instance('fr-selection-instance'), '\s+')">
                         <xforms:var name="document-name" value="." as="xs:string"/>
                         <xforms:dispatch name="fr-delete-data" targetid="fr-persistence-model">
-                            <xxforms:context name="document-id" value="$document-name"/>
+                            <xforms:property name="document-id" value="$document-name"/>
                         </xforms:dispatch>
                     </xforms:action>
                     <!-- Reset search selection and navigation -->

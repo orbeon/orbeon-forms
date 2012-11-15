@@ -54,6 +54,14 @@
                 name="source-form-metadata"
                 value="instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/*"/>
 
+            <xf:var
+                name="source-form-attachments"
+                value="instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-attachments']/*"/>
+
+            <xf:var
+                name="has-pdf-template"
+                value="normalize-space($source-form-attachments/pdf)"/>
+
             <!-- NOTE: use xxf:cache="false" otherwise updates to the form won't work in the summary page -->
             <!-- A solution for this might be for read-form.xpl, which is able to use conditional GET, to run always, or to
                  improve submissions to handle conditional GET as well when using caching. -->
@@ -772,7 +780,9 @@
                                 </xf:trigger>
                             </xf:group>
                             <!-- PDF button -->
-                            <xf:group ref="if (. = 'pdf') then instance('fr-summary-triggers-instance')/pdf else ()">
+                            <!-- Don't show the PDF template button in CE (also on detail page) -->
+                            <xf:group ref="if (. = 'pdf' and not($has-pdf-template and not(version:isPE()))) then instance('fr-summary-triggers-instance')/pdf else ()"
+                                    xmlns:version="java:org.orbeon.oxf.common.Version">
                                 <fr:href-button
                                         ref="."
                                         href="/fr/{$app}/{$form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxf:instance('fr-language-instance')}">

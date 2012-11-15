@@ -23,7 +23,8 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:p="http://www.orbeon.com/oxf/pipeline"
+        xmlns:version="java:org.orbeon.oxf.common.Version">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
@@ -38,6 +39,8 @@
     <xsl:variable name="form" select="doc('input:instance')/*/form" as="xs:string"/>
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
+    <xsl:variable name="is-pe" select="version:isPE()"/>
+    
     <xsl:variable name="is-detail" select="not($mode = ('summary', ''))" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript-support" select="not(/xh:html/xh:head/xf:model[1]/@xxf:noscript-support = 'false')" as="xs:boolean"/>
@@ -47,28 +50,28 @@
     <xsl:variable name="has-pdf-template" select="normalize-space(/xh:html/xh:head//xf:instance[@id = 'fr-form-attachments']/*/pdf) != ''"/>
 
     <!-- Properties -->
-    <xsl:variable name="has-version" select="xpl:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="has-noscript-link" select="xpl:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="is-noscript-table" select="not(not(xpl:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
-    <xsl:variable name="is-noscript-section-collapse" select="not(xpl:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="min-toc" select="(xpl:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
+    <xsl:variable name="has-version" select="p:property(string-join(('oxf.fr.version', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="has-noscript-link" select="p:property(string-join(('oxf.fr.noscript-link', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="is-noscript-table" select="not(not(p:property(string-join(('oxf.fr.detail.noscript.table', $app, $form), '.'))) = false())" as="xs:boolean"/>
+    <xsl:variable name="is-noscript-section-collapse" select="not(p:property(string-join(('oxf.fr.detail.noscript.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
+    <xsl:variable name="min-toc" select="(p:property(string-join(('oxf.fr.detail.toc', $app, $form), '.')), -1)[1]" as="xs:integer"/>
     <xsl:variable name="has-toc" select="$min-toc ge 0" as="xs:boolean"/>
-    <xsl:variable name="error-summary" select="xpl:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="is-ajax-section-collapse" select="not(xpl:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="default-logo-uri" select="xpl:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
-    <xsl:variable name="hide-logo" select="xpl:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-header" select="xpl:property(string-join(('oxf.fr.detail.hide-header', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-footer" select="xpl:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-top" select="xpl:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="hide-buttons-bar" select="xpl:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="css-uri" select="tokenize(normalize-space(xpl:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
+    <xsl:variable name="error-summary" select="p:property(string-join(('oxf.fr.detail.error-summary', $app, $form), '.'))" as="xs:string?"/>
+    <xsl:variable name="is-ajax-section-collapse" select="not(p:property(string-join(('oxf.fr.detail.ajax.section.collapse', $app, $form), '.')) = false())" as="xs:boolean"/>
+    <xsl:variable name="default-logo-uri" select="p:property(string-join(('oxf.fr.default-logo.uri', $app, $form), '.'))" as="xs:string?"/>
+    <xsl:variable name="hide-logo" select="p:property(string-join(('oxf.fr.detail.hide-logo', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-header" select="p:property(string-join(('oxf.fr.detail.hide-header', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-footer" select="p:property(string-join(('oxf.fr.detail.hide-footer', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-top" select="p:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="css-uri" select="tokenize(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
-    <xsl:variable name="buttons" select="tokenize(xpl:property(string-join(($buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
-    <xsl:variable name="has-alfresco" select="xpl:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
-    <xsl:variable name="is-show-explanation" select="xpl:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
-    <xsl:variable name="is-inline-hints" select="not(xpl:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(xpl:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
-    <xsl:variable name="captcha" as="xs:string" select="xpl:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
+    <xsl:variable name="buttons" select="tokenize(p:property(string-join(($buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="has-alfresco" select="p:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
+    <xsl:variable name="is-show-explanation" select="p:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
+    <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
+    <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
+    <xsl:variable name="captcha" as="xs:string" select="p:property(string-join(('oxf.fr.detail.captcha', $app, $form), '.'))"/>
     <xsl:variable name="has-captcha" as="xs:boolean" select="$captcha = ('reCAPTCHA', 'SimpleCaptcha')"/>
 
     <xsl:variable name="is-section-collapse" select="(not($is-noscript) and $is-ajax-section-collapse) or $is-noscript-section-collapse" as="xs:boolean"/>

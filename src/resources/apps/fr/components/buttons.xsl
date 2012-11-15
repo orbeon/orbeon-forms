@@ -105,16 +105,19 @@
     <xsl:template match="fr:pdf-button">
         <!-- TODO: bind to strict-submit, but maybe fr-pdf-submission should check validity instead -->
         <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
-        <fr:href-button
-                model="fr-persistence-model"
-                ref="instance('fr-triggers-instance')/strict-submit"
-                href="/fr/service/{$app}/{$form}/pdf/{{xxf:instance('fr-parameters-instance')/document}}/{{xxf:document-id()}}.pdf">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/print-pdf"/></xh:span>
-            </xf:label>
-        </fr:href-button>
+        <!-- Don't show the PDF template button in CE (also on summary page) -->
+        <xsl:if test="not($has-pdf-template and not($is-pe))">
+            <fr:href-button
+                    model="fr-persistence-model"
+                    ref="instance('fr-triggers-instance')/strict-submit"
+                    href="/fr/service/{$app}/{$form}/pdf/{{xxf:instance('fr-parameters-instance')/document}}/{{xxf:document-id()}}.pdf">
+                <xsl:copy-of select="@appearance"/>
+                <xf:label>
+                    <xh:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
+                    <xh:span><xf:output value="$fr-resources/detail/labels/print-pdf"/></xh:span>
+                </xf:label>
+            </fr:href-button>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:save-button">

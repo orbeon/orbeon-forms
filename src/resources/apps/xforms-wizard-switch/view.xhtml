@@ -37,12 +37,12 @@
             <xforms:instance id="formatted">
                 <formated-instance/>
             </xforms:instance>                
-            <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
-            <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="back" readonly="true()"/>
-                <xforms:bind nodeset="finish" readonly="@readonly = 'false'"/>
+            <xforms:bind ref="age" constraint="number(.) >= 0"/>
+            <xforms:bind ref="instance('control-instance')">
+                <xforms:bind ref="back" readonly="true()"/>
+                <xforms:bind ref="finish" readonly="@readonly = 'false'"/>
             </xforms:bind>
-            <xforms:bind nodeset="instance('formatted')" 
+            <xforms:bind ref="instance('formatted')"
                 calculate="xxforms:serialize(xxforms:call-xpl('oxf:/ops/utils/formatting/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
         </xforms:model>
         <xhtml:style type="text/css">

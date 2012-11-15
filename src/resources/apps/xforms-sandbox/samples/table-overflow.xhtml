@@ -59,8 +59,8 @@
                         et ultricies lacus lorem varius purus. Curabitur eu amet.</text>
                 </control>
             </xforms:instance>
-            <xforms:bind nodeset="text-length" datatatype="xs:integer"/>
-            <xforms:bind nodeset="rows" datatatype="xs:integer"/>
+            <xforms:bind ref="text-length" datatatype="xs:integer"/>
+            <xforms:bind ref="rows" datatatype="xs:integer"/>
         </xforms:model>
     </head>
     <body>
@@ -108,7 +108,7 @@
                 </thead>
                 <tbody>
                     <xforms:repeat
-                        nodeset="
+                        ref="
                         for $n in 1 to rows return xxforms:element('row', (
                             xxforms:element('number', $n),    
                             xxforms:element('text', substring(normalize-space(text), 1, text-length))

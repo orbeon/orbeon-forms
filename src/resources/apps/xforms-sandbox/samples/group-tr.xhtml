@@ -35,7 +35,7 @@
     <xhtml:body>
         <xhtml:h2>Table with repeat</xhtml:h2>
         <xhtml:table>
-            <xforms:repeat id="tr-repeat" nodeset="/instance/value">
+            <xforms:repeat id="tr-repeat" ref="/instance/value">
                 <xhtml:tr>
                     <xhtml:td>
                         Group shows line:
@@ -61,7 +61,7 @@
 
         <xhtml:h2>Table with group</xhtml:h2>
         <xhtml:table>
-            <xforms:repeat nodeset="/instance/value[@repeat = 'true']" id="value-repeat">
+            <xforms:repeat ref="/instance/value[@repeat = 'true']" id="value-repeat">
                 <xforms:group ref=".[@tr = 'true']" id="tr-group">
                     <xhtml:tr>
                         <xhtml:td>Line <xforms:output value="count(preceding-sibling::value) + 1"/></xhtml:td>

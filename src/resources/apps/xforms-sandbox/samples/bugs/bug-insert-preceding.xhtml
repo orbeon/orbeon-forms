@@ -37,7 +37,7 @@
             <xforms:label>Try it</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <xforms:variable name="b" select="b"/>
-                <xforms:insert nodeset="$b" position="before" origin="/*/a[1]"/>
+                <xforms:insert ref="$b" position="before" origin="/*/a[1]"/>
                 <xforms:message>There are now <xforms:output value="count($b/preceding-sibling::a)"/> preceding "a" elements (should be <xforms:output value="count(/*/b/preceding-sibling::a)"/>).</xforms:message>
             </xforms:action>
         </xforms:trigger>

@@ -37,7 +37,7 @@
                     </record>
                 </instance>
             </xf:instance>
-            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xf:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
         </xf:model>
     </head>
     <body>
@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr repeat-nodeset="record">
+                <tr repeat-ref="record">
                     <td>
                         <xf:output ref="AAA"/>
                     </td>
@@ -74,7 +74,7 @@
             xforms labels.</p>
         <fr:datatable id="table-repeat2">
             <!-- Optional <thead>, otherwise try to build one from body -->
-            <tr repeat-nodeset="record">
+            <tr repeat-ref="record">
                 <td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
                     <xf:output ref="AAA">
                         <xf:label>AAA (imp)</xf:label>

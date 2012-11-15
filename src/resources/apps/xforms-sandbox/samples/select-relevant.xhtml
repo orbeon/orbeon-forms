@@ -39,8 +39,8 @@
                     </itemset>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/select" relevant="/instance/relevant = 'true'"/>
-            <xforms:bind nodeset="/instance/itemset/item[value = 'true']" relevant="/instance/relevant = 'true'"/>
+            <xforms:bind ref="/instance/select" relevant="/instance/relevant = 'true'"/>
+            <xforms:bind ref="/instance/itemset/item[value = 'true']" relevant="/instance/relevant = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -69,7 +69,7 @@
         <xhtml:div style="margin-bottom: 1em">
             <xforms:select1 ref="/instance/select-item-relevance" appearance="minimal">
                 <xforms:label class="gaga">Label for select</xforms:label>
-                <xforms:itemset nodeset="/instance/itemset/item">
+                <xforms:itemset ref="/instance/itemset/item">
                     <xforms:label ref="label"/>
                     <xforms:value ref="value"/>
                 </xforms:itemset>

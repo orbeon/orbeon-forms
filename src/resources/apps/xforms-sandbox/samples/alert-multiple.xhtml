@@ -29,13 +29,13 @@
                 </instance>
             </xforms:instance>
 
-            <xforms:bind nodeset="age" id="must-be-present" required="true()"/>
-            <xforms:bind nodeset="age" id="must-be-integer" constraint=". castable as xs:integer"/>
-            <xforms:bind nodeset="age" id="must-be-positive" constraint="if (. castable as xs:integer) then . >= 0 else true()"/>
-            <xforms:bind nodeset="age" id="must-be-lower" constraint="if (. castable as xs:integer) then 150 >= . else true()"/>
+            <xforms:bind ref="age" id="must-be-present" required="true()"/>
+            <xforms:bind ref="age" id="must-be-integer" constraint=". castable as xs:integer"/>
+            <xforms:bind ref="age" id="must-be-positive" constraint="if (. castable as xs:integer) then . >= 0 else true()"/>
+            <xforms:bind ref="age" id="must-be-lower" constraint="if (. castable as xs:integer) then 150 >= . else true()"/>
 
-            <xforms:bind nodeset="height" id="h-must-be-present" required="true()"/>
-            <xforms:bind nodeset="height" id="h-must-be-integer" constraint=". castable as xs:integer"/>
+            <xforms:bind ref="height" id="h-must-be-present" required="true()"/>
+            <xforms:bind ref="height" id="h-must-be-integer" constraint=". castable as xs:integer"/>
 
         </xforms:model>
         <xhtml:style type="text/css">
@@ -61,9 +61,9 @@
         </xhtml:ol>
 
         <xhtml:ul>
-            <xforms:repeat nodeset="instance('instance')/*">
+            <xforms:repeat ref="instance('instance')/*">
                 <xforms:var name="invalid-binds" value="xxforms:invalid-binds(.)"/>
-                <xforms:repeat nodeset="for $bind-id in $invalid-binds return xxforms:element('bind-id', $bind-id)">
+                <xforms:repeat ref="for $bind-id in $invalid-binds return xxforms:element('bind-id', $bind-id)">
                     <xhtml:li>
                         <xforms:output value="if ($invalid-binds = 'must-be-present') then 'Age missing'
                             else if ($invalid-binds = 'must-be-integer') then 'Age must be an integer'

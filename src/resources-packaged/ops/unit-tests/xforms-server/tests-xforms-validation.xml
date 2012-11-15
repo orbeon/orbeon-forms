@@ -97,7 +97,7 @@
                             </values>
                         </xforms:instance>
 
-                        <xforms:bind nodeset="value" type="uwdcdate"/>
+                        <xforms:bind ref="value" type="uwdcdate"/>
 
                         <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified">
                             <xs:simpleType name="uwdcdate">

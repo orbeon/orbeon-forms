@@ -30,14 +30,14 @@
                     <value/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="value">
-                <xforms:bind nodeset="." calculate="random()"/>
+            <xforms:bind ref="value">
+                <xforms:bind ref="." calculate="random()"/>
             </xforms:bind>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xhtml:ul>
-            <xforms:repeat nodeset="value" id="nodes">
+            <xforms:repeat ref="value" id="nodes">
                 <xhtml:li>
                     <xforms:output ref="."/>
                 </xhtml:li>

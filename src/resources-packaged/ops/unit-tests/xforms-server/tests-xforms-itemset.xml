@@ -66,7 +66,7 @@
 
                                 <xforms:select id="select-control" ref=".">
                                     <xforms:label>Items</xforms:label>
-                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                    <xforms:itemset ref="instance('itemset')/fruit">
                                         <xforms:label ref="description"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
@@ -132,7 +132,7 @@
 
                                 <xforms:select id="select-control" ref=".">
                                     <xforms:label>Items</xforms:label>
-                                    <xforms:itemset nodeset="instance('itemset')//item">
+                                    <xforms:itemset ref="instance('itemset')//item">
                                         <xforms:label ref="@label"/>
                                         <xforms:value ref="@value"/>
                                     </xforms:itemset>
@@ -212,7 +212,7 @@
                                             <item id="3"/>
                                         </items>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="instance('itemset-2')//item[@relevant = 'false']" relevant="false()"/>
+                                    <xforms:bind ref="instance('itemset-2')//item[@relevant = 'false']" relevant="false()"/>
                                     <xforms:instance id="itemset-3">
                                         <items>
                                             <item id="1"/>
@@ -238,7 +238,7 @@
 
                                 <!-- All items relevant -->
                                 <xforms:select id="select-1" ref=".">
-                                    <xforms:itemset nodeset="instance('itemset-1')//item">
+                                    <xforms:itemset ref="instance('itemset-1')//item">
                                         <xforms:label ref="@id"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
@@ -246,7 +246,7 @@
 
                                 <!-- Some items non-relevant due to relevant MIP -->
                                 <xforms:select id="select-2" ref=".">
-                                    <xforms:itemset nodeset="instance('itemset-2')//item">
+                                    <xforms:itemset ref="instance('itemset-2')//item">
                                         <xforms:label ref="@id"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
@@ -254,7 +254,7 @@
 
                                 <!-- Some items non-relevant due to value pointing to empty node-set -->
                                 <xforms:select id="select-3" ref=".">
-                                    <xforms:itemset nodeset="instance('itemset-3')//item">
+                                    <xforms:itemset ref="instance('itemset-3')//item">
                                         <xforms:label ref="@id"/>
                                         <xforms:value ref="@id[not(tokenize(., '\.') = '3')]"/>
                                     </xforms:itemset>
@@ -318,7 +318,7 @@
                             </xhtml:head>
                             <xhtml:body>
                                 <xforms:select id="select-1" ref=".">
-                                    <xforms:itemset nodeset="instance('itemset-1')//item[tokenize(@id, '\.')[last()] = '1']">
+                                    <xforms:itemset ref="instance('itemset-1')//item[tokenize(@id, '\.')[last()] = '1']">
                                         <xforms:label ref="@id"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
@@ -371,12 +371,12 @@
                             </items>
                         </xforms:instance>
 
-                        <xforms:delete ev:event="xforms-ready" nodeset="instance('itemset-1')//item[@id = '2.2.2.1']"/>
+                        <xforms:delete ev:event="xforms-ready" ref="instance('itemset-1')//item[@id = '2.2.2.1']"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:select id="select-1" ref=".">
-                        <xforms:itemset nodeset="instance('itemset-1')//item">
+                        <xforms:itemset ref="instance('itemset-1')//item">
                             <xforms:label ref="@id"/>
                             <xforms:value ref="@id"/>
                         </xforms:itemset>
@@ -481,17 +481,17 @@
                             <xhtml:body>
                                 <!-- Single selection -->
                                 <xforms:select1 id="select1-control" ref="single" appearance="xxforms:internal">
-                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                    <xforms:itemset ref="instance('itemset')/fruit">
                                         <xforms:label ref="description"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
 
                                     <xforms:action ev:event="xforms-enabled">
-                                        <xforms:insert nodeset="instance('xml-result-single')"
+                                        <xforms:insert ref="instance('xml-result-single')"
                                                        origin="xxforms:itemset('select1-control', 'xml')"/>
                                         <xforms:setvalue ref="instance('json-result-single')"
                                                          value="xxforms:itemset('select1-control', 'json')"/>
-                                        <xforms:insert nodeset="instance('xml-result-single-selected')"
+                                        <xforms:insert ref="instance('xml-result-single-selected')"
                                                        origin="xxforms:itemset('select1-control', 'xml', true())"/>
                                         <xforms:setvalue ref="instance('json-result-single-selected')"
                                                          value="xxforms:itemset('select1-control', 'json', true())"/>
@@ -500,17 +500,17 @@
                                 </xforms:select1>
                                 <!-- Multiple selection -->
                                 <xforms:select id="select-control" ref="multiple" appearance="xxforms:internal">
-                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                    <xforms:itemset ref="instance('itemset')/fruit">
                                         <xforms:label ref="description"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
 
                                     <xforms:action ev:event="xforms-enabled">
-                                        <xforms:insert nodeset="instance('xml-result-multiple')"
+                                        <xforms:insert ref="instance('xml-result-multiple')"
                                                        origin="xxforms:itemset('select-control', 'xml')"/>
                                         <xforms:setvalue ref="instance('json-result-multiple')"
                                                          value="xxforms:itemset('select-control', 'json')"/>
-                                        <xforms:insert nodeset="instance('xml-result-multiple-selected')"
+                                        <xforms:insert ref="instance('xml-result-multiple-selected')"
                                                        origin="xxforms:itemset('select-control', 'xml', true())"/>
                                         <xforms:setvalue ref="instance('json-result-multiple-selected')"
                                                          value="xxforms:itemset('select-control', 'json', true())"/>
@@ -701,17 +701,17 @@
                             <xhtml:body>
                                 <!-- Single selection -->
                                 <xforms:select1 id="select1-control" ref="single" appearance="xxforms:internal">
-                                    <xforms:itemset nodeset="instance('itemset')//item">
+                                    <xforms:itemset ref="instance('itemset')//item">
                                         <xforms:label ref="@id"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
 
                                     <xforms:action ev:event="xforms-enabled">
-                                        <xforms:insert nodeset="instance('xml-result-single')"
+                                        <xforms:insert ref="instance('xml-result-single')"
                                                        origin="xxforms:itemset('select1-control', 'xml')"/>
                                         <xforms:setvalue ref="instance('json-result-single')"
                                                          value="xxforms:itemset('select1-control', 'json')"/>
-                                        <xforms:insert nodeset="instance('xml-result-single-selected')"
+                                        <xforms:insert ref="instance('xml-result-single-selected')"
                                                        origin="xxforms:itemset('select1-control', 'xml', true())"/>
                                         <xforms:setvalue ref="instance('json-result-single-selected')"
                                                          value="xxforms:itemset('select1-control', 'json', true())"/>
@@ -720,17 +720,17 @@
                                 </xforms:select1>
                                 <!-- Multiple selection -->
                                 <xforms:select id="select-control" ref="multiple" appearance="xxforms:internal">
-                                    <xforms:itemset nodeset="instance('itemset')//item">
+                                    <xforms:itemset ref="instance('itemset')//item">
                                         <xforms:label ref="@id"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
 
                                     <xforms:action ev:event="xforms-enabled">
-                                        <xforms:insert nodeset="instance('xml-result-multiple')"
+                                        <xforms:insert ref="instance('xml-result-multiple')"
                                                        origin="xxforms:itemset('select-control', 'xml')"/>
                                         <xforms:setvalue ref="instance('json-result-multiple')"
                                                          value="xxforms:itemset('select-control', 'json')"/>
-                                        <xforms:insert nodeset="instance('xml-result-multiple-selected')"
+                                        <xforms:insert ref="instance('xml-result-multiple-selected')"
                                                        origin="xxforms:itemset('select-control', 'xml', true())"/>
                                         <xforms:setvalue ref="instance('json-result-multiple-selected')"
                                                          value="xxforms:itemset('select-control', 'json', true())"/>
@@ -966,7 +966,7 @@
                                         </selection>
                                     </xforms:instance>
                                     <!-- Make node non-relevant -->
-                                    <xforms:bind nodeset="non-relevant" relevant="false()"/>
+                                    <xforms:bind ref="non-relevant" relevant="false()"/>
                                     <xforms:instance id="itemset" xxforms:readonly="true">
                                         <fruits>
                                             <fruit id="1">
@@ -1002,12 +1002,12 @@
 
                                     <xforms:action ev:event="xforms-ready">
                                         <xforms:refresh/>
-                                        <xforms:insert nodeset="instance('xml-result-relevant')"
+                                        <xforms:insert ref="instance('xml-result-relevant')"
                                                        origin="xxforms:itemset('relevant-control', 'xml')"/>
                                         <xforms:setvalue ref="instance('json-result-relevant')"
                                                          value="xxforms:itemset('relevant-control', 'json')"/>
 
-                                        <xforms:insert nodeset="instance('xml-result-non-relevant')"
+                                        <xforms:insert ref="instance('xml-result-non-relevant')"
                                                        origin="xxforms:itemset('non-relevant-control', 'xml')"/>
                                         <xforms:setvalue ref="instance('json-result-non-relevant')"
                                                          value="xxforms:itemset('non-relevant-control', 'json')"/>
@@ -1017,13 +1017,13 @@
                             </xhtml:head>
                             <xhtml:body>
                                 <xforms:select1 id="relevant-control" ref="relevant" appearance="xxforms:internal">
-                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                    <xforms:itemset ref="instance('itemset')/fruit">
                                         <xforms:label ref="description"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>
                                 </xforms:select1>
                                 <xforms:select1 id="non-relevant-control" ref="non-relevant" appearance="xxforms:internal">
-                                    <xforms:itemset nodeset="instance('itemset')/fruit">
+                                    <xforms:itemset ref="instance('itemset')/fruit">
                                         <xforms:label ref="description"/>
                                         <xforms:value ref="@id"/>
                                     </xforms:itemset>

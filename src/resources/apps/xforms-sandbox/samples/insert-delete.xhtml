@@ -46,14 +46,14 @@
             <xforms:trigger>
                 <xforms:label>Insert Book</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="instance('main-instance')" nodeset="book" origin="instance('books-instance')/book[1]"/>
+                    <xforms:insert context="instance('main-instance')" ref="book" origin="instance('books-instance')/book[1]"/>
                     <xforms:setvalue ref="instance('books-instance')/book[1]/@id" value=". + 1"/>
                 </xforms:action>
             </xforms:trigger>
             <xforms:trigger>
                 <xforms:label>Insert Books</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:insert context="instance('main-instance')" nodeset="book" origin="instance('books-instance')/book"/>
+                    <xforms:insert context="instance('main-instance')" ref="book" origin="instance('books-instance')/book"/>
                     <xforms:setvalue ref="instance('books-instance')/book[1]/@id" value=". + 1"/>
                 </xforms:action>
             </xforms:trigger>
@@ -62,7 +62,7 @@
             <xforms:trigger>
                 <xforms:label>Delete Book</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:delete nodeset="instance('main-instance')/book" at="last()"/>
+                    <xforms:delete ref="instance('main-instance')/book" at="last()"/>
                 </xforms:action>
             </xforms:trigger>
         </xhtml:p>
@@ -80,13 +80,13 @@
             <xforms:trigger>
                 <xforms:label>Insert Attributes on Root Element (Node-Set)</xforms:label>
                 <xforms:insert ev:event="DOMActivate"
-                        nodeset="instance('main-instance')/@*" origin="instance('books-instance')/book[1]/@*"/>
+                        ref="instance('main-instance')/@*" origin="instance('books-instance')/book[1]/@*"/>
             </xforms:trigger>
         </xhtml:p>
         <xhtml:p>
             <xforms:trigger>
                 <xforms:label>Delete Attribute on Root Element</xforms:label>
-                <xforms:delete ev:event="DOMActivate" nodeset="instance('main-instance')/@id"/>
+                <xforms:delete ev:event="DOMActivate" ref="instance('main-instance')/@id"/>
             </xforms:trigger>
         </xhtml:p>
          <xhtml:p>

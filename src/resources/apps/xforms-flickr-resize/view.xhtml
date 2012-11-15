@@ -43,7 +43,7 @@
                 <xforms:toggle case="case-busy" ev:event="xforms-submit"/>
                 <xforms:toggle case="case-done" ev:event="xforms-submit-done"/>
             </xforms:submission>
-            <xforms:bind nodeset="instance('control-instance')/size" type="xs:integer"/>
+            <xforms:bind ref="instance('control-instance')/size" type="xs:integer"/>
 
             <!-- Perform the submission upon initialization -->
             <xforms:send ev:event="xforms-model-construct-done" submission="flickr-submission"/>
@@ -131,7 +131,7 @@
                 </xforms:case>
                 <xforms:case id="case-done" selected="true">
                     <xforms:group ref="instance('response-instance')">
-                        <xforms:repeat nodeset="photos/photo">
+                        <xforms:repeat ref="photos/photo">
                             <xforms:output
                                 value="concat(
                                         '&lt;img',

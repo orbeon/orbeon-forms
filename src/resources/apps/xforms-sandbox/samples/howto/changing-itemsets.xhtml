@@ -25,8 +25,8 @@
             </xforms:instance>
 
             <!-- Selected state is only valid if it is in the itemset -->
-            <xforms:bind nodeset="*" constraint="@valid = 'true' and . != 'nv'"/>
-            <xforms:bind nodeset="removed-view-state" readonly="true()"/>
+            <xforms:bind ref="*" constraint="@valid = 'true' and . != 'nv'"/>
+            <xforms:bind ref="removed-view-state" readonly="true()"/>
 
             <!-- List of possible states -->
             <xforms:instance id="states">
@@ -116,7 +116,7 @@
                         <xforms:label>Select...</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="instance('states')/state">
+                    <xforms:itemset ref="instance('states')/state">
                         <xforms:value ref="@value"/>
                         <xforms:label ref="."/>
                     </xforms:itemset>
@@ -136,7 +136,7 @@
                         <xforms:label>Select...</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="instance('states')/state[@value != 'ca']">
+                    <xforms:itemset ref="instance('states')/state[@value != 'ca']">
                         <xforms:value ref="@value"/>
                         <xforms:label ref="."/>
                     </xforms:itemset>
@@ -159,7 +159,7 @@
                         <xforms:label>Select...</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="instance('states')/state[@value != 'ca']">
+                    <xforms:itemset ref="instance('states')/state[@value != 'ca']">
                         <xforms:value ref="@value"/>
                         <xforms:label ref="."/>
                     </xforms:itemset>

@@ -61,7 +61,7 @@
 
         <xforms:trigger>
             <xforms:label>Insert row</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
+            <xforms:insert ev:event="DOMActivate" ref="tr"/>
         </xforms:trigger>
 
         <xforms:trigger>
@@ -69,7 +69,7 @@
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="instance('variable')/iteration-count">10</xforms:setvalue>
                 <xforms:action while="instance('variable')/iteration-count != 0">
-                    <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
+                    <xforms:insert ev:event="DOMActivate" ref="tr"/>
                     <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
                     <xforms:action iterate="tr[last()]/td">
                         <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
@@ -84,7 +84,7 @@
             <xforms:action ev:event="DOMActivate">
                 <xforms:setvalue ref="instance('variable')/iteration-count">100</xforms:setvalue>
                 <xforms:action while="instance('variable')/iteration-count != 0">
-                    <xforms:insert ev:event="DOMActivate" nodeset="tr"/>
+                    <xforms:insert ev:event="DOMActivate" ref="tr"/>
                     <xforms:setvalue ref="instance('variable')/iteration-count" value=". - 1"/>
                     <xforms:action iterate="tr[last()]/td">
                         <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
@@ -100,7 +100,7 @@
                 <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
 
                 <xforms:action iterate="tr">
-                    <xforms:insert nodeset="td"/>
+                    <xforms:insert ref="td"/>
                     <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
                     <xforms:setvalue ref="td[last()]" value="instance('variable')/count"/>
                 </xforms:action>
@@ -119,7 +119,7 @@
                     <xforms:setvalue ref="instance('variable')/column-count" value="count(instance('main-instance')/tr[1]/td) + 1"/>
 
                     <xforms:action iterate="tr">
-                        <xforms:insert nodeset="td"/>
+                        <xforms:insert ref="td"/>
                         <xforms:setvalue ref="instance('variable')/count" value=". + 1"/>
                         <xforms:setvalue ref="td[last()]" value="instance('variable')/count"/>
                     </xforms:action>
@@ -132,9 +132,9 @@
         <xhtml:h2>Table D&amp;D of Rows</xhtml:h2>
 
         <xhtml:table>
-            <xforms:repeat nodeset="tr" xxforms:dnd="true" id="row-repeat-dd-row">
+            <xforms:repeat ref="tr" xxforms:dnd="true" id="row-repeat-dd-row">
                 <xhtml:tr>
-                    <xforms:repeat nodeset="td" id="row-repeat-dd-cell">
+                    <xforms:repeat ref="td" id="row-repeat-dd-cell">
                         <xhtml:td>
                             (<xforms:output id="output-1" value="."/>)
                         </xhtml:td>
@@ -148,9 +148,9 @@
         <xhtml:p>Legend: (count(preceding-sibling) + 1, position())</xhtml:p>
 
         <xhtml:table>
-            <xforms:repeat nodeset="tr" id="cell-repeat-dd-row">
+            <xforms:repeat ref="tr" id="cell-repeat-dd-row">
                 <xhtml:tr>
-                    <xforms:repeat nodeset="td" xxforms:dnd="true" id="cell-repeat-dd-cell">
+                    <xforms:repeat ref="td" xxforms:dnd="true" id="cell-repeat-dd-cell">
                         <xhtml:td>
                             (<xforms:output id="output-2-1" value="count(xxforms:context('cell-repeat-dd-cell')/preceding-sibling::*) + 1"/>,
                             <xforms:output id="output-2-2" value="position()"/>)
@@ -163,7 +163,7 @@
         <xhtml:h2>List</xhtml:h2>
 
         <xhtml:ol>
-            <xforms:repeat nodeset="tr" xxforms:dnd="true">
+            <xforms:repeat ref="tr" xxforms:dnd="true">
                 <xhtml:li>
                     Item number <xforms:output id="output-3" value="position()"/>
                 </xhtml:li>
@@ -172,12 +172,12 @@
 
         <xhtml:h2>Nested</xhtml:h2>
 
-        <xforms:repeat nodeset="tr" id="outer">
+        <xforms:repeat ref="tr" id="outer">
             <xhtml:div style="border: 1px solid gray; margin: 5px; float: left">
-                <xforms:repeat nodeset="td" xxforms:dnd="true" id="middle">
+                <xforms:repeat ref="td" xxforms:dnd="true" id="middle">
                     <xhtml:div style="border: 1px solid gray; margin: 5px; padding: 3px">
                         <xforms:output id="output-4-1" ref="."/>
-                        <xforms:repeat nodeset="../td" xxforms:dnd="true" id="inner">
+                        <xforms:repeat ref="../td" xxforms:dnd="true" id="inner">
                             <xhtml:span style="border: 1px solid gray; margin: 5px">
                                 <xforms:output id="output-4-2" ref="."/>
                             </xhtml:span>

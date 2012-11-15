@@ -42,14 +42,14 @@
                     <sample-trigger/>
                 </form>
             </xforms:instance>
-            <xforms:bind nodeset="instance('main-instance')">
-                <xforms:bind nodeset="file[2]/@valid" calculate="../../action = 'upload' or
+            <xforms:bind ref="instance('main-instance')">
+                <xforms:bind ref="file[2]/@valid" calculate="../../action = 'upload' or
                         (../../action = 'download' and starts-with(normalize-space(..), 'http://'))"/>
-                <xforms:bind nodeset="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
+                <xforms:bind ref="file[2]" type="xs:anyURI" constraint="@valid = 'true'"/>
 
-                <xforms:bind nodeset="upload-trigger" readonly="not(property('xxforms:noscript')) and ../file[1]/@selected = 'false'"/>
-                <xforms:bind nodeset="download-trigger" readonly="not(property('xxforms:noscript')) and ../file[2]/@valid = 'false'"/>
-                <xforms:bind nodeset="sample-trigger" readonly="not(property('xxforms:noscript')) and ../sample = ''"/>
+                <xforms:bind ref="upload-trigger" readonly="not(property('xxforms:noscript')) and ../file[1]/@selected = 'false'"/>
+                <xforms:bind ref="download-trigger" readonly="not(property('xxforms:noscript')) and ../file[2]/@valid = 'false'"/>
+                <xforms:bind ref="sample-trigger" readonly="not(property('xxforms:noscript')) and ../sample = ''"/>
             </xforms:bind>
             <xforms:instance id="samples-instance">
                 <directory xmlns=""/>
@@ -122,7 +122,7 @@
                                 <xforms:label/>
                                 <xforms:value/>
                             </xforms:item>
-                            <xforms:itemset nodeset="xxforms:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
+                            <xforms:itemset ref="xxforms:sort(instance('samples-instance')/file, @name, 'text', 'ascending')">
                                 <xforms:label><xforms:output value="substring(@name, 1, string-length(@name) - 6)"/></xforms:label>
                                 <xforms:value value="substring(@name, 1, string-length(@name) - 6)"/>
                             </xforms:itemset>

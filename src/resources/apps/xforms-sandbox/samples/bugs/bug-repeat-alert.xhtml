@@ -30,8 +30,8 @@
                     </entry>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="entry/value1" type="xs:nonNegativeInteger"/>
-            <xforms:bind nodeset="entry/value2" type="xs:nonNegativeInteger"
+            <xforms:bind ref="entry/value1" type="xs:nonNegativeInteger"/>
+            <xforms:bind ref="entry/value2" type="xs:nonNegativeInteger"
                          constraint="xs:integer(.) ge xs:integer(../value1[. castable as xs:integer])"/>
         </xforms:model>
     </xhtml:head>
@@ -42,7 +42,7 @@
             the alert doesn't appear, even though the control is invalid.
         </xhtml:p>
 
-        <xforms:repeat nodeset="entry">
+        <xforms:repeat ref="entry">
             <xhtml:div>
                 <xforms:input ref="value1">
                     <xforms:alert>Alert 1</xforms:alert>
@@ -56,7 +56,7 @@
         <xforms:trigger>
             <xforms:label>Add</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="entry"/>
+                <xforms:insert ref="entry"/>
             </xforms:action>
         </xforms:trigger>
 

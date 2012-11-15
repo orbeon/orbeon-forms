@@ -38,13 +38,13 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:h2>Without labels</xhtml:h2>
-        <xforms:repeat nodeset="*" id="fruit-repeat-1">
+        <xforms:repeat ref="*" id="fruit-repeat-1">
             <xforms:group>
                 <xforms:output value="."/>
             </xforms:group>
         </xforms:repeat>
         <xhtml:h2>With labels</xhtml:h2>
-        <xforms:repeat nodeset="*" id="fruit-repeat-2">
+        <xforms:repeat ref="*" id="fruit-repeat-2">
             <xforms:group>
                 <xforms:label>Fruit: </xforms:label>
                 <xforms:output value="."/>
@@ -53,11 +53,11 @@
         <xhtml:br/>
         <xforms:trigger>
             <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="*" at="index('fruit-repeat-1')"/>
+            <xforms:insert ev:event="DOMActivate" ref="*" at="index('fruit-repeat-1')"/>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Remove</xforms:label>
-            <xforms:delete ev:event="DOMActivate" nodeset="*" at="index('fruit-repeat-1')"/>
+            <xforms:delete ev:event="DOMActivate" ref="*" at="index('fruit-repeat-1')"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

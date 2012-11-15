@@ -28,7 +28,7 @@
                     <loading>false</loading>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/loading" relevant=". = 'true'"/>
+            <xforms:bind ref="/instance/loading" relevant=". = 'true'"/>
         </xforms:model>
         <xhtml:script type="text/javascript">
             var FORM_URL = window.location.href.substring(0, window.location.href.lastIndexOf("/")) + "/offline-mips";

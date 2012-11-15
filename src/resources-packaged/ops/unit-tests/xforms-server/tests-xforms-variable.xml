@@ -75,7 +75,7 @@
 
                                 <exforms:variable name="items" select="$instance/item"/>
 
-                                <xforms:repeat nodeset="$items" id="items-repeat">
+                                <xforms:repeat ref="$items" id="items-repeat">
                                     <exforms:variable name="current-item" select="."/>
                                     <xforms:var name="current-position" value="position()"/>
                                     <xforms:output id="my-count" ref="$current-item/value">

@@ -40,15 +40,15 @@
                     <item>1</item>
                 </items>
             </xforms:instance>
-            <xforms:bind nodeset="show" type="xs:boolean"/>
-            <xforms:bind nodeset="date" type="xs:date"/>
-            <xforms:bind nodeset="boolean-group" type="xs:boolean"/>
-            <xforms:bind nodeset="boolean-dynamic-type[../type = 'string']" type="xs:string"/>
-            <xforms:bind nodeset="boolean-dynamic-type[../type = 'boolean']" type="xs:boolean"/>
-            <xforms:bind nodeset="boolean-dynamic-type[../type = 'date']" type="xs:date"/>
-            <xforms:bind nodeset="boolean-dynamic-type[../type = 'time']" type="xs:time"/>
-            <xforms:bind nodeset="boolean-dynamic-type[../type = 'dateTime']" type="xs:dateTime"/>
-            <xforms:bind nodeset="boolean-repeat" type="xs:boolean"/>
+            <xforms:bind ref="show" type="xs:boolean"/>
+            <xforms:bind ref="date" type="xs:date"/>
+            <xforms:bind ref="boolean-group" type="xs:boolean"/>
+            <xforms:bind ref="boolean-dynamic-type[../type = 'string']" type="xs:string"/>
+            <xforms:bind ref="boolean-dynamic-type[../type = 'boolean']" type="xs:boolean"/>
+            <xforms:bind ref="boolean-dynamic-type[../type = 'date']" type="xs:date"/>
+            <xforms:bind ref="boolean-dynamic-type[../type = 'time']" type="xs:time"/>
+            <xforms:bind ref="boolean-dynamic-type[../type = 'dateTime']" type="xs:dateTime"/>
+            <xforms:bind ref="boolean-repeat" type="xs:boolean"/>
         </xforms:model>
         <!--<xhtml:script type='text/javascript'  src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'/>-->
     </xhtml:head>
@@ -110,7 +110,7 @@
             </xhtml:div>
             <xhtml:div>
                 <xforms:select ref="select" appearance="full">
-                    <xforms:itemset nodeset="instance('itemset')/item">
+                    <xforms:itemset ref="instance('itemset')/item">
                         <xforms:label ref="."/>
                         <xforms:value ref="."/>
                     </xforms:itemset>
@@ -118,7 +118,7 @@
             </xhtml:div>
             <xhtml:div>
                 <xforms:select1 ref="select" appearance="full">
-                    <xforms:itemset nodeset="instance('itemset')/item">
+                    <xforms:itemset ref="instance('itemset')/item">
                         <xforms:label ref="."/>
                         <xforms:value ref="."/>
                     </xforms:itemset>
@@ -128,7 +128,7 @@
                 <xforms:trigger>
                     <xforms:label>Add item</xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:insert nodeset="instance('itemset')/item"/>
+                        <xforms:insert ref="instance('itemset')/item"/>
                         <xforms:setvalue ref="instance('itemset')/item[last()]" value=". + 1"/>
                     </xforms:action>
                 </xforms:trigger>
@@ -165,9 +165,9 @@
             <xhtml:legend>Checkbox in a repeat</xhtml:legend>
             <xforms:trigger>
                 <xforms:label>Add</xforms:label>
-                <xforms:insert ev:event="DOMActivate" nodeset="boolean-repeat"/>
+                <xforms:insert ev:event="DOMActivate" ref="boolean-repeat"/>
             </xforms:trigger>
-            <xforms:repeat nodeset="boolean-repeat">
+            <xforms:repeat ref="boolean-repeat">
                 <xhtml:div>
                     <xforms:input ref="." appearance="full">
                         <xforms:label>Name</xforms:label>

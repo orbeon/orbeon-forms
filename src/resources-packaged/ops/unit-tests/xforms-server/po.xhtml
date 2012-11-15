@@ -72,7 +72,7 @@
 
             <xf:action ev:event="xforms-ready">
                 <xf:refresh/>
-                <xf:delete model="events-model" nodeset="*"/>
+                <xf:delete model="events-model" ref="*"/>
 
                 <!-- Cause 1st price to become invalid -->
                 <xf:setvalue ref="items/item/price">foo</xf:setvalue>
@@ -94,7 +94,7 @@
     </xh:head>
     <xh:body>
         <xf:insert id="my-insert" ev:event="#all"
-                       model="events-model" context="." nodeset="*"
+                       model="events-model" context="." ref="*"
                        origin="xxf:element('event',
                                 (xxf:attribute('type', event('xxf:type')),
                                  xxf:attribute('target', event('xxf:targetid')),

@@ -275,11 +275,11 @@
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Repeats (iteration relevance)</xhtml:legend>
-            <xforms:repeat nodeset="instance()/enabled[@section = 'outer']" id="outer-repeat-iteration">
+            <xforms:repeat ref="instance()/enabled[@section = 'outer']" id="outer-repeat-iteration">
                 <xforms:input ref="instance()/input" id="repeat-iteration-outer-input-1">
                     <xforms:label>Repeat iteration outer 1</xforms:label>
                 </xforms:input>
-                <xforms:repeat nodeset="instance()/enabled[@section = 'inner']" id="inner-repeat-iteration">
+                <xforms:repeat ref="instance()/enabled[@section = 'inner']" id="inner-repeat-iteration">
                     <xforms:input ref="instance()/input" id="repeat-iteration-inner-input">
                         <xforms:label>Repeat iteration inner</xforms:label>
                     </xforms:input>
@@ -294,11 +294,11 @@
         </xhtml:fieldset>
         <xhtml:fieldset>
             <xhtml:legend>Repeats (repeat relevance)</xhtml:legend>
-            <xforms:repeat nodeset="instance()[enabled[@section = 'outer'] = 'true']" id="outer-repeat-repeat">
+            <xforms:repeat ref="instance()[enabled[@section = 'outer'] = 'true']" id="outer-repeat-repeat">
                 <xforms:input ref="instance()/input" id="repeat-repeat-outer-input-1">
                     <xforms:label>Repeat repeat outer 1</xforms:label>
                 </xforms:input>
-                <xforms:repeat nodeset="instance()[enabled[@section = 'inner'] = 'true']" id="inner-repeat-repeat">
+                <xforms:repeat ref="instance()[enabled[@section = 'inner'] = 'true']" id="inner-repeat-repeat">
                     <xforms:input ref="instance()/input" id="repeat-repeat-inner-input">
                         <xforms:label>Repeat repeat inner</xforms:label>
                     </xforms:input>

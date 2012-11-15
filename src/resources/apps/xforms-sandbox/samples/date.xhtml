@@ -38,8 +38,8 @@
                     </node>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/node/date[../is-date-type = 'true']" type="xs:date"/>
-            <xforms:bind nodeset="/instance/node/date" readonly="../readonly = 'true'" relevant="../relevant = 'true'"/>
+            <xforms:bind ref="/instance/node/date[../is-date-type = 'true']" type="xs:date"/>
+            <xforms:bind ref="/instance/node/date" readonly="../readonly = 'true'" relevant="../relevant = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -51,7 +51,7 @@
                 <xhtml:th>&lt;xforms:input></xhtml:th>
                 <xhtml:th>&lt;xforms:output></xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="node" id="nodes">
+            <xforms:repeat ref="node" id="nodes">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output value="if (is-date-type = 'true') then 'Date ' else 'No type '"/>
@@ -59,7 +59,7 @@
                             <xforms:label>[change]</xforms:label>
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:setvalue ref="is-date-type" value="if (. = 'true') then 'false' else 'true'"/>
-                                <!-- We need to do a rebuild as the XPath expressions in the bind nodeset are only reevaluated upon
+                                <!-- We need to do a rebuild as the XPath expressions in the bind ref are only reevaluated upon
                                      insert, delete, instance replacement, but not when a value is set. -->
                                 <xforms:rebuild/>
                             </xforms:action>
@@ -93,7 +93,7 @@
         </xhtml:table>
         <xforms:trigger>
             <xforms:label>Add line</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

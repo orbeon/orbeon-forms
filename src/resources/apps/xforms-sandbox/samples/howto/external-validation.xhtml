@@ -21,10 +21,10 @@
             </xforms:instance>
 
             <!-- Mark all fields as required -->
-            <xforms:bind nodeset="*" required="true()"/>
+            <xforms:bind ref="*" required="true()"/>
 
             <!-- Mark all externally-invalid fields as invalid -->
-            <xforms:bind id="external-constraints-bind" nodeset="//*" constraint="not(@v:valid = 'false')"/>
+            <xforms:bind id="external-constraints-bind" ref="//*" constraint="not(@v:valid = 'false')"/>
 
             <!-- Temporary validation result -->
             <xforms:instance id="validation-result"><dummy/></xforms:instance>
@@ -34,10 +34,10 @@
                     resource="/apps/xforms-sandbox/samples/howto/external-validation-response.xml"
                     method="post" replace="instance" instance="validation-result">
                 <!-- Clear external errors just before doing external validation -->
-                <xforms:delete ev:event="xforms-submit" nodeset="//@v:*"/>
+                <xforms:delete ev:event="xforms-submit" ref="//@v:*"/>
                 <xforms:action ev:event="xforms-submit-done">
                     <!-- Insert external validation results when done -->
-                    <xforms:insert nodeset="." origin="instance('validation-result')/v:data/*"/>
+                    <xforms:insert ref="." origin="instance('validation-result')/v:data/*"/>
                     <!-- Add note that certain errors are revalidated until upon revalidation -->
                     <xforms:setvalue iterate="//@v:alert" ref="." value="concat(., ' (save again to revalidate)')"/>
                     <!-- Show all errors on form -->
@@ -114,13 +114,13 @@
 
         <fr:error-summary id="error-summary-incremental" observer="form-group">
             <fr:label>Errors in this form (incremental)</fr:label>
-            <fr:errors nodeset="instance('validation-result')/v:global-errors/v:global-error">
+            <fr:errors ref="instance('validation-result')/v:global-errors/v:global-error">
                 <fr:alert ref="@v:alert"/>
             </fr:errors>
         </fr:error-summary>
         <fr:error-summary id="error-summary" observer="form-group" incremental="false">
             <fr:label>Errors in this form (non-incremental)</fr:label>
-            <fr:errors nodeset="instance('validation-result')/v:global-errors/v:global-error">
+            <fr:errors ref="instance('validation-result')/v:global-errors/v:global-error">
                 <fr:alert ref="@v:alert"/>
             </fr:errors>
         </fr:error-summary>

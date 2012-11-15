@@ -30,8 +30,8 @@
                     <incorporated/>
                 </company>
             </xforms:instance>
-            <xforms:bind nodeset="/companies/@show" type="xs:boolean"/>
-            <xforms:bind nodeset="/companies/company/incorporated" type="xs:date"/>
+            <xforms:bind ref="/companies/@show" type="xs:boolean"/>
+            <xforms:bind ref="/companies/company/incorporated" type="xs:date"/>
         </xforms:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
@@ -132,7 +132,7 @@
             <xforms:label>Show</xforms:label>
         </xforms:input>
         <xhtml:table id="table">
-            <xforms:repeat nodeset=".[@show = 'true']/company" id="company-repeat">
+            <xforms:repeat ref=".[@show = 'true']/company" id="company-repeat">
                 <xxforms:script ev:event="DOMFocusIn">window.observerElement = this;</xxforms:script>
                 <xhtml:tr>
                     <xhtml:td>
@@ -147,8 +147,8 @@
 
         <hr/>
         <xhtml:table id="table-observer">
-            <xforms:repeat nodeset=".[@show = 'true']/company" >
-                <xxforms:script ev:target="#observer" ev:event="xxforms-nodeset-changed">window.observerElement = this;</xxforms:script>
+            <xforms:repeat ref=".[@show = 'true']/company" >
+                <xxforms:script ev:target="#observer" ev:event="xxforms-ref-changed">window.observerElement = this;</xxforms:script>
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:input ref="name" id="name-observer"/>
@@ -160,7 +160,7 @@
         <hr/>
         <xhtml:table id="table-xbl">
             <fr:identity id="xbl-component">
-                <xforms:repeat nodeset=".[@show = 'true']/company">
+                <xforms:repeat ref=".[@show = 'true']/company">
                     <xxforms:script ev:event="DOMFocusIn">window.observerElement = this;</xxforms:script>
                     <xhtml:tr>
                         <xhtml:td>

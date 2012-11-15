@@ -37,7 +37,7 @@
                     </record>
                 </instance>
             </xf:instance>
-            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:integer"/>
+            <xf:bind ref="instance('instance')/record/AAA" type="xs:integer"/>
         </xf:model>
     </head>
     <body>
@@ -65,7 +65,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr repeat-nodeset="record">
+                        <tr repeat-ref="record">
                             <td>
                                 <!-- Classes allow setting column properties -->
                                 <xf:output ref="AAA"/>

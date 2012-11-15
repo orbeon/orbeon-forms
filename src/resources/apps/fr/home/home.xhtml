@@ -61,7 +61,7 @@
                             <xhtml:th>View</xhtml:th>
                             <xhtml:th>New</xhtml:th>
                         </xhtml:tr>
-                        <xforms:repeat nodeset="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
+                        <xforms:repeat ref="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
                             <xhtml:tr>
                                 <xhtml:td>
                                     <xforms:output value="application-name"/>

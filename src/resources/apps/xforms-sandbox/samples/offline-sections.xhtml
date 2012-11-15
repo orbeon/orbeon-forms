@@ -52,16 +52,16 @@
                     </item>
                 </items>
             </xforms:instance>
-            <xforms:bind nodeset="instance('ui')">
-                <xforms:bind name="section" nodeset="section" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-1" relevant="$section = 1 or $show-all-pages = 'true'" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-2" relevant="$section = 2 or $show-all-pages = 'true'" xxforms:offline="true"/>
-                <xforms:bind nodeset="section-3" relevant="$section = 3 or $show-all-pages = 'true'" xxforms:offline="true"/>
+            <xforms:bind ref="instance('ui')">
+                <xforms:bind name="section" ref="section" xxforms:offline="true"/>
+                <xforms:bind ref="section-1" relevant="$section = 1 or $show-all-pages = 'true'" xxforms:offline="true"/>
+                <xforms:bind ref="section-2" relevant="$section = 2 or $show-all-pages = 'true'" xxforms:offline="true"/>
+                <xforms:bind ref="section-3" relevant="$section = 3 or $show-all-pages = 'true'" xxforms:offline="true"/>
 
-                <xforms:bind nodeset="previous-button" readonly="$section = '1'" xxforms:offline="true"/>
-                <xforms:bind nodeset="next-button" readonly="$section = '3'" xxforms:offline="true"/>
+                <xforms:bind ref="previous-button" readonly="$section = '1'" xxforms:offline="true"/>
+                <xforms:bind ref="next-button" readonly="$section = '3'" xxforms:offline="true"/>
 
-                <xforms:bind nodeset="show-all-pages" name="show-all-pages" xxforms:offline="true"/>
+                <xforms:bind ref="show-all-pages" name="show-all-pages" xxforms:offline="true"/>
             </xforms:bind>
 
             <xforms:action ev:event="xxforms-offline">
@@ -95,7 +95,7 @@
             </xforms:group>
             <xforms:group ref="section-2">
                 <xforms:select1 appearance="full" ref="accept-privacy" id="accept-privacy">
-                    <xforms:itemset nodeset="instance('yes-no')/item">
+                    <xforms:itemset ref="instance('yes-no')/item">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>

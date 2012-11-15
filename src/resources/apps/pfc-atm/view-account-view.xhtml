@@ -22,7 +22,7 @@
             <xforms:instance id="withdraw-instance">
                 <amount/>
             </xforms:instance>
-            <xforms:bind nodeset="instance('withdraw-instance')" constraint="number(.) > 0"/>
+            <xforms:bind ref="instance('withdraw-instance')" constraint="number(.) > 0"/>
             <xforms:submission id="main-submission" ref="instance('withdraw-instance')" method="post"
                                action="/pfc-atm/atm-view-account"/>
         </xforms:model>

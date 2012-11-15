@@ -29,7 +29,7 @@
 
         <p>Note the limitations when using these functions in sort expressions:</p>
         <ul>
-            <li><tt>position()</tt> is evaluated as an XForms function when used in xforms:output and returns the position in the repeat nodeset after
+            <li><tt>position()</tt> is evaluated as an XForms function when used in xforms:output and returns the position in the repeat ref after
                 the sort operation (1 in the first row, 2 in the second, ...). However, when evaluated in the sort expression this function returns
                 the position in the instance before the sort operation. This is demonstrated by the table below when you click on the
                     <tt>position()</tt> column.</li>
@@ -40,7 +40,7 @@
         <fr:datatable>
             <!-- Optional <thead>, otherwise try to build one from body -->
             <tbody>
-                <xf:repeat nodeset="/rss/channel/item" id="repeat">
+                <xf:repeat ref="/rss/channel/item" id="repeat">
                     <tr>
                         <td fr:sortable="true" fr:resizeable="true">
                             <xf:output ref="dc:creator">

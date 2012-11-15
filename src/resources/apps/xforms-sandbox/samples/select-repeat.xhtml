@@ -54,8 +54,8 @@
                     <show-fruit-selection>false</show-fruit-selection>
                 </ui>
             </xforms:instance>
-            <xforms:bind nodeset="instance('main-instance')/fruit" relevant="@id = instance('selection-instance')"/>
-            <xforms:bind nodeset="instance('main-instance')/fruit/quantity" type="xs:nonNegativeInteger"/>
+            <xforms:bind ref="instance('main-instance')/fruit" relevant="@id = instance('selection-instance')"/>
+            <xforms:bind ref="instance('main-instance')/fruit/quantity" type="xs:nonNegativeInteger"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -83,7 +83,7 @@
                         <xforms:label>Select fruit</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="instance('main-instance')/fruit">
+                    <xforms:itemset ref="instance('main-instance')/fruit">
                         <xforms:label ref="name"/>
                         <xforms:value ref="@id"/>
                     </xforms:itemset>
@@ -96,7 +96,7 @@
                 <xhtml:th>Color</xhtml:th>
                 <xhtml:th>Quantity</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="fruit" id="fruit">
+            <xforms:repeat ref="fruit" id="fruit">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output ref="name"/>

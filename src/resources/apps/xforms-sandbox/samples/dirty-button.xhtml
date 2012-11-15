@@ -34,7 +34,7 @@
                 </control>
             </xforms:instance>
             <!-- Disable the save button when the data is dirty -->
-            <xforms:bind nodeset="instance('control-instance')/save-trigger" readonly="not(../dirty = 'true')"/>
+            <xforms:bind ref="instance('control-instance')/save-trigger" readonly="not(../dirty = 'true')"/>
             <!-- Mark data as dirty upon insert/delete -->
             <xforms:setvalue ev:event="xforms-insert xforms-delete" ref="instance('control-instance')/dirty">true</xforms:setvalue>
 

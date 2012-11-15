@@ -28,7 +28,7 @@
         </xforms:model>
     </head>
     <body>
-        <xforms:repeat nodeset="//*">
+        <xforms:repeat ref="//*">
             <xforms:output value="string-join(for $element in ancestor-or-self::* return '', ' → ')"/>
             <xforms:output value="name()"/>
             <br/>

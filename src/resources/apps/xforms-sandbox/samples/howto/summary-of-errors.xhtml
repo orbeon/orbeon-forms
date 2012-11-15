@@ -41,10 +41,10 @@
             </xforms:instance>
 
             <!-- Validation rules  -->
-            <xforms:bind nodeset="instance('company')/name" required="true()"/>
-            <xforms:bind nodeset="instance('company')/employees/employee, instance('edit-employee')">
-                <xforms:bind nodeset="first-name, last-name" required="true()"/>
-                <xforms:bind nodeset="expenses" constraint=". castable as xs:integer and xs:integer(.) lt 25000"/>
+            <xforms:bind ref="instance('company')/name" required="true()"/>
+            <xforms:bind ref="instance('company')/employees/employee, instance('edit-employee')">
+                <xforms:bind ref="first-name, last-name" required="true()"/>
+                <xforms:bind ref="expenses" constraint=". castable as xs:integer and xs:integer(.) lt 25000"/>
             </xforms:bind>
 
         </xforms:model>
@@ -66,12 +66,12 @@
 
         <!-- Summary of errors; the magic is done by the xxforms:valid() function -->
         <xhtml:ul>
-            <xforms:repeat nodeset="employees/employee[not(xxforms:valid(., true()))]">
+            <xforms:repeat ref="employees/employee[not(xxforms:valid(., true()))]">
                 <xhtml:li>
                     <xforms:trigger appearance="minimal">
                         <xforms:label>Correct errors for employee <xforms:output value="@id"/></xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:insert nodeset="instance('edit-employee')" origin="context()"/>
+                            <xforms:insert ref="instance('edit-employee')" origin="context()"/>
                             <xforms:dispatch name="fr-visit-all" targetid="error-summary"/>
                         </xforms:action>
                     </xforms:trigger>
@@ -95,13 +95,13 @@
             </xforms:input>
             <xhtml:div class="buttons">
                 <xforms:group>
-                    <xforms:delete ev:event="DOMActivate" nodeset="*"/>
+                    <xforms:delete ev:event="DOMActivate" ref="*"/>
                     <fr:button>
                         <xforms:label>OK</xforms:label>
                         <xforms:action ev:event="DOMActivate">
-                            <xforms:insert nodeset="instance('company')/employees/employee[@id = instance('edit-employee')/@id]"
+                            <xforms:insert ref="instance('company')/employees/employee[@id = instance('edit-employee')/@id]"
                                 origin="instance('edit-employee')"/>
-                            <xforms:delete nodeset="(instance('company')/employees/employee[@id = instance('edit-employee')/@id])[1]"/>
+                            <xforms:delete ref="(instance('company')/employees/employee[@id = instance('edit-employee')/@id])[1]"/>
                         </xforms:action>
                     </fr:button>
                     <fr:button>

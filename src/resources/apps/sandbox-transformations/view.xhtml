@@ -46,9 +46,9 @@
                     ref="instance('request')" replace="instance" instance="response">
                 <!-- Prepare request -->
                 <xforms:action ev:event="xforms-submit">
-                    <xforms:delete context="instance('request')" while="*" nodeset="*"/>
-                    <xforms:insert context="instance('request')" nodeset="*" origin="instance('input')"/>
-                    <xforms:insert context="instance('request')" nodeset="*" origin="instance('transformation')"/>
+                    <xforms:delete context="instance('request')" while="*" ref="*"/>
+                    <xforms:insert context="instance('request')" ref="*" origin="instance('input')"/>
+                    <xforms:insert context="instance('request')" ref="*" origin="instance('transformation')"/>
                 </xforms:action>
                 <!-- Handle success -->
                 <xforms:setvalue ev:event="xforms-submit-done" ref="instance('message')"/>

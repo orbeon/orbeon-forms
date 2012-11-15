@@ -55,7 +55,7 @@
                     <xsl:output method="xml" omit-xml-declaration="yes" indent="no" saxon:indent-spaces="4"/>
                 </ui>
             </xforms:instance>
-            <xforms:delete ev:event="xforms-model-construct-done" nodeset="instance('input')//text()[normalize-space() = '']"/>
+            <xforms:delete ev:event="xforms-model-construct-done" ref="instance('input')//text()[normalize-space() = '']"/>
             
         </xforms:model>
         <xhtml:style type="text/css">
@@ -71,7 +71,7 @@
         <xforms:trigger appearance="minimal" class="transform-trigger">
             <xforms:label>Run XSLT</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="instance('output')" origin="saxon:transform(
+                <xforms:insert ref="instance('output')" origin="saxon:transform(
                     saxon:compile-stylesheet(instance('stylesheet')/root()), 
                     saxon:parse(saxon:serialize(instance('input'), 'xml')))"/>
                 <xforms:toggle case="show-result"/>

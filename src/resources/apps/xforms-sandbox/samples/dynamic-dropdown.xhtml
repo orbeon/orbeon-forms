@@ -38,7 +38,7 @@
     <body>
         <xf:select ref="pets" appearance="full">
             <xf:label>Please list all your pets:</xf:label>
-            <xf:itemset nodeset="instance('pets')/item">
+            <xf:itemset ref="instance('pets')/item">
                 <xf:label ref="@name"/>
                 <xf:value ref="@value"/>
             </xf:itemset>
@@ -50,7 +50,7 @@
                 <xf:label/>
                 <xf:value/>
             </xf:itemset>
-            <xf:itemset nodeset="instance('pets')/item[@value = tokenize(context()/../pets, '\s+')]">
+            <xf:itemset ref="instance('pets')/item[@value = tokenize(context()/../pets, '\s+')]">
                 <xf:label ref="@name"/>
                 <xf:value ref="@value"/>
             </xf:itemset>

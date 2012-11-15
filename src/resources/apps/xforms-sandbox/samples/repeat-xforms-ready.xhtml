@@ -32,7 +32,7 @@
     </xhtml:head>
     <xhtml:body>
         Current index: <xforms:output value="index('color-index')"/>
-        <xforms:repeat nodeset="instance('colors')/color" id="color-index">
+        <xforms:repeat ref="instance('colors')/color" id="color-index">
             <xhtml:p>
                 <xforms:output ref="."/>
             </xhtml:p>

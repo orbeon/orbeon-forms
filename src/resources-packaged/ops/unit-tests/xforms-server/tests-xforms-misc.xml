@@ -454,11 +454,11 @@
                                             <record/>
                                         </instance>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
+                                    <xforms:bind ref="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-                                <xforms:repeat model="model2" nodeset="record" id="my-repeat">
+                                <xforms:repeat model="model2" ref="record" id="my-repeat">
                                      <xforms:trigger id="my-trigger" ref=".">
                                         <xforms:label>Do Stuff</xforms:label>
                                          <!-- Add event handler so that refresh goes through event dispatching -->
@@ -561,7 +561,7 @@
 
                         <xforms:action ev:event="xforms-ready">
                             <xxforms:show dialog="dialog-1"/>
-                            <xforms:insert nodeset="label" origin="xxforms:element('label', 'Vanilla')"/>
+                            <xforms:insert ref="label" origin="xxforms:element('label', 'Vanilla')"/>
                         </xforms:action>
 
                     </xforms:model>

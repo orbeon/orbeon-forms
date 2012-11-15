@@ -33,7 +33,7 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="logo[. != '']" id="fruit">
+        <xforms:repeat ref="logo[. != '']" id="fruit">
             <xhtml:div>
                 <xforms:output mediatype="image/gif" value="."/>
             </xhtml:div>

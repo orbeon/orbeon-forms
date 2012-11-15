@@ -49,7 +49,7 @@
                 <xforms:dispatch target="main-model" name="load-resources"/>
             </xforms:action>
             <xforms:label ref="$resources/language/change"/>
-            <xforms:itemset nodeset="instance('all-resources')/resources">
+            <xforms:itemset ref="instance('all-resources')/resources">
                 <xforms:label ref="label"/>
                 <xforms:value ref="@xml:lang"/>
             </xforms:itemset>

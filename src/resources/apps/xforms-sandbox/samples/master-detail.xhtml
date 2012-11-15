@@ -38,7 +38,7 @@
             <xforms:label>Add</xforms:label>
             <xforms:action ev:event="DOMActivate">
                 <!-- Insert new row and populate id with max of exising ids + 1 -->
-                <xforms:insert nodeset="*" at="index('orange-repeat')"
+                <xforms:insert ref="*" at="index('orange-repeat')"
                                origin="xxforms:element('orange',
                                             (xxforms:element('type'),
                                              xxforms:element('id', max(for $n in /*/orange/id[. castable as xs:integer] return xs:integer($n)) + 1)))"/>
@@ -48,7 +48,7 @@
         <xhtml:h2>Master</xhtml:h2>
 
         <xhtml:table>
-            <xforms:repeat nodeset="orange" id="orange-repeat">
+            <xforms:repeat ref="orange" id="orange-repeat">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output ref="type">

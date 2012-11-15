@@ -51,7 +51,7 @@
         </xhtml:p>
         <!-- Set a different CSS class if there was focus or not -->
         <xhtml:div class="{if (instance('focus') = 'true') then 'my-focused' else 'my-unfocused'}">
-            <xforms:repeat nodeset="*">
+            <xforms:repeat ref="*">
                 <xhtml:div>
                     <xforms:input ref=".">
                         <xforms:label>Fruit</xforms:label>

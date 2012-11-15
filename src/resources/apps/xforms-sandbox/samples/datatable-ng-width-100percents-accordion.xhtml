@@ -61,7 +61,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
         </xforms:model>
     </head>
     <body>
@@ -74,7 +74,7 @@
                 <fr:label>100%</fr:label>
                 <div>
                     <fr:datatable width="100%">
-                        <xforms:repeat nodeset="record">
+                        <xforms:repeat ref="record">
                             <tr>
                                 <td fr:sortable="true" fr:resizeable="true">
                                     <xforms:output ref="AAA">
@@ -100,7 +100,7 @@
                 <fr:label>100%, with an vertical scrollbar</fr:label>
                 <div>
                     <fr:datatable width="100%" scrollable="vertical" height="120px">
-                        <xforms:repeat nodeset="record">
+                        <xforms:repeat ref="record">
                             <tr>
                                 <td fr:sortable="true" fr:resizeable="true">
                                     <xforms:output ref="AAA">
@@ -126,7 +126,7 @@
                 <fr:label>100%, with an horizontal scrollbar</fr:label>
                 <div>
                     <fr:datatable width="100%" scrollable="horizontal">
-                        <xforms:repeat nodeset="record">
+                        <xforms:repeat ref="record">
                             <tr>
                                 <td fr:sortable="true" fr:resizeable="true">
                                     <xforms:output ref="AAA">
@@ -152,7 +152,7 @@
                 <fr:label>100%, with two scrollbars</fr:label>
                 <div>
                     <fr:datatable width="100%" scrollable="both" height="120px">
-                        <xforms:repeat nodeset="record">
+                        <xforms:repeat ref="record">
                             <tr>
                                 <td fr:sortable="true" fr:resizeable="true">
                                     <xforms:output ref="AAA">

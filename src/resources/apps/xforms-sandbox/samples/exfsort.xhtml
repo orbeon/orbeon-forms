@@ -42,7 +42,7 @@
 
         <h2>Sorted instance using exforms:sort() and a variable</h2>
         <ul>
-            <xforms:repeat nodeset="exf:sort(record, 'for  $code in @code return $lookup-records[@code = $code]', 'text', 'descending')">
+            <xforms:repeat ref="exf:sort(record, 'for  $code in @code return $lookup-records[@code = $code]', 'text', 'descending')">
                 <li>
                     <xforms:output value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                 </li>
@@ -51,7 +51,7 @@
 
         <h2>Sorted instance using exforms:sort() and instance()</h2>
         <ul>
-            <xforms:repeat nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
+            <xforms:repeat ref="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
                 <li>
                     <xforms:output value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                 </li>
@@ -60,7 +60,7 @@
 
         <h2>Sorted instance using xxforms:sort() and a variable</h2>
         <ul>
-            <xforms:repeat nodeset="xxforms:sort(record, for $code in @code return instance('lookup-instance')/record[@code = $code], 'text', 'descending')">
+            <xforms:repeat ref="xxforms:sort(record, for $code in @code return instance('lookup-instance')/record[@code = $code], 'text', 'descending')">
                 <li>
                     <xforms:output value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                 </li>
@@ -69,7 +69,7 @@
 
         <h2>Sorted instance using xxforms:sort() and instance()</h2>
         <ul>
-            <xforms:repeat nodeset="xxforms:sort(record, for $code in @code return $lookup-records[@code = $code], 'text', 'descending')">
+            <xforms:repeat ref="xxforms:sort(record, for $code in @code return $lookup-records[@code = $code], 'text', 'descending')">
                 <li>
                     <xforms:output value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                 </li>

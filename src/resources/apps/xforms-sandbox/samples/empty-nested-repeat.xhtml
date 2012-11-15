@@ -32,52 +32,52 @@
         <div>
             <xf:trigger>
                 <xf:label>Insert level 1</xf:label>
-                <xf:insert ev:event="DOMActivate" at="last()" position="before" nodeset="level1"/>
+                <xf:insert ev:event="DOMActivate" at="last()" position="before" ref="level1"/>
             </xf:trigger>
         </div>
 
-        <xf:repeat id="level1-repeat" nodeset="level1[position() &lt; last()]">
+        <xf:repeat id="level1-repeat" ref="level1[position() &lt; last()]">
             <fieldset>
                 <legend>Level 1</legend>
                 <div>
                     <xf:input ref="@value"/>
                     <xf:trigger>
                         <xf:label>Delete</xf:label>
-                        <xf:delete ev:event="DOMActivate" nodeset="." at="index('level1-repeat')"/>
+                        <xf:delete ev:event="DOMActivate" ref="." at="index('level1-repeat')"/>
                     </xf:trigger>
                 </div>
                 <div>
                     <xf:trigger>
                         <xf:label>Insert level 2</xf:label>
-                        <xf:insert ev:event="DOMActivate" at="last()" position="before" nodeset="level2"/>
+                        <xf:insert ev:event="DOMActivate" at="last()" position="before" ref="level2"/>
                     </xf:trigger>
                 </div>
                 <div>
-                    <xf:repeat id="level2-repeat" nodeset="level2[position() &lt; last()]">
+                    <xf:repeat id="level2-repeat" ref="level2[position() &lt; last()]">
                         <fieldset>
                             <legend>Level 2</legend>
                             <div>
                                 <xf:input ref="@value"/>
                                 <xf:trigger>
                                     <xf:label>Delete</xf:label>
-                                    <xf:delete ev:event="DOMActivate" nodeset="." at="index('level2-repeat')"/>
+                                    <xf:delete ev:event="DOMActivate" ref="." at="index('level2-repeat')"/>
                                 </xf:trigger>
                             </div>
                             <div>
                                 <xf:trigger>
                                     <xf:label>Insert level 3</xf:label>
-                                    <xf:insert ev:event="DOMActivate" at="last()" position="before" nodeset="level3"/>
+                                    <xf:insert ev:event="DOMActivate" at="last()" position="before" ref="level3"/>
                                 </xf:trigger>
                             </div>
                             <div>
-                                <xf:repeat id="level3-repeat" nodeset="level3[position() &lt; last()]">
+                                <xf:repeat id="level3-repeat" ref="level3[position() &lt; last()]">
                                     <fieldset>
                                         <legend>Level 3</legend>
                                         <div>
                                             <xf:input ref="@value"/>
                                             <xf:trigger>
                                                 <xf:label>Delete</xf:label>
-                                                <xf:delete ev:event="DOMActivate" nodeset="." at="index('level3-repeat')"/>
+                                                <xf:delete ev:event="DOMActivate" ref="." at="index('level3-repeat')"/>
                                             </xf:trigger>
                                         </div>
                                     </fieldset>

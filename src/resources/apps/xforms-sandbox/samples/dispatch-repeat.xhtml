@@ -31,7 +31,7 @@
     </head>
     <body>
         <!-- Iterate over all the values -->
-        <xforms:repeat nodeset="value" id="my-repeat">
+        <xforms:repeat ref="value" id="my-repeat">
             <div>
                 <xforms:input id="my-input" ref=".">
                     <!-- Upon receiving event "my-event", set the value of the control -->

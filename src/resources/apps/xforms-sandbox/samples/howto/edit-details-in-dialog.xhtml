@@ -71,7 +71,7 @@
                     <edited-planet/>
                 </ui>
             </xforms:instance>
-            <xforms:bind nodeset="instance('ui')/edited-planet/planet/description" required="true()"/>
+            <xforms:bind ref="instance('ui')/edited-planet/planet/description" required="true()"/>
             <xforms:action ev:event="xforms-model-construct-done" iterate="instance('planets')/planet/description">
                 <xforms:setvalue ref="." value="normalize-space(.)"/>
             </xforms:action>
@@ -86,7 +86,7 @@
     <xhtml:body>
         <xxforms:dialog id="edit-planet-dialog">
             <xforms:label>Edit Planet</xforms:label>
-            <xforms:delete ev:event="xxforms-dialog-close" nodeset="instance('ui')/edited-planet/planet"/>
+            <xforms:delete ev:event="xxforms-dialog-close" ref="instance('ui')/edited-planet/planet"/>
             <xforms:group ref="instance('ui')/edited-planet/planet" id="edit-planet-group">
                 <xforms:output value="name">
                     <xforms:label>Planet</xforms:label>
@@ -129,7 +129,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="instance('planets')/planet">
+                <xforms:repeat ref="instance('planets')/planet">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:output value="name"/>

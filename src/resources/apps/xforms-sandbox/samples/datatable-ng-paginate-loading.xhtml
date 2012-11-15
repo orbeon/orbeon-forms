@@ -26,7 +26,7 @@
             <xforms:instance id="loading">
                 <loading>true</loading>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/atom:entry/atom:published"
+            <xforms:bind ref="instance('instance')/atom:entry/atom:published"
                 type="xforms:dateTime"/>
             <xxforms:script ev:event="xforms-model-construct-done">
                 ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxforms:script>
@@ -35,7 +35,7 @@
                 replace="instance"/>
             <xforms:action ev:event="load-initial-data">
                 <xforms:send submission="twit"/>
-                <xforms:setvalue nodeset="instance('loading')">false</xforms:setvalue>
+                <xforms:setvalue ref="instance('loading')">false</xforms:setvalue>
             </xforms:action>
         </xforms:model>
     </head>
@@ -56,7 +56,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr repeat-nodeset="/atom:feed/atom:entry">
+                <tr repeat-ref="/atom:feed/atom:entry">
                     <td>
                         <xforms:output ref="atom:published"
                             xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"

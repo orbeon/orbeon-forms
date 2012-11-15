@@ -57,10 +57,10 @@
                 </checkout>
             </xforms:instance>
 
-            <xforms:bind nodeset="/checkout/cart/item/line-total" calculate="../unit-count * ../unit-price"/>
-            <xforms:bind nodeset="/checkout/cart/cart-total" calculate="sum(../item/line-total)"/>
-            <xforms:bind nodeset="/checkout/addresses/billing-address/@use-same-for-shipping" type="xs:boolean"/>
-            <xforms:bind nodeset="/checkout/addresses/shipping-address" relevant="../billing-address/@use-same-for-shipping = 'false'"/>
+            <xforms:bind ref="/checkout/cart/item/line-total" calculate="../unit-count * ../unit-price"/>
+            <xforms:bind ref="/checkout/cart/cart-total" calculate="sum(../item/line-total)"/>
+            <xforms:bind ref="/checkout/addresses/billing-address/@use-same-for-shipping" type="xs:boolean"/>
+            <xforms:bind ref="/checkout/addresses/shipping-address" relevant="../billing-address/@use-same-for-shipping = 'false'"/>
 
         </xforms:model>
         <xhtml:style type="text/css">
@@ -79,7 +79,7 @@
                 <xhtml:th>Unit count</xhtml:th>
                 <xhtml:th>Total</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="cart/item">
+            <xforms:repeat ref="cart/item">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:input ref="description" class="description"/>

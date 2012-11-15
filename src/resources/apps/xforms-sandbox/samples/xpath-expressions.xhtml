@@ -32,10 +32,10 @@
                     <result3/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="result1" calculate="sum(for $i in ../salary return number($i))"
+            <xforms:bind ref="result1" calculate="sum(for $i in ../salary return number($i))"
                          relevant="string(sum(for $i in ../salary return number($i))) != 'NaN'"/>
-            <xforms:bind nodeset="result2" calculate="9999 * 9999"/>
-            <xforms:bind nodeset="result3" calculate="9999 * 9999" type="xs:integer"/>
+            <xforms:bind ref="result2" calculate="9999 * 9999"/>
+            <xforms:bind ref="result3" calculate="9999 * 9999" type="xs:integer"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

@@ -70,7 +70,7 @@
                     <xhtml:th>Minimums</xhtml:th>
                     <xhtml:th>Maximums</xhtml:th>
                 </xhtml:tr>
-                <xforms:repeat nodeset="service:GetWeatherByZipCodeResult/service:Details/service:WeatherData">
+                <xforms:repeat ref="service:GetWeatherByZipCodeResult/service:Details/service:WeatherData">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:output value="service:Day"/>

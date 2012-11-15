@@ -28,7 +28,7 @@
                     <bar/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/bar" calculate="/instance/foo"/>
+            <xforms:bind ref="/instance/bar" calculate="/instance/foo"/>
             <xxforms:script ev:event="xforms-ready">
                 ORBEON.xforms.Document.setValue("foo", 42);
             </xxforms:script>

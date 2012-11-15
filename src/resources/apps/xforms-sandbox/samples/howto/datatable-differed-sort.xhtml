@@ -73,7 +73,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="contact">
+                <xforms:repeat ref="contact">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:input ref="name"/>
@@ -97,8 +97,8 @@
                 <xforms:var name="contacts" value="contact"/>
                 <xforms:setvalue ref="$sorting/order" value="if ($sorting/column = $column and . = 'ascending') then 'descending' else 'ascending'"/>
                 <xforms:setvalue ref="$sorting/column" value="$column"/>
-                <xforms:delete nodeset="$contacts"/>
-                <xforms:insert context="instance('contacts')" nodeset="*" origin="exf:sort($contacts, $column, 'text', instance('sorting')/order)"/>
+                <xforms:delete ref="$contacts"/>
+                <xforms:insert context="instance('contacts')" ref="*" origin="exf:sort($contacts, $column, 'text', instance('sorting')/order)"/>
             </xforms:action>
             <xhtml:thead>
                 <xhtml:tr>
@@ -114,7 +114,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="contact">
+                <xforms:repeat ref="contact">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:input ref="name"/>

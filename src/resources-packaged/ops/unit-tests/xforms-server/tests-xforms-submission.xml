@@ -76,14 +76,14 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat nodeset="r1" id="repeat1" startindex="2">
-                        <xforms:repeat nodeset="r2" id="repeat2" startindex="4">
+                    <xforms:repeat ref="r1" id="repeat1" startindex="2">
+                        <xforms:repeat ref="r2" id="repeat2" startindex="4">
                         </xforms:repeat>
                     </xforms:repeat>
-                    <xforms:repeat nodeset="r3" id="repeat3">
+                    <xforms:repeat ref="r3" id="repeat3">
                     </xforms:repeat>
-                    <xforms:repeat nodeset="r4" id="repeat4">
-                        <xforms:repeat nodeset="r5" id="repeat5"/>
+                    <xforms:repeat ref="r4" id="repeat4">
+                        <xforms:repeat ref="r5" id="repeat5"/>
                     </xforms:repeat>
                     <xforms:trigger id="test-trigger">
                         <xforms:label>Test</xforms:label>
@@ -151,8 +151,8 @@
                             </instance>
                         </xforms:instance>
 
-                        <xforms:bind nodeset="required-but-emtpy-element" required="true()"/>
-                        <xforms:bind nodeset="other-element/@required-but-emtpy-attribute" required="true()"/>
+                        <xforms:bind ref="required-but-emtpy-element" required="true()"/>
+                        <xforms:bind ref="other-element/@required-but-emtpy-attribute" required="true()"/>
 
                         <xforms:submission id="test-submission" method="post" action="echo:" replace="instance">
                             <xforms:setvalue ev:event="xforms-submit-error" ref="submission-result">error</xforms:setvalue>
@@ -322,7 +322,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -330,7 +330,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -392,7 +392,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -400,7 +400,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -466,7 +466,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -474,7 +474,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -545,7 +545,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -553,7 +553,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -619,7 +619,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -627,7 +627,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -693,7 +693,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -701,7 +701,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -771,7 +771,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -779,7 +779,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -859,7 +859,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -867,7 +867,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -924,7 +924,7 @@
                             <!-- Refresh will cause UI events dispatch -->
                             <xforms:refresh/>
                             <!-- Clear all events recorded so far -->
-                            <xforms:delete nodeset="instance('events')/*"/>
+                            <xforms:delete ref="instance('events')/*"/>
                             <!-- Start submission -->
                             <xforms:send submission="replace-instance"/>
                         </xforms:action>
@@ -937,7 +937,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -945,7 +945,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -958,7 +958,7 @@
 
                     <xforms:group id="group">
                         <xforms:insert ev:event="#all"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -1037,7 +1037,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -1045,7 +1045,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -1121,7 +1121,7 @@
                             <events/>
                         </xforms:instance>
                         <xforms:insert ev:event="xforms-insert xforms-delete" ev:target="source-instance destination-instance"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -1129,7 +1129,7 @@
                                                  for $c in event('deleted-nodes')[1] return xxforms:attribute('deleted-nodes', name($c))
                                                  ))"/>
                         <xforms:insert ev:event="xforms-submit-done xforms-submit-error"
-                                       context="instance('events')" nodeset="*"
+                                       context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid')),
@@ -1286,7 +1286,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
                                 <xforms:rebuild/>
                                 <xforms:recalculate/>
                                 <xforms:revalidate/>
@@ -1302,7 +1302,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state but don't refresh -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
 
                                 <!-- Because of insert above, expecting: rebuild, recalculate -->
                                 <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
@@ -1316,7 +1316,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
                                 <xforms:rebuild/>
                                 <xforms:recalculate/>
                                 <xforms:revalidate/>
@@ -1332,7 +1332,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state but don't refresh -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
 
                                 <!-- NOT expecting rebuild or recalculate, and binds point to old instance -->
                                 <xforms:setvalue ref="instance()/source">888</xforms:setvalue>
@@ -1462,7 +1462,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
                                 <xforms:rebuild/>
                                 <xforms:recalculate/>
                                 <xforms:revalidate/>
@@ -1480,7 +1480,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state but don't refresh -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
 
                                 <!-- Because of insert above, expecting: rebuild, revalidate; integer type points to value[2] -->
                                 <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
@@ -1496,7 +1496,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
                                 <xforms:rebuild/>
                                 <xforms:recalculate/>
                                 <xforms:revalidate/>
@@ -1514,7 +1514,7 @@
 
                             <xforms:action ev:event="xforms-submit">
                                 <!-- Restore state but don't refresh -->
-                                <xforms:insert nodeset="instance()" origin="instance('template')"/>
+                                <xforms:insert ref="instance()" origin="instance('template')"/>
 
                                 <!-- NOT expecting rebuild or revalidate, and binds point to old instance -->
                                 <xforms:setvalue ref="instance()/position">2</xforms:setvalue>
@@ -1574,7 +1574,7 @@
             <xforms:submission method="get" resource="oxf:/ops/unit-tests/xforms-server/sample-instance.xml">
                 <!-- Try some actions -->
                 <xforms:action ev:event="xforms-submit-done">
-                    <xforms:insert nodeset="/*" origin="xxforms:element('envelope', /*)"/>
+                    <xforms:insert ref="/*" origin="xxforms:element('envelope', /*)"/>
                 </xforms:action>
             </xforms:submission>
         </input>
@@ -1596,10 +1596,10 @@
             <xforms:submission method="get" resource="oxf:/ops/unit-tests/xforms-server/i-don't-exist.xml">
                 <!-- Try some actions -->
                 <xforms:action ev:event="xforms-submit-done">
-                    <xforms:insert nodeset="/*" origin="xxforms:element('success')"/>
+                    <xforms:insert ref="/*" origin="xxforms:element('success')"/>
                 </xforms:action>
                 <xforms:action ev:event="xforms-submit-error">
-                    <xforms:insert nodeset="/*" origin="xxforms:element('failure')"/>
+                    <xforms:insert ref="/*" origin="xxforms:element('failure')"/>
                 </xforms:action>
             </xforms:submission>
         </input>

@@ -48,13 +48,13 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:h2>Div inside div</xhtml:h2>
-        <xforms:repeat nodeset="company" id="company-repeat-first">
+        <xforms:repeat ref="company" id="company-repeat-first">
             <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                 <xforms:output ref="@name"/>
-                <xforms:repeat nodeset="department" id="department-repeat-first">
+                <xforms:repeat ref="department" id="department-repeat-first">
                     <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                         <xforms:output ref="@name"/>
-                        <xforms:repeat nodeset="employee" id="employee-repeat-first">
+                        <xforms:repeat ref="employee" id="employee-repeat-first">
                             <xhtml:div style="padding: .5em .5em .5em 2em; border: 1px solid #eee">
                                 <xforms:output ref="@name"/>
                                 <i>(employee name)</i>
@@ -66,12 +66,12 @@
         </xforms:repeat>
         <xhtml:h2>Table</xhtml:h2>
         <xhtml:table class="zebra-table">
-            <xforms:repeat nodeset="company" id="company-repeat">
+            <xforms:repeat ref="company" id="company-repeat">
                 <xforms:var name="company-name" value="@name"/>
-                <xforms:repeat nodeset="department" id="department-repeat">
+                <xforms:repeat ref="department" id="department-repeat">
                     <xforms:var name="department-name" value="@name"/>
                     <xforms:var name="department-position" value="position()"/>
-                    <xforms:repeat nodeset="employee" id="employee-repeat">
+                    <xforms:repeat ref="employee" id="employee-repeat">
                         <xforms:var name="employee-name" value="@name"/>
                         <xforms:var name="employee-position" value="position()"/>
                         <xhtml:tr class="{if ((count(preceding::employee)  + 1) mod 2 = 1) then 'table-row-odd' else 'table-row-even'}">
@@ -91,15 +91,15 @@
         </xhtml:table>
         <xforms:trigger>
             <xforms:label>Add company</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/companies/company" at="last()+1" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/companies/company" at="last()+1" position="after"/>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Add department</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/companies/company/department" at="last()+1" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/companies/company/department" at="last()+1" position="after"/>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Add employee</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/companies/company/department/employee" at="last()+1" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/companies/company/department/employee" at="last()+1" position="after"/>
         </xforms:trigger>
 
     </xhtml:body>

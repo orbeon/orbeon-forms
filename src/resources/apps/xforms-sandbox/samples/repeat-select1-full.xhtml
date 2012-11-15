@@ -36,12 +36,12 @@
 
         <xforms:trigger>
             <xforms:label>Insert</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="row"/>
+            <xforms:insert ev:event="DOMActivate" ref="row"/>
         </xforms:trigger>
 
         <ul>
             <table>
-                <xforms:repeat nodeset="row">
+                <xforms:repeat ref="row">
                     <tr>
                         <td>
                             <xforms:select1 ref="select" appearance="full">

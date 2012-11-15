@@ -37,7 +37,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
             <xforms:instance id="nbrows">
                 <nbrows xmlns="">1</nbrows>
             </xforms:instance>
@@ -47,7 +47,7 @@
 
         <h1>Using the datatable widget (new generation)</h1>
 
-        <p>Testing xforms:repeat nodeset updates. Set the number of rows to 0 and then to 3 and see what happens...</p>
+        <p>Testing xforms:repeat ref updates. Set the number of rows to 0 and then to 3 and see what happens...</p>
         <p><xforms:input ref="xxforms:instance('nbrows')">
             <xforms:label>Number of rows (0 to 3): </xforms:label>
             </xforms:input>
@@ -61,7 +61,7 @@
                 </tr>
             </thead>
             <tbody>
-            <xforms:repeat nodeset="record[position() &lt;= xxforms:instance('nbrows')]">
+            <xforms:repeat ref="record[position() &lt;= xxforms:instance('nbrows')]">
                 <tr>
                     <td>
                         <xforms:output ref="AAA"/>

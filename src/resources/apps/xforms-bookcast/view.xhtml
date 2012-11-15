@@ -95,9 +95,9 @@
                 </books>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('books-instance')/book">
-                <xforms:bind nodeset="title" required="true()"/>
-                <xforms:bind nodeset="author" required="true()"/>
+            <xforms:bind ref="instance('books-instance')/book">
+                <xforms:bind ref="title" required="true()"/>
+                <xforms:bind ref="author" required="true()"/>
             </xforms:bind>
 
             <xforms:instance id="book-template">
@@ -223,21 +223,21 @@
                 <td>
                     <xforms:trigger appearance="minimal">
                         <xforms:label><img src="/apps/xforms-bookcast/images/add.gif"/></xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
+                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="1" position="before" origin="instance('book-template')"/>
                     </xforms:trigger>
                 </td>
                 <td class="add-td">
                     <xforms:trigger appearance="minimal">
                         <xforms:label>Add One</xforms:label>
-                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="1" position="before" origin="instance('book-template')"/>
+                        <xforms:insert ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="1" position="before" origin="instance('book-template')"/>
                     </xforms:trigger>
                 </td>
             </tr>
-            <xforms:repeat nodeset="book" id="book-repeat">
+            <xforms:repeat ref="book" id="book-repeat">
                 <tr>
                     <td>
                         <xforms:trigger appearance="minimal">
-                            <xforms:delete ev:event="DOMActivate" context="instance('books-instance')" nodeset="book" at="index('book-repeat')"/>
+                            <xforms:delete ev:event="DOMActivate" context="instance('books-instance')" ref="book" at="index('book-repeat')"/>
                             <xforms:label><img src="/apps/xforms-bookcast/images/remove.gif"/></xforms:label>
                         </xforms:trigger>
                     </td>
@@ -258,7 +258,7 @@
                                 <xforms:label>Choose One...</xforms:label>
                                 <xforms:value/>
                             </xforms:item>
-                            <xforms:itemset nodeset="instance('languages-instance')/language">
+                            <xforms:itemset ref="instance('languages-instance')/language">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="value"/>
                             </xforms:itemset>
@@ -275,7 +275,7 @@
                                 <xforms:label>None</xforms:label>
                                 <xforms:value/>
                             </xforms:item>
-                            <xforms:itemset nodeset="instance('ratings-instance')/rating">
+                            <xforms:itemset ref="instance('ratings-instance')/rating">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="value"/>
                             </xforms:itemset>

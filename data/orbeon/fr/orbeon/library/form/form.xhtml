@@ -27,8 +27,8 @@
                 </form>
             </xforms:instance>
             <xforms:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds"
-                         nodeset="instance('fr-form-instance')">
-                <xforms:bind id="address-bind" nodeset="address" name="address">
+                         ref="instance('fr-form-instance')">
+                <xforms:bind id="address-bind" ref="address" name="address">
                     <xforms:bind xmlns:fb="http://orbeon.org/oxf/xml/form-builder" id="street-number-bind"
                                  name="street-number"
                                  required="true()"

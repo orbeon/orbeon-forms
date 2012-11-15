@@ -83,7 +83,7 @@
         <xforms:group id="external-group">
             <!-- Record all events -->
             <xforms:insert ev:event="#all"
-                           context="instance('events')" nodeset="*"
+                           context="instance('events')" ref="*"
                            origin="xxforms:element('event',
                                     (xxforms:attribute('type', event('xxforms:type')),
                                      xxforms:attribute('target', event('xxforms:targetid')),

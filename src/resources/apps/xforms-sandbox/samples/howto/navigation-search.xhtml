@@ -25,14 +25,14 @@
                     <select-trigger/>
                 </ui>
             </xforms:instance>
-            <xforms:bind nodeset="instance('ui')/select-trigger" readonly="instance('country')/country = ''"/>
+            <xforms:bind ref="instance('ui')/select-trigger" readonly="instance('country')/country = ''"/>
             
             <!-- List of all possible countries -->
             <xforms:instance id="all-countries" src="oxf:/apps/xforms-controls/services/countries.xml"/>
 
             <!-- Input instance, which we copy to the 'country' instance when the form loads -->
             <xforms:instance id="input" src="input:instance"/>
-            <xforms:insert ev:event="xforms-model-construct-done" nodeset="instance('country')/*" origin="instance('input')"/>
+            <xforms:insert ev:event="xforms-model-construct-done" ref="instance('country')/*" origin="instance('input')"/>
             
             <!-- Submission to go back to the main form -->
             <xforms:submission id="go-to-main" ref="instance('country')"  method="post" replace="all" resource="navigation-main"/>
@@ -49,7 +49,7 @@
         <!-- Field for country name -->
         <fr:autocomplete ref="country" dynamic-itemset="false" class="country-selection">
             <xforms:label>Search country</xforms:label>
-            <xforms:itemset nodeset="instance('all-countries')/country">
+            <xforms:itemset ref="instance('all-countries')/country">
                 <xforms:value ref="us-code"/>
                 <xforms:label ref="name"/>
             </xforms:itemset>

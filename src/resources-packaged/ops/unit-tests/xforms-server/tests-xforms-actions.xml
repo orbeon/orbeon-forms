@@ -129,7 +129,7 @@
 
                                     <!-- Show how you can easily reformat data from one instance to the other -->
                                     <xf:action ev:event="xforms-ready" iterate="instance('source-instance')/title">
-                                        <xf:insert context="instance('main-instance')" nodeset="book" origin="instance('template-instance')"/>
+                                        <xf:insert context="instance('main-instance')" ref="book" origin="instance('template-instance')"/>
                                         <!-- Make things a bit trickier by changing the context -->
                                         <xf:action context="context()/following-sibling::author">
                                             <xf:setvalue ref="instance('main-instance')/book[last()]/title" value="context()/preceding-sibling::title[1]"/>
@@ -204,7 +204,7 @@
                                 </xf:instance>
 
                                 <xf:action ev:event="xforms-ready" iterate="tokenize(substring-after(instance('url'), '?'), '&amp;')">
-                                    <xf:insert context="instance('name')" origin="instance('element-template')" nodeset="element"/>
+                                    <xf:insert context="instance('name')" origin="instance('element-template')" ref="element"/>
                                     <xf:setvalue ref="instance('name')/element[last()]/@name" value="substring-before(context(), '=')"/>
                                     <xf:setvalue ref="instance('name')/element[last()]" value="substring-after(context(), '=')"/>
                                 </xf:action>

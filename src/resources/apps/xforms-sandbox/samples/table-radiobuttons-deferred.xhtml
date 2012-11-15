@@ -50,7 +50,7 @@
                 <xhtml:th>Country</xhtml:th>
                 <xhtml:th>Code</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="instance('countries')/country[position() lt 20]">
+            <xforms:repeat ref="instance('countries')/country[position() lt 20]">
                 <xforms:var name="country" value="."/>
                 <xhtml:tr>
                     <xhtml:td>

@@ -31,7 +31,7 @@
                     <value2/>
                 </values>
             </xforms:instance>
-            <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+            <xforms:bind ref="value1" readonly="../value2 = '42'"/>
         </xforms:model>
         <xbl:xbl>
             <xbl:binding id="fr-super-control-binding" element="fr|super-control">
@@ -68,7 +68,7 @@
 
         <xhtml:hr/>
 
-        <xforms:repeat nodeset="value1 | value2">
+        <xforms:repeat ref="value1 | value2">
             <xhtml:div id="my-repeated-id">
                 <fr:super-control ref="." id="fr-super-control-3"/>
             </xhtml:div>

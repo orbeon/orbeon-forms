@@ -43,7 +43,7 @@
                 <xforms:label>Add new checkbox</xforms:label>
                 <xforms:action ev:event="DOMActivate">
                     <xforms:setvalue ref="instance('ui')/item" value=". + 1"/>
-                    <xforms:insert nodeset="instance('items')/item" origin="instance('ui')/item"/>
+                    <xforms:insert ref="instance('items')/item" origin="instance('ui')/item"/>
                     <xforms:setvalue ref="instance('ui')/selected" value="../item"/>                    
                 </xforms:action>
             </xforms:trigger>
@@ -53,7 +53,7 @@
                 <xforms:action ev:event="xforms-value-changed">
                     <xforms:setvalue ref="instance('ui')/operation" value="concat('Checkbox #', instance('ui')/selected, ' selected ', exists(event('xxforms:item-value')))"/>
                 </xforms:action>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="."/>
                     <xforms:value ref="."/>
                 </xforms:itemset>

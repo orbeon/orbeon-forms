@@ -574,7 +574,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             return false
 
         for (currentItem ← bindingContext.getNodeset.asScala) {
-            // If bound to non-node, consider as relevant (e.g. nodeset="(1 to 10)")
+            // If bound to non-node, consider as relevant (e.g. ref="(1 to 10)")
             if (! currentItem.isInstanceOf[NodeInfo])
                 return true
 

@@ -29,7 +29,7 @@
                     <upload/>
                 </triggers>
             </xforms:instance>
-            <xforms:bind nodeset="instance('triggers-instance')/upload" readonly="instance('files-instance')/@selected = 'false'"/>
+            <xforms:bind ref="instance('triggers-instance')/upload" readonly="instance('files-instance')/@selected = 'false'"/>
             <xforms:submission id="convert-submission" method="post" action="/xforms-tidy/convert" replace="all"/>
         </xforms:model>
         <style type="text/css">

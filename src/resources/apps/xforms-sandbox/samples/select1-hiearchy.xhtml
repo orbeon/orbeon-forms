@@ -78,7 +78,7 @@
         <xhtml:p>
             <xforms:select1 ref="value1" appearance="minimal">
                 <xforms:label>Select: </xforms:label>
-                <xforms:itemset nodeset="instance('items-instance')//item">
+                <xforms:itemset ref="instance('items-instance')//item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -140,7 +140,7 @@
                         <xforms:label>Pistachio</xforms:label>
                         <xforms:value>p</xforms:value>
                     </xforms:item>
-                    <xforms:itemset nodeset="instance('flavors-instance')/flavor">
+                    <xforms:itemset ref="instance('flavors-instance')/flavor">
                         <xforms:label ref="label"/>
                         <xforms:value ref="@value"/>
                     </xforms:itemset>
@@ -151,7 +151,7 @@
                         <xforms:label>USPS</xforms:label>
                         <xforms:value>usps</xforms:value>
                     </xforms:item>
-                    <xforms:itemset nodeset="instance('carriers-instance')/carrier">
+                    <xforms:itemset ref="instance('carriers-instance')/carrier">
                         <xforms:label ref="label"/>
                         <xforms:value ref="@value"/>
                     </xforms:itemset>

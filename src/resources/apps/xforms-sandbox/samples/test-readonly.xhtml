@@ -20,8 +20,8 @@
                 </instance2>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('instance1')">
-                <xforms:bind nodeset="//*" readonly="true()"/>
+            <xforms:bind ref="instance('instance1')">
+                <xforms:bind ref="//*" readonly="true()"/>
             </xforms:bind>
 
         </xforms:model>

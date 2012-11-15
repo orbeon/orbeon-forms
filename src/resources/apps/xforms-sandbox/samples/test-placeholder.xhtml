@@ -32,11 +32,11 @@
         <xhtml:div>
             <xforms:trigger id="add" class="add">
                 <xforms:label>Add</xforms:label>
-                <xforms:insert ev:event="DOMActivate" nodeset="iteration"/>
+                <xforms:insert ev:event="DOMActivate" ref="iteration"/>
             </xforms:trigger>
             <xforms:trigger id="remove" class="remove">
                 <xforms:label>Remove</xforms:label>
-                <xforms:delete ev:event="DOMActivate" nodeset="iteration[last()]"/>
+                <xforms:delete ev:event="DOMActivate" ref="iteration[last()]"/>
             </xforms:trigger>
         </xhtml:div>
         <xforms:repeat ref="iteration">

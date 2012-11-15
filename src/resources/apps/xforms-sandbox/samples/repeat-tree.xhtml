@@ -36,11 +36,11 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="fruit" id="fruit">
+        <xforms:repeat ref="fruit" id="fruit">
             <xhtml:div>
                 <xforms:select1 ref="selected-type" id="type-of-fruit" appearance="xxforms:tree">
                     <xforms:label>Type: </xforms:label>
-                    <xforms:itemset nodeset="../type">
+                    <xforms:itemset ref="../type">
                         <xforms:label ref="."/>
                         <xforms:value ref="."/>
                     </xforms:itemset>
@@ -49,11 +49,11 @@
         </xforms:repeat>
         <xforms:trigger>
             <xforms:label>Add fruit</xforms:label>
-            <xforms:insert nodeset="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
+            <xforms:insert ref="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Remove fruit</xforms:label>
-            <xforms:delete nodeset="fruit" at="index('fruit')" ev:event="DOMActivate"/>
+            <xforms:delete ref="fruit" at="index('fruit')" ev:event="DOMActivate"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

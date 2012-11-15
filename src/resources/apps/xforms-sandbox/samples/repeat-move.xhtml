@@ -34,7 +34,7 @@
     <xhtml:body>
 
         <xhtml:table>
-            <xforms:repeat nodeset="orange">
+            <xforms:repeat ref="orange">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:input ref=".">
@@ -45,8 +45,8 @@
                         <xforms:trigger ref=".[preceding-sibling::*]">
                             <xforms:label>Up</xforms:label>
                             <xforms:action ev:event="DOMActivate">
-                                <xforms:insert origin="context()" nodeset="preceding-sibling::*[1]" position="before"/>
-                                <xforms:delete nodeset="."/>
+                                <xforms:insert origin="context()" ref="preceding-sibling::*[1]" position="before"/>
+                                <xforms:delete ref="."/>
                             </xforms:action>
                         </xforms:trigger>
                     </xhtml:td>
@@ -54,8 +54,8 @@
                         <xforms:trigger ref=".[following-sibling::*]">
                             <xforms:label>Down</xforms:label>
                             <xforms:action ev:event="DOMActivate">
-                                <xforms:insert origin="context()" nodeset="following-sibling::*[1]"/>
-                                <xforms:delete nodeset="."/>
+                                <xforms:insert origin="context()" ref="following-sibling::*[1]"/>
+                                <xforms:delete ref="."/>
                             </xforms:action>
                         </xforms:trigger>
                     </xhtml:td>

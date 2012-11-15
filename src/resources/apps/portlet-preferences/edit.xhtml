@@ -26,9 +26,9 @@
             <xforms:instance id="preferences">
                 <xi:include href="input:data" xxi:omit-xml-base="true"/>
             </xforms:instance>
-            <xforms:bind nodeset="preference">
-                <xforms:bind nodeset="name" type="xs:NCName" required="true()"/>
-                <xforms:bind nodeset="value" type="xs:string" required="true()"/>
+            <xforms:bind ref="preference">
+                <xforms:bind ref="name" type="xs:NCName" required="true()"/>
+                <xforms:bind ref="value" type="xs:string" required="true()"/>
             </xforms:bind>
             <xforms:instance id="preference-template">
                 <preference xmlns="">
@@ -59,20 +59,20 @@
                     <xforms:trigger appearance="minimal">
                         <xforms:label><img src="/apps/portlet-preferences/images/add.gif"/></xforms:label>
                         <xforms:insert ev:event="DOMActivate" context="instance('preferences')"
-                                       nodeset="preference" origin="instance('preference-template')"
+                                       ref="preference" origin="instance('preference-template')"
                                        at="index('preference-repeat')"/>
                     </xforms:trigger>
                 </td>
                 <th>Preference Name</th>
                 <th>Preference Values</th>
             </tr>
-            <xforms:repeat nodeset="instance('preferences')/preference" id="preference-repeat">
+            <xforms:repeat ref="instance('preferences')/preference" id="preference-repeat">
                 <tr>
                     <td>
                         <xforms:trigger appearance="minimal">
                             <xforms:label><img src="/apps/portlet-preferences/images/remove.gif" alt="Remove"/></xforms:label>
                             <xforms:delete ev:event="DOMActivate" context="instance('preferences')"
-                                           nodeset="preference" ad="index('preference-repeat')"/>
+                                           ref="preference" ad="index('preference-repeat')"/>
                         </xforms:trigger>
                     </td>
                     <td style="white-space: nowrap">

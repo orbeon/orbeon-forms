@@ -99,7 +99,7 @@
                     <xf:action if="$form-data">
                         <xf:message level="xxf:log-debug">Loading data submitted to the page as parameter</xf:message>
                         <xf:var name="xml-data" value="saxon:parse(saxon:base64Binary-to-string(xs:base64Binary($form-data), 'UTF-8'))"/>
-                        <xf:insert nodeset="xxf:instance('fr-form-instance')" origin="$xml-data"/>
+                        <xf:insert ref="xxf:instance('fr-form-instance')" origin="$xml-data"/>
                     </xf:action>
                 </xf:action>
 
@@ -107,7 +107,7 @@
                 <xf:action if="$is-xml-submit">
                     <xf:message level="xxf:log-debug">Loading data submitted to the page as XML</xf:message>
                     <xf:var name="form-data" value="xxf:get-request-attribute('fr-form-data')" as="document-node()?"/>
-                    <xf:insert nodeset="xxf:instance('fr-form-instance')" origin="$form-data"/>
+                    <xf:insert ref="xxf:instance('fr-form-instance')" origin="$form-data"/>
                 </xf:action>
 
                 <!-- Set initial data as dirty, because this is the case typically of switching between script/noscript
@@ -164,7 +164,7 @@
     <!-- Clear operation -->
     <xf:action ev:event="fr-clear">
         <!-- Case of inline template -->
-        <xf:insert nodeset="xxf:instance('fr-form-instance')" origin="instance('fr-initial-instance')"/>
+        <xf:insert ref="xxf:instance('fr-form-instance')" origin="instance('fr-initial-instance')"/>
 
         <!-- Notify that the data is reset -->
         <xf:dispatch targetid="fr-form-model" name="fr-data-reset"/>
@@ -430,9 +430,9 @@
         </save>
     </xf:instance>
 
-    <xf:bind nodeset="$persistence-instance">
-        <xf:bind nodeset="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
-        <xf:bind nodeset="captcha" constraint=". = 'true'"/>
+    <xf:bind ref="$persistence-instance">
+        <xf:bind ref="data-safe" calculate="../data-status = 'clean' or ../data-safe-override = 'true'"/>
+        <xf:bind ref="captcha" constraint=". = 'true'"/>
     </xf:bind>
 
     <!-- Configuration for Saxon serialization -->
@@ -461,26 +461,26 @@
         </triggers>
     </xf:instance>
 
-    <xf:bind nodeset="instance('fr-triggers-instance')">
+    <xf:bind ref="instance('fr-triggers-instance')">
         <!--
             NOTE: Don't disable basic save/submit buttons so that user can always press it. This arguably yields a
             better experience in non-incremental mode and also allows user to force showing errors.
         -->
 
         <!-- Condition for disabling strict Save button -->
-        <xf:bind nodeset="strict-save" readonly="not(property('xxf:noscript'))
+        <xf:bind ref="strict-save" readonly="not(property('xxf:noscript'))
             and ($persistence-instance/data-status = 'clean' or xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0)"/>
         <!-- Condition for disabling strict Submit button -->
-        <xf:bind nodeset="strict-submit" readonly="not(property('xxf:noscript'))
+        <xf:bind ref="strict-submit" readonly="not(property('xxf:noscript'))
             and (xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0)"/>
 
         <!-- Condition for disabling Publish button -->
-        <xf:bind nodeset="publish" readonly="not($persistence-instance/data-status = 'clean') or xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0"/>
+        <xf:bind ref="publish" readonly="not($persistence-instance/data-status = 'clean') or xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0"/>
 
         <!-- Conditions for disabling workflow buttons -->
-        <xf:bind nodeset="workflow-review" readonly="exf:readonly(../submit)"/>
-        <xf:bind nodeset="workflow-edit" readonly="exf:readonly(../submit)"/>
-        <xf:bind nodeset="workflow-send" readonly="exf:readonly(../submit)"/>
+        <xf:bind ref="workflow-review" readonly="exf:readonly(../submit)"/>
+        <xf:bind ref="workflow-edit" readonly="exf:readonly(../submit)"/>
+        <xf:bind ref="workflow-send" readonly="exf:readonly(../submit)"/>
     </xf:bind>
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity

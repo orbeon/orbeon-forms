@@ -51,7 +51,7 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-            <xforms:itemset nodeset="instance('encyclopedia-instance')//item" class="{if (@folder = 'true') then 'node-folder' else 'node-document'}">
+            <xforms:itemset ref="instance('encyclopedia-instance')//item" class="{if (@folder = 'true') then 'node-folder' else 'node-document'}">
                 <xforms:label ref="@label"/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>

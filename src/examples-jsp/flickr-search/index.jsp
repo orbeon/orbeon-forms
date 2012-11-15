@@ -48,7 +48,7 @@
             </xforms:group>
         </xhtml:div>
         <xhtml:div>
-            <xforms:repeat nodeset="photo[position() le 50]">
+            <xforms:repeat ref="photo[position() le 50]">
                 <xhtml:a href="{@page}">
                     <xhtml:img class="flickr-image" src="{@url}"/>
                 </xhtml:a>

@@ -30,7 +30,7 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="node" id="nodes">
+        <xforms:repeat ref="node" id="nodes">
             <xhtml:div>
                 <xhtml:div>
                     <xforms:input id="input" ref="." incremental="true" style="width: 20em">
@@ -44,7 +44,7 @@
         </xforms:repeat>
         <xforms:trigger>
             <xforms:label>Add line</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

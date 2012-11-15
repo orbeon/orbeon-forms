@@ -92,26 +92,26 @@
                 <document xmlns=""/>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('source-files-instance')">
+            <xforms:bind ref="instance('source-files-instance')">
                 <!-- Make sure there are no backslashes in file names -->
-                <xforms:bind nodeset=".//file/@path" calculate="replace(., '\\', '/')"/>
+                <xforms:bind ref=".//file/@path" calculate="replace(., '\\', '/')"/>
                 <!-- Make current trigger read-only -->
-                <xforms:bind nodeset=".//file/@path" readonly=". = instance('source-request-instance')/source-url"/>
+                <xforms:bind ref=".//file/@path" readonly=". = instance('source-request-instance')/source-url"/>
             </xforms:bind>
 
-            <xforms:bind nodeset="instance('source-request-instance')">
-                <xforms:bind nodeset="application-id" calculate="instance('parameters-instance')/application-id"/>
-                <xforms:bind nodeset="source-url" calculate="if (. = '' and instance('parameters-instance')/source-url != '')
+            <xforms:bind ref="instance('source-request-instance')">
+                <xforms:bind ref="application-id" calculate="instance('parameters-instance')/application-id"/>
+                <xforms:bind ref="source-url" calculate="if (. = '' and instance('parameters-instance')/source-url != '')
                                                              then instance('parameters-instance')/source-url
                                                              else (instance('source-files-instance')//file)[index('files-repeat')]/@path"/>
-                <xforms:bind nodeset="mediatype"
+                <xforms:bind ref="mediatype"
                              calculate="if (instance('control-instance')/show-xml = 'false' or ends-with(../source-url, '.txt') or ends-with(../source-url, '.java'))
                                         then 'text/plain' else 'application/xml'"/>
             </xforms:bind>
 
-            <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="xml-trigger" readonly="../show-xml = 'true'"/>
-                <xforms:bind nodeset="text-trigger" readonly="not(../show-xml = 'true')"/>
+            <xforms:bind ref="instance('control-instance')">
+                <xforms:bind ref="xml-trigger" readonly="../show-xml = 'true'"/>
+                <xforms:bind ref="text-trigger" readonly="not(../show-xml = 'true')"/>
             </xforms:bind>
 
             <xforms:submission id="request-source-submission" ref="instance('source-request-instance')" method="get" separator="&amp;"
@@ -132,7 +132,7 @@
                 <td>
                     <xforms:select1 ref="instance('parameters-instance')/application-id">
                         <xforms:label>Application:</xforms:label>
-                        <xforms:itemset nodeset="instance('apps-list-instance')//(section|application)">
+                        <xforms:itemset ref="instance('apps-list-instance')//(section|application)">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@id"/>
                         </xforms:itemset>
@@ -191,7 +191,7 @@
                     <table>
                         <xforms:group>
                             <xforms:dispatch ev:event="DOMFocusIn" name="ops-format-source" target="main-model"/>
-                            <xforms:repeat nodeset="instance('source-files-instance')//file" id="files-repeat">
+                            <xforms:repeat ref="instance('source-files-instance')//file" id="files-repeat">
                                 <tr>
                                     <td style="white-space: nowrap">
                                         <xforms:trigger ref="@path" appearance="minimal">

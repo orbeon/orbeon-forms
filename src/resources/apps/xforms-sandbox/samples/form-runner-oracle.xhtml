@@ -99,7 +99,7 @@
             <xforms:action ev:event="xforms-model-construct-done">
                 <xforms:setvalue ref="instance('query')//sql:datasource" value="xxforms:property('oxf.fr.persistence.service.oracle.datasource')"/>
                 <!-- page-flow.xml used as a dummy document, as the pipeline comes from the 'run-sql' instance. -->
-                <xforms:insert nodeset="instance('books')" origin="xxforms:call-xpl('oxf:/page-flow.xml',
+                <xforms:insert ref="instance('books')" origin="xxforms:call-xpl('oxf:/page-flow.xml',
                     ('config', 'data', 'sql-config'), (instance('run-sql'), instance('dummy'), instance('query')), 'data')"/>
             </xforms:action>
         </xforms:model>
@@ -114,7 +114,7 @@
                 <xhtml:th>Author</xhtml:th>
                 <xhtml:th>Title</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="/books/book">
+            <xforms:repeat ref="/books/book">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output ref="document-id"/>

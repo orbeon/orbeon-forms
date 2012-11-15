@@ -46,9 +46,9 @@
                     <remove-upload-trigger/>
                 </control>
             </xforms:instance>
-            <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="add-upload-trigger" readonly="false()"/>
-                <xforms:bind nodeset="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
+            <xforms:bind ref="instance('control-instance')">
+                <xforms:bind ref="add-upload-trigger" readonly="false()"/>
+                <xforms:bind ref="remove-upload-trigger" readonly="count(instance('files-instance')/file) le 1"/>
             </xforms:bind>
             <!-- Main submission which uploads the files
                  This would be nice but is blocked by Firefox: xxforms:target="_blank" xxforms:show-progress="false"
@@ -80,7 +80,7 @@
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
                         <xforms:trigger appearance="minimal">
                             <xforms:label><xhtml:img src="../apps/xforms-upload/images/add.gif"/></xforms:label>
-                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" nodeset="file" at="last()" position="after" origin="instance('file-template')"/>
+                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" ref="file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>
@@ -88,7 +88,7 @@
                     <xforms:group ref="instance('control-instance')/add-upload-trigger">
                         <xforms:trigger appearance="minimal">
                             <xforms:label>Add One</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" nodeset="file" at="last()" position="after" origin="instance('file-template')"/>
+                            <xforms:insert ev:event="DOMActivate" context="instance('files-instance')" ref="file" at="last()" position="after" origin="instance('file-template')"/>
                         </xforms:trigger>
                     </xforms:group>
                 </td>
@@ -96,7 +96,7 @@
                     <xforms:group ref=".[(for $m in file/@mediatype return starts-with($m, 'image/')) = true()]">Image</xforms:group>
                 </th>
             </tr>
-            <xforms:repeat nodeset="file" id="file-repeat">
+            <xforms:repeat ref="file" id="file-repeat">
                 <tr>
                     <td>
                         <xforms:output value="count(preceding-sibling::file) + 1"/>
@@ -105,7 +105,7 @@
                         <xforms:group ref="instance('control-instance')/remove-upload-trigger" id="remove-group">
                             <xforms:trigger appearance="minimal" id="remove-trigger">
                                 <xforms:label><xhtml:img src="../apps/xforms-upload/images/remove.gif"/></xforms:label>
-                                <xforms:delete ev:event="DOMActivate" nodeset="instance('files-instance')/file" at="index('file-repeat')"/>
+                                <xforms:delete ev:event="DOMActivate" ref="instance('files-instance')/file" at="index('file-repeat')"/>
                             </xforms:trigger>
                         </xforms:group>
                     </td>

@@ -29,7 +29,7 @@
                     <users/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/users" calculate="(../process-time + ../wait-time * 1000) div ../process-time"/>
+            <xforms:bind ref="/instance/users" calculate="(../process-time + ../wait-time * 1000) div ../process-time"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

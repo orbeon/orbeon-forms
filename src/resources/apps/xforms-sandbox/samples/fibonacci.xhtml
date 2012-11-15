@@ -32,7 +32,7 @@
                     <counter/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/total" constraint=". castable as xs:integer and . >= 2"/>
+            <xforms:bind ref="/instance/total" constraint=". castable as xs:integer and . >= 2"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

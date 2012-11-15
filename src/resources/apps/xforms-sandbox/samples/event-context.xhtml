@@ -47,15 +47,15 @@
             <xforms:setvalue ev:event="DOMFocusOut" ref="dom-focus-out-target" value="event('xxforms:targetid')"/>
             <xforms:setvalue ev:event="xforms-value-changed" ref="value-changed-target" value="event('xxforms:targetid')"/>
             <xforms:action ev:event="DOMFocusIn">
-                <xforms:insert context="event-names" nodeset="event-name"/>
+                <xforms:insert context="event-names" ref="event-name"/>
                 <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
             </xforms:action>
             <xforms:action ev:event="DOMFocusOut">
-                <xforms:insert context="event-names" nodeset="event-name"/>
+                <xforms:insert context="event-names" ref="event-name"/>
                 <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
             </xforms:action>
             <xforms:action ev:event="xforms-value-changed">
-                <xforms:insert context="event-names" nodeset="event-name"/>
+                <xforms:insert context="event-names" ref="event-name"/>
                 <xforms:setvalue ref="event-names/event-name[last() - 1]" value="event('xxforms:type')"/>
             </xforms:action>
             <xhtml:p>
@@ -96,14 +96,14 @@
                     <xforms:label>xforms-value-changed:</xforms:label>
                 </xforms:output>
             </xhtml:p>
-            <xforms:repeat nodeset="children/child">
+            <xforms:repeat ref="children/child">
                 <xhtml:div>
                     <xforms:input ref="." id="child-control">
                         <xforms:label>Child:</xforms:label>
                     </xforms:input>
                 </xhtml:div>
             </xforms:repeat>
-            <xforms:repeat nodeset="event-names/event-name[position() != last()]" id="event-names-repeat">
+            <xforms:repeat ref="event-names/event-name[position() != last()]" id="event-names-repeat">
                 <xhtml:div>
                     <xforms:output ref="." id="event-name-control">
                         <xforms:label>Event name:</xforms:label>

@@ -46,7 +46,7 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:select1 ref="instance('instance')/cat:BuyersID">
-            <xforms:itemset nodeset="instance('choices')/choice">
+            <xforms:itemset ref="instance('choices')/choice">
                 <xforms:label ref="."/>
                 <xforms:value ref="@value"/>
             </xforms:itemset>

@@ -55,7 +55,7 @@
                                             <second>0</second>
                                         </other-instance>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="instance('instance2')/first" calculate="314"/>
+                                    <xforms:bind ref="instance('instance2')/first" calculate="314"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
@@ -141,11 +141,11 @@
                                 <fourth/>
                             </other-instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="instance('instance2')/first"
+                        <xforms:bind ref="instance('instance2')/first"
                             calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
-                        <xforms:bind nodeset="instance('instance2')/second"
+                        <xforms:bind ref="instance('instance2')/second"
                             calculate="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance1'), 'result')/*/second"/>
-                        <xforms:bind nodeset="/*/screen"
+                        <xforms:bind ref="/*/screen"
                             constraint="false()"/>
 
                         <xforms:dispatch ev:event="xforms-ready" name="DOMActivate" targetid="3"/>
@@ -264,7 +264,7 @@
                                         <xforms:label>Select...</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="instance('items')/item">
+                                    <xforms:itemset ref="instance('items')/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>
@@ -356,12 +356,12 @@
                             </xhtml:head>
                             <xhtml:body>
 
-                                <xforms:repeat id="my-repeat" nodeset="*">
+                                <xforms:repeat id="my-repeat" ref="*">
                                     <xforms:var name="position" value="position()" as="xs:integer"/>
                                     <xforms:group id="my-group" ref="..">
                                         <xforms:action ev:event="xforms-enabled">
                                             <!-- Test use in actions -->
-                                            <xforms:insert context="instance('result')" nodeset="*"
+                                            <xforms:insert context="instance('result')" ref="*"
                                                            origin="xxforms:element('repeat-current', (xxforms:attribute('position', $position),
                                                                                                       xxforms:attribute('repeat-current-1', xxforms:repeat-current()),
                                                                                                       xxforms:attribute('repeat-current-2', xxforms:repeat-current('my-repeat')),
@@ -554,17 +554,17 @@
                             <xhtml:body>
                                 <xforms:var name="lookup-records" value="instance('lookup-instance')/record" as="element(record)+"/>
                                 <!-- Sort expression with variable and use of instance() -->
-                                <xforms:repeat id="exforms-sort-repeat" nodeset="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
+                                <xforms:repeat id="exforms-sort-repeat" ref="exf:sort(record, 'for  $code in @code return instance(''lookup-instance'')/record[@code = $code]', 'text', 'descending')">
                                     <xforms:output id="exforms-sort-output" value="for $code in @code return instance('lookup-instance')/record[@code=$code]"/>
                                 </xforms:repeat>
-                                <xforms:repeat id="xxforms-sort-repeat" nodeset="xxforms:sort(record, for $code in @code return instance('lookup-instance')/record[@code = $code], 'text', 'descending')">
+                                <xforms:repeat id="xxforms-sort-repeat" ref="xxforms:sort(record, for $code in @code return instance('lookup-instance')/record[@code = $code], 'text', 'descending')">
                                     <xforms:output id="xxforms-sort-output" value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                                 </xforms:repeat>
                                 <!-- Sort expression with variable and use of variables -->
-                                <xforms:repeat id="exforms-sort-v-repeat" nodeset="exf:sort(record, 'for  $code in @code return $lookup-records[@code = $code]', 'text', 'descending')">
+                                <xforms:repeat id="exforms-sort-v-repeat" ref="exf:sort(record, 'for  $code in @code return $lookup-records[@code = $code]', 'text', 'descending')">
                                     <xforms:output id="exforms-sort-v-output" value="for $code in @code return instance('lookup-instance')/record[@code=$code]"/>
                                 </xforms:repeat>
-                                <xforms:repeat id="xxforms-sort-v-repeat" nodeset="xxforms:sort(record, for $code in @code return $lookup-records[@code = $code], 'text', 'descending')">
+                                <xforms:repeat id="xxforms-sort-v-repeat" ref="xxforms:sort(record, for $code in @code return $lookup-records[@code = $code], 'text', 'descending')">
                                     <xforms:output id="xxforms-sort-v-output" value="for $code in @code return instance('lookup-instance')/record[@code = $code]"/>
                                 </xforms:repeat>
                             </xhtml:body>
@@ -627,7 +627,7 @@
                     <xforms:output id="output1" value="xxforms:evaluate-avt('state={state}')"/>
                     <xforms:var name="city" value="city"/>
                     <xforms:output id="output2" value="xxforms:evaluate-avt('state={state}&amp;city={$city}')"/>
-                    <xforms:repeat id="repeat" nodeset="*">
+                    <xforms:repeat id="repeat" ref="*">
                         <xforms:output id="output3" value="xxforms:evaluate-avt('position={position()}&amp;index={index(''repeat'')}')"/>
                     </xforms:repeat>
                 </xhtml:body>
@@ -989,7 +989,7 @@
 
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat nodeset="choose(count(dogs/dog) &gt; count(cats/cat), dogs/dog, cats/cat)">
+                    <xforms:repeat ref="choose(count(dogs/dog) &gt; count(cats/cat), dogs/dog, cats/cat)">
                         <xforms:output ref="@name">
                             <xforms:label>Nodeset : </xforms:label>
                         </xforms:output>
@@ -1201,7 +1201,7 @@
                             </xforms:instance>
                         </xforms:instance>
 
-                        <xforms:insert ev:event="xforms-ready" nodeset="value" at="last()" position="before"
+                        <xforms:insert ev:event="xforms-ready" ref="value" at="last()" position="before"
                                        origin="xxforms:element('value', 44)"/>
 
                     </xforms:model>

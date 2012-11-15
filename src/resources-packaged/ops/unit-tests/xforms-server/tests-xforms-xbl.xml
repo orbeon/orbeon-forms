@@ -128,14 +128,14 @@
                                             <date>2008-02-01</date>
                                         </instance>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
+                                    <xforms:bind ref="date1 | date2" type="xforms:date"/>
 
                                     <!-- TEST: Action to take on xforms-ready -->
                                     <xforms:action ev:event="xforms-ready">
                                         <!-- Tricky: add second refresh because first refresh causes a series of values set into nested components -->
                                         <xforms:refresh/>
                                         <xforms:refresh/>
-                                        <xforms:delete nodeset="instance('events')/*"/>
+                                        <xforms:delete ref="instance('events')/*"/>
                                         <xforms:dispatch name="DOMActivate" target="add-row-trigger"/>
                                     </xforms:action>
 
@@ -178,11 +178,11 @@
                                                     </xforms:action>
                                                     <xforms:action iterate="(1 to 3)">
                                                         <xforms:var name="month" value="." as="xs:string"/>
-                                                        <xforms:insert context="instance('months-itemset')" nodeset="*" origin="xxforms:element('month', $month)"/>
+                                                        <xforms:insert context="instance('months-itemset')" ref="*" origin="xxforms:element('month', $month)"/>
                                                     </xforms:action>
                                                     <xforms:action iterate="(1 to 3)">
                                                         <xforms:var name="day" value="." as="xs:string"/>
-                                                        <xforms:insert context="instance('days-itemset')" nodeset="*" origin="xxforms:element('day', $day)"/>
+                                                        <xforms:insert context="instance('days-itemset')" ref="*" origin="xxforms:element('day', $day)"/>
                                                     </xforms:action>
                                                 </xforms:action>
                                             </xforms:model>
@@ -212,7 +212,7 @@
                                                                 <xforms:label>Year</xforms:label>
                                                                 <xforms:value/>
                                                             </xforms:item>
-                                                            <xforms:itemset nodeset="instance('years-itemset')/year">
+                                                            <xforms:itemset ref="instance('years-itemset')/year">
                                                                 <xforms:label ref="."/>
                                                                 <xforms:value ref="."/>
                                                             </xforms:itemset>
@@ -222,7 +222,7 @@
                                                                 <xforms:label>Month</xforms:label>
                                                                 <xforms:value/>
                                                             </xforms:item>
-                                                            <xforms:itemset nodeset="instance('months-itemset')/month">
+                                                            <xforms:itemset ref="instance('months-itemset')/month">
                                                                 <xforms:label ref="."/>
                                                                 <xforms:value ref="."/>
                                                             </xforms:itemset>
@@ -232,7 +232,7 @@
                                                                 <xforms:label>Day</xforms:label>
                                                                 <xforms:value/>
                                                             </xforms:item>
-                                                            <xforms:itemset nodeset="instance('days-itemset')/day">
+                                                            <xforms:itemset ref="instance('days-itemset')/day">
                                                                 <xforms:label ref="."/>
                                                                 <xforms:value ref="."/>
                                                             </xforms:itemset>
@@ -261,13 +261,13 @@
                                     <!-- TEST: Event listener -->
                                     <xforms:insert ev:event="xforms-value-changed xforms-enabled xforms-disabled"
                                                    xxforms:phantom="true"
-                                                   context="instance('events')" nodeset="*"
+                                                   context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
                                                              xxforms:attribute('indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
-                                    <xforms:repeat nodeset="date" id="date-repeat">
+                                    <xforms:repeat ref="date" id="date-repeat">
                                         <fr:dropdown-date ref="." id="fr-dropdown-date">
                                             <xforms:label>Date: </xforms:label>
                                         </fr:dropdown-date>
@@ -275,12 +275,12 @@
 
                                     <xforms:trigger id="add-row-trigger">
                                         <xforms:label>Add</xforms:label>
-                                        <xforms:insert ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
+                                        <xforms:insert ev:event="DOMActivate" ref="date" at="index('date-repeat')"/>
                                     </xforms:trigger>
 
                                     <xforms:trigger id="remove-row-trigger">
                                         <xforms:label>Remove</xforms:label>
-                                        <xforms:delete ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
+                                        <xforms:delete ev:event="DOMActivate" ref="date" at="index('date-repeat')"/>
                                     </xforms:trigger>
                                 </xforms:group>
 
@@ -458,7 +458,7 @@
                                             <value2>bar-value</value2>
                                         </values>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+                                    <xforms:bind ref="value1" readonly="../value2 = '42'"/>
                                 </xforms:model>
                                 <xbl:xbl>
                                     <xbl:binding id="fr-super-control-binding" element="fr|super-control">
@@ -472,9 +472,9 @@
                                                 </xforms:instance>
                                                 <!-- TEST: The variable below must be found and not cause an error -->
                                                 <xforms:var name="ctx" context="xxforms:component-context()" xbl:attr="value=ref" as="node()*"/>
-                                                <xforms:bind nodeset="value" readonly="exf:readonly($ctx)"/>
+                                                <xforms:bind ref="value" readonly="exf:readonly($ctx)"/>
                                                 <!-- TEST: The variable must point to the outer element -->
-                                                <xforms:bind nodeset="name" calculate="name($ctx[1])"/>
+                                                <xforms:bind ref="name" calculate="name($ctx[1])"/>
                                             </xforms:model>
 
                                             <xforms:group xbl:attr="model context ref bind" xxbl:scope="outer">
@@ -767,7 +767,7 @@
                                             <value2>font-weight: bold</value2>
                                         </values>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="value1" readonly="../value2 = '42'"/>
+                                    <xforms:bind ref="value1" readonly="../value2 = '42'"/>
                                 </xforms:model>
                                 <xbl:xbl>
                                     <xbl:binding id="fr-super-control-binding" element="fr|super-control">
@@ -787,7 +787,7 @@
 
                                 <fr:super-control ref="value1" id="fr-super-control-1"/>
                                 <fr:super-control ref="value2" id="fr-super-control-2"/>
-                                <xforms:repeat id="repeat" nodeset="value1 | value2">
+                                <xforms:repeat id="repeat" ref="value1 | value2">
                                     <xhtml:div id="my-repeated-id">
                                         <fr:super-control ref="." id="fr-super-control-3"/>
                                     </xhtml:div>
@@ -888,7 +888,7 @@
                                 <xforms:group id="external-group">
                                     <!-- Record all events -->
                                     <xforms:insert ev:event="#all"
-                                                   context="instance('events')" nodeset="*"
+                                                   context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
@@ -898,7 +898,7 @@
                                                              xxforms:attribute('original-indexes', string-join(event('xxforms:repeat-indexes'), ' '))))"/>
 
                                     <xforms:insert ev:event="#all" ev:phase="capture"
-                                                   context="instance('events')" nodeset="*"
+                                                   context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
@@ -1043,7 +1043,7 @@
                                     </xforms:instance>
 
                                     <!-- Insert globally upon ready -->
-                                    <xforms:insert ev:event="xforms-ready" nodeset="instance('instance')/record" at="1"/>
+                                    <xforms:insert ev:event="xforms-ready" ref="instance('instance')/record" at="1"/>
 
                                 </xforms:model>
 
@@ -1065,7 +1065,7 @@
                                                     </instance>
                                                 </xforms:instance>
                                                 <!-- Insert locally upon xforms-enabled of the group -->
-                                                <xforms:insert ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group" nodeset="instance('instance')/record" at="1"/>
+                                                <xforms:insert ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group" ref="instance('instance')/record" at="1"/>
                                             </xforms:model>
                                             <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
                                                 <xbl:content/>
@@ -1077,20 +1077,20 @@
                             <xhtml:body>
 
                                 <!-- Without XBL (update to global instance) -->
-                                <xforms:repeat nodeset="record" id="repeat-no-xbl">
+                                <xforms:repeat ref="record" id="repeat-no-xbl">
                                     <xforms:output id="my-output" value="index('repeat-no-xbl')"/>
                                 </xforms:repeat>
 
                                 <!-- With XBL (update to global instance) -->
                                 <fr:foo id="my-foo">
-                                    <xforms:repeat nodeset="record" id="repeat-xbl-foo">
+                                    <xforms:repeat ref="record" id="repeat-xbl-foo">
                                         <xforms:output id="my-output-foo" value="index('repeat-xbl-foo')"/>
                                     </xforms:repeat>
                                 </fr:foo>
 
                                 <!-- With XBL (update to local instance) -->
                                 <fr:bar id="my-bar">
-                                    <xforms:repeat nodeset="record" id="repeat-xbl-bar">
+                                    <xforms:repeat ref="record" id="repeat-xbl-bar">
                                         <xforms:output id="my-output-bar" value="index('repeat-xbl-bar')"/>
                                     </xforms:repeat>
                                 </fr:bar>
@@ -1160,7 +1160,7 @@
 
                                     <xforms:action ev:event="xforms-ready">
                                         <!-- Insert one element, this takes index to 2 -->
-                                        <xforms:insert nodeset="instance('instance')/record" at="1"/>
+                                        <xforms:insert ref="instance('instance')/record" at="1"/>
                                         <xforms:refresh/>
                                         <!-- Dispatch repeat focus to change the index back to 1 -->
                                         <xforms:dispatch name="xxforms-repeat-activate" target="my-output" xxforms:repeat-indexes="1"/>
@@ -1187,8 +1187,8 @@
                                                 </xforms:instance>
                                                 <xforms:action ev:event="xforms-model-construct-done">
                                                     <!-- Insert two element, this takes index to 3 -->
-                                                    <xforms:insert nodeset="instance('instance')/record"/>
-                                                    <xforms:insert nodeset="instance('instance')/record"/>
+                                                    <xforms:insert ref="instance('instance')/record"/>
+                                                    <xforms:insert ref="instance('instance')/record"/>
                                                 </xforms:action>
                                                 <xforms:action ev:event="xforms-enabled" ev:observer="bar-group" ev:target="bar-group">
                                                     <!-- Dispatch repeat focus to change the index back to 2 -->
@@ -1205,20 +1205,20 @@
                             </xhtml:head>
                             <xhtml:body>
                                 <!-- Without XBL (update to global instance) -->
-                                <xforms:repeat nodeset="record" id="repeat-no-xbl">
+                                <xforms:repeat ref="record" id="repeat-no-xbl">
                                     <xforms:output id="my-output" value="index('repeat-no-xbl')"/>
                                 </xforms:repeat>
 
                                 <!-- With XBL (update to global instance) -->
                                 <fr:foo id="my-foo">
-                                    <xforms:repeat nodeset="record" id="repeat-xbl-foo">
+                                    <xforms:repeat ref="record" id="repeat-xbl-foo">
                                         <xforms:output id="my-output-foo" value="index('repeat-xbl-foo')"/>
                                     </xforms:repeat>
                                 </fr:foo>
 
                                 <!-- With XBL (update to local instance) -->
                                 <fr:bar id="my-bar">
-                                    <xforms:repeat nodeset="record" id="repeat-xbl-bar">
+                                    <xforms:repeat ref="record" id="repeat-xbl-bar">
                                         <xforms:output id="my-output-bar" value="index('repeat-xbl-bar')"/>
                                     </xforms:repeat>
                                 </fr:bar>
@@ -1393,7 +1393,7 @@
                                             <!-- TEST: Record all events -->
                                             <xbl:handler event="#all">
                                                 <xforms:insert model="model"
-                                                   context="instance('events')" nodeset="*"
+                                                   context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
@@ -1601,7 +1601,7 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', event('xxforms:type')),
@@ -1617,7 +1617,7 @@
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
-                                            <xforms:repeat id="level1-repeat" nodeset="level1" xxbl:scope="outer">
+                                            <xforms:repeat id="level1-repeat" ref="level1" xxbl:scope="outer">
                                                 <xforms:dispatch ev:event="down-2" name="down-1" targetid="fr-level1-binding" xxbl:scope="inner"/>
                                                 <fr:level2 id="level2-component"/>
                                             </xforms:repeat>
@@ -1629,7 +1629,7 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', event('xxforms:type')),
@@ -1645,7 +1645,7 @@
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
-                                            <xforms:repeat id="level2-repeat" nodeset="level2" xxbl:scope="outer">
+                                            <xforms:repeat id="level2-repeat" ref="level2" xxbl:scope="outer">
                                                 <xforms:dispatch ev:event="down-3" name="down-2" targetid="fr-level2-binding" xxbl:scope="inner"/>
                                                 <fr:level3 id="level3-component"/>
                                             </xforms:repeat>
@@ -1657,7 +1657,7 @@
                                         <xbl:handlers>
                                             <xbl:handler event="#all" xxbl:scope="outer">
                                                 <!-- TEST: Event listener -->
-                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" nodeset="*"
+                                                <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" context="xxforms:instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', event('xxforms:type')),
@@ -1675,7 +1675,7 @@
                                             </xbl:handler>
                                         </xbl:handlers>
                                         <xbl:template>
-                                            <xforms:repeat id="level3-repeat" nodeset="level3" xxbl:scope="outer">
+                                            <xforms:repeat id="level3-repeat" ref="level3" xxbl:scope="outer">
                                                 <xforms:input id="title-control" ref="title">
                                                     <xforms:dispatch ev:event="DOMFocusIn" name="down-3" targetid="fr-level3-binding" xxbl:scope="inner"/>
                                                 </xforms:input>
@@ -1688,7 +1688,7 @@
 
                                 <xforms:group context="instance('main-instance')" id="main-group">
                                     <!-- TEST: Event listener -->
-                                    <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" nodeset="*"
+                                    <xforms:insert if="not(event('xxforms:type') = 'xxforms-index-changed')" ev:event="#all" context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('observer', event('xxforms:observerid')),
                                                              xxforms:attribute('type', event('xxforms:type')),
@@ -2089,7 +2089,7 @@
                             </instance>
                         </xforms:instance>
 
-                        <xforms:bind nodeset="index" calculate="index('my-repeat')"/>
+                        <xforms:bind ref="index" calculate="index('my-repeat')"/>
 
                         <xforms:setindex ev:event="xforms-ready" repeat="my-repeat" index="2"/>
 
@@ -2109,7 +2109,7 @@
                 </xhtml:head>
                 <xhtml:body>
                     <fr:foo id="my-foo">
-                        <xforms:repeat id="my-repeat" nodeset="value">
+                        <xforms:repeat id="my-repeat" ref="value">
 
                         </xforms:repeat>
                     </fr:foo>
@@ -2156,7 +2156,7 @@
                             <events/>
                         </xforms:instance>
 
-                        <xforms:insert ev:event="my-event-1 my-event-2" context="instance('events')" nodeset="*"
+                        <xforms:insert ev:event="my-event-1 my-event-2" context="instance('events')" ref="*"
                                        origin="xxforms:element('event',
                                                 (xxforms:attribute('type', event('xxforms:type')),
                                                  xxforms:attribute('target', event('xxforms:targetid'))
@@ -2175,7 +2175,7 @@
                     <fr:foo id="my-foo">
                         <!-- Don't put an id on the action -->
                         <xforms:action ev:event="xforms-enabled xforms-disabled">
-                            <xforms:insert context="instance('events')" nodeset="*"
+                            <xforms:insert context="instance('events')" ref="*"
                                            origin="xxforms:element('event',
                                                     (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('target', event('xxforms:targetid'))
@@ -2187,7 +2187,7 @@
                     <fr:foo id="my-foo-2">
                         <!-- Put an id on the action -->
                         <xforms:action ev:event="xforms-enabled xforms-disabled" id="my-event">
-                            <xforms:insert context="instance('events')" nodeset="*"
+                            <xforms:insert context="instance('events')" ref="*"
                                            origin="xxforms:element('event',
                                                     (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('target', event('xxforms:targetid'))
@@ -2332,7 +2332,7 @@
                 <xhtml:body>
                     <!-- Itemset -->
                     <fr:foo id="my-foo-1" ref="foo">
-                        <xforms:itemset nodeset="instance('items')/item[position() mod 2 = 1]">
+                        <xforms:itemset ref="instance('items')/item[position() mod 2 = 1]">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -2348,7 +2348,7 @@
                         </xforms:choices>
                         <xforms:choices>
                             <xforms:label ref="../foo"/>
-                            <xforms:itemset nodeset="instance('items')/item[position() mod 2 = 0]">
+                            <xforms:itemset ref="instance('items')/item[position() mod 2 = 0]">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>
@@ -2542,8 +2542,8 @@
                                 <bar>43</bar>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind id="foo-bind1" nodeset="foo"/>
-                        <xforms:bind id="bar-bind1" nodeset="bar"/>
+                        <xforms:bind id="foo-bind1" ref="foo"/>
+                        <xforms:bind id="bar-bind1" ref="bar"/>
                         <xforms:var name="foo" value="foo"/>
                         <xforms:var name="bar" value="bar"/>
                     </xforms:model>
@@ -2554,8 +2554,8 @@
                                 <bar>45</bar>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind id="foo-bind2" nodeset="foo"/>
-                        <xforms:bind id="bar-bind2" nodeset="bar"/>
+                        <xforms:bind id="foo-bind2" ref="foo"/>
+                        <xforms:bind id="bar-bind2" ref="bar"/>
                         <xforms:var name="foo" value="foo"/>
                         <xforms:var name="bar" value="bar"/>
                     </xforms:model>
@@ -2910,7 +2910,7 @@
                         <xbl:binding id="foobar-component" element="fr|foobar">
                             <xbl:template>
                                 <!-- Repeat in outer scope -->
-                                <xforms:repeat id="my-repeat" nodeset="fruit" xxbl:scope="outer" startindex="2">
+                                <xforms:repeat id="my-repeat" ref="fruit" xxbl:scope="outer" startindex="2">
                                     <xforms:var name="p" value="position()" as="xs:integer"/>
                                     <!-- Group in inner scope -->
                                     <xforms:group id="my-group" xxbl:scope="inner">
@@ -2971,7 +2971,7 @@
                         <xbl:binding id="foobar-component" element="fr|foobar">
                             <xbl:template>
                                 <!-- Repeat in outer scope -->
-                                <xforms:repeat id="my-repeat" nodeset="fruit" xxbl:scope="outer" startindex="2">
+                                <xforms:repeat id="my-repeat" ref="fruit" xxbl:scope="outer" startindex="2">
                                     <xforms:var name="p" value="position()" as="xs:integer"/>
                                     <!-- Group in inner scope -->
                                     <xforms:group id="my-group" xxbl:scope="inner">

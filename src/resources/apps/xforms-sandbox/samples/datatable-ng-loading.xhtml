@@ -48,14 +48,14 @@
                 ORBEON.xforms.Document.dispatchEvent("model", "load-initial-data"); </xxforms:script>
             <xforms:action ev:event="load-initial-data">
                 <xforms:send submission="sleep-5-seconds"/>
-                <xforms:insert nodeset="instance('instance')" origin="instance('datasource')"/>
+                <xforms:insert ref="instance('instance')" origin="instance('datasource')"/>
             </xforms:action>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
 
         <fr:datatable id="table-repeat2" loading="@loading = 'true'">
-            <xhtml:tr repeat-nodeset="record">
+            <xhtml:tr repeat-ref="record">
                 <xhtml:td fr:sortable="true" fr:sortType="text" fr:resizeable="true">
                     <xforms:output ref="AAA">
                         <xforms:label>AAA (imp)</xforms:label>

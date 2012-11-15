@@ -184,7 +184,7 @@
                 <xforms:action if="exists($source-form)">
                     <!-- Got it from the request -->
                     <xforms:message level="xxforms:log-debug">Got source form from request.</xforms:message>
-                    <xforms:insert nodeset="instance('fr-source-form-instance')" origin="$source-form"/>
+                    <xforms:insert ref="instance('fr-source-form-instance')" origin="$source-form"/>
                 </xforms:action>
                 <xforms:action if="not(exists($source-form))">
                     <!-- Try submission -->

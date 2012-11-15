@@ -33,7 +33,7 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="fruit" id="fruit">
+        <xforms:repeat ref="fruit" id="fruit">
             <xhtml:div>
                 <xforms:switch>
                     <xforms:case id="case-1">
@@ -55,11 +55,11 @@
         </xforms:repeat>
         <xforms:trigger>
             <xforms:label>Add fruit</xforms:label>
-            <xforms:insert nodeset="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
+            <xforms:insert ref="fruit" at="index('fruit')" position="after" ev:event="DOMActivate"/>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Remove fruit</xforms:label>
-            <xforms:delete nodeset="fruit" at="index('fruit')" ev:event="DOMActivate"/>
+            <xforms:delete ref="fruit" at="index('fruit')" ev:event="DOMActivate"/>
         </xforms:trigger>
 
         <fr:xforms-inspector xmlns:fr="http://orbeon.org/oxf/xml/form-runner"/>

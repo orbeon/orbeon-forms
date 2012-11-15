@@ -37,7 +37,7 @@
                     </group>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="group" relevant="(count(preceding-sibling::group) + 1) = ../current-group"/>
+            <xforms:bind ref="group" relevant="(count(preceding-sibling::group) + 1) = ../current-group"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -60,7 +60,7 @@
                         </xforms:label>
                     </xforms:trigger>
                 </xforms:group>
-                [<xforms:repeat nodeset="repeat1a">
+                [<xforms:repeat ref="repeat1a">
                     <xforms:output value="'X'"/>
                 </xforms:repeat>]
             </xforms:group>
@@ -78,7 +78,7 @@
                         </xforms:label>
                     </xforms:trigger>
                 </xforms:group>
-                [<xforms:repeat nodeset="repeat2a">
+                [<xforms:repeat ref="repeat2a">
                     <xforms:output value="'.'"/>
                 </xforms:repeat>]
             </xforms:group>

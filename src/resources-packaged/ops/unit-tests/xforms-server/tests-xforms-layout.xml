@@ -40,13 +40,13 @@
                                 <boolean>true</boolean>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="default" type="xs:NCName" required="true()"/>
-                        <xforms:bind nodeset="boolean" type="xs:boolean" required="true()"/>
+                        <xforms:bind ref="default" type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="boolean" type="xs:boolean" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
                     <!-- Nested LHHA -->
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:input id="my-new-input" ref="default">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -192,11 +192,11 @@
                         <xforms:instance id="tests">
                             <instance>apple</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:select1 id="my-new-select1" ref="." appearance="minimal">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -260,11 +260,11 @@
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:output id="my-new-output" ref=".">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -314,11 +314,11 @@
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:group id="my-new-group" ref=".">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -452,11 +452,11 @@
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:trigger id="my-new-trigger" ref=".">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -555,11 +555,11 @@
                         <xforms:instance id="tests">
                             <instance>Hello!</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:range id="my-new-range" ref=".">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -613,11 +613,11 @@
                         <xforms:instance id="tests">
                             <instance>apple</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:select id="my-new-select" ref=".">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>
@@ -724,7 +724,7 @@
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <!-- Nested LHHA -->
                         <xforms:upload id="my-new-upload" ref="default">
                             <xforms:label>My label</xforms:label>
@@ -966,7 +966,7 @@
                                 <default>Hello!</default>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="default" type="xs:NCName" required="true()" readonly="true()"/>
+                        <xforms:bind ref="default" type="xs:NCName" required="true()" readonly="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
@@ -1022,7 +1022,7 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:select id="select-1" ref="." appearance="compact">
-                        <xforms:itemset nodeset="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
+                        <xforms:itemset ref="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
                             <xforms:label ref="@id"/>
                             <xforms:value ref="@id"/>
                         </xforms:itemset>
@@ -1077,7 +1077,7 @@
                 </xhtml:head>
                 <xhtml:body>
                     <xforms:select id="select-1" ref="." appearance="xxforms:tree">
-                        <xforms:itemset nodeset="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
+                        <xforms:itemset ref="instance('itemset-1')//item" class="my-{if (exists(*)) then 'folder' else 'leaf'}">
                             <xforms:label ref="@id"/>
                             <xforms:value ref="@id"/>
                         </xforms:itemset>
@@ -1106,7 +1106,7 @@
                                 <show>true</show>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="image" relevant="../show = 'true'"/>
+                        <xforms:bind ref="image" relevant="../show = 'true'"/>
                         <xforms:setvalue ev:event="xforms-ready" ref="show">false</xforms:setvalue>
                     </xforms:model>
                 </xhtml:head>
@@ -1143,7 +1143,7 @@
             <models>
                 <xforms:model id="model">
                     <xforms:instance id="instance"/>
-                    <xforms:bind id="bind1" nodeset="image" relevant="../show = 'true'"/>
+                    <xforms:bind id="bind1" ref="image" relevant="../show = 'true'"/>
                 </xforms:model>
             </models>
         </input>
@@ -1191,7 +1191,7 @@
                                 <image>/ops/images/xforms/help.png</image>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind id="bind1" nodeset="image" relevant="../show = 'true'"/>
+                        <xforms:bind id="bind1" ref="image" relevant="../show = 'true'"/>
                         <xforms:setvalue ev:event="xforms-ready" ref="image">    </xforms:setvalue>
                     </xforms:model>
                 </xhtml:head>
@@ -1326,11 +1326,11 @@
                         <xforms:instance id="tests">
                             <instance>apple</instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="." type="xs:NCName" required="true()"/>
+                        <xforms:bind ref="." type="xs:NCName" required="true()"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
-                    <xforms:repeat id="my-repeat" nodeset=".">
+                    <xforms:repeat id="my-repeat" ref=".">
                         <xforms:select1 id="my-new-select1" ref="." appearance="full">
                             <xforms:label>My label</xforms:label>
                             <xforms:hint>My hint</xforms:hint>

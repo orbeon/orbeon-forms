@@ -59,11 +59,11 @@
                     <readonly/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
-            <xforms:bind nodeset="type-change[type = 'date']/input" type="xs:date"/>
-            <xforms:bind nodeset="type-change[type = 'float']/input" type="xs:float"/>
-            <xforms:bind nodeset="disabled" relevant="false()"/>
-            <xforms:bind nodeset="readonly" readonly="true()" relevant="context()/@relevant = 'true'"/>
+            <xforms:bind ref="input | textarea | secret | input-boolean | date | time | date-time" constraint="false()"/>
+            <xforms:bind ref="type-change[type = 'date']/input" type="xs:date"/>
+            <xforms:bind ref="type-change[type = 'float']/input" type="xs:float"/>
+            <xforms:bind ref="disabled" relevant="false()"/>
+            <xforms:bind ref="readonly" readonly="true()" relevant="context()/@relevant = 'true'"/>
             <xforms:instance id="flavors">
                 <flavors>
                     <flavor label="Fruits" color="red">
@@ -77,13 +77,13 @@
                 </flavors>
             </xforms:instance>
             <!-- Global MIPS that apply to all the controls -->
-            <xforms:bind nodeset="* except (disabled, readonly)" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
-            <xforms:bind nodeset="@*" type="xs:boolean"/>
-            <xforms:bind nodeset="input-boolean" type="xs:boolean"/>
-            <xforms:bind nodeset="date" type="xs:date"/>
-            <xforms:bind nodeset="time" type="xs:time"/>
-            <xforms:bind nodeset="date-time" type="xs:dateTime"/>
-            <xforms:bind nodeset="output-file/uri" type="xs:anyURI"/>
+            <xforms:bind ref="* except (disabled, readonly)" readonly="context()/@readonly = 'true'" relevant="context()/@relevant = 'true'"/>
+            <xforms:bind ref="@*" type="xs:boolean"/>
+            <xforms:bind ref="input-boolean" type="xs:boolean"/>
+            <xforms:bind ref="date" type="xs:date"/>
+            <xforms:bind ref="time" type="xs:time"/>
+            <xforms:bind ref="date-time" type="xs:dateTime"/>
+            <xforms:bind ref="output-file/uri" type="xs:anyURI"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .xforms-repeat-selected-item-1 { background-color: transparent }
@@ -118,7 +118,7 @@
         </xhtml:div>
 
         <xhtml:div id="controls">
-            <xforms:repeat nodeset=".[@repeat-shown = 'true']">
+            <xforms:repeat ref=".[@repeat-shown = 'true']">
 
                 <!-- Input -->
                 <xhtml:h2>Input</xhtml:h2>
@@ -169,7 +169,7 @@
                 <xforms:group ref="select">
                     <xhtml:div>
                         <xforms:select1 appearance="full" ref="single" id="flavor-select1-full">
-                            <xforms:itemset nodeset="instance('flavors')/flavor/flavor" class="{@color}">
+                            <xforms:itemset ref="instance('flavors')/flavor/flavor" class="{@color}">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@name"/>
                             </xforms:itemset>
@@ -177,7 +177,7 @@
                     </xhtml:div>
                     <xhtml:div>
                         <xforms:select appearance="full" ref="multiple" id="flavor-select-full">
-                            <xforms:itemset nodeset="instance('flavors')/flavor/flavor" class="{@color}">
+                            <xforms:itemset ref="instance('flavors')/flavor/flavor" class="{@color}">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@name"/>
                             </xforms:itemset>
@@ -185,7 +185,7 @@
                     </xhtml:div>
                     <xhtml:div>
                         <xforms:select1 appearance="compact" ref="single" id="flavor-select1-compact">
-                            <xforms:itemset nodeset="instance('flavors')//flavor" class="{@color}">
+                            <xforms:itemset ref="instance('flavors')//flavor" class="{@color}">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@name"/>
                             </xforms:itemset>
@@ -193,7 +193,7 @@
                     </xhtml:div>
                     <xhtml:div>
                         <xforms:select appearance="compact" ref="multiple" id="flavor-select-compact">
-                            <xforms:itemset nodeset="instance('flavors')//flavor" class="{@color}">
+                            <xforms:itemset ref="instance('flavors')//flavor" class="{@color}">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@name"/>
                             </xforms:itemset>
@@ -201,7 +201,7 @@
                     </xhtml:div>
                     <xhtml:div>
                         <xforms:select1 appearance="minimal" ref="single" id="flavor-select-minimal">
-                            <xforms:itemset nodeset="instance('flavors')//flavor" class="{@color}">
+                            <xforms:itemset ref="instance('flavors')//flavor" class="{@color}">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@name"/>
                             </xforms:itemset>
@@ -225,7 +225,7 @@
                         <xforms:trigger appearance="minimal" id="add-flavor">
                             <xforms:label>Add flavor</xforms:label>
                             <xforms:action ev:event="DOMActivate">
-                                <xforms:insert nodeset="instance('flavors')/flavor[1]/flavor"/>
+                                <xforms:insert ref="instance('flavors')/flavor[1]/flavor"/>
                                 <xforms:action context="instance('flavors')/flavor[1]/flavor[last()]">
                                     <xforms:setvalue ref="@label">Key lime</xforms:setvalue>
                                     <xforms:setvalue ref="@name">k</xforms:setvalue>

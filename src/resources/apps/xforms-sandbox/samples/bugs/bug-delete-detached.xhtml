@@ -23,13 +23,13 @@
     </xhtml:head>
     <xhtml:body>
 
-        <xforms:repeat nodeset="company">
+        <xforms:repeat ref="company">
             <xforms:input ref="employee">
-                <xforms:delete ev:event="xforms-disabled" nodeset=".."/>
+                <xforms:delete ev:event="xforms-disabled" ref=".."/>
             </xforms:input>
             <xforms:trigger>
                 <xforms:label>Delete</xforms:label>
-                <xforms:delete ev:event="DOMActivate" nodeset="."/>
+                <xforms:delete ev:event="DOMActivate" ref="."/>
             </xforms:trigger>
         </xforms:repeat>
 

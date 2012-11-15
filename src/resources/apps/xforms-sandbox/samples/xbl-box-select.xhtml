@@ -52,7 +52,7 @@
 
         <fr:box-select ref="value1" id="value1">
             <xforms:label>Fruit 1: </xforms:label>
-            <xforms:itemset nodeset="xxforms:instance('items-instance')/fruit">
+            <xforms:itemset ref="xxforms:instance('items-instance')/fruit">
                 <xforms:label ref="name"/>
                 <xforms:value ref="@id"/>
             </xforms:itemset>
@@ -60,7 +60,7 @@
 
         <fr:box-select ref="value2" id="value2">
             <xforms:label>Fruit 2: </xforms:label>
-            <xforms:itemset nodeset="xxforms:instance('items-instance')/fruit">
+            <xforms:itemset ref="xxforms:instance('items-instance')/fruit">
                 <xforms:label ref="name"/>
                 <xforms:value ref="@id"/>
             </xforms:itemset>

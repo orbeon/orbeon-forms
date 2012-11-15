@@ -309,7 +309,7 @@
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
             <xforms:group id="fr-language-selector" model="fr-resources-model" ref=".[count($available-languages) gt 1]">
                 <fr:link-select1 ref="instance('fr-language-instance')">
-                    <xforms:itemset nodeset="$available-languages">
+                    <xforms:itemset ref="$available-languages">
                         <xforms:label ref="(xxforms:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>
                         <xforms:value ref="context()"/>
                     </xforms:itemset>

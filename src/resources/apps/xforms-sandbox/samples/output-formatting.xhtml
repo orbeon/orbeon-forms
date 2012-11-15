@@ -34,18 +34,18 @@
                     <double>123456.789</double>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="date" type="xs:date" calculate="current-date()"/>
-            <xforms:bind nodeset="dateTime" type="xs:dateTime" calculate="current-dateTime()"/>
-            <xforms:bind nodeset="time" type="xs:time" calculate="current-time()"/>
-            <xforms:bind nodeset="decimal" type="xs:decimal"/>
-            <xforms:bind nodeset="integer" type="xs:integer"/>
-            <xforms:bind nodeset="float" type="xs:float"/>
-            <xforms:bind nodeset="double" type="xs:double"/>
+            <xforms:bind ref="date" type="xs:date" calculate="current-date()"/>
+            <xforms:bind ref="dateTime" type="xs:dateTime" calculate="current-dateTime()"/>
+            <xforms:bind ref="time" type="xs:time" calculate="current-time()"/>
+            <xforms:bind ref="decimal" type="xs:decimal"/>
+            <xforms:bind ref="integer" type="xs:integer"/>
+            <xforms:bind ref="float" type="xs:float"/>
+            <xforms:bind ref="double" type="xs:double"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xhtml:table>
-            <xforms:repeat nodeset="*">
+            <xforms:repeat ref="*">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output value="name()"/>

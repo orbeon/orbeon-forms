@@ -40,16 +40,16 @@
                 </instance>
             </xforms:instance>
 
-            <xforms:bind nodeset="a" constraint="'false'"/>
-            <xforms:bind nodeset="b" constraint="false()"/>
-            <xforms:bind nodeset="c" constraint="'true'"/>
-            <xforms:bind nodeset="d" constraint="true()"/>
-            <xforms:bind nodeset="e" constraint="../true"/>
-            <xforms:bind nodeset="f" constraint="../false"/>
-            <xforms:bind nodeset="g" constraint="non-existing"/>
-            <xforms:bind nodeset="h" constraint="0"/>
-            <xforms:bind nodeset="i" constraint="1000"/>
-            <xforms:bind nodeset="j" constraint="number('NaN')"/>
+            <xforms:bind ref="a" constraint="'false'"/>
+            <xforms:bind ref="b" constraint="false()"/>
+            <xforms:bind ref="c" constraint="'true'"/>
+            <xforms:bind ref="d" constraint="true()"/>
+            <xforms:bind ref="e" constraint="../true"/>
+            <xforms:bind ref="f" constraint="../false"/>
+            <xforms:bind ref="g" constraint="non-existing"/>
+            <xforms:bind ref="h" constraint="0"/>
+            <xforms:bind ref="i" constraint="1000"/>
+            <xforms:bind ref="j" constraint="number('NaN')"/>
 
             <xforms:instance id="result">
                 <result/>
@@ -57,7 +57,7 @@
 
             <xforms:action ev:event="xforms-ready" iterate="*">
                 <xforms:var name="current" value="."/>
-                <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
+                <xforms:insert context="instance('result')" ref="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
             </xforms:action>
 
         </xforms:model>

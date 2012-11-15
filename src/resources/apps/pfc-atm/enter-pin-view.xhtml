@@ -24,7 +24,7 @@
                     <action/>
                 </form>
             </xforms:instance>
-            <xforms:bind nodeset="pin" constraint="number(.) = 42"/>
+            <xforms:bind ref="pin" constraint="number(.) = 42"/>
             <xforms:submission id="main-submission" method="post" action="."/>
         </xforms:model>
         <xhtml:style type="text/css">

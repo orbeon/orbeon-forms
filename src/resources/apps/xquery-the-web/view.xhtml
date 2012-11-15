@@ -48,7 +48,7 @@
                 </instance>
             </xforms:instance>
             <!-- Calculate JavaScript code -->
-            <xforms:bind nodeset="javascript" readonly="false"
+            <xforms:bind ref="javascript" readonly="false"
                          calculate="concat('&lt;script language=&quot;javascript&quot; type=&quot;text/javascript&quot; src=&quot;',
                                            'http://www.orbeon.com/ops/xquery-the-web/query?url=',
                                            encode-for-uri(../url), '&amp;xquery=', encode-for-uri(../xquery), '&amp;output=javascript&quot;>')"/>

@@ -24,7 +24,7 @@
                 </instance>
             </xforms:instance>
 
-            <xforms:insert ev:event="xforms-ready" nodeset="instance('instance')/record" at="1"/>
+            <xforms:insert ev:event="xforms-ready" ref="instance('instance')/record" at="1"/>
 
         </xforms:model>
 
@@ -47,12 +47,12 @@
                                 <record/>
                             </instance>
                         </xforms:instance>
-                        <xforms:insert ev:event="xforms-ready" nodeset="instance('instance')/record" at="1"/>
+                        <xforms:insert ev:event="xforms-ready" ref="instance('instance')/record" at="1"/>
                     </xforms:model>
                     <xforms:group id="bar-group" model="model" appearance="xxforms:internal">
                         <xforms:trigger id="bar-trigger">
                             <xforms:label>Insert</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" nodeset="instance('instance')/record" at="1"/>
+                            <xforms:insert ev:event="DOMActivate" ref="instance('instance')/record" at="1"/>
                         </xforms:trigger>
                         <table>
                             <xbl:content/>
@@ -73,13 +73,13 @@
 
         <xforms:trigger>
             <xforms:label>Insert</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="instance('instance')/record" at="1"/>
+            <xforms:insert ev:event="DOMActivate" ref="instance('instance')/record" at="1"/>
         </xforms:trigger>
 
         <h2>Without XBL (update to global instance)</h2>
         <table>
             <tbody>
-                <xforms:repeat nodeset="record" id="repeat-no-xbl">
+                <xforms:repeat ref="record" id="repeat-no-xbl">
                     <tr>
                         <td>
                             <xforms:output id="my-output" value="index('repeat-no-xbl')"/>
@@ -92,7 +92,7 @@
         <h2>With XBL (update to global instance)</h2>
         <fr:foo id="my-foo">
             <tbody>
-                <xforms:repeat nodeset="record" id="repeat-xbl">
+                <xforms:repeat ref="record" id="repeat-xbl">
                     <tr>
                         <td>
                             <xforms:output id="my-output" value="index('repeat-xbl')"/>
@@ -105,7 +105,7 @@
         <h2>With XBL (update to local instance)</h2>
         <fr:bar id="my-bar">
             <tbody>
-                <xforms:repeat nodeset="record" id="repeat-xbl">
+                <xforms:repeat ref="record" id="repeat-xbl">
                     <tr>
                         <td>
                             <xforms:output id="my-output" value="index('repeat-xbl')"/>

@@ -103,19 +103,19 @@
                             <xforms:var name="sortKey" xxbl:scope="outer">
                                 <xxforms:sequence value="key" xxbl:scope="inner"/>
                             </xforms:var>
-                            <xforms:var name="nodeset" value="{@nodeset}" xxbl:scope="outer"/>
-                            <xforms:var name="rewrittenNodeset" xxbl:scope="outer">
+                            <xforms:var name="ref" value="{@ref}" xxbl:scope="outer"/>
+                            <xforms:var name="rewrittenref" xxbl:scope="outer">
                                 <xxforms:sequence xxbl:scope="outer"
                                     select="
                                 
                                 if ($sortKey = 'none') 
-                                    then $nodeset
-                                    else exf:sort($nodeset,  $sortKey , 'text', $sortOrder)
+                                    then $ref
+                                    else exf:sort($ref,  $sortKey , 'text', $sortOrder)
                                 
                                 "
                                 />
                             </xforms:var>
-                            <xforms:repeat id="repeat" nodeset="$rewrittenNodeset" xxbl:scope="outer">
+                            <xforms:repeat id="repeat" ref="$rewrittenref" xxbl:scope="outer">
                                 <xsl:apply-templates select="node()"/>
                             </xforms:repeat>
                         </xsl:template>
@@ -133,7 +133,7 @@
                 <xhtml:th>Label</xhtml:th>
                 <xhtml:th>Value</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="item">
+            <xforms:repeat ref="item">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:output value="@label"/>

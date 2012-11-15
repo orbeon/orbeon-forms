@@ -43,7 +43,7 @@
         <xbl:xbl>
             <xbl:binding id="foo-component" element="fr|foo">
                 <xbl:template>
-                    <xforms:repeat nodeset="fruit" id="fruit-repeat">
+                    <xforms:repeat ref="fruit" id="fruit-repeat">
                         <xhtml:div>
                             <fr:bar id="my-bar"/>
                         </xhtml:div>
@@ -52,7 +52,7 @@
             </xbl:binding>
             <xbl:binding id="bar-component" element="fr|bar">
                 <xbl:template>
-                    <xforms:repeat nodeset="color" id="color-repeat">
+                    <xforms:repeat ref="color" id="color-repeat">
                         <xhtml:div>
                             <xforms:output value="."/>
                         </xhtml:div>

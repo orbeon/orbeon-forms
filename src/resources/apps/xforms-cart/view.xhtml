@@ -57,7 +57,7 @@
             </xforms:trigger>
         </xhtml:p>
         <xhtml:ol>
-            <xforms:repeat nodeset="instance('cart')/item" id="main-repeat">
+            <xforms:repeat ref="instance('cart')/item" id="main-repeat">
                 <xhtml:li><xforms:output ref="."/></xhtml:li>
             </xforms:repeat>
         </xhtml:ol>

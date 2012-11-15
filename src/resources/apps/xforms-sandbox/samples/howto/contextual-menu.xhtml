@@ -43,7 +43,7 @@
     </xhtml:head>
     <xhtml:body>
         <xxforms:dialog id="select-state-dialog" appearance="minimal">
-            <xforms:repeat nodeset="instance('state-itemset')/state">
+            <xforms:repeat ref="instance('state-itemset')/state">
                 <xhtml:div>
                     <xforms:trigger appearance="minimal">
                         <xforms:label ref="@label"/>
@@ -62,7 +62,7 @@
                 <xhtml:th>Abbreviation</xhtml:th>
                 <xhtml:th>Name</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="instance('employees')/employee" id="employee-repeat">
+            <xforms:repeat ref="instance('employees')/employee" id="employee-repeat">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:trigger appearance="minimal" id="select-state-trigger">
@@ -72,7 +72,7 @@
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:select1 ref="@state" appearance="xxforms:menu">
-                            <xforms:itemset nodeset="instance('state-itemset')/(.,*)">
+                            <xforms:itemset ref="instance('state-itemset')/(.,*)">
                                 <xforms:label ref="@label"/>
                                 <xforms:value ref="@value"/>
                             </xforms:itemset>

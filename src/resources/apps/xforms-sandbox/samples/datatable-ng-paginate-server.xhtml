@@ -23,7 +23,7 @@
         <xforms:model id="model">
             <xforms:instance id="twitter"
                 src="/xforms-sandbox/service/twitter?sortBy=published&amp;sortOrder=descending"/>
-            <xforms:bind nodeset="instance('twitter')/atom:entry/atom:published"
+            <xforms:bind ref="instance('twitter')/atom:entry/atom:published"
                 type="xforms:dateTime"/>
             <xforms:instance id="params">
                 <params xmlns="">
@@ -92,7 +92,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr repeat-nodeset="/atom:feed/atom:entry">
+                <tr repeat-ref="/atom:feed/atom:entry">
                     <td>
                         <xforms:output ref="atom:published"
                             xxforms:format="format-dateTime(., '[M01]/[D01]/[Y] - [h01]:[m01]:[s01]')"

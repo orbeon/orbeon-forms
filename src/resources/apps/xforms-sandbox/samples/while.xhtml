@@ -38,9 +38,9 @@
 
         <xforms:trigger>
             <xforms:label>Insert</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
             <xforms:action ev:event="DOMActivate" while="count > count(element)">
-                <xforms:insert context="instance('main-instance')" nodeset="element" origin="instance('insert-template')"/>
+                <xforms:insert context="instance('main-instance')" ref="element" origin="instance('insert-template')"/>
                 <xforms:setvalue ref="element[last()]/@position" value="count(../preceding-sibling::element) + 1"/>
             </xforms:action>
         </xforms:trigger>
@@ -48,11 +48,11 @@
         <xforms:trigger>
             <xforms:label>Delete</xforms:label>
             <xforms:delete ev:event="DOMActivate" while="count(element) > 0"
-                           context="instance('main-instance')" nodeset="element"/>
+                           context="instance('main-instance')" ref="element"/>
         </xforms:trigger>
 
         <ul>
-            <xforms:repeat nodeset="element">
+            <xforms:repeat ref="element">
                 <li>
                     Element at position: <xforms:output ref="@position"/>
                 </li>

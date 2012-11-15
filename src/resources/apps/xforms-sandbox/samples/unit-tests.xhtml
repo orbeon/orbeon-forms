@@ -39,8 +39,8 @@
             </xforms:instance>
 
             <!-- Compute durations -->
-            <xforms:bind nodeset="all-start | page-start" calculate="if (. = '') then current-dateTime() else ."/>
-            <xforms:bind nodeset="*[ends-with(local-name(), '-duration')]"
+            <xforms:bind ref="all-start | page-start" calculate="if (. = '') then current-dateTime() else ."/>
+            <xforms:bind ref="*[ends-with(local-name(), '-duration')]"
                          calculate="for $start-name in concat(substring-before(local-name(), '-duration'), '-start') return
                                     for $start in ../*[local-name() = $start-name] return
                                     for $duration in current-dateTime() - xs:dateTime($start) return
@@ -58,8 +58,8 @@
             </xforms:action>
 
             <xforms:action ev:event="page-complete">
-                <xforms:delete nodeset="reports/in-progress"/>
-                <xforms:insert context="reports" nodeset="report" origin="saxon:parse(/instance/report-text)"/>
+                <xforms:delete ref="reports/in-progress"/>
+                <xforms:insert context="reports" ref="report" origin="saxon:parse(/instance/report-text)"/>
                 <xforms:insert context="reports/report[last()]" origin="xxforms:attribute('page', /instance/page)"/>
                 <xforms:setvalue ref="reports/report[last()]/@page" value="tokenize(., '/')[last()]"/>
                 <xforms:setvalue ref="page-start" value="current-dateTime()"/>
@@ -108,12 +108,12 @@
                     <xhtml:th>Test</xhtml:th>
                     <xhtml:th>Result</xhtml:th>
                 </xhtml:tr>
-                <xforms:repeat nodeset="reports/report">
+                <xforms:repeat ref="reports/report">
                     <xforms:var name="report" value="."/>
-                    <xforms:repeat nodeset="testcase">
+                    <xforms:repeat ref="testcase">
                         <xforms:var name="testcase" value="."/>
                         <xforms:var name="testcase-position" value="position()"/>
-                        <xforms:repeat nodeset="test[@result = 'fail']">
+                        <xforms:repeat ref="test[@result = 'fail']">
                             <xhtml:tr>
                                 <xforms:var name="test" value="."/>
                                 <xforms:var name="test-position" value="position()"/>

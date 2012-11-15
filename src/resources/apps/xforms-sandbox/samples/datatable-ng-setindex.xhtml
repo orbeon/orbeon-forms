@@ -39,7 +39,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
             <xforms:dispatch ev:event="xforms-ready" name="fr-datatable-set-index-in-current-page"
                 target="dt">
                 <xxforms:context name="index" select="2"/>
@@ -60,7 +60,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat nodeset="record">
+                <xforms:repeat ref="record">
                     <tr>
                         <td>
                             <xforms:output ref="AAA"/>

@@ -47,7 +47,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -75,7 +75,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="record">
+                <xforms:repeat ref="record">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:output ref="AAA"/>
@@ -113,7 +113,7 @@
 
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="record">
+                <xforms:repeat ref="record">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:output ref="AAA"/>
@@ -150,7 +150,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="record">
+                <xforms:repeat ref="record">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:output ref="AAA"/>

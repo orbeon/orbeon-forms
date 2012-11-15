@@ -39,7 +39,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
             <xforms:setindex ev:event="xforms-ready" repeat="dt-repeat" index="2"/>
         </xforms:model>
 
@@ -65,7 +65,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xforms:repeat nodeset="record" id="dt-repeat">
+                <xforms:repeat ref="record" id="dt-repeat">
                     <tr>
                         <td>
                             <xforms:output ref="AAA"/>

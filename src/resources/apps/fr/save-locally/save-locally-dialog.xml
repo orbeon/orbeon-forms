@@ -53,7 +53,7 @@
             <xforms:setvalue ref="xxforms:instance('fr-persistence-instance')/save-attempted">true</xforms:setvalue>
 
             <xforms:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
-            <xforms:insert nodeset="instance('fr-uuid')" origin="xxforms:call-xpl('oxf:/apps/fr/save-locally/save-generate.xpl',
+            <xforms:insert ref="instance('fr-uuid')" origin="xxforms:call-xpl('oxf:/apps/fr/save-locally/save-generate.xpl',
                     ('form-instance', 'parameters', 'fr-current-resources'), (xxforms:instance('fr-form-instance'), $parameters, $fr-resources),
                     'uuid')"/>
             <xxforms:show dialog="fr-download-save-dialog"/>

@@ -20,10 +20,10 @@
                     <number/>
                 </user-info>
             </xforms:instance>
-            <xforms:bind nodeset="first-name | last-name" required="true()"/>
-            <xforms:bind nodeset="age"
+            <xforms:bind ref="first-name | last-name" required="true()"/>
+            <xforms:bind ref="age"
                 constraint=". = '' or (. castable as xs:integer and xs:integer(.) ge 0 and xs:integer(.) le 150)"/>
-            <xforms:bind nodeset="phone/number" required="true()"/>
+            <xforms:bind ref="phone/number" required="true()"/>
             
             <xforms:instance id="phone-template">
                 <phone>
@@ -32,7 +32,7 @@
                 </phone>
             </xforms:instance>
             <xforms:action ev:event="xforms-model-construct-done" iterate="for $i in (1 to 3) return .">
-                <xforms:insert context="instance('user-info')" nodeset="phone" origin="instance('phone-template')"/>
+                <xforms:insert context="instance('user-info')" ref="phone" origin="instance('phone-template')"/>
             </xforms:action>
 
             <xforms:instance id="ui">
@@ -92,7 +92,7 @@
                             <xforms:alert>If provided, age must be a number between 0 and 150</xforms:alert>
                         </xforms:input>
                     </xhtml:div>
-                    <xforms:repeat nodeset="phone" id="phone-repeat">
+                    <xforms:repeat ref="phone" id="phone-repeat">
                         <xhtml:div>
                             <xforms:input ref="number">
                                 <xforms:label>Phone number</xforms:label>
@@ -108,7 +108,7 @@
                             <xhtml:img src="/apps/fr/style/images/silk/add.png"/>
                             <xhtml:span>Add phone</xhtml:span>
                         </xforms:label>
-                        <xforms:insert context="." nodeset="phone" origin="instance('phone-template')" ev:event="DOMActivate"/>
+                        <xforms:insert context="." ref="phone" origin="instance('phone-template')" ev:event="DOMActivate"/>
                     </fr:button>
                     <fr:button>
                         <xforms:label>

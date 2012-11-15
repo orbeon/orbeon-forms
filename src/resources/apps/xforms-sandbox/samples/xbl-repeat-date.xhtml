@@ -30,9 +30,9 @@
                     <date/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="date[1]" xxforms:default="current-date()"/>
-            <xforms:bind nodeset="date[2]" xxforms:default="current-date() - xs:dayTimeDuration('P1D')"/>
-            <xforms:bind nodeset="date" type="xforms:date"/>
+            <xforms:bind ref="date[1]" xxforms:default="current-date()"/>
+            <xforms:bind ref="date[2]" xxforms:default="current-date() - xs:dayTimeDuration('P1D')"/>
+            <xforms:bind ref="date" type="xforms:date"/>
         </xforms:model>
      </xhtml:head>
     <xhtml:body>
@@ -45,17 +45,17 @@
 
         <xforms:trigger>
             <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" context="." nodeset="date" at="index('date-repeat')" origin="xxforms:element('date')"/>
+            <xforms:insert ev:event="DOMActivate" context="." ref="date" at="index('date-repeat')" origin="xxforms:element('date')"/>
         </xforms:trigger>
 
         <xforms:trigger>
             <xforms:label>Remove</xforms:label>
-            <xforms:delete ev:event="DOMActivate" nodeset="date" at="index('date-repeat')"/>
+            <xforms:delete ev:event="DOMActivate" ref="date" at="index('date-repeat')"/>
         </xforms:trigger>
 
         <xhtml:hr/>
 
-        <xforms:repeat nodeset="date" id="date-repeat">
+        <xforms:repeat ref="date" id="date-repeat">
             <fr:dropdown-date ref="." id="fr-dropdown-date">
                 <xforms:label>Date: </xforms:label>
             </fr:dropdown-date>

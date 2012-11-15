@@ -50,11 +50,11 @@
                 </test2:instance>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('lax-instance')">
-                <xforms:bind nodeset="test:value/@state" type="test:state-type"/>
-                <xforms:bind nodeset="test:state1" type="test:state-type"/>
-                <xforms:bind nodeset="test:state2" type="test:state-with-attribute"/>
-                <xforms:bind nodeset="test:state3" type="test:state-element"/>
+            <xforms:bind ref="instance('lax-instance')">
+                <xforms:bind ref="test:value/@state" type="test:state-type"/>
+                <xforms:bind ref="test:state1" type="test:state-type"/>
+                <xforms:bind ref="test:state2" type="test:state-with-attribute"/>
+                <xforms:bind ref="test:state3" type="test:state-element"/>
             </xforms:bind>
 
             <xforms:instance id="schema-instance" src="oxf:/apps/xforms-sandbox/samples/schema-types.xsd"/>
@@ -75,7 +75,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -87,7 +87,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -99,7 +99,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -111,7 +111,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -131,7 +131,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -143,7 +143,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -155,7 +155,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -175,7 +175,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -187,7 +187,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
@@ -199,7 +199,7 @@
                     <xforms:label>[Select...]</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
+                <xforms:itemset ref="instance('schema-instance')/xs:simpleType[@name = 'state-type']//xs:enumeration">
                     <xforms:label ref="@value"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>

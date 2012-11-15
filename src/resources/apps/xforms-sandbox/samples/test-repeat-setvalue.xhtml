@@ -59,9 +59,9 @@
     <xhtml:body>
         <fr:button id="add">
             <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="name"/>
+            <xforms:insert ev:event="DOMActivate" ref="name"/>
         </fr:button>
-        <xforms:repeat nodeset="name">
+        <xforms:repeat ref="name">
             <xforms:input id="name" ref="."/>
         </xforms:repeat>
     </xhtml:body>

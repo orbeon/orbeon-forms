@@ -194,7 +194,7 @@ public class XFormsActionInterpreter {
             // NOTE: If we repeat, re-evaluate the action binding.
             // For example:
             //
-            //   <xforms:delete nodeset="/*/foo[1]" while="/*/foo"/>
+            //   <xforms:delete ref="/*/foo[1]" while="/*/foo"/>
             //
             // In this case, in the second iteration, xforms:repeat must find an up-to-date nodeset!
             // TODO: function context

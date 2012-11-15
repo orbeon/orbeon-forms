@@ -28,22 +28,22 @@
                     </message>
                 </form>
             </xforms:instance>
-            <xforms:bind id="fr-form-binds" nodeset="instance('fr-form-instance')">
-                <xforms:bind id="contact-bind" nodeset="contact" name="contact">
-                    <xforms:bind id="first-name-bind" nodeset="first-name" type="xs:string" required="true()"
+            <xforms:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xforms:bind id="contact-bind" ref="contact" name="contact">
+                    <xforms:bind id="first-name-bind" ref="first-name" type="xs:string" required="true()"
                                  name="first-name"/>
-                    <xforms:bind id="last-name-bind" nodeset="last-name" type="xs:string" required="true()"
+                    <xforms:bind id="last-name-bind" ref="last-name" type="xs:string" required="true()"
                                  name="last-name"/>
-                    <xforms:bind id="email-bind" nodeset="email" type="xforms:email" required="true()"
+                    <xforms:bind id="email-bind" ref="email" type="xforms:email" required="true()"
                                  name="email"/>
-                    <xforms:bind id="phone-bind" nodeset="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/>
+                    <xforms:bind id="phone-bind" ref="phone" constraint=". = '' or matches(., '^\d{10}$')" name="phone"/>
                 </xforms:bind>
-                <xforms:bind id="message-bind" nodeset="message" name="message">
-                    <xforms:bind id="order-number-bind" nodeset="order-number" type="xs:string"
+                <xforms:bind id="message-bind" ref="message" name="message">
+                    <xforms:bind id="order-number-bind" ref="order-number" type="xs:string"
                                  required="true()"
                                  name="order-number"/>
-                    <xforms:bind id="topic-bind" nodeset="topic" type="xs:string" required="true()" name="topic"/>
-                    <xforms:bind id="comments-bind" nodeset="comments" type="xs:string" required="true()"
+                    <xforms:bind id="topic-bind" ref="topic" type="xs:string" required="true()" name="topic"/>
+                    <xforms:bind id="comments-bind" ref="comments" type="xs:string" required="true()"
                                  name="comments"/>
                 </xforms:bind>
             </xforms:bind>
@@ -319,7 +319,7 @@
                                         <xforms:label>[Select...]</xforms:label>
                                         <xforms:value/>
                                     </xforms:item>
-                                    <xforms:itemset nodeset="$form-resources/topic/item">
+                                    <xforms:itemset ref="$form-resources/topic/item">
                                         <xforms:label ref="label"/>
                                         <xforms:value ref="value"/>
                                     </xforms:itemset>

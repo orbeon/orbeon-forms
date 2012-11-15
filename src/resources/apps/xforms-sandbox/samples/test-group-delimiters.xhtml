@@ -41,7 +41,7 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:input id="count" ref="count"/>
-        <xforms:repeat nodeset="enabled">
+        <xforms:repeat ref="enabled">
             <xhtml:div>
                 <fr:button>
                     <xforms:label>Toggle level <xforms:output value="@level"/><xforms:output value="if (@position) then concat(' position ', @position) else ''"/></xforms:label>

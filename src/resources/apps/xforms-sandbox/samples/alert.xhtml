@@ -29,7 +29,7 @@
                     <node value="" valid="1" readonly="0" required="0"/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/node/@value" constraint="../@valid = 1" readonly="../@readonly = 1"
+            <xforms:bind ref="/instance/node/@value" constraint="../@valid = 1" readonly="../@readonly = 1"
                     required="../@required = 1"/>
         </xforms:model>
     </xhtml:head>
@@ -41,7 +41,7 @@
                 <xhtml:th>Read only</xhtml:th>
                 <xhtml:th>Required</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="/instance/node">
+            <xforms:repeat ref="/instance/node">
                 <xhtml:tr>
                     <xhtml:td>
                         <xforms:input id="input" ref="@value">
@@ -75,7 +75,7 @@
         </xhtml:table>
         <xforms:trigger>
             <xforms:label>Add line</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>
+            <xforms:insert ev:event="DOMActivate" ref="/instance/node" at="last()" position="after"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

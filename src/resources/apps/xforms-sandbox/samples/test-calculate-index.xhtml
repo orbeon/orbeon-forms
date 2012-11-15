@@ -32,7 +32,7 @@
                     <section-index/>
                 </ui>
             </xforms:instance>
-            <xforms:bind nodeset="section-index" calculate="index('repeat-section')"/>
+            <xforms:bind ref="section-index" calculate="index('repeat-section')"/>
 
         </xforms:model>
     </xhtml:head>
@@ -43,7 +43,7 @@
         /
         <xforms:output value="section-index"/>
 
-        <xforms:repeat nodeset="item" id="repeat-section">
+        <xforms:repeat ref="item" id="repeat-section">
             <xhtml:div>
                 <xforms:output value="."/>
             </xhtml:div>

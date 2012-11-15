@@ -37,14 +37,14 @@
                 </instance>
             </xforms:instance>
 
-            <xforms:bind nodeset="book">
-                <xforms:bind id="title-bind" nodeset="title" required="true()"/>
-                <xforms:bind id="author-bind" nodeset="author" required="true()"/>
+            <xforms:bind ref="book">
+                <xforms:bind id="title-bind" ref="title" required="true()"/>
+                <xforms:bind id="author-bind" ref="author" required="true()"/>
             </xforms:bind>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="book">
+        <xforms:repeat ref="book">
             <xforms:input id="title-control" bind="title-bind">
                 <xforms:label>Title</xforms:label>
             </xforms:input>

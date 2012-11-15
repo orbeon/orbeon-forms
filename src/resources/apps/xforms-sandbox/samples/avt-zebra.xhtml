@@ -52,7 +52,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="*">
+                <xforms:repeat ref="*">
                     <xhtml:tr class="zebra-row-{if (position() mod 2 = 0) then 'even' else 'odd'}">
                         <xhtml:td>
                             <xforms:output value="position()"/>

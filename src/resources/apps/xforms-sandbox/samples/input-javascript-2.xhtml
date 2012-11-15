@@ -30,7 +30,7 @@
                 <instance/>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('formatted')" calculate="saxon:serialize(xxforms:call-xpl ('oxf:/ops/utils/formatting/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+            <xforms:bind ref="instance('formatted')" calculate="saxon:serialize(xxforms:call-xpl ('oxf:/ops/utils/formatting/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

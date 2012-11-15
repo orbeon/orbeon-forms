@@ -53,7 +53,7 @@
                                                          return concat('&amp;path=', encode-for-uri($query/@path), '&amp;value=', $query), ''))
                                             }&amp;lang={/*/lang}" replace="instance">
                 <!-- Move resulting <document> element as root element -->
-                <xforms:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" nodeset="/*" origin="/*/*[1]"/>
+                <xforms:insert ev:event="xforms-submit-done" if="event('response-status-code') = 200" ref="/*" origin="/*/*[1]"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
             </xforms:submission>
         </p:input>

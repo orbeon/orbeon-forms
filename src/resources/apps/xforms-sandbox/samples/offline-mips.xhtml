@@ -54,14 +54,14 @@
                     <g/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance">
-                <xforms:bind nodeset="a" name="a" type="xs:integer" xxforms:offline="true"/>
-                <xforms:bind nodeset="b" name="b" relevant="$a = '42'" xxforms:offline="true"/>
-                <xforms:bind nodeset="c" name="c" constraint=". = $b" xxforms:offline="true"/>
-                <xforms:bind nodeset="d" name="d" required="$c = '42'" xxforms:offline="true"/>
-                <xforms:bind nodeset="e" name="e" readonly="$d = '42'" xxforms:offline="true"/>
-                <xforms:bind nodeset="f" name="f" calculate="xxforms:if($e = '42', 'Good', 'Could be better')" xxforms:offline="true"/>
-                <xforms:bind nodeset="g" name="g" constraint="matches(., '^\d\d\d\d-\d\d-\d\d$')" xxforms:offline="true"/>
+            <xforms:bind ref="/instance">
+                <xforms:bind ref="a" name="a" type="xs:integer" xxforms:offline="true"/>
+                <xforms:bind ref="b" name="b" relevant="$a = '42'" xxforms:offline="true"/>
+                <xforms:bind ref="c" name="c" constraint=". = $b" xxforms:offline="true"/>
+                <xforms:bind ref="d" name="d" required="$c = '42'" xxforms:offline="true"/>
+                <xforms:bind ref="e" name="e" readonly="$d = '42'" xxforms:offline="true"/>
+                <xforms:bind ref="f" name="f" calculate="xxforms:if($e = '42', 'Good', 'Could be better')" xxforms:offline="true"/>
+                <xforms:bind ref="g" name="g" constraint="matches(., '^\d\d\d\d-\d\d-\d\d$')" xxforms:offline="true"/>
             </xforms:bind>
 
             <xforms:instance id="ui">

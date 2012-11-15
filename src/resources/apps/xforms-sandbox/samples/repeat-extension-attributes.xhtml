@@ -53,7 +53,7 @@
             </xforms:input>
         </xforms:group>
 
-        <xforms:repeat nodeset="*" id="fruit-repeat">
+        <xforms:repeat ref="*" id="fruit-repeat">
             <xhtml:div>
                 <xforms:input ref="." xxforms:maxlength="{instance('attributes')/maxlength}" style="{instance('attributes')/style}"/>
             </xhtml:div>
@@ -61,11 +61,11 @@
 
         <xforms:trigger>
             <xforms:label>Add</xforms:label>
-            <xforms:insert ev:event="DOMActivate" nodeset="*" at="index('fruit-repeat')"/>
+            <xforms:insert ev:event="DOMActivate" ref="*" at="index('fruit-repeat')"/>
         </xforms:trigger>
         <xforms:trigger style="{instance('attributes')/style}">
             <xforms:label>Remove</xforms:label>
-            <xforms:delete ev:event="DOMActivate" nodeset="*" at="index('fruit-repeat')"/>
+            <xforms:delete ev:event="DOMActivate" ref="*" at="index('fruit-repeat')"/>
         </xforms:trigger>
     </xhtml:body>
 </xhtml:html>

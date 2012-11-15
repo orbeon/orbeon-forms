@@ -37,14 +37,14 @@
             </xf:instance>
 
             <!-- Touch instance11 -->
-            <xf:bind nodeset="." id="bind11">
-                <xf:bind nodeset="a" id="bind12"/>
+            <xf:bind ref="." id="bind11">
+                <xf:bind ref="a" id="bind12"/>
                 <!-- Touch instance12 -->
-                <xf:bind nodeset="instance('instance12')" id="bind13"/>
+                <xf:bind ref="instance('instance12')" id="bind13"/>
             </xf:bind>
 
             <!-- Touch instance13 -->
-            <xf:bind nodeset="instance('instance13')" id="bind14"/>
+            <xf:bind ref="instance('instance13')" id="bind14"/>
 
         </xf:model>
         <xf:model id="model2">
@@ -67,7 +67,7 @@
                 </instance>
             </xf:instance>
             <!-- Touch instance32 only -->
-            <xf:bind nodeset="instance('instance32')" id="bind31"/>
+            <xf:bind ref="instance('instance32')" id="bind31"/>
         </xf:model>
         <xf:model id="model4">
             <xf:instance id="instance41">
@@ -81,7 +81,7 @@
                 </instance>
             </xf:instance>
             <!-- Touch instance41 only -->
-            <xf:bind nodeset="instance()" id="bind41"/>
+            <xf:bind ref="instance()" id="bind41"/>
         </xf:model>
         <xf:model id="model5">
             <xf:instance id="instance51">
@@ -95,9 +95,9 @@
                 </instance>
             </xf:instance>
             <!-- Validity MIP -->
-            <xf:bind nodeset="instance()/a" id="bind51" constraint="true()"/>
+            <xf:bind ref="instance()/a" id="bind51" constraint="true()"/>
             <!-- Calculate MIP -->
-            <xf:bind nodeset="instance('instance52')/a" id="bind52" calculate="42"/>
+            <xf:bind ref="instance('instance52')/a" id="bind52" calculate="42"/>
         </xf:model>
     </xh:head>
     <xh:body/>

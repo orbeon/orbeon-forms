@@ -53,9 +53,9 @@
     <xhtml:body>
 
         <table>
-            <xforms:repeat nodeset="tr" id="row-repeat" xxforms:dnd="true">
+            <xforms:repeat ref="tr" id="row-repeat" xxforms:dnd="true">
                 <tr>
-                    <xforms:repeat nodeset="td" id="cell-repeat">
+                    <xforms:repeat ref="td" id="cell-repeat">
                         <td>
                             <xforms:input id="my-input" ref="."/>
                         </td>

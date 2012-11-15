@@ -47,12 +47,12 @@
                     <xforms:label>-- Select one --</xforms:label>
                     <xforms:value/>
                 </xforms:item>
-                <xforms:itemset nodeset="instance('items-instance')/item">
+                <xforms:itemset ref="instance('items-instance')/item">
                     <xforms:label ref="@label"/>
                     <xforms:value ref="@value"/>
                 </xforms:itemset>
                 <xforms:action ev:event="xforms-value-changed">
-                    <xforms:delete nodeset="../item"/>
+                    <xforms:delete ref="../item"/>
                     <xforms:action if=". != ''" >
                         <xforms:insert context=".." origin="instance('items-instance')/item[@value = context()/@value]"/>
                     </xforms:action>

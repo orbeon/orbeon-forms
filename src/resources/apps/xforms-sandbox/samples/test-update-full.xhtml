@@ -40,9 +40,9 @@
                     <server-value>false</server-value>
                 </ui>
             </xforms:instance>
-            <xforms:bind nodeset="focus-non-relevant-no-error" relevant=". != 'Non-relevant'"/>
-            <xforms:bind nodeset="focus-readonly-no-error" readonly=". = 'Read-only'"/>
-            <xforms:bind nodeset="server-value" type="xs:boolean"/>
+            <xforms:bind ref="focus-non-relevant-no-error" relevant=". != 'Non-relevant'"/>
+            <xforms:bind ref="focus-readonly-no-error" readonly=". = 'Read-only'"/>
+            <xforms:bind ref="server-value" type="xs:boolean"/>
             <xforms:instance id="numbers">
                 <numbers>
                     <number value="1">One</number>
@@ -65,7 +65,7 @@
             </fr:button>
             <xhtml:div>
                 <xhtml:table>
-                    <xforms:repeat nodeset="instance('numbers')/number">
+                    <xforms:repeat ref="instance('numbers')/number">
                         <xforms:var name="position" value="position()"/>
                         <xforms:group ref=".[@value != 2 or instance('ui')/show-two = 'true']" xxforms:update="full" id="group-update-full">
                             <xhtml:tr>
@@ -104,7 +104,7 @@
                 <xforms:setvalue ev:event="DOMActivate" ref="show-one" value="if (. = 'true') then 'false' else 'true'"/>
             </fr:button>
             <xhtml:div>
-                <xforms:repeat nodeset="instance('numbers')/number[if (instance('ui')/show-one = 'false') then @value != 1 else true()]"  xxforms:update="full" id="repeat-update-full">
+                <xforms:repeat ref="instance('numbers')/number[if (instance('ui')/show-one = 'false') then @value != 1 else true()]"  xxforms:update="full" id="repeat-update-full">
                     <xforms:output value="." id="repeat-value"/>
                 </xforms:repeat>
             </xhtml:div>
@@ -141,11 +141,11 @@
             <xhtml:legend>Dialog initialization</xhtml:legend>
             <fr:button id="add-iteration">
                 <xforms:label>Add iteration</xforms:label>
-                <xforms:insert ev:event="DOMActivate" nodeset="*" origin="xxforms:element('dialog')"/>
+                <xforms:insert ev:event="DOMActivate" ref="*" origin="xxforms:element('dialog')"/>
             </fr:button>
             <xhtml:div>
                 <xforms:group id="dialog-container" xxforms:update="full">
-                    <xforms:repeat nodeset="dialog">
+                    <xforms:repeat ref="dialog">
                         <xxforms:dialog id="dialog">Dialog content</xxforms:dialog>
                     </xforms:repeat>
                 </xforms:group>

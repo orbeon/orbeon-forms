@@ -50,7 +50,7 @@
         <p:input name="submission">
             <xforms:submission method="post" replace="instance"
                                resource="{xxforms:get-request-header('orbeon-exist-uri')}">
-                <xforms:insert ev:event="xforms-submit-done" nodeset="/*" origin="xxforms:element('forms', *)"/>
+                <xforms:insert ev:event="xforms-submit-done" ref="/*" origin="xxforms:element('forms', *)"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
             </xforms:submission>
         </p:input>

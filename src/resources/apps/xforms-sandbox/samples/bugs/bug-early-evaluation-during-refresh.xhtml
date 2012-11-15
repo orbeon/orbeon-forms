@@ -34,7 +34,7 @@
                     <record/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
+            <xforms:bind ref="record" readonly="(count(preceding-sibling::*) + 1) = index('my-repeat')"/>
         </xforms:model>
     </head>
     <body>
@@ -46,7 +46,7 @@
             </a>.
         </p>
 
-        <xforms:repeat model="model2" nodeset="record" id="my-repeat">
+        <xforms:repeat model="model2" ref="record" id="my-repeat">
             <div>
                  <xforms:trigger id="my-trigger" ref=".">
                     <xforms:label>Do Stuff</xforms:label>

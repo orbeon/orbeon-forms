@@ -29,7 +29,7 @@
                     <city relevant="true">San Diego</city>
                 </cities>
             </xforms:instance>
-            <xforms:bind nodeset="/cities/city" relevant="@relevant = 'true'"/>
+            <xforms:bind ref="/cities/city" relevant="@relevant = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -40,7 +40,7 @@
             <xforms:label>Toggle relevance</xforms:label>
             <xforms:setvalue ev:event="DOMActivate" ref="/cities/city[number(/cities/@index)]/@relevant" value="if (. = 'true') then 'false' else 'true'"/>
         </xforms:trigger>
-        <xforms:repeat nodeset="city">
+        <xforms:repeat ref="city">
             <xhtml:div>
                 <xforms:input ref=".">
                     <xforms:label>City: </xforms:label>

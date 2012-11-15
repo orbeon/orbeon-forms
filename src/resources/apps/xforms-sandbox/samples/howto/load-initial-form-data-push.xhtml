@@ -29,7 +29,7 @@
 
             <!-- Load initial data from the request -->
             <xforms:insert ev:event="xforms-model-construct-done"
-                           nodeset="instance('user-data')" origin="xxforms:get-request-attribute('my-user-data')"/>
+                           ref="instance('user-data')" origin="xxforms:get-request-attribute('my-user-data')"/>
 
         </xforms:model>
         <style type="text/css">

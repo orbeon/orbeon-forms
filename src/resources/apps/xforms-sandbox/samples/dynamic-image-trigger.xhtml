@@ -39,7 +39,7 @@
         <xhtml:table>
             <xhtml:tr>
                 <xhtml:td>
-                    <xforms:repeat nodeset="instance('main-instance')/button">
+                    <xforms:repeat ref="instance('main-instance')/button">
                         <xhtml:td width="150px">
                             <xforms:output value="image" mediatype="image/*" xhtml:style="cursor:pointer">
                                 <xforms:action ev:event="DOMActivate">
@@ -56,7 +56,7 @@
         <xhtml:table>
             <xhtml:tr>
                 <xhtml:td>
-                    <xforms:repeat nodeset="instance('main-instance')/button">
+                    <xforms:repeat ref="instance('main-instance')/button">
                         <xhtml:td>
                             <xforms:trigger appearance="minimal">
                                 <xforms:label><xforms:output ref="image" mediatype="image/*"/></xforms:label>
@@ -71,7 +71,7 @@
         <b>Case 3: Trigger with label containing "text/html" mediatype generating relative path</b> [Works]
         <xhtml:table>
             <xhtml:tr>
-                <xforms:repeat nodeset="instance('main-instance')/button">
+                <xforms:repeat ref="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger>
                             <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
@@ -81,7 +81,7 @@
                 </xforms:repeat>
             </xhtml:tr>
             <xhtml:tr>
-                <xforms:repeat nodeset="instance('main-instance')/button">
+                <xforms:repeat ref="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger appearance="minimal">
                             <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''../..', image, '''>')" mediatype="text/html"/></xforms:label>
@@ -96,7 +96,7 @@
         <b>Case 4: Trigger with label containing "text/html" mediatype generating absolute path</b> [Works]
         <xhtml:table>
             <xhtml:tr>
-                <xforms:repeat nodeset="instance('main-instance')/button">
+                <xforms:repeat ref="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger>
                             <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''', image, '''>')" mediatype="text/html"/></xforms:label>
@@ -106,7 +106,7 @@
                 </xforms:repeat>
             </xhtml:tr>
             <xhtml:tr>
-                <xforms:repeat nodeset="instance('main-instance')/button">
+                <xforms:repeat ref="instance('main-instance')/button">
                     <xhtml:td>
                         <xforms:trigger appearance="minimal">
                             <xforms:label><b>Bold:</b> <xforms:output value="concat('&lt;img src=''', image, '''>')" mediatype="text/html"/></xforms:label>

@@ -45,7 +45,7 @@
             different nested repeat.
         </p>
 
-        <xforms:repeat nodeset="department" id="repeat-department">
+        <xforms:repeat ref="department" id="repeat-department">
             <table class="gridtable">
                 <thead>
                     <tr>
@@ -56,7 +56,7 @@
                 </thead>
                 <tbody>
                     <xforms:var name="department-position" value="position()"/>
-                    <xforms:repeat nodeset="employee" id="repeat-employee">
+                    <xforms:repeat ref="employee" id="repeat-employee">
                         <xforms:var name="employee-position" value="position()"/>
                         <tr>
                             <td>

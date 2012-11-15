@@ -2521,7 +2521,7 @@
 
                         <xf:action ev:event="xforms-ready">
                             <xf:refresh/>
-                            <xf:delete model="events-model" nodeset="*"/>
+                            <xf:delete model="events-model" ref="*"/>
 
                             <!-- Cause a to become valid -->
                             <xf:setvalue ref="b">x</xf:setvalue>
@@ -2539,7 +2539,7 @@
                 </xh:head>
                 <xh:body>
                     <xf:insert ev:event="#all"
-                                   model="events-model" context="." nodeset="*"
+                                   model="events-model" context="." ref="*"
                                    origin="xxf:element('event',
                                             (xxf:attribute('type', event('xxf:type')),
                                              xxf:attribute('target', event('xxf:targetid'))))"/>
@@ -5369,7 +5369,7 @@
                         <xf:instance>
                             <first-name/>
                         </xf:instance>
-                        <xf:bind nodeset="instance()" required="true()"/>
+                        <xf:bind ref="instance()" required="true()"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>

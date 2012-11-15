@@ -32,7 +32,7 @@
 
             <!-- If we get an initial instance and country from the search page, use that -->
             <xforms:action ev:event="xforms-model-construct-done" if="exists(instance('input')/registration)">
-                <xforms:insert nodeset="instance('registration')" origin="instance('input')/registration"/>
+                <xforms:insert ref="instance('registration')" origin="instance('input')/registration"/>
                 <xforms:setvalue ref="instance('registration')/country" value="instance('input')/country"/>
             </xforms:action>
                 

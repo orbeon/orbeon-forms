@@ -134,19 +134,19 @@
                     <xhtml:p>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>Remove selected</xforms:label>
-                            <xforms:delete ev:event="DOMActivate" nodeset="$current-item"/>
+                            <xforms:delete ev:event="DOMActivate" ref="$current-item"/>
                         </xforms:trigger>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>Add new item</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" nodeset="$current-item" origin="instance('template-instance')"/>
+                            <xforms:insert ev:event="DOMActivate" ref="$current-item" origin="instance('template-instance')"/>
                         </xforms:trigger>
                     </xhtml:p>
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree1" incremental="true">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}" xxforms:open="{count(ancestor-or-self::item) = 1}">
+                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}" xxforms:open="{count(ancestor-or-self::item) = 1}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -154,7 +154,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select1 ref="select1" appearance="xxforms:tree" id="tree2" incremental="false">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -173,19 +173,19 @@
                     <xhtml:p>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>Remove selected</xforms:label>
-                            <xforms:delete ev:event="DOMActivate" nodeset="$current-items"/>
+                            <xforms:delete ev:event="DOMActivate" ref="$current-items"/>
                         </xforms:trigger>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:trigger appearance="minimal">
                             <xforms:label>Add new item</xforms:label>
-                            <xforms:insert ev:event="DOMActivate" nodeset="$current-items[last()]" origin="instance('template-instance')"/>
+                            <xforms:insert ev:event="DOMActivate" ref="$current-items[last()]" origin="instance('template-instance')"/>
                         </xforms:trigger>
                     </xhtml:p>
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree3" incremental="true">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>
@@ -193,7 +193,7 @@
                 </xhtml:td>
                 <xhtml:td>
                     <xforms:select ref="select" appearance="xxforms:tree" id="tree4" incremental="false">
-                        <xforms:itemset nodeset="instance(instance('main-instance')/data-set)//item" class="{@color}">
+                        <xforms:itemset ref="instance(instance('main-instance')/data-set)//item" class="{@color}">
                             <xforms:label ref="@label"/>
                             <xforms:value ref="@value"/>
                         </xforms:itemset>

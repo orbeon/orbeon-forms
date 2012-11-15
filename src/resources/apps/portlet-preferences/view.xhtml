@@ -41,7 +41,7 @@
                 <th>Preference Name</th>
                 <th>Preference Values</th>
             </tr>
-            <xforms:repeat nodeset="instance('preferences')/preference">
+            <xforms:repeat ref="instance('preferences')/preference">
                 <tr>
                     <td>
                         <xforms:output value="name"/>

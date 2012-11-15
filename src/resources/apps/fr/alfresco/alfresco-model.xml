@@ -265,7 +265,7 @@
             <!-- Set path -->
             <xforms:setvalue ref=".//alf-cml:path" value="$alfresco-path"/>
             <!-- Set authentication headers -->
-            <xforms:delete nodeset="instance('alfresco-create-ws-request')/soap:Header"/>
+            <xforms:delete ref="instance('alfresco-create-ws-request')/soap:Header"/>
             <xforms:insert context="instance('alfresco-create-ws-request')" origin="instance('alfresco-auth-headers')"/>
         </xforms:action>
     </xforms:submission>
@@ -309,7 +309,7 @@
 
         <xforms:action ev:event="xforms-submit">
             <!-- Set authentication headers -->
-            <xforms:delete nodeset="instance('alfresco-post-content-ws-request')/soap:Header"/>
+            <xforms:delete ref="instance('alfresco-post-content-ws-request')/soap:Header"/>
             <xforms:insert context="instance('alfresco-post-content-ws-request')" origin="instance('alfresco-auth-headers')"/>
         </xforms:action>
     </xforms:submission>

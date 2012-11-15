@@ -63,13 +63,13 @@
         <xforms:trigger>
             <xforms:label>Read-Write Source Copy</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                <xforms:insert ref="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
             </xforms:action>
         </xforms:trigger>
         <xforms:trigger>
             <xforms:label>Read-Only Source Copy</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/second"/>
+                <xforms:insert ref="instance('instance3')" origin="xxforms:call-xpl('oxf:/ops/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', instance('instance2'), 'result')/*/second"/>
             </xforms:action>
         </xforms:trigger>
     </xhtml:body>

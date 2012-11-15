@@ -54,7 +54,7 @@
             </xforms:help>
 
             <!-- do not allow n/a in this rating select1, since N/A is last we can use position() != last() -->
-            <xforms:itemset model="resources-model" nodeset="instance('ratings-resources')/rating[position() != last()]">
+            <xforms:itemset model="resources-model" ref="instance('ratings-resources')/rating[position() != last()]">
                 <xforms:label ref="display/name"/>
                 <xforms:value ref="ratingId"/>
             </xforms:itemset>
@@ -67,7 +67,7 @@
             </xforms:help>
 
             <!-- do not allow n/a in this rating select1, since N/A is last we can use position() != last() -->
-            <xforms:itemset model="resources-model" nodeset="instance('ratings-resources')/rating[position() != last()]">
+            <xforms:itemset model="resources-model" ref="instance('ratings-resources')/rating[position() != last()]">
                 <xforms:label ref="display/name"/>
                 <xforms:value ref="ratingId"/>
             </xforms:itemset>

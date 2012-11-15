@@ -27,7 +27,7 @@
                     <guess/>
                 </number>
             </xforms:instance>
-            <xforms:bind nodeset="guess" type="xforms:integer"/>
+            <xforms:bind ref="guess" type="xforms:integer"/>
         </xforms:model>
         <xhtml:style type="text/css">
             .paragraph { margin-top: 1em; }

@@ -32,7 +32,7 @@
                     <enabled>false</enabled>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="enabled" type="xs:boolean"/>
+            <xforms:bind ref="enabled" type="xs:boolean"/>
 
             <xforms:instance id="items">
                 <items xmlns="">
@@ -94,7 +94,7 @@
 
             <xforms:select1 id="single-dynamic" ref="value1" appearance="full">
                 <xforms:label>Value: </xforms:label>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="label"/>
                     <xforms:value ref="value"/>
                 </xforms:itemset>
@@ -104,7 +104,7 @@
 
             <xforms:select id="multiple-dynamic" ref="value2" appearance="full">
                 <xforms:label>Value: </xforms:label>
-                <xforms:itemset nodeset="instance('items')/item">
+                <xforms:itemset ref="instance('items')/item">
                     <xforms:label ref="label"/>
                     <xforms:value ref="value"/>
                 </xforms:itemset>

@@ -97,7 +97,7 @@
         </fieldset>
         <!-- Iterate over the search configuration -->
         <fieldset>
-            <xforms:repeat nodeset="instance(instance())/search/value">
+            <xforms:repeat ref="instance(instance())/search/value">
                 <xforms:input ref=".[../@type = 'input']">
                     <xforms:label ref="../label"/>
                 </xforms:input>
@@ -107,7 +107,7 @@
                         <xforms:label>[Select...]</xforms:label>
                         <xforms:value/>
                     </xforms:item>
-                    <xforms:itemset nodeset="../item">
+                    <xforms:itemset ref="../item">
                         <xforms:label ref="label"/>
                         <xforms:value ref="value"/>
                     </xforms:itemset>

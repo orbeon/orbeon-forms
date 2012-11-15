@@ -270,7 +270,7 @@
                     </xsl:choose>
                 </error-summary>
             </xforms:instance>
-            <xforms:bind nodeset="trigger" readonly="not(../valid = 'true')"/>
+            <xforms:bind ref="trigger" readonly="not(../valid = 'true')"/>
 
             <!-- Verify captcha and mark all controls as visited when certain buttons are activated -->
             <xforms:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button fr-submit-button">
@@ -342,7 +342,7 @@
             <xforms:var name="fr-mode" value="xxforms:instance('fr-parameters-instance')/mode"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
-            <xforms:bind nodeset="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
+            <xforms:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
             <!-- Focus to the first control supporting input on load -->
             <xforms:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>

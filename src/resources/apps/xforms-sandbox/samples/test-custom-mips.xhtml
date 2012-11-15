@@ -81,7 +81,7 @@
                     <!--<state abbreviation="WY" name="Wyoming"/>-->
                 </states>
             </xforms:instance>
-            <xforms:bind nodeset="*/@name" foo:bar="if (starts-with(., 'N')) then 'is-n' else 'is-not-n'"/>
+            <xforms:bind ref="*/@name" foo:bar="if (starts-with(., 'N')) then 'is-n' else 'is-not-n'"/>
         </xforms:model>
         <xhtml:link type="text/css" rel="stylesheet" href="/ops/yui/logger/assets/logger.css"/>
         <xhtml:script type="text/javascript" src="/ops/yui/logger/logger.js"/>
@@ -144,7 +144,7 @@
                 </xhtml:tr>
             </xhtml:thead>
             <xhtml:tbody>
-                <xforms:repeat nodeset="*">
+                <xforms:repeat ref="*">
                     <xhtml:tr>
                         <xhtml:td>
                             <xforms:output value="position()"/>
@@ -160,7 +160,7 @@
         <xforms:trigger id="insert-1-button">
             <xforms:label>Insert Wyoming (for unit test)</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="*"
+                <xforms:insert ref="*"
                                origin="xxforms:element('state',
                                             (xxforms:attribute('abbreviation', 'WY'),
                                                 xxforms:attribute('name', 'Wyoming')))"/>
@@ -169,7 +169,7 @@
         <xforms:trigger id="insert-2-button">
             <xforms:label>Insert New Jersey (for unit test)</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="state[@abbreviation = 'NH']"
+                <xforms:insert ref="state[@abbreviation = 'NH']"
                                origin="xxforms:element('state',
                                             (xxforms:attribute('abbreviation', 'NJ'),
                                                 xxforms:attribute('name', 'New Jersey')))"/>

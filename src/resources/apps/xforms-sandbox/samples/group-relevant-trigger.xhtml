@@ -25,7 +25,7 @@
             <xforms:instance id="instance">
                 <instance relevant="true"/>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/@relevant" relevant=". = 'true'"/>
+            <xforms:bind ref="/instance/@relevant" relevant=". = 'true'"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

@@ -15,7 +15,7 @@
         <xhtml:title>Session</xhtml:title>
         <xforms:model>
             <xforms:instance id="from-session"><dummy/></xforms:instance>
-            <xforms:insert ev:event="xforms-model-construct-done" nodeset="instance('from-session')" 
+            <xforms:insert ev:event="xforms-model-construct-done" ref="instance('from-session')"
                 origin="xxforms:get-session-attribute('session-howto')"/>
             <xforms:instance id="ui">
                 <instance>

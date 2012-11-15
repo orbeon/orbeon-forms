@@ -91,7 +91,7 @@
                                 <value>42</value>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind nodeset="value" readonly="true()"/>
+                        <xforms:bind ref="value" readonly="true()"/>
                     </xforms:model>
                     <xi:include href="oxf:/xbl/orbeon/inplace-input/inplace-input.xbl" xxi:omit-xml-base="true"/>
                 </xhtml:head>
@@ -156,7 +156,7 @@
                     <xforms:group id="group1">
                         <xforms:action ev:event="my-event" ev:target="group1">
                             <!-- TEST: Event listener -->
-                            <xforms:insert context="instance('events')" nodeset="*"
+                            <xforms:insert context="instance('events')" ref="*"
                                            origin="xxforms:element('event',
                                                     (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('target', event('xxforms:targetid')),
@@ -172,7 +172,7 @@
                             <xforms:group id="group2">
                                 <xforms:action ev:event="my-event" ev:target="group2">
                                     <!-- TEST: Event listener -->
-                                    <xforms:insert context="instance('events')" nodeset="*"
+                                    <xforms:insert context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
@@ -189,7 +189,7 @@
                             <xforms:group id="group3">
                                 <xforms:action ev:event="my-event" ev:target="group3">
                                     <!-- TEST: Event listener -->
-                                    <xforms:insert context="instance('events')" nodeset="*"
+                                    <xforms:insert context="instance('events')" ref="*"
                                                    origin="xxforms:element('event',
                                                             (xxforms:attribute('type', event('xxforms:type')),
                                                              xxforms:attribute('target', event('xxforms:targetid')),
@@ -205,7 +205,7 @@
                     <xforms:group id="group4">
                         <xforms:action ev:event="my-event" ev:target="group4">
                             <!-- TEST: Event listener -->
-                            <xforms:insert context="instance('events')" nodeset="*"
+                            <xforms:insert context="instance('events')" ref="*"
                                            origin="xxforms:element('event',
                                                     (xxforms:attribute('type', event('xxforms:type')),
                                                      xxforms:attribute('target', event('xxforms:targetid')),
@@ -268,7 +268,7 @@
                             </instance>
                         </xforms:instance>
 
-                        <xforms:bind id="label5-bind" nodeset="label5"/>
+                        <xforms:bind id="label5-bind" ref="label5"/>
                     </xforms:model>
                     <xforms:model id="model2">
                         <xforms:instance id="instance2">
@@ -357,9 +357,9 @@
                             </instance>
                         </xforms:instance>
 
-                        <xforms:bind id="first-name-bind" nodeset="first-name" required="true()"/>
-                        <xforms:bind id="last-name-bind" nodeset="last-name" required="true()"/>
-                        <xforms:bind id="note-bind" nodeset="note" required="true()"/>
+                        <xforms:bind id="first-name-bind" ref="first-name" required="true()"/>
+                        <xforms:bind id="last-name-bind" ref="last-name" required="true()"/>
+                        <xforms:bind id="note-bind" ref="note" required="true()"/>
 
                         <xforms:instance id="error-summary-instance">
                             <error-summary>
@@ -376,7 +376,7 @@
                             <xforms:setindex repeat="repeat" index="2"/>
                             <xforms:dispatch name="DOMFocusOut" targetid="note-control"/>
                             <!-- Insert new note #2 -->
-                            <xforms:insert nodeset="note" at="1" position="after" origin="xxforms:element('note')"/>
+                            <xforms:insert ref="note" at="1" position="after" origin="xxforms:element('note')"/>
                         </xforms:action>
 
                     </xforms:model>
@@ -394,7 +394,7 @@
                             <xforms:label>First name</xforms:label>
                             <xforms:alert>Invalid first name</xforms:alert>
                         </xforms:input>
-                        <xforms:repeat nodeset="note" id="repeat">
+                        <xforms:repeat ref="note" id="repeat">
                             <xforms:input id="note-control" ref=".">
                                 <xforms:label>Note</xforms:label>
                                 <xforms:alert>Invalid note</xforms:alert>
@@ -606,7 +606,7 @@
                 </xhtml:head>
                 <xhtml:body>
                     <fr:autocomplete id="my-autocomplete" ref="value" incremental="true" dynamic-itemset="true" >
-                        <xforms:itemset nodeset="../item">
+                        <xforms:itemset ref="../item">
                             <xforms:label ref="."/>
                             <xforms:value ref="."/>
                         </xforms:itemset>
@@ -684,7 +684,7 @@
                 <xhtml:body>
                     <fr:datatable id="my-datatable">
                         <xh:tbody>
-                            <xh:tr repeat-nodeset="department">
+                            <xh:tr repeat-ref="department">
                                 <xh:td>
                                     <xf:input id="my-input" ref="@id"/>
                                 </xh:td>

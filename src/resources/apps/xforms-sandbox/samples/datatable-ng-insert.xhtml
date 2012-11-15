@@ -48,7 +48,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
         </xforms:model>
 
         <xbl:xbl script-type="application/xhtml+xml">
@@ -91,7 +91,7 @@
                 <xforms:trigger>
                     <xforms:label>Insert</xforms:label>
                     <xforms:insert ev:event="DOMActivate" origin="instance('new-row')/record"
-                        context="instance('instance')" nodeset="record" at="instance('new-row')/@at"
+                        context="instance('instance')" ref="record" at="instance('new-row')/@at"
                         position="before"/>
                 </xforms:trigger>
             </p>
@@ -111,7 +111,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <xforms:repeat nodeset="record" id="r1">
+                            <xforms:repeat ref="record" id="r1">
                                 <tr>
                                     <td>
                                         <xforms:output ref="AAA"/>
@@ -143,7 +143,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <xforms:repeat nodeset="record" id="r2">
+                            <xforms:repeat ref="record" id="r2">
                                 <tr>
                                     <td>
                                         <xforms:output ref="AAA"/>
@@ -175,7 +175,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <xforms:repeat nodeset="record" id="r3">
+                            <xforms:repeat ref="record" id="r3">
                                 <tr>
                                     <td>
                                         <xforms:output ref="AAA"/>

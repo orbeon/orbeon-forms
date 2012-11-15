@@ -44,8 +44,8 @@
                                             <noFoundData>0</noFoundData>
                                         </instance>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="instance('tests')">
-                                        <xforms:bind nodeset="noFoundData" calculate=". + 1"/>
+                                    <xforms:bind ref="instance('tests')">
+                                        <xforms:bind ref="noFoundData" calculate=". + 1"/>
                                     </xforms:bind>
                                 </xforms:model>
                             </xhtml:head>
@@ -153,8 +153,8 @@
                                             </e4>
                                         </e1>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="e2" relevant="false()"/>
-                                    <xforms:bind nodeset="e4" readonly="true()"/>
+                                    <xforms:bind ref="e2" relevant="false()"/>
+                                    <xforms:bind ref="e4" readonly="true()"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
@@ -209,16 +209,16 @@
                             </instance>
                         </xforms:instance>
 
-                        <xforms:bind nodeset="a" constraint="'false'"/>
-                        <xforms:bind nodeset="b" constraint="false()"/>
-                        <xforms:bind nodeset="c" constraint="'true'"/>
-                        <xforms:bind nodeset="d" constraint="true()"/>
-                        <xforms:bind nodeset="e" constraint="../true"/>
-                        <xforms:bind nodeset="f" constraint="../false"/>
-                        <xforms:bind nodeset="g" constraint="non-existing"/>
-                        <xforms:bind nodeset="h" constraint="0"/>
-                        <xforms:bind nodeset="i" constraint="1000"/>
-                        <xforms:bind nodeset="j" constraint="number('NaN')"/>
+                        <xforms:bind ref="a" constraint="'false'"/>
+                        <xforms:bind ref="b" constraint="false()"/>
+                        <xforms:bind ref="c" constraint="'true'"/>
+                        <xforms:bind ref="d" constraint="true()"/>
+                        <xforms:bind ref="e" constraint="../true"/>
+                        <xforms:bind ref="f" constraint="../false"/>
+                        <xforms:bind ref="g" constraint="non-existing"/>
+                        <xforms:bind ref="h" constraint="0"/>
+                        <xforms:bind ref="i" constraint="1000"/>
+                        <xforms:bind ref="j" constraint="number('NaN')"/>
 
                         <xforms:instance id="result">
                             <result/>
@@ -228,7 +228,7 @@
 
                         <xforms:action ev:event="xforms-ready" iterate="*">
                             <xforms:var name="current" value="."/>
-                            <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
+                            <xforms:insert context="instance('result')" ref="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
                         </xforms:action>
 
                     </xforms:model>
@@ -296,7 +296,7 @@
                                         </instance>
                                     </xforms:instance>
 
-                                    <xforms:bind nodeset="emails/email" type="xforms:email"/>
+                                    <xforms:bind ref="emails/email" type="xforms:email"/>
 
                                     <xforms:instance id="result">
                                         <result/>
@@ -304,7 +304,7 @@
 
                                     <xforms:action ev:event="xforms-ready" iterate="*/*">
                                         <xforms:var name="current" value="."/>
-                                        <xforms:insert context="instance('result')" nodeset="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
+                                        <xforms:insert context="instance('result')" ref="*" origin="xxforms:element(name($current), xxforms:valid($current))"/>
                                     </xforms:action>
 
                                 </xforms:model>
@@ -370,11 +370,11 @@
                                         </fruits>
                                     </xforms:instance>
                                     <!-- This is the key: set a custom MIP depending on the value -->
-                                    <xforms:bind nodeset="*" foo:bar="if (starts-with(., 'g')) then 'is-g' else 'is-not-g'"/>
+                                    <xforms:bind ref="*" foo:bar="if (starts-with(., 'g')) then 'is-g' else 'is-not-g'"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body>
-                                <xforms:repeat id="my-repeat" nodeset="*">
+                                <xforms:repeat id="my-repeat" ref="*">
                                     <xforms:input id="my-control" ref="."/>
                                 </xforms:repeat>
                             </xhtml:body>
@@ -430,11 +430,11 @@
                                         </instance>
                                     </xforms:instance>
 
-                                    <xforms:bind nodeset="readonly" readonly="true()"/>
-                                    <xforms:bind nodeset="required" required="true()"/>
+                                    <xforms:bind ref="readonly" readonly="true()"/>
+                                    <xforms:bind ref="required" required="true()"/>
 
-                                    <xforms:bind nodeset="relevant" relevant="false()"/>
-                                    <xforms:bind nodeset="valid" constraint="false()"/>
+                                    <xforms:bind ref="relevant" relevant="false()"/>
+                                    <xforms:bind ref="valid" constraint="false()"/>
                                 </xforms:model>
                             </xhtml:head>
                             <xhtml:body xmlns:exforms="http://www.exforms.org/exf/1-0">
@@ -494,7 +494,7 @@
                                         <first-name xmlns=""/>
                                     </xforms:instance>
                                     <!-- Value is always invalid -->
-                                    <xforms:bind nodeset="." constraint="false()"/>
+                                    <xforms:bind ref="." constraint="false()"/>
                                 </xforms:model>
 
                                 <xforms:model id="errors-model">
@@ -512,7 +512,7 @@
                                         <submit xmlns=""/>
                                     </xforms:instance>
                                     <!-- Cross-model dependency with xxforms:instance() won't update without explicit xf:recalculate -->
-                                    <xforms:bind nodeset="." readonly="xxforms:instance('form-valid-instance') = 'false'"/>
+                                    <xforms:bind ref="." readonly="xxforms:instance('form-valid-instance') = 'false'"/>
 
                                 </xforms:model>
                             </xhtml:head>
@@ -715,17 +715,17 @@
                                     <xforms:instance id="value" xmlns="">
                                         <value/>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="instance('value')" required="true()" />
+                                    <xforms:bind ref="instance('value')" required="true()" />
 
                                     <xforms:instance id="validity">
                                         <validity/>
                                     </xforms:instance>
 
                                     <xforms:action ev:event="xxforms-valid" ev:observer="value">
-                                        <xforms:insert context="instance('validity')" nodeset="*" origin="xxforms:element('valid')" />
+                                        <xforms:insert context="instance('validity')" ref="*" origin="xxforms:element('valid')" />
                                     </xforms:action>
                                     <xforms:action ev:event="xxforms-invalid" ev:observer="value">
-                                        <xforms:insert context="instance('validity')" nodeset="*" origin="xxforms:element('invalid')" />
+                                        <xforms:insert context="instance('validity')" ref="*" origin="xxforms:element('invalid')" />
                                     </xforms:action>
 
                                     <xforms:setvalue ev:event="xforms-ready" ref="instance('value')">42</xforms:setvalue>
@@ -780,7 +780,7 @@
                                 <bar>43</bar>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind id="foo-bind" nodeset="foo"
+                        <xforms:bind id="foo-bind" ref="foo"
                                      xxforms:default="42"
                                      relevant=". = 86"
                                      calculate="xs:integer(../bar) * 2"
@@ -842,8 +842,8 @@
                                 <foo bar=""/>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind id="foo-bind" nodeset="foo">
-                            <xforms:bind id="value-bind" nodeset="."
+                        <xforms:bind id="foo-bind" ref="foo">
+                            <xforms:bind id="value-bind" ref="."
                                          xxforms:default="count(preceding-sibling::foo) + 42"
                                          relevant="count(preceding-sibling::foo) mod 2 = 0"
                                          readonly="count(preceding-sibling::foo) mod 3 = 0"
@@ -852,7 +852,7 @@
                                          constraint="xs:integer(.) le 43"
                                          foo:bar="string-join((., @bar), ', ')"
                                          />
-                            <xforms:bind id="bar-bind" nodeset="@bar" calculate=".. + 1"/>
+                            <xforms:bind id="bar-bind" ref="@bar" calculate=".. + 1"/>
 
                         </xforms:bind>
                     </xforms:model>
@@ -949,8 +949,8 @@
                                 <save/>
                             </triggers>
                         </xforms:instance>
-                        <xforms:bind nodeset="instance('fr-triggers-instance')">
-                            <xforms:bind nodeset="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
+                        <xforms:bind ref="instance('fr-triggers-instance')">
+                            <xforms:bind ref="save" readonly="instance('fr-persistence-instance')/data-status = 'clean'"/>
                         </xforms:bind>
 
                         <xforms:submission id="fr-get-document-submission" serialization="none"
@@ -976,7 +976,7 @@
                                 <title/>
                             </book>
                         </xforms:instance>
-                        <xforms:bind id="title-bind" nodeset="title"/>
+                        <xforms:bind id="title-bind" ref="title"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
@@ -1061,11 +1061,11 @@
                                             </company>
                                         </instance>
                                     </xforms:instance>
-                                    <xforms:bind nodeset="company" id="companies">
-                                        <xforms:bind nodeset="employee" id="employees"/>
+                                    <xforms:bind ref="company" id="companies">
+                                        <xforms:bind ref="employee" id="employees"/>
                                     </xforms:bind>
-                                    <xforms:bind nodeset="foo" id="foos">
-                                        <xforms:bind nodeset="bar" id="bars"/>
+                                    <xforms:bind ref="foo" id="foos">
+                                        <xforms:bind ref="bar" id="bars"/>
                                     </xforms:bind>
                                 </xforms:model>
                             </xhtml:head>
@@ -1203,7 +1203,7 @@
                                 <bar>CA</bar>
                             </instance>
                         </xforms:instance>
-                        <xforms:bind id="bind1" nodeset="bar" type="foo:myType"/>
+                        <xforms:bind id="bind1" ref="bar" type="foo:myType"/>
                     </xforms:model>
                 </xhtml:head>
                 <xhtml:body>
@@ -1371,10 +1371,10 @@
                             </instance>
                         </xf:instance>
                         <!-- Constraint applies -->
-                        <xf:bind nodeset="outer[1]" constraint="false()"/>
+                        <xf:bind ref="outer[1]" constraint="false()"/>
                         <!-- Type and required doesn't apply -->
-                        <xf:bind nodeset="outer[2]" type="xs:integer"/>
-                        <xf:bind nodeset="outer[3]" required="true()"/>
+                        <xf:bind ref="outer[2]" type="xs:integer"/>
+                        <xf:bind ref="outer[3]" required="true()"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>

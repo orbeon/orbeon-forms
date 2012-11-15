@@ -67,7 +67,7 @@
 
             <!-- Parse XML we got from the client -->
             <xforms:action ev:event="my-show-candidates">
-                <xforms:delete nodeset="candidates/*"/>
+                <xforms:delete ref="candidates/*"/>
                 <xforms:insert context="candidates" origin="saxon:parse(@text)"/>
                 <xforms:setvalue ref="candidates/@text"/>
                 <xxforms:show dialog="candidates-dialog" neighbor="validate-trigger"/>
@@ -85,7 +85,7 @@
         <xxforms:dialog id="candidates-dialog" level="modal" close="true" draggable="false" appearance="full">
             <xforms:label>Choose address</xforms:label>
             <xhtml:ul>
-                <xforms:repeat nodeset="candidates/addresses/address">
+                <xforms:repeat ref="candidates/addresses/address">
                     <xhtml:li>
                         <xforms:trigger appearance="minimal">
                             <xforms:label ref="full"/>
@@ -118,7 +118,7 @@
         <xhtml:div>
             <fr:databound-select1 ref="state" appearance="minimal" resource="/xforms-sandbox/service/zip-states">
                 <xforms:label>State: </xforms:label>
-                <xforms:itemset nodeset="/states/state">
+                <xforms:itemset ref="/states/state">
                     <xforms:label ref="@name"/>
                     <xforms:value ref="@abbreviation"/>
                 </xforms:itemset>

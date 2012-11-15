@@ -34,10 +34,10 @@
                 </control>
             </xforms:instance>
 
-            <xforms:bind nodeset="instance('control-instance')">
-                <xforms:bind nodeset="query" relevant="../operation = 'query'"/>
-                <xforms:bind nodeset="insert" relevant="../operation = 'insert'"/>
-                <xforms:bind nodeset="formatted-result"
+            <xforms:bind ref="instance('control-instance')">
+                <xforms:bind ref="query" relevant="../operation = 'query'"/>
+                <xforms:bind ref="insert" relevant="../operation = 'insert'"/>
+                <xforms:bind ref="formatted-result"
                         calculate="if (instance('response-instance')/*)
                                    then xxforms:serialize(xxforms:call-xpl('oxf:/ops/utils/formatting/format.xpl', 'data', instance('response-instance')/*[1], 'data')/*, 'html')
                                    else ''"/>
@@ -140,7 +140,7 @@
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:send if="instance('control-instance')/operation = 'query'" submission="query-submission"/>
                                     <xforms:action if="instance('control-instance')/operation = 'insert'">
-                                        <xforms:insert nodeset="instance('insert-instance')" origin="saxon:parse(instance('control-instance')/insert)/*"/>
+                                        <xforms:insert ref="instance('insert-instance')" origin="saxon:parse(instance('control-instance')/insert)/*"/>
                                         <xforms:send submission="insert-submission"/>
                                     </xforms:action>
                                     <xforms:send if="instance('control-instance')/operation = 'delete'" submission="delete-submission"/>

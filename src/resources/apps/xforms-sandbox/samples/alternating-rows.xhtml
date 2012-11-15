@@ -42,7 +42,7 @@
                 <xhtml:th>Label</xhtml:th>
                 <xhtml:th>Value</xhtml:th>
             </xhtml:tr>
-            <xforms:repeat nodeset="item">
+            <xforms:repeat ref="item">
                 <xforms:group ref=".[count(preceding-sibling::item) mod 2 = 1]">
                     <xhtml:tr style="background: red">
                         <xhtml:td>
@@ -69,7 +69,7 @@
         <xforms:trigger>
             <xforms:label>Add line</xforms:label>
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert nodeset="item" at="last()" position="after"/>
+                <xforms:insert ref="item" at="last()" position="after"/>
                 <xforms:setvalue ref="item[last()]/@label" value="'Don''t know!'"/>
                 <xforms:setvalue ref="item[last()]/@value" value="count(../../item)"/>
             </xforms:action>

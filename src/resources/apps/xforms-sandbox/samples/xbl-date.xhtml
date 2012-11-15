@@ -30,8 +30,8 @@
                     <dateTime1/>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="date1 | date2" type="xforms:date"/>
-            <xforms:bind nodeset="dateTime1" type="xforms:dateTime"/>
+            <xforms:bind ref="date1 | date2" type="xforms:date"/>
+            <xforms:bind ref="dateTime1" type="xforms:dateTime"/>
         </xforms:model>
           <!-- Example of dateTime component that looks like the built-in one -->
         <xbl:xbl>
@@ -58,8 +58,8 @@
                                     <time/>
                                 </values>
                             </xforms:instance>
-                            <xforms:bind nodeset="date" type="xs:date"/>
-                            <xforms:bind nodeset="time" type="xs:time"/>
+                            <xforms:bind ref="date" type="xs:date"/>
+                            <xforms:bind ref="time" type="xs:time"/>
                         </xforms:model>
 
                         <!-- Local controls -->

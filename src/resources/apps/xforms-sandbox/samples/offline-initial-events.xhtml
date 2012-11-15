@@ -38,13 +38,13 @@
             </xforms:instance>
             <xforms:action ev:event="xforms-model-construct-done">
                 <!-- Move from "instance" to "instance-copy" -->
-                <xforms:insert nodeset="instance('instance-copy')" origin="instance('instance')"/>
-                <xforms:delete while="instance('instance')/*" nodeset="instance('instance')/*"/>
+                <xforms:insert ref="instance('instance-copy')" origin="instance('instance')"/>
+                <xforms:delete while="instance('instance')/*" ref="instance('instance')/*"/>
                 <xxforms:script>ORBEON.xforms.Document.dispatchEvent("#document", "xxforms-offline");</xxforms:script>
             </xforms:action>
             <xforms:action ev:event="xxforms-offline">
                 <!-- Move from "instance-copy" to "instance" -->
-                <xforms:insert nodeset="instance('instance')" origin="instance('instance-copy')"/>
+                <xforms:insert ref="instance('instance')" origin="instance('instance-copy')"/>
                 <xforms:setvalue ref="instance('ui')/offline">true</xforms:setvalue>
             </xforms:action>
             <xforms:action ev:event="xxforms-online">

@@ -30,7 +30,7 @@
     </head>
     <body>
         <table>
-            <xf:repeat nodeset="(exf:sort(vehicle, 'plate-number', 'text', 'descending'))">
+            <xf:repeat ref="(exf:sort(vehicle, 'plate-number', 'text', 'descending'))">
                 <tr>
                     <td>
                         <xf:input ref="plate-number">

@@ -39,7 +39,7 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="instance('config')/param">
+        <xforms:repeat ref="instance('config')/param">
             <xforms:input ref="value">
                 <xforms:label><xforms:output ref="../label"/></xforms:label>
                 <xforms:help><xforms:output ref="../help"/></xforms:help>

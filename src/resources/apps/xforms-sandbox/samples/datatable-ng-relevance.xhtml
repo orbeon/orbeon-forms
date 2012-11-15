@@ -39,7 +39,7 @@
                     </record>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xforms:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
             <xforms:instance id="relevance">
                 <relevance xmlns="">
                     <table>show</table>
@@ -76,7 +76,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr repeat-nodeset="record">
+                    <tr repeat-ref="record">
                         <td>
                             <xforms:output ref="AAA"/>
                         </td>
@@ -115,7 +115,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr repeat-nodeset="record">
+                    <tr repeat-ref="record">
                         <td>
                             <xforms:output ref="AAA"/>
                         </td>

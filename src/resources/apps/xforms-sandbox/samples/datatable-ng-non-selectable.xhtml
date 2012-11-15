@@ -39,7 +39,7 @@
                     </record>
                 </instance>
             </xf:instance>
-            <xf:bind nodeset="instance('instance')/record/AAA" type="xs:unsignedByte"/>
+            <xf:bind ref="instance('instance')/record/AAA" type="xs:unsignedByte"/>
         </xf:model>
 
         <style type="text/css">
@@ -60,7 +60,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xf:repeat nodeset="record" id="r1">
+                <xf:repeat ref="record" id="r1">
                     <tr class="not-selectable">
                         <td>
                             <xf:output ref="AAA"/>
@@ -86,7 +86,7 @@
                 </tr>
             </thead>
             <tbody>
-                <xf:repeat nodeset="record" id="r2">
+                <xf:repeat ref="record" id="r2">
                     <tr>
                         <td>
                             <xf:output ref="AAA"/>

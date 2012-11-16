@@ -50,7 +50,7 @@ object Authorizer extends Logging {
     def authorizedWithToken(header: String ⇒ Option[Array[String]], attribute: String ⇒ Option[AnyRef]): Boolean = {
 
         val requestToken =
-            header(TokenKey).flatten.headOption
+            header(TokenKey).toList.flatten.headOption
 
         def applicationToken =
             attribute(TokenKey) collect { case token: String ⇒ token }

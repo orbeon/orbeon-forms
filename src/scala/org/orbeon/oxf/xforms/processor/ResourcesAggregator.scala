@@ -16,13 +16,12 @@ package org.orbeon.oxf.xforms.processor
 
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.xml._
-import java.lang.String
 import org.xml.sax.Attributes
 import net.sf.ehcache.{Element ⇒ EhElement }
 import org.orbeon.oxf.common.Version
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.util._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
 import org.orbeon.oxf.xforms._
@@ -200,14 +199,14 @@ class ResourcesAggregator extends ProcessorImpl {
                             }
 
                             def outputCSS() = {
-                                val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link") _
+                                val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link")(_)
                                 aggregate(baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
                                 aggregate(supplementalCSS -- baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
                                 preservedCSS foreach outputPreservedElement
                             }
 
                             def outputJS() = {
-                                val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script") _
+                                val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script")(_)
                                 aggregate(baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
                                 aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
                                 preservedJS foreach outputPreservedElement
@@ -299,8 +298,8 @@ object ResourcesAggregator {
 
                 assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
 
-                val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, false)
-                XFormsResourceRewriter.cacheResources(resourcesConfig, path, combinedLastModified, isCSS, false)
+                val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig.asJava, isMinimal = false)
+                XFormsResourceRewriter.cacheResources(resourcesConfig.asJava, path, combinedLastModified, isCSS, isMinimal = false)
             }
 
             Some(result)

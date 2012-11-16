@@ -192,12 +192,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
             connection
         } catch{
-            case e ⇒
+            case t: Throwable ⇒
                 val is = connection.getInputStream
                 if (is ne null)
                     runQuietly(is.close())
 
-                throw e
+                throw t
         }
     }
 

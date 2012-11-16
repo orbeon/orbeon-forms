@@ -126,7 +126,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             }
 
             def endElement(element: Element): Unit =
-                if (element == CHOICES_QNAME)
+                if (element.getQName == CHOICES_QNAME)
                     stack pop()
 
             def text(text: Text) = ()

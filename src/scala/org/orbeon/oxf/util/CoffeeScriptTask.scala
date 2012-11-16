@@ -51,14 +51,14 @@ class CoffeeScriptTask extends MatchingTask {
                     try {
                         copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
                     } catch {
-                        case e ⇒
+                        case t: Throwable ⇒
                             runQuietly(oFile.delete()) // remove output file if something happened while producing the file
-                            throw e
+                            throw t
                     }
                 }
             }
         } catch {
-            case e ⇒ throw new BuildException(e);
+            case t: Throwable ⇒ throw new BuildException(t)
         }
     }
 }

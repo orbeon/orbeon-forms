@@ -177,7 +177,7 @@ object ClientEvents extends Logging {
         val blankEvents = {
 
             // Get set of all value change events effective ids
-            def getValueChangeIds = groups.get(ValueChange).flatten map (_.attributeValue("source-control-id")) toSet
+            def getValueChangeIds = groups.get(ValueChange).toList.flatten map (_.attributeValue("source-control-id")) toSet
 
             // Create <xxf:event name="xxforms-value-or-activate" source-control-id="my-effective-id"/>
             def createBlankingEvent(control: XFormsControl) = {

@@ -91,20 +91,19 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             (resource, cssClass) ⇒ resource match {
                 case Some(resource) ⇒ ("link", Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all", "class", cssClass.orNull))
                 case None ⇒ ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
-            }) _
+            })(_, _, _)
 
         // Output all CSS
         outputResources(outputCSSElement, XFormsFeatures.getCSSResources,
             containingDocument.getStaticOps.getXBLStyles,
             containingDocument.getStaticOps.baselineResources._2, minimal)
-
     }
 
     override def outputJavaScriptResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl) {
 
         // Function to output either a <script> element
         def outputJSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
-            (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull))) _
+            (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull)))(_, _, _)
 
         // Output all JS
         outputResources(outputJSElement, XFormsFeatures.getJavaScriptResources,

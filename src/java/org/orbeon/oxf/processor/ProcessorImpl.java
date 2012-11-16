@@ -644,7 +644,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     // For backward compatibility
-    protected abstract class ProcessorOutputImpl extends org.orbeon.oxf.processor.impl.ProcessorOutputImpl {
+    public abstract class ProcessorOutputImpl extends org.orbeon.oxf.processor.impl.ProcessorOutputImpl {
         public ProcessorOutputImpl(Class processorClass, String name) {
             super(processorClass, name);
         }

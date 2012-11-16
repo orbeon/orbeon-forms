@@ -74,7 +74,7 @@ object XFormsResourceRewriter extends Logging {
                         sbw.write("/* Original CSS path: " + resourcePath + " */\n")
                     copyReader(new InputStreamReader(is, "utf-8"), sbw)
                 } catch {
-                    case _ ⇒ logger.logWarning("resources", "could not aggregate CSS file", "path", resourcePath)
+                    case _: Throwable ⇒ logger.logWarning("resources", "could not aggregate CSS file", "path", resourcePath)
                 }
                 sbw.toString
             }
@@ -104,7 +104,7 @@ object XFormsResourceRewriter extends Logging {
                 val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
                 "url(" + rewrittenURI + ")"
             } catch {
-                case _ ⇒
+                case _: Throwable ⇒
                     logger.logWarning("resources", "found invalid URI in CSS file", "uri", url)
                     "url(" + url + ")"
             }
@@ -137,7 +137,7 @@ object XFormsResourceRewriter extends Logging {
         // NOTE: Actual aggregation will log missing files so we ignore them here
         def lastModified(r: ResourceConfig) =
             try rm.lastModified(r.getResourcePath(isMinimal), false)
-            catch { case _ ⇒ 0L }
+            catch { case _: Throwable ⇒ 0L }
 
         if (resources.isEmpty) 0L else resources.asScala map lastModified max
     }

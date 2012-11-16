@@ -44,7 +44,7 @@ class XFormsSetindexAction extends XFormsAction {
             val indexString = interpreter.evaluateAsString(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
 
             try indexString.toInt
-            catch { case _ ⇒ return } // "If the index evaluates to NaN the action has no effect."
+            catch { case _: Throwable ⇒ return } // "If the index evaluates to NaN the action has no effect."
         }
 
         // Execute

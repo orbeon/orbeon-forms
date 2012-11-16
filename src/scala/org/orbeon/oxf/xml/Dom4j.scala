@@ -65,9 +65,9 @@ object Dom4j {
         case t: CharacterData if isNotBlank(t.getText) ⇒ t
     }
 
-    private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(implicit normalizeText: String ⇒ String) =
+    private def compareTwoNodeSeqs(left: Seq[Node], right: Seq[Node])(normalizeText: String ⇒ String) =
         left.size == right.size && (left.zip(right) forall
-            { case (n1, n2) ⇒ compareTwoNodes(n1, n2) })
+            { case (n1, n2) ⇒ compareTwoNodes(n1, n2)(normalizeText) })
 
     private implicit def dom4jListToNodeSeq(l: JList[_]): Seq[Node] = l.asInstanceOf[JList[Node]].asScala
 
@@ -77,14 +77,14 @@ object Dom4j {
             XMLUtils.buildExplodedQName(x.getQName) compare XMLUtils.buildExplodedQName(y.getQName)
     }
 
-    private def compareTwoNodes(left: Node, right: Node)(implicit normalizeText: String ⇒ String): Boolean =
+    private def compareTwoNodes(left: Node, right: Node)(normalizeText: String ⇒ String): Boolean =
         (left, right) match {
             case (d1: Document, d2: Document) ⇒
-                compareTwoNodeSeqs(filterOut(d1.content), filterOut(d2.content))
+                compareTwoNodeSeqs(filterOut(d1.content), filterOut(d2.content))(normalizeText)
             case (e1: Element, e2: Element) ⇒
                 e1.getQName == e2.getQName &&
-                    compareTwoNodeSeqs(e1.attributes.asInstanceOf[JList[Attribute]].asScala.sorted, e2.attributes.asInstanceOf[JList[Attribute]].asScala.sorted) && // sort attributes
-                    compareTwoNodeSeqs(filterOut(e1.content), filterOut(e2.content))
+                    compareTwoNodeSeqs(e1.attributes.asInstanceOf[JList[Attribute]].asScala.sorted, e2.attributes.asInstanceOf[JList[Attribute]].asScala.sorted)(normalizeText) && // sort attributes
+                    compareTwoNodeSeqs(filterOut(e1.content), filterOut(e2.content))(normalizeText)
             case (a1: Attribute, a2: Attribute) ⇒
                 a1.getQName == a2.getQName &&
                     a1.getValue == a2.getValue

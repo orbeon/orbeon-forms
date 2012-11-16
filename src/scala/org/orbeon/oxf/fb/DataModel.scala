@@ -156,7 +156,7 @@ object DataModel {
                 (bind ⇒ evaluateBoundItem(bind.namespaceMapping)) map
                     (XFormsControl.isAllowedBoundItem(control, _)) getOrElse
                         false
-        } catch { case _ ⇒ false }
+        } catch { case _: Throwable ⇒ false }
     }
 
     // For a given value control name and XPath sequence, whether the resulting bound item is acceptable

@@ -59,7 +59,7 @@ class OrbeonSessionListener extends HttpSessionListener {
                 val listeners = httpSession.getAttribute(ServletExternalContext.SESSION_LISTENERS).asInstanceOf[ServletExternalContext.SessionListeners]
                 Option(listeners).toList flatMap (_.iterator.asScala) foreach {
                     // Run listener and ignore exceptions so we can continue running the remaining listeners
-                    listener ⇒ try listener.sessionDestroyed() catch { case t ⇒ logger.error("Throwable caught when calling listener", t) }
+                    listener ⇒ try listener.sessionDestroyed() catch { case t: Throwable ⇒ logger.error("Throwable caught when calling listener", t) }
                 }
             }
         }

@@ -105,7 +105,7 @@ object XFormsCompressor {
         override def passivateObject(o: Deflater): Unit =
             try o.reset()
             catch {
-                case e ⇒ XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", e)
+                case t: Throwable ⇒ XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", t)
             }
     }
 

@@ -66,8 +66,10 @@
                         <xf:var name="fb-section" value="xxf:instance('fb-form-instance')/xh:body//fr:section[@id = $id]"/>
                         <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ''"/>
 
-                        <xf:group xbl:attr="model context ref bind"
-                                class="{string-join(('fr-section-container', @class), ' ')} {{$fb-can-do-classes}}">
+                        <xf:group
+                            xbl:attr="model context ref bind"
+                            class="{string-join(('fr-section-container', @class), ' ')} {{$fb-can-do-classes}}"
+                            xxf:element="div">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">
 
@@ -126,7 +128,7 @@
 
                                 </xsl:element>
 
-                                <xf:switch id="switch" xxf:readonly-appearance="dynamic">
+                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div">
                                     <!-- Closed section -->
                                     <xf:case id="case-closed" selected="{not($open)}"/>
                                     <!-- Open section -->
@@ -134,7 +136,7 @@
                                         <xsl:if test="$animate">
                                             <xsl:attribute name="class">xxforms-animate</xsl:attribute>
                                         </xsl:if>
-                                        <xf:group class="fr-section-content" xxbl:scope="outer">
+                                        <xf:group class="fr-section-content" xxbl:scope="outer" xxf:element="div">
                                             <!-- Section content except label, event handlers, and buttons -->
                                             <xsl:apply-templates select="* except (xf:label, xf:help, fr:buttons)"/>
                                         </xf:group>

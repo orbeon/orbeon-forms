@@ -17,7 +17,7 @@ import org.apache.tools.ant.BuildException
 import org.apache.tools.ant.taskdefs.MatchingTask
 import java.nio.charset.Charset
 import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler
-import reflect.BeanProperty
+import scala.beans.BeanProperty
 import ScalaUtils._
 import java.io._
 

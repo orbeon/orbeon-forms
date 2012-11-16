@@ -2620,9 +2620,6 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="required" expression="boolean(true())">
-                                    <analysis expression="boolean(true())" analyzed="true"/>
-                                </mip>
                                 <mip name="constraint" expression="boolean(normalize-space())">
                                     <analysis expression="boolean(normalize-space())" analyzed="true">
                                         <value-dependent>
@@ -2635,6 +2632,9 @@
                                             <instance>po</instance>
                                         </dependent-instances>
                                     </analysis>
+                                </mip>
+                                <mip name="required" expression="boolean(true())">
+                                    <analysis expression="boolean(true())" analyzed="true"/>
                                 </mip>
                             </bind>
                             <bind id="units-bind" ref="units">
@@ -2755,10 +2755,11 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="relevant" expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)">
-                                    <analysis expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)" analyzed="true">
+                                <mip name="calculate" expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])">
+                                    <analysis expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
+                                            <path>instance('po')/items/item/price</path>
                                         </value-dependent>
                                         <dependent-models>
                                             <model>model</model>
@@ -2768,11 +2769,10 @@
                                         </dependent-instances>
                                     </analysis>
                                 </mip>
-                                <mip name="calculate" expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])">
-                                    <analysis expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
+                                <mip name="relevant" expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)">
+                                    <analysis expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
-                                            <path>instance('po')/items/item/price</path>
                                         </value-dependent>
                                         <dependent-models>
                                             <model>model</model>

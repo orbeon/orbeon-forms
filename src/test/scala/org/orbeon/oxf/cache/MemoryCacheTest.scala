@@ -16,8 +16,10 @@ package org.orbeon.oxf.cache
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import java.util.concurrent.locks.{ReentrantLock, Lock}
-import scala.actors.Futures._
 import scala.collection.JavaConversions._
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class MemoryCacheTest extends AssertionsForJUnit {
 
@@ -133,12 +135,8 @@ class MemoryCacheTest extends AssertionsForJUnit {
 
         // Reduce size in other thread
         lock.lock()
-        try {
-            // Run in separate thread and wait
-            future { cache.setMaxSize(0) } apply()
-        } finally {
-            lock.unlock()
-        }
+        Await.ready(Future(cache.setMaxSize(0)), Duration.Inf)
+        lock.unlock()
 
         assert(!o1.wasEvicted)
         assert(!o1.wasRemoved)
@@ -169,13 +167,10 @@ class MemoryCacheTest extends AssertionsForJUnit {
         // Add first object
         cache.add(Key("o1"), VALIDITY, o1)
 
+        // Run in separate thread and wait
         lock.lock()
-        try {
-            // Run in separate thread and wait
-            future { cache.add(Key("o2"), VALIDITY, new AnyRef) } apply()
-        } finally {
-            lock.unlock()
-        }
+        Await.ready(Future(cache.add(Key("o2"), VALIDITY, new AnyRef)), Duration.Inf)
+        lock.unlock()
 
         assert(!o1.wasEvicted)
         assert(!o1.wasRemoved)
@@ -197,13 +192,10 @@ class MemoryCacheTest extends AssertionsForJUnit {
         cache.add(Key("o1"), VALIDITY, o1)
         cache.add(Key("o2"), VALIDITY, o2)
 
+        // Run in separate thread and wait
         lock.lock()
-        try {
-            // Run in separate thread and wait
-            future { cache.add(Key("o3"), VALIDITY, new AnyRef) } apply()
-        } finally {
-            lock.unlock()
-        }
+        Await.ready(Future(cache.add(Key("o3"), VALIDITY, new AnyRef)), Duration.Inf)
+        lock.unlock()
 
         assert(!o1.wasEvicted)
         assert(!o1.wasRemoved)

@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.portlet
 
-import actors.Future
-import actors.Futures._
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext.Implicits.global
 import collection.mutable.LinkedHashSet
 import javax.portlet.{ResourceResponse, ResourceRequest, PortletRequest}
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
@@ -40,9 +41,7 @@ trait AsyncPortlet extends BufferedPortlet {
 
         // Schedule a future to provide new content
         val parameterMap = toScalaMap(request.getParameterMap)
-        val futureResponse = future {
-            ResponseWithParameters(render(context), parameterMap)
-        }
+        val futureResponse = Future(ResponseWithParameters(render(context), parameterMap))
         setFutureResponse(request, futureResponse)
 
         // Output the placeholder HTML
@@ -102,7 +101,7 @@ trait AsyncPortlet extends BufferedPortlet {
     private def getOrWaitFutureResponse(request: PortletRequest) =
         getFutureResponse(request) map { futureResponse ⇒
             clearFutureResponse(request)
-            futureResponse()
+            Await.result(futureResponse, Duration.Inf)
         }
 
     private def getFutureResponse(request: PortletRequest) =

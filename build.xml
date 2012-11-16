@@ -35,8 +35,9 @@
     <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
         <classpath>
-            <pathelement location="lib/scala-compiler-2.9.2.jar"/>
-            <pathelement location="lib/scala-library-2.9.2.jar"/>
+            <pathelement location="lib/scala-compiler-2.10.1.jar"/>
+            <pathelement location="lib/scala-library-2.10.1.jar"/>
+            <pathelement location="lib/scala-reflect-2.10.1.jar"/>
         </classpath>
     </taskdef>
 
@@ -73,7 +74,7 @@
 
     <fileset id="war.libs" dir="lib">
 
-        <include name="orbeon-errorified-20120619.jar"/>
+        <include name="orbeon-errorified-20121115.jar"/>
 
         <!-- These JARs are checked in. They can be rebuilt with the jarjar target -->
         <include name="xerces-2.11-orbeon.jar"/>
@@ -149,8 +150,8 @@
         <include name="ehcache-dependency-slf4j-api-1.6.1.jar"/>
         <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
 
-        <include name="scala-library-2.9.2.jar"/>
-        <include name="sbinary-2.9.1-0.4.0.jar"/>
+        <include name="scala-library-2.10.1.jar"/>
+        <include name="sbinary_2.10-0.4.1.jar"/>
 
         <include name="rhino-1.7R2.jar"/>
 
@@ -182,8 +183,8 @@
 
         <!-- JSON -->
         <include name="parboiled-core-1.1.4.jar"/>
-        <include name="parboiled-scala_2.9.2-1.1.4.jar"/>
-        <include name="spray-json_2.9.2-1.2.3.jar"/>
+        <include name="parboiled-scala_2.10-1.1.4.jar"/>
+        <include name="spray-json_2.10-1.2.3.jar"/>
 
     </fileset>
 
@@ -346,7 +347,7 @@
         <scalac destdir="${build.classes.dir}"
                 classpathref="class.path"
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                addparams="-Xfatal-warnings" deprecation="yes">
+                addparams="-Xfatal-warnings -feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="yes">
             <src path="${build.dir}/src"/> <!-- Location of the copy of Version.scala with the release/edition set -->
             <src path="src/main/java"/>
             <src path="src/main/scala"/>
@@ -585,7 +586,7 @@
             </lib>
             <lib dir="lib">
                 <include name="xerces-2.11-orbeon.jar"/>
-                <include name="orbeon-errorified-20120619.jar"/>
+                <include name="orbeon-errorified-20121115.jar"/>
                 <include name="scala-library-*.jar"/>
                 <include name="commons-fileupload-*.jar"/>
                 <include name="commons-lang3-*.jar"/>
@@ -637,8 +638,8 @@
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1_2_15.jar"/>
-                <pathelement location="lib/scala-library-2.9.2.jar"/>
-                <pathelement location="lib/orbeon-errorified-20120619.jar"/>
+                <pathelement location="lib/scala-library-2.10.1.jar"/>
+                <pathelement location="lib/orbeon-errorified-20121115.jar"/>
             </classpath>
         </taskdef>
 

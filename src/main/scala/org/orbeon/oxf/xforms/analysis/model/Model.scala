@@ -158,7 +158,7 @@ trait ModelVariables {
 
         for {
             variableElement ← variableElements.asScala
-            analysis = {
+            analysis: VariableAnalysisTrait = {
                 val result = new SimpleElementAnalysis(staticStateContext, variableElement, Some(self), preceding, scope) with VariableAnalysisTrait
                 preceding = Some(result)
                 result
@@ -512,7 +512,7 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
                 // @ref analysis is handled by superclass
 
                 // MIP analysis
-                for (mip ← allMIPNameToXPathMIP.values) {
+                for ((_, mip) ← allMIPNameToXPathMIP.to[List].sortBy(_._1)) {
                     helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
                     mip.analysis.toXML(helper)
                     helper.endElement()

@@ -21,6 +21,7 @@ import java.net.URLDecoder.{decode ⇒ decodeURL}
 import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
 import scala.collection.mutable
 import scala.collection.generic.CanBuildFrom
+import scala.reflect.ClassTag
 
 object ScalaUtils {
 
@@ -39,7 +40,7 @@ object ScalaUtils {
 
     // Copy a stream, with optional progress callback
     // This fails at runtime due to: https://lampsvn.epfl.ch/trac/scala/ticket/2672
-    def genericCopyStream[T : ClassManifest](in: Readable[T], out: Writable[T], progress: Long ⇒ Unit = _ ⇒ ()) = {
+    def genericCopyStream[T : ClassTag](in: Readable[T], out: Writable[T], progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -127,9 +128,6 @@ object ScalaUtils {
     def capitalizeHeader(s: String) =
         if (s equalsIgnoreCase "SOAPAction") "SOAPAction" else s split '-' map (_.toLowerCase.capitalize) mkString "-"
 
-    // Shortcut for "not implemented yet" (something like this is in Scala 2.10)
-    def ??? = throw new RuntimeException("NIY")
-
     // Semi-standard pipe operator
     class PipeOps[A](a: A) { def |>[B](f: A ⇒ B) = f(a) }
     implicit def anyToPipeOps[A](a: A) = new PipeOps(a)
@@ -200,8 +198,5 @@ object ScalaUtils {
     implicit def booleanToBooleanWrapper(b: Boolean) = new BooleanWrapper(b)
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
-    // NOTE: With Scala 2.10, use `ClassTag` and `case t: T`
-    def collectByErasedType[T: ClassManifest](value: AnyRef) =
-        Option(value) collect
-        { case t: AnyRef if implicitly[ClassManifest[T]].erasure.isAssignableFrom(t.getClass) ⇒ t.asInstanceOf[T] }
+    def collectByErasedType[T: ClassTag](value: AnyRef) = Option(value) collect { case t: T  ⇒ t }
 }

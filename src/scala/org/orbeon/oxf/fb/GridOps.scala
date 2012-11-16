@@ -23,6 +23,7 @@ import collection.mutable.Buffer
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.properties.Properties
 import java.util.{List ⇒ JList}
+import org.orbeon.oxf.util.ScalaUtils._
 
 /*
  * Form Builder: operations on grids.
@@ -521,10 +522,9 @@ object GridOps {
     // Return all classes that need to be added to an editable grid
     def canDoClasses(gridId: String): JList[String] = {
         val grid = containerById(gridId)
-        val canDelete = DeleteTests collect { case (what, test) if test(grid) ⇒ what }
 
-        val deleteClasses = canDelete map ("fb-can-delete-" + _)
-        val insertClasses = if (getGridSize(grid) < maxGridColumns) List("fb-can-add-col") else Nil
+        val deleteClasses = DeleteTests collect { case (what, test) if test(grid) ⇒ "fb-can-delete-" + what }
+        val insertClasses = getGridSize(grid) < maxGridColumns list "fb-can-add-col"
 
         ("fr-editable" :: deleteClasses ::: insertClasses) asJava
     }

@@ -501,7 +501,7 @@ h2 .fr-section-label {
   height: 36px;
 }
 /* ***** Grid ******************************************************************************************************* */
-.fb .fr-section-container .fr-section-content {
+.fb .xbl-fr-section .fr-section-content {
   padding: 10px;
 }
 .fb .xbl-fr-grid {

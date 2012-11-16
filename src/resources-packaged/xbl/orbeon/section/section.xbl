@@ -64,11 +64,11 @@
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
                         <xf:var name="id" xbl:attr="xbl:text=id"/>
                         <xf:var name="fb-section" value="xxf:instance('fb-form-instance')/xh:body//fr:section[@id = $id]"/>
-                        <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ''"/>
+                        <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ()"/>
 
+                        <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
-                            xbl:attr="model context ref bind"
-                            class="{string-join(('fr-section-container', @class), ' ')} {{$fb-can-do-classes}}"
+                            class="{{string-join((@class, $fb-can-do-classes), ' ')}}"
                             xxf:element="div">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">

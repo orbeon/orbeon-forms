@@ -189,8 +189,11 @@ object ScalaUtils {
     // If the string is null or empty, return none, otherwise return the trimmed value
     def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
 
-    // Extension Boolean.option[A](a: A): Option[A]
-    class BooleanWrapper(b: Boolean) { def option[A](a: ⇒ A) = if (b) Some(a) else None }
+    // Extensions on Boolean
+    class BooleanWrapper(b: Boolean) {
+        def option[A](a: ⇒ A) = if (b) Some(a) else None
+        def list[A](a: ⇒ A)   = if (b) List(a) else Nil
+    }
     implicit def booleanToBooleanWrapper(b: Boolean) = new BooleanWrapper(b)
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!

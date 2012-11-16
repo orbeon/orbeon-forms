@@ -19,7 +19,8 @@ import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.xforms.XFormsUtils
+import java.util.{List ⇒ JList}
+import org.orbeon.oxf.util.ScalaUtils._
 
 object SectionOps {
 
@@ -75,14 +76,22 @@ object SectionOps {
     def canMoveLeft(container: NodeInfo) =
         findAncestorContainers(container).size >= 2
 
-    def canDoClasses(container: NodeInfo): java.util.List[String] = {
-        val directionClasses = {
-            val directionCheck = Map("up" → (canMoveUp _), "right" → (canMoveRight _), "down" → (canMoveDown _),  "left" → (canMoveLeft _))
-            val canDirections = directionCheck filter { case (_, check) ⇒ check(container) } map { case (direction, _) ⇒ direction }
-            canDirections map ( "fb-can-move-" ++ _)
-        }
-        val deleteClass = if (canDeleteSection(container)) Some("fb-can-delete") else None
-        (directionClasses ++ deleteClass).toList.asJava
+    private val DirectionCheck = List(
+        "up"    → (canMoveUp _),
+        "right" → (canMoveRight _),
+        "down"  → (canMoveDown _),
+        "left"  → (canMoveLeft _)
+    )
+
+    // Return all classes that need to be added to an editable section
+    def canDoClasses(container: NodeInfo): JList[String] = {
+        val directionClasses =
+            DirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction }
+
+        val deleteClasses =
+            canDeleteSection(container) list "fb-can-delete"
+
+        ("fr-section-container" :: deleteClasses ::: directionClasses) asJava
     }
 
     private def precedingSection(container: NodeInfo) =

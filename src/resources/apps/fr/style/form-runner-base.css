@@ -391,11 +391,11 @@ button.btn-link {
   width: 800px;
 }
 /* ***** Sections *************************************************************************************************** */
-.fr-section-container {
+.xbl-fr-section {
   display: block;
   clear: both;
 }
-.fr-section-container .fr-section-title .xforms-help-image {
+.xbl-fr-section .fr-section-title .xforms-help-image {
   float: left;
   margin-top: 13px;
   margin-right: 5px;
@@ -409,16 +409,16 @@ button.btn-link {
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-.fr-section-container p {
+.xbl-fr-section p {
   margin-top: 1em;
 }
-.fr-section-container .fr-section-open-close img {
+.xbl-fr-section .fr-section-open-close img {
   margin-right: 0;
 }
-.fr-section-container .fr-section-open-close {
+.xbl-fr-section .fr-section-open-close {
   padding: 0 7px 0 7px;
 }
-.fr-section-container .fr-section-content {
+.xbl-fr-section .fr-section-content {
   display: block;
   padding-left: 16px;
   padding-right: 16px;

@@ -405,7 +405,12 @@ object ToolboxOps {
                 // Create the bind and copy all attributes and content
                 val bind = ensureBinds(gridTd, findContainerNames(gridTd) :+ name)
                 (xvc \ "bind" \ * headOption) foreach { xvcBind ⇒
+
                     insert(into = bind, origin = (xvcBind \@ @*) ++ (xvcBind \ *))
+
+                    // If we copied a bind with @nodeset, keep things that way and remove the @ref created by ensureBinds
+                    if (bind \@ "nodeset" nonEmpty)
+                        delete(bind \@ "ref")
                 }
             }
         }

@@ -11,16 +11,14 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
-    <!-- Files to serve directly (and exclude files under /[app]/service/) -->
-    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf)" matcher="regexp"/>
-    <files path-info="(?!/([^/]+)/service/).+\.xml" matcher="regexp" mime-type="application/xml"/>
-    <files path-info="(?!/([^/]+)/service/).+\.html?" matcher="regexp" mime-type="text/html"/>
-    <files path-info="(?!/([^/]+)/service/).+\.(java|txt|xq)" matcher="regexp" mime-type="text/plain"/>
-    <files path-info="(?!/([^/]+)/service/).+\.jar" matcher="regexp" mime-type="application/zip"/>
+    <!-- ==== Files ================================================================================================ -->
 
-    <!-- Error page -->
-    <page id="error" path-info="*" model="error.xpl"/>
+    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)"/>
 
-</config>
+    <!-- ==== Pages ================================================================================================ -->
+
+    <page path-info="*" model="error.xpl"/>
+
+</controller>

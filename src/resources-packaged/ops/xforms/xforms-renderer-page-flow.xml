@@ -11,19 +11,27 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller" matcher="regexp">
 
-    <!-- Files to serve directly (and exclude files under /[app]/service/) -->
+    <!-- ==== Files ================================================================================================ -->
+
     <!-- NOTE: We leave this here so that the page flow creates the list of path matchers for XForms versioned resources -->
-    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)" matcher="regexp"/>
+    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)"/>
 
-    <!-- This should be the only path matched  -->
-    <page id="renderer" path-info="/xforms-renderer" model="xforms-renderer.xpl"/>
+    <!-- ==== Pages ================================================================================================ -->
 
-    <!-- "Not Found" page displayed when no page matches the request path -->
-    <page id="not-found" path-info="/not-found" view="/config/not-found.xhtml"/>
+    <page path-info="/xforms-renderer" model="xforms-renderer.xpl"/>
+
+    <!-- ==== Epilogue and handlers ================================================================================ -->
+
+    <page id="not-found"    path="/not-found"    view="/config/not-found.xhtml"/>
+    <page id="unauthorized" path="/unauthorized" view="/config/unauthorized.xhtml"/>
+    <page id="error"        path="/error"        model="/config/error.xpl"/>
+
+    <not-found-handler    page="not-found"/>
+    <unauthorized-handler page="unauthorized"/>
+    <error-handler        page="error"/>
 
     <epilogue url="/config/epilogue.xpl"/>
-    <not-found-handler page="not-found"/>
 
-</config>
+</controller>

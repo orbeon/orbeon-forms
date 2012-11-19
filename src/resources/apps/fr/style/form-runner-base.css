@@ -335,8 +335,9 @@ button.btn-link {
   margin-top: 2px;
 }
 .fr-repeat-table .fr-repeat-column-trigger {
-  width: 16px;
+  width: 14px;
   text-align: center;
+  vertical-align: middle;
 }
 .fr-repeat-table .fr-repeat-column-trigger i {
   margin: 0;

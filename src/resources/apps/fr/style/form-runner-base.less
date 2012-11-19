@@ -260,11 +260,12 @@ button.btn-link {
     }
 
     .fr-repeat-column-trigger {
-        width: 16px;
+        width: @frGridPlusMinusIconWidth;
         text-align: center;
+        vertical-align: middle;
 
-        i { margin: 0; display: block }
-        span i { *margin-left: 0px } // IE buttons depress; is there a way to remove their 1px 3px padding?
+        i { margin: 0; display: block } // for the Bootstrap icon
+        span i { *margin-left: 0px }    // IE buttons depress; is there a way to remove their 1px 3px padding?
         button { display: block; margin: auto }
     }
 
@@ -299,8 +300,8 @@ button.btn-link {
     .fr-section-title {
         .xforms-help-image {
             float: left;                       // Help on the same line as section title in display: block
-            margin-top: 13px;                  // To make it vertically centered, with a line height of 14px and image height of 14px: (40-14)/2 = 13px
-            margin-right: 5px;                // Space between help icon and section title
+            margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
+            margin-right: 5px;                 // Space between help icon and section title
 
             .help-icon();
         }

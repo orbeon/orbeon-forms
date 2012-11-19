@@ -24,16 +24,17 @@ import org.orbeon.oxf.xforms.XFormsUtils
 object ContainerOps {
 
     // Node tests
-    private val GridElementTest: Test = FR → "grid"
+    private val GridElementTest: Test    = FR → "grid"
+    private val GroupElementTest: Test   = FR → "group"
     private val SectionElementTest: Test = FR → "section"
-    private val ContainerElementTest = SectionElementTest || GridElementTest
+    private val ContainerElementTest     = SectionElementTest || GridElementTest
 
     // Predicates
     val IsGrid: NodeInfo ⇒ Boolean = _ self GridElementTest
     val IsSection: NodeInfo ⇒ Boolean = _ self SectionElementTest
 
     val IsContainer: NodeInfo ⇒ Boolean =
-        node ⇒ (node self ContainerElementTest) || ((node self (XF → "group")) && node.attClasses("fb-body"))
+        node ⇒ (node self ContainerElementTest) || ((node self GroupElementTest) && node.attClasses("fb-body"))
 
     // Namespace URL a section template component must match
     private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r

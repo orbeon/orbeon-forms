@@ -101,9 +101,13 @@
                         -->
 
                         <xf:var name="binding" value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
+                        <!--
+                            Be sure to replace $decimal-separator before $grouping-separator because $grouping-separator
+                            can be blank: https://github.com/orbeon/orbeon-forms/issues/587
+                        -->
                         <xf:var name="formatted"
                             value="if ($binding castable as xs:decimal)
-                                   then translate(format-number(xs:decimal($binding), $picture-string), ',.', concat($grouping-separator, $decimal-separator))
+                                   then translate(format-number(xs:decimal($binding), $picture-string), '.,', concat($decimal-separator, $grouping-separator))
                                    else $binding"/>
                         <xf:group ref="$binding[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]">
                             <xf:input

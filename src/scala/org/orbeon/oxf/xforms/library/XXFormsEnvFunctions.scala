@@ -115,6 +115,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("binding-context", classOf[XXFormsBindingContext], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
+
+        // xxf:value
+        Fun("value", classOf[XXFormsValue], 0, 1, STRING, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, EXACTLY_ONE)
+        )
     
         // xxf:mutable
         Fun("mutable-document", classOf[XXFormsMutableDocument], 0, 1, Type.NODE_TYPE, EXACTLY_ONE,

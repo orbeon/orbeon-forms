@@ -25,6 +25,9 @@ protected trait FunctionSupport extends XFormsFunction {
     def stringArgument(i: Int)(implicit xpathContext: XPathContext) =
         arguments(i).evaluateAsString(xpathContext).toString
 
+    def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+        arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
+
     // Resolve the relevant control by argument expression
     def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
         relevantControl(arguments(i).evaluateAsString(xpathContext).toString)
@@ -53,7 +56,9 @@ protected trait FunctionSupport extends XFormsFunction {
 
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)
+    def asItem(v: Option[String])    = v map stringToStringValue orNull
 
-    implicit def stringToStringValue(v: String)    = StringValue.makeStringValue(v)
-    implicit def booleanToBooleanValue(v: Boolean) = BooleanValue.get(v)
+    implicit def stringToStringValue(v: String)     = StringValue.makeStringValue(v)
+    implicit def booleanToBooleanValue(v: Boolean)  = BooleanValue.get(v)
+    implicit def stringOptToItem(v: Option[String]) = asItem(v)
 }

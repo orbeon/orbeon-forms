@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.expr.PathMap.PathMapNodeSet
-import org.orbeon.oxf.xforms.function.{MatchSimpleAnalysis, XFormsFunction}
+import org.orbeon.oxf.xforms.function.{FunctionSupport, MatchSimpleAnalysis, XFormsFunction}
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.orbeon.oxf.xforms.XFormsContextStack
 
@@ -25,11 +25,11 @@ import org.orbeon.oxf.xforms.XFormsContextStack
  *
  * This function must be called from within an xf:repeat.
  */
-class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis {
+class XXFormsRepeatCurrent extends XFormsFunction with MatchSimpleAnalysis with FunctionSupport {
 
     override def evaluateItem(xpathContext: XPathContext) =
         getRepeatCurrentSingleNode(context(xpathContext).contextStack,
-            argument.headOption map (_.evaluateAsString(xpathContext).toString))
+            stringArgumentOpt(0)(xpathContext))
 
     override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMapNodeSet): PathMapNodeSet = {
 

@@ -77,16 +77,14 @@ case class AbstractBinding(
             generatedDocument
     }
 
-    // XBL mode
-    val xblMode = attSet(bindingElement, XXBL_MODE_QNAME)
-    def modeAllXForms  = xblMode("xforms")
-    def modeBinding    = modeAllXForms || xblMode("binding")
-    def modeValue      = modeAllXForms || xblMode("value")
-    def modeLHHA       = modeAllXForms || xblMode("lhha")
-    def modeItemset    = modeAllXForms || xblMode("itemset")
-
-    def modeLHHACustom = modeLHHA && xblMode("custom-lhha")
-    def modeHandlers =  ! xblMode("nohandlers")
+    // XBL modes
+    private val xblMode = attSet(bindingElement, XXBL_MODE_QNAME)
+    def modeBinding     = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
+    def modeValue       = xblMode("value")
+    def modeLHHA        = xblMode("lhha")
+    def modeLHHACustom  = modeLHHA && xblMode("custom-lhha")
+    def modeItemset     = xblMode("itemset") // NIY as of 2012-11-20
+    def modeHandlers    = ! xblMode("nohandlers")
 }
 
 object AbstractBinding {

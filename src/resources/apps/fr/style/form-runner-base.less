@@ -278,15 +278,28 @@ button.btn-link {
 
 // Dialogs
 .xforms-dialog {
-    width: 400px;
+    width: 400px;               // default width
+
+    .bd p {
+        margin: .5em 0 .5em 0
+    }
+
+    .fr-dialog-icon {
+        float: left;
+        margin-right: 2em;
+        margin-left: 1em;
+        padding-bottom: 1em
+    }
+
+    .fr-dialog-buttons {
+        text-align: right;
+        padding: 10px 5px 0 5px;     // NOTE: dialog bd already has padding so no padding-bottom
+        border-top: 2px solid @frBorderColor;
+        clear: both
+    }
 
     ol { padding-left: 3em }
     li { list-style-type: decimal }// overrides YUI reset so numbers in enumeration do show
-    .bd p { margin: .5em 0 .5em 0 }
-    .hd { background-color: #666699 }
-    .bd { margin: 0 .5em .5em .5em }
-    .fr-dialog-icon { float: left; margin-right: 2em; margin-left: 1em; padding-bottom: 1em }
-    .fr-dialog-buttons { text-align: right; padding-right: .5em; padding-top: .5em; padding-bottom: .5em; margin-top: .5em; border-top: 2px solid @frBorderColor; clear: both }
 }
 
 #fr-submission-result-dialog { width: 800px }

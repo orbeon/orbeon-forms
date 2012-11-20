@@ -358,20 +358,8 @@ button.btn-link {
 .xforms-dialog {
   width: 400px;
 }
-.xforms-dialog ol {
-  padding-left: 3em;
-}
-.xforms-dialog li {
-  list-style-type: decimal;
-}
 .xforms-dialog .bd p {
   margin: 0.5em 0 0.5em 0;
-}
-.xforms-dialog .hd {
-  background-color: #666699;
-}
-.xforms-dialog .bd {
-  margin: 0 0.5em 0.5em 0.5em;
 }
 .xforms-dialog .fr-dialog-icon {
   float: left;
@@ -381,12 +369,15 @@ button.btn-link {
 }
 .xforms-dialog .fr-dialog-buttons {
   text-align: right;
-  padding-right: .5em;
-  padding-top: .5em;
-  padding-bottom: .5em;
-  margin-top: .5em;
+  padding: 10px 5px 0 5px;
   border-top: 2px solid #ddddee;
   clear: both;
+}
+.xforms-dialog ol {
+  padding-left: 3em;
+}
+.xforms-dialog li {
+  list-style-type: decimal;
 }
 #fr-submission-result-dialog {
   width: 800px;

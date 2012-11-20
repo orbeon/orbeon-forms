@@ -4494,12 +4494,18 @@
                         <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding value">
                             <xbl:template/>
                         </xbl:binding>
+                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:mode="binding">
+                            <xbl:template/>
+                        </xbl:binding>
                     </xbl:xbl>
                 </xh:head>
                 <xh:body>
                     <fr:gaga id="gaga1" ref="foo">
-                        <xf:message ev:event="xforms-value-changed">Changed!</xf:message>
+                        <xf:message ev:event="xforms-value-changed">fr:gaga changed!</xf:message>
                     </fr:gaga>
+                    <fr:toto id="toto1" ref="foo">
+                        <xf:message ev:event="xforms-value-changed">fr:toto Changed!</xf:message>
+                    </fr:toto>
                 </xh:body>
             </xh:html>
         </input>
@@ -4517,10 +4523,8 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="gaga1">42</xxf:control>
-                    </xxf:control-values>
-                    <xxf:message level="modal">Changed!</xxf:message>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">fr:gaga changed!</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

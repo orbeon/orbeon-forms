@@ -70,9 +70,29 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
+    <!-- Hacky rewrite of the XPath to support both short (xh, xf) and long (xhtml, xforms) prefixes
+         See: https://github.com/orbeon/orbeon-forms/issues/598 -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#instance"/>
+        <p:input name="config">
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:template match="query/@path">
+                    <xsl:attribute name="path" select="
+                        if (starts-with(., 'xh:')) then
+                            concat('/*/', ., ' | /*/', replace(replace(., 'xh:', 'xhtml:'), 'xf:', 'xforms:'))
+                        else if (starts-with(., 'xhtml:')) then
+                            concat('/*/', ., ' | /*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
+                        else concat('/*/', .)"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="search"/>
+    </p:processor>
+
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
@@ -206,7 +226,7 @@
         <p:output name="data" id="sql-config"/>
     </p:processor>
     <p:processor name="oxf:sql">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search"/>
         <p:input name="config" href="#sql-config"/>
         <p:output name="data" id="sql-output"/>
     </p:processor>

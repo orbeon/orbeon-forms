@@ -25,8 +25,8 @@ object ContainerOps {
 
     // Node tests
     private val GridElementTest: Test    = FR → "grid"
-    private val GroupElementTest: Test   = FR → "group"
     private val SectionElementTest: Test = FR → "section"
+    private val GroupElementTest: Test   = XF → "group"
     private val ContainerElementTest     = SectionElementTest || GridElementTest
 
     // Predicates

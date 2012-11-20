@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 4.0 M14, November 2012
+Last updated for Orbeon Forms 4.0 M16, November 2012
 
 NOTE: This is a milestone build, not a final release.
 

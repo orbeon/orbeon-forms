@@ -20,7 +20,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci" xxbl:mode="xforms">
+    <xbl:binding element="fr|tutorial-davinci" id="fr-tutorial-davinci" xxbl:mode="lhha binding value">
         <xbl:handlers>
             <!-- When the control comes to life or its value changes, copy the new value to the local model after
                  reversing it -->

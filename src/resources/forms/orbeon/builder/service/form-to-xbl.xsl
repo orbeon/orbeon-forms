@@ -176,7 +176,10 @@
 
         <!-- Create binding for the section/grid as a component -->
         <!-- TODO: Is using class fr-section-component the best way? -->
-        <xbl:binding id="{$component-id}-component" element="component|{$component-id}" class="fr-section-component">
+        <xbl:binding
+                id="{$component-id}-component"
+                element="component|{$component-id}"
+                class="fr-section-component">
 
             <!-- Orbeon Form Builder Component Metadata -->
             <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -280,57 +283,49 @@
 
             <!-- XBL template -->
             <xbl:template>
+                <!-- Point to the context of the current element.
+                     NOTE: FB doesn't place a @ref. -->
+                <xf:var name="context" value="xxf:binding-context('{$component-id}-component')"/>
 
-                <xf:group appearance="xxf:internal" xxbl:scope="outer">
-
-                    <!-- Inner group -->
-                    <xf:group appearance="xxf:internal" xxbl:scope="inner">
-                        <!-- Variable pointing to external node -->
-                        <xf:var id="binding" name="binding" as="node()?">
-                            <xxf:sequence value="." xxbl:scope="outer"/>
-                        </xf:var>
-
-                        <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
-                            <!-- Section becomes visible OR binding changes -->
-                            <xf:action>
-                                <xf:action if="$binding/*">
-                                    <!-- There are already some nodes, copy them in. This handles the case where existing
-                                         external data must be loaded in, for example when editing a form. -->
-                                    <xf:delete ref="instance()/*"/>
-                                    <xf:insert context="instance()" origin="$binding/*"/>
-                                </xf:action>
-                                <xf:action if="not($binding/*)">
-                                    <!-- No nodes, copy template out. This handles the case where there is not yet existing
-                                         external data. -->
-                                    <xf:insert context="$binding" origin="instance('fr-form-template')/*"/>
-                                    <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
-                                </xf:action>
-                            </xf:action>
+                <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
+                    <!-- Section becomes visible OR binding changes -->
+                    <xf:action>
+                        <xf:action if="$context/*">
+                            <!-- There are already some nodes, copy them in. This handles the case where existing
+                                 external data must be loaded in, for example when editing a form. -->
+                            <xf:delete ref="instance()/*"/>
+                            <xf:insert context="instance()" origin="$context/*"/>
                         </xf:action>
+                        <xf:action if="not($context/*)">
+                            <!-- No nodes, copy template out. This handles the case where there is not yet existing
+                                 external data. -->
+                            <xf:insert context="$context" origin="instance('fr-form-template')/*"/>
+                            <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
+                        </xf:action>
+                    </xf:action>
+                </xf:action>
 
-                        <!-- Propagate readonly -->
-                        <xf:var name="readonly" as="xs:boolean" value="exf:readonly($binding)">
-                            <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($binding)"/>
-                        </xf:var>
+                <!-- Propagate readonly of containing section -->
+                <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">
+                    <xf:setvalue ev:event="xforms-enabled xforms-value-changed" ref="instance('readonly')" value="exf:readonly($context)"/>
+                </xf:var>
 
-                        <!-- Expose internally a variable pointing to Form Runner resources -->
-                        <xf:var name="fr-resources" as="element()?">
-                            <xxf:sequence value="$fr-resources" xxbl:scope="outer"/>
-                        </xf:var>
+                <!-- Expose internally a variable pointing to Form Runner resources -->
+                <xf:var name="fr-resources" as="element()?">
+                    <xxf:sequence value="$fr-resources" xxbl:scope="outer"/>
+                </xf:var>
 
-                        <xf:group appearance="xxf:internal">
-                            <!-- Synchronize data with external world upon local value change -->
-                            <!-- This assumes the element QName match, or the value is not copied -->
-                            <xf:action ev:event="xforms-value-changed" if="exists($binding/*) and exists(event('xxf:binding'))">
-                                <xf:var name="source-binding" value="event('xxf:binding')" as="element()"/>
-                                <xf:setvalue ref="$binding/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
-                            </xf:action>
+                <xf:group appearance="xxf:internal">
+                    <!-- Synchronize data with external world upon local value change -->
+                    <!-- This assumes the element QName match, or the value is not copied -->
+                    <xf:action ev:event="xforms-value-changed" if="exists($context/*) and exists(event('xxf:binding'))">
+                        <xf:var name="source-binding" value="event('xxf:binding')" as="element()"/>
+                        <xf:setvalue ref="$context/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
+                    </xf:action>
 
-                            <!-- Copy grids within section -->
-                            <xsl:copy-of select="$fr-section/(fr:grid | fb:grid)"/>
+                    <!-- Copy grids within section -->
+                    <xsl:copy-of select="$fr-section/(fr:grid | fb:grid)"/>
 
-                        </xf:group>
-                    </xf:group>
                 </xf:group>
             </xbl:template>
         </xbl:binding>

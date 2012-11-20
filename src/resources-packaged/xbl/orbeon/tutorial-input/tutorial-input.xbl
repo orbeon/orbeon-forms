@@ -20,7 +20,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
 
-    <xbl:binding element="fr|tutorial-input" id="fr-tutorial-input" xxbl:mode="binding lhha">
+    <xbl:binding element="fr|tutorial-input" id="fr-tutorial-input" xxbl:mode="lhha binding value">
         <xbl:template>
             <!-- Input points to the external single-node binding -->
             <xf:input ref="xxf:binding('fr-tutorial-input')"/>

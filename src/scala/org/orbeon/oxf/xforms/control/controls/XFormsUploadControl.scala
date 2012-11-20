@@ -38,8 +38,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
  * Represents an xf:upload control.
  */
 class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsValueControl(container, parent, element, id)
-        with FocusableTrait with FileMetadata {
+        extends XFormsSingleNodeControl(container, parent, element, id)
+        with XFormsValueControl
+        with FocusableTrait
+        with FileMetadata {
 
     def supportedFileMetadata = FileMetadata.AllMetadataNames
 
@@ -178,6 +180,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             case e: Exception ⇒ throw new ValidationException(e, getLocationData)
         }
     }
+
+    // Don't expose an external value
+    override def evaluateExternalValue(): Unit = setExternalValue(null)
 
     override def equalsExternal(other: XFormsControl) =
         other match {

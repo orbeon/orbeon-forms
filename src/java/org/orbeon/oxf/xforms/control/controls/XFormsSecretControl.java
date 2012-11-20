@@ -18,13 +18,13 @@ import org.dom4j.QName;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControlBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 /**
  * Represents an xf:secret control.
  */
-public class XFormsSecretControl extends XFormsValueControl implements FocusableTrait {
+public class XFormsSecretControl extends XFormsValueControlBase implements FocusableTrait {
 
     // List of attributes to handle as AVTs
     private static final QName[] EXTENSION_ATTRIBUTES = {

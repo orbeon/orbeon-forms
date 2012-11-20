@@ -4476,6 +4476,56 @@
         </output>
     </test>
 
+    <test description="#437: Support XBL 'value' mode" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/437 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values xmlns="">
+                                <foo/>
+                            </values>
+                        </xf:instance>
+                        <xf:setvalue ev:event="xforms-ready" ref="foo">42</xf:setvalue>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding value">
+                            <xbl:template/>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="gaga1" ref="foo">
+                        <xf:message ev:event="xforms-value-changed">Changed!</xf:message>
+                    </fr:gaga>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <foo>42</foo>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="gaga1">42</xxf:control>
+                    </xxf:control-values>
+                    <xxf:message level="modal">Changed!</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

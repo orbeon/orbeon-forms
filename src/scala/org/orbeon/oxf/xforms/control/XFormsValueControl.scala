@@ -30,11 +30,13 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 
-/**
- * Base class for all controls that hold a value.
- */
-abstract class XFormsValueControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
-    extends XFormsSingleNodeControl(container, parent, element, effectiveId) {
+// For Java classes that can't directly implement XFormsValueControl
+abstract class XFormsValueControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
+    extends XFormsSingleNodeControl(container, parent, element, effectiveId)
+    with XFormsValueControl
+
+// Trait for for all controls that hold a value
+trait XFormsValueControl extends XFormsSingleNodeControl {
 
     override type Control <: ValueControl
 

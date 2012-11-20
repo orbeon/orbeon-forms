@@ -29,7 +29,7 @@
     <xbl:script src="/ops/yui/datasource/datasource.js"/>
     <xbl:script src="/ops/yui/autocomplete/autocomplete.js"/>
 
-    <xbl:binding id="fr-autocomplete" element="fr|autocomplete" xxf:external-events="fr-value-selected" xxbl:mode="binding lhha">
+    <xbl:binding id="fr-autocomplete" element="fr|autocomplete" xxf:external-events="fr-value-selected" xxbl:mode="lhha binding value">
 
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xf="http://www.w3.org/2002/xforms">
             <display-name lang="en">Autocomplete</display-name>

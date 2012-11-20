@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
-import org.orbeon.oxf.xforms.control.{AjaxSupport, FocusableTrait, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.ValueRepresentation
@@ -38,7 +38,9 @@ import org.orbeon.oxf.xml.XMLConstants._
  * Represents an xf:input control.
  */
 class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsValueControl(container, parent, element, id) with FocusableTrait {
+        extends XFormsSingleNodeControl(container, parent, element, id)
+        with XFormsValueControl
+        with FocusableTrait {
 
     override def getExtensionAttributes = ExtensionAttributes
 

@@ -143,12 +143,18 @@ object ControlAnalysisFactory {
         require(scope ne null)
 
         // XBL binding if any
-        val binding = context.partAnalysis.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement)))
+        lazy val binding = context.partAnalysis.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement)))
+        def bindingValue = binding.get.abstractBinding.modeValue
+        def bindingLHHA  = binding.get.abstractBinding.modeLHHA
 
         // Not all factories are simply indexed by QName, so compose those with factories for components and actions
         val componentFactory: PartialFunction[Element, ControlFactory] = {
-            case e if binding.isDefined && binding.get.abstractBinding.modeLHHA ⇒ (new ComponentControl(_, _, _, _, _) with LHHATrait)
-            case e if binding.isDefined ⇒ (new ComponentControl(_, _, _, _, _))
+            // Value
+            case e if binding.isDefined && bindingValue && bindingLHHA ⇒ (new ComponentControl(_, _, _, _, _) with ValueTrait with LHHATrait)
+            case e if binding.isDefined && bindingValue                ⇒ (new ComponentControl(_, _, _, _, _) with ValueTrait)
+            // No value
+            case e if binding.isDefined                 && bindingLHHA ⇒ (new ComponentControl(_, _, _, _, _) with LHHATrait)
+            case e if binding.isDefined                                ⇒ (new ComponentControl(_, _, _, _, _))
         }
 
         val f = controlFactory orElse componentFactory orElse XFormsActions.factory

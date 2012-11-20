@@ -19,11 +19,8 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
-import org.orbeon.oxf.xforms.control.FocusableTrait
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
-import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
-import org.orbeon.oxf.xforms.control.XFormsValueControl
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
@@ -39,7 +36,9 @@ import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
  * Represents an xf:select1 control.
  */
 class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsValueControl(container, parent, element, id) with FocusableTrait {
+        extends XFormsSingleNodeControl(container, parent, element, id)
+        with XFormsValueControl
+        with FocusableTrait {
 
     import XFormsSelect1Control._
 

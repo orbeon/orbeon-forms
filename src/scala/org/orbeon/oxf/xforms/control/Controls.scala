@@ -110,7 +110,7 @@ object Controls {
         // TODO LATER: controls must take ElementAnalysis, not Element
 
         // NOTE: If we are unable to create a control (case of Model at least), this has no effect
-        Option(XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement.element, effectiveId)) map {
+        XFormsControlFactory.createXFormsControl(container, parentOption.orNull, staticElement, effectiveId) map {
             control ⇒
                 // Index the new control
                 // NOTE: We used to do this after evaluating the binding. In general it shouldn't hurt to do it here.

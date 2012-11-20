@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.FocusableTrait;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControlBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -30,7 +30,7 @@ import scala.Tuple3;
 /**
  * Represents an xf:textarea control.
  */
-public class XFormsTextareaControl extends XFormsValueControl implements FocusableTrait {
+public class XFormsTextareaControl extends XFormsValueControlBase implements FocusableTrait {
 
     // List of attributes to handle as AVTs
     private static final QName[] EXTENSION_ATTRIBUTES = {

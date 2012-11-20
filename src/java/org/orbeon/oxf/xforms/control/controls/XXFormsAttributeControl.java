@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
 import org.orbeon.oxf.xforms.control.AjaxSupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControlBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.xml.sax.helpers.AttributesImpl;
@@ -29,7 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Represents an extension xxf:attribute control.
  */
-public class XXFormsAttributeControl extends XFormsValueControl {
+public class XXFormsAttributeControl extends XFormsValueControlBase {
 
     private AttributeControl attributeControl;
     private String attributeName;

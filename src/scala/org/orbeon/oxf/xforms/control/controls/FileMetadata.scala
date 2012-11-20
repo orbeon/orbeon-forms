@@ -22,7 +22,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.event.events.XXFormsBindingErrorEvent
 import org.orbeon.oxf.xforms.control.XFormsControl.{ImmutableControlProperty, MutableControlProperty, ControlProperty}
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.xforms.control.{AjaxSupport, XFormsControl, XFormsValueControl}
+import org.orbeon.oxf.xforms.control.{XFormsValueControl, AjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
 

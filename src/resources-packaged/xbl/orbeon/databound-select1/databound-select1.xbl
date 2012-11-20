@@ -24,7 +24,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <xbl:binding id="fr-databound-select1" element="fr|databound-select1" xxbl:mode="binding lhha">
+    <xbl:binding id="fr-databound-select1" element="fr|databound-select1" xxbl:mode="lhha binding value">
         <fb:metadata>
             <fb:display-name lang="en">Dynamic Data Dropdown</fb:display-name>
             <fb:display-name lang="fr">Menu données dynamique</fb:display-name>

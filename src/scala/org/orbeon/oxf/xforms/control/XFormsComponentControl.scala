@@ -21,16 +21,18 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.BindingContext
 import org.xml.sax.helpers.AttributesImpl
 import collection.JavaConverters._
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 
-/**
- * Control that represents a custom components.
- *
- * A component control contains a nested container, which handles:
- *
- * o models nested within component (which we are not 100% happy with as models should be allowed in other places)
- * o HOWEVER this might still be all right for models within xbl:implementation if any
- * o event dispatching
- */
+// A component control with native support for a value
+class XFormsValueComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
+        extends XFormsComponentControl(container, parent, element, effectiveId) with XFormsValueControl {
+    override type Control <: ComponentControl with ValueControl
+
+    // Don't expose an external value
+    override def evaluateExternalValue(): Unit = setExternalValue(null)
+}
+
+// A component control with or without a value
 class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 

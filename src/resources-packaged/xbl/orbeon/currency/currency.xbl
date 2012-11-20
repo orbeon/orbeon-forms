@@ -20,7 +20,7 @@
 
     <xbl:script src="/xbl/orbeon/number/number.js"/>
     <xbl:script src="/xbl/orbeon/currency/currency.js"/>
-    <xbl:binding id="fr-currency" element="fr|currency" xxbl:mode="lhha binding">
+    <xbl:binding id="fr-currency" element="fr|currency" xxbl:mode="lhha binding value">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

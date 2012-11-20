@@ -29,8 +29,7 @@ import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.analysis.controls.OutputControl
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.XFormsValueControl
+import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer.proxyURI
 import org.orbeon.oxf.xforms.submission.{SubmissionUtils, Headers}
@@ -42,7 +41,9 @@ import org.orbeon.exception.OrbeonFormatter
  * Represents an xf:output control.
  */
 class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsValueControl(container, parent, element, id) with FileMetadata {
+        extends XFormsSingleNodeControl(container, parent, element, id)
+        with XFormsValueControl
+        with FileMetadata {
 
     override type Control <: OutputControl
 

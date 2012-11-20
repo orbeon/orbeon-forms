@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control.controls;
 import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
-import org.orbeon.oxf.xforms.control.XFormsValueControl;
+import org.orbeon.oxf.xforms.control.XFormsValueControlBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.XMLConstants;
 import scala.Tuple3;
@@ -24,7 +24,7 @@ import scala.Tuple3;
 /**
  * Represents an xf:range control.
  */
-public class XFormsRangeControl extends XFormsValueControl {
+public class XFormsRangeControl extends XFormsValueControlBase {
 
     private String start;
     private String end;

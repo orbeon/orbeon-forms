@@ -22,7 +22,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl">
-    <xbl:binding id="fr-expandable-output" element="fr|expandable-output" xxbl:mode="binding lhha">
+    <xbl:binding id="fr-expandable-output" element="fr|expandable-output" xxbl:mode="lhha binding value">
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/expandable-output/expandable-output.css"/>
         </xbl:resources>

@@ -253,7 +253,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         // Get current value if possible for this control
         // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
         // client not to update the value, unlike with attributes which can be omitted
-        if (control2.isInstanceOf[XFormsValueControl] && ! control2.isInstanceOf[XFormsUploadControl]) {
+        // FIXME: Remove isInstanceOf calls
+        if (control2.isInstanceOf[XFormsValueControl] && ! control2.isInstanceOf[XFormsUploadControl] && !control2.isInstanceOf[XFormsComponentControl]) {
 
             // TODO: Output value only when changed
 

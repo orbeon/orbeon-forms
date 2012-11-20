@@ -25,7 +25,7 @@
     <!--
         Selection control appearing like a series of clickable links.
      -->
-    <xbl:binding id="fr-link-select1-binding" element="fr|link-select1" xxbl:mode="binding value lhha">
+    <xbl:binding id="fr-link-select1-binding" element="fr|link-select1" xxbl:mode="lhha binding value">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">

@@ -18,6 +18,8 @@ import org.dom4j._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{ValueTrait, ComponentControl}
 
 /**
  * Factory for all existing XForms controls including built-in controls, XBL controls, and actions.
@@ -62,7 +64,7 @@ object XFormsControlFactory {
 
     private val variableFactory: ControlFactory = (new XFormsVariableControl(_, _, _, _))
 
-    private val byQNameFactory = Map[QName, ControlFactory](
+    private val controlFactory = Map[QName, ControlFactory](
         // Root control
         QName.get("root")               → (new XXFormsRootControl(_, _, _, _)),
         XBL_TEMPLATE_QNAME              → (new XXFormsComponentRootControl(_, _, _, _)),
@@ -94,32 +96,31 @@ object XFormsControlFactory {
         EXFORMS_VARIABLE_QNAME          → variableFactory
     )
 
-    /**
-     * Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
-     * control, or a custom component.
-     *
-     * @param container             container
-     * @param parent                parent control, null if none
-     * @param element               element associated with the control
-     * @param effectiveId           effective id of the control
-     * @return                      control
-     */
-    def createXFormsControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String) = {
+    private val actionFactory: PartialFunction[QName, ControlFactory] =
+        { case qName if XFormsActions.isAction(qName) ⇒ (new XFormsActionControl(_, _, _, _)) }
 
-        def isComponent = container.getContainingDocument.getStaticOps.isComponent(element.getQName)
+    private val controlOrActionFactory = controlFactory orElse actionFactory
 
-        // Not all factories are simply indexed by QName, so compose those with factories for components and actions
-        val componentFactory: PartialFunction[QName, ControlFactory] =
-            { case qName if isComponent ⇒ (new XFormsComponentControl(_, _, _, _)) }
+    private val ValueComponentControlFactory: ControlFactory = (new XFormsValueComponentControl(_, _, _, _))
+    private val ComponentControlFactory: ControlFactory      = (new XFormsComponentControl(_, _, _, _))
 
-        val actionFactory: PartialFunction[QName, ControlFactory] =
-            { case qName if XFormsActions.isAction(qName) ⇒ (new XFormsActionControl(_, _, _, _)) }
+    // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
+    // control, or a custom component.
+    def createXFormsControl(container: XBLContainer, parent: XFormsControl, staticElement: ElementAnalysis, effectiveId: String) = {
 
-        val make = byQNameFactory orElse componentFactory orElse actionFactory
+        def create(f: ControlFactory) = f(container, parent, staticElement.element, effectiveId)
 
-        // Create the ElementAnalysis if possible
-        make.lift(element.getQName) map
-            (_(container, parent, element, effectiveId)) orNull
+        staticElement match {
+            case component: ComponentControl with ValueTrait ⇒
+                // Component control with value
+                Some(create(ValueComponentControlFactory))
+            case component: ComponentControl ⇒
+                // Component control without value
+                Some(create(ComponentControlFactory))
+            case _ ⇒
+                // Built-in controls and actions
+                controlOrActionFactory.lift(staticElement.element.getQName) map create
+        }
     }
 
     // TODO: Move this to ControlAnalysisFactory

@@ -116,7 +116,7 @@
                                                     <xf:var name="can-add" as="xs:boolean"
                                                              value="{if ($max-occurs = 'unbounded') then 'true()'
                                                                        else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
-                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]">
+                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1">
                                                         <xf:label><xh:i class="icon-plus-sign"/></xf:label>
                                                         <xf:insert ev:event="DOMActivate"
                                                                    context="$repeat-context"
@@ -189,7 +189,7 @@
                                                                     <!-- Remove trigger -->
                                                                     <xf:var name="can-remove"
                                                                              value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
-                                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]">
+                                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]" tabindex="-1">
                                                                         <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                                                         <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
                                                                     </xf:trigger>

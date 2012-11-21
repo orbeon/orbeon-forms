@@ -179,11 +179,16 @@
 
                                 <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model'] treat as element()"/>
 
-                                <xf:var name="schema" value="$model/xs:schema[1]" as="element(xs:schema)?"/>
-                                <xf:var name="schema-namespace" value="$schema/@targetNamespace" as="xs:string?"/>
-                                <xf:var name="schema-prefixes" value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
-                                <xf:var name="schema-namespaces" value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
-                                <xf:var name="schema-prefix" value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
+                                <xf:var name="schema"
+                                        value="$model/xs:schema[1]" as="element(xs:schema)?"/>
+                                <xf:var name="schema-namespace"
+                                        value="$schema/@targetNamespace" as="xs:string?"/>
+                                <xf:var name="schema-prefixes"
+                                        value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
+                                <xf:var name="schema-namespaces"
+                                        value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
+                                <xf:var name="schema-prefix"
+                                        value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
 
                                 <xf:group appearance="xxf:fieldset">
                                     <xf:label ref="$resources/dialog-validation-details/types/label"/>
@@ -200,7 +205,7 @@
                                     </xf:select1>
 
                                     <!-- Schema type selection if applicable -->
-                                    <xf:select1 ref="schema-type[exists($schema)]">
+                                    <xf:select1 ref="$local/schema-type[exists($schema)]">
                                         <xf:label>
                                             <xh:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
                                             <xh:span><xf:output value="$resources/dialog-validation-details/schema-type/label"/></xh:span>

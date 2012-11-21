@@ -62,7 +62,7 @@ object XFormsActions {
     )
 
     // Return a factory for action analysis
-    val factory = {
+    val ActionFactory = {
 
         def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
 

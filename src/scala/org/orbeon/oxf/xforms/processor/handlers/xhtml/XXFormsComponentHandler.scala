@@ -42,7 +42,7 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
         if (classes.length != 0)
             classes.append(' ')
 
-        classes.append("xbl-component xbl-" + binding.abstractBinding.cssName)
+        classes.append(binding.abstractBinding.cssClasses)
     }
 
     protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl): Unit = {

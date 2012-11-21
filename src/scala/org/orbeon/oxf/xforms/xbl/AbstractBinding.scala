@@ -20,6 +20,7 @@ import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
+import org.orbeon.oxf.util.ScalaUtils._
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
@@ -33,17 +34,30 @@ case class AbstractBinding(
     implementations: Seq[Element],
     global: Option[Document]
 ) {
-    def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
-
     val containerElementName =          // "div" by default
         Option(bindingElement.attributeValue(XXBL_CONTAINER_QNAME)) getOrElse
             "div"
 
+    // XBL modes
+    private val xblMode = attSet(bindingElement, XXBL_MODE_QNAME)
+    def modeBinding     = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
+    def modeValue       = xblMode("value")
+    def modeLHHA        = xblMode("lhha")
+    def modeFocus       = xblMode("focus")
+    def modeLHHACustom  = modeLHHA && xblMode("custom-lhha")
+    def modeItemset     = xblMode("itemset") // NIY as of 2012-11-20
+    def modeHandlers    = ! xblMode("nohandlers")
+
     // Return a CSS-friendly name for this binding (no `|` or `:`)
-    def cssName = qNameMatch.getQualifiedName.replace(':', '-')
+    val cssName = qNameMatch.getQualifiedName.replace(':', '-')
+
+    // CSS classes to put in the markup
+    val cssClasses = "xbl-component" :: ("xbl-" + cssName) :: (modeFocus list "xbl-focusable") mkString " "
 
     val allowedExternalEvents =
         attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)
+
+    def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
 
     private def transformQNameOption = templateElement flatMap
         (e ⇒ Option(Dom4jUtils.extractAttributeValueQName(e, XXBL_TRANSFORM_QNAME)))
@@ -76,15 +90,6 @@ case class AbstractBinding(
 
             generatedDocument
     }
-
-    // XBL modes
-    private val xblMode = attSet(bindingElement, XXBL_MODE_QNAME)
-    def modeBinding     = xblMode("binding") // currently semantic is optional binding but need mandatory, optional, and prohibited
-    def modeValue       = xblMode("value")
-    def modeLHHA        = xblMode("lhha")
-    def modeLHHACustom  = modeLHHA && xblMode("custom-lhha")
-    def modeItemset     = xblMode("itemset") // NIY as of 2012-11-20
-    def modeHandlers    = ! xblMode("nohandlers")
 }
 
 object AbstractBinding {

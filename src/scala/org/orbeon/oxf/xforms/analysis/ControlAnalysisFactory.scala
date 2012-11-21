@@ -129,8 +129,17 @@ object ControlAnalysisFactory {
         XFORMS_INSTANCE_QNAME         → (new Instance(_, _, _, _, _))
     ) ++ variableFactory
 
-    private val controlFactory: PartialFunction[Element, ControlFactory] =
+    private val ControlFactory: PartialFunction[Element, ControlFactory] =
         { case e: Element if byQNameFactory.isDefinedAt(e.getQName) ⇒ byQNameFactory(e.getQName) }
+
+    private val ControlOrActionFactory = ControlFactory orElse XFormsActions.ActionFactory lift
+
+    private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
+        (false, false) → (new ComponentControl(_, _, _, _, _)                               ),
+        (false, true)  → (new ComponentControl(_, _, _, _, _) with                 LHHATrait),
+        (true,  false) → (new ComponentControl(_, _, _, _, _) with ValueTrait               ),
+        (true,  true)  → (new ComponentControl(_, _, _, _, _) with ValueTrait with LHHATrait)
+    )
 
     def create(
           context: StaticStateContext,
@@ -142,26 +151,15 @@ object ControlAnalysisFactory {
         require(controlElement ne null)
         require(scope ne null)
 
-        // XBL binding if any
-        lazy val binding = context.partAnalysis.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement)))
-        def bindingValue = binding.get.abstractBinding.modeValue
-        def bindingLHHA  = binding.get.abstractBinding.modeLHHA
+        val factory =
+            context.partAnalysis.getBinding(scope.prefixedIdForStaticId(XFormsUtils.getElementId(controlElement))) match {
+                case Some(binding) ⇒
+                    ComponentFactories.get(binding.abstractBinding.modeValue, binding.abstractBinding.modeLHHA)
+                case None ⇒
+                    ControlOrActionFactory(controlElement)
+            }
 
-        // Not all factories are simply indexed by QName, so compose those with factories for components and actions
-        val componentFactory: PartialFunction[Element, ControlFactory] = {
-            // Value
-            case e if binding.isDefined && bindingValue && bindingLHHA ⇒ (new ComponentControl(_, _, _, _, _) with ValueTrait with LHHATrait)
-            case e if binding.isDefined && bindingValue                ⇒ (new ComponentControl(_, _, _, _, _) with ValueTrait)
-            // No value
-            case e if binding.isDefined                 && bindingLHHA ⇒ (new ComponentControl(_, _, _, _, _) with LHHATrait)
-            case e if binding.isDefined                                ⇒ (new ComponentControl(_, _, _, _, _))
-        }
-
-        val f = controlFactory orElse componentFactory orElse XFormsActions.factory
-
-        // Create the ElementAnalysis if possible
-        f.lift(controlElement) map
-            (_(context, controlElement, parent, preceding, scope))
+        factory map (_(context, controlElement, parent, preceding, scope))
     }
 
     def isVariable(qName: QName) = variableFactory.contains(qName)

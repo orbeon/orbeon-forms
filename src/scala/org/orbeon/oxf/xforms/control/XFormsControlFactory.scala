@@ -64,7 +64,7 @@ object XFormsControlFactory {
 
     private val variableFactory: ControlFactory = (new XFormsVariableControl(_, _, _, _))
 
-    private val controlFactory = Map[QName, ControlFactory](
+    private val ControlFactory = Map[QName, ControlFactory](
         // Root control
         QName.get("root")               → (new XXFormsRootControl(_, _, _, _)),
         XBL_TEMPLATE_QNAME              → (new XXFormsComponentRootControl(_, _, _, _)),
@@ -96,31 +96,31 @@ object XFormsControlFactory {
         EXFORMS_VARIABLE_QNAME          → variableFactory
     )
 
-    private val actionFactory: PartialFunction[QName, ControlFactory] =
+    private val ActionFactory: PartialFunction[QName, ControlFactory] =
         { case qName if XFormsActions.isAction(qName) ⇒ (new XFormsActionControl(_, _, _, _)) }
 
-    private val controlOrActionFactory = controlFactory orElse actionFactory
+    private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 
-    private val ValueComponentControlFactory: ControlFactory = (new XFormsValueComponentControl(_, _, _, _))
-    private val ComponentControlFactory: ControlFactory      = (new XFormsComponentControl(_, _, _, _))
+    private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
+        (false, false) → (new XFormsComponentControl(_, _, _, _)                         ),
+        (false, true)  → (new XFormsComponentControl(_, _, _, _)      with FocusableTrait),
+        (true,  false) → (new XFormsValueComponentControl(_, _, _, _)                    ),
+        (true,  true)  → (new XFormsValueComponentControl(_, _, _, _) with FocusableTrait)
+    )
 
     // Create a new XForms control. The control returned may be a built-in standard control, a built-in extension
     // control, or a custom component.
     def createXFormsControl(container: XBLContainer, parent: XFormsControl, staticElement: ElementAnalysis, effectiveId: String) = {
 
-        def create(f: ControlFactory) = f(container, parent, staticElement.element, effectiveId)
+        val factory =
+            staticElement match {
+                case component: ComponentControl ⇒
+                    ComponentFactories.get(component.isInstanceOf[ValueTrait], component.binding.abstractBinding.modeFocus)
+                case _ ⇒
+                    ControlOrActionFactory(staticElement.element.getQName)
+            }
 
-        staticElement match {
-            case component: ComponentControl with ValueTrait ⇒
-                // Component control with value
-                Some(create(ValueComponentControlFactory))
-            case component: ComponentControl ⇒
-                // Component control without value
-                Some(create(ComponentControlFactory))
-            case _ ⇒
-                // Built-in controls and actions
-                controlOrActionFactory.lift(staticElement.element.getQName) map create
-        }
+        factory map (_(container, parent, staticElement.element, effectiveId))
     }
 
     // TODO: Move this to ControlAnalysisFactory

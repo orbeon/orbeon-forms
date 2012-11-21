@@ -1144,7 +1144,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1210,7 +1210,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1230,7 +1230,7 @@
                     </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1276,7 +1276,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1296,7 +1296,7 @@
                     </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1470,7 +1470,7 @@
                         </analysis>
                     </value>
                 </output>
-                <var scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="true" name="mv1">
+                <var scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="false" name="mv1">
                     <value>
                         <analysis expression="$mv" analyzed="true">
                             <returnable>
@@ -1488,7 +1488,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="" prefixed-id="xf-4" model-prefixed-id="model2" binding="false" value="true" name="mv2">
+                <var scope="" prefixed-id="xf-4" model-prefixed-id="model2" binding="false" value="false" name="mv2">
                     <value>
                         <analysis expression="$mv" analyzed="true">
                             <returnable>
@@ -1566,7 +1566,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance1" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="xxf:instance('instance2')" analyzed="true">
                                 <returnable>
@@ -1586,7 +1586,7 @@
                     </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance2" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="true" name="mv">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model2" binding="false" value="false" name="mv">
                         <value>
                             <analysis expression="xxf:instance('instance1')" analyzed="true">
                                 <returnable>
@@ -1662,7 +1662,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model1" default-instance-prefixed-id="instance11" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="true" name="v11a">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model1" binding="false" value="false" name="v11a">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1680,7 +1680,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model1" binding="false" value="true" name="v11b">
+                    <var scope="" prefixed-id="xf-2" model-prefixed-id="model1" binding="false" value="false" name="v11b">
                         <value>
                             <analysis expression="instance('instance11')" analyzed="true">
                                 <returnable>
@@ -1698,7 +1698,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="true" name="v12">
+                    <var scope="" prefixed-id="xf-3" model-prefixed-id="model1" binding="false" value="false" name="v12">
                         <value>
                             <analysis expression="instance('instance12')" analyzed="true">
                                 <returnable>
@@ -1716,7 +1716,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-4" model-prefixed-id="model1" binding="false" value="true" name="v13">
+                    <var scope="" prefixed-id="xf-4" model-prefixed-id="model1" binding="false" value="false" name="v13">
                         <value>
                             <analysis expression="xxf:instance('instance21')" analyzed="true">
                                 <returnable>
@@ -1734,7 +1734,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-5" model-prefixed-id="model1" binding="false" value="true" name="v14">
+                    <var scope="" prefixed-id="xf-5" model-prefixed-id="model1" binding="false" value="false" name="v14">
                         <value>
                             <analysis expression="xxf:instance('instance22')" analyzed="true">
                                 <returnable>
@@ -1752,7 +1752,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-6" model-prefixed-id="model2" binding="false" value="true" name="v15a">
+                    <var scope="" prefixed-id="xf-6" model-prefixed-id="model2" binding="false" value="false" name="v15a">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1770,7 +1770,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-7" model-prefixed-id="model2" binding="false" value="true" name="v15b">
+                    <var scope="" prefixed-id="xf-7" model-prefixed-id="model2" binding="false" value="false" name="v15b">
                         <value>
                             <analysis expression="instance('instance21')" analyzed="true">
                                 <returnable>
@@ -1788,7 +1788,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-8" model-prefixed-id="model2" binding="false" value="true" name="v16">
+                    <var scope="" prefixed-id="xf-8" model-prefixed-id="model2" binding="false" value="false" name="v16">
                         <value>
                             <analysis expression="instance('instance22')" analyzed="true">
                                 <returnable>
@@ -1808,7 +1808,7 @@
                     </var>
                 </model>
                 <model scope="" prefixed-id="model2" default-instance-prefixed-id="instance21" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-9" model-prefixed-id="model2" binding="false" value="true" name="v21">
+                    <var scope="" prefixed-id="xf-9" model-prefixed-id="model2" binding="false" value="false" name="v21">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1826,7 +1826,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-10" model-prefixed-id="model2" binding="false" value="true" name="v22">
+                    <var scope="" prefixed-id="xf-10" model-prefixed-id="model2" binding="false" value="false" name="v22">
                         <value>
                             <analysis expression="instance('instance22')" analyzed="true">
                                 <returnable>
@@ -1844,7 +1844,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-11" model-prefixed-id="model2" binding="false" value="true" name="v23">
+                    <var scope="" prefixed-id="xf-11" model-prefixed-id="model2" binding="false" value="false" name="v23">
                         <value>
                             <analysis expression="xxf:instance('instance11')" analyzed="true">
                                 <returnable>
@@ -1862,7 +1862,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-12" model-prefixed-id="model2" binding="false" value="true" name="v24">
+                    <var scope="" prefixed-id="xf-12" model-prefixed-id="model2" binding="false" value="false" name="v24">
                         <value>
                             <analysis expression="xxf:instance('instance12')" analyzed="true">
                                 <returnable>
@@ -1880,7 +1880,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-13" model-prefixed-id="model1" binding="false" value="true" name="v25a">
+                    <var scope="" prefixed-id="xf-13" model-prefixed-id="model1" binding="false" value="false" name="v25a">
                         <value>
                             <analysis expression="instance()" analyzed="true">
                                 <returnable>
@@ -1898,7 +1898,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-14" model-prefixed-id="model1" binding="false" value="true" name="v25b">
+                    <var scope="" prefixed-id="xf-14" model-prefixed-id="model1" binding="false" value="false" name="v25b">
                         <value>
                             <analysis expression="instance('instance11')" analyzed="true">
                                 <returnable>
@@ -1916,7 +1916,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="xf-15" model-prefixed-id="model1" binding="false" value="true" name="v26">
+                    <var scope="" prefixed-id="xf-15" model-prefixed-id="model1" binding="false" value="false" name="v26">
                         <value>
                             <analysis expression="instance('instance12')" analyzed="true">
                                 <returnable>
@@ -1982,7 +1982,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                <var scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="true" name="foo">
+                <var scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="false" name="foo">
                     <value>
                         <analysis expression="foo" analyzed="true">
                             <returnable>
@@ -2000,7 +2000,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="false" name="bar">
                     <value>
                         <analysis expression="bar" analyzed="true">
                             <returnable>
@@ -2019,7 +2019,7 @@
                     </value>
                 </var>
             </model>
-                <var scope="" prefixed-id="vsum" model-prefixed-id="model" binding="false" value="true" name="sum">
+                <var scope="" prefixed-id="vsum" model-prefixed-id="model" binding="false" value="false" name="sum">
                     <value>
                         <analysis expression="$foo + $bar" analyzed="true">
                             <value-dependent>
@@ -2035,7 +2035,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="" prefixed-id="vproduct" model-prefixed-id="model" binding="false" value="true" name="product">
+                <var scope="" prefixed-id="vproduct" model-prefixed-id="model" binding="false" value="false" name="product">
                     <value>
                         <analysis expression=". * $bar" analyzed="true">
                             <value-dependent>
@@ -2051,7 +2051,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="" prefixed-id="vdifference" model-prefixed-id="model" binding="true" value="true" name="difference">
+                <var scope="" prefixed-id="vdifference" model-prefixed-id="model" binding="true" value="false" name="difference">
                     <binding>
                         <analysis expression="foo" analyzed="true">
                             <returnable>
@@ -2193,7 +2193,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <var scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="true" name="foo">
+                    <var scope="" prefixed-id="vfoo" model-prefixed-id="model" binding="false" value="false" name="foo">
                         <value>
                             <analysis expression="foo" analyzed="true">
                                 <returnable>
@@ -2211,7 +2211,7 @@
                             </analysis>
                         </value>
                     </var>
-                    <var scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="true" name="bar">
+                    <var scope="" prefixed-id="vbar" model-prefixed-id="model" binding="false" value="false" name="bar">
                         <value>
                             <analysis expression="bar" analyzed="true">
                                 <returnable>
@@ -2233,7 +2233,7 @@
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false"/>
                 <model scope="my-foo" prefixed-id="my-foo$model" default-instance-prefixed-id="my-foo$instance" analyzed-binds="true"/>
                 <template scope="my-foo" prefixed-id="my-foo$xf-4" model-prefixed-id="my-foo$model" binding="false" value="false"/>
-                <var scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="true" name="internal">
+                <var scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="false" name="internal">
                     <value>
                         <analysis expression="." analyzed="true">
                             <returnable>
@@ -2251,7 +2251,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="my-foo" prefixed-id="my-foo$ov" model-prefixed-id="my-foo$model" binding="false" value="true" name="external">
+                <var scope="my-foo" prefixed-id="my-foo$ov" model-prefixed-id="my-foo$model" binding="false" value="false" name="external">
                     <value>
                         <analysis expression="foo" analyzed="true">
                             <returnable>
@@ -2269,7 +2269,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="my-foo" prefixed-id="my-foo$ro" model-prefixed-id="my-foo$model" binding="false" value="true" name="readonly">
+                <var scope="my-foo" prefixed-id="my-foo$ro" model-prefixed-id="my-foo$model" binding="false" value="false" name="readonly">
                     <value>
                         <analysis expression="exf:readonly($external)" analyzed="false"/>
                     </value>
@@ -2400,7 +2400,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
-                <var scope="" prefixed-id="show-variable" model-prefixed-id="model" binding="false" value="true" name="show">
+                <var scope="" prefixed-id="show-variable" model-prefixed-id="model" binding="false" value="false" name="show">
                     <value>
                         <analysis expression="value = 'true'" analyzed="true">
                             <value-dependent>
@@ -4364,7 +4364,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <var scope="" prefixed-id="v1" model-prefixed-id="model" binding="false" value="true" name="foo">
+                    <var scope="" prefixed-id="v1" model-prefixed-id="model" binding="false" value="false" name="foo">
                         <value>
                             <analysis expression="instance()/a" analyzed="true">
                                 <returnable>
@@ -4936,13 +4936,13 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="foo">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="false" name="foo">
                         <value>
                             <analysis expression="'CONSTANT'" analyzed="true"/>
                         </value>
                     </var>
                 </model>
-                <var scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="false" name="bar">
                     <value>
                         <analysis expression="'CONSTANT'" analyzed="true"/>
                     </value>
@@ -4999,7 +4999,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="m1" default-instance-prefixed-id="i11" analyzed-binds="true">
-                    <var scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="false" value="true" name="label">
+                    <var scope="" prefixed-id="xf-1" model-prefixed-id="m1" binding="false" value="false" name="label">
                         <value>
                             <analysis expression="instance()/@label" analyzed="true">
                                 <returnable>
@@ -5061,7 +5061,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
-                <var scope="" prefixed-id="bar-variable" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="bar-variable" model-prefixed-id="model" binding="false" value="false" name="bar">
                     <value>
                         <analysis expression="@bar" analyzed="true">
                             <returnable>
@@ -5647,7 +5647,7 @@
                 <model scope="my-foo" prefixed-id="my-foo$foo-model" default-instance-prefixed-id="my-foo$foo-instance" analyzed-binds="true"/>
                 <template scope="my-foo" prefixed-id="my-foo$xf-2" model-prefixed-id="my-foo$foo-model" binding="false" value="false"/>
                 <group scope="" prefixed-id="my-foo$foo-group" model-prefixed-id="model" binding="false" value="false"/>
-                <var scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="true" name="v1">
+                <var scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="false" name="v1">
                     <value>
                         <analysis expression="." analyzed="true">
                             <returnable>
@@ -5665,7 +5665,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="my-foo" prefixed-id="my-foo$v2" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v2">
+                <var scope="my-foo" prefixed-id="my-foo$v2" model-prefixed-id="my-foo$foo-model" binding="false" value="false" name="v2">
                     <value>
                         <analysis expression="$v1" analyzed="true">
                             <returnable>
@@ -5698,7 +5698,7 @@
                         </analysis>
                     </value>
                 </output>
-                <var scope="my-foo" prefixed-id="my-foo$v3" model-prefixed-id="my-foo$foo-model" binding="false" value="true" name="v3">
+                <var scope="my-foo" prefixed-id="my-foo$v3" model-prefixed-id="my-foo$foo-model" binding="false" value="false" name="v3">
                     <value>
                         <analysis expression="." analyzed="true">
                             <returnable>
@@ -5716,7 +5716,7 @@
                         </analysis>
                     </value>
                 </var>
-                <var scope="" prefixed-id="my-foo$v4" model-prefixed-id="model" binding="false" value="true" name="v4">
+                <var scope="" prefixed-id="my-foo$v4" model-prefixed-id="model" binding="false" value="false" name="v4">
                     <value>
                         <analysis expression="$v3" analyzed="true">
                             <returnable>
@@ -5788,7 +5788,7 @@
         <output name="analysis">
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" default-instance-prefixed-id="instance" analyzed-binds="true"/>
-                <var scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="bar">
+                <var scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="false" name="bar">
                     <value>
                         <analysis expression="instance()/bar" analyzed="true">
                             <returnable>
@@ -6650,7 +6650,7 @@
             <request request-uri="/orbeon/doc/home-welcome" query-string="id=12&amp;print=false" method="GET">
                 <model scope="" prefixed-id="model" analyzed-binds="true"/>
                 <group scope="" prefixed-id="my-group" model-prefixed-id="model" binding="false" value="false"/>
-                <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="true" name="foo">
+                <var scope="" prefixed-id="xf-1" model-prefixed-id="model" binding="false" value="false" name="foo">
                     <value>
                         <analysis expression="'CONSTANT'" analyzed="true"/>
                     </value>

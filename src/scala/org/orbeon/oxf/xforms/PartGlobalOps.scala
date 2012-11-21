@@ -88,7 +88,7 @@ trait PartGlobalOps {
     }
 
     def isValueControl(effectiveId: String) =
-        getControlAnalysisOption(XFormsUtils.getPrefixedId(effectiveId)) map (_.canHoldValue) getOrElse false
+        getControlAnalysisOption(XFormsUtils.getPrefixedId(effectiveId)) map (_.isInstanceOf[ValueTrait]) getOrElse false
 
     def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
         getControlAnalysisOption(prefixedId) foreach { controlAnalysis ⇒

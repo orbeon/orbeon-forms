@@ -16,7 +16,11 @@ package org.orbeon.oxf.xforms.analysis.controls
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.model.DataModel
 
 class VariableControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends CoreControl(staticStateContext, element, parent, preceding, scope)
-        with ValueTrait with OptionalSingleNode with VariableAnalysisTrait
+        with OptionalSingleNode with VariableAnalysisTrait {
+    override def isAllowedBoundItem(item: Item) = DataModel.isAllowedValueBoundItem(item)
+}

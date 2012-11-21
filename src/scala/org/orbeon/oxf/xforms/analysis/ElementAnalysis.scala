@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import controls.RepeatControl
+import org.orbeon.oxf.xforms.analysis.controls.{ValueTrait, RepeatControl}
 import model.Model
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.dom4j.{QName, Element}
@@ -113,7 +113,6 @@ abstract class ElementAnalysis(
     // Other
     def hasBinding = ref.isDefined || bind.isDefined
     val bindingXPathEvaluations = (if (context.isDefined) 1 else 0) + (if (ref.isDefined) 1 else 0)// 0, 1, or 2: number of XPath evaluations used to resolve the binding if no optimization is taking place
-    val canHoldValue = false // by default
 
     // Classes (not used at this time)
     val classes = ""
@@ -164,7 +163,7 @@ abstract class ElementAnalysis(
                         "prefixed-id", prefixedId,
                         "model-prefixed-id", getModelPrefixedId.orNull,
                         "binding", hasBinding.toString,
-                        "value", canHoldValue.toString,
+                        "value", self.isInstanceOf[ValueTrait].toString,
                         "name", element.attributeValue("name") // e.g. variables
                     )
                 case _ ⇒ Array(attributes: _*)

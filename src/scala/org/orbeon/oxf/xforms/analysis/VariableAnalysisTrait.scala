@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.analysis
 import controls.ViewTrait
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.xforms.model.DataModel
 
 /**
  * Trait representing a variable element, whether in the model or in the view.
@@ -70,9 +72,6 @@ trait VariableAnalysisTrait extends SimpleElementAnalysis with VariableTrait {
     }
 
     def variableAnalysis = getValueAnalysis
-
-    // NOTE: This is used by isValueControl, but it's not clear if a variable should return true
-    override val canHoldValue = true
 
     override def computeValueAnalysis =
         sequenceAnalysis match {

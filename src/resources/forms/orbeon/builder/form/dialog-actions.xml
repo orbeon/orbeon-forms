@@ -272,7 +272,7 @@
                 </xf:action>
             </xf:trigger>
             <!-- Save button -->
-            <xf:trigger ref="$instance/save-test-trigger">
+            <xf:trigger ref="$instance/save-test-trigger" appearance="xxf:primary">
                 <xf:label>
                     <xf:output value="$form-resources/dialog-actions/save/label"/>
                 </xf:label>

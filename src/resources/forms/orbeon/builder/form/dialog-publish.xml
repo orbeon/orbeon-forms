@@ -54,9 +54,8 @@
             <xh:div class="fr-dialog-buttons">
                 <xf:group>
                     <!-- Submit button -->
-                    <xf:trigger xxf:modal="true">
+                    <xf:trigger xxf:modal="true" appearance="xxf:primary">
                         <xf:label>
-                            <xh:img src="/forms/orbeon/builder/images/upload.png"/>
                             <xh:span><xf:output value="$form-resources/dialog-publish/publish/label"/></xh:span>
                         </xf:label>
                         <!-- Dispatch publish event -->
@@ -65,10 +64,10 @@
                             <xf:property name="form" value="$form"/>
                         </xf:dispatch>
                     </xf:trigger>
+                    <xf:output value="$form-resources/or/label"/>
                     <!-- Cancel button -->
-                    <xf:trigger>
+                    <xf:trigger appearance="minimal">
                         <xf:label>
-                            <xh:img src="/apps/fr/style/close.gif" alt=""/>
                             <xh:span><xf:output value="$form-resources/cancel/label"/></xh:span>
                         </xf:label>
                         <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
@@ -108,9 +107,8 @@
                 </xf:group>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
-                <xf:trigger>
+                <xf:trigger appearance="xxf:primary">
                     <xf:label>
-                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
                         <xh:span><xf:output value="$form-resources/close/label"/></xh:span>
                     </xf:label>
                     <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
@@ -125,9 +123,8 @@
                 </xh:p>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
-                <xf:trigger>
+                <xf:trigger appearance="xxf:primary">
                     <xf:label>
-                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
                         <xh:span><xf:output value="$form-resources/close/label"/></xh:span>
                     </xf:label>
                     <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>

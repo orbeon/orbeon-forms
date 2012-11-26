@@ -143,9 +143,9 @@
                             <xsl:if test="$handler = 'negative'"><xh:img src="/apps/fr/style/images/silk/cross.png" alt=""/></xsl:if>
                             <xsl:choose>
                                 <xsl:when test="exists($fr-label)">
-                                    <xf:output>
-                                        <xsl:copy-of select="$fr-label/(@* | node())"/>
-                                    </xf:output>
+                                    <!-- Not sure why we used to use an xf:output wrapper here, but that wasn't handled
+                                         properly. See: https://github.com/orbeon/orbeon-forms/issues/607 -->
+                                    <xsl:copy-of select="$fr-label/(@* | node())"/>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:value-of select="$default"/>

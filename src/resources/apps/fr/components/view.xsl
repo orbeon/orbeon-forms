@@ -91,8 +91,22 @@
         <!-- Form content. Set context on form instance and define this group as #fr-form-group as observers will refer to it. -->
         <xf:group id="fr-form-group" class="fr-body{if ($is-detail) then ' fr-border' else ''}" model="fr-form-model" ref="instance('fr-form-instance')">
             <xh:a name="fr-form"/>
-            <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+            <xsl:choose>
+                <xsl:when test="not($mode = ('edit', 'new')) or $is-form-builder or $view-appearance = 'full'">
+                    <!-- Just place the content as is -->
+                    <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Insert appropriate XBL component -->
+                    <!-- NOTE: Once we support XBL matching on @appearance, use instead
+                         <fr:view appearance="{$view-appearance}">. -->
+                    <xsl:element name="fr:{$view-appearance}">
+                        <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+                    </xsl:element>
+                </xsl:otherwise>
+            </xsl:choose>
             <fr:captcha/>
+            <!--<fr:xforms-inspector/>-->
         </xf:group>
     </xsl:template>
 

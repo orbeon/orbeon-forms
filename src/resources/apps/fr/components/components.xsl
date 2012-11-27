@@ -79,6 +79,8 @@
     <xsl:variable name="error-summary-top" select="normalize-space($error-summary) = ('top', 'both')" as="xs:boolean"/>
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
 
+    <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>
+
     <xsl:variable name="is-rendered" select="doc('input:request')/request/request-path = '/xforms-renderer'" as="xs:boolean"/>
     <xsl:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(doc('input:request')/request/request-uri, '/xforms-renderer') else ''" as="xs:string"/>
 
@@ -99,7 +101,7 @@
                 value="xxf:instance('fr-form-metadata')/title[@xml:lang = xxf:instance('fr-language-instance')], xxf:instance('fr-form-metadata')/title"/>
 
             <!-- Title from the current page's xf:output under HTML title -->
-             <xsl:choose>
+            <xsl:choose>
                 <xsl:when test="xh:head/xh:title/xf:output">
                     <xf:var
                         name="title-from-output"

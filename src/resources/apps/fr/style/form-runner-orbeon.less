@@ -35,11 +35,8 @@ html, body { background-color: @frBackground }
     }
 
     h2 {
-        font-size: 20px;
-    }
-
-    h2 .fr-section-label {
-        display: block;                                 // So the line expands all the way to the right
+        font-size: @frSectionTitleHeight;
+        line-height: @frSectionTitleLineHeight;
     }
 
     h3, h4 {
@@ -180,33 +177,43 @@ html, body { background-color: @frBackground }
     background-color: white;
 
     .fr-section-title {
-        a {
-            text-decoration: none;
-            color: @frHeaderColor;      // Don't use the default styling for anchors
-                                        // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
-            display: block;             // - So it extends all the way to the right
+
+        //button.btn-link { text-decoration: none }
+
+        .fr-section-label {
+            display: block;                                 // So the line expands all the way to the right
+            padding-left: @frSectionTitleLeftPadding;
             height: 100%;               // - So it take the whole height, even when the section title is empty
             overflow: hidden;           // Avoid wrapping under help image for long title
-        }
-        .fr-section-open-close { border-bottom: white }
-        .xforms-label { font-weight: normal }
-        .fr-section-arrow { float: left; display: block; height: 1.5em; background-color: white }
-        button.btn-link { text-decoration: none }
+            font-size: 20px;
 
-        .fr-section-opened, .fr-section-closed {
-            padding-left: @frSectionTitleLeftPadding;
-            background-repeat: no-repeat;
-            background-position: 5px 17px;                          // 17 is (40-7)/7, to vertically align on the middle of the first line of the section title
-                                                                    // We use 17px, an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
-                                                                    // to be aligned on the first line, not the middle of the section area
-            cursor: pointer;                                        // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
-        }
+            // Case of collapsable section
+            a {
+                text-decoration: none;
+                color: @frHeaderColor;      // Don't use the default styling for anchors
+                                            // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
+            }
 
-        .fr-section-opened {
-            background-image: url(arrow-down.png);
-        }
-        .fr-section-closed {
-            background-image: url(arrow-right.png);
+            // Override default label styles
+            label {
+                font-size: @frSectionTitleHeight;
+                line-height: @frSectionTitleLineHeight;
+                margin-bottom: 0;
+            }
+
+            &.fr-section-open, &.fr-section-closed {
+                background-repeat: no-repeat;
+                background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
+                                                                                                         // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
+                                                                                                         // to be aligned on the first line, not the middle of the section area
+                cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
+            }
+            &.fr-section-open {
+                background-image: url(arrow-down.png);
+            }
+            &.fr-section-closed {
+                background-image: url(arrow-right.png);
+            }
         }
     }
 }

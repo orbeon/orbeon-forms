@@ -92,3 +92,33 @@ form.xforms-form fieldset > legend {
   padding-right: 4px;
   font-size: 16px;
 }
+form.xforms-form .nav > li > span > a {
+  display: block;
+}
+form.xforms-form .nav > li > span > a:hover {
+  text-decoration: none;
+  background-color: #eeeeee;
+}
+form.xforms-form .nav-list > li > span > a,
+form.xforms-form .nav-list .nav-header {
+  margin-left: -15px;
+  margin-right: -15px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+form.xforms-form .nav-list > li > span > a {
+  padding: 3px 15px;
+}
+form.xforms-form .nav-list > .active > span > a,
+form.xforms-form .nav-list > .active > span > a:hover {
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  background-color: #0088cc;
+}
+form.xforms-form .nav > .disabled > span > a {
+  color: #999999;
+}
+form.xforms-form .nav > .disabled > span > a:hover {
+  text-decoration: none;
+  background-color: transparent;
+  cursor: default;
+}

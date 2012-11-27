@@ -82,7 +82,7 @@
                                     <xf:toggle ev:event="xforms-value-changed" case="case-{{if (. = 'true') then 'open' else 'closed'}}"/>
                                 </xf:var>
 
-                                <xf:setvalue ev:event="xforms-enabled" ref="instance('open')" value="'{$open}'"/>
+                                <xf:setvalue ev:event="xforms-enabled" ev:target="#observer" ref="instance('open')" value="'{$open}'"/>
 
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">
@@ -109,18 +109,18 @@
                                         <!-- Actual section title -->
                                         <xsl:choose>
                                             <xsl:when test="$collapse">
-                                                <xf:trigger appearance="minimal" id="fr-section-label" class="fr-section-label fr-section-{{if ($open) then 'opened' else 'closed'}}">
+                                                <xf:trigger appearance="minimal" class="fr-section-label fr-section-{{if ($open) then 'open' else 'closed'}}">
                                                     <xf:label value="xxf:label('fr-section')"/>
                                                     <xf:help  value="xxf:help('fr-section')"/>
                                                     <xf:hint  value="xxf:hint('fr-section')"/>
                                                 </xf:trigger>
                                             </xsl:when>
                                             <xsl:otherwise>
-                                                <xf:output appearance="minimal" value="''">
-                                                    <xf:label value="xxf:label('fr-section')"/>
-                                                    <xf:help  value="xxf:help('fr-section')"/>
-                                                    <xf:hint  value="xxf:hint('fr-section')"/>
-                                                </xf:output>
+                                                <xh:span class="fr-section-label">
+                                                    <xf:help  value="xxf:help('fr-section')"  for="switch"/>
+                                                    <xf:label value="xxf:label('fr-section')" for="switch"/>
+                                                    <xf:hint  value="xxf:hint('fr-section')"  for="switch"/>
+                                                </xh:span>
                                             </xsl:otherwise>
                                         </xsl:choose>
 

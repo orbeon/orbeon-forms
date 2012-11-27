@@ -104,10 +104,8 @@ body {
   color: #555555;
 }
 .xforms-form h2 {
-  font-size: 20px;
-}
-.xforms-form h2 .fr-section-label {
-  display: block;
+  font-size: 18px;
+  line-height: 36px;
 }
 .xforms-form h3,
 .xforms-form h4 {
@@ -277,39 +275,32 @@ textarea.xforms-invalid-visited {
 .xbl-fr-section {
   background-color: white;
 }
-.xbl-fr-section .fr-section-title a {
-  text-decoration: none;
-  color: #555555;
+.xbl-fr-section .fr-section-title .fr-section-label {
   display: block;
+  padding-left: 20px;
   height: 100%;
   overflow: hidden;
+  font-size: 20px;
 }
-.xbl-fr-section .fr-section-title .fr-section-open-close {
-  border-bottom: #ffffff;
-}
-.xbl-fr-section .fr-section-title .xforms-label {
-  font-weight: normal;
-}
-.xbl-fr-section .fr-section-title .fr-section-arrow {
-  float: left;
-  display: block;
-  height: 1.5em;
-  background-color: #ffffff;
-}
-.xbl-fr-section .fr-section-title button.btn-link {
+.xbl-fr-section .fr-section-title .fr-section-label a {
   text-decoration: none;
+  color: #555555;
 }
-.xbl-fr-section .fr-section-title .fr-section-opened,
-.xbl-fr-section .fr-section-title .fr-section-closed {
-  padding-left: 20px;
+.xbl-fr-section .fr-section-title .fr-section-label label {
+  font-size: 18px;
+  line-height: 36px;
+  margin-bottom: 0;
+}
+.xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
+.xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
   background-repeat: no-repeat;
-  background-position: 5px 17px;
+  background-position: 5px 15px;
   cursor: pointer;
 }
-.xbl-fr-section .fr-section-title .fr-section-opened {
+.xbl-fr-section .fr-section-title .fr-section-label.fr-section-open {
   background-image: url(arrow-down.png);
 }
-.xbl-fr-section .fr-section-title .fr-section-closed {
+.xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
   background-image: url(arrow-right.png);
 }
 /* Add background to static read-only fields and special output fields */

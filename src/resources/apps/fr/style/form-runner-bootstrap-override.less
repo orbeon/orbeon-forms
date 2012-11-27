@@ -82,4 +82,44 @@ form.xforms-form {
         padding-right: 4px;
         font-size: 16px;
     }
+
+    // NAV LIST
+    // --------
+
+    // Copy Boostrap rules but add span between li and a
+    // Make links block level
+    .nav > li > span > a {
+      display: block;
+    }
+    .nav > li > span > a:hover {
+      text-decoration: none;
+      background-color: @grayLighter;
+    }
+
+    .nav-list > li > span > a,
+    .nav-list .nav-header {
+      margin-left:  -15px;
+      margin-right: -15px;
+      text-shadow: 0 1px 0 rgba(255,255,255,.5);
+    }
+    .nav-list > li > span > a {
+      padding: 3px 15px;
+    }
+    .nav-list > .active > span > a,
+    .nav-list > .active > span > a:hover {
+      color: @white;
+      text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+      background-color: @linkColor;
+    }
+
+        // Gray out text
+    .nav > .disabled > span > a {
+      color: @grayLight;
+    }
+    // Nuke hover effects
+    .nav > .disabled > span > a:hover {
+      text-decoration: none;
+      background-color: transparent;
+      cursor: default;
+    }
 }

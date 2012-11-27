@@ -86,6 +86,18 @@ body {
 .fr-clear {
   clear: both;
 }
+.fr-clear-container {
+  *zoom: 1;
+}
+.fr-clear-container:before,
+.fr-clear-container:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.fr-clear-container:after {
+  clear: both;
+}
 /* ***** Portlet reset *********************************************************************************************** */
 .orbeon-portlet-body {
   font: 13px/1.231 arial, helvetica, clean, sans-serif;
@@ -373,23 +385,16 @@ button.btn-link {
   border-top: 2px solid #ddddee;
   clear: both;
 }
-.xforms-dialog ol {
-  padding-left: 3em;
-}
-.xforms-dialog li {
-  list-style-type: decimal;
-}
 #fr-submission-result-dialog {
   width: 800px;
 }
 /* ***** Sections *************************************************************************************************** */
 .xbl-fr-section {
   display: block;
-  clear: both;
 }
 .xbl-fr-section .fr-section-title .xforms-help-image {
   float: left;
-  margin-top: 13px;
+  margin-top: 11px;
   margin-right: 5px;
   display: inline-block;
   width: 14px;

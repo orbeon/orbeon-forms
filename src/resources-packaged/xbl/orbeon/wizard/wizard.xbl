@@ -1,0 +1,164 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:exf="http://www.exforms.org/exf/1-0"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <xbl:binding id="fr-wizard" element="fr|wizard">
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/wizard/wizard.css"/>
+        </xbl:resources>
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="local">
+                    <local>
+                        <readonly/>
+                        <readwrite/>
+                    </local>
+                </xf:instance>
+                <xf:bind ref="readonly" readonly="true()"/>
+            </xf:model>
+        </xbl:implementation>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+
+                <xsl:template match="/*">
+                    <xh:div class="fr-clear-container">
+                        <xh:div class="fr-wizard-body">
+                            <xf:switch id="switch" xxbl:scope="outer">
+                                <!-- Wrap each top-level fr:section within each own case -->
+                                <xsl:for-each select="fr:section">
+                                    <xf:case id="{@id}-case">
+                                        <xf:action ev:event="xforms-deselect" ev:target="#observer">
+                                            <xxf:setvisited control="{{event('xxf:targetid')}}" visited="true" recurse="true"/>
+                                        </xf:action>
+                                        <xf:group appearance="xxf:internal">
+                                            <xsl:copy>
+                                                <xsl:attribute name="collapse">false</xsl:attribute>
+                                                <xsl:apply-templates select="@* except @collapse | node()"/>
+                                            </xsl:copy>
+                                        </xf:group>
+                                    </xf:case>
+                                </xsl:for-each>
+                            </xf:switch>
+                            <xf:group class="fr-buttons" xxbl:scope="outer">
+
+                                <xf:var
+                                    name="case-index"
+                                    value="index-of(xxf:cases('switch'), xxf:case('switch'))"/>
+
+                                <xf:var
+                                    name="prev-cases"
+                                    value="xxf:cases('switch')[position() lt $case-index][exf:relevant(xxf:binding(replace(., '-case$', '')))]"/>
+
+                                <xf:var
+                                    name="next-cases"
+                                    value="xxf:cases('switch')[position() gt $case-index][exf:relevant(xxf:binding(replace(., '-case$', '')))]"/>
+
+                                <xf:var name="prev-button-ref" value="xxf:instance('local')/(if (exists($prev-cases)) then readwrite else readonly)"/>
+                                <xf:var name="next-button-ref" value="xxf:instance('local')/(if (exists($next-cases)) then readwrite else readonly)"/>
+
+                                <xf:trigger ref="$prev-button-ref">
+                                    <xf:label>
+                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt="Prev"/>
+                                        <xf:output value="$fr-resources/summary/labels/previous"/>
+                                    </xf:label>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:toggle case="{{$prev-cases[last()]}}"/>
+                                        <xf:setfocus control="{{$prev-cases[last()]}}" input-only="true"/>
+                                    </xf:action>
+                                </xf:trigger>
+                                <xf:trigger ref="$next-button-ref">
+                                    <xf:label>
+                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt="Next"/>
+                                        <xf:output value="$fr-resources/summary/labels/next"/>
+                                    </xf:label>
+                                    <xf:action ev:event="DOMActivate">
+                                        <xf:toggle case="{{$next-cases[1]}}"/>
+                                        <xf:setfocus control="{{$next-cases[1]}}" input-only="true"/>
+                                    </xf:action>
+                                </xf:trigger>
+                            </xf:group>
+                        </xh:div>
+                        <xh:div class="fr-wizard-toc">
+                            <xf:group xxbl:scope="outer">
+                                <xh:ul class="nav nav-list">
+                                    <xsl:apply-templates mode="toc-sections"/>
+                                </xh:ul>
+                            </xf:group>
+                        </xh:div>
+                        <!--<xh:div class="fr-clear"/>-->
+                    </xh:div>
+                </xsl:template>
+
+                <!-- TOC: Swallow non-relevant nodes -->
+                <xsl:template match="text()" mode="toc-sections"/>
+                <xsl:template match="*" mode="toc-sections">
+                    <xsl:apply-templates mode="toc-sections"/>
+                </xsl:template>
+
+                <!-- TOC: handle section -->
+                <xsl:template match="fr:section" mode="toc-sections">
+                    <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
+                    <xf:group xxbl:scope="outer">
+                        <xsl:copy-of select="@model | @context | @bind | @ref"/>
+                        <xsl:variable
+                            name="top-level-section-case-id"
+                            select="concat((ancestor-or-self::fr:section/@id)[1], '-case')"/>
+                        <xh:li class="{{if (xxf:case('switch') = '{$top-level-section-case-id}') then 'active' else (),
+                                        if (xxf:visited('{$top-level-section-case-id}') and not(xxf:valid(context(), true()))) then 'invalid' else ()}}">
+
+                            <!--visited: <xf:output value="xxf:visited('{$top-level-section-case-id}')"/>-->
+                            <!--valid: <xf:output value="xxf:valid(context(), true())"/>-->
+
+                            <xf:var
+                                name="section-label"
+                                value="xxf:label('{@id}')"/>
+
+                            <xf:trigger appearance="minimal" >
+                                <xf:label value="$section-label"/>
+                                <xf:action ev:event="DOMActivate">
+                                    <!-- Toggle to top-level section... -->
+                                    <xf:toggle case="{$top-level-section-case-id}"/>
+                                    <!-- ...but focus on specific sub-section -->
+                                    <xf:setfocus control="{@id}" input-only="true"/>
+                                </xf:action>
+                            </xf:trigger>
+
+                            <xsl:if test="exists(.//fr:section)">
+                                <xh:ul>
+                                    <xsl:apply-templates mode="toc-sections"/>
+                                </xh:ul>
+                            </xsl:if>
+                        </xh:li>
+                    </xf:group>
+                </xsl:template>
+
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+
+</xbl:xbl>

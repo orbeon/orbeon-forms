@@ -38,6 +38,10 @@ body { padding-top: 40px } // if using navbar-fixed-top
 /* ***** Utilities ************************************************************************************************** */
 .fr-clear { clear: both }
 
+.fr-clear-container {
+    .clearfix()
+}
+
 /* ***** Portlet reset *********************************************************************************************** */
 
 // rom YUI font.css, but applied to portlet body only
@@ -298,8 +302,8 @@ button.btn-link {
         clear: both
     }
 
-    ol { padding-left: 3em }
-    li { list-style-type: decimal }// overrides YUI reset so numbers in enumeration do show
+//    ol { padding-left: 3em }
+    //li { list-style-type: decimal }// overrides YUI reset so numbers in enumeration do show
 }
 
 #fr-submission-result-dialog { width: 800px }
@@ -308,7 +312,6 @@ button.btn-link {
 
 .xbl-fr-section {
     display: block;
-    clear: both;
 
     .fr-section-title {
         .xforms-help-image {

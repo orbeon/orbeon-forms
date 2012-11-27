@@ -241,6 +241,7 @@ public class XFormsConstants {
     public static final QName CONSTRAINT_QNAME = new QName("constraint");
     public static final QName XXFORMS_DEFAULT_QNAME = new QName("default", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DEFAULTS_QNAME = new QName("defaults", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_DEFERRED_QNAME = new QName("deferred", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
 

@@ -18,6 +18,7 @@ import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xforms._
 import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_FOCUS
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
 import org.orbeon.oxf.util.ScalaUtils._
@@ -55,7 +56,7 @@ case class AbstractBinding(
     val cssClasses = "xbl-component" :: ("xbl-" + cssName) :: (modeFocus list "xbl-focusable") mkString " "
 
     val allowedExternalEvents =
-        attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME)
+        attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (modeFocus set XFORMS_FOCUS)
 
     def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
 

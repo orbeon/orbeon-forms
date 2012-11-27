@@ -193,6 +193,7 @@ object ScalaUtils {
     class BooleanWrapper(b: Boolean) {
         def option[A](a: ⇒ A) = if (b) Some(a) else None
         def list[A](a: ⇒ A)   = if (b) List(a) else Nil
+        def set[A](a: ⇒ A)    = if (b) Set(a) else Set()
     }
     implicit def booleanToBooleanWrapper(b: Boolean) = new BooleanWrapper(b)
 

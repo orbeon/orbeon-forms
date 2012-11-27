@@ -699,7 +699,7 @@
 
     <!-- Clear message -->
     <xf:action ev:observer="#document" ev:event="DOMFocusIn">
-        <xf:toggle case="fr-message-none"/>
+        <xf:toggle case="fr-message-none" xxf:deferred-updates="false"/>
         <xf:setvalue ref="$persistence-instance/message"/>
     </xf:action>
 

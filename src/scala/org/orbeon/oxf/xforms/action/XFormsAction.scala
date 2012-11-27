@@ -105,12 +105,12 @@ abstract class XFormsAction extends Logging {
     }
 
     // Resolve a control given the name of an AVT
-    def resolveControl(context: DynamicActionContext, attName: String): Option[XFormsControl] = {
+    def resolveControl(attName: String)(implicit context: DynamicActionContext): Option[XFormsControl] = {
 
         val interpreter = context.interpreter
         val element = context.element
 
-        resolveStringAVT(context, "control") match {
+        resolveStringAVT("control")(context) match {
             case Some(resolvedAvt) ⇒
 
                 val controlObject = interpreter.resolveObject(element, resolvedAvt)
@@ -136,13 +136,13 @@ abstract class XFormsAction extends Logging {
 
     // Resolve an optional boolean AVT
     // Return None if there is no attribute or if the AVT cannot be evaluated
-    def resolveStringAVT(context: DynamicActionContext, att: String) =
+    def resolveStringAVT(att: String)(implicit context: DynamicActionContext) =
         Option(context.element.attributeValue(att)) flatMap
             (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
 
     // Resolve an optional boolean AVT
-    def resolveBooleanAVT(context: DynamicActionContext, att: String, default: Boolean) =
-        resolveStringAVT(context, att) map (_ == "true") getOrElse default
+    def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext) =
+        resolveStringAVT(att)(context) map (_ == "true") getOrElse default
 
     def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
         if (context.interpreter.isDeferredUpdates(context.element))

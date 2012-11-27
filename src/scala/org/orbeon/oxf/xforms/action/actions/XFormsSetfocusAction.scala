@@ -28,10 +28,10 @@ class XFormsSetfocusAction extends XFormsAction {
         synchronizeAndRefreshIfNeeded(context)
 
         // Extension: whether to focus on input controls only
-        val inputOnly = resolveBooleanAVT(context, "input-only", default = false)
+        val inputOnly = resolveBooleanAVT("input-only", default = false)(context)
 
         // Resolve and update control
-        resolveControl(context, "control") foreach
+        resolveControl("control")(context) foreach
             (control ⇒ Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly)))
     }
 }

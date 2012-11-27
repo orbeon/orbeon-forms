@@ -33,7 +33,7 @@ class XFormsSetindexAction extends XFormsAction {
 
         // Get the repeat static id
         val repeatStaticId =
-            resolveStringAVT(context, "repeat") getOrElse
+            resolveStringAVT("repeat")(context) getOrElse
                 (throw new OXFException("Cannot resolve mandatory '" + "repeat" + "' attribute on " + context.actionName + " action."))
 
         // Determine the index

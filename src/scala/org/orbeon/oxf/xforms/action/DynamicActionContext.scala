@@ -26,4 +26,6 @@ case class DynamicActionContext(
     def element = analysis.element
     def scope = analysis.scope
     def containingDocument = interpreter.containingDocument
+
+    def logger = interpreter.indentedLogger
 }

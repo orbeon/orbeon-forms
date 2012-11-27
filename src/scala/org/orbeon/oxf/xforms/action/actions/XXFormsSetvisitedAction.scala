@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{Controls, XFormsControl}
 import org.orbeon.oxf.xforms.control.Controls.XFormsControlVisitorListener
+import org.orbeon.oxf.util.IndentedLogger
 
 class XXFormsSetvisitedAction extends XFormsAction {
 
@@ -25,14 +26,14 @@ class XXFormsSetvisitedAction extends XFormsAction {
         synchronizeAndRefreshIfNeeded(context)
 
         // Parameters
-        val visited = resolveBooleanAVT(context, "visited", default = true)
-        val recurse = resolveBooleanAVT(context, "recurse", default = false)
+        val visited = resolveBooleanAVT("visited", default = true)(context)
+        val recurse = resolveBooleanAVT("recurse", default = false)(context)
 
         // Resolve and update control
-        resolveControl(context, "control") foreach (setVisited(_, recurse, visited))
+        resolveControl("control")(context) foreach (setVisited(_, recurse, visited)(context.logger))
     }
 
-    private def setVisited(control: XFormsControl, recurse: Boolean, visited: Boolean) =
+    private def setVisited(control: XFormsControl, recurse: Boolean, visited: Boolean)(implicit logger: IndentedLogger) = {
         Controls.visitControls(control, listener = new XFormsControlVisitorListener {
             def startVisitControl(control: XFormsControl) = {
                 if (control.isRelevant)
@@ -42,4 +43,5 @@ class XXFormsSetvisitedAction extends XFormsAction {
 
             def endVisitControl(control: XFormsControl) = ()
         }, includeCurrent = true, recurse = recurse)
+    }
 }

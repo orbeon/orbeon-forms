@@ -72,7 +72,7 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl {
         //
         // Ideally, XPath dependencies should make this smarter.
         //
-        containingDocument().getControls().requireRefresh();
+        containingDocument().requireRefresh();
 
         getSwitch().setSelectedCase(this);
     }

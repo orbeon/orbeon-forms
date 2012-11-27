@@ -46,7 +46,9 @@
             this.onInit(_.bind(function() {
                 this.myEditor.setContent(xformsValue);
                 // On click inside the iframe, propagate the click outside, so code listening on click on an ancestor gets called
-                $(this.container).find('iframe').contents().on('click', _.bind(function() { this.container.click(); }, this));
+                var iframe = $(this.container).find('iframe');
+                iframe.contents().on('click', _.bind(function() { this.container.click(); }, this));
+                $(iframe[0].contentWindow).on('focus', _.bind(this.focus, this));
                 this.tinymceInitialized = true;
             }, this));
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
@@ -62,6 +64,12 @@
         // Send value in MCE to server
         clientToServer: function() {
             ORBEON.xforms.Document.setValue(this.clientValueTextareaId, this.myEditor.getContent());
+        },
+
+        // TinyMCE got the focus
+        focus: function(event) {
+            event.target = this.container;                          // From the perspetive of the XForms engine, the focus is on the XBL component
+            Events.focus(event);                                    // Forward to the "XForms engine"
         },
 
         hasFocus: function() {

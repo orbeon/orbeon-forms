@@ -43,13 +43,13 @@
                 <!-- Mark all controls as visited -->
                 <xxf:setvisited iterate="tokenize(instance('fr-state-instance')/observer, '\s+')" control="{.}" visited="true" recurse="true"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
-                <xf:recalculate/>
+                <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
                 <xxf:setvisited iterate="tokenize(instance('fr-state-instance')/observer, '\s+')" control="{.}" visited="false" recurse="true"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
-                <xf:recalculate/>
+                <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-update" phase="target">
                 <!-- Update errors in non-incremental mode -->
@@ -211,8 +211,8 @@ Inserting error information into error list:
                         <!-- Make sure the model is recalculated when there is a chance visited controls might have
                              changed. We do this because there is no dependency handling with the xxf:visited()
                              function. -->
-                        <xf:action xbl:attr="ev:observer=observer" ev:event="DOMFocusOut" xxf:phantom="true">
-                            <xf:recalculate xxbl:scope="inner"/>
+                        <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-visited xxforms-unvisited" xxf:phantom="true">
+                            <xf:recalculate xxbl:scope="inner" xxf:deferred="true"/>
                         </xf:action>
 
                         <!-- Control becomes invalid or its value is updated -->

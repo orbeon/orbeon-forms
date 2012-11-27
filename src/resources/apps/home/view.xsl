@@ -32,6 +32,16 @@
                 <xh:ul class="thumbnails">
                     <xsl:apply-templates select="node()"/>
                 </xh:ul>
+                <xh:div class="license">
+                    Images on this pages are licensed by their respective author under Creative Commons, and are,
+                    in order of appearance, from the following sources:
+                    <xsl:for-each select="example">
+                        <xh:a href="{@source}">
+                            <xsl:value-of select="if (position() > 1) then ', ' else ''"/>
+                            <xsl:value-of select="position()"/>
+                        </xh:a>
+                    </xsl:for-each>.
+                </xh:div>
             </xh:body>
         </xh:html>
     </xsl:template>

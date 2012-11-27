@@ -528,8 +528,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         (newIterations, partialFocusRepeatOption)
     }
 
-    def dispatchRefreshEvents() {
-        if (isRelevant && (refreshInfo ne null)) {
+    override def dispatchChangeEvents() =
+        if (refreshInfo ne null) {
             val refreshInfo = this.refreshInfo
             this.refreshInfo = null
             if (refreshInfo.isNodesetChanged) {
@@ -543,7 +543,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 Dispatch.dispatchEvent(new XXFormsIndexChangedEvent(this, refreshInfo.oldRepeatIndex, getIndex))
             }
         }
-    }
 
     private def findNodeIndexes(nodeset1: Seq[Item], nodeset2: Seq[Item]) = {
 

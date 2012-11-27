@@ -19,7 +19,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
 import analysis.PartAnalysisImpl
-import collection.JavaConverters._
 import control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
 import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.DocumentWrapper
@@ -147,9 +146,6 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         // Create new part
         val element = node.getUnderlyingNode.asInstanceOf[Element]
         val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), container.getPartAnalysis)
-
-        // Update allowed events as depending on the dynamic subtree this can change
-        tree.updateAllowedEvents(containingDocument)
 
         // Save new scripts if any
 //            val newScriptCount = containingDocument.getStaticState.getScripts.size

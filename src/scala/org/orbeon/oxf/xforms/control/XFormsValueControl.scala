@@ -35,6 +35,15 @@ abstract class XFormsValueControlBase(container: XBLContainer, parent: XFormsCon
     extends XFormsSingleNodeControl(container, parent, element, effectiveId)
     with XFormsValueControl
 
+// For Java classes that can't directly implement FocusableTrait
+abstract class XFormsValueFocusableControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
+    extends XFormsValueControlBase(container, parent, element, effectiveId)
+    with FocusableTrait
+
+abstract class XFormsSingleNodeFocusableControlBase(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
+    extends XFormsSingleNodeControl(container, parent, element, effectiveId)
+    with FocusableTrait
+
 // Trait for for all controls that hold a value
 trait XFormsValueControl extends XFormsSingleNodeControl {
 

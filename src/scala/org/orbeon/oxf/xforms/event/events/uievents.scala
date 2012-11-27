@@ -90,6 +90,16 @@ class XFormsOptionalEvent(target: XFormsEventTarget, properties: PropertyGetter)
     def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 
+class XXFormsVisitedEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsUIEvent(XXFORMS_VISITED, target.asInstanceOf[XFormsControl], properties) {
+    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
+class XXFormsUnvisitedEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsUIEvent(XXFORMS_UNVISITED, target.asInstanceOf[XFormsControl], properties) {
+    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_VALUE_CHANGED, target.asInstanceOf[XFormsControl], properties) {
     def this(target: XFormsEventTarget) = this(target, EmptyGetter)

@@ -78,22 +78,7 @@ class XFormsControl(
     final def stateToRestoreJava = stateToRestore.orNull
 
     // Whether the control has been visited
-    private var _visited = stateToRestore match {
-        case Some(state) ⇒ state.visited
-        case None ⇒ false
-    }
-
-    def visited = _visited
-    def visited_=(visited: Boolean) =
-        if (visited != _visited) {
-            // This mutation requires a clone. We could use XFormsControlLocal but that is more complex. In addition, most
-            // non-trivial forms e.g. Form Runner will require a clone anyway as other stuff takes place upon focus out,
-            // such as updating the error summary. What should be implemented is a better diff mechanism, for example lazy
-            // copy of control properties upon mutation, rather than the current XFormsControlLocal/full clone alternative.
-            containingDocument.getControls.cloneInitialStateIfNeeded()
-            containingDocument.requireRefresh()
-            _visited = visited
-        }
+    def visited = false
 
     parent match {
         case container: XFormsContainerControl ⇒ container.addChild(this)
@@ -121,10 +106,9 @@ class XFormsControl(
             val parentEffectiveId = parent.getEffectiveId
             val parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId)
             effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix
-            if (childrenActions ne null) {
-                for (actionControl ← childrenActions.asScala)
+            if (_childrenActions.nonEmpty)
+                for (actionControl ← _childrenActions)
                     actionControl.updateEffectiveId()
-            }
         }
     }
 
@@ -138,7 +122,7 @@ class XFormsControl(
         if (staticControl ne null) staticControl.locationData else if (element ne null) element.getData.asInstanceOf[LocationData] else null
 
     // Semi-dynamic information (depends on the tree of controls, but does not change over time)
-    private var childrenActions: JList[XFormsActionControl] = null
+    private var _childrenActions: List[XFormsActionControl] = Nil
 
     // Dynamic information (changes depending on the content of XForms instances)
     private var previousEffectiveId: String = null
@@ -155,14 +139,11 @@ class XFormsControl(
     // bindingContextForChild, bindingContextForFollowing operations work on nested actions too.
     // Possibly we could make *any* control able to have nested content. This would make sense from a class hierarchy
     // perspective.
-    final def addChildAction(actionControl: XFormsActionControl) {
-        if (childrenActions == null)
-            childrenActions = new LinkedList[XFormsActionControl]
-        childrenActions.add(actionControl)
-    }
+    final def addChildAction(actionControl: XFormsActionControl): Unit =
+        _childrenActions ::= actionControl
 
-    final def getChildrenActions =
-        Option(childrenActions) getOrElse Collections.emptyList[XFormsActionControl]
+    final def childrenActions = _childrenActions
+    final def getChildrenActions = _childrenActions.asJava
 
     final def previousEffectiveIdCommit() = {
         val result = previousEffectiveId
@@ -198,7 +179,6 @@ class XFormsControl(
         other match {
             case other if this eq other ⇒ true
             case other: XFormsControl ⇒
-                visited == other.visited &&
                 isRelevant == other.isRelevant &&
                 compareLHHA(other) &&
                 compareExtensionAttributes(other)
@@ -248,11 +228,10 @@ class XFormsControl(
         cloned
     }
 
-    /**
-     * Set the focus on this control.
-     *
-     * @return  true iif control accepted focus
-     */
+    // Whether focus can be set to this control
+    def isFocusable = false
+
+    // Set the focus on this control and return true iif control accepted focus
     // By default, a control doesn't accept focus
     def setFocus(inputOnly: Boolean) = false
 

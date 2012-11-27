@@ -444,7 +444,7 @@ object ClientEvents extends Logging {
                 // Disallow focus if the control is no focusable
                 // Relevance and read-only above are already caught. This catches hidden controls, which must not be
                 // focusable from the client.
-                case control: XFormsControl if event.isInstanceOf[XFormsFocusEvent] && ! Focus.isFocusable(control) ⇒
+                case control: XFormsControl if event.isInstanceOf[XFormsFocusEvent] && ! control.isFocusable ⇒
                     warn("non-focusable control")
 
                 case _ ⇒

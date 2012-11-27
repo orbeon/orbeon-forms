@@ -18,7 +18,7 @@ import collection.mutable.{ArrayBuffer, Buffer}
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import java.util.{List ⇒ JList}
 
-trait XFormsContainerControl extends XFormsControl {
+trait XFormsContainerControl extends VisitableTrait {
 
     private var _children: Buffer[XFormsControl] = _ // allow null internally
     private def hasChildren = (_children ne null) && _children.nonEmpty

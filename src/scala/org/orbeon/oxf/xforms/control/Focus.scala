@@ -27,7 +27,7 @@ object Focus {
     def focusWithEvents(control: XFormsControl): Boolean = {
 
         // Continue only if control is focusable
-        if (! isFocusable(control))
+        if (! control.isFocusable)
             return false
 
         val doc = control.containingDocument
@@ -117,7 +117,7 @@ object Focus {
                         // Control might be a ghost that has been removed from the tree (iteration removed)
                         onRemoveFocus()
 
-                    case Some(newReference) if ! isFocusable(newReference) ⇒
+                    case Some(newReference) if ! newReference.isFocusable ⇒
                         // New reference exists, but is not focusable
                         onRemoveFocus()
 
@@ -190,7 +190,7 @@ object Focus {
         removeFocusPartially(doc, boundary = None)
 
     // Whether the control is hidden within a non-visible case or dialog
-    private def isHidden(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) exists {
+    def isHidden(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) exists {
         case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ true
         case dialog: XXFormsDialogControl if ! dialog.isVisible ⇒ true
         case _ ⇒ false
@@ -199,13 +199,6 @@ object Focus {
     // Return all the ancestor-or-self hidden cases
     def hiddenCases(control: XFormsControl) = new AncestorOrSelfIterator(control.parent) collect {
         case switchCase: XFormsCaseControl if ! switchCase.isVisible ⇒ switchCase
-    }
-
-    // Whether the control is focusable, that is it supports focus, is relevant, not read-only, and is not in a hidden case or dialog
-    def isFocusable(control: XFormsControl) = control match {
-        case focusable: XFormsSingleNodeControl with FocusableTrait ⇒ focusable.isRelevant && ! isHidden(focusable) && ! focusable.isReadonly
-        case focusable: FocusableTrait                              ⇒ focusable.isRelevant && ! isHidden(focusable)
-        case _ ⇒ false
     }
 
     // Dispatch DOMFocusOut and DOMFocusIn

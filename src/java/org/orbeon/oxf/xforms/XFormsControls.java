@@ -314,27 +314,17 @@ public class XFormsControls implements XFormsObjectResolver {
                 // Update control bindings
                 final Controls.BindingUpdater updater = updateControlBindings();
 
-                if (currentControlTree.isAllowSendingRefreshEvents()) {
-                    // There are potentially event handlers for UI events, so do the whole processing
+                // There are potentially event handlers for UI events, so do the whole processing
 
-                    // Gather controls to which to dispatch refresh events
-                    final List<String> controlsEffectiveIds = gatherControlsForRefresh();
+                // Gather controls to which to dispatch refresh events
+                final List<String> controlsEffectiveIds = gatherControlsForRefresh();
 
-                    // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
-                    // effect, and clear the corresponding flag."
-                    refreshDone();
+                // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
+                // effect, and clear the corresponding flag."
+                refreshDone();
 
-                    // Dispatch events
-                    currentControlTree.dispatchRefreshEvents(controlsEffectiveIds);
-
-                } else {
-                    // No UI events to send because there is no event handlers for any of them
-                    indentedLogger.logDebug("controls", "refresh skipping sending of UI events because no listener was found", "container id", container.getEffectiveId());
-
-                    // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always have an immediate
-                    // effect, and clear the corresponding flag."
-                    refreshDone();
-                }
+                // Dispatch events
+                currentControlTree.dispatchRefreshEvents(controlsEffectiveIds);
 
                 // Handle focus changes
                 Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());
@@ -408,15 +398,13 @@ public class XFormsControls implements XFormsObjectResolver {
         // Update bindings starting at the container control
         final Controls.BindingUpdater updater = updateSubtreeBindings(containerControl);
 
-        if (currentControlTree.isAllowSendingRefreshEvents()) {
-            // There are potentially event handlers for UI events, so do the whole processing
+        // There are potentially event handlers for UI events, so do the whole processing
 
-            // Gather controls to which to dispatch refresh events
-            final List<String> eventsToDispatch = gatherControlsForRefresh(containerControl);
+        // Gather controls to which to dispatch refresh events
+        final List<String> eventsToDispatch = gatherControlsForRefresh(containerControl);
 
-            // Dispatch events
-            currentControlTree.dispatchRefreshEvents(eventsToDispatch);
-        }
+        // Dispatch events
+        currentControlTree.dispatchRefreshEvents(eventsToDispatch);
 
         // Handle focus changes
         Focus.updateFocusWithEvents(focusedBefore, updater.partialFocusRepeat());

@@ -29,6 +29,9 @@ import org.orbeon.saxon.om.NodeInfo
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.saxon.value.AtomicValue
+import org.orbeon.oxf.xforms.event.{XFormsEvents, Dispatch}
+import org.orbeon.oxf.xforms.event.events._
+import org.orbeon.oxf.xforms.BindingContext
 
 /**
 * Control with a single-node binding (possibly optional). Such controls can have MIPs.
@@ -356,6 +359,73 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                // Control is bound to a custom schema type
                write("xforms-type-custom", customTypeName)
            }
+        }
+    }
+
+    // Dispatch creation events
+    override def dispatchCreationEvents() = {
+        super.dispatchCreationEvents()
+
+        // Dispatch events only if the MIP value is different from the default
+
+        // Dispatch xforms-required if needed
+        // TODO: must reacquire control and test for relevance again
+        if (isRequired)
+            Dispatch.dispatchEvent(new XFormsRequiredEvent(this))
+
+        // Dispatch xforms-readonly if needed
+        // TODO: must reacquire control and test for relevance again
+        if (isReadonly)
+            Dispatch.dispatchEvent(new XFormsReadonlyEvent(this))
+
+        // Dispatch xforms-invalid if needed
+        // TODO: must reacquire control and test for relevance again
+        if (!isValid)
+            Dispatch.dispatchEvent(new XFormsInvalidEvent(this))
+    }
+
+    // NOTE: For the purpose of dispatching value change and MIP events, we used to make a
+    // distinction between value controls and plain single-node controls. However it seems that it is
+    // still reasonable to dispatch those events to xf:group, xf:switch, and even repeat
+    // iterations if they are bound.
+    override def dispatchChangeEvents() = {
+
+        super.dispatchChangeEvents()
+
+        // xforms-value-changed
+        if (isValueChanged)
+            Dispatch.dispatchEvent(new XFormsValueChangeEvent(this))
+
+        // Dispatch moved xxforms-iteration-changed if needed
+        if (previousEffectiveIdCommit != getEffectiveId
+                && container.getPartAnalysis.observerHasHandlerForEvent(getPrefixedId, XFormsEvents.XXFORMS_ITERATION_MOVED))
+            Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(this))
+
+        // Dispatch events only if the MIP value is different from the previous value
+
+        // TODO: must reacquire control and test for relevance again
+        locally {
+            val previousValidState = wasValid
+            val newValidState = isValid
+
+            if (previousValidState != newValidState)
+                Dispatch.dispatchEvent(if (newValidState) new XFormsValidEvent(this) else new XFormsInvalidEvent(this))
+        }
+        // TODO: must reacquire control and test for relevance again
+        locally {
+            val previousRequiredState = wasRequired
+            val newRequiredState = isRequired
+
+            if (previousRequiredState != newRequiredState)
+                Dispatch.dispatchEvent(if (newRequiredState) new XFormsRequiredEvent(this) else new XFormsOptionalEvent(this))
+        }
+        // TODO: must reacquire control and test for relevance again
+        locally {
+            val previousReadonlyState = wasReadonly
+            val newReadonlyState = isReadonly
+
+            if (previousReadonlyState != newReadonlyState)
+                Dispatch.dispatchEvent(if (newReadonlyState) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this))
         }
     }
 }

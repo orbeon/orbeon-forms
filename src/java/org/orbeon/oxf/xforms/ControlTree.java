@@ -19,10 +19,9 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xforms.event.Dispatch;
 
 import java.util.*;
 
@@ -30,14 +29,6 @@ import java.util.*;
  * Represents a tree of XForms controls.
  */
 public class ControlTree implements ExternalCopyable {
-
-    private boolean isAllowSendingValueChangedEvents;
-    private boolean isAllowSendingRequiredEvents;
-    private boolean isAllowSendingRelevantEvents;
-    private boolean isAllowSendingReadonlyEvents;
-    private boolean isAllowSendingValidEvents;
-    private boolean isAllowSendingRefreshEvents;
-    private boolean isAllowSendingIterationMovedEvents;
 
     private final IndentedLogger indentedLogger;
 
@@ -55,32 +46,6 @@ public class ControlTree implements ExternalCopyable {
     public ControlTree(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger) {
         this.indentedLogger = indentedLogger;
         this.controlIndex = new ControlIndex(containingDocument.getStaticState().isNoscript());
-        updateAllowedEvents(containingDocument);
-    }
-
-    public void updateAllowedEvents(XFormsContainingDocument containingDocument) {
-        // Obtain global information about event handlers. This is a rough optimization so we can avoid sending certain
-        // types of events below. Mostly useful for simple forms!
-
-        final StaticStateGlobalOps ops = containingDocument.getStaticOps();
-
-        isAllowSendingValueChangedEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_VALUE_CHANGED);
-        isAllowSendingRequiredEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_REQUIRED) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_OPTIONAL);
-        isAllowSendingRelevantEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_ENABLED) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_DISABLED);
-        isAllowSendingReadonlyEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_READONLY) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_READWRITE);
-        isAllowSendingValidEvents = ops.hasHandlerForEvent(XFormsEvents.XFORMS_VALID) || ops.hasHandlerForEvent(XFormsEvents.XFORMS_INVALID);
-        isAllowSendingIterationMovedEvents = ops.hasHandlerForEvent(XFormsEvents.XXFORMS_ITERATION_MOVED);
-        final boolean isAllowSendingNodesetChangedEvent = ops.hasHandlerForEvent(XFormsEvents.XXFORMS_NODESET_CHANGED);
-        final boolean isAllowSendingIndexChangedEvent = ops.hasHandlerForEvent(XFormsEvents.XXFORMS_INDEX_CHANGED);
-
-        isAllowSendingRefreshEvents = isAllowSendingValueChangedEvents
-                || isAllowSendingRequiredEvents
-                || isAllowSendingRelevantEvents
-                || isAllowSendingReadonlyEvents
-                || isAllowSendingValidEvents
-                || isAllowSendingIterationMovedEvents
-                || isAllowSendingNodesetChangedEvent
-                || isAllowSendingIndexChangedEvent;
     }
 
     /**
@@ -113,10 +78,6 @@ public class ControlTree implements ExternalCopyable {
         );
     }
 
-    public boolean isAllowSendingRefreshEvents() {
-        return isAllowSendingRefreshEvents;
-    }
-
     public void dispatchRefreshEvents(Collection<String> controlsEffectiveIds) {
         indentedLogger.startHandleOperation("controls", "dispatching refresh events");
         for (final String controlEffectiveId: controlsEffectiveIds) {
@@ -134,49 +95,13 @@ public class ControlTree implements ExternalCopyable {
 
             if (newRelevantState && !oldRelevantState) {
                 // Control has become relevant
-                dispatchCreationEvents(control);
+                control.dispatchCreationEvents();
             } else if (!newRelevantState && oldRelevantState) {
                 // Control has become non-relevant
-                dispatchDestructionEvents(control);
+                control.dispatchDestructionEvents();
             } else if (newRelevantState) {
                 // Control was and is relevant
-                dispatchChangeEvents(control);
-            }
-        }
-    }
-
-    private void dispatchCreationEvents(XFormsControl control) {
-        if (XFormsControl.controlSupportsRefreshEvents(control)) {
-            if (control.isRelevant()) {
-                // Commit current control state
-                control.commitCurrentUIState();
-
-                // Dispatch xforms-enabled if needed
-                if (isAllowSendingRelevantEvents) {
-                    Dispatch.dispatchEvent(new XFormsEnabledEvent(control));
-                }
-                if (control instanceof XFormsSingleNodeControl) {
-                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    // Dispatch events only if the MIP value is different from the default
-
-                    // Dispatch xforms-required if needed
-                    // TODO: must reacquire control and test for relevance again
-                    if (isAllowSendingRequiredEvents && singleNodeControl.isRequired()) {
-                        Dispatch.dispatchEvent(new XFormsRequiredEvent(singleNodeControl));
-                    }
-
-                    // Dispatch xforms-readonly if needed
-                    // TODO: must reacquire control and test for relevance again
-                    if (isAllowSendingReadonlyEvents && singleNodeControl.isReadonly()) {
-                        Dispatch.dispatchEvent(new XFormsReadonlyEvent(singleNodeControl));
-                    }
-
-                    // Dispatch xforms-invalid if needed
-                    // TODO: must reacquire control and test for relevance again
-                    if (isAllowSendingValidEvents && !singleNodeControl.isValid()) {
-                        Dispatch.dispatchEvent(new XFormsInvalidEvent(singleNodeControl));
-                    }
-                }
+                control.dispatchChangeEvents();
             }
         }
     }
@@ -207,100 +132,11 @@ public class ControlTree implements ExternalCopyable {
         for (final String effectiveId : controlsEffectiveIds) {
             final XFormsControl control = controlIndex.getControl(effectiveId);
             // Directly call destruction events as we know the iteration is going away
-            dispatchDestructionEvents(control);
+            if (XFormsControl.controlSupportsRefreshEvents(control))
+                control.dispatchDestructionEvents();
         }
 
         indentedLogger.endHandleOperation("controls", Integer.toString(controlsEffectiveIds.size()));
-    }
-
-    private void dispatchDestructionEvents(XFormsControl control) {
-        if (XFormsControl.controlSupportsRefreshEvents(control)) {
-
-            // Don't test for relevance here
-            // o In iteration removal case, control is still relevant
-            // o In refresh case, control is non-relevant
-
-            // Dispatch xforms-disabled if needed
-            if (isAllowSendingRelevantEvents) {
-                Dispatch.dispatchEvent(new XFormsDisabledEvent(control));
-            }
-
-            // TODO: if control *becomes* non-relevant and value changed, arguably we should dispatch the value-changed event
-        }
-    }
-
-    private void dispatchChangeEvents(XFormsControl control) {
-
-        // NOTE: For the purpose of dispatching value change and MIP events, we used to make a
-        // distinction between value controls and plain single-node controls. However it seems that it is
-        // still reasonable to dispatch those events to xf:group, xf:switch, and even repeat
-        // iterations if they are bound.
-
-        if (XFormsControl.controlSupportsRefreshEvents(control)) {
-            if (control.isRelevant()) {
-                // TODO: implement dispatchRefreshEvents() on all controls instead of using if ()
-                if (control instanceof XFormsSingleNodeControl) {
-
-                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-
-                    // xforms-value-changed
-                    if (isAllowSendingValueChangedEvents && singleNodeControl.isValueChanged()) {
-                        Dispatch.dispatchEvent(new XFormsValueChangeEvent(singleNodeControl));
-                    }
-
-                    // Dispatch moved xxforms-iteration-changed if needed
-                    if (isAllowSendingIterationMovedEvents
-                            && control.previousEffectiveIdCommit() != control.getEffectiveId()
-                            && control.container().getPartAnalysis().observerHasHandlerForEvent(control.getPrefixedId(), XFormsEvents.XXFORMS_ITERATION_MOVED)) {
-                        Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(control));
-                    }
-
-                    // Dispatch events only if the MIP value is different from the previous value
-
-                    // TODO: must reacquire control and test for relevance again
-                    if (isAllowSendingValidEvents) {
-                        final boolean previousValidState = singleNodeControl.wasValid();
-                        final boolean newValidState = singleNodeControl.isValid();
-
-                        if (previousValidState != newValidState) {
-                            if (newValidState) {
-                                Dispatch.dispatchEvent(new XFormsValidEvent(singleNodeControl));
-                            } else {
-                                Dispatch.dispatchEvent(new XFormsInvalidEvent(singleNodeControl));
-                            }
-                        }
-                    }
-                    // TODO: must reacquire control and test for relevance again
-                    if (isAllowSendingRequiredEvents) {
-                        final boolean previousRequiredState = singleNodeControl.wasRequired();
-                        final boolean newRequiredState = singleNodeControl.isRequired();
-
-                        if (previousRequiredState != newRequiredState) {
-                            if (newRequiredState) {
-                                Dispatch.dispatchEvent(new XFormsRequiredEvent(singleNodeControl));
-                            } else {
-                                Dispatch.dispatchEvent(new XFormsOptionalEvent(singleNodeControl));
-                            }
-                        }
-                    }
-                    // TODO: must reacquire control and test for relevance again
-                    if (isAllowSendingReadonlyEvents) {
-                        final boolean previousReadonlyState = singleNodeControl.wasReadonly();
-                        final boolean newReadonlyState = singleNodeControl.isReadonly();
-
-                        if (previousReadonlyState != newReadonlyState) {
-                            if (newReadonlyState) {
-                                Dispatch.dispatchEvent(new XFormsReadonlyEvent(singleNodeControl));
-                            } else {
-                                Dispatch.dispatchEvent(new XFormsReadwriteEvent(singleNodeControl));
-                            }
-                        }
-                    }
-                } else if (control instanceof XFormsRepeatControl) {
-                    ((XFormsRepeatControl) control).dispatchRefreshEvents();
-                }
-            }
-        }
     }
 
     public Object getBackCopy() {
@@ -432,10 +268,6 @@ public class ControlTree implements ExternalCopyable {
 
     public List<XFormsControl> getChildren() {
         return root != null ? root.childrenJava() : Collections.<XFormsControl>emptyList();
-    }
-
-    public Map<String, XFormsControl> getEffectiveIdsToControls() {
-        return controlIndex.getEffectiveIdsToControls();
     }
 
     public XFormsControl getControl(String effectiveId) {

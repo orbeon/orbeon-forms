@@ -134,7 +134,7 @@ trait ControlBindingSupport {
             onBindingUpdate(oldBinding, bindingContext)
     }
 
-    def onCreate() = { _wasRelevant = false; visited = false }
+    def onCreate() = { _wasRelevant = false }
     def onDestroy() = ()
     def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) = ()
 

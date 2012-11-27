@@ -11,16 +11,47 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<examples title="Orbeon Forms - XForms Examples and Apps">
-    <example title="Espresso Order" href="/xforms-espresso/" img="/apps/home/images/xforms-espresso-small.png">
-        The <b>Espresso Order</b> demo shows powerful aspect of XForms in a compact example:
+<examples title="Creating forms by writing XForms by hand"
+          xmlns:xh="http://www.w3.org/1999/xhtml">
+    <banner>
+        The examples below have been created by writing XForms by hand. If you are not a developer, instead, you might
+        be more interested in <xh:a href="./">creating forms with Form Builder</xh:a>.
+    </banner>
+    <example title="Espresso Order" href="/xforms-espresso/" img="images/xforms-espresso-small.jpg" size="4"
+             source="http://www.flickr.com/photos/kubina/1469914113/">
+        This example shows powerful aspect of XForms in a compact example:
         declarative binds, repeats, dynamic sets of items and dynamic rules.
     </example>
-    <example title="XForms Bookcast" href="/xforms-bookcast/" img="/apps/home/images/xforms-bookcast-small.png">
-        The <b>XForms Bookcast</b> app is part of the Orbeon Forms tutorial. It shows simple XRX-style database access,
-        repeats, and more!
+    <example title="XForms Bookcast" href="/xforms-bookcast/" img="images/xforms-bookcast-small.jpg" size="4"
+             source="http://www.flickr.com/photos/osiatynska/3287986172/">
+        The <xh:i>Bookcast</xh:i> is part of the Orbeon <xh:a
+        href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial">XForms tutorial</xh:a>.
+        It shows simple XRX-style database access, repeats, and more.
     </example>
-    <example href="/home/" img="/apps/home/images/arrow_left.png">
-        Back to Form Builder &amp; Sample Forms
+    <example title="XForms Todo" href="/xforms-todo/" img="images/xforms-todo-small.jpg" size="4"
+             source="http://www.flickr.com/photos/childofwar/3097124543/">
+        A todo-list example is a must-have for any web technology. And unmistakably, here is one, in XForms.
+    </example>
+    <example title="Flickr Resize" href="/xforms-flickr-resize/" img="images/xforms-flickr-resize-small.jpg" size="4"
+             source="http://www.flickr.com/photos/seanmolin/5638588326/">
+        Uses an XForms submission to do a search on Flickr through their REST API, and uses a slider to dynamically
+        change the size of the images.
+    </example>
+    <example title="XForms Sandbox" href="/xforms-sandbox/" img="images/xforms-sandbox-small.jpg" size="4"
+             source="http://www.flickr.com/photos/foreverphoto/2467694199/">
+        Allows you to run standalone XForms examples. A number of such examples come built-in, and you use the XForms
+        Sandbox to run your own standalone file by either uploading it, or providing the URL of its source.
+    </example>
+    <example title="XPath Sandbox" href="/sandbox-transformations/xpath/" img="images/xpath-sandbox-small.jpg" size="4"
+             source="http://www.flickr.com/photos/vinothchandar/6820565620/">
+        Allows you to quickly test XPath expressions, and see as you type what they evaluate to.
+    </example>
+    <example title="XForms Translate" href="/xforms-translate/" img="images/xforms-translate-small.jpg" size="4"
+             source="http://www.flickr.com/photos/horiavarlan/4290551550/">
+        Provides as-you-type translation, using Google Translate through screen scraping.
+    </example>
+    <example title="XForms Wizard" href="/xforms-wizard-switch/" img="images/xforms-wizard-switch-small.jpg" size="4"
+             source="http://www.flickr.com/photos/mcgraths/3248483447/">
+        Shows how to create a multi-step form (aka wizard) using the XForms switch construct.
     </example>
 </examples>

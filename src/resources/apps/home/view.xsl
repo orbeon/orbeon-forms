@@ -1,6 +1,6 @@
 <!--
-  Copyright (C) 2011 Orbeon, Inc.
-  
+  Copyright (C) 2012 Orbeon, Inc.
+
   This program is free software; you can redistribute it and/or modify it under the terms of the
   GNU Lesser General Public License as published by the Free Software Foundation; either version
   2.1 of the License, or (at your option) any later version.
@@ -11,40 +11,50 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xsl:version="2.0">
-    <head>
-        <title><xsl:value-of select="/*/@title"/></title>
-        <style type="text/css">
-            .orbeon .examples .example { float: left; width: 360px; height: 455px; margin: 0 .5em .5em 0; border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; background-color: white }
-            .orbeon .examples .example .image { height: 310px; overflow-y: auto; overflow-x: hidden; padding: 1px 0 } <!-- padding 1px to make FF 3.6 happy -->
-            .orbeon .examples .example img { border: none; display: block; margin: 0 auto; padding: 1px 0 1px }
-            .orbeon .examples .example:hover { background-color: #FFCC66 }
-            .orbeon .examples .example h2 { font-size: 14px }
-            .orbeon .examples .example .description { padding: .5em 1em; font-family: georgia,serif; font-size: 14px; line-height: 1.3 }
-            .orbeon .examples .example.last .image { margin-top: 5em }
-            .orbeon .examples .example.last .description {  text-align: center; font-style: italic }
-            .orbeon .examples .example.last .image { height: auto }
-        </style>
-    </head>
-    <body>
-        <div class="examples">
-            <xsl:variable xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
-                          name="is-portlet" select="xpl:isPortlet()"/>
-            <xsl:for-each select="/*/example[not($is-portlet and @portlet-exclude = 'true')]">
-                <div class="example{if (position() = last()) then ' last' else ''}">
-                    <xsl:if test="@title">
-                        <h2><xsl:value-of select="@title"/></h2>
-                    </xsl:if>
-                    <div class="image">
-                        <a href="{@href}"><img src="{@img}" alt="{@title}"/></a>
-                    </div>
-                    <p class="description">
-                        <xsl:copy-of select="* | text()"/>
-                    </p>
-                </div>
-            </xsl:for-each>
-            <div class="cleaner"/>
-        </div>
-    </body>
-</html>
+<xsl:stylesheet xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      version="2.0">
+
+    <xsl:variable name="is-portlet" select="xpl:isPortlet()"/>
+
+    <xsl:template match="/examples">
+        <xh:html>
+            <xh:head>
+                <xh:title><xsl:value-of select="@title"/></xh:title>
+                <xh:link rel="stylesheet" href="home.css" type="text/css"/>
+            </xh:head>
+            <xh:body>
+                <xh:ul class="thumbnails">
+                    <xsl:apply-templates select="node()"/>
+                </xh:ul>
+            </xh:body>
+        </xh:html>
+    </xsl:template>
+
+    <xsl:template match="example[not($is-portlet and @portlet-exclude = 'true')]">
+        <xsl:variable name="is-first" select="position() = 1"/>
+        <xh:li class="thumbnail span{@size}">
+            <xh:a href="{@href}">
+                <!-- Image ratio must be 620x230 (larger) or 300x230 (smaller) -->
+                <xh:img src="{@img}" alt=""/>
+                <xh:h2><xsl:value-of select="@title"/></xh:h2>
+            </xh:a>
+            <xh:p><xsl:copy-of select="node()"/></xh:p>
+        </xh:li>
+    </xsl:template>
+
+    <xsl:template match="banner">
+        <xh:li class="thumbnail span12">
+            <xh:p>
+                <xsl:copy-of select="node()"/>
+            </xh:p>
+        </xh:li>
+    </xsl:template>
+
+</xsl:stylesheet>
 

@@ -97,6 +97,7 @@
                 <xf:bind ref="remove-list" readonly="count(instance('lists')/list) = 1"/>
                 <xf:bind ref="remove-list-item" readonly="count(instance('lists')/list[index('listSet')]/todo) = 1"/>
             </xf:bind>
+            <xf:recalculate ev:event="xforms-ready"/>
         </xf:model>
     </xh:head>
     <xh:body>

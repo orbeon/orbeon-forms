@@ -1,0 +1,43 @@
+@import "../../../resources/apps/fr/style/bootstrap-src/less/variables";
+@import "../../../resources/apps/fr/style/bootstrap-src/less/mixins";
+
+body {
+    background-color: #e3e3e1 !important;
+    .thumbnails {
+        li {
+            margin: 0 0 18px 18px;          // Default is 20px and somehow boxes don't fit on one line
+            background-color: white;
+            font-family: "ff-meta-serif-web-pro",Georgia,Cambria,"Times New Roman",Times,serif;
+            padding: 0;
+            &.span4, &.span8 { height: 438px; }
+            a {
+                text-decoration: none;
+                img {
+                    height: 230px;
+                }
+                h2 {
+                    font-size: 20px;
+                    line-height: 25px;
+                    font-weight: 700;
+                    color: #303239;
+                    margin: 0;
+                    padding-top: 24px;
+                }
+            }
+            h2, p {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+            p {
+                padding-top: 6px;
+                font-size: 15px;
+                line-height: 21px;
+                color: #444;
+            }
+            &.span12 {
+                padding: 4px 0 0 0;     // We want 10px at the top and bottom; p already 10px margin at the bottom and 6px padding at the top
+            }
+        }
+    }
+}
+

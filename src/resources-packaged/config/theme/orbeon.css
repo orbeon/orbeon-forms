@@ -11,6 +11,9 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+
+/* TODO: This file is deprecated, as the example use a new L&F (see examples.less) */
+
 body { margin: .71em; padding: 0; text-align: left }
 
 body, input, select, button, table {

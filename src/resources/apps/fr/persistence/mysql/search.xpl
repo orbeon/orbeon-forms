@@ -107,7 +107,7 @@
                                         data.created, data.last_modified, data.document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
-                                            , extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') detail_<xsl:value-of select="position()"/>
+                                            , extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
                                     from orbeon_form_data data,
                                         (
@@ -131,12 +131,12 @@
                                             <xsl:choose>
                                                 <xsl:when test="@match = 'exact'">
                                                     <!-- Exact match -->
-                                                    and extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')
+                                                    and extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')
                                                     = '<xsl:value-of select="f:escape-sql(.)"/>'
                                                 </xsl:when>
                                                 <xsl:otherwise>
                                                     <!-- Substring, case-insensitive match -->
-                                                    and lower(extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>'))
+                                                    and lower(extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>'))
                                                     like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                                 </xsl:otherwise>
                                             </xsl:choose>

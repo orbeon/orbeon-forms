@@ -13,26 +13,28 @@
  */
 package org.orbeon.oxf.xforms.action.actions
 
-import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.events.XFormsRecalculateEvent
+import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent
+import org.orbeon.oxf.xml.dom4j.LocationData
 
 /**
- * 10.1.4 The recalculate Element
+ * 10.1.6 The refresh Element
  */
-class XFormsRecalculateAction extends XFormsAction {
-
+class XFormsRefreshAction extends XFormsAction {
     override def execute(context: DynamicActionContext): Unit = {
 
         val interpreter = context.interpreter
         val model       = interpreter.actionXPathContext.getCurrentModel
 
-        val applyDefaults = (Option(interpreter.resolveAVT(context.element, XXFORMS_DEFAULTS_QNAME)) getOrElse  "false").toBoolean
-        val deferred      = (Option(interpreter.resolveAVT(context.element, XXFORMS_DEFERRED_QNAME)) getOrElse  "false").toBoolean
+        val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
+        if (model eq null)
+            throw new ValidationException("Invalid model id: " + modelId, context.element.getData.asInstanceOf[LocationData])
 
-        model.getDeferredActionContext.recalculate = true
-        if (! deferred)
-            Dispatch.dispatchEvent(new XFormsRecalculateEvent(model, applyDefaults))
+        // NOTE: We no longer need to force the refresh flag here because the refresh flag is global. If a change in any
+        // model occurred, then the flag will be already set and we are safe. Otherwise, it is safe not to do anything.
+        Dispatch.dispatchEvent(new XFormsRefreshEvent(model))
     }
 }

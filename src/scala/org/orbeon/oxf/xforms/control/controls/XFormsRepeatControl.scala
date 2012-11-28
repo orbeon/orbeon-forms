@@ -30,7 +30,6 @@ import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.Logging
 
@@ -121,11 +120,11 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     private def ensureIndexBounds(index: Int) =
         math.min(math.max(index, if (getSize > 0) 1 else 0), getSize)
 
+    // Return the size based on the nodeset size, so we can call this before all iterations have been added.
+    // Scenario:
+    // - call index() or xxf:index() from within a variable within the iteration:
+    // - not all iterations have been added, but the size must be known
     override def getSize =
-        // Return the size based on the nodeset size, so we can call this before all iterations have been added.
-        // Scenario:
-        // - call index() or xxf:index() from within a variable within the iteration:
-        // - not all iterations have been added, but the size must be known
         Option(getBindingContext) map (_.nodeset.size) getOrElse  0
 
     def getIndex =
@@ -590,26 +589,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         else
             false
 
-    override def computeRelevant: Boolean = {
-
-        // If parent is not relevant then we are not relevant either
-        if (! super.computeRelevant)
-            return false
-
-        for (currentItem ← bindingContext.getNodeset.asScala) {
-            // If bound to non-node, consider as relevant (e.g. ref="(1 to 10)")
-            if (! currentItem.isInstanceOf[NodeInfo])
-                return true
-
-            // Bound to node and node is relevant
-            val currentNodeInfo = currentItem.asInstanceOf[NodeInfo]
-            if (InstanceData.getInheritedRelevant(currentNodeInfo))
-                return true
-        }
-
-        // No item was relevant so we are not relevant either
-        false
-    }
+    // NOTE: pushBindingImpl ensures that any item we are bound to is relevant
+    override def computeRelevant = super.computeRelevant && getSize > 0
 
     override def performDefaultAction(event: XFormsEvent) = event match {
         case e: XXFormsSetindexEvent ⇒ setIndex(e.index)

@@ -898,32 +898,14 @@
                         <xxf:control id="output-default·1">42</xxf:control>
                         <xxf:control id="output-custom·1">42, 43</xxf:control>
                         <xxf:control id="output-calculate·1">43</xxf:control>
-                        <xxf:repeat-iteration id="repeat" relevant="false" iteration="2"/>
-                        <xxf:control id="output-relevant·2" relevant="false"/>
-                        <xxf:control id="output-readonly·2" relevant="false"/>
-                        <xxf:control id="output-required·2" relevant="false"/>
-                        <xxf:control id="output-type·2" relevant="false"/>
-                        <xxf:control id="output-constraint·2" relevant="false"/>
-                        <xxf:control id="output-default·2" relevant="false"/>
-                        <xxf:control id="output-custom·2" relevant="false"/>
-                        <xxf:control id="output-calculate·2" relevant="false"/>
-                        <xxf:control id="output-relevant·3">true</xxf:control>
-                        <xxf:control id="output-readonly·3">false</xxf:control>
-                        <xxf:control id="output-required·3">false</xxf:control>
-                        <xxf:control id="output-type·3">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·3">false</xxf:control>
-                        <xxf:control id="output-default·3">44</xxf:control>
-                        <xxf:control id="output-custom·3">44, 45</xxf:control>
-                        <xxf:control id="output-calculate·3">45</xxf:control>
-                        <xxf:repeat-iteration id="repeat" relevant="false" iteration="4"/>
-                        <xxf:control id="output-relevant·4" relevant="false"/>
-                        <xxf:control id="output-readonly·4" relevant="false"/>
-                        <xxf:control id="output-required·4" relevant="false"/>
-                        <xxf:control id="output-type·4" relevant="false"/>
-                        <xxf:control id="output-constraint·4" relevant="false"/>
-                        <xxf:control id="output-default·4" relevant="false"/>
-                        <xxf:control id="output-custom·4" relevant="false"/>
-                        <xxf:control id="output-calculate·4" relevant="false"/>
+                        <xxf:control id="output-relevant·2">true</xxf:control>
+                        <xxf:control id="output-readonly·2">false</xxf:control>
+                        <xxf:control id="output-required·2">false</xxf:control>
+                        <xxf:control id="output-type·2">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint·2">false</xxf:control>
+                        <xxf:control id="output-default·2">44</xxf:control>
+                        <xxf:control id="output-custom·2">44, 45</xxf:control>
+                        <xxf:control id="output-calculate·2">45</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

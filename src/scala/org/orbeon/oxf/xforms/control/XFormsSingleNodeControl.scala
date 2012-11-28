@@ -192,22 +192,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         if (! super.computeRelevant)
             return false
 
-        val currentItem: Item = bindingContext.getSingleItem
+        val currentItem = bindingContext.getSingleItem
         if (bindingContext.isNewBind) {
             // There is a binding
-            if (isAllowedBoundItem(currentItem)) {
-                if (currentItem.isInstanceOf[NodeInfo]) {
-                    // Control is bound to an acceptable node, get node relevance
-                    val currentNodeInfo: NodeInfo = currentItem.asInstanceOf[NodeInfo]
-                    InstanceData.getInheritedRelevant(currentNodeInfo)
-                } else {
-                    // Control bound to a value is considered relevant
-                    true
-                }
-            } else {
-                // Q: Should warn?
-                false
-            }
+
+            isAllowedBoundItem(currentItem) && isRelevantItem(currentItem)
         } else {
             // Control is not bound because it doesn't have a binding
             // If the binding is optional (group, trigger, dialog, etc. without @ref), the control is relevant,
@@ -431,6 +420,13 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 }
 
 object XFormsSingleNodeControl {
+
+    // Item relevance (atomic values are considered relevant)
+    def isRelevantItem(item: Item) =
+        if (item.isInstanceOf[NodeInfo])
+            InstanceData.getInheritedRelevant(item.asInstanceOf[NodeInfo])
+        else
+            true
 
     // Convenience method to figure out when a control is relevant, assuming a "null" control is non-relevant.
     def isRelevant(control: XFormsSingleNodeControl) = Option(control) exists (_.isRelevant)

@@ -67,6 +67,7 @@ trait ControlBindingSupport {
         evaluateChildFollowingBinding()
     }
 
+    // NOTE: Protected for use by repeat
     final protected def pushBinding(parentContext: BindingContext, update: Boolean) = {
         pushBindingImpl(parentContext)
 

@@ -124,10 +124,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     override def getSize =
         // Return the size based on the nodeset size, so we can call this before all iterations have been added.
         // Scenario:
-        // o call index() or xxf:index() from within a variable within the iteration:
-        // o not all iterations have been added, but the size must be known
-        // NOTE: This raises an interesting question about the relevance of iterations. As of 2009-12-04, not sure
-        // how we handle that!
+        // - call index() or xxf:index() from within a variable within the iteration:
+        // - not all iterations have been added, but the size must be known
         Option(getBindingContext) map (_.nodeset.size) getOrElse  0
 
     def getIndex =
@@ -232,6 +230,32 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     def isDnD = {
         val dndAttribute = element.attributeValue(XXFORMS_DND_QNAME)
         dndAttribute != null && dndAttribute != "none"
+    }
+
+    // Push binding but ignore non-relevant iterations
+    override protected def pushBindingImpl(parentContext: BindingContext) = {
+        // Compute new binding
+        val newBindingContext = {
+            val contextStack = container.getContextStack
+            contextStack.setBinding(parentContext)
+            contextStack.pushBinding(element, effectiveId, staticControl.scope)
+
+            // Keep only the relevant items
+            import XFormsSingleNodeControl.isRelevantItem
+
+            val items       = contextStack.getCurrentBindingContext.nodeset
+            val allRelevant = items.asScala forall isRelevantItem
+
+            if (allRelevant)
+                contextStack.getCurrentBindingContext
+            else
+                contextStack.getCurrentBindingContext.copy(nodeset = items.asScala filter isRelevantItem asJava)
+        }
+
+        // Set binding context
+        setBindingContext(newBindingContext)
+
+        newBindingContext
     }
 
     def updateNodesetForInsertDelete(insertedNodeInfos: Seq[Item]): Unit = {

@@ -889,7 +889,7 @@
         </output>
     </test>
 
-    <test description="Repeat iteration relevance" name="oxf:pipeline" only="false">
+    <test description="Repeat iteration relevance" name="oxf:pipeline">
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxf:action>
@@ -1000,10 +1000,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="approvalStatus-input·2">bbb</xxf:control>
-                        <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="1"/>
-                        <xxf:control id="description-textarea·2-1" label="Condition:" relevant="true"/>
-                        <xxf:repeat-iteration id="condition-repeat·2" relevant="true" iteration="2"/>
-                        <xxf:control id="description-textarea·2-2" label="Condition:" relevant="true"/>
+                        <xxf:copy-repeat-template id="condition-repeat" parent-indexes="2" start-suffix="1" end-suffix="2"/>
+                        <xxf:control id="description-textarea·2-1" label="Condition:"/>
+                        <xxf:control id="description-textarea·2-2" label="Condition:"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" new-index="2"/>
@@ -2247,13 +2246,6 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="1"/>
-                        <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="2"/>
-                        <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="3"/>
-                        <xxf:repeat-iteration id="my-repeat-2" relevant="false" iteration="4"/>
-                        <xxf:repeat-iteration id="my-repeat-3" relevant="false" iteration="1"/>
-                        <xxf:repeat-iteration id="my-repeat-3" relevant="false" iteration="2"/>
-                        <xxf:repeat-iteration id="my-repeat-3" relevant="false" iteration="3"/>
                         <xxf:control id="my-group-2" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>

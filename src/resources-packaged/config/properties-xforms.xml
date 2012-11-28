@@ -111,11 +111,13 @@
     <property as="xs:integer" name="oxf.xforms.xbl.fr.autocomplete.max-results-displayed"   value="10"/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.prefix"                      value="$"/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.suffix"                      value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.digits-after-decimal"        value="2"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.decimal-separator"           value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.currency.grouping-separator"          value=","/>
 
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.prefix"                        value=""/>
+    <property as="xs:string"  name="oxf.xforms.xbl.fr.number.suffix"                        value=""/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.digits-after-decimal"          value="0"/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.decimal-separator"             value="."/>
     <property as="xs:string"  name="oxf.xforms.xbl.fr.number.grouping-separator"            value=","/>

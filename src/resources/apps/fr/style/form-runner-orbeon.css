@@ -280,11 +280,13 @@ textarea.xforms-invalid-visited {
   padding-left: 20px;
   height: 100%;
   overflow: hidden;
-  font-size: 20px;
+  font-size: 18px;
 }
 .xbl-fr-section .fr-section-title .fr-section-label a {
   text-decoration: none;
   color: #555555;
+  display: block;
+  min-height: 36px;
 }
 .xbl-fr-section .fr-section-title .fr-section-label label {
   font-size: 18px;

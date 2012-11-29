@@ -52,43 +52,52 @@
         <xh:div class="container">
             <fr:row>
                 <fr:body>
-                    <xh:table class="table table-bordered table-condensed table-striped table-hover">
-                        <xh:tr>
-                            <!-- TODO: i18n -->
-                            <xh:th>Application</xh:th>
-                            <xh:th>Form</xh:th>
-                            <xh:th>Title</xh:th>
-                            <xh:th>View</xh:th>
-                            <xh:th>New</xh:th>
-                        </xh:tr>
-                        <xf:repeat ref="instance('fr-forms')/form[exists(*) and @operations != '']"><!--  -->
+                    <xf:var name="forms" value="instance('fr-forms')/form[exists(*) and @operations != '']"/>
+                    <xf:group ref=".[empty($forms)]">
+                        <xh:div class="alert">
+                            No forms have been deployed, or you don't have the permissions to access any
+                            of the deployed forms.
+                        </xh:div>
+                    </xf:group>
+                    <xf:group ref=".[exists($forms)]">
+                        <xh:table class="table table-bordered table-condensed table-striped table-hover">
                             <xh:tr>
-                                <xh:td>
-                                    <xf:output value="application-name"/>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:output value="form-name"/>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:output value="title"/>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
-                                        <xh:a href="/fr/{application-name}/{form-name}/summary">
-                                            <xh:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
-                                        </xh:a>
-                                    </xf:group>
-                                </xh:td>
-                                <xh:td>
-                                    <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
-                                        <xh:a href="/fr/{application-name}/{form-name}/new">
-                                            <xh:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
-                                        </xh:a>
-                                    </xf:group>
-                                </xh:td>
+                                <!-- TODO: i18n -->
+                                <xh:th>Application</xh:th>
+                                <xh:th>Form</xh:th>
+                                <xh:th>Title</xh:th>
+                                <xh:th>View</xh:th>
+                                <xh:th>New</xh:th>
                             </xh:tr>
-                        </xf:repeat>
-                    </xh:table>
+                            <xf:repeat ref="$forms">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:output value="application-name"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="form-name"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output value="title"/>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
+                                            <xh:a href="/fr/{application-name}/{form-name}/summary">
+                                                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
+                                            </xh:a>
+                                        </xf:group>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
+                                            <xh:a href="/fr/{application-name}/{form-name}/new">
+                                                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
+                                            </xh:a>
+                                        </xf:group>
+                                    </xh:td>
+                                </xh:tr>
+                            </xf:repeat>
+                        </xh:table>
+                    </xf:group>
                 </fr:body>
             </fr:row>
             <fr:row>

@@ -61,16 +61,20 @@ form.xforms-form {
         height: 18px;
     }
 
+    .navbar-inverse .brand:hover {          // We don't want the title in the navbar to get highlighted on hover if it isn't a link
+        color: @navbarInverseLinkColor;     // Overrides https://github.com/twitter/bootstrap/blob/v2.1.1/less/navbar.less#L394
+    }                                       // Don't use inherit, which isn't supported by IE7
+
     .fr-grid tr th label {
-        margin: 0;                  //  No margin on label inside table headers as they are not next to a control
+        margin: 0;                          //  No margin on label inside table headers as they are not next to a control
     }
 
     .table {
-        margin: 0;                  // Bootstrap adds a bottom margin of 20px
+        margin: 0;                          // Bootstrap adds a bottom margin of 20px
     }
 
     table th {
-        font-weight: normal;        // Set to bold in Bootstrap
+        font-weight: normal;                // Set to bold in Bootstrap
     }
 
     // Used in Form Builder in particular and we probably never want the humongous legends anywhere
@@ -112,7 +116,7 @@ form.xforms-form {
       background-color: @linkColor;
     }
 
-        // Gray out text
+    // Gray out text
     .nav > .disabled > span > a {
       color: @grayLight;
     }

@@ -75,6 +75,9 @@ form.xforms-form .input-append .add-on,
 form.xforms-form .input-prepend .add-on {
   height: 18px;
 }
+form.xforms-form .navbar-inverse .brand:hover {
+  color: #999999;
+}
 form.xforms-form .fr-grid tr th label {
   margin: 0;
 }

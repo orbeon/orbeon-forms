@@ -29,21 +29,23 @@
     <p:processor name="oxf:xforms-submission">
         <p:input name="request">
             <exist:query max="0"><exist:text>
-                declare namespace xhtml="http://www.w3.org/1999/xhtml";
-                declare namespace xforms="http://www.w3.org/2002/xforms";
+                declare namespace xh="http://www.w3.org/1999/xhtml";
+                declare namespace xf="http://www.w3.org/2002/xforms";
 
                 (: Retrieve the metadata for the deployed form, which are under /db/orbeon/fr/*/*/form/form.xhtml :)
                 (: The beginning of the path, /db/orbeon/fr, is part of the eXist URI we get from the orbeon-exist-uri header :)
 
                 (: TODO: use "current collection" instead of hard coding /db/orbeon/fr, once we know how to get the current collection in XQuery :)
 
-                for $app in xmldb:get-child-collections('/db/orbeon/fr'),
-                    $form in xmldb:get-child-collections(concat('/db/orbeon/fr/', $app))
-                return
-                    element form {
-                        doc(concat('/db/orbeon/fr/', $app, '/', $form, '/form/form.xhtml'))
-                        /xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*
-                    }
+                if (xmldb:collection-available('/db/orbeon/fr')) then
+                    for $app in xmldb:get-child-collections('/db/orbeon/fr'),
+                        $form in xmldb:get-child-collections(concat('/db/orbeon/fr/', $app))
+                    return
+                        element form {
+                            doc(concat('/db/orbeon/fr/', $app, '/', $form, '/form/form.xhtml'))
+                            /xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*
+                        }
+                else ()
             </exist:text></exist:query>
         </p:input>
         <p:input name="submission">

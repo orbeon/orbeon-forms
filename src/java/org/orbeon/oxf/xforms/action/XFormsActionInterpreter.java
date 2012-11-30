@@ -285,7 +285,8 @@ public class XFormsActionInterpreter {
                 nodeset, position,
                 xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
-                (LocationData) actionElement.getData());
+                (LocationData) actionElement.getData(),
+                containingDocument().getRequestStats().getReporter());
 
         // Restore function context
         _actionXPathContext.returnFunctionContext();
@@ -304,7 +305,8 @@ public class XFormsActionInterpreter {
                 nodeset, position,
                 xpathExpression, getNamespaceMappings(actionElement), _actionXPathContext.getCurrentVariables(),
                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null,
-                (LocationData) actionElement.getData());
+                (LocationData) actionElement.getData(),
+                containingDocument().getRequestStats().getReporter());
 
         // Restore function context
         _actionXPathContext.returnFunctionContext();
@@ -341,9 +343,17 @@ public class XFormsActionInterpreter {
             // Setup function context
             final XFormsFunction.Context functionContext = _actionXPathContext.getFunctionContext(getSourceEffectiveId(actionElement));
 
-            resolvedAVTValue = XFormsUtils.resolveAttributeValueTemplates(bindingContext.getNodeset(),
-                        bindingContext.getPosition(), _actionXPathContext.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                        functionContext, namespaceMapping, locationData, attributeValue);
+            resolvedAVTValue = XPathCache.evaluateAsAvt(
+                bindingContext.getNodeset(),
+                bindingContext.getPosition(),
+                attributeValue,
+                namespaceMapping,
+                _actionXPathContext.getCurrentVariables(),
+                XFormsContainingDocument.getFunctionLibrary(),
+                functionContext,
+                null,
+                locationData,
+                containingDocument().getRequestStats().getReporter());
 
             // Restore function context
             _actionXPathContext.returnFunctionContext();

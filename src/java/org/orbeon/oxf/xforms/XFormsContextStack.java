@@ -204,7 +204,7 @@ public class XFormsContextStack {
     public BindingContext.VariableInfo scopeVariable(VariableAnalysisTrait staticVariable, String sourceEffectiveId, boolean handleNonFatal) {
         
         // Create variable object
-        final Variable variable = new Variable(staticVariable, this);
+        final Variable variable = new Variable(staticVariable, this, containingDocument);
 
         // Find variable scope
         final Scope newScope = ((ElementAnalysis) staticVariable).scope();
@@ -431,7 +431,7 @@ public class XFormsContextStack {
                             try {
                                 result = XPathCache.evaluateKeepItems(evaluationNodeset, evaluationPosition,
                                         ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                        functionContext, null, locationData);
+                                        functionContext, null, locationData, containingDocument.getRequestStats().getReporter());
                             } catch (Exception e) {
                                 if (handleNonFatal) {
                                     XFormsError.handleNonFatalXPathError(container, e);
@@ -469,7 +469,7 @@ public class XFormsContextStack {
                                 try {
                                     result = XPathCache.evaluateKeepItems(evaluationContextBinding.getNodeset(), evaluationContextBinding.getPosition(),
                                             ref != null ? ref : nodeset, bindingElementNamespaceMapping, evaluationContextBinding.getInScopeVariables(), XFormsContainingDocument.getFunctionLibrary(),
-                                            functionContext, null, locationData);
+                                            functionContext, null, locationData, containingDocument.getRequestStats().getReporter());
                                 } catch (Exception e) {
                                     if (handleNonFatal) {
                                         XFormsError.handleNonFatalXPathError(container, e);

@@ -374,7 +374,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 /* ***** Handle deferred submission ********************************************************************* */
 
                 // Resolve the target AVT because XFormsServer requires it for deferred submission
-                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsTarget);
+                resolvedXXFormsTarget = XFormsUtils.resolveAttributeValueTemplates(containingDocument, p.xpathContext, p.refNodeInfo, avtXXFormsTarget);
 
                 // Deferred submission: end of the first pass
                 if (p.isDeferredSubmissionFirstPass) {
@@ -800,17 +800,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
             {
                 // Resolved method AVT
-                final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo , avtMethod);
+                final String resolvedMethodQName = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtMethod);
                 resolvedMethod = Dom4jUtils.qNameToExplodedQName(Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, resolvedMethodQName, true));
 
                 // Get actual method based on the method attribute
                 actualHttpMethod = XFormsSubmissionUtils.getActualHttpMethod(resolvedMethod);
 
                 // Get mediatype
-                resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo, avtMediatype);
+                resolvedMediatype = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtMediatype);
 
                 // Serialization
-                serialization = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo, avtSerialization);
+                serialization = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo, avtSerialization);
                 if (serialization != null) {
                     serialize = !serialization.equals("none");
                 } else {
@@ -819,18 +819,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 // Resolve validate and relevant AVTs
-                final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo , avtValidate);
+                final String resolvedValidateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtValidate);
                 // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
                 resolvedValidate = serialize && !"false".equals(resolvedValidateString);
 
-                final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo , avtRelevant);
+                final String resolvedRelevantString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtRelevant);
                 // "The default value is "false" if the value of serialization is "none" and "true" otherwise"
                 resolvedRelevant = serialize && !"false".equals(resolvedRelevantString);
 
-                final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo , avtXXFormsCalculate);
+                final String resolvedCalculateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsCalculate);
                 resolvedXXFormsCalculate = serialize && !"false".equals(resolvedCalculateString);
 
-                final String resolvedUploadsString = XFormsUtils.resolveAttributeValueTemplates(xpathContext, refNodeInfo , avtXXFormsUploads);
+                final String resolvedUploadsString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsUploads);
                 resolvedXXFormsUploads = serialize && !"false".equals(resolvedUploadsString);
             }
 
@@ -880,7 +880,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         public SecondPassParameters(SubmissionParameters p) {
             {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtActionOrResource);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtActionOrResource);
                 if (temp == null) {
                     // This can be null if, e.g. you have an AVT like resource="{()}"
                     throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: mandatory resource or action evaluated to an empty sequence for attribute value: " + avtActionOrResource,
@@ -891,31 +891,31 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 //                actionOrResource = XFormsUtils.resolveXMLBase(containingDocument, getSubmissionElement(), NetUtils.encodeHRRI(temp, true)).toString();
             }
 
-            mode = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtMode);
-            version = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtVersion);
-            separator = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtSeparator);
+            mode = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtMode);
+            version = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtVersion);
+            separator = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtSeparator);
 
             {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtEncoding);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtEncoding);
                 encoding = (temp != null) ? temp : "UTF-8";
             }
             {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtIndent);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtIndent);
                 indent = Boolean.valueOf(temp);
             }
             {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtOmitxmldeclaration);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtOmitxmldeclaration);
                 omitxmldeclaration = Boolean.valueOf(temp);
             }
             {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtStandalone);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtStandalone);
                 standalone = (temp != null) ? Boolean.valueOf(temp) : null;
             }
 
-            final String username = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
-            final String password = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
-            final String preemptiveAuthentication = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuthentication);
-            final String domain = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
+            final String username = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsUsername);
+            final String password = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPassword);
+            final String preemptiveAuthentication = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuthentication);
+            final String domain = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
 
             if (username == null)
                 credentials = null;
@@ -923,23 +923,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 credentials = new Connection.Credentials(username, password, preemptiveAuthentication, domain);
 
             {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsReadonly);
                 isReadonly = (temp != null) ? Boolean.valueOf(temp) : false;
             }
 
             if (avtXXFormsCache != null) {
-                final String temp = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsCache);
+                final String temp = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsCache);
                 // New attribute
                 isCache = Boolean.valueOf(temp);
             } else {
                 // For backward compatibility
-                isCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsShared));
+                isCache = "application".equals(XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsShared));
             }
 
             timeToLive = Instance.timeToLiveOrDefault(getSubmissionElement());
 
             // Default is "false" for security reasons
-            final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(p.xpathContext, p.refNodeInfo, avtXXFormsHandleXInclude);
+            final String tempHandleXInclude = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsHandleXInclude);
             isHandleXInclude = Boolean.valueOf(tempHandleXInclude);
 
             // Check read-only and cache hints
@@ -1158,7 +1158,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // Evaluate destination node
             // "This attribute is evaluated only once a successful submission response has been received and if the replace
             // attribute value is "instance" or "text". The first node rule is applied to the result."
-            destinationObject = XPathCache.evaluateSingle(xpathContext, targetRefContextItem, targetref);
+            destinationObject = XPathCache.evaluateSingle(xpathContext, targetRefContextItem, targetref, containingDocument().getRequestStats().getReporter());
         }
 
         // TODO: Also detect readonly node/ancestor situation

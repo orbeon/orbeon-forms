@@ -55,7 +55,8 @@ trait ControlXPathSupport {
                 // Evaluate
                 try
                     XPathCache.evaluateAsAvt(contextNodeset, bc.getPosition, attributeValue, getNamespaceMappings,
-                        bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData)
+                        bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
+                        containingDocument.getRequestStats.addXPathStat)
                 catch {
                     case e: Exception ⇒
                         // Don't consider this as fatal
@@ -83,7 +84,8 @@ trait ControlXPathSupport {
             getContextStack.setBinding(bc)
             try
                 Option(XPathCache.evaluateAsString(contextItems.asJava, contextPosition, xpathString, getNamespaceMappings,
-                    bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))
+                    bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
+                    containingDocument.getRequestStats.addXPathStat))
             catch {
                 case e: Exception ⇒
                     // Don't consider this as fatal
@@ -105,7 +107,8 @@ trait ControlXPathSupport {
                 getContextStack.setBinding(bindingContext)
                 try
                     Option(XPathCache.evaluateAsString(contextItem, xpathString, namespaceMapping, variableToValueMap,
-                        XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))
+                        XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
+                        containingDocument.getRequestStats.addXPathStat _))
                 catch {
                     case e: Exception ⇒
                         // Don't consider this as fatal

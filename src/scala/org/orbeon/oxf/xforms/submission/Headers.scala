@@ -20,6 +20,7 @@ import scala.collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.dom4j.{QName, Element}
 import scala.collection.mutable
+import org.orbeon.oxf.util.XPathCache
 
 object Headers {
     /**
@@ -64,10 +65,17 @@ object Headers {
                 // Evaluate combine attribute as AVT
                 val combine = {
                     val avtCombine = headerElement.attributeValue("combine", defaultCombineValue)
-                    val result = XFormsUtils.resolveAttributeValueTemplates(contextStack.getCurrentBindingContext.getNodeset,
-                        contextStack.getCurrentBindingContext.getPosition, contextStack.getCurrentVariables, XFormsContainingDocument.getFunctionLibrary,
-                        contextStack.getFunctionContext(sourceEffectiveId), xblContainer.getContainingDocument.getNamespaceMappings(headerElement),
-                        headerElement.getData.asInstanceOf[LocationData], avtCombine)
+                    val result = XPathCache.evaluateAsAvt(
+                        contextStack.getCurrentBindingContext.getNodeset,
+                        contextStack.getCurrentBindingContext.getPosition,
+                        avtCombine,
+                        xblContainer.getContainingDocument.getNamespaceMappings(headerElement),
+                        contextStack.getCurrentVariables,
+                        XFormsContainingDocument.getFunctionLibrary, contextStack.getFunctionContext(sourceEffectiveId),
+                        null,
+                        headerElement.getData.asInstanceOf[LocationData],
+                        xblContainer.getContainingDocument.getRequestStats.getReporter)
+
                     contextStack.returnFunctionContext()
 
                     if (! allowedCombineValues(result))

@@ -120,7 +120,7 @@ object ControlOps {
                 val namespaces = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(unwrapElement(bind)))
 
                 // Evaluate path from instance root element
-                val instanceElements = eval(formInstanceRoot(inDoc), path, namespaces)
+                val instanceElements = eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat)
                 instanceElements.asInstanceOf[JList[NodeInfo]].asScala
             } getOrElse Seq()
         else

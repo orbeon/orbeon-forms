@@ -43,6 +43,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.event.XFormsEvent.Phase
 import org.orbeon.oxf.xforms.event.EventHandler
+import org.orbeon.oxf.xforms.analytics.{RequestStatsImpl, NOPRequestStats}
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -534,20 +535,22 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                 </xh:body>
             </xh:html>
 
-        val section1 = doc.getObjectByEffectiveId("section-1-section").asInstanceOf[XFormsControl]
-        val control1 = doc.getObjectByEffectiveId("control-1-control").asInstanceOf[XFormsControl]
+        withContainingDocument(doc) {
+            val section1 = doc.getObjectByEffectiveId("section-1-section").asInstanceOf[XFormsControl]
+            val control1 = doc.getObjectByEffectiveId("control-1-control").asInstanceOf[XFormsControl]
 
-        assert(true  === DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
-        assert(false === DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node
-        assert(false === DataModel.isAllowedBindingExpression(section1, "("))         // invalid expression
-        assert(true  === DataModel.isAllowedBindingExpression(section1, "/"))         // root node
-        assert(true  === DataModel.isAllowedBindingExpression(section1, ".."))        // complex content
+            assert(true  === DataModel.isAllowedBindingExpression(section1, "section-1")) // existing node
+            assert(false === DataModel.isAllowedBindingExpression(section1, "foo/bar"))   // non-existing node
+            assert(false === DataModel.isAllowedBindingExpression(section1, "("))         // invalid expression
+            assert(true  === DataModel.isAllowedBindingExpression(section1, "/"))         // root node
+            assert(true  === DataModel.isAllowedBindingExpression(section1, ".."))        // complex content
 
-        assert(true  === DataModel.isAllowedBindingExpression(control1, "control-1")) // existing node
-        assert(false === DataModel.isAllowedBindingExpression(control1, "foo/bar"))   // non-existing node
-        assert(false === DataModel.isAllowedBindingExpression(control1, "("))         // invalid expression
-        assert(false === DataModel.isAllowedBindingExpression(control1, "/"))         // root node
-        assert(false === DataModel.isAllowedBindingExpression(control1, ".."))        // complex content
+            assert(true  === DataModel.isAllowedBindingExpression(control1, "control-1")) // existing node
+            assert(false === DataModel.isAllowedBindingExpression(control1, "foo/bar"))   // non-existing node
+            assert(false === DataModel.isAllowedBindingExpression(control1, "("))         // invalid expression
+            assert(false === DataModel.isAllowedBindingExpression(control1, "/"))         // root node
+            assert(false === DataModel.isAllowedBindingExpression(control1, ".."))        // complex content
+        }
     }
 
     @Test def controlEffectiveId(): Unit =
@@ -666,6 +669,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         Mockito when document.getModelsJava thenReturn Seq(model).asJava
         Mockito when document.getIndentedLogger(Matchers.any[String]) thenReturn new IndentedLogger(XFormsServer.logger, "any")
         Mockito when document.getIndentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "document")
+        Mockito when document.getRequestStats thenReturn RequestStatsImpl.apply()
 
         Mockito when instance.containingDocument thenReturn document
 

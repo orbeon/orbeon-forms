@@ -27,6 +27,8 @@ import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
+import org.orbeon.oxf.xforms.analytics.RequestStats;
+import org.orbeon.oxf.xforms.analytics.RequestStatsImpl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -143,6 +145,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
     private List<DelayedEvent> delayedEvents;
     private List<XFormsError.ServerError> serverErrors;
     private Set<String> controlsStructuralChanges;
+    private RequestStats requestStats = RequestStatsImpl.apply();
 
     // Page template for noscript mode if stored in dynamic state (otherwise stored in static state)
     private AnnotatedTemplate template;
@@ -598,8 +601,14 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         
         this.serverErrors = null;
 
+        this.requestStats = RequestStatsImpl.apply();
+
         if (this.controlsStructuralChanges != null)
             this.controlsStructuralChanges.clear();
+    }
+
+    public RequestStats getRequestStats() {
+        return requestStats;
     }
 
     /**
@@ -969,6 +978,8 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
 
     public void afterInitialResponse() {
 
+        getRequestStats().afterInitialResponse();
+
         this.uriResolver = null;        // URI resolver is of no use after initialization and it may keep dangerous references (PipelineContext)
         this.response = null;           // same as above
         this.initializing = false;
@@ -1012,6 +1023,9 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
      * Called after sending a successful update response.
      */
     public void afterUpdateResponse() {
+
+        getRequestStats().afterUpdateResponse();
+
         clearClientState();
         xformsControls.afterUpdateResponse();
         // Tell dependencies

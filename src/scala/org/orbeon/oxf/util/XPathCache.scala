@@ -65,6 +65,8 @@ object XPathCache {
 
     // Marker for XPath function context
     trait FunctionContext
+
+    type Reporter = (String, Long) ⇒ Unit
     
     case class XPathContext(
         namespaceMapping: NamespaceMapping,
@@ -83,6 +85,7 @@ object XPathCache {
     }
     // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
     // etc.), but NodeInfo wrappers are preserved.
+    // 7 external usages
     def evaluate(
             contextItem: Item,
             xpathString: String,
@@ -91,7 +94,8 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): JList[AnyRef] =
+            locationData: LocationData,
+            reporter: Reporter): JList[AnyRef] =
         evaluate(
             Seq(contextItem).asJava,
             1,
@@ -101,10 +105,12 @@ object XPathCache {
             functionLibrary,
             functionContext,
             baseURI,
-            locationData)
+            locationData,
+            reporter)
 
     // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
     // etc.), but NodeInfo wrappers are preserved.
+    // 2 external usages
     def evaluate(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -114,14 +120,15 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): JList[AnyRef] = {
+            locationData: LocationData,
+            reporter: Reporter): JList[AnyRef] = {
 
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, baseURI, false, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateKeepNodeInfo(functionContext)
         }
     }
@@ -131,6 +138,7 @@ object XPathCache {
     def normalizeSingletons(seq: Seq[AnyRef]): AnyRef = if (seq.size == 1) seq(0) else seq
 
     // Evaluate an XPath expression on the document and keep Item objects in the result
+    // 4 external usages
     def evaluateKeepItems(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -140,19 +148,21 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): JList[Item] = {
+            locationData: LocationData,
+            reporter: Reporter): JList[Item] = {
 
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, baseURI, false, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateKeepItems(functionContext)
         }
     }
 
     // Evaluate an XPath expression on the document and keep Item objects in the result
+    // 1 external usage
     def evaluateSingleKeepItems(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -162,19 +172,21 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): Item = {
+            locationData: LocationData,
+            reporter: Reporter): Item = {
 
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap, functionLibrary, baseURI, false, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateSingleKeepItems(functionContext)
         }
     }
 
     // Evaluate the expression as a variable value usable by Saxon in further XPath expressions
+    // 1 external usage
     def evaluateAsExtent(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -184,7 +196,8 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): SequenceExtent = {
+            locationData: LocationData,
+            reporter: Reporter): SequenceExtent = {
 
         val xpathExpression =
             getXPathExpression(
@@ -192,19 +205,21 @@ object XPathCache {
                 variableToValueMap,
                 functionLibrary, baseURI, false, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateAsExtent(functionContext)
         }
     }
 
     // Evaluate an XPath expression on the document
-    def evaluateSingle(xpathContext: XPathContext, contextItem: Item, xpathString: String): AnyRef =
+    // 2 external usages
+    def evaluateSingle(xpathContext: XPathContext, contextItem: Item, xpathString: String, reporter: Reporter): AnyRef =
         evaluateSingle(
             Seq(contextItem).asJava, 1, xpathString, xpathContext.namespaceMapping,
             xpathContext.variableToValueMap, xpathContext.functionLibrary, xpathContext.functionContext,
-            xpathContext.baseURI, xpathContext.locationData)
+            xpathContext.baseURI, xpathContext.locationData, reporter)
 
     // Evaluate an XPath expression on the document
+    // 2 external usages
     def evaluateSingle(
             contextItem: Item,
             xpathString: String,
@@ -213,16 +228,19 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): AnyRef =
+            locationData: LocationData,
+            reporter: Reporter): AnyRef =
         evaluateSingle(
             Seq(contextItem).asJava, 1, xpathString, namespaceMapping, variableToValueMap,
-            functionLibrary, functionContext, baseURI, locationData)
+            functionLibrary, functionContext, baseURI, locationData, reporter)
 
     // Evaluate an XPath expression on the document
+    // 2 external usages
     def evaluateSingle(
         contextItems: JList[Item], contextPosition: Int, xpathString: String, namespaceMapping: NamespaceMapping,
         variableToValueMap: JMap[String, ValueRepresentation], functionLibrary: FunctionLibrary,
-        functionContext: FunctionContext, baseURI: String, locationData: LocationData) = {
+        functionContext: FunctionContext, baseURI: String, locationData: LocationData,
+        reporter: Reporter) = {
 
         val xpathExpression =
             getXPathExpression(
@@ -230,19 +248,21 @@ object XPathCache {
                 variableToValueMap,
                 functionLibrary, baseURI, false, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateSingleKeepNodeInfo(functionContext)
         }
     }
 
     // Evaluate an XPath expression on the document as an attribute value template, and return its string value
-    def evaluateAsAvt(xpathContext: XPathContext, contextItem: Item, xpathString: String): String =
+    // 1 external usage
+    def evaluateAsAvt(xpathContext: XPathContext, contextItem: Item, xpathString: String, reporter: Reporter): String =
         evaluateAsAvt(
             Seq(contextItem).asJava, 1, xpathString, xpathContext.namespaceMapping,
             xpathContext.variableToValueMap, xpathContext.functionLibrary, xpathContext.functionContext,
-            xpathContext.baseURI, xpathContext.locationData)
+            xpathContext.baseURI, xpathContext.locationData, reporter)
 
     // Evaluate an XPath expression on the document as an attribute value template, and return its string value
+    // 1 external usage
     def evaluateAsAvt(
             contextItem: Item,
             xpathString: String,
@@ -251,12 +271,14 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): String =
+            locationData: LocationData,
+            reporter: Reporter): String =
         evaluateAsAvt(
             Seq(contextItem).asJava, 1, xpathString, namespaceMapping, variableToValueMap,
-            functionLibrary, functionContext, baseURI, locationData)
+            functionLibrary, functionContext, baseURI, locationData, reporter)
 
     // Evaluate an XPath expression on the document as an attribute value template, and return its string value
+    // 3 external usages
     def evaluateAsAvt(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -266,7 +288,8 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): String = {
+            locationData: LocationData,
+            reporter: Reporter): String = {
 
         val xpathExpression =
             getXPathExpression(
@@ -274,12 +297,13 @@ object XPathCache {
                 variableToValueMap,
                 functionLibrary, baseURI, true, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             Option(xpathExpression.evaluateSingleKeepNodeInfo(functionContext)) map (_.toString) orNull
         }
     }
 
     // Evaluate an XPath expression and return its string value
+    // 3 external usages
     def evaluateAsString(
             contextItem: Item,
             xpathString: String,
@@ -288,12 +312,14 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): String =
+            locationData: LocationData,
+            reporter: Reporter): String =
         evaluateAsString(
             Seq(contextItem).asJava, 1, xpathString, namespaceMapping, variableToValueMap,
-            functionLibrary, functionContext, baseURI, locationData)
+            functionLibrary, functionContext, baseURI, locationData, reporter)
 
     // Evaluate an XPath expression and return its string value
+    // 6 external usages
     def evaluateAsString(
             contextItems: JList[Item],
             contextPosition: Int,
@@ -303,23 +329,26 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             functionContext: FunctionContext,
             baseURI: String,
-            locationData: LocationData): String = {
+            locationData: LocationData,
+            reporter: Reporter): String = {
 
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, "string((" + xpathString + ")[1])",
                 namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData)
 
-        withEvaluation(xpathString, xpathExpression, locationData) {
+        withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             Option(xpathExpression.evaluateSingleKeepNodeInfo(functionContext)) map (_.toString) orNull
         }
     }
 
+    // No call from XForms
     def getXPathExpression(
         configuration: Configuration, contextItem: Item, xpathString: String,
         locationData: LocationData): PooledXPathExpression =
         getXPathExpression(configuration, contextItem, xpathString, null, null, null, null, locationData)
 
+    // No call from XForms
     def getXPathExpression(
             configuration: Configuration,
             contextItem: Item,
@@ -328,6 +357,7 @@ object XPathCache {
             locationData: LocationData): PooledXPathExpression =
         getXPathExpression(configuration, contextItem, xpathString, namespaceMapping, null, null, null, locationData)
 
+    // No call from XForms
     def getXPathExpression(
             configuration: Configuration,
             contextItem: Item,
@@ -358,6 +388,7 @@ object XPathCache {
             functionLibrary: FunctionLibrary): Unit =
         new XPathCachePoolableObjectFactory(configurationOrDefault(configuration), xpathString, namespaceMapping, null, functionLibrary, null, false, true, null).makeObject
 
+    // 1  external usage for XPath analysis
     def createExpression(
             configuration: Configuration,
             xpathString: String,
@@ -474,7 +505,7 @@ object XPathCache {
     }
 
     // Ideally: add this to Saxon XPathEvaluator
-    def prepareExpression(independentContext: IndependentContext, expression: Expression): XPathExpression = {
+    private def prepareExpression(independentContext: IndependentContext, expression: Expression): XPathExpression = {
         // Based on XPathEvaluator.createExpression()
         expression.setContainer(independentContext)
         val visitor = ExpressionVisitor.make(independentContext)
@@ -570,9 +601,19 @@ object XPathCache {
 //        }
     }
 
-    private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData)(body: ⇒ T): T =
-        try body
-        catch { case e: Exception ⇒ throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData) }
+    private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData, reporter: Reporter)(body: ⇒ T): T =
+        try {
+            if (reporter ne null) {
+                val startTime = System.nanoTime
+                val result = body
+                val totalTimeMicroSeconds = (System.nanoTime - startTime) / 1000 // never smaller than 1000 ns on OS X
+                if (totalTimeMicroSeconds > 0)
+                    reporter(xpathString, totalTimeMicroSeconds)
+
+                result
+            } else
+                body
+        } catch { case e: Exception ⇒ throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData) }
         finally xpathExpression.returnToPool()
 
     private def handleXPathException(e: Exception, xpathString: String, description: String, locationData: LocationData) = {

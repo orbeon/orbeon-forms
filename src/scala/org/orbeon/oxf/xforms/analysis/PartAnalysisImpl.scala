@@ -279,7 +279,7 @@ object PartAnalysisImpl {
         // TODO: Don't use XPath here, but extract models as controls tree is visited
         val xpathExpression = "//xf:model[not(ancestor::xf:instance)]"
         val modelItems = XPathCache.evaluate(compactShadowTreeWrapper, xpathExpression,
-            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData)
+            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData, null)
 
         for {
             item ← modelItems.asScala

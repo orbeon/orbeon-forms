@@ -94,7 +94,7 @@ public class XBLTransformer {
 
                         // TODO: don't use getNamespaceContext() as this is already computed for the bound element
                         final List<Object> elements = XPathCache.evaluate(boundElementInfo, xpathExpression, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
-                                null, null, null, null, null);// TODO: locationData
+                                null, null, null, null, null, null);// TODO: locationData
 
                         if (elements.size() > 0) {
                             // Clone all the resulting elements
@@ -228,7 +228,7 @@ public class XBLTransformer {
 
                     // TODO: don't use getNamespaceContext() as this is already computed for the bound element
                     final List<Object> nodeInfos = XPathCache.evaluate(boundElementInfo, xxblAttrString, new NamespaceMapping(Dom4jUtils.getNamespaceContext(element)),
-                            null, null, null, null, null);// TODO: locationData
+                            null, null, null, null, null, null);// TODO: locationData
 
                     if (nodeInfos.size() > 0) {
                         for (Object nodeInfo: nodeInfos) {

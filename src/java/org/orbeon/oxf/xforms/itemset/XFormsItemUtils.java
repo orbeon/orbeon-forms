@@ -296,7 +296,8 @@ public class XFormsItemUtils {
                                     attributeValue, container.getNamespaceMappings(itemChoiceItemsetElement),
                                     contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                     contextStack.getFunctionContext(elementEffectiveId), null,
-                                    (LocationData) itemChoiceItemsetElement.getData());
+                                    (LocationData) itemChoiceItemsetElement.getData(),
+                                    container.getContainingDocument().getRequestStats().getReporter());
                         } catch (Exception e) {
                             XFormsError.handleNonFatalXPathError(container, e);
                             tempResult = "";

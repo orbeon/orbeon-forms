@@ -301,7 +301,8 @@ public class XFormsProperties {
     private static final String DEBUG_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.debug";
     private static final String ERROR_LOGGING_PROPERTY = XFORMS_PROPERTY_PREFIX + "logging.error";
 
-    private static final String DEBUG_LOG_XPATH_ANALYSIS = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
+    private static final String DEBUG_LOG_XPATH_ANALYSIS_PROPERTY = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
+    private static final String DEBUG_REQUEST_STATS_PROPERTY      = XFORMS_PROPERTY_PREFIX + "debug.log-request-stats";
 
     // == Global properties ============================================================================================
     /**
@@ -428,7 +429,11 @@ public class XFormsProperties {
     }
 
     public static boolean getDebugLogXPathAnalysis() {
-        return Properties.instance().getPropertySet().getBoolean(DEBUG_LOG_XPATH_ANALYSIS, false);
+        return Properties.instance().getPropertySet().getBoolean(DEBUG_LOG_XPATH_ANALYSIS_PROPERTY, false);
+    }
+
+    public static boolean isRequestStats() {
+        return Properties.instance().getPropertySet().getBoolean(DEBUG_REQUEST_STATS_PROPERTY, false);
     }
 
     // == XForms document properties ===================================================================================

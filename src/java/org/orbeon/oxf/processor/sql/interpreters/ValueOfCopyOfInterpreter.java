@@ -101,7 +101,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                             }
 
                             stringValue = XPathCache.evaluateAsString(newList, 1, "string(.)",
-                                null, null, null, null, null, null);
+                                null, null, null, null, null, null, null);
                         } else {
                             // It's just an empty list
                             stringValue = "";

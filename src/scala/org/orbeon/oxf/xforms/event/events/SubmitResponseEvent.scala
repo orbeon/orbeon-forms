@@ -69,7 +69,14 @@ private object SubmitResponseEvent {
         }
 
     def headerElements(e: SubmitResponseEvent): Option[Seq[Item]] = headersDocument(e.headers) map { document: Item ⇒
-        evaluateKeepItems(Seq(document).asJava, 1, "/headers/header", EMPTY_MAPPING, null, null, null, null, e.locationData).asScala
+        evaluateKeepItems(
+            Seq(document).asJava,
+            1,
+            "/headers/header",
+            EMPTY_MAPPING,
+            null, null, null, null,
+            e.locationData,
+            e.containingDocument.getRequestStats.addXPathStat).asScala
     }
 
     def body(e: SubmitResponseEvent): Option[AnyRef] = {

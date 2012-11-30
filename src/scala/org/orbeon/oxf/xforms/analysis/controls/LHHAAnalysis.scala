@@ -133,7 +133,7 @@ object LHHAAnalysis {
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
         XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPathCache.getGlobalConfiguration).wrap(lhhaElement),
             "not(exists(descendant-or-self::xf:*[@ref or @nodeset or @bind or @value] | descendant::*[@*[contains(., '{')]]))",
-            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement)).asInstanceOf[Boolean]
+            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, ElementAnalysis.createLocationData(lhhaElement), null).asInstanceOf[Boolean]
     }
 
     // Whether the control has label OR hint placeholder

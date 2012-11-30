@@ -162,6 +162,7 @@ class XIncludeReceiver(
                                 FunctionLibrary.instance,
                                 null,
                                 systemId,
+                                null,
                                 null)
 
                         // Each resulting object is output through the next level of processing

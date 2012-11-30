@@ -314,7 +314,8 @@ public class XFormsUtils {
                                 valueAttribute, container.getNamespaceMappings(childElement),
                                 contextStack.getCurrentVariables(), XFormsContainingDocument.getFunctionLibrary(),
                                 contextStack.getFunctionContext(sourceEffectiveId), null,
-                                (LocationData) childElement.getData());
+                                (LocationData) childElement.getData(),
+                                container.getContainingDocument().getRequestStats().getReporter());
                     } catch (Exception e) {
                         XFormsError.handleNonFatalXPathError(container, e);
                         tempResult = "";
@@ -583,41 +584,17 @@ public class XFormsUtils {
     /**
      * Resolve attribute value templates (AVTs).
      *
-     * @param contextItems       context items
-     * @param contextPosition    context position
-     * @param variableToValueMap variables
-     * @param functionLibrary    XPath function library to use
-     * @param functionContext    context object to pass to the XForms function
-     * @param namespaceMapping   namespace mappings
-     * @param locationData       LocationData for error reporting
-     * @param attributeValue     attribute value
-     * @return                   resolved attribute value
-     */
-    public static String resolveAttributeValueTemplates(List<Item> contextItems, int contextPosition, Map<String, ValueRepresentation> variableToValueMap,
-                                                        FunctionLibrary functionLibrary, XPathCache.FunctionContext functionContext,
-                                                        NamespaceMapping namespaceMapping, LocationData locationData, String attributeValue) {
-
-        if (attributeValue == null)
-            return null;
-
-        return XPathCache.evaluateAsAvt(contextItems, contextPosition, attributeValue, namespaceMapping,
-                variableToValueMap, functionLibrary, functionContext, null, locationData);
-    }
-
-    /**
-     * Resolve attribute value templates (AVTs).
-     *
      * @param xpathContext      current XPath context
      * @param contextNode       context node for evaluation
      * @param attributeValue    attribute value
      * @return                  resolved attribute value
      */
-    public static String resolveAttributeValueTemplates(XPathCache.XPathContext xpathContext, NodeInfo contextNode, String attributeValue) {
+    public static String resolveAttributeValueTemplates(XFormsContainingDocument containingDocument, XPathCache.XPathContext xpathContext, NodeInfo contextNode, String attributeValue) {
 
         if (attributeValue == null)
             return null;
 
-        return XPathCache.evaluateAsAvt(xpathContext, contextNode, attributeValue);
+        return XPathCache.evaluateAsAvt(xpathContext, contextNode, attributeValue, containingDocument.getRequestStats().getReporter());
     }
 
     /**

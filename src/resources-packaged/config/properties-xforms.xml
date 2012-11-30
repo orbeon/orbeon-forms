@@ -34,8 +34,9 @@
     -->
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.error"                          value="submission-error-body"/>
 
-    <!-- Log XPath analysis -->
+    <!-- Debug properties -->
     <property as="xs:boolean" name="oxf.xforms.debug.log-xpath-analysis"                value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.debug.log-request-stats"                 value="false"/>
 
     <!-- XPath analysis (PE) -->
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>

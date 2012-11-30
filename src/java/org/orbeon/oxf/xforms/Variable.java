@@ -44,18 +44,20 @@ import java.util.List;
 public class Variable {
 
     private final VariableAnalysisTrait staticVariable;
+    private final XFormsContainingDocument containingDocument;
 
     private final Element variableElement;
     private final Element valueElement;
 
-    private String variableName;
-    private String selectAttribute;
+    public final String variableName;
+    public final String expression;
 
     private boolean evaluated;
     private ValueRepresentation variableValue;
 
-    public Variable(VariableAnalysisTrait staticVariable, XFormsContextStack contextStack) {
+    public Variable(VariableAnalysisTrait staticVariable, XFormsContextStack contextStack, XFormsContainingDocument containingDocument) {
         this.staticVariable = staticVariable;
+        this.containingDocument = containingDocument;
         this.variableElement = ((ElementAnalysis) staticVariable).element();
 
         this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
@@ -70,11 +72,11 @@ public class Variable {
             this.valueElement = sequenceElement;
         }
 
-        this.selectAttribute = VariableAnalysis.valueOrSelectAttribute(valueElement);
+        this.expression = VariableAnalysis.valueOrSelectAttribute(valueElement);
     }
 
     private void evaluate(XFormsContextStack contextStack, String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
-        if (selectAttribute == null) {
+        if (expression == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xf:output in it? more?)
             variableValue = new StringValue(valueElement.getStringValue());
         } else {
@@ -96,8 +98,9 @@ public class Variable {
                     try {
                         variableValue = XPathCache.evaluateAsExtent(
                                 currentNodeset, bindingContext.getPosition(),
-                                selectAttribute, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(),
-                                XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData());
+                                expression, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(),
+                                XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData(),
+                                containingDocument.getRequestStats().getReporter());
                     } catch (Exception e) {
                         if (handleNonFatal) {
                             // Don't consider this as fatal
@@ -126,13 +129,16 @@ public class Variable {
 
     public ValueRepresentation getVariableValue(XFormsContextStack contextStack, String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
         // Make sure the variable is evaluated
+        final boolean justEvaluated;
         if (!evaluated) {
             evaluated = true;
             evaluate(contextStack, XFormsUtils.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId()), pushOuterContext, handleNonFatal);
-        }
+            justEvaluated = true;
+        } else
+            justEvaluated = false;
 
         // Return value and rewrap if necessary
-        if (variableValue instanceof SequenceExtent) {
+        if (! justEvaluated && (variableValue instanceof SequenceExtent)) {
             // Rewrap NodeWrapper contained in the variable value. Not the most efficient, but at this point we have to
             // to ensure that things work properly. See RewrappingSequenceIterator for more details.
             try {
@@ -159,6 +165,9 @@ public class Variable {
      * This iterator rewraps NodeWrapper elements so that the original NodeWrapper is discarded and a new one created.
      * The reason we do this is that when we keep variables around, we don't want NodeWrapper.index to be set to
      * anything but -1. If we did that, then upon insertions of nodes in the DOM, the index would be out of date.
+     *
+     * Q: Could we instead do this only upon insert/delete, and use the dependency engine to mark only mutated
+     * variables? What about in actions? What about using wrappers for variables which don't cache the position?
      */
     private static class RewrappingSequenceIterator implements SequenceIterator, LastPositionFinder {
 

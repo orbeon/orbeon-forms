@@ -438,22 +438,22 @@ object PDFTemplateProcessor {
 
         def evaluateSingle(xpath: String): NodeInfo = {
             val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            XPathCache.evaluateSingle(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData]).asInstanceOf[NodeInfo]
+            XPathCache.evaluateSingle(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null).asInstanceOf[NodeInfo]
         }
 
         def evaluate(xpath: String): Seq[Item] = {
             val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            XPathCache.evaluate(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData]).asInstanceOf[JList[Item]].asScala
+            XPathCache.evaluate(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null).asInstanceOf[JList[Item]].asScala
         }
 
         def evaluateAsString(xpath: String): String = {
             val namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element))
-            XPathCache.evaluateAsString(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData])
+            XPathCache.evaluateAsString(contextSeq.asJava, contextPosition, xpath, namespaceMapping, jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null)
         }
 
         def resolveAVT(attributeName: String, otherAttributeName: String = null) =
             Option(att(attributeName)) orElse Option(Option(otherAttributeName) map att orNull) map
-                (XPathCache.evaluateAsAvt(contextItem, _, new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)), jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData])) orNull
+                (XPathCache.evaluateAsAvt(contextItem, _, new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(element)), jVariables, functionLibrary, null, null, element.getData.asInstanceOf[LocationData], null)) orNull
 
         def getFontAttributes = {
             val newFontPitch  = Option(resolveAVT("font-pitch", "spacing")) map (_.toFloat) getOrElse fontPitch

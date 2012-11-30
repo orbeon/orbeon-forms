@@ -88,7 +88,8 @@ abstract class XFormsAction extends Logging {
                             XFormsContainingDocument.getFunctionLibrary,
                             contextStack.getFunctionContext(actionInterpreter.getSourceEffectiveId(element)),
                             null,
-                            element.getData.asInstanceOf[LocationData]).asScala)
+                            element.getData.asInstanceOf[LocationData],
+                            actionInterpreter.containingDocument().getRequestStats.addXPathStat).asScala)
 
                         contextStack.returnFunctionContext()
                         contextStack.popBinding()

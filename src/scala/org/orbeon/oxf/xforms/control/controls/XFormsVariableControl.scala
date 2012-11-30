@@ -35,7 +35,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override type Control <: VariableControl
 
     // Actual variable name/value representation
-    private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], container.getContextStack)
+    private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], container.getContextStack, containingDocument)
 
     // This is the context within or after this control, which is affected by the value of the variable
     private var _bindingContextForChild: BindingContext = null
@@ -69,7 +69,9 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
                 variable.markDirty()
                 val contextStack = getContextStack
                 contextStack.setBinding(bindingContext)
-                _value = variable.getVariableValue(contextStack, getEffectiveId, false, true)
+                containingDocument.getRequestStats.withXPath(variable.expression) {
+                    _value = variable.getVariableValue(contextStack, getEffectiveId, false, true)
+                }
             }
         } else {
             // Value is empty sequence if non-relevant

@@ -65,8 +65,7 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
         val destinationNodeInfo =
             if (submission.getTargetref ne null) {
                 // Evaluate destination node
-                val destinationObject = XPathCache.evaluateSingle(p.xpathContext, p.refNodeInfo, submission.getTargetref)
-                destinationObject match {
+                XPathCache.evaluateSingle(p.xpathContext, p.refNodeInfo, submission.getTargetref, containingDocument.getRequestStats.addXPathStat) match {
                     case nodeInfo: NodeInfo ⇒ nodeInfo
                     case _ ⇒ throwSubmissionException("""targetref attribute doesn't point to a node for replace="text".""")
                 }

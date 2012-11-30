@@ -35,7 +35,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
     // don't check things like event handlers. Also check for AVTs ion @class and @style.
     val hasStaticItemset = ! XPathCache.evaluateSingle(new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration).wrap(element),
             "exists((xf:choices | xf:item | xf:itemset)/(., .//xf:*)[@ref or @nodeset or @bind or @value or @*[contains(., '{')]])",
-            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData).asInstanceOf[Boolean]
+            XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING, null, null, null, null, locationData, null).asInstanceOf[Boolean]
 
     val isNorefresh = element.attributeValue(XXFORMS_REFRESH_ITEMS_QNAME) == "false"
 

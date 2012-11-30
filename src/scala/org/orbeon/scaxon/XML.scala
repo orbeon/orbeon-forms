@@ -17,7 +17,7 @@ import java.util.{List ⇒ JList}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.value.StringValue
 import xml.Elem
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.XPathCache._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsInstance
@@ -32,22 +32,29 @@ import org.orbeon.saxon.om._
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.saxon.tinytree.TinyTree
+import org.orbeon.oxf.util.XPathCache
 
 object XML {
 
     // TODO: Like for XFSS, this should not be global
-    private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
+    private val wrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, getGlobalConfiguration)
 
     // Convenience methods for the XPath API
-    def evalOne(item: Item, expr: String, namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING, variables: Map[String, ValueRepresentation] = null)(implicit library: FunctionLibrary = null) =
-        XPathCache.evaluateSingleKeepItems(Seq(item).asJava, 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
+    def evalOne(
+            item: Item,
+            expr: String,
+            namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
+            variables: Map[String, ValueRepresentation] = null,
+            reporter: Reporter = null)(implicit library: FunctionLibrary = null) =
+        evaluateSingleKeepItems(Seq(item).asJava, 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null, reporter)
 
     def eval(item: Item,
-             expr: String,
-             namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
-             variables: Map[String, ValueRepresentation] = null)
+            expr: String,
+            namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
+            variables: Map[String, ValueRepresentation] = null,
+            reporter: Reporter = null)
             (implicit library: FunctionLibrary = null): JList[AnyRef] =
-        XPathCache.evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null)
+        evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null, reporter)
 
     // Runtime conversion to NodeInfo (can fail!)
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]

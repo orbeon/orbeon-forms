@@ -602,7 +602,8 @@ public class XFormsModelBinds {
             result = XPathCache.evaluateAsString(nodeset, position, xpathExpression,
                         bind.staticBind.namespaceMapping(), currentVariables,
                         XFormsContainingDocument.getFunctionLibrary(), functionContext,
-                        bind.staticBind.locationData().getSystemID(), bind.staticBind.locationData());
+                        bind.staticBind.locationData().getSystemID(), bind.staticBind.locationData(),
+                        containingDocument.getRequestStats().getReporter());
         } finally {
             // Restore function context
             model.getContextStack().returnFunctionContext();
@@ -621,7 +622,8 @@ public class XFormsModelBinds {
         final String xpath = "boolean(" + xpathExpression + ")";
         final boolean result = (Boolean) XPathCache.evaluateSingle(
                 nodeset, position, xpath, bind.staticBind.namespaceMapping(), currentVariables,
-                XFormsContainingDocument.getFunctionLibrary(), functionContext, bind.staticBind.locationData().getSystemID(), bind.staticBind.locationData());
+                XFormsContainingDocument.getFunctionLibrary(), functionContext, bind.staticBind.locationData().getSystemID(), bind.staticBind.locationData(),
+                containingDocument.getRequestStats().getReporter());
 
         // Restore function context
         model.getContextStack().returnFunctionContext();

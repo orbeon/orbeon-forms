@@ -74,7 +74,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
 
         if (lhhaAnalysis.isLocal) {
             // LHHA is direct child of control, evaluate within context
-            contextStack.setBinding(control.getBindingContext)
+            contextStack.setBinding(control.bindingContext)
             contextStack.pushBinding(lhhaElement, control.effectiveId, lhhaAnalysis.scope)
             val result = XFormsUtils.getElementValue(control.container, contextStack, control.effectiveId, lhhaElement, supportsHTML, tempContainsHTML)
             contextStack.popBinding()
@@ -94,7 +94,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
                     // Not at top-level, find containing object
                     val ancestorContextControl = findAncestorContextControl(contextStaticId, XFormsUtils.getElementId(lhhaElement))
                     if (ancestorContextControl != null) {
-                        contextStack.setBinding(ancestorContextControl.getBindingContext)
+                        contextStack.setBinding(ancestorContextControl.bindingContext)
                         ancestorContextControl.effectiveId
                     } else
                         null

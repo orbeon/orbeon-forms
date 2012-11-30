@@ -68,8 +68,9 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         // NOTE: The following should be reasonably cheap, in case the variable had not been made dirty. It would be
         // nice to keep _bindingContextForChild/_bindingContextForFollowing if no reevaluation is needed, but then we
         // must make sure the chain of contexts is correct.
-        _bindingContextForChild = bindingContext.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
-        _bindingContextForFollowing = bindingContext.parent.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
+        val bc = bindingContext
+        _bindingContextForChild     = bc.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
+        _bindingContextForFollowing = bc.parent.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
     }
 
     override def markDirtyImpl(xpathDependencies: XPathDependencies) {
@@ -91,7 +92,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         _value =
             if (isRelevant) {
                 // Control is relevant
-                getContextStack.setBinding(getBindingContext)
+                getContextStack.setBinding(bindingContext)
                 variable.getVariableValue(getEffectiveId, false, true)
             } else {
                 // Control is not relevant

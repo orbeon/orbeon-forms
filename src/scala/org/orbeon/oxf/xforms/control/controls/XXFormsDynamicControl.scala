@@ -74,7 +74,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
     override def bindingContextForChild =
         _nested map { n ⇒
             val contextStack = n.container.getContextStack
-            contextStack.setParentBindingContext(getBindingContext)
+            contextStack.setParentBindingContext(bindingContext)
             contextStack.resetBindingContext()
             contextStack.getCurrentBindingContext
         } orNull
@@ -292,7 +292,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
    }
 
     private def getBoundElement =
-        getBindingContext.getSingleItem match {
+        bindingContext.getSingleItem match {
             case node: VirtualNode if node.getNodeKind == ELEMENT_NODE ⇒ Some(node)
             case _ ⇒ None
         }

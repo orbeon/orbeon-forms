@@ -125,7 +125,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     // - call index() or xxf:index() from within a variable within the iteration:
     // - not all iterations have been added, but the size must be known
     override def getSize =
-        Option(getBindingContext) map (_.nodeset.size) getOrElse  0
+        Option(bindingContext) map (_.nodeset.size) getOrElse  0
 
     def getIndex =
         if (isRelevant) {
@@ -155,7 +155,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Find source information
         val (sourceNodeset, requestedSourceIndex) =
-            (getBindingContext.getNodeset, Integer.parseInt(dndStart(dndStart.length - 1)))
+            (bindingContext.getNodeset, Integer.parseInt(dndStart(dndStart.length - 1)))
 
         if (requestedSourceIndex < 1 || requestedSourceIndex > sourceNodeset.size)
             throw new ValidationException("Out of range Dnd start iteration: " + requestedSourceIndex, getLocationData)
@@ -171,7 +171,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 // DnD destination is the current repeat control
                 this
 
-            (new ArrayList[Item](destinationControl.getBindingContext.getNodeset), dndEnd(dndEnd.length - 1).toInt)
+            (new ArrayList[Item](destinationControl.bindingContext.getNodeset), dndEnd(dndEnd.length - 1).toInt)
         }
 
         // TODO: Detect DnD over repeat boundaries, and throw if not explicitly enabled
@@ -260,17 +260,17 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     def updateNodesetForInsertDelete(insertedNodeInfos: Seq[Item]): Unit = {
 
         // Get old nodeset
-        val oldRepeatNodeset = getBindingContext.getNodeset.asScala
+        val oldRepeatNodeset = bindingContext.getNodeset.asScala
 
         // Set new binding context on the repeat control
         locally {
             // NOTE: here we just reevaluate against the parent; maybe we should reevaluate all the way down
             val contextStack = container.getContextStack
-            if (getBindingContext.parent eq null)
+            if (bindingContext.parent eq null)
                 // This might happen at the top-level if there is no model and no variables in scope?
                 contextStack.resetBindingContext
             else {
-                contextStack.setBinding(getBindingContext)
+                contextStack.setBinding(bindingContext)
                 // If there are some preceding variables in scope, the top of the stack is now the last scoped variable
                 contextStack.popBinding
             }
@@ -282,7 +282,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
         // Move things around and create new iterations if needed
-        if (! Controls.compareNodesets(oldRepeatNodeset, getBindingContext.getNodeset.asScala)) {
+        if (! Controls.compareNodesets(oldRepeatNodeset, bindingContext.getNodeset.asScala)) {
             // Update iterationsInitialStateIfNeeded()
 
             val focusedBefore = containingDocument.getControls.getFocusedControl
@@ -321,7 +321,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         val controls = containingDocument.getControls
 
         // Get current (new) nodeset
-        val newRepeatNodeset = getBindingContext.getNodeset.asScala
+        val newRepeatNodeset = bindingContext.getNodeset.asScala
 
         val isInsert = insertedItems ne null
 
@@ -605,8 +605,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // Build one sub-tree per repeat iteration (iteration itself handles its own binding with pushBinding, depending on its index/suffix)
         val iterationAnalysis = staticControl.iteration.get
-        for (iterationIndex ← 1 to getBindingContext.getNodeset.size)
-            buildTree(container, getBindingContext, iterationAnalysis, idSuffix :+ iterationIndex)
+        for (iterationIndex ← 1 to bindingContext.getNodeset.size)
+            buildTree(container, bindingContext, iterationAnalysis, idSuffix :+ iterationIndex)
 
         // TODO LATER: handle isOptimizeRelevance()
     }

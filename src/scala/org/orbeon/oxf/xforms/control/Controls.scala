@@ -53,7 +53,7 @@ object Controls {
         val container = repeatControl.container
         val bindingContext = {
             val contextStack = container.getContextStack
-            contextStack.setBinding(repeatControl.getBindingContext)
+            contextStack.setBinding(repeatControl.bindingContext)
             contextStack.pushIteration(iterationIndex)
         }
 
@@ -282,7 +282,7 @@ object Controls {
             // - or dependencies tell us an update is required
             // - or the control has a @model attribute (TODO TEMP HACK: because that causes model variable evaluation!)
             def mustReEvaluateBinding =
-                (newlyRelevantLevel != -1 && level > newlyRelevantLevel) ||
+                (newlyRelevantLevel != -1 && level > newlyRelevantLevel)   ||
                 xpathDependencies.requireBindingUpdate(control.prefixedId) ||
                 (control.staticControl.element.attribute(XFormsConstants.MODEL_QNAME) ne null)
 
@@ -291,7 +291,7 @@ object Controls {
                 control match {
                     case repeatControl: XFormsRepeatControl ⇒
                         // Update iterations
-                        val oldRepeatSeq = control.getBindingContext.getNodeset.asScala
+                        val oldRepeatSeq = control.bindingContext.getNodeset.asScala
                         control.evaluateBinding(bindingContext, update = true)
                         val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
 

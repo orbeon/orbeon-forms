@@ -75,13 +75,14 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     override def evaluateValue(): Unit = {
+        val bc = bindingContext
         val value =
             if (valueAttribute eq null)
                 // Get value from single-node binding
-                Option(DataModel.getValue(bindingContext.getSingleItem))
+                Option(DataModel.getValue(bc.getSingleItem))
             else
                 // Value comes from the XPath expression within the value attribute
-                evaluateAsString(valueAttribute, bindingContext.getNodeset.asScala, bindingContext.getPosition)
+                evaluateAsString(valueAttribute, bc.getNodeset.asScala, bc.getPosition)
 
         setValue(value getOrElse "")
     }
@@ -120,7 +121,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     // Keep public for unit tests
     def evaluatedHeaders: JMap[String, Array[String]] = {
         // TODO: pass BindingContext directly
-        getContextStack.setBinding(getBindingContext)
+        getContextStack.setBinding(bindingContext)
         val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
         try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward).asJava
         catch {

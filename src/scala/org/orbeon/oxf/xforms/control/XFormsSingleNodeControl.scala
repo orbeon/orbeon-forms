@@ -95,8 +95,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     private def readBinding(): Unit = {
         // Set bound item, only considering actual bindings (with @bind, @ref or @nodeset)
-        if (bindingContext.isNewBind)
-            this._boundItem = bindingContext.getSingleItem
+        val bc = bindingContext
+        if (bc.isNewBind)
+            this._boundItem = bc.getSingleItem
 
         // Get MIPs
         getBoundItem match {
@@ -192,8 +193,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         if (! super.computeRelevant)
             return false
 
-        val currentItem = bindingContext.getSingleItem
-        if (bindingContext.isNewBind) {
+        val bc = bindingContext
+        val currentItem = bc.getSingleItem
+        if (bc.isNewBind) {
             // There is a binding
 
             isAllowedBoundItem(currentItem) && isRelevantItem(currentItem)

@@ -99,7 +99,7 @@ public class XFormsItemUtils {
         // remain unmodified.
         final XFormsContextStack contextStack = container.getContextStack();
         final BindingContext savedBindingContext = contextStack.getCurrentBindingContext();
-        contextStack.setBinding(select1Control.getBindingContext());
+        contextStack.setBinding(select1Control.bindingContext());
 
         // TODO: This visits all of the control's descendants. It should only visit the top-level item|itemset|choices elements.
         final boolean isEncryptItemValues = select1Control.isEncryptValues();

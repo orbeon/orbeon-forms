@@ -127,7 +127,7 @@ trait FileMetadata extends XFormsValueControl {
         if (value ne null)
             element foreach { e ⇒
                 val contextStack = self.getContextStack
-                contextStack.setBinding(self.getBindingContext)
+                contextStack.setBinding(self.bindingContext)
                 contextStack.pushBinding(e, self.getEffectiveId, self.getChildElementScope(e))
 
                 contextStack.getCurrentSingleItem match {
@@ -168,7 +168,7 @@ object FileMetadata {
 
     private def childMetadataValue(m: FileMetadata, element: Element) = {
         val contextStack = m.getContextStack
-        contextStack.setBinding(m.getBindingContext)
+        contextStack.setBinding(m.bindingContext)
         contextStack.pushBinding(element, m.getEffectiveId, m.getChildElementScope(element))
         DataModel.getValue(contextStack.getCurrentSingleItem)
     }

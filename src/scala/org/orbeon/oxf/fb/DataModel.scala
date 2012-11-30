@@ -149,7 +149,7 @@ object DataModel {
     def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
 
         def evaluateBoundItem(namespaces: NamespaceMapping) =
-            Option(evalOne(control.getBindingContext.contextItem, expr, namespaces))
+            Option(evalOne(control.bindingContext.contextItem, expr, namespaces))
 
         try {
             control.bind flatMap

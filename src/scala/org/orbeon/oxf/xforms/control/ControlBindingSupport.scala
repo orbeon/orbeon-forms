@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
@@ -23,27 +22,26 @@ trait ControlBindingSupport {
     self: XFormsControl ⇒
 
     // This control's binding context
-    var bindingContext: BindingContext = null
-    final def getBindingContext: BindingContext = bindingContext
-    final def getBindingContext(containingDocument: XFormsContainingDocument): BindingContext = bindingContext
+    private[ControlBindingSupport] var _bindingContext: BindingContext = null
+    def bindingContext: BindingContext = _bindingContext
 
     // The control's binding, by default none
     def binding: Seq[Item] = Seq()
 
     // Find the control's binding context
-    def contextForBinding: Seq[Item] = Option(bindingContext) flatMap
+    def contextForBinding: Seq[Item] = Option(_bindingContext) flatMap
         (binding ⇒ Option(binding.parent)) map
             (binding ⇒ binding.nodeset.asScala) getOrElse
                 Seq()
 
     // Find the bind object for this control, if it has one
-    def bind = Option(bindingContext.bind)
+    def bind = Option(_bindingContext.bind)
 
     // Relevance
-    private var _isRelevant = false
+    private[ControlBindingSupport] var _isRelevant = false
     final def isRelevant = _isRelevant
 
-    private var _wasRelevant = false
+    private[ControlBindingSupport] var _wasRelevant = false
     final def wasRelevant = _wasRelevant
 
     // Whether this control's content is visible (by default it is)
@@ -62,7 +60,7 @@ trait ControlBindingSupport {
     final def refreshBinding(parentContext: BindingContext) = {
         // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
         // ensure that the chain of bindings is consistent
-        setBindingContext(getBindingContext.copy(parent = parentContext))
+        setBindingContext(bindingContext.copy(parent = parentContext))
         markDirtyImpl(containingDocument.getXPathDependencies)
         // NOTE: We should call evaluate only if relevant
         //if (control.isRelevant)
@@ -114,13 +112,13 @@ trait ControlBindingSupport {
     def evaluateChildFollowingBinding() = ()
 
     // Return the bindings in effect within and after this control
-    def bindingContextForChild = bindingContext
-    def bindingContextForFollowing = bindingContext.parent
+    def bindingContextForChild = _bindingContext
+    def bindingContextForFollowing = _bindingContext.parent
 
     // Set this control's binding context and handle create/destroy/update lifecycle
     final def setBindingContext(bindingContext: BindingContext) {
-        val oldBinding = this.bindingContext
-        this.bindingContext = bindingContext
+        val oldBinding = this._bindingContext
+        this._bindingContext = bindingContext
 
         // Relevance is a property of all controls
         val oldRelevant = this._isRelevant

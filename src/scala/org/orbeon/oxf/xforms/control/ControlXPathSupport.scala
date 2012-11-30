@@ -41,17 +41,18 @@ trait ControlXPathSupport {
             // Possible AVT
 
             // NOTE: the control may or may not be bound, so don't use getBoundItem()
-            val contextNodeset = bindingContext.getNodeset
+            val bc = bindingContext
+            val contextNodeset = bc.getNodeset
             if (contextNodeset.size == 0)
                 null // TODO: in the future we should be able to try evaluating anyway
             else {
                 // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
                 // Reason is that XPath functions might use the context stack to get the current model, etc.
-                getContextStack.setBinding(getBindingContext)
+                getContextStack.setBinding(bc)
                 // Evaluate
                 try
-                    XPathCache.evaluateAsAvt(contextNodeset, bindingContext.getPosition, attributeValue, getNamespaceMappings,
-                        bindingContext.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData)
+                    XPathCache.evaluateAsAvt(contextNodeset, bc.getPosition, attributeValue, getNamespaceMappings,
+                        bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData)
                 catch {
                     case e: Exception ⇒
                         // Don't consider this as fatal
@@ -72,10 +73,11 @@ trait ControlXPathSupport {
         else {
             // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
             // Reason is that XPath functions might use the context stack to get the current model, etc.
-            getContextStack.setBinding(getBindingContext)
+            val bc = bindingContext
+            getContextStack.setBinding(bc)
             try
                 Option(XPathCache.evaluateAsString(contextItems.asJava, contextPosition, xpathString, getNamespaceMappings,
-                    bindingContext.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))
+                    bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))
             catch {
                 case e: Exception ⇒
                     // Don't consider this as fatal
@@ -94,7 +96,7 @@ trait ControlXPathSupport {
             case Some(contextItem) ⇒
                 // Need to ensure the binding on the context stack is correct before evaluating XPath expressions
                 // Reason is that XPath functions might use the context stack to get the current model, etc.
-                getContextStack.setBinding(getBindingContext)
+                getContextStack.setBinding(bindingContext)
                 try
                     Option(XPathCache.evaluateAsString(contextItem, xpathString, namespaceMapping, variableToValueMap,
                         XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData))

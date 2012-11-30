@@ -85,7 +85,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         // For nested event handlers, this still works, because the nested handler can never match the inner scope. So
         // the context goes inner context → component binding.
         val contextStack = nestedContainer.getContextStack
-        contextStack.setParentBindingContext(getBindingContext)
+        contextStack.setParentBindingContext(bindingContext)
         contextStack.resetBindingContext
         contextStack.getCurrentBindingContext
     }

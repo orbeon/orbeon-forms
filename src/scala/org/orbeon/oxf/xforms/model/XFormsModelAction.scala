@@ -24,7 +24,7 @@ class XFormsModelAction(parent: XFormsEventObserver, eventHandler: EventHandlerI
     def containingDocument = parent.containingDocument
 
     // This is called by EventHandlerImpl when determining the XPath context for nested event handlers
-    def getBindingContext(containingDocument: XFormsContainingDocument) = parent match {
+    def bindingContext = parent match {
         case model: XFormsModel ⇒
             // Use the model's inner context
             model.getDefaultEvaluationContext

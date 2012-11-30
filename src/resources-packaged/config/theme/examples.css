@@ -25,41 +25,6 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-body {
-  -webkit-font-smoothing: antialiased;
-  padding-top: 10px;
-}
-body .navbar {
-  margin-bottom: 10px;
-}
-body .navbar .navbar-inner {
-  background-color: #3b3b3b;
-  background-image: -moz-linear-gradient(top, #535353, #171717);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#535353), to(#171717));
-  background-image: -webkit-linear-gradient(top, #535353, #171717);
-  background-image: -o-linear-gradient(top, #535353, #171717);
-  background-image: linear-gradient(to bottom, #535353, #171717);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff535353', endColorstr='#ff171717', GradientType=0);
-}
-body .navbar .navbar-inner img,
-body .navbar .navbar-inner h1 {
-  vertical-align: middle;
-  line-height: 40px;
-}
-body .navbar .navbar-inner img {
-  margin-right: 15px;
-}
-body .navbar .navbar-inner h1 {
-  font-size: 16px;
-  font-weight: normal;
-  color: #ccc;
-  text-shadow: none;
-  text-decoration: none;
-  margin: 0;
-  padding: 0;
-  display: inline;
-}
 body .license {
   text-align: center;
   font-size: 11px;

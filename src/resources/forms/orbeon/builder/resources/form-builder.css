@@ -715,15 +715,34 @@ td.fb-selected:hover .fb-click-message {
   -moz-border-radius: 0;
   border-radius: 0;
 }
-.fb-navbar .fr-language-choice {
-  text-shadow: 0 1px 0 #ffffff;
-  margin-left: 15px;
-  font-size: inherit;
-}
 .fb-navbar .container {
   width: auto;
   margin-left: 15px;
   margin-right: 15px;
+}
+.fb-navbar .container img,
+.fb-navbar .container .brand {
+  vertical-align: middle;
+}
+.fb-navbar .container img {
+  padding: 0 10px;
+}
+.fb-navbar .container .brand {
+  float: none;
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+.fb-navbar .container .nav {
+  position: absolute;
+  right: 0;
+  top: 0;
+  left: auto;
+}
+.fb-navbar .container .nav .fr-language-choice {
+  text-shadow: 0 1px 0 #ffffff;
+  margin-left: 15px;
+  font-size: inherit;
 }
 .fb-main .navbar-inverse .navbar-inner {
   background-color: #303030;

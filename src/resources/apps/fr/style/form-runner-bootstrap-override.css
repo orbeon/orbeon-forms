@@ -37,6 +37,38 @@ textarea,
 a {
   text-decoration: underline;
 }
+.navbar-inverse {
+  margin: 10px 0;
+}
+.navbar-inverse .navbar-inner {
+  background-color: #414141;
+  background-image: -moz-linear-gradient(top, #555555, #222222);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#555555), to(#222222));
+  background-image: -webkit-linear-gradient(top, #555555, #222222);
+  background-image: -o-linear-gradient(top, #555555, #222222);
+  background-image: linear-gradient(to bottom, #555555, #222222);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff555555', endColorstr='#ff222222', GradientType=0);
+  border: none;
+}
+.navbar-inverse .navbar-inner img,
+.navbar-inverse .navbar-inner h1 {
+  vertical-align: middle;
+  line-height: 40px;
+}
+.navbar-inverse .navbar-inner img {
+  margin-right: 15px;
+}
+.navbar-inverse .navbar-inner h1 {
+  font-size: 16px;
+  font-weight: normal;
+  color: #bbb;
+  text-shadow: none;
+  text-decoration: none;
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
 form.xforms-form {
   float: none;
   margin: 0;
@@ -74,9 +106,6 @@ form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
 form.xforms-form .input-append .add-on,
 form.xforms-form .input-prepend .add-on {
   height: 18px;
-}
-form.xforms-form .navbar-inverse .brand:hover {
-  color: #999999;
 }
 form.xforms-form .fr-grid tr th label {
   margin: 0;

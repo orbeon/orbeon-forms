@@ -61,11 +61,6 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-.fr-logo img {
-  float: left;
-  padding-top: 7px;
-  margin-right: 10px;
-}
 .fr-status-icons {
   float: right;
   padding-top: 7px;
@@ -78,9 +73,6 @@
 }
 .fr-body h2 {
   margin-top: 0;
-}
-body {
-  padding-top: 40px;
 }
 /* ***** Utilities ************************************************************************************************** */
 .fr-clear {

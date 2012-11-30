@@ -22,6 +22,30 @@ a {
     text-decoration: underline;     // Don't remove the underline for anchors; this is an important web convention
 }
 
+.navbar-inverse {
+    .navbar-inner {
+        #gradient > .vertical(@gray, @grayDarker);
+        border: none;
+        img, h1 {
+            vertical-align: middle;
+            line-height: @navbarHeight;
+        }
+        img {
+            margin-right: 15px;     // Space between image and title
+        }
+        h1 {
+            font-size: 16px;
+            font-weight: normal;
+            color: #bbb;
+            text-shadow: none;
+            text-decoration: none;
+            margin: 0; padding: 0;
+            display: inline;
+        }
+    }
+    margin: 10px 0;                 // Space before and after the navbar
+}
+
 form.xforms-form {
 
     // Override Bootstrap styling for element with a class name ending with 'span' (.xforms-layout-span)
@@ -60,10 +84,6 @@ form.xforms-form {
     .input-append .add-on, .input-prepend .add-on {
         height: 18px;
     }
-
-    .navbar-inverse .brand:hover {          // We don't want the title in the navbar to get highlighted on hover if it isn't a link
-        color: @navbarInverseLinkColor;     // Overrides https://github.com/twitter/bootstrap/blob/v2.1.1/less/navbar.less#L394
-    }                                       // Don't use inherit, which isn't supported by IE7
 
     .fr-grid tr th label {
         margin: 0;                          //  No margin on label inside table headers as they are not next to a control

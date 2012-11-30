@@ -34,43 +34,41 @@
     <!-- Template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(*)*">
         <fr:navbar/>
-        <xh:div class="container">
 
-            <xh:p class="lead"><fr:description/></xh:p>
+        <fr:description/>
 
-            <!-- Error summary (if at top) -->
-            <xsl:if test="$error-summary-top">
-                <fr:error-summary position="top"/>
+        <!-- Error summary (if at top) -->
+        <xsl:if test="$error-summary-top">
+            <fr:error-summary position="top"/>
+        </xsl:if>
+
+        <fr:row>
+            <fr:toc/>
+        </fr:row>
+        <fr:row>
+            <fr:body/>
+        </fr:row>
+
+        <!-- Error summary (if at bottom) -->
+        <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
+             This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
+        <xh:div>
+            <xsl:if test="not($error-summary-bottom)">
+                <xsl:attribute name="style">display: none</xsl:attribute>
             </xsl:if>
-
-            <fr:row>
-                <fr:toc/>
-            </fr:row>
-            <fr:row>
-                <fr:body/>
-            </fr:row>
-
-            <!-- Error summary (if at bottom) -->
-            <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
-                 This is necessary because the persistence model relies on the error summary to know if the data is valid. -->
-            <xh:div>
-                <xsl:if test="not($error-summary-bottom)">
-                    <xsl:attribute name="style">display: none</xsl:attribute>
-                </xsl:if>
-                <fr:error-summary position="bottom"/>
-            </xh:div>
-
-            <fr:row>
-                <fr:noscript-help/>
-            </fr:row>
-            <fr:row>
-                <fr:messages/>
-            </fr:row>
-            <fr:bottom-bar/>
-            <fr:row>
-                <fr:version/>
-            </fr:row>
+            <fr:error-summary position="bottom"/>
         </xh:div>
+
+        <fr:row>
+            <fr:noscript-help/>
+        </fr:row>
+        <fr:row>
+            <fr:messages/>
+        </fr:row>
+        <fr:bottom-bar/>
+        <fr:row>
+            <fr:version/>
+        </fr:row>
     </xsl:variable>
 
     <!-- Template for the default layout of the bottom bar -->
@@ -115,7 +113,7 @@
         <xsl:copy>
             <xsl:attribute name="class" select="string-join((if ($is-inline-hints) then 'xforms-disable-hint-as-tooltip' else (), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
-            <xf:group model="fr-form-model" id="fr-view" class="fr-view{concat(' fr-mode-', $mode)}">
+            <xf:group model="fr-form-model" id="fr-view" class="container fr-view{concat(' fr-mode-', $mode)}" xxf:element="div">
                 <xsl:apply-templates select="if ($custom-layout) then node() else $default-page-template"/>
                 <xsl:call-template name="fr-hidden-controls"/>
                 <xsl:call-template name="fr-dialogs"/>
@@ -124,7 +122,7 @@
     </xsl:template>
 
     <xsl:template match="fr:navbar" name="fr-navbar">
-        <xsl:variable name="header-classes" as="xs:string*" select="('navbar', 'navbar-inverse', 'navbar-fixed-top')"/>
+        <xsl:variable name="header-classes" as="xs:string*" select="('navbar', 'navbar-inverse')"/>
         <xh:div class="{string-join($header-classes, ' ')}">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
@@ -272,7 +270,7 @@
 
     <xsl:template match="fr:title" name="fr-title">
         <!-- Q: Why do we need @ref here? -->
-        <xf:output value="{if (exists(@ref)) then @ref else '$title'}" class="brand"/>
+        <xh:h1><xf:output value="{if (exists(@ref)) then @ref else '$title'}"/></xh:h1>
     </xsl:template>
 
     <!-- Description in chosen language or first one if not found -->

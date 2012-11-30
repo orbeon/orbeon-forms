@@ -33,6 +33,7 @@
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
             <xh:link rel="stylesheet" href="/fr/style/bootstrap/css/bootstrap.css" type="text/css"/>
+            <xh:link rel="stylesheet" href="/fr/style/form-runner-bootstrap-override.css" type="text/css"/>
             <xh:link rel="stylesheet" href="/config/theme/examples.css" type="text/css" media="all"/>
             <xh:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
             <xh:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
@@ -42,7 +43,7 @@
     <xsl:template match="xh:body">
         <xsl:copy>
             <xh:div class="container{if (@class) then concat(' ', @class) else ''}">
-                <xh:div class="navbar">
+                <xh:div class="navbar navbar-inverse">
                     <xh:div class="navbar-inner">
                         <xh:div class="container">
                             <xh:a href="http://www.orbeon.com/">

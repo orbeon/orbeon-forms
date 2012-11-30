@@ -292,21 +292,7 @@
 
     <xsl:template match="fr:logo">
         <xsl:if test="not($hide-logo)">
-
-            <xf:var name="logo-uri"
-                select="({if (@paths) then concat(@paths, ', ') else ''}xxf:instance('fr-form-metadata')/logo,
-                         '{$default-logo-uri}')[normalize-space()][1]"/>
-
-            <!-- If image comes from resources, use an img tag so we can serve GIF for IE6 -->
-            <xf:var name="is-logo-in-resources" value="starts-with($logo-uri, 'oxf:')"/>
-            <xh:span class="fr-logo">
-                <xf:group ref=".[$is-logo-in-resources]">
-                    <xh:img src="{{substring-after($logo-uri, 'oxf:')}}" alt=""/>
-                </xf:group>
-                <xf:group ref=".[exists($logo-uri) and not($is-logo-in-resources)]">
-                    <xf:output value="$logo-uri" mediatype="image/*"/>
-                </xf:group>
-            </xh:span>
+            <xh:img src="{$default-logo-uri}" alt=""/>
         </xsl:if>
     </xsl:template>
 

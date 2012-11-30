@@ -32,7 +32,7 @@
 
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>
-    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                                value="oxf:/apps/fr/style/orbeon-navbar-logo.png"/>
+    <property as="xs:anyURI"  name="oxf.fr.default-logo.uri.*.*"                                value="/apps/fr/style/orbeon-navbar-logo.png"/>
     <property as="xs:string"  name="oxf.fr.css.uri.*.*"                                         value="/apps/fr/style/bootstrap/css/bootstrap.css
                                                                                                        /apps/fr/style/form-runner-bootstrap-override.css
                                                                                                        /apps/fr/style/form-runner-base.css

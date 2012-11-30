@@ -48,7 +48,7 @@ body .thumbnails li a h2 {
   font-size: 20px;
   line-height: 25px;
   font-weight: 700;
-  color: #303239;
+  color: #444;
   margin: 0;
   padding-top: 24px;
 }
@@ -61,7 +61,7 @@ body .thumbnails li p {
   padding-top: 6px;
   font-size: 15px;
   line-height: 21px;
-  color: #444;
+  color: #666;
 }
 body .thumbnails li.span12 {
   padding: 4px 0 0 0;

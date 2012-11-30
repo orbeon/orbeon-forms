@@ -26,21 +26,19 @@ a {
     .navbar-inner {
         #gradient > .vertical(@gray, @grayDarker);
         border: none;
-        img, h1 {
-            vertical-align: middle;
-            line-height: @navbarHeight;
-        }
-        img {
-            margin-right: 15px;     // Space between image and title
-        }
-        h1 {
-            font-size: 16px;
-            font-weight: normal;
-            color: #bbb;
-            text-shadow: none;
-            text-decoration: none;
-            margin: 0; padding: 0;
-            display: inline;
+        .container {
+            line-height: @navbarHeight;             // Get the content of the navbar to be verticaly aligned
+            img, h1 { vertical-align: middle }      // See: http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Center-content-vertically-inside-a-box
+            img { margin-right: 15px }              // Space between image and title
+            h1 {
+                font-size: 16px;
+                font-weight: normal;
+                color: #bbb;
+                text-shadow: none;
+                text-decoration: none;
+                margin: 0; padding: 0;
+                display: inline;
+            }
         }
     }
     margin: 10px 0;                 // Space before and after the navbar

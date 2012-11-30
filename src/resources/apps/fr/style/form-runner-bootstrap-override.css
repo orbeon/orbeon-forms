@@ -51,15 +51,17 @@ a {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff555555', endColorstr='#ff222222', GradientType=0);
   border: none;
 }
-.navbar-inverse .navbar-inner img,
-.navbar-inverse .navbar-inner h1 {
-  vertical-align: middle;
+.navbar-inverse .navbar-inner .container {
   line-height: 40px;
 }
-.navbar-inverse .navbar-inner img {
+.navbar-inverse .navbar-inner .container img,
+.navbar-inverse .navbar-inner .container h1 {
+  vertical-align: middle;
+}
+.navbar-inverse .navbar-inner .container img {
   margin-right: 15px;
 }
-.navbar-inverse .navbar-inner h1 {
+.navbar-inverse .navbar-inner .container h1 {
   font-size: 16px;
   font-weight: normal;
   color: #bbb;

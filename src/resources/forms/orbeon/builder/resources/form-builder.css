@@ -735,12 +735,18 @@ td.fb-selected:hover .fb-click-message {
 }
 .fb-navbar .container .nav {
   position: absolute;
+  left: auto;
   right: 0;
   top: 0;
-  left: auto;
 }
-.fb-navbar .container .nav .fr-language-choice {
-  text-shadow: 0 1px 0 #ffffff;
+.fb-navbar .container .nav li {
+  line-height: 40px;
+}
+.fb-navbar .container .nav li a {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.fb-navbar .container .nav li .fr-language-choice {
   margin-left: 15px;
   font-size: inherit;
 }

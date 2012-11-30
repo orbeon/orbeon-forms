@@ -541,24 +541,27 @@ td.fb-selected:hover .fb-click-message { display: none }
 
 // Top Form Builder navbar only
 .fb-navbar {
-    margin-bottom: 0;                                               // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
-    .border-radius(0);                                              // override Boostrap rounded corners
+    margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
+    .border-radius(0);                                                  // override Boostrap rounded corners
     .container {
         width: auto;
         margin-left: 15px;
         margin-right: 15px;
-        img, .brand { vertical-align: middle }                      // Logo and title vertically centered
-        img { padding: 0 10px }                                     // Space to the left/right of the logo
-        .brand {                                                    // For the title, reuse some of the styling defined in Bootstrap for .brand
-            float: none;                                            // Override Bootstrap float, which doesn't allow us to vertically align logo and title
-            margin: 0; padding: 0; display: inline;                 // Overdide h1 styles
+        img, .brand { vertical-align: middle }                          // Logo and title vertically centered
+        img { padding: 0 10px }                                         // Space to the left/right of the logo
+        .brand {                                                        // For the title, reuse some of the styling defined in Bootstrap for .brand
+            float: none;                                                // Override Bootstrap float, which doesn't allow us to vertically align logo and title
+            margin: 0; padding: 0; display: inline;                     // Overdide h1 styles
         }
-        .nav {                                                      // Contains links to user guide and screencast, and language selection
-            position: absolute; right: 0; top: 0; left: auto;       // Position to the top right
-            .fr-language-choice {
-                text-shadow: 0 1px 0 @navbarBackgroundHighlight;    // make it look like Boostrap nav links
-                margin-left: 15px;
-                font-size: inherit;                                 // ovverride FR
+        .nav {                                                          // Contains links to user guide and screencast, and language selection
+            position: absolute; left: auto; right: 0; top: 0;           // Position to the top right
+            li {
+                line-height: @navbarHeight;                             // So it is vertically centered, specified again as this is is absolutely positioned
+                a { padding-top: 0; padding-bottom: 0 }                 // Undo Bootstrap's additional padding, which breaks vertical centering
+                .fr-language-choice {
+                    margin-left: 15px;                                  // Space betteen links and language FB's selection
+                    font-size: inherit;                                 // Override FR smaller size for language selector
+                }
             }
         }
     }

@@ -566,19 +566,8 @@ td.fb-selected:hover .fb-click-message { display: none }
 
 // Form navbar only
 .fb-main .navbar {
-    margin-top: 0;                                              // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
-    .navbar-inner {
-        #gradient > .vertical(#222, #444);
-        .border-radius(6px 6px 0 0);                            // Add radius to the top of the navbar, so it doesn't show over the radius of the surrounding .fb-main-inner
-
-        .fb-language-triggers, .fb-form-settings-trigger {
-            margin-left: 6px;
-        }
-
-        .fr-language-choice {
-            margin-right: 0;                                    // ovverride FR
-        }
-    }
+    margin-top: 0;                                                  // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
+    .navbar-inner { .border-radius(6px 6px 0 0) }                   // Add radius to the top of the navbar, so it doesn't show over the radius of the surrounding .fb-main-inner
 }
 
 /* ***** Other media ************************************************************************************************ */

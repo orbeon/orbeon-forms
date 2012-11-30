@@ -59,14 +59,13 @@ a {
   vertical-align: middle;
 }
 .navbar-inverse .navbar-inner .container h1 {
-  margin-left: 15px;
+  margin: 0 0 0 15px;
+  padding: 0;
   font-size: 16px;
   font-weight: normal;
   color: #bbb;
   text-shadow: none;
   text-decoration: none;
-  margin: 0;
-  padding: 0;
   display: inline;
 }
 form.xforms-form {

@@ -758,6 +758,9 @@ td.fb-selected:hover .fb-click-message {
   -moz-border-radius: 6px 6px 0 0;
   border-radius: 6px 6px 0 0;
 }
+.fb-main .navbar .fb-form-settings-trigger {
+  padding-left: 20px;
+}
 /* ***** Other media ************************************************************************************************ */
 @media print {
   input {

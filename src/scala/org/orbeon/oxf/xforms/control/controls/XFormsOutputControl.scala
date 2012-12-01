@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import XFormsOutputControl._
 import collection.JavaConverters._
 import java.util.Collections
 import java.util.{Map ⇒ JMap}
@@ -27,7 +26,6 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsError
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.analysis.controls.OutputControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.model.DataModel
@@ -58,19 +56,13 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     // TODO: resolve statically
     private val urlNorewrite = XFormsUtils.resolveUrlNorewrite(element)
 
-    override def getExtensionAttributes: Array[QName] =
-        if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME))
-            DownloadAppearanceExtensionAttributes
-        else
-            null
-
     override def evaluateImpl(): Unit = {
         super.evaluateImpl()
         evaluateFileMetadata()
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies): Unit ={
-        super.markDirtyImpl(xpathDependencies)
+    override def markDirtyImpl(): Unit ={
+        super.markDirtyImpl()
         markFileMetadataDirty()
     }
 
@@ -250,6 +242,4 @@ object XFormsOutputControl {
         else
             // Default for other mediatypes
             null
-
-    val DownloadAppearanceExtensionAttributes = Array(XXFORMS_TARGET_QNAME)
 }

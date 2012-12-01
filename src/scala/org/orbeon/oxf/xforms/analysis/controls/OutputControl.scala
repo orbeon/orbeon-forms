@@ -14,13 +14,15 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
 import org.orbeon.oxf.xforms.analysis.{ChildrenLHHAAndActionsTrait, ChildrenBuilderTrait, ElementAnalysis}
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
-import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
 
 class OutputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends ValueControl(staticStateContext, element, parent, preceding, scope)
@@ -32,6 +34,8 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
 
     // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
     override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
+
+    override val extensionAttributeNames = appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) list XXFORMS_TARGET_QNAME
 
     override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
     override val externalEvents              = externalEventsDef

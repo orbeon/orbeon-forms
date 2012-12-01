@@ -232,32 +232,27 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     // Push binding but ignore non-relevant iterations
-    override protected def pushBindingImpl(parentContext: BindingContext) = {
-        // Compute new binding
-        val newBindingContext = {
-            val contextStack = container.getContextStack
-            contextStack.setBinding(parentContext)
-            contextStack.pushBinding(element, effectiveId, staticControl.scope)
+    override protected def computeBinding(parentContext: BindingContext) = {
+        val contextStack = container.getContextStack
+        contextStack.setBinding(parentContext)
+        contextStack.pushBinding(element, effectiveId, staticControl.scope)
 
-            // Keep only the relevant items
-            import XFormsSingleNodeControl.isRelevantItem
+        // Keep only the relevant items
+        import XFormsSingleNodeControl.isRelevantItem
 
-            val items       = contextStack.getCurrentBindingContext.nodeset
-            val allRelevant = items.asScala forall isRelevantItem
+        val items       = contextStack.getCurrentBindingContext.nodeset
+        val allRelevant = items.asScala forall isRelevantItem
 
-            if (allRelevant)
-                contextStack.getCurrentBindingContext
-            else
-                contextStack.getCurrentBindingContext.copy(nodeset = items.asScala filter isRelevantItem asJava)
-        }
-
-        // Set binding context
-        setBindingContext(newBindingContext)
-
-        newBindingContext
+        if (allRelevant)
+            contextStack.getCurrentBindingContext
+        else
+            contextStack.getCurrentBindingContext.copy(nodeset = items.asScala filter isRelevantItem asJava)
     }
 
-    def updateNodesetForInsertDelete(insertedNodeInfos: Seq[Item]): Unit = {
+    def updateSequenceForInsertDelete(insertedNodeInfos: Seq[Item]): Unit = {
+
+        // NOTE: This can be called even if we are not relevant!
+
 
         // Get old nodeset
         val oldRepeatNodeset = bindingContext.getNodeset.asScala
@@ -275,10 +270,10 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 contextStack.popBinding
             }
 
-            // Do this before pushBinding() because after that controls are temporarily in an inconsistent state
+            // Do this before evaluating the binding because after that controls are temporarily in an inconsistent state
             containingDocument.getControls.cloneInitialStateIfNeeded()
 
-            pushBinding(contextStack.getCurrentBindingContext, update = true)
+            evaluateBindingAndValues(contextStack.getCurrentBindingContext, update = true)
         }
 
         // Move things around and create new iterations if needed

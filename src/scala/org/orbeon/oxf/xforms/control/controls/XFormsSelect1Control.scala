@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.control.XFormsControl.{ControlProperty, ImmutableControlProperty}
 import org.orbeon.oxf.xforms.event.Dispatch
@@ -48,7 +47,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     private var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
 
     def isEncryptValues  = staticControl.isEncryptValues
-    def isFullAppearance = staticControl.appearances(XFORMS_FULL_APPEARANCE_QNAME)
+    def isFullAppearance = staticControl.isFull
 
     override def onCreate() {
         super.onCreate()
@@ -57,12 +56,6 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         if (containingDocument.isRestoringDynamicState)
             getItemset
     }
-
-    override def getExtensionAttributes =
-        if (! staticControl.isMultiple && isFullAppearance)
-            ExtensionAttributesSelect1AppearanceFull
-        else
-            super.getExtensionAttributes
 
     // Return the custom group name if present, otherwise return the effective id
     def getGroupName: String =
@@ -73,8 +66,8 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         if (hasInitialization) getCommonJavaScriptInitialization else null
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies) {
-        super.markDirtyImpl(xpathDependencies)
+    override def markDirtyImpl() {
+        super.markDirtyImpl()
         if (itemsetProperty ne null)
             itemsetProperty.handleMarkDirty()
     }
@@ -234,8 +227,6 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 }
 
 object XFormsSelect1Control {
-
-    private val ExtensionAttributesSelect1AppearanceFull = Array(XXFORMS_GROUP_QNAME)
 
     private val AppearancesWithInitialization =
         Set(XXFORMS_TREE_APPEARANCE_QNAME, XXFORMS_MENU_APPEARANCE_QNAME, XFORMS_COMPACT_APPEARANCE_QNAME)

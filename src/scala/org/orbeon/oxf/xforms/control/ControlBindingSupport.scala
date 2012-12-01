@@ -23,19 +23,19 @@ trait ControlBindingSupport {
 
     // This control's binding context
     private[ControlBindingSupport] var _bindingContext: BindingContext = null
-    def bindingContext: BindingContext = _bindingContext
+    final def bindingContext = _bindingContext
 
     // The control's binding, by default none
     def binding: Seq[Item] = Seq()
 
     // Find the control's binding context
-    def contextForBinding: Seq[Item] = Option(_bindingContext) flatMap
+    final def contextForBinding: Seq[Item] = Option(_bindingContext) flatMap
         (binding ⇒ Option(binding.parent)) map
             (binding ⇒ binding.nodeset.asScala) getOrElse
                 Seq()
 
     // Find the bind object for this control, if it has one
-    def bind = Option(_bindingContext.bind)
+    final def bind = Option(_bindingContext.bind)
 
     // Relevance
     private[ControlBindingSupport] var _isRelevant = false
@@ -47,64 +47,53 @@ trait ControlBindingSupport {
     // Whether this control's content is visible (by default it is)
     def contentVisible = true
 
-    // Evaluate the control's binding, either during create or update
-    final def evaluateBinding(parentContext: BindingContext, update: Boolean) = {
-        pushBinding(parentContext, update)
-        // NOTE: We should call evaluate only if relevant
-        //if (control.isRelevant)
-        evaluate()
-        evaluateChildFollowingBinding()
+    // Evaluate the control's binding and value either during create or update
+    final def evaluateBindingAndValues(parentContext: BindingContext, update: Boolean) = {
+        if (true || parent.isRelevant)
+            evaluateBinding(parentContext, update)
+        else
+            evaluateEmptyBinding(parentContext, update)
+
+        if (isRelevant) {
+            evaluate()
+            evaluateChildFollowingBinding()
+        }
     }
 
     // Refresh the control's binding during update, in case a re-evaluation is not needed
-    final def refreshBinding(parentContext: BindingContext) = {
+    final def refreshBindingAndValues(parentContext: BindingContext) = {
         // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
         // ensure that the chain of bindings is consistent
         setBindingContext(bindingContext.copy(parent = parentContext))
-        markDirtyImpl(containingDocument.getXPathDependencies)
+        markDirtyImpl()
         // NOTE: We should call evaluate only if relevant
         //if (control.isRelevant)
         evaluate()
         evaluateChildFollowingBinding()
     }
 
-    // NOTE: Protected for use by repeat
-    final protected def pushBinding(parentContext: BindingContext, update: Boolean) = {
-        pushBindingImpl(parentContext)
+    private final def evaluateBinding(parentContext: BindingContext, update: Boolean): Unit = {
+        // Evaluate and set binding context
+        setBindingContext(computeBinding(parentContext))
 
         if (update)
-            markDirtyImpl(containingDocument.getXPathDependencies)
+            markDirtyImpl()
     }
 
-    // Default behavior for pushing a binding
-    protected def pushBindingImpl(parentContext: BindingContext) = {
-
-        // Compute new binding
-        val newBindingContext = {
-            val contextStack = container.getContextStack
-            contextStack.setBinding(parentContext)
-            contextStack.pushBinding(element, effectiveId, staticControl.scope)
-            contextStack.getCurrentBindingContext
-        }
-
-        // Set binding context
-        setBindingContext(newBindingContext)
-
-        newBindingContext
     }
 
-    final protected def pushBindingCopy(context: BindingContext) = {
-        // Compute new binding
-        val newBindingContext = {
-            val contextStack = container.getContextStack
-            contextStack.setBinding(context)
-            contextStack.pushCopy()
-        }
+    // Default binding evaluation
+    protected def computeBinding(parentContext: BindingContext) = {
+        val contextStack = container.getContextStack
+        contextStack.setBinding(parentContext)
+        contextStack.pushBinding(element, effectiveId, staticControl.scope)
+        contextStack.getCurrentBindingContext
+    }
 
-        // Set binding context
-        setBindingContext(newBindingContext)
-
-        newBindingContext
+    final protected def computeBindingCopy(context: BindingContext) = {
+        val contextStack = container.getContextStack
+        contextStack.setBinding(context)
+        contextStack.pushCopy()
     }
 
     // Update the bindings in effect within and after this control
@@ -145,7 +134,7 @@ trait ControlBindingSupport {
         // we are relevant by default. Also, we are not relevant if the parent says its content is not visible.
         (parent eq null) || parent.isRelevant && parent.contentVisible
 
-    def wasRelevantCommit() = {
+    final def wasRelevantCommit() = {
         val result = _wasRelevant
         _wasRelevant = _isRelevant
         result

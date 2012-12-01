@@ -42,8 +42,6 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
         with XFormsValueControl
         with FocusableTrait {
 
-    override def getExtensionAttributes = ExtensionAttributes
-
     def getSize         = getExtensionAttributeValue(XXFORMS_SIZE_QNAME)
     def getMaxlength    = getExtensionAttributeValue(XXFORMS_MAXLENGTH_QNAME)
     def getAutocomplete = getExtensionAttributeValue(XXFORMS_AUTOCOMPLETE_QNAME)
@@ -212,9 +210,6 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
 object XFormsInputControl {
 
     val StringQNames = Set(XS_STRING_EXPLODED_QNAME, XFORMS_STRING_EXPLODED_QNAME)
-
-    // List of attributes to handle as AVTs
-    val ExtensionAttributes = Array(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
     
     // Anything but "true" is "false"
     private def normalizeBooleanString(s: String) = (s == "true").toString

@@ -73,11 +73,11 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         _bindingContextForFollowing = bc.parent.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies) {
-        super.markDirtyImpl(xpathDependencies)
+    override def markDirtyImpl() {
+        super.markDirtyImpl()
 
         // Handle value update
-        if (xpathDependencies.requireValueUpdate(getPrefixedId)) {
+        if (containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
             _value = null
             variable.markDirty()
         }

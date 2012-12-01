@@ -72,11 +72,11 @@ class XFormsSelectControl(container: XBLContainer, parent: XFormsControl, elemen
         newInstanceValue mkString " "
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies): Unit = {
+    override def markDirtyImpl(): Unit = {
 
         // Default implementation
-        super.markDirtyImpl(xpathDependencies)
-        if (! isExternalValueDirty && xpathDependencies.requireItemsetUpdate(getPrefixedId)) {
+        super.markDirtyImpl()
+        if (! isExternalValueDirty && containingDocument.getXPathDependencies.requireItemsetUpdate(getPrefixedId)) {
             // If the itemset has changed but the value has not changed, the external value might still need to be
             // re-evaluated.
             markExternalValueDirty()

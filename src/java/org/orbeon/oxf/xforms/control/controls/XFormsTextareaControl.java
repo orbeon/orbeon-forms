@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -31,20 +30,8 @@ import scala.Tuple3;
  */
 public class XFormsTextareaControl extends XFormsValueFocusableControlBase { // TODO: move to Scala
 
-    // List of attributes to handle as AVTs
-    private static final QName[] EXTENSION_ATTRIBUTES = {
-            XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
-            XFormsConstants.XXFORMS_COLS_QNAME,
-            XFormsConstants.XXFORMS_ROWS_QNAME
-    };
-
     public XFormsTextareaControl(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
-    }
-
-    @Override
-    public QName[] getExtensionAttributes() {
-        return EXTENSION_ATTRIBUTES;
     }
 
     @Override

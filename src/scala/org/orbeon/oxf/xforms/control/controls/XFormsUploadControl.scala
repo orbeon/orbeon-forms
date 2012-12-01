@@ -50,8 +50,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         evaluateFileMetadata()
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies): Unit = {
-        super.markDirtyImpl(xpathDependencies)
+    override def markDirtyImpl(): Unit = {
+        super.markDirtyImpl()
         markFileMetadataDirty()
     }
 

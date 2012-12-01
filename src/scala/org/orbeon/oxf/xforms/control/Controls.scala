@@ -118,7 +118,7 @@ object Controls {
                 controlIndex.indexControl(control)
 
                 // Determine binding
-                control.evaluateBinding(bindingContext, update = false)
+                control.evaluateBindingAndValues(bindingContext, update = false)
 
                 // Build the control's children if any
                 control.buildChildren(buildTree(controlIndex, _, _, Some(control), _, _), idSuffix)
@@ -292,7 +292,7 @@ object Controls {
                     case repeatControl: XFormsRepeatControl ⇒
                         // Update iterations
                         val oldRepeatSeq = control.bindingContext.getNodeset.asScala
-                        control.evaluateBinding(bindingContext, update = true)
+                        control.evaluateBindingAndValues(bindingContext, update = true)
                         val (newIterations, partialFocusRepeatOption) = repeatControl.updateIterations(oldRepeatSeq, null, isInsertDelete = false)
 
                         // Remember partial focus out of repeat if needed
@@ -306,11 +306,11 @@ object Controls {
                         this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
                     case control ⇒
                         // Simply set new binding
-                        control.evaluateBinding(bindingContext, update = true)
+                        control.evaluateBindingAndValues(bindingContext, update = true)
                 }
                 _updatedCount += 1
             } else {
-                control.refreshBinding(bindingContext)
+                control.refreshBindingAndValues(bindingContext)
                 _optimizedCount += 1
             }
 

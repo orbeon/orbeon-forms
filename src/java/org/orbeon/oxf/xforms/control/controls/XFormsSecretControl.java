@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls;
 
 import org.dom4j.Element;
-import org.dom4j.QName;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueFocusableControlBase;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
@@ -25,19 +23,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer;
  */
 public class XFormsSecretControl extends XFormsValueFocusableControlBase { // TODO: move to Scala
 
-    // List of attributes to handle as AVTs
-    private static final QName[] EXTENSION_ATTRIBUTES = {
-            XFormsConstants.XXFORMS_SIZE_QNAME,
-            XFormsConstants.XXFORMS_MAXLENGTH_QNAME,
-            XFormsConstants.XXFORMS_AUTOCOMPLETE_QNAME
-    };
-
     public XFormsSecretControl(XBLContainer container, XFormsControl parent, Element element, String id) {
         super(container, parent, element, id);
-    }
-
-    @Override
-    public QName[] getExtensionAttributes() {
-        return EXTENSION_ATTRIBUTES;
     }
 }

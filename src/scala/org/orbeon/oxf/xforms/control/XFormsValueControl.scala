@@ -89,11 +89,11 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
     }
 
-    override def markDirtyImpl(xpathDependencies: XPathDependencies): Unit = {
-        super.markDirtyImpl(xpathDependencies)
+    override def markDirtyImpl(): Unit = {
+        super.markDirtyImpl()
 
         // Handle value update
-        if (xpathDependencies.requireValueUpdate(getPrefixedId)) {
+        if (containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
             value = null
             // Always mark the external value dirty if the value is dirty
             markExternalValueDirty()

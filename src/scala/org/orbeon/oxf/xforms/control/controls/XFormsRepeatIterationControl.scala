@@ -108,18 +108,10 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
         // NOTE: in this case, don't do the regular Ajax output (maybe in the future we should to be more consistent?)
     }
 
-    override def pushBindingImpl(parentContext: BindingContext) = {
-        // Compute new binding
-        val newBindingContext = {
-            val contextStack = container.getContextStack
-            contextStack.setBinding(parentContext)
-            contextStack.pushIteration(iterationIndex)
-            contextStack.getCurrentBindingContext
-        }
-
-        // Set binding context
-        setBindingContext(newBindingContext)
-
-        newBindingContext
+    override def computeBinding(parentContext: BindingContext) = {
+        val contextStack = container.getContextStack
+        contextStack.setBinding(parentContext)
+        contextStack.pushIteration(iterationIndex)
+        contextStack.getCurrentBindingContext
     }
 }

@@ -70,15 +70,11 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     }
 
     // Only handle binding if we support modeBinding
-    override protected def pushBindingImpl(parentContext: BindingContext): BindingContext = {
-        val newBindingContext =
-            if (staticControl.binding.abstractBinding.modeBinding)
-                super.pushBindingImpl(parentContext)
-            else
-                super.pushBindingCopy(parentContext)
-
-        newBindingContext
-    }
+    override protected def computeBinding(parentContext: BindingContext) =
+        if (staticControl.binding.abstractBinding.modeBinding)
+            super.computeBinding(parentContext)
+        else
+            super.computeBindingCopy(parentContext)
 
     override def bindingContextForChild = {
         // Start with inner context

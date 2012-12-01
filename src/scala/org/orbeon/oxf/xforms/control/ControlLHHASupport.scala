@@ -23,7 +23,7 @@ trait ControlLHHASupport {
     self: XFormsControl ⇒
 
     // Label, help, hint and alert (evaluated lazily)
-    private var lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
+    private[ControlLHHASupport] var lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
 
     def markLHHADirty() {
         for (currentLHHA ← lhha)

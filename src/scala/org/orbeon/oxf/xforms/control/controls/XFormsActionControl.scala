@@ -33,8 +33,7 @@ class XFormsActionControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // Don't push the actual binding for actions because it's unnecessary at build/refresh time and the binding needs to
     // be re-evaluated when the action runs anyway.
-    override def pushBindingImpl(parentContext: BindingContext) =
-        super.pushBindingCopy(parentContext)
+    override def computeBinding(parentContext: BindingContext) = computeBindingCopy(parentContext)
 
     // Don't build any children, as in the view we don't support event handlers nested within event handlers, and nested
     // actions are evaluated dynamically.

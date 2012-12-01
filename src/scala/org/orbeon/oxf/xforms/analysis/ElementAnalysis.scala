@@ -117,6 +117,9 @@ abstract class ElementAnalysis(
     // Classes (not used at this time)
     val classes = ""
 
+    // Extension attributes
+    def extensionAttributeNames = Seq[QName]()
+
     // XPath analysis
     private var contextAnalysis: Option[XPathAnalysis] = None
     private var _contextAnalyzed = false

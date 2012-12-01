@@ -19,7 +19,6 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.control.controls.XFormsActionControl
 import org.orbeon.oxf.xforms.event.XFormsEventObserver
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
@@ -205,7 +204,7 @@ class XFormsControl(
 
     // Notify the control that some of its aspects (value, label, etc.) might have changed and require re-evaluation. It
     // is left to the control to figure out if this can be optimized.
-    def markDirtyImpl(xpathDependencies: XPathDependencies) {
+    def markDirtyImpl() {
         markLHHADirty()
         markExtensionAttributesDirty()
     }
@@ -214,11 +213,8 @@ class XFormsControl(
     // TODO: move this method to XFormsValueControl and XFormsValueContainerControl?
     def evaluateImpl() {
         // TODO: these should be evaluated lazily
-        // Evaluate standard extension attributes
-        evaluateExtensionAttributes(AjaxSupport.StandardExtensionAttributes)
-
-        // Evaluate custom extension attributes
-        Option(getExtensionAttributes) foreach evaluateExtensionAttributes
+        // Evaluate standard and custom extension attributes
+        evaluateExtensionAttributes()
     }
 
     /**
@@ -232,7 +228,6 @@ class XFormsControl(
 
         updateLHHACopy(cloned)
         updateLocalCopy(cloned)
-        updateExtensionAttributesCopy(cloned)
 
         cloned
     }

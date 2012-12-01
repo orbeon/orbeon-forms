@@ -21,6 +21,7 @@ import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xforms.action.XFormsActions
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xforms.event.XFormsEvents._
+import org.orbeon.oxf.util.ScalaUtils._
 
 object ControlAnalysisFactory {
 
@@ -49,7 +50,9 @@ object ControlAnalysisFactory {
 
     class SelectionControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends InputValueControl(staticStateContext, element, parent, preceding, scope)
-            with SelectionControlTrait
+            with SelectionControlTrait {
+        override val extensionAttributeNames = ! isMultiple && isFull list XXFORMS_GROUP_QNAME
+    }
 
     class TriggerControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends CoreControl(staticStateContext, element, parent, preceding, scope)
@@ -67,16 +70,42 @@ object ControlAnalysisFactory {
         override val externalEvents = externalEventsDef
     }
 
+    class InputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+        override val extensionAttributeNames = Seq(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
+    }
+
+    class SecretControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+        override val extensionAttributeNames = Seq(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
+    }
+
+    class TextareaControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
+        override val extensionAttributeNames = Seq(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
+    }
+
     private val VariableControlFactory: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
     private val LHHAControlFactory    : ControlFactory = (new LHHAAnalysis(_, _, _, _, _))
     private val ValueControlFactory   : ControlFactory = (new InputValueControl(_, _, _, _, _))
     private val SwitchControlFactory  : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait with AppearanceTrait)
     private val CaseControlFactory    : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait)
 
-    private val GroupControlFactory: ControlFactory =
-        (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait {
-            override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
-        })
+    class GroupControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
+            extends ContainerControl(staticStateContext, element, parent, preceding, scope)
+            with OptionalSingleNode
+            with LHHATrait
+            with ChildrenBuilderTrait {
+
+        // Extension attributes depend on the name of the element
+        override val extensionAttributeNames =
+            if ((elementQName ne null) && elementQName.getName == "td")
+                Seq(QName.get("rowspan"), QName.get("colspan"))
+            else
+                Seq()
+
+        override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
+    }
 
     private val DialogControlFactory: ControlFactory =
         (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait {
@@ -93,9 +122,9 @@ object ControlAnalysisFactory {
     private val byQNameFactory = Map[QName, ControlFactory](
         XBL_TEMPLATE_QNAME            → (new ContainerControl(_, _, _, _, _) with ChildrenBuilderTrait),
         // Core value controls
-        XFORMS_INPUT_QNAME            → ValueControlFactory,
-        XFORMS_SECRET_QNAME           → ValueControlFactory,
-        XFORMS_TEXTAREA_QNAME         → ValueControlFactory,
+        XFORMS_INPUT_QNAME            → (new InputControl(_, _, _, _, _)),
+        XFORMS_SECRET_QNAME           → (new SecretControl(_, _, _, _, _)),
+        XFORMS_TEXTAREA_QNAME         → (new TextareaControl(_, _, _, _, _)),
         XFORMS_UPLOAD_QNAME           → (new UploadControl(_, _, _, _, _)),
         XFORMS_RANGE_QNAME            → ValueControlFactory,
         XXFORMS_TEXT_QNAME            → (new OutputControl(_, _, _, _, _)),// TODO: don't accept any external events
@@ -109,7 +138,7 @@ object ControlAnalysisFactory {
         // Attributes
         XXFORMS_ATTRIBUTE_QNAME       → (new AttributeControl(_, _, _, _, _)),
         // Container controls
-        XFORMS_GROUP_QNAME            → GroupControlFactory,
+        XFORMS_GROUP_QNAME            → (new GroupControl(_, _, _, _, _)),
         XFORMS_SWITCH_QNAME           → SwitchControlFactory,
         XFORMS_CASE_QNAME             → CaseControlFactory,
         XXFORMS_DIALOG_QNAME          → DialogControlFactory,

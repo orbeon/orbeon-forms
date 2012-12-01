@@ -88,7 +88,7 @@ trait ControlAjaxSupport {
      */
     def addAjaxCustomAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
 
-        def addAttributesDiffs(attributeQNames: Array[QName], namespaceURI: String) = {
+        def addAttributesDiffs(attributeQNames: Seq[QName], namespaceURI: String) = {
             var added = false
             for {
                 avtAttributeQName ← attributeQNames
@@ -106,32 +106,28 @@ trait ControlAjaxSupport {
         }
 
         // By default, diff only attributes in the xxf:* namespace
-        val extensionAttributes = getExtensionAttributes
-        (extensionAttributes ne null) && addAttributesDiffs(extensionAttributes, XXFORMS_NAMESPACE_URI)
+        val extensionAttributes = staticControl.extensionAttributeNames
+        extensionAttributes.nonEmpty && addAttributesDiffs(extensionAttributes, XXFORMS_NAMESPACE_URI)
     }
 
-    final def addAjaxStandardAttributes(originalControl: XFormsSingleNodeControl, ch: ContentHandlerHelper, isNewRepeatIteration: Boolean) {
-        val extensionAttributes = StandardExtensionAttributes
+    final def addAjaxStandardAttributes(originalControl: XFormsSingleNodeControl, ch: ContentHandlerHelper, isNewRepeatIteration: Boolean): Unit = {
+        val control2 = this
 
-        if (extensionAttributes ne null) {
-            val control2 = this
-
-            for {
-                avtAttributeQName ← extensionAttributes
-                if avtAttributeQName != CLASS_QNAME
-                value1 = if (originalControl eq null) null else originalControl.getExtensionAttributeValue(avtAttributeQName)
-                value2 = control2.getExtensionAttributeValue(avtAttributeQName)
-                if value1 != value2
-                attributeValue = if (value2 ne null) value2 else ""
-                attributesImpl = new AttributesImpl
-            } yield {
-                attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId))
-                addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId, isNewRepeatIteration, false)
-                addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName, isNewRepeatIteration, false)
-                ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
-                ch.text(attributeValue)
-                ch.endElement()
-            }
+        for {
+            avtAttributeQName ← ControlExtensionAttributesSupport.StandardExtensionAttributes
+            if avtAttributeQName != CLASS_QNAME
+            value1 = if (originalControl eq null) null else originalControl.getExtensionAttributeValue(avtAttributeQName)
+            value2 = control2.getExtensionAttributeValue(avtAttributeQName)
+            if value1 != value2
+            attributeValue = if (value2 ne null) value2 else ""
+            attributesImpl = new AttributesImpl
+        } yield {
+            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId))
+            addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId, isNewRepeatIteration, false)
+            addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName, isNewRepeatIteration, false)
+            ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
+            ch.text(attributeValue)
+            ch.endElement()
         }
     }
 
@@ -148,8 +144,6 @@ trait ControlAjaxSupport {
 
 // NOTE: Use name different from trait so that the Java compiler is happy
 object AjaxSupport {
-
-    val StandardExtensionAttributes = Array(STYLE_QNAME, CLASS_QNAME)
 
     def addAjaxClasses(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
         var added = false

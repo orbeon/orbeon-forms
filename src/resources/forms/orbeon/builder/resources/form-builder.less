@@ -24,12 +24,11 @@
 html {
     overflow-y: scroll;
     background-color: darkgray;
-    background-image: url("../../../../forms/orbeon/builder/images/low_contrast_linen_@2X.png");
+    background-image: url('../../../../forms/orbeon/builder/images/low_contrast_linen.png');
 }
 body {
     padding-top: 0;
     margin-right: 4px;
-    background-image: url("../../../../forms/orbeon/builder/images/low_contrast_linen_@2X.png");
 }
 
 .fb-main {
@@ -45,6 +44,7 @@ body {
         .border-radius(6px);
         .box-sizing(border-box);
         margin-bottom: 0;
+        min-height: 100%;               // So the main area uses all the available space, not revealing a large porting of the background
     }
 }
 

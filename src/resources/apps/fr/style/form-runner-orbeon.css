@@ -347,6 +347,9 @@ textarea.xforms-invalid-visited {
   }
   form.xforms-form .fr-body {
     border: none;
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+    -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
   }
   form.xforms-form h2 {
     border-bottom: 1px solid #e3e3e3;

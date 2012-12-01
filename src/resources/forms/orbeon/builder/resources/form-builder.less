@@ -18,6 +18,8 @@
 @lightBlue: #DEF;
 @yellow: #ffffd3;
 @fbGutter: 10px;
+@fbToolbarWidth: 192px;
+@fbBottomHeight: 54px;
 @fbGridIconsGutter: 22px;
 
 // Overwrite definition in form-runner-orbeon.css if any
@@ -35,8 +37,8 @@ body {
     position: absolute;
     top: 40px + @fbGutter;
     right: @fbGutter;
-    left: 200px + @fbGutter;
-    bottom: 62px;
+    left: @fbGutter + @fbToolbarWidth + @fbGutter/2;    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+    bottom: @fbBottomHeight + @fbGutter;
     overflow-y: auto;
 
     .fb-main-inner {
@@ -107,21 +109,22 @@ body {
     position: fixed;
     left: @fbGutter;
     top: 40px + @fbGutter;
-    bottom: 62px;
+    bottom: @fbBottomHeight + @fbGutter;
     width: 192px;
-    padding: 0px;
-    padding-bottom: 6px;
-    overflow-y: auto;
     .box-sizing(border-box);
 
     .fb-toolbox-inside {
         width: 100%;
+        height: 100%;
+        padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+        overflow-y: auto;                       // Make inside box scrollable, as if we make the outside box scrollable, IE9 sizes it width incorrectly
         .box-sizing(border-box);
 
         .fb-tools {
             .fr-border();
             padding: 8px;
             margin-bottom: @fbGutter;
+            &:last-child { margin-bottom: 0 }
 
             legend {
                 font-size: 11px;
@@ -523,7 +526,10 @@ td.fb-selected:hover .fb-click-message { display: none }
     bottom: 0;
     width: 100%;
     .box-sizing(border-box);
-    padding: .8em;
+    height: @fbBottomHeight;
+    line-height: @fbBottomHeight;
+    vertical-align: middle;
+    padding: 0 @fbGutter;
 
     .fr-buttons {
         margin: 0;

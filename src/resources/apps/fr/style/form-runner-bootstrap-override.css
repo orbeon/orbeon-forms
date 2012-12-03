@@ -58,6 +58,9 @@ a {
 .navbar-inverse .navbar-inner .container h1 {
   vertical-align: middle;
 }
+.navbar-inverse .navbar-inner .container img {
+  max-height: 40px;
+}
 .navbar-inverse .navbar-inner .container h1 {
   margin: 0 0 0 15px;
   padding: 0;

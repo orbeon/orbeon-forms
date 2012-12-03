@@ -62,8 +62,7 @@
   background-position: -120px -96px;
 }
 .fr-status-icons {
-  float: right;
-  padding-top: 7px;
+  display: inline;
 }
 .fr-status-icons img {
   margin-left: 3px;
@@ -244,10 +243,6 @@ button.btn-link {
   display: inline;
   margin-right: .5em;
 }
-.fr-status-icons {
-  margin-bottom: .5em;
-  float: left;
-}
 .fr-status-icons img {
   margin-right: 0.5em;
 }
@@ -285,12 +280,18 @@ button.btn-link {
 .fr-explanation {
   padding: 10px;
 }
+.fr-bottom-bar {
+  text-align: right;
+}
 .fr-buttons {
-  float: right;
+  display: inline;
   margin-bottom: 1em;
   /* Space between the image and the text in a button, only for the buttons bar
        (not other buttons in the form which might contain just an image) */
 
+}
+.fr-buttons .fr-buttons-message div {
+  display: inline;
 }
 .fr-buttons .xforms-trigger button img {
   margin-right: 10px;

@@ -65,7 +65,9 @@
         <fr:row>
             <fr:messages/>
         </fr:row>
-        <fr:bottom-bar/>
+        <fr:row class="fr-bottom-bar">
+            <fr:bottom-bar/>
+        </fr:row>
         <fr:row>
             <fr:version/>
         </fr:row>
@@ -80,7 +82,7 @@
     <xsl:template match="fr:row">
         <xh:div class="row">
             <xh:div class="span12">
-                <xsl:apply-templates/>
+                <xsl:apply-templates select="@* | node()"/>
             </xh:div>
         </xh:div>
     </xsl:template>
@@ -498,7 +500,7 @@
     <xsl:template match="fr:status-icons" name="fr-status-icons">
         <!-- Status icons for detail page -->
         <xsl:if test="$is-detail">
-            <xh:div class="fr-status-icons">
+            <xh:span class="fr-status-icons">
                 <xf:group model="fr-error-summary-model" ref=".[valid = 'false']">
                     <!-- Form is invalid -->
 
@@ -524,7 +526,7 @@
                         title="{{$fr-resources/errors/unsaved}}"/>
                     <!--<xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>-->
                 </xf:group>
-            </xh:div>
+            </xh:span>
         </xsl:if>
     </xsl:template>
 
@@ -541,15 +543,13 @@
     </xsl:template>
 
     <xsl:template match="fr:bottom-bar">
-        <fr:row>
-            <xsl:apply-templates select="$default-bottom-template"/>
-        </fr:row>
+        <xsl:apply-templates select="$default-bottom-template"/>
     </xsl:template>
 
     <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">
         <!-- Buttons -->
         <xsl:if test="not($hide-buttons-bar)">
-            <xh:div class="fr-buttons">
+            <xh:span class="fr-buttons">
                 <xsl:choose>
                     <!-- Use user-provided buttons -->
                     <xsl:when test="exists($custom-buttons)">
@@ -569,9 +569,9 @@
                     <!-- Use default buttons -->
                     <xsl:otherwise>
                         <!-- Message shown next to the buttons -->
-                        <xh:div class="fr-buttons-message">
+                        <xh:span class="fr-buttons-message">
                             <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
-                        </xh:div>
+                        </xh:span>
                         <!-- List of buttons we include based on property -->
                         <xsl:variable name="default-buttons" as="node()*">
                             <xsl:for-each select="$buttons">
@@ -587,7 +587,7 @@
                         <xsl:apply-templates select="$default-buttons"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            </xh:div>
+            </xh:span>
         </xsl:if>
     </xsl:template>
 

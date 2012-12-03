@@ -507,10 +507,8 @@ td.fb-selected:hover .fb-click-message { display: none }
 // Size message so that it fits within bottom navbar, see #486
 .fr-messages, .fb-xpath-errors {
     display: inline-block;
-    float: left;
-
     .alert {
-        display: block;
+        display: inline;
         margin: 0;
         padding-top: 5px;
         padding-bottom: 5px;
@@ -529,16 +527,16 @@ td.fb-selected:hover .fb-click-message { display: none }
     height: @fbBottomHeight;
     line-height: @fbBottomHeight;
     vertical-align: middle;
+    text-align: right;                                              // Message and buttons to show on the right
     padding: 0 @fbGutter;
 
+    .fr-status-icons { display: none }                              // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
     .fr-buttons {
         margin: 0;
     }
 }
 
-
-
-.fr-container { top: 10px }                                 // override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+.fr-container { top: 10px }                                         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
 
 // Both navbars
 .navbar .navbar-inner {

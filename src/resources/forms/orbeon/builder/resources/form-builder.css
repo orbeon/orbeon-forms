@@ -681,11 +681,10 @@ td.fb-selected:hover .fb-click-message {
 .fr-messages,
 .fb-xpath-errors {
   display: inline-block;
-  float: left;
 }
 .fr-messages .alert,
 .fb-xpath-errors .alert {
-  display: block;
+  display: inline;
   margin: 0;
   padding-top: 5px;
   padding-bottom: 5px;
@@ -704,7 +703,11 @@ td.fb-selected:hover .fb-click-message {
   height: 54px;
   line-height: 54px;
   vertical-align: middle;
+  text-align: right;
   padding: 0 10px;
+}
+.fb-bottom .fr-status-icons {
+  display: none;
 }
 .fb-bottom .fr-buttons {
   margin: 0;

@@ -17,9 +17,8 @@
 @import "form-runner-common";
 
 .fr-status-icons {
-  float: right;
-  padding-top: 7px;
-  img { margin-left: 3px; }
+    display: inline;
+    img { margin-left: 3px; }
 }
 
 .fr-body {
@@ -176,7 +175,6 @@ button.btn-link {
 }
 
 // Status icons
-.fr-status-icons { margin-bottom: .5em; float: left }
 .fr-status-icons img { margin-right: .5em }
 
 // Enable noscript icon when in noscript mode
@@ -203,9 +201,13 @@ button.btn-link {
 
 // Button bar
 
+.fr-bottom-bar { text-align: right }
+
 .fr-buttons {
-    float: right;
+    display: inline;
     margin-bottom: 1em;
+
+    .fr-buttons-message div { display: inline }
 
     /* Space between the image and the text in a button, only for the buttons bar
        (not other buttons in the form which might contain just an image) */

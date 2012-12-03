@@ -166,8 +166,7 @@
                     <xh:div class="navbar-inner">
                         <xh:div class="container">
                             <!-- Custom logo upload is removed in 4.0 -->
-                            <!--<fr:logo ref="xxf:bind('logo-bind')"/>-->
-                            <xh:img src="/apps/fr/style/orbeon-navbar-logo.png" alt=""/>
+                            <xh:img src="{xxf:property(string-join(('oxf.fr.default-logo.uri', xxf:bind('application-name-bind'), xxf:bind('form-name-bind')), '.'))}" alt=""/>
                             <fr:title ref="xxf:bind('title-bind')"/>
 
                             <!-- Form settings -->

@@ -319,7 +319,7 @@
                   'data')"
             method="post"
             replace="all"
-            resource="/fr/orbeon/builder/test"
+            resource="/fr/{xxf:bind('application-name-bind')}/{xxf:bind('form-name-bind')}/test"
             xxf:target="fb-test-iframe"
             xxf:show-progress="false"/>
 

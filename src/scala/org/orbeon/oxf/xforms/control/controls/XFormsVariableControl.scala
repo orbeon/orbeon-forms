@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.analysis.controls.VariableControl
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.om._
@@ -56,50 +55,42 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
 
     override def onCreate() {
         super.onCreate()
-        // Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
+        // FIXME: Case should be caught by the requireValueUpdate() below, but it's more fail-safe to mark things dirty here too
         _value = null
-        variable.markDirty()
     }
 
-    override def evaluateChildFollowingBinding() {
-        // NOTE: markDirtyImpl() has already been called
+    override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean) {
 
-        // Push variable value on the stack and remember it
+        super.evaluateImpl(relevant, parentRelevant)
+
+        if (relevant) {
+            // Evaluate variable value if needed if relevant
+            if ((_value eq null) || containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
+                variable.markDirty()
+                val contextStack = getContextStack
+                contextStack.setBinding(bindingContext)
+                _value = variable.getVariableValue(contextStack, getEffectiveId, false, true)
+            }
+        } else {
+            // Value is empty sequence if non-relevant
+            _value = EmptySequence.getInstance
+        }
+
+        // Push variable value on the stack
         // NOTE: The following should be reasonably cheap, in case the variable had not been made dirty. It would be
         // nice to keep _bindingContextForChild/_bindingContextForFollowing if no reevaluation is needed, but then we
         // must make sure the chain of contexts is correct.
         val bc = bindingContext
-        _bindingContextForChild     = bc.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
-        _bindingContextForFollowing = bc.parent.pushVariable(staticControl.element, staticControl.name, getValue, staticControl.scope)
-    }
-
-    override def markDirtyImpl() {
-        super.markDirtyImpl()
-
-        // Handle value update
-        if (containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
-            _value = null
-            variable.markDirty()
+        getContextStack.setBinding(bc)
+        if (parentRelevant) {
+            _bindingContextForChild     = bc.pushVariable(staticControl.element, staticControl.name, _value, staticControl.scope)
+            _bindingContextForFollowing = bc.parent.pushVariable(staticControl.element, staticControl.name, _value, staticControl.scope)
+        } else {
+            // If we are within a non-relevant container, don't even bother pushing variables
+            val empty = BindingContext.empty(staticControl.element, staticControl.scope)
+            _bindingContextForChild     = empty
+            _bindingContextForFollowing = empty
         }
-    }
-
-    override def evaluateImpl() {
-
-        // Evaluate other aspects of the control if necessary
-        super.evaluateImpl()
-
-        // Evaluate control values
-        _value =
-            if (isRelevant) {
-                // Control is relevant
-                getContextStack.setBinding(bindingContext)
-                variable.getVariableValue(getEffectiveId, false, true)
-            } else {
-                // Control is not relevant
-                // NOTE: Nobody should use this variable if it's non-relevant, but right now we still have possible uses
-                // of non-relevant variables.
-                EmptySequence.getInstance
-            }
     }
 
     override def isValueChanged() = {

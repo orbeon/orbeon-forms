@@ -273,8 +273,8 @@ object Controls {
             level += 1
             _visitedCount += 1
 
-            // Value of relevance before messing with the binding
-            val wasRelevant = control.isRelevant
+            // Value of relevance of content before messing with the binding
+            val wasContentRelevant = control.wasContentRelevant
 
             // Update is required if:
             //
@@ -318,8 +318,7 @@ object Controls {
             bindingContext = control.bindingContextForChild
 
             // Remember whether we are in a newly relevant subtree
-            val isRelevant = control.isRelevant // determine when binding is set on control
-            if (newlyRelevantLevel == -1 && control.isInstanceOf[XFormsContainerControl] && ! wasRelevant && isRelevant)
+            if (newlyRelevantLevel == -1 && control.isInstanceOf[XFormsContainerControl] && ! wasContentRelevant && control.contentRelevant)
                 newlyRelevantLevel = level // entering level of containing
 
             true

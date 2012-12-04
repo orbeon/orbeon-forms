@@ -902,7 +902,7 @@ public class XFormsUtils {
 
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {
-                    outputControl.setBindingContext(contextStack.getCurrentBindingContext());
+                    outputControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false);
                     outputControl.evaluate();
                 }
                 contextStack.popBinding();
@@ -955,7 +955,7 @@ public class XFormsUtils {
 
                             contextStack.pushBinding(element, sourceEffectiveId, attributeControl.getChildElementScope(element));
                             {
-                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext());
+                                attributeControl.setBindingContext(contextStack.getCurrentBindingContext(), true, false);
                                 attributeControl.evaluate();
                             }
                             contextStack.popBinding();

@@ -18,7 +18,6 @@ import collection.JavaConverters._
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.event.XFormsEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.model.DataModel
@@ -50,54 +49,45 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     override type Control <: ValueControl
 
     // Value
-    private var value: String = null // TODO: use ControlProperty<String>?
+    private[XFormsValueControl] var _value: String = null // TODO: use ControlProperty<String>?
 
     // Previous value for refresh
-    private var previousValue: String = null
+    private[XFormsValueControl] var _previousValue: String = null
 
     // External value (evaluated lazily)
-    private var isExternalValueEvaluated: Boolean = false
-    private var externalValue: String = null
+    private[XFormsValueControl] var isExternalValueEvaluated: Boolean = false
+    private[XFormsValueControl] var externalValue: String = null
 
     override def onCreate(): Unit = {
         super.onCreate()
 
-        value = null
-        previousValue = null
+        _value = null
+        _previousValue = null
 
         markExternalValueDirty()
     }
 
-    override def evaluateImpl(): Unit = {
+    override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
 
         // Evaluate other aspects of the control if necessary
-        super.evaluateImpl()
+        super.evaluateImpl(relevant, parentRelevant)
 
         // Evaluate control values
-        if (isRelevant) {
+        if (relevant) {
             // Control is relevant
-            if (value eq null)
-                // Only evaluate if the value is not already available
+            // NOTE: Ugly test on staticControl is to handle the case of xf:output within LHHA
+            if ((_value eq null) || (staticControl eq null) || containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
                 evaluateValue()
+                markExternalValueDirty()
+            }
         } else {
             // Control is not relevant
             isExternalValueEvaluated = true
-            value = null
+            _value = null
         }
 
         // NOTE: We no longer evaluate the external value here, instead we do lazy evaluation. This is good in particular when there
         // are multiple refreshes during an Ajax request, and LHHA values are only needed in the end.
-    }
-
-    override def markDirtyImpl(): Unit = {
-        super.markDirtyImpl()
-
-        // Handle value update
-        if (containingDocument.getXPathDependencies.requireValueUpdate(getPrefixedId)) {
-            value = null
-            // Always mark the external value dirty if the value is dirty
-            markExternalValueDirty()
-        }
     }
 
     def evaluateValue(): Unit =
@@ -116,8 +106,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         ! isExternalValueEvaluated
 
     override def isValueChanged(): Boolean = {
-        val result = previousValue != value
-        previousValue = value
+        val result = _previousValue != _value
+        _previousValue = _value
         result
     }
 
@@ -172,8 +162,8 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return the control's internal value.
      */
-    final def getValue = value
-    final def isEmpty = XFormsModelBinds.isEmptyValue(value)
+    final def getValue = _value
+    final def isEmpty = XFormsModelBinds.isEmptyValue(_value)
 
     /**
      * Return the control's external value is the value as exposed to the UI layer.
@@ -197,7 +187,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     def getEscapedExternalValue = getExternalValue
 
     protected final def setValue(value: String): Unit =
-        this.value = value
+        this._value = value
 
     protected final def setExternalValue(externalValue: String): Unit =
         this.externalValue = externalValue

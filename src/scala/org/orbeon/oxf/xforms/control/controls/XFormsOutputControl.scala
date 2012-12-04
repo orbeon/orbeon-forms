@@ -56,9 +56,9 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     // TODO: resolve statically
     private val urlNorewrite = XFormsUtils.resolveUrlNorewrite(element)
 
-    override def evaluateImpl(): Unit = {
-        super.evaluateImpl()
-        evaluateFileMetadata()
+    override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
+        super.evaluateImpl(relevant, parentRelevant)
+        evaluateFileMetadata(relevant)
     }
 
     override def markDirtyImpl(): Unit ={

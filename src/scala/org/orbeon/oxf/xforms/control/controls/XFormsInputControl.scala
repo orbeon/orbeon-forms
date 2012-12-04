@@ -42,10 +42,6 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
         with XFormsValueControl
         with FocusableTrait {
 
-    def getSize         = getExtensionAttributeValue(XXFORMS_SIZE_QNAME)
-    def getMaxlength    = getExtensionAttributeValue(XXFORMS_MAXLENGTH_QNAME)
-    def getAutocomplete = getExtensionAttributeValue(XXFORMS_AUTOCOMPLETE_QNAME)
-
     private def format   = Option(staticControl) flatMap (_.format)
     private def unformat = Option(staticControl) flatMap (_.unformat)
 

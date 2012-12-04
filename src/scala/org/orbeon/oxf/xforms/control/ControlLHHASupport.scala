@@ -23,16 +23,20 @@ trait ControlLHHASupport {
     self: XFormsControl ⇒
 
     // Label, help, hint and alert (evaluated lazily)
+    // NOTE: var because of cloning
     private[ControlLHHASupport] var lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
 
-    def markLHHADirty() {
+    def markLHHADirty(): Unit =
         for (currentLHHA ← lhha)
             if (currentLHHA ne null)
                 currentLHHA.handleMarkDirty()
-    }
+
+    def evaluateNonRelevantLHHA(): Unit =
+        for (i ← 0 to lhha.size - 1)
+            lhha(i) = null
 
     // Copy LHHA if not null
-    def updateLHHACopy(copy: XFormsControl) {
+    def updateLHHACopy(copy: XFormsControl): Unit = {
         copy.lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
         for {
             i ← 0 to lhha.size - 1

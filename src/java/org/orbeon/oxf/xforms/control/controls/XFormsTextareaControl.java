@@ -41,11 +41,6 @@ public class XFormsTextareaControl extends XFormsValueFocusableControlBase { // 
         return hasInitialization ? getCommonJavaScriptInitialization() : null;
     }
 
-    // NOTE: textarea doesn't support maxlength natively until HTML 5 (this can be implemented in JavaScript client-side for older browsers)
-    public String getMaxlength() {
-        return getExtensionAttributeValue(XFormsConstants.XXFORMS_MAXLENGTH_QNAME);
-    }
-
     /**
      * For textareas with mediatype="text/html", we first clean the HTML with TagSoup, and then transform it with
      * a stylesheet that removes all unknown or dangerous content.

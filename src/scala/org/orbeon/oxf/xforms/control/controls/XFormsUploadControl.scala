@@ -45,9 +45,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
 
     def supportedFileMetadata = FileMetadata.AllMetadataNames
 
-    override def evaluateImpl(): Unit = {
-        super.evaluateImpl()
-        evaluateFileMetadata()
+    override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
+        super.evaluateImpl(relevant, parentRelevant)
+        evaluateFileMetadata(relevant)
     }
 
     override def markDirtyImpl(): Unit = {

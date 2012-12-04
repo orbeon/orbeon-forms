@@ -44,7 +44,6 @@ import java.util.List;
 public class Variable {
 
     private final VariableAnalysisTrait staticVariable;
-    private final XFormsContextStack contextStack;
 
     private final Element variableElement;
     private final Element valueElement;
@@ -57,7 +56,6 @@ public class Variable {
 
     public Variable(VariableAnalysisTrait staticVariable, XFormsContextStack contextStack) {
         this.staticVariable = staticVariable;
-        this.contextStack = contextStack;
         this.variableElement = ((ElementAnalysis) staticVariable).element();
 
         this.variableName = variableElement.attributeValue(XFormsConstants.NAME_QNAME);
@@ -75,7 +73,7 @@ public class Variable {
         this.selectAttribute = VariableAnalysis.valueOrSelectAttribute(valueElement);
     }
 
-    private void evaluate(String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
+    private void evaluate(XFormsContextStack contextStack, String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
         if (selectAttribute == null) {
             // Inline constructor (for now, only textual content, but in the future, we could allow xf:output in it? more?)
             variableValue = new StringValue(valueElement.getStringValue());
@@ -126,11 +124,11 @@ public class Variable {
         return variableName;
     }
 
-    public ValueRepresentation getVariableValue(String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
+    public ValueRepresentation getVariableValue(XFormsContextStack contextStack, String sourceEffectiveId, boolean pushOuterContext, boolean handleNonFatal) {
         // Make sure the variable is evaluated
         if (!evaluated) {
             evaluated = true;
-            evaluate(XFormsUtils.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId()), pushOuterContext, handleNonFatal);
+            evaluate(contextStack, XFormsUtils.getRelatedEffectiveId(sourceEffectiveId, staticVariable.valueStaticId()), pushOuterContext, handleNonFatal);
         }
 
         // Return value and rewrap if necessary

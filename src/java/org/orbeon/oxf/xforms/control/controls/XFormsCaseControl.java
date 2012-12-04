@@ -36,13 +36,8 @@ public class XFormsCaseControl extends XFormsNoSingleNodeContainerControl {
 
     @Override
     public boolean computeRelevant() {
-        if (!super.computeRelevant()) {
-            // If parent is not relevant then we are not relevant either
-            return false;
-        } else {
-            // Otherwise we are relevant only if we are selected
-            return !getSwitch().isXForms11Switch() || isSelected();
-        }
+        // We are relevant only if we are selected
+        return super.computeRelevant() && (! getSwitch().isXForms11Switch() || isSelected());
     }
 
     /**

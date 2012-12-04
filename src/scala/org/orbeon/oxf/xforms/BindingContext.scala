@@ -175,3 +175,10 @@ case class BindingContext(
         }
     }
 }
+
+object BindingContext {
+    // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context
+    // should simply be None.
+    def empty(bindingElement: Element, scope: Scope) =
+        BindingContext(null, null, null, Seq.empty[Item].asJava, 0, null, false, bindingElement, null, false, null, scope)
+}

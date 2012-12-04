@@ -35,19 +35,15 @@ public class XFormsTriggerControl extends XFormsSingleNodeFocusableControlBase {
         return TRIGGER_LHHA_HTML_SUPPORT;
     }
 
-    @Override
-    public boolean computeRelevant() {
-        // NOTE: We used to make the trigger non-relevant if it was static-readonly. But this caused issues:
-        //
-        // o at the time computeRelevant() is called, MIPs haven't been read yet
-        // o even if we specially read the readonly value from the binding here, then:
-        //   o the static-readonly control becomes non-relevant
-        //   o therefore its readonly value becomes false (the default)
-        //   o therefore isStaticReadonly() returns false!
-        //
-        // So we keep the control relevant in this case.
-        return super.computeRelevant();
-    }
+    // NOTE: We used to make the trigger non-relevant if it was static-readonly. But this caused issues:
+    //
+    // o at the time computeRelevant() is called, MIPs haven't been read yet
+    // o even if we specially read the readonly value from the binding here, then:
+    //   o the static-readonly control becomes non-relevant
+    //   o therefore its readonly value becomes false (the default)
+    //   o therefore isStaticReadonly() returns false!
+    //
+    // So we keep the control relevant in this case.
 
     @Override
     public boolean supportAjaxUpdates() {

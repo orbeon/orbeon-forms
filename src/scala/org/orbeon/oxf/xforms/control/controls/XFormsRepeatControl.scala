@@ -253,6 +253,9 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
 
         // NOTE: This can be called even if we are not relevant!
 
+        // Don't do any work if our parent is non-relevant because that means we are necessarily not relevant either
+        if (! parent.isRelevant)
+            return
 
         // Get old nodeset
         val oldRepeatNodeset = bindingContext.getNodeset.asScala

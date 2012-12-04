@@ -1157,4 +1157,45 @@
         </output>
     </test>
 
+    <test description="Control within newly shown dialog re-evaluates binding and values (dependencies)" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true">
+                        <xf:instance>
+                            <resources>
+                                <message>My message</message>
+                            </resources>
+                        </xf:instance>
+                        <xf:var name="fr-resources" value="instance()"/>
+                        <xxf:show ev:event="xforms-ready" dialog="my-dialog"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xxf:dialog level="modal" id="my-dialog">
+                        <xf:output value="$fr-resources/message" id="my-output"/>
+                    </xxf:dialog>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <controls>
+                            <control effective-id="my-dialog" visible="true" constrain="true"/>
+                        </controls>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:div id="my-dialog" visibility="visible" constrain="true"/>
+                        <xxf:control id="my-output">My message</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

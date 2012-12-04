@@ -193,29 +193,32 @@ class XFormsControl(
             case _ ⇒ false
         }
 
-    final def evaluate() {
-        try evaluateImpl()
+    // Evaluate the control's value and metadata
+    final def evaluate(): Unit =
+        try evaluateImpl(relevant = true, parentRelevant = true)
         catch {
             case e: ValidationException ⇒ {
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element, "element", Dom4jUtils.elementToDebugString(element)))
             }
         }
+
+    // Called to clear the control's values when the control becomes non-relevant
+    final def evaluateNonRelevant(parentRelevant: Boolean): Unit = {
+        evaluateNonRelevantLHHA()
+        evaluateNonRelevantExtensionAttribute()
+        evaluateImpl(relevant = false, parentRelevant = parentRelevant)
     }
 
     // Notify the control that some of its aspects (value, label, etc.) might have changed and require re-evaluation. It
     // is left to the control to figure out if this can be optimized.
-    def markDirtyImpl() {
+    def markDirtyImpl(): Unit = {
         markLHHADirty()
         markExtensionAttributesDirty()
     }
 
-    // Evaluate this control.
-    // TODO: move this method to XFormsValueControl and XFormsValueContainerControl?
-    def evaluateImpl() {
-        // TODO: these should be evaluated lazily
-        // Evaluate standard and custom extension attributes
-        evaluateExtensionAttributes()
-    }
+    // Evaluate this control
+    // NOTE: LHHA and extension attributes are computed lazily
+    def evaluateImpl(relevant: Boolean, parentRelevant: Boolean) = ()
 
     /**
      * Clone a control. It is important to understand why this is implemented: to create a copy of a tree of controls

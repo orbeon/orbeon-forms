@@ -1647,6 +1647,9 @@
                                 </events>
                             </instance>
                         </instances>
+                        <controls>
+                            <control effective-id="my-dialog" visible="false"/>
+                        </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>

@@ -95,17 +95,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public boolean computeRelevant() {
-        // If parent is not relevant then we are not relevant either
-        if (!super.computeRelevant()) {
-            return false;
-        } else {
-            // Otherwise we are relevant only if we are selected
-            return !isXForms11Switch() || isVisible();
-        }
-    }
-
-    @Override
     public Tuple3<String, String, String> getJavaScriptInitialization() {
         return getCommonJavaScriptInitialization();
     }

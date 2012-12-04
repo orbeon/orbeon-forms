@@ -42,44 +42,28 @@ trait ControlBindingSupport {
     final def isRelevant = _isRelevant
 
     private[ControlBindingSupport] var _wasRelevant = false
+    private[ControlBindingSupport] var _wasContentRelevant = false
     final def wasRelevant = _wasRelevant
+    final def wasContentRelevant = _wasContentRelevant
 
     // Whether this control's content is visible (by default it is)
     def contentVisible = true
 
-    // Evaluate the control's binding and value either during create or update
-    final def evaluateBindingAndValues(parentContext: BindingContext, update: Boolean) = {
-        if (true || parent.isRelevant)
-            evaluateBinding(parentContext, update)
-        else
-            evaluateEmptyBinding(parentContext, update)
+    // Whether this control's content is relevant
+    def contentRelevant = _isRelevant && contentVisible
 
-        if (isRelevant) {
-            evaluate()
-            evaluateChildFollowingBinding()
-        }
+    // Evaluate the control's binding and value either during create or update
+    final def evaluateBindingAndValues(parentContext: BindingContext, update: Boolean): Unit = {
+        // Evaluate and set binding context as needed
+        val pr = parentContentRelevant
+        setBindingContext(if (pr) computeBinding(parentContext) else BindingContext.empty(element, staticControl.scope), pr, update)
     }
 
     // Refresh the control's binding during update, in case a re-evaluation is not needed
     final def refreshBindingAndValues(parentContext: BindingContext) = {
         // Make sure the parent is updated, as ancestor bindings might have changed, and it is important to
         // ensure that the chain of bindings is consistent
-        setBindingContext(bindingContext.copy(parent = parentContext))
-        markDirtyImpl()
-        // NOTE: We should call evaluate only if relevant
-        //if (control.isRelevant)
-        evaluate()
-        evaluateChildFollowingBinding()
-    }
-
-    private final def evaluateBinding(parentContext: BindingContext, update: Boolean): Unit = {
-        // Evaluate and set binding context
-        setBindingContext(computeBinding(parentContext))
-
-        if (update)
-            markDirtyImpl()
-    }
-
+        setBindingContext(bindingContext.copy(parent = parentContext), parentContentRelevant, update = true)
     }
 
     // Default binding evaluation
@@ -96,47 +80,60 @@ trait ControlBindingSupport {
         contextStack.pushCopy()
     }
 
-    // Update the bindings in effect within and after this control
-    // Only variables modify the default behavior
-    def evaluateChildFollowingBinding() = ()
-
     // Return the bindings in effect within and after this control
     def bindingContextForChild = _bindingContext
     def bindingContextForFollowing = _bindingContext.parent
 
     // Set this control's binding context and handle create/destroy/update lifecycle
-    final def setBindingContext(bindingContext: BindingContext) {
+    final def setBindingContext(bindingContext: BindingContext, parentRelevant: Boolean, update: Boolean) {
         val oldBinding = this._bindingContext
         this._bindingContext = bindingContext
 
         // Relevance is a property of all controls
         val oldRelevant = this._isRelevant
-        val newRelevant = computeRelevant
+        val newRelevant = parentRelevant && computeRelevant
 
         if (! oldRelevant && newRelevant) {
-            // Control is created
-            this._isRelevant = newRelevant
+            // Control becomes relevant
+            this._isRelevant = true
             onCreate()
+            if (update)
+                markDirtyImpl()
+            evaluate()
         } else if (oldRelevant && ! newRelevant) {
-            // Control is destroyed
+            // Control becomes non-relevant
             onDestroy()
-            this._isRelevant = newRelevant
-        } else if (newRelevant)
+            this._isRelevant = false
+            evaluateNonRelevant(parentRelevant)
+        } else if (newRelevant) {
+            // Control remains relevant
             onBindingUpdate(oldBinding, bindingContext)
+            if (update)
+                markDirtyImpl()
+            evaluate()
+        } else if (! update) {
+            // Control is created non-relevant
+            evaluateNonRelevant(parentRelevant)
+        }
     }
 
-    def onCreate() = { _wasRelevant = false }
+    // Control lifecycle
+    def onCreate() = { _wasRelevant = false; _wasContentRelevant = false }
     def onDestroy() = ()
     def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) = ()
 
-    def computeRelevant =
-        // By default: if there is a parent, we have the same relevance as the parent, otherwise we are top-level so
-        // we are relevant by default. Also, we are not relevant if the parent says its content is not visible.
-        (parent eq null) || parent.isRelevant && parent.contentVisible
+    // Compute relevance in addition to the parentRelevant logic
+    // For subclasses to call super.computeRelevant()
+    def computeRelevant = true
+
+    // By default: if there is a parent, we have the same relevance as the parent, otherwise we are top-level so
+    // we are relevant by default. Also, we are not relevant if the parent says its content is not visible.
+    private final def parentContentRelevant = (parent eq null) || parent.contentRelevant
 
     final def wasRelevantCommit() = {
         val result = _wasRelevant
         _wasRelevant = _isRelevant
+        _wasContentRelevant = contentRelevant
         result
     }
 }

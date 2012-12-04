@@ -44,7 +44,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     override type Control <: SelectionControl
 
     // This is a var just for getBackCopy
-    private var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
+    private[XFormsSelect1Control] var itemsetProperty: ControlProperty[Itemset] = new MutableItemsetProperty(this)
 
     def isEncryptValues  = staticControl.isEncryptValues
     def isFullAppearance = staticControl.isFull
@@ -66,10 +66,9 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         if (hasInitialization) getCommonJavaScriptInitialization else null
     }
 
-    override def markDirtyImpl() {
+    override def markDirtyImpl(): Unit = {
         super.markDirtyImpl()
-        if (itemsetProperty ne null)
-            itemsetProperty.handleMarkDirty()
+        itemsetProperty.handleMarkDirty()
     }
 
     // Get this control's itemset

@@ -189,11 +189,11 @@
                             <!--suppress XmlUnusedNamespaceDeclaration -->
                             <xf:group class="fb-language-triggers pull-right" ref=".[xpl:isPE()]" xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
                                 <xf:trigger appearance="minimal">
-                                    <xf:label><xh:img src="/apps/fr/style/images/silk/add.png" alt="" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
+                                    <xf:label><xh:i class="icon-plus-sign icon-white" title="{$form-resources/dialog-add-language/add-language/label}"/></xf:label>
                                     <xxf:show ev:event="DOMActivate" dialog="fb-add-language-dialog" neighbor="fb-resources-language-select"/>
                                 </xf:trigger>
                                 <xf:trigger appearance="minimal" id="fb-language-remove" ref=".[count($resources/resource) gt 1]">
-                                    <xf:label><xh:img src="/apps/fr/style/images/silk/delete.png" alt="" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
+                                    <xf:label><xh:i class="icon-minus-sign icon-white" title="{$form-resources/dialog-add-language/remove-language/label}"/></xf:label>
                                     <xf:action ev:event="DOMActivate">
                                         <!-- Ask confirmation -->
                                         <xxf:show dialog="fb-confirmation-dialog">

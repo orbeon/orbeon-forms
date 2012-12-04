@@ -1,0 +1,487 @@
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+
+/* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
+
+/* See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden  */
+
+html body .xforms-form {
+    .xforms-repeat-template,
+    .xforms-template,
+    .xforms-repeat-delimiter,
+    .xforms-repeat-begin-end,
+    .xforms-group-begin-end,
+    .xforms-disabled-subsequent,
+    .xforms-case-begin-end,
+    .xforms-case-deselected-subsequent,
+    .xforms-hidden {
+        display: none;
+    }
+    
+    .xforms-disabled,
+    .xforms-case-deselected,
+    .xforms-case-deselected .xforms-case-selected {
+        top: -10000px; /* this so that no space is visible on the page */
+        left: -10000px; /* this so that no space is visible on the page */
+        position: absolute;
+    }
+
+    br.xforms-disabled,
+    br.xforms-case-deselected,
+    .xforms-case-deselected br.xforms-case-selected {
+        /* Special case for <br> which takes space with IE and Chrome with the -10000px trick */
+        display: none;
+    }
+
+    .xforms-disabled a,
+    a.xforms-disabled,
+    .xforms-case-deselected a,
+    a.xforms-case-deselected {
+        /* Prevent links from being able to get the focus. See bug:
+           [ #315198 ] Non-relevant links and minimal triggers can get the focus
+           http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
+        display: none;
+    }
+
+    /**
+     * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
+     * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
+     * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
+     * doesn't require us to update disabled attributes on controls during the life of the page.
+     */
+    // Disabled
+    .xforms-disabled {
+        input, select, button {
+            visibility: hidden;
+        }
+    }
+    // Deselected
+    .xforms-case-deselected {
+        input, select, button {
+            visibility: hidden;
+        }
+    }
+
+    /* Special visibility rule for table borders */
+    tr.xforms-disabled,
+    .xforms-disabled tr,
+    th.xforms-disabled,
+    .xforms-disabled th,
+    td.xforms-disabled,
+    .xforms-disabled td {
+        border-style: none ! important;
+    }
+}
+
+/* Special text content that must remain hidden */
+#xforms-repeat-tree, #xforms-repeat-indexes {
+    display: none;
+}
+
+/**
+ * XForms switch/case
+ * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
+ */
+.xforms-case-selected {
+    position: static;
+}
+
+/* ***** Label, hint, help, alert *********************************************************************************** */
+
+.xforms-hint {
+    display: none;
+}
+
+.xforms-help {
+    display: none;
+}
+
+.xforms-help-image {
+    display: -moz-inline-box;
+    display: inline-block;
+    margin-left: 0;
+    vertical-align: middle;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    border: none;
+    background-image: url(../../ops/images/xforms/help.png);
+    background-repeat: no-repeat;
+    background-position: left bottom;
+}
+
+.xforms-alert-inactive, .xforms-alert-active {
+    display: -moz-inline-box;
+    display: inline-block;
+    white-space: nowrap;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+    /* This is needed to hide the text of the alert! */
+    text-indent: 16px;
+    /* text-indent doesn't work on Firefox 2 (but does in 3), but the following does the trick */
+    font-size: 0;
+    margin-left: .25em;
+    vertical-align: middle;
+}
+
+.xforms-alert-active {
+    background-image: url(../../ops/images/xforms/exclamation.png);
+    background-repeat: no-repeat;
+    background-position: left center;
+}
+
+/* ***** Controls *********************************************************************************** */
+
+/* Prevent display of border when static read-only */
+.xforms-static { border: none }
+
+.xforms-output {
+    display: inline;
+}
+
+.xforms-trigger-appearance-minimal img, .xforms-submit-appearance-minimal img { border: 0 }
+
+.xforms-trigger-appearance-xxforms-minimal button, .xforms-submit-appearance-xxforms-minimal button {
+
+    border: none;
+    background: transparent;
+    cursor: hand;
+    *width: auto;  *overflow: visible; /* IE 6/7 HACK: remove funny variable padding within button */
+}
+
+/* Special rule for Firefox to remove extra padding inside noscript buttons working as links */
+button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner {
+    border: 0; padding: 0;
+}
+
+.xforms-input input.xforms-type-date {
+    width: 8em;
+    padding-right: 16px;
+    background-image: url(../../ops/images/xforms/calendar.png);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+/* Reset to default platform styling for dates on iOS */
+.xforms-ios .xforms-input input.xforms-type-date {
+    width: initial;
+    padding-right: initial;
+    background-image: initial;
+    background-position: initial;
+    background-repeat: initial;
+}
+
+.xforms-type-date img { vertical-align: middle; padding-left: .2em; }
+.xforms-readonly img.xforms-type-date { display: none; }
+
+.xforms-input input.xforms-type-time {
+    width: 8em;
+    padding-right: 16px;
+    background-image: url(../../ops/images/xforms/clock.png);
+    background-position: right center;
+    background-repeat: no-repeat;
+}
+
+/* Reset to default platform styling for dates on iOS */
+.xforms-ios .xforms-input input.xforms-type-time {
+    width: initial;
+    padding-right: initial;
+    background-image: initial;
+    background-position: initial;
+    background-repeat: initial;
+}
+.xforms-type-dateTime input.xforms-type-date { margin-right: 1em }
+
+
+.xforms-input input {
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+
+.xforms-placeholder input {
+    color: #bbb;
+}
+
+.xforms-form .xforms-textarea textarea {
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+    font-family: Arial,Helvetica,Geneva,sans-serif;
+    -webkit-overflow-scrolling: touch; /* Only supported by iOS 5, but should be good too if it becomes supported in the future by browsers on OS X */
+}
+
+.xforms-secret input {
+    -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
+}
+
+.xforms-textarea-appearance-xxforms-autosize textarea {
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Default size for YUI RTE (seems to work!) */
+.xforms-mediatype-text-html textarea { width: 550px; height: 300px }
+
+.xforms-select1-appearance-minimal {
+    font-family: Arial, Helvetica, Geneva, sans-serif
+}
+
+.xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
+fieldset.xforms-select1-appearance-full { margin: 0; border: none } /* when fieldset is used for full selection controls */
+
+.xforms-select-appearance-full input { vertical-align: middle }
+.xforms-select-appearance-full label { vertical-align: middle; margin-right: .5em  }
+fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when fieldset is used for full selection controls */
+
+.xforms-dialog .bd { overflow: auto }
+
+.xforms-group-appearance-xxforms-fieldset {
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 0;
+    padding-bottom: 0
+}
+
+// xf:range
+.xforms-range-background {
+    position: relative;
+    background: url(../../ops/images/xforms/slider-horizontal-background.png) no-repeat;
+    height: 26px;
+    width: 218px;
+    z-index: 5;
+}
+
+.xforms-range-thumb {
+    position:absolute;
+    left: 0;
+    top: 8px;
+    cursor: default;
+    width: 18px;
+    height: 20px;
+    background: url(../../ops/images/xforms/slider-horizontal-thumb.png) no-repeat;
+}
+
+// xf:upload
+.xforms-upload-state-empty {
+    .xforms-upload-info { display: none; }
+    .xforms-upload-progress { display: none; }
+}
+.xforms-upload-state-progress {
+    .xforms-upload-select { display: none; }
+    .xforms-upload-info { display: none; }
+}
+.xforms-upload-state-file {
+    .xforms-upload-select { display: none; }
+    .xforms-upload-progress { display: none; }
+}
+.xforms-upload-mediatype { display: none }
+.xforms-upload-size { padding-left: .5em; }
+.xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
+.xforms-upload-progress {
+    .yui-pb, .xforms-upload-cancel { vertical-align: middle }
+    .xforms-upload-cancel { padding-left: .5em }
+    .yui-pb { display: inline-block; *display: inline; *zoom: 1 }
+}
+.xforms-readonly .xforms-upload-remove { display: none }
+
+// Reasonable defaults for alignment of button content
+.xforms-trigger button {
+    img, span {
+        vertical-align: middle
+    }
+}
+.xforms-submit button {
+    img, span {
+        vertical-align: middle
+    }
+}
+
+.xforms-trigger-readonly a { color: gray; cursor: default }
+
+// Calendar
+#orbeon-calendar-div .yui-calendar {
+    .calheader {
+        padding-top: .3em;
+    }
+    .calnavleft {
+        top: 7px;
+    }
+    .calyearleft {
+        overflow: hidden;
+        position: absolute;
+        text-indent: -10000em;
+        z-index: 1;
+        background: transparent url(../../ops/images/xforms/calendar-left-double.png) no-repeat scroll;
+        bottom:0;
+        cursor: pointer;
+        height: 15px;
+        left: -10px;
+        margin-left: 0.4em;
+        top: -7px;
+        width: 25px;
+    }
+    .calnavright {
+        top: 7px;
+    }
+    .calyearright {
+        overflow: hidden;
+        position: absolute;
+        text-indent: -10000em;
+        z-index: 1;
+        background: transparent url(../../ops/images/xforms/calendar-right-double.png) no-repeat scroll;
+        bottom:0;
+        cursor: pointer;
+        height: 15px;
+        right: -10px;
+        margin-right: 0.4em;
+        top: -7px;
+        width: 25px;
+    }
+}
+
+.yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
+    border: 0;                                  /* Override border set in YUI's menu.css, which creates a thicker border around the menu bar titles on iOS */
+    padding-top: 2px; padding-bottom: 2px;      /* Compensate for the lost border by adding some padding */
+}
+
+.yui-tt-shadow { display: none }                /* Remove shadow, which now looks tacky, and also for issue #581 */
+
+/* ***** Repeats **************************************************************************************************** */
+
+.xforms-repeat-selected-item-1 {
+    background-color: #ffc;
+}
+
+.xforms-repeat-selected-item-2 {
+    background-color: #ff9;
+}
+
+.xforms-repeat-selected-item-3 {
+    background-color: #ff6;
+}
+
+.xforms-repeat-selected-item-4 {
+    background-color: #ff3;
+}
+
+/* ***** Indicators and messages ************************************************************************************ */
+
+.xforms-loading-loading {
+    background-color: #c44;
+    color: #fff;
+    padding: 2px;
+    position: absolute;
+    right: 2em;
+}
+
+.xforms-loading-none {
+    display: block;
+    height: 0;
+}
+
+div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../../ops/images/xforms/processing.gif) }
+
+.xforms-error-panel .bd {
+    background-image: url(../../ops/images/xforms/warning_64.png);
+    background-position: 20px 20px;
+    background-repeat: no-repeat;
+    padding: 10px 20px 10px 110px !important; /* Override padding defined by YUI */
+    overflow: auto; background-color: white;
+}
+.xforms-error-panel {
+    width: 500px;
+
+    .hd { background-color: #FF6600; }
+
+    .xforms-error-panel-details-hidden,
+    .xforms-error-panel-details-shown {
+        vertical-align: middle;
+    }
+
+    .xforms-error-panel-show-details,
+    .xforms-error-panel-hide-details,
+    .xforms-error-panel-close,
+    .xforms-error-panel-reload {
+        cursor: pointer;
+    }
+}
+
+// In noscript mode, center the panel
+.xforms-noscript .xforms-error-panel { margin: auto }
+
+.xforms-help-panel {
+    width: 300px;
+    .xforms-help-panel-close {
+        text-align: right;
+    }
+}
+
+.xforms-noscript-panel {
+    display: block;
+    border: 4px solid #FF6600;
+    width: auto;
+    margin: 1em;
+    padding: .5em;
+}
+
+.xforms-debug {
+    background-color: #fc9;
+    position: absolute;
+    -moz-opacity: 0.5;
+    opacity: 0.5;
+    *filter: alpha(opacity=50);
+    border: 1px solid red;
+    font-size: 11px;
+}
+
+.xforms-message {
+    list-style: disc;
+    display: list-item;
+    margin-left: 2em;
+}
+
+#wait .bd { background-color: white }
+
+/* ***** Tree ******************************************************************************************************* */
+/* Fix for Firefox issue when clicking on the first "-" in span mode
+   http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
+.xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { display: block }
+
+// Yellow highlight for selected item
+.xforms-form .ygtvcontent {
+    .xforms-tree-label-selected,
+    .xforms-tree-label-selected:hover { background-color: #ff6 }
+}
+/* Override YUI CSS which adds a light blue green background to "currently focused" label */
+.ygtvfocus .ygtvlabel,
+.ygtvfocus .ygtvlabel:hover { background-color: transparent }
+
+/* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
+a.ygtvlabel { cursor: pointer; }
+
+/* YUI sets this to a color, but it is hindering more than anything else */
+.ygtvfocus { background-color: transparent }
+.xforms-select-appearance-xxforms-tree table, xforms-select1-appearance-xxforms-tree table { margin: 0 }/* as table style can be globally changed */
+
+// Custom control widths
+#xforms-form {
+    .xforms-width-2em input.xforms-input-input,  .xforms-width-2em select  { width: 2em }
+    .xforms-width-3em input.xforms-input-input,  .xforms-width-3em select  { width: 3em }
+    .xforms-width-5em input.xforms-input-input,  .xforms-width-5em select  { width: 5em }
+    .xforms-width-7em input.xforms-input-input,  .xforms-width-7em select  { width: 7em }
+    .xforms-width-10em input.xforms-input-input, .xforms-width-10em select { width: 10em }
+    .xforms-width-15em input.xforms-input-input, .xforms-width-15em select { width: 15em }
+}
+
+@media print {
+    .xforms-form .xforms-loading-loading { display: none }
+}

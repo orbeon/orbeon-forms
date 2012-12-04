@@ -12,18 +12,30 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-.fb-permissions-dialog {
+@import "../../../../resources/apps/fr/style/bootstrap-src/less/variables";
+@import "../../../../resources/apps/fr/style/bootstrap-src/less/mixins";
+@import "../../../../resources/apps/fr/style/bootstrap-src/less/forms";
+@import "../../../../resources/apps/fr/style/form-runner-bootstrap-override";
+
+.xforms-dialog.fb-permissions-dialog {
+    width: 450px;                                   // Large dialog, to have space for editing roles
     .xforms-select-appearance-full {
-        span, span label {
-            display: inline;                        // Override FR default which is block
+        label {
+            .checkbox.inline();                     // Re-use Bootstrap style for inline checkboxes
+            white-space: nowrap;                    // Not sure why, but browser splits text in inline-block over multiple lines even if not needed
+            padding-top: 0;
         }
     }
     .fb-permissions-repeat {
         margin-top: 1em;                            // Spacing before the roles table
-    }
-    .fb-permissions-repeat th,
-    .fb-permissions-repeat td {
-        padding: .2em 0;                            // Padding in cells of table
+        width: 100%;                                // Table to use the whole width of the dialog
+        .fb-role { width: 100% }                    // First column with the input fields to use all the remaining space
+        .xforms-input input { width: 100% }         // Input field to use all the space in the column
+        th { font-weight: bold }
+        th, td {
+            padding-right: 10px;                    // Padding in cells of table
+            height: @controlsHeight;                // So the lines all have the same height
+        }
+        i.disabled { .opacity(40) }
     }
 }
-

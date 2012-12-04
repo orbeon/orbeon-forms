@@ -13,6 +13,8 @@
 @import "bootstrap-src/less/variables"; // Modify this for custom colors, font-sizes, etc
 @import "bootstrap-src/less/mixins";    // Modify this for custom colors, font-sizes, etc
 
+@controlsHeight: @baseLineHeight + 8px; // Because of the border-box on the controls
+
 body, label, input, button,         // Bootstrap sets a default font-size of 14px, and here we reset it to the
 select, textarea, .btn {            // YUI's default value of 13px
     font-size: 13px;
@@ -71,7 +73,7 @@ form.xforms-form {
         margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
         color: black;                   // Make text inside the fields stand out, as this is the most important information
         .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap
-        height: @baseLineHeight + 8px;  // Because of the border-box
+        height: @controlsHeight;
     }
 
     // Adapt pagination to use of xf:trigger

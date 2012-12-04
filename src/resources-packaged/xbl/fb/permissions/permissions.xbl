@@ -163,21 +163,19 @@
                         <xh:table class="fb-permissions-repeat">
                             <xh:tr>
                                 <xh:th><xf:output value="$resources/dialog-permissions/role"/></xh:th>
-                                <xh:th><xf:output value="$resources/dialog-permissions/operations"/></xh:th>
+                                <xh:th colspan="3"><xf:output value="$resources/dialog-permissions/operations"/></xh:th>
                             </xh:tr>
                             <xf:var name="anyone-operations" value="tokenize($ui/permissions/permission[1]/operations, '\s')"/>
                             <xf:repeat ref="$ui/permissions/permission">
                                 <xf:var name="is-first" value="position() = 1"/>
                                 <xh:tr>
-                                    <xh:td>
+                                    <xh:td class="fb-role">
                                         <!-- Role name or "anyone" -->
                                         <xf:group ref=".[$is-first]">
                                             <xf:output value="$resources/dialog-permissions/anyone"/>
                                         </xf:group>
                                         <xf:group ref=".[not($is-first)]">
-                                            <xf:input ref="role" incremental="true">
-                                                <xf:alert ref="$resources/dialog-permissions/invalid-role-name"/>
-                                            </xf:input>
+                                            <xf:input ref="role" incremental="true"/>
                                         </xf:group>
                                     </xh:td>
                                     <xh:td>
@@ -188,12 +186,16 @@
                                                 <xf:value>create</xf:value>
                                             </xf:item>
                                         </xf:select>
+                                    </xh:td>
+                                    <xh:td>
                                         <xf:select ref="if (not($is-first) and $anyone-operations = 'read-update') then $ui/readonly-checked else operations" appearance="full">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/read-update"/>
                                                 <xf:value>read-update</xf:value>
                                             </xf:item>
                                         </xf:select>
+                                    </xh:td>
+                                    <xh:td>
                                         <xf:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations" appearance="full">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/delete"/>
@@ -204,18 +206,24 @@
                                     <xh:td>
                                         <!-- Remove -->
                                         <xf:trigger appearance="minimal" ref=".[not($is-first)]">
-                                            <xf:label><xh:img src="/apps/fr/style/images/silk/cross_bw.png" alt="Remove"/></xf:label>
+                                            <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                             <xf:delete ev:event="DOMActivate" ref="."/>
                                         </xf:trigger>
+                                        <xf:group ref=".[$is-first]"><xh:i class="icon-minus-sign disabled"/></xf:group>
                                     </xh:td>
                                 </xh:tr>
                             </xf:repeat>
+                            <xh:tr>
+                                <xh:td colspan="4"/>
+                                <xh:td>
+                                    <!-- Add -->
+                                    <xf:trigger appearance="minimal">
+                                        <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                        <xf:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
+                                    </xf:trigger>
+                                </xh:td>
+                            </xh:tr>
                         </xh:table>
-                        <!-- Add -->
-                        <xf:trigger appearance="minimal">
-                            <xf:label><xh:img src="/apps/fr/style/images/silk/add.png" alt="Add"/></xf:label>
-                            <xf:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
-                        </xf:trigger>
                     </xf:group>
 
                     <!-- Buttons -->

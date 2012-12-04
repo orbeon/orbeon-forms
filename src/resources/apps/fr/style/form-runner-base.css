@@ -117,7 +117,7 @@
 #fr-view .xforms-case-deselected .xforms-label {
   display: none;
 }
-#fr-view .fr-hidden {
+#fr-view .xforms-hidden {
   display: none;
 }
 .xforms-noscript .xforms-help-image {
@@ -422,9 +422,6 @@ button.btn-link {
   margin-bottom: 1em;
 }
 /* ***** Grids ****************************************************************************************************** */
-.fr-grid-td .fr-grid-content .fr-hidden {
-  display: none;
-}
 .fr-grid {
   table-layout: fixed;
   width: 100%;

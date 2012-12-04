@@ -23,7 +23,8 @@ html body .xforms-form .xforms-repeat-template,
     html body .xforms-form .xforms-group-begin-end,
     html body .xforms-form .xforms-disabled-subsequent,
     html body .xforms-form .xforms-case-begin-end,
-    html body .xforms-form .xforms-case-deselected-subsequent {
+    html body .xforms-form .xforms-case-deselected-subsequent,
+    html body .xforms-form .xforms-hidden {
 
     display: none;
 }

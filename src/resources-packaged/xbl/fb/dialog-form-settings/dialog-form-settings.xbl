@@ -141,7 +141,7 @@
                             <!-- Logo -->
                             <!-- Custom logo upload is removed in 4.0 -->
                             <!--<xf:group ref=".[$is-form-settings]">-->
-                                <!--<xf:label ref="$resources/logo/label" class="fr-hidden"/>-->
+                                <!--<xf:label ref="$resources/logo/label" class="xforms-hidden"/>-->
                                 <!--<fr:image-attachment ref="logo" class="fr-attachment">-->
                                     <!--&lt;!&ndash; Only show hint if there is no attachment &ndash;&gt;-->
                                     <!--<xf:hint ref="$resources/logo/hint[not(normalize-space(context()))]"/>-->

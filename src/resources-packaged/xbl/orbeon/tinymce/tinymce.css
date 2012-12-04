@@ -14,4 +14,4 @@
 
 .xbl-fr-tinymce.xforms-readonly .mceToolbar,
 .xbl-fr-tinymce.xforms-readonly .mceStatusbar { display: none }	/* Hide the toolbar and status bar when readonly */
-.xbl-fr-tinymce .fr-hidden { display: none }
+.xbl-fr-tinymce .xforms-hidden { display: none }

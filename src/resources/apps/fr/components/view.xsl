@@ -162,7 +162,7 @@
     </xsl:template>
 
     <xsl:template match="fr:hidden-controls" name="fr-hidden-controls">
-        <xh:span class="fr-hidden">
+        <xh:span class="xforms-hidden">
             <!-- Hidden field to communicate to the client whether the data is safe -->
             <xf:input
                     model="fr-persistence-model"

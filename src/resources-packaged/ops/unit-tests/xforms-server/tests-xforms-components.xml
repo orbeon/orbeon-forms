@@ -570,7 +570,7 @@
                         <xxf:attribute id="my-currency$xf-19" for="my-currency$xf-19" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-currency$xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
                         <xxf:attribute id="my-currency$xf-22" for="my-currency$xf-22" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-27" class="xbl-fr-number-xforms-input fr-hidden">12.34</xxf:control>
+                        <xxf:control id="my-currency$xf-27" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
                         <xxf:attribute id="my-currency$xf-29" for="my-currency$xf-28" name="class">fr-width-10em input-prepend</xxf:attribute>
                         <xxf:control id="my-currency$xf-30" class="add-on"/>
                         <xxf:control id="my-currency$xf-31">$</xxf:control>

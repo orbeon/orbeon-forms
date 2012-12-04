@@ -88,10 +88,10 @@
 
             <xf:group ref=".[$script]">
                 <!-- XForms control the JavaScript writes to -->
-                <xf:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value fr-hidden">
+                <xf:textarea ref="$client-value" id="tinymce-client-value" class="xbl-fr-tinymce-xforms-client-value xforms-hidden">
                     <xf:setvalue ev:event="xforms-value-changed" ref="$binding" value="xxf:call-xpl('oxf:/ops/xforms/clean-html.xpl', 'dirty-html', $client-value, 'clean-html')"/>
                 </xf:textarea>
-                <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value fr-hidden">
+                <xf:output ref="$binding" id="tinymce-server-value" class="xbl-fr-tinymce-xforms-server-value xforms-hidden">
                     <!-- Listen on xforms-enable to refresh TinyMCE with latest value in case the value changed while the component was non-relevant -->
                     <xxf:script id="xf-ch" ev:event="xforms-value-changed xforms-enabled xxforms-iteration-moved">YAHOO.xbl.fr.Tinymce.instance(this).serverToClient();</xxf:script>
                     <xxf:script id="xf-ro" ev:event="xforms-readonly">YAHOO.xbl.fr.Tinymce.instance(this).readonly();</xxf:script>

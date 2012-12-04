@@ -105,18 +105,27 @@
                             Be sure to replace $decimal-separator before $grouping-separator because $grouping-separator
                             can be blank: https://github.com/orbeon/orbeon-forms/issues/587
                         -->
-                        <xf:var name="formatted"
+                        <xf:var name="formatted" id="formatted-value"
                             value="if ($binding castable as xs:decimal)
                                    then translate(format-number(xs:decimal($binding), $picture-string), '.,', concat($decimal-separator, $grouping-separator))
-                                   else $binding"/>
+                                   else string($binding)">
+                        </xf:var>
+                        <!-- Update field when formatted value changes. Do this here so client has valid observer id. -->
+                        <xxf:script
+                            ev:target="formatted-value"
+                            ev:event="xforms-value-changed xxforms-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxf:script>
+
+                        <xxf:script
+                            ev:target="#observer"
+                            ev:observer="fr-number"
+                            ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.update();</xxf:script>
+                        <!-- Readwrite mode -->
                         <xf:group ref="$binding[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]">
                             <xf:input
                                     ref="."
-                                    class="xbl-fr-number-xforms-input fr-hidden"
+                                    class="xbl-fr-number-xforms-input xforms-hidden"
                                     xxf:format="$formatted"
                                     xxf:unformat="translate(translate(., $grouping-separator, ''), $decimal-separator, '.')">
-
-                                <xxf:script id="xf-ch" ev:event="xforms-value-changed xxforms-iteration-moved"><xsl:value-of select="$js-object"/>.update();</xxf:script>
                                 <xxf:script id="xf-ro" ev:event="xforms-readonly"><xsl:value-of select="$js-object"/>.readonly();</xxf:script>
                                 <xxf:script id="xf-rw" ev:event="xforms-readwrite"><xsl:value-of select="$js-object"/>.readwrite();</xxf:script>
                             </xf:input>

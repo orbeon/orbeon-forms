@@ -136,11 +136,8 @@
                                 <xf:action if="$is-section-component" type="xpath">toolboxOps:insertNewSectionTemplate($model, $binding)</xf:action>
                                 <xf:action if="not($is-section-component)">
                                     <xf:action type="xpath">toolboxOps:insertNewControl($model, $binding)</xf:action>
-                                    <xf:var name="absolute-id" value="controlOps:buildControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
-
-                                    xxx wrong, client needs effectiveid
-
-                                    <xf:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$absolute-id}')"/>
+                                    <xf:var name="effective-id" value="controlOps:buildControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                    <xf:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
                                 </xf:action>
                             </xf:action>
                         </xf:trigger>

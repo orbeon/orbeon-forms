@@ -604,6 +604,9 @@ object ControlOps {
     def buildControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String) =
         buildControlAbsoluteId(inDoc, staticId).orNull
 
+    def buildControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String) =
+        buildControlEffectiveId(inDoc, staticId).orNull
+
     // Build an effective id for a given static id
     //
     // This assumes a certain hierarchy:
@@ -613,7 +616,7 @@ object ControlOps {
     // - zero or more fr:grid containers
     // - the only repeats are containers
     // - all containers must have stable ids
-    def buildControlAbsoluteId(inDoc: NodeInfo, staticId: String) =
+    def buildControlEffectiveId(inDoc: NodeInfo, staticId: String) =
         findControlById(inDoc, staticId) map { control ⇒
             // Ancestors from root to leaf except the top-level
             val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse.tail
@@ -624,6 +627,9 @@ object ControlOps {
             def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString "-"
             val prefixedId = containerIds :+ staticId mkString "$"
 
-            effectiveIdToAbsoluteId(DynamicControlId + "$" + prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix))
+            DynamicControlId + "$" + prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
         }
+
+    def buildControlAbsoluteId(inDoc: NodeInfo, staticId: String) =
+        buildControlEffectiveId(inDoc, staticId) map effectiveIdToAbsoluteId
 }

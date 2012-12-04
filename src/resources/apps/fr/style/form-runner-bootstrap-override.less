@@ -10,8 +10,7 @@
 //
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-@import "bootstrap-src/less/variables"; // Modify this for custom colors, font-sizes, etc
-@import "bootstrap-src/less/mixins";    // Modify this for custom colors, font-sizes, etc
+@import "form-runner-common";
 
 @controlsHeight: @baseLineHeight + 8px; // Because of the border-box on the controls
 
@@ -37,7 +36,7 @@ a {
                 padding: 0;
                 font-size: 16px;
                 font-weight: normal;
-                color: #bbb;
+                color: @frNavBarTextColor;
                 text-shadow: none;
                 text-decoration: none;
                 display: inline;

@@ -44,7 +44,7 @@
             <xsl:copy-of select="@appearance"/>
             <xf:label>
                 <xh:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/close"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/close"/>
             </xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>
@@ -54,7 +54,7 @@
         <!--<xf:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">-->
             <!--<xf:label>-->
                 <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>-->
-                <!--<xh:span><xf:output value="$fr-resources/detail/labels/discard"/></xh:span>-->
+                <!--<xf:output value="$fr-resources/detail/labels/discard"/>-->
             <!--</xf:label>-->
             <!--<xf:action ev:event="DOMActivate">-->
                 <!--<xf:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>-->
@@ -64,7 +64,7 @@
         <!--<xf:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">-->
             <!--<xf:label>-->
                 <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>-->
-                <!--<xh:span><xf:output value="$fr-resources/detail/labels/return"/></xh:span>-->
+                <!--<xf:output value="$fr-resources/detail/labels/return"/>-->
             <!--</xf:label>-->
             <!--<xf:action ev:event="DOMActivate">-->
                 <!--<xf:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>-->
@@ -76,7 +76,7 @@
         <xf:trigger id="fr-clear-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
             <xsl:copy-of select="@appearance"/>
             <xf:label><xh:img width="16" height="16" src="/apps/fr/style/clear.gif" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/clear"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/clear"/>
             </xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:setvalue ref="xxf:instance('errors-state')/submitted">true</xf:setvalue>
@@ -93,7 +93,7 @@
         <xf:trigger id="fr-print-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/print"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/print"/>
             </xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:send submission="fr-print-submission"/>
@@ -114,7 +114,7 @@
                 <xsl:copy-of select="@appearance"/>
                 <xf:label>
                     <xh:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                    <xh:span><xf:output value="$fr-resources/detail/labels/print-pdf"/></xh:span>
+                    <xf:output value="$fr-resources/detail/labels/print-pdf"/>
                 </xf:label>
             </fr:href-button>
         </xsl:if>
@@ -125,7 +125,7 @@
             <xsl:copy-of select="@appearance"/>
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/save-document"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/save-document"/>
             </xf:label>
         </xf:trigger>
     </xsl:template>
@@ -134,7 +134,7 @@
         <xf:trigger id="fr-save-locally-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/save-locally"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/save-locally"/>
             </xf:label>
         </xf:trigger>
     </xsl:template>
@@ -144,7 +144,7 @@
             <xsl:copy-of select="@appearance"/>
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/silk/application_go.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/submit-document"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/submit-document"/>
             </xf:label>
         </xf:trigger>
     </xsl:template>
@@ -154,7 +154,7 @@
             <xsl:copy-of select="@appearance"/>
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/workflow-review"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/workflow-review"/>
             </xf:label>
         </xf:trigger>
     </xsl:template>
@@ -164,7 +164,7 @@
             <xsl:copy-of select="@appearance"/>
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/workflow-edit"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/workflow-edit"/>
             </xf:label>
         </xf:trigger>
     </xsl:template>
@@ -174,7 +174,7 @@
             <xsl:copy-of select="@appearance"/>
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/workflow-send"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/workflow-send"/>
             </xf:label>
         </xf:trigger>
     </xsl:template>
@@ -187,7 +187,7 @@
             <xf:label>
                 <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>-->
                 <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/letter_16.png" alt=""/>
-                <xh:span><xf:output value="$fr-resources/detail/labels/email"/></xh:span>
+                <xf:output value="$fr-resources/detail/labels/email"/>
             </xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:send submission="fr-email-service-submission"/>

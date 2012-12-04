@@ -175,7 +175,7 @@
                     <xf:trigger id="confirm">
                         <xf:label>
                             <xh:img width="11" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt=""/>
-                            <xh:span><xf:output value="$resources/confirm"/></xh:span>
+                            <xf:output value="$resources/confirm"/>
                         </xf:label>
                         <xf:action ev:event="DOMActivate">
                             <!-- Store values in itemset order -->
@@ -190,7 +190,7 @@
                     <xf:trigger id="cancel">
                         <xf:label>
                             <xh:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                            <xh:span><xf:output value="$resources/cancel"/></xh:span>
+                            <xf:output value="$resources/cancel"/>
                         </xf:label>
                         <xf:action ev:event="DOMActivate">
                             <!-- Just close -->

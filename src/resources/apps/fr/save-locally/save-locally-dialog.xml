@@ -36,14 +36,14 @@
                             encode-for-uri(concat(instance('fr-save-locally-file-name'), '.html'))}">
                 <xf:label>
                     <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xh:span><xf:output value="$fr-resources/detail/labels/save-document"/></xh:span>
+                    <xf:output value="$fr-resources/detail/labels/save-document"/>
                 </xf:label>
             </fr:href-button>
 
             <xf:trigger>
                 <xf:label>
                     <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xh:span><xf:output value="$fr-resources/detail/labels/cancel"/></xh:span>
+                    <xf:output value="$fr-resources/detail/labels/cancel"/>
                 </xf:label>
             </xf:trigger>
         </xf:group>

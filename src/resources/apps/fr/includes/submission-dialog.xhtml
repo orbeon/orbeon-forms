@@ -35,7 +35,7 @@
                 <xf:trigger ref="instance()[context() = 'clear']">
                     <xf:label>
                         <xh:img src="/apps/fr/style/clear.gif" alt=""/>
-                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-clear"/></xh:span>
+                        <xf:output value="$fr-resources/detail/labels/submit-dialog-clear"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate">
                         <!-- Restore instance -->
@@ -50,7 +50,7 @@
                 <xf:trigger ref="instance()[context() = 'keep']">
                     <xf:label>
                         <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-keep"/></xh:span>
+                        <xf:output value="$fr-resources/detail/labels/submit-dialog-keep"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate">
                         <xxf:hide dialog="fr-submission-result-dialog"/>
@@ -61,7 +61,7 @@
                 <xf:trigger ref="instance()[context() = 'go']">
                     <xf:label>
                         <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-go"/></xh:span>
+                        <xf:output value="$fr-resources/detail/labels/submit-dialog-go"/>
                     </xf:label>
                     <xf:action ev:event="DOMActivate">
                         <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
@@ -72,7 +72,7 @@
                 <xf:trigger ref="instance()[context() = 'close-window']">
                     <xf:label>
                         <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xh:span><xf:output value="$fr-resources/detail/labels/submit-dialog-close-window"/></xh:span>
+                        <xf:output value="$fr-resources/detail/labels/submit-dialog-close-window"/>
                     </xf:label>
                     <xxf:script ev:event="DOMActivate">window.close();</xxf:script>
                 </xf:trigger>

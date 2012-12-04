@@ -52,7 +52,7 @@
             <xf:trigger ref="save-test-trigger[false()]">
                 <xf:label>
                     <xh:img src="/forms/orbeon/builder/images/play.png" alt=""/>
-                    <xh:span><xf:output value="$form-resources/dialog-database-services/test/label"/></xh:span>
+                    <xf:output value="$form-resources/dialog-database-services/test/label"/>
                 </xf:label>
 
                 <!-- Test submission -->

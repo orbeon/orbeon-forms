@@ -56,7 +56,7 @@
                     <!-- Submit button -->
                     <xf:trigger xxf:modal="true" appearance="xxf:primary">
                         <xf:label>
-                            <xh:span><xf:output value="$form-resources/dialog-publish/publish/label"/></xh:span>
+                            <xf:output value="$form-resources/dialog-publish/publish/label"/>
                         </xf:label>
                         <!-- Dispatch publish event -->
                         <xf:dispatch ev:event="DOMActivate" name="fb-publish-form" targetid="fb-publish-model">
@@ -68,7 +68,7 @@
                     <!-- Cancel button -->
                     <xf:trigger appearance="minimal">
                         <xf:label>
-                            <xh:span><xf:output value="$form-resources/cancel/label"/></xh:span>
+                            <xf:output value="$form-resources/cancel/label"/>
                         </xf:label>
                         <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
                     </xf:trigger>
@@ -109,7 +109,7 @@
             <xh:div class="fr-dialog-buttons">
                 <xf:trigger appearance="xxf:primary">
                     <xf:label>
-                        <xh:span><xf:output value="$form-resources/close/label"/></xh:span>
+                        <xf:output value="$form-resources/close/label"/>
                     </xf:label>
                     <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
                 </xf:trigger>
@@ -125,7 +125,7 @@
             <xh:div class="fr-dialog-buttons">
                 <xf:trigger appearance="xxf:primary">
                     <xf:label>
-                        <xh:span><xf:output value="$form-resources/close/label"/></xh:span>
+                        <xf:output value="$form-resources/close/label"/>
                     </xf:label>
                     <xxf:hide ev:event="DOMActivate" dialog="fb-publish-dialog"/>
                 </xf:trigger>

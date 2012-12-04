@@ -4826,15 +4826,15 @@
                     <xf:input id="i5" ref="instance()">
                         <!-- Simple xf:output -->
                         <xf:label>
-                            <xh:span><xf:output ref="@label"/></xh:span>
+                            <xf:output ref="@label"/>
                         </xf:label>
                         <!-- 2 simple xf:output -->
                         <xf:help>
-                            <xh:span><xf:output ref="@help1"/> - <xf:output model="m2" ref="@help2"/></xh:span>
+                            <xf:output ref="@help1"/> - <xf:output model="m2" ref="@help2"/>
                         </xf:help>
                         <!-- Output we can't analyze -->
                         <xf:hint>
-                            <xh:span><xf:output ref="@help1"/> - <xf:output value="index('my-repeat')"/></xh:span>
+                            <xf:output ref="@help1"/> - <xf:output value="index('my-repeat')"/>
                         </xf:hint>
                     </xf:input>
                 </xh:body>

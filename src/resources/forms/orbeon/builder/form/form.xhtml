@@ -102,7 +102,7 @@
                     <xf:trigger id="fb-test-button">
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/pixelmixer/gear_16.png" alt=""/>
-                            <xh:span><xf:output value="$fr-resources/detail/labels/test"/></xh:span>
+                            <xf:output value="$fr-resources/detail/labels/test"/>
                         </xf:label>
                         <xf:action ev:event="DOMActivate">
                             <xxf:script>
@@ -123,7 +123,7 @@
                     <xf:trigger id="fb-publish-button" ref=".">
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/pixelmixer/globe_16.png" alt=""/>
-                            <xh:span><xf:output value="$fr-resources/detail/labels/publish"/></xh:span>
+                            <xf:output value="$fr-resources/detail/labels/publish"/>
                         </xf:label>
                         <xf:action ev:event="DOMActivate">
                             <xxf:show dialog="fb-publish-dialog"/>
@@ -139,7 +139,7 @@
                 <!--<xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">-->
                     <!--<xf:label>-->
                         <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>-->
-                        <!--<xh:span><xf:output value="$fr-resources/detail/labels/save-as-document"/></xh:span>-->
+                        <!--<xf:output value="$fr-resources/detail/labels/save-as-document"/>-->
                     <!--</xf:label>-->
                     <!--<xf:action ev:event="DOMActivate">-->
                         <!--&lt;!&ndash; Open the dialog in "save-as" mode &ndash;&gt;-->
@@ -487,7 +487,7 @@
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" alt=""/>
-                                        <xh:span><xf:output value="$fb-resources/edit-items/label"/></xh:span>
+                                        <xf:output value="$fb-resources/edit-items/label"/>
                                     </xf:label>
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
                                         <xf:property name="control-id" value="$control/@id"/>

@@ -99,20 +99,8 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         result
     }
 
-    override def equalsExternal(other: XFormsControl): Boolean = {
-        if (other == null || ! other.isInstanceOf[XFormsVariableControl])
-            return false
-
-        if (this eq other)
-            return true
-
-        val otherValueControl = other.asInstanceOf[XFormsVariableControl]
-
-        if (! compareValues(getValue, otherValueControl.getValue))
-            return false
-
-        super.equalsExternal(other)
-    }
+    // Variables don't support Ajax updates
+    override def equalsExternal(other: XFormsControl) = throw new IllegalStateException
 }
 
 object XFormsVariableControl {

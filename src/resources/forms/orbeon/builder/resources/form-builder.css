@@ -583,10 +583,10 @@ h2 .fr-section-label {
   display: inline;
 }
 .fb-label-hint-placeholder,
-.fb-label-hint-placeholder .xforms-mock-button {
+.fb-label-hint-placeholder .btn {
   color: #bbbbbb;
 }
-.fr-grid .fr-grid-content .xforms-trigger .xforms-mock-button input,
+.fr-grid .fr-grid-content .xforms-trigger .btn input,
 .fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input {
   margin: 0;
 }
@@ -594,7 +594,7 @@ h2 .fr-section-label {
   color: #004b92;
   text-decoration: underline;
 }
-.xforms-mock-button .xforms-label {
+.btn .xforms-label {
   margin: 0;
 }
 .fb-label-hint-placeholder .fb-mock-link {
@@ -614,7 +614,7 @@ h2 .fr-section-label {
 .fr-view .fr-grid .fr-grid-content .xforms-hint:hover,
 .fr-view .fr-grid .fr-grid-th .xforms-label:hover,
 .fr-view .fr-grid .fr-grid-th .xforms-hint:hover,
-.fr-view .fr-grid .xforms-mock-button span:hover {
+.fr-view .fr-grid .btn span:hover {
   background-color: #ffffd3;
 }
 .fr-view .fr-grid .fr-grid-content .xforms-label,

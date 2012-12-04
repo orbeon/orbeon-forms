@@ -42,17 +42,16 @@ $ ->
             selector: '.fr-grid-content > .xforms-trigger-appearance-full'
             editInputSelector: '#fb-edit-label'
             placeholderOutputSelector: '#fb-placeholder-label'
-            placeholderContainerSelector: '.xforms-mock-button span'
+            placeholderContainerSelector: '.btn'
             initialValueSelector: 'button'
             createMock: (element) ->
                 button = f$.find 'button', element                                                                      # Hide actual button
                 f$.hide button
-                mockDiv = f$.appendTo element, ($ '<div class="xforms-mock-button">')                                   # Create mock button
-                f$.append (mockLabel = $ '<span>'), mockDiv
-                mockLabel.text f$.text button
+                mockButton = f$.appendTo element, ($ '<span class="btn">')                                              # Create mock button
+                mockButton.text f$.text button
             removeMock: (element) ->
                 f$.show f$.find 'button', element
-                f$.remove f$.find '.xforms-mock-button', element
+                f$.remove f$.find 'span.btn', element
         link:
             selector: '.fr-grid-content > .xforms-trigger-appearance-minimal'
             editInputSelector: '#fb-edit-label'

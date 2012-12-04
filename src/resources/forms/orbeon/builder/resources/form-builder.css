@@ -770,7 +770,7 @@ td.fb-selected:hover .fb-click-message {
 .fb-main .navbar .fb-form-settings-trigger {
   padding-left: 20px;
 }
-.fb-main .navbar .fb-language-triggers i {
+.fb-main .navbar .icon-white {
   opacity: 0.7;
   filter: alpha(opacity=70);
 }

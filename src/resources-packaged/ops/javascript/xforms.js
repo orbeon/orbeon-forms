@@ -2993,7 +2993,7 @@ ORBEON.xforms.Events = {
                     effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
                     // We provide here a "high" zIndex value so the tooltip is "always" displayed on top over everything else.
                     // Otherwise, with dialogs, the tooltip might end up being below the dialog and be invisible.
-                    zIndex: 1000
+                    zIndex: 10000
                 });
                 yuiTooltip.orbeonControl = control;
                 var context = ORBEON.util.Dom.get(target.id);

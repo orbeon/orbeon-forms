@@ -11,14 +11,19 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.fb-permissions-dialog .xforms-select-appearance-full span,
-.fb-permissions-dialog .xforms-select-appearance-full span label {
-  display: inline;
+
+.fb-permissions-dialog {
+    .xforms-select-appearance-full {
+        span, span label {
+            display: inline;                        // Override FR default which is block
+        }
+    }
+    .fb-permissions-repeat {
+        margin-top: 1em;                            // Spacing before the roles table
+    }
+    .fb-permissions-repeat th,
+    .fb-permissions-repeat td {
+        padding: .2em 0;                            // Padding in cells of table
+    }
 }
-.fb-permissions-dialog .fb-permissions-repeat {
-  margin-top: 1em;
-}
-.fb-permissions-dialog .fb-permissions-repeat th,
-.fb-permissions-dialog .fb-permissions-repeat td {
-  padding: .2em 0;
-}
+

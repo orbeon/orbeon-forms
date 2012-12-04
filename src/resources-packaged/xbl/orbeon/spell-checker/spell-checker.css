@@ -26,8 +26,6 @@
 .fr-spell-checker-dialog .label { width: 90px }
 .fr-spell-checker-dialog .not-in-dictionary { height: 60px; overflow-y: scroll; display: block; border: 1px solid #999 }
 .fr-spell-checker-dialog .unknown-word { font-weight: bold; background: url('unknown-word.png') repeat-x left bottom }
-.fr-spell-checker-dialog .xforms-repeat-selected-item-1,
-.fr-spell-checker-dialog .xforms-repeat-selected-item-2 { background-color: transparent }
 .fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button { display: block; margin-bottom: 3px }
 .fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button { text-align: left }
 .fr-spell-checker-dialog .xbl-fr-spell-checker-correcting .xbl-fr-button button img { padding-right: 10px }

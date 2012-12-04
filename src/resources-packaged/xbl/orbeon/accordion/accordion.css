@@ -50,8 +50,3 @@ html.accordion-menu-js dd.a-m-d-anim {
     top: 0;
     left: 0;
 }
-
-/* Do not highlight the "current" case of an accordion when cases are generated with an <xf:repeat>. */
-.xbl-fr-accordion-dl .xforms-repeat-selected-item-1 {
-    background-color: transparent;
-}

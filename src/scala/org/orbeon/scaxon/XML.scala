@@ -434,7 +434,7 @@ object XML {
 
     implicit def itemSeqToSequenceIterator[T <: Item](seq: Seq[T]): SequenceIterator = new ListIterator(seq.asJava)
 
-    implicit def stringToQName(s: String) = QName.get(s)
+    implicit def stringToQName(s: String) = QName.get(s ensuring ! s.contains(':'))
     implicit def tupleToQName(name: (String, String)) = QName.get(name._2, "", name._1)
     def stringToStringValue(s: String) = StringValue.makeStringValue(s)
 

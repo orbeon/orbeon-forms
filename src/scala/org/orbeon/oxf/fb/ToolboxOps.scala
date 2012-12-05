@@ -20,6 +20,7 @@ import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.ContainerOps._
+import org.orbeon.oxf.xml.XMLConstants.XML_URI
 
 /*
  * Form Builder: toolbox operations.
@@ -340,7 +341,7 @@ object ToolboxOps {
 
             // Create <resource xml:lang="..."> containers
             val resourcesWithLang = findResourceHoldersWithLang(name) map {
-                case (lang, holder) ⇒ elementInfo("resource", attributeInfo("xml:lang", lang) ++ holder)
+                case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
             }
 
             // Clear and insert each clipboard element

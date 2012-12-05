@@ -20,7 +20,7 @@ import org.orbeon.scaxon.XML._
 
 class XMLTest extends AssertionsForJUnit {
 
-    @Test def attributes() {
+    @Test def attributes(): Unit = {
         val foo: NodeInfo = <foo a1="v1" a2="v2" my:a3="v3a" your:a3="v3b" xmlns:my="ns1" xmlns:your="ns2"/>
 
         assert((foo \@ "a1" stringValue) === "v1")
@@ -35,5 +35,14 @@ class XMLTest extends AssertionsForJUnit {
         assert((foo \@ @* map (_.stringValue) sorted) === Seq("v1", "v2", "v3a", "v3b"))
 
         assert((foo \@ ("a1" || "a2") map (_.stringValue) sorted) === Seq("v1", "v2"))
+    }
+
+    @Test def stringToQName(): Unit = {
+        // stringToQName must not accept a qualified name
+        intercept[AssertionError] {
+            attributeInfo("foo:bar", "")
+        }
+
+        attributeInfo("bar", "")
     }
 }

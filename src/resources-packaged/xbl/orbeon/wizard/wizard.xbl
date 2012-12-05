@@ -64,7 +64,12 @@
                                     </xf:case>
                                 </xsl:for-each>
                             </xf:switch>
-                            <xf:group class="fr-buttons" xxbl:scope="outer">
+                        </xh:div>
+                        <xh:div class="fr-wizard-toc">
+                            <xf:group xxbl:scope="outer">
+                                <xh:ul class="nav nav-list">
+                                    <xsl:apply-templates mode="toc-sections"/>
+                                </xh:ul>
 
                                 <xf:var
                                     name="case-index"
@@ -81,33 +86,40 @@
                                 <xf:var name="prev-button-ref" value="xxf:instance('local')/(if (exists($prev-cases)) then readwrite else readonly)"/>
                                 <xf:var name="next-button-ref" value="xxf:instance('local')/(if (exists($next-cases)) then readwrite else readonly)"/>
 
-                                <xf:trigger ref="$prev-button-ref">
-                                    <xf:label>
-                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt="Prev"/>
-                                        <xf:output value="$fr-resources/summary/labels/previous"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate">
-                                        <xf:toggle case="{{$prev-cases[last()]}}"/>
-                                        <xf:setfocus control="{{$prev-cases[last()]}}" input-only="true"/>
-                                    </xf:action>
-                                </xf:trigger>
-                                <xf:trigger ref="$next-button-ref">
-                                    <xf:label>
-                                        <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt="Next"/>
-                                        <xf:output value="$fr-resources/summary/labels/next"/>
-                                    </xf:label>
-                                    <xf:action ev:event="DOMActivate">
-                                        <xf:toggle case="{{$next-cases[1]}}"/>
-                                        <xf:setfocus control="{{$next-cases[1]}}" input-only="true"/>
-                                    </xf:action>
-                                </xf:trigger>
-                            </xf:group>
-                        </xh:div>
-                        <xh:div class="fr-wizard-toc">
-                            <xf:group xxbl:scope="outer">
-                                <xh:ul class="nav nav-list">
-                                    <xsl:apply-templates mode="toc-sections"/>
-                                </xh:ul>
+                                <div class="pagination pagination-centered" xmlns="http://www.w3.org/1999/xhtml">
+                                    <ul>
+                                        <li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
+                                            <xf:trigger ref="$prev-button-ref" appearance="minimal">
+                                                <xf:label>
+                                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
+                                                </xf:label>
+                                                <xf:action ev:event="DOMActivate">
+                                                    <xf:toggle case="{{$prev-cases[last()]}}"/>
+                                                    <xf:setfocus control="{{$prev-cases[last()]}}" input-only="true"/>
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </li>
+                                        <li>
+                                            <span>
+                                                <xf:output value="$case-index"/>
+                                                <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
+                                                <xf:output value="count(xxf:cases('switch'))"/>
+                                            </span>
+                                        </li>
+                                        <li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
+                                            <xf:trigger ref="$next-button-ref" appearance="minimal">
+                                                <xf:label>
+                                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
+                                                </xf:label>
+                                                <xf:action ev:event="DOMActivate">
+                                                    <xf:toggle case="{{$next-cases[1]}}"/>
+                                                    <xf:setfocus control="{{$next-cases[1]}}" input-only="true"/>
+                                                </xf:action>
+                                            </xf:trigger>
+                                        </li>
+                                    </ul>
+                                </div>
+
                             </xf:group>
                         </xh:div>
                         <!--<xh:div class="fr-clear"/>-->

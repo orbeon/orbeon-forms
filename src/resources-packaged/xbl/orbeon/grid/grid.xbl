@@ -111,7 +111,7 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <xf:group ref="$repeat-context[not(xxf:readonly(.))]">
+                                            <xf:group ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
                                                 <xh:th class="fr-repeat-column fr-repeat-column-trigger">
                                                     <xf:var name="can-add" as="xs:boolean"
                                                              value="{if ($max-occurs = 'unbounded') then 'true()'
@@ -184,7 +184,7 @@
 
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                            <xf:group ref="$repeat-context[not(xxf:readonly(.))]">
+                                                            <xf:group ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
                                                                 <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
                                                                     <!-- Remove trigger -->
                                                                     <xf:var name="can-remove"

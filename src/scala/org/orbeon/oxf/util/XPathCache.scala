@@ -40,6 +40,7 @@ import org.orbeon.saxon.sxpath.XPathExpression
 import org.orbeon.saxon.sxpath.XPathVariable
 import org.orbeon.saxon.value.SequenceExtent
 import collection.JavaConverters._
+import org.orbeon.saxon.trans.XPathException
 
 /**
  * XPath expressions cache.
@@ -76,6 +77,10 @@ object XPathCache {
     
     def getGlobalConfiguration = Configuration
 
+    def isDynamicXPathError(t: Throwable) = t match {
+        case e: XPathException if ! e.isStaticError ⇒ true
+        case _ ⇒ false
+    }
     // Evaluate an XPath expression on the document and return a List of native Java objects (i.e. String, Boolean,
     // etc.), but NodeInfo wrappers are preserved.
     def evaluate(

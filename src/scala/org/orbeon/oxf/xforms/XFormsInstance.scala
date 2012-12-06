@@ -119,6 +119,7 @@ class XFormsInstance(
     }
 
     def exposeXPathTypes = instance.exposeXPathTypes
+    def isSchemaValidation = instance.isSchemaValidation && ! _readonly
 
     // Don't serialize if the instance is inline and hasn't been modified
     // NOTE: If the instance is cacheable, its metadata gets serialized, but not it's XML content
@@ -135,10 +136,6 @@ class XFormsInstance(
 
     def scope = model.getStaticModel.scope
     def container = model.container
-
-    def isLaxValidation = (instance.validation eq null) || instance.validation == "lax"
-    def isStrictValidation = instance.validation == "strict"
-    def isSchemaValidation = (isLaxValidation || isStrictValidation) && ! _readonly
 
     def getLocationData =
         if (_documentInfo.isInstanceOf[DocumentWrapper])
@@ -317,7 +314,8 @@ object XFormsInstance extends Logging {
     // Take a non-wrapped DocumentInfo and wrap it if needed
     def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean) = {
         assert(! documentInfo.isInstanceOf[VirtualNode], "DocumentInfo must not be a VirtualNode, i.e. it must be a native readonly tree like TinyTree")
-        assert(! (readonly && exposeXPathTypes), "can't expose XPath types on readonly instances")
+
+        // NOTE: We don't honor exposeXPathTypes on readonly instances, anyway they don't support MIPs at this time
 
         if (readonly)
             documentInfo // the optimal case: no copy of the cached document is needed
@@ -366,8 +364,6 @@ object XFormsInstance extends Logging {
     // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
     // @exposeXPathTypes if true, use a TypedDocumentWrapper
     def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
-
-        require(! (readonly && exposeXPathTypes), "can't expose XPath types on readonly content")
 
         // Extract a document and adjust namespaces if requested
         // NOTE: Should implement exactly as per XSLT 2.0

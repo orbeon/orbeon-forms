@@ -1514,4 +1514,93 @@
         </output>
     </test>
 
+    <test description="Access typed value" name="oxf:pipeline">
+        <!-- See also: #630 "Enable XPath type annotations by default in Builder" -->
+        <input name="config">
+            <p:config>
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="wrap-xforms-state.xpl"/>
+                    <p:input name="document">
+                        <xh:html>
+                            <xh:head>
+                                <xf:model id="form-model" xxf:expose-xpath-types="true">
+                                    <xf:instance id="input">
+                                        <values xmlns="">
+                                            <int>35</int>
+                                            <int/>
+                                        </values>
+                                    </xf:instance>
+                                    <xf:bind ref="instance('input')">
+                                        <xf:bind ref="string"  type="xf:string"/>
+                                        <xf:bind ref="int"     type="xf:integer"/>
+                                        <xf:bind ref="boolean" type="xf:boolean"/>
+                                        <xf:bind ref="date"    type="xf:date"/>
+                                        <xf:bind ref="time"    type="xf:time"/>
+                                        <xf:bind ref="double"  type="xf:double"/>
+                                    </xf:bind>
+                                    <xf:instance id="output">
+                                        <values xmlns="">
+                                            <value/>
+                                            <value/>
+                                            <value>MUST BE BLANKED</value>
+                                            <value/>
+                                            <value/>
+                                            <value/>
+                                            <value/>
+                                        </values>
+                                    </xf:instance>
+                                    <xf:bind ref="instance('output')">
+                                        <!-- Multiplication using type -->
+                                        <xf:bind ref="value[1]"  calculate="instance('input')/int[1] * 2"/>
+                                        <!-- Result must be an integer -->
+                                        <xf:bind ref="value[2]"  calculate="(instance('input')/int[1] * 2) instance of xs:integer"/>
+                                        <!-- This must fail so blank the value -->
+                                        <xf:bind ref="value[3]"  calculate="data(instance('input')/int[2])"/>
+                                        <!-- false because the type is a node -->
+                                        <xf:bind ref="value[4]"  calculate="instance('input')/int[1] instance of xs:integer"/>
+                                        <!-- true because the type is an integer -->
+                                        <xf:bind ref="value[5]"  calculate="data(instance('input')/int[1]) instance of xs:integer"/>/>
+                                        <!-- string() accessor -->
+                                        <xf:bind ref="value[6]"  calculate="string(instance('input')/int[1]) castable as xs:integer"/>/>
+                                        <xf:bind ref="value[7]"  calculate="string(instance('input')/int[2]) castable as xs:integer"/>/>
+                                    </xf:bind>
+                                </xf:model>
+                            </xh:head>
+                            <xh:body>
+                            </xh:body>
+                        </xh:html>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="output" model-id="form-model">
+                                <values>
+                                    <value>70</value>
+                                    <value>true</value>
+                                    <value/>
+                                    <value>false</value>
+                                    <value>true</value>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </values>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

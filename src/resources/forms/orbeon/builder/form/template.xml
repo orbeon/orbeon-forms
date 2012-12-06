@@ -27,7 +27,7 @@
             xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
     <xh:head>
         <xh:title>[Give this form a title]</xh:title>
-        <xf:model id="fr-form-model">
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
 
             <!-- Main instance -->
             <xf:instance id="fr-form-instance">

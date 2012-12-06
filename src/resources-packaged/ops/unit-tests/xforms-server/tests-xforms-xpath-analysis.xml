@@ -2623,6 +2623,19 @@
                                 <mip name="required" expression="true()">
                                     <analysis expression="boolean(true())" analyzed="true"/>
                                 </mip>
+                                <mip name="constraint" expression="normalize-space()">
+                                    <analysis expression="boolean(normalize-space())" analyzed="true">
+                                        <value-dependent>
+                                            <path>instance('po')/items/item/name</path>
+                                        </value-dependent>
+                                        <dependent-models>
+                                            <model>model</model>
+                                        </dependent-models>
+                                        <dependent-instances>
+                                            <instance>po</instance>
+                                        </dependent-instances>
+                                    </analysis>
+                                </mip>
                             </bind>
                             <bind id="units-bind" ref="units">
                                 <binding>
@@ -2742,8 +2755,8 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="relevant" expression="for $u in ../units return $u castable as xs:decimal and $u &gt; 0">
-                                    <analysis expression="boolean(for $u in ../units return $u castable as xs:decimal and $u &gt; 0)" analyzed="true">
+                                <mip name="relevant" expression="for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0">
+                                    <analysis expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
                                         </value-dependent>
@@ -2755,8 +2768,8 @@
                                         </dependent-instances>
                                     </analysis>
                                 </mip>
-                                <mip name="calculate" expression="if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-'">
-                                    <analysis expression="string((if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
+                                <mip name="calculate" expression="if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-'">
+                                    <analysis expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
                                             <path>instance('po')/items/item/price</path>
@@ -2818,8 +2831,8 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="calculate" expression="sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t)">
-                                    <analysis expression="string((sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t))[1])" analyzed="true">
+                                <mip name="calculate" expression="sum(for $t in ../../items/item/total[string(.) castable as xs:decimal] return $t)">
+                                    <analysis expression="string((sum(for $t in ../../items/item/total[string(.) castable as xs:decimal] return $t))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/total</path>
                                         </value-dependent>

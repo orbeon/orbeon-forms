@@ -759,11 +759,11 @@ public class XFormsModelSchemaValidator {
 
             // Get validation mode ("lax" is the default)
             boolean isValid = true;
-            if (instance.isLaxValidation()) {
+            if (instance.instance().isLaxValidation()) {
                 // Lax validation
                 final Element instanceRootElement = instance.underlyingDocumentOrNull().getRootElement();
                 isValid &= validateElementLax(instanceRootElement);
-            } else if (instance.isStrictValidation()) {
+            } else if (instance.instance().isStrictValidation()) {
                 // Strict validation
                 final Acceptor acceptor = documentDeclaration.createAcceptor();
                 final Element instanceRootElement = instance.underlyingDocumentOrNull().getRootElement();

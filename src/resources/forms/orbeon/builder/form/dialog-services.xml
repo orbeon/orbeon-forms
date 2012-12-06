@@ -78,7 +78,7 @@
                         <xf:hint ref="$form-resources/dialog-http-services/soap-submission/hint"/>
                     </xf:input>
 
-                    <xf:group ref=".[is-soap = 'true']">
+                    <xf:group ref=".[string(is-soap) = 'true']">
                         <xf:input ref="soap-action" incremental="true">
                             <xf:label ref="$form-resources/dialog-http-services/soap-action/label"/>
                             <xf:hint ref="$form-resources/dialog-http-services/soap-action/hint"/>
@@ -90,7 +90,7 @@
                         <xf:hint ref="$form-resources/dialog-http-services/http-authentication/hint"/>
                     </xf:input>
 
-                    <xf:group ref=".[is-auth = 'true']">
+                    <xf:group ref=".[string(is-auth) = 'true']">
                         <xf:input ref="username" incremental="true">
                             <xf:label ref="$form-resources/dialog-http-services/username/label"/>
                         </xf:input>
@@ -403,7 +403,7 @@
             <!--<xf:bind ref="request/soap-action"/>-->
             <!-- Compute mediatype based on SOAP or serialization -->
             <xf:bind ref="request/mediatype"
-                         calculate="if (../is-soap = 'true')
+                         calculate="if (string(../is-soap) = 'true')
                                     then string-join(('application/soap+xml', if (normalize-space(../soap-action) != '') then concat('action=', normalize-space(../soap-action)) else ()), '; ')
                                     else ../serialization"/>
             <xf:bind ref="request/body" type="xxf:xml" required="true()"/>

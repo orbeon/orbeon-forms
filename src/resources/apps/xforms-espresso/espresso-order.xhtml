@@ -145,21 +145,24 @@
                          type="xs:nonNegativeInteger"
                          constraint=". mod 10 = 0"
                          readonly="false()"
-                         calculate="if (matches(xs:string(.), '[^\d]*\d+.*'))
-                                    then xs:integer(replace(xs:string(.), '[^\d]*(\d+).*', '$1')) idiv 10 * 10
-                                    else if (normalize-space(.)) then . else 0"/>
+                         calculate="for $s in string(.)
+                                    return
+                                        if (matches($s, '[^\d]*\d+.*'))
+                                        then xs:integer(replace($s, '[^\d]*(\d+).*', '$1')) idiv 10 * 10
+                                        else if (normalize-space($s)) then . else 0"/>
             </xf:bind>
             <!-- Totals -->
             <xf:bind ref="total">
                 <!-- Sum all quantities that are integers -->
                 <!-- Mark the sum as invalid if there is any non-valid quantity -->
                 <xf:bind id="total-units" ref="units" type="xs:nonNegativeInteger"
-                         calculate="sum(../../item/quantity[. castable as xs:integer])"
+                         calculate="sum(../../item/quantity[string(.) castable as xs:integer])"
                          constraint="not((for $v in ../../item/quantity return xxf:valid($v)) = false())"/>
                 <!-- Sum all prices that have integer quantities -->
                 <!-- Mark the sum as invalid if there is any non-valid quantity -->
                 <xf:bind id="total-price" ref="price" type="xs:decimal"
-                         calculate="sum(for $item in ../../item[quantity castable as xs:integer] return $item/price * $item/quantity)"
+                         calculate="sum(for $item in ../../item[string(quantity) castable as xs:integer]
+                                        return $item/price * $item/quantity)"
                          constraint="xxf:valid(../units)"/>
             </xf:bind>
 
@@ -194,7 +197,7 @@
                         <td><xf:output value="concat('$ ', price)"/></td>
                         <td>
                             <!-- Predefined quantities dropdown -->
-                            <xf:var name="predefined-quantities" value="for $i in (0 to 29) return normalize-space(xs:string($i * 10))" as="xs:string+"/>
+                            <xf:var name="predefined-quantities" value="for $i in (0 to 29) return normalize-space(string($i * 10))" as="xs:string+"/>
                             <xf:select1 class="quantity-select" ref="quantity">
                                 <!-- Show all predefined quantities -->
                                 <xf:itemset ref="$predefined-quantities">
@@ -203,7 +206,7 @@
                                 </xf:itemset>
                                 <!-- The "custom" item is shown only if the current value is not in the set of
                                      predefined values, and its value is set to the current value. -->
-                                <xf:itemset ref=".[not(xs:string(.) = $predefined-quantities)]">
+                                <xf:itemset ref=".[not(string(.) = $predefined-quantities)]">
                                     <xf:label>Custom</xf:label>
                                     <xf:value value="."/>
                                 </xf:itemset>

@@ -58,12 +58,12 @@
                 <xf:bind id="price-bind" ref="price" type="xs:decimal" constraint=". > 0"/>
                 <xf:bind id="line-total-bind" ref="total"
                          type="xs:decimal"
-                         calculate="if (../units castable as xs:integer and ../price castable as xs:decimal) then ../units * ../price else '-'"
-                         relevant="for $u in ../units return $u castable as xs:decimal and $u > 0"/>
+                         calculate="if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-'"
+                         relevant="for $u in ../units return string($u) castable as xs:decimal and $u > 0"/>
             </xf:bind>
 
             <xf:bind id="totals-bind" ref="totals">
-                <xf:bind id="subtotal-bind" ref="subtotal" type="xs:decimal" calculate="sum(for $t in ../../items/item/total[. castable as xs:decimal] return $t)"/>
+                <xf:bind id="subtotal-bind" ref="subtotal" type="xs:decimal" calculate="sum(for $t in ../../items/item/total[string(.) castable as xs:decimal] return $t)"/>
                 <xf:bind id="tax-bind" ref="tax" type="xs:decimal" calculate="../subtotal * ../../info/tax"/>
                 <xf:bind id="total-bind" ref="total" type="xs:decimal" calculate="for $t in ../subtotal + ../tax return if ($t > 4000) then $t else $t * 0.9"/>
             </xf:bind>

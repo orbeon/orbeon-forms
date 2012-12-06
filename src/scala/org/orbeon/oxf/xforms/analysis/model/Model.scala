@@ -659,5 +659,60 @@ object Model {
     val DEFAULT_READONLY = false
     val DEFAULT_REQUIRED = false
     val DEFAULT_VALID    = true
+
+    val XFormsSchemaTypeNames = Set(
+        "dayTimeDuration",
+        "yearMonthDuration",
+        "email",
+        "card-number"
+    )
+
+    val jXFormsSchemaTypeNames = XFormsSchemaTypeNames.asJava
+
+    val XFormsVariationTypeNames = Set(
+        "dateTime",
+        "time",
+        "date",
+        "gYearMonth",
+        "gYear",
+        "gMonthDay",
+        "gDay",
+        "gMonth",
+        "string",
+        "boolean",
+        "base64Binary",
+        "hexBinary",
+        "float",
+        "decimal",
+        "double",
+        "anyURI",
+        "QName",
+
+        "normalizedString",
+        "token",
+        "language",
+        "Name",
+        "NCName",
+        "ID",
+        "IDREF",
+        "IDREFS",
+        "NMTOKEN",
+        "NMTOKENS",
+        "integer",
+        "nonPositiveInteger",
+        "negativeInteger",
+        "long",
+        "int",
+        "short",
+        "byte",
+        "nonNegativeInteger",
+        "unsignedLong",
+        "unsignedInt",
+        "unsignedShort",
+        "unsignedByte",
+        "positiveInteger"
+    )
+
+    val jXFormsVariationTypeNames = XFormsVariationTypeNames.asJava
 }
 

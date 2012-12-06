@@ -35,6 +35,10 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
 
     def startScope: Scope
 
+    // Part-local properties
+    def getProperty[T](propertyName: String): T
+    def isExposeXPathTypes: Boolean
+
     def getEventHandlers(observerPrefixedId: String): Seq[EventHandler]
     def observerHasHandlerForEvent(observerPrefixedId: String, eventName: String): Boolean
 

@@ -13,23 +13,23 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import java.lang.String
-import model.Model
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.Element
 import org.orbeon.oxf.xforms._
-import event.EventHandlerImpl
+import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData, Dom4jUtils}
 import collection.mutable.Buffer
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{Version, ValidationException}
 import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper, XMLUtils}
-import xbl.Scope
+import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
+import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 
 /**
  * Static analysis of a whole part, including:
@@ -78,6 +78,9 @@ class PartAnalysisImpl(
     def getMark(prefixedId: String) = metadata.getMark(prefixedId)
 
     def isTopLevel = startScope.isTopLevelScope
+
+    def getProperty[T](propertyName: String) = staticStateDocument.getProperty[T](propertyName)
+    val isExposeXPathTypes = getProperty[Boolean](P.EXPOSE_XPATH_TYPES_PROPERTY)
 
     /**
      * Return the namespace mappings for a given element. If the element does not have an id, or if the mapping is not

@@ -61,12 +61,11 @@ class XFormsStaticStateImpl(
 
     // Properties
     lazy val allowedExternalEvents = stringOptionToSet(Option(getProperty[String](P.EXTERNAL_EVENTS_PROPERTY)))
-    lazy val isNoscript = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
-    lazy val isXPathAnalysis = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
-    lazy val isExposeXPathTypes = getProperty[Boolean](P.EXPOSE_XPATH_TYPES_PROPERTY)
-    lazy val isHTMLDocument = staticStateDocument.isHTMLDocument
+    lazy val isNoscript            = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
+    lazy val isHTMLDocument        = staticStateDocument.isHTMLDocument
+    lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
 
-    def isCacheDocument = staticStateDocument.isCacheDocument
+    def isCacheDocument       = staticStateDocument.isCacheDocument
     def isClientStateHandling = staticStateDocument.isClientStateHandling
     def isServerStateHandling = staticStateDocument.isServerStateHandling
 
@@ -77,11 +76,11 @@ class XFormsStaticStateImpl(
     def getProperty[T](propertyName: String): T = staticStateDocument.getProperty[T](propertyName)
 
     // Legacy methods
-    def getAllowedExternalEvents: JSet[String] = allowedExternalEvents
+    def getAllowedExternalEvents: JSet[String]       = allowedExternalEvents
     def getNonDefaultProperties: Map[String, AnyRef] = staticStateDocument.nonDefaultProperties
-    def getStringProperty(propertyName: String) = getProperty[String](propertyName)
-    def getBooleanProperty(propertyName: String) = getProperty[Boolean](propertyName)
-    def getIntegerProperty(propertyName: String) = getProperty[Int](propertyName)
+    def getStringProperty(propertyName: String)      = getProperty[String](propertyName)
+    def getBooleanProperty(propertyName: String)     = getProperty[Boolean](propertyName)
+    def getIntegerProperty(propertyName: String)     = getProperty[Int](propertyName)
 }
 
 object XFormsStaticStateImpl {
@@ -270,9 +269,9 @@ object XFormsStaticStateImpl {
         // NOTE: XFormsExtractorContentHandler takes care of propagating only non-default properties
         val nonDefaultProperties = {
             for {
-                element ← Dom4jUtils.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME).asScala
-                attribute ← Dom4jUtils.attributes(element).asScala
-                propertyName = attribute.getName
+                element       ← Dom4jUtils.elements(staticStateElement, STATIC_STATE_PROPERTIES_QNAME).asScala
+                attribute     ← Dom4jUtils.attributes(element).asScala
+                propertyName  = attribute.getName
                 propertyValue = P.parseProperty(propertyName, attribute.getValue)
             } yield
                 (propertyName, propertyValue)

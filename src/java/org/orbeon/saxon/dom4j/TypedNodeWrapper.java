@@ -16,15 +16,14 @@ package org.orbeon.saxon.dom4j;
 import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.xforms.InstanceData;
-import org.orbeon.oxf.xforms.model.DataModel;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.analysis.model.Model;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.Err;
 import org.orbeon.saxon.trans.XPathException;
-import org.orbeon.saxon.type.AtomicType;
-import org.orbeon.saxon.type.BuiltInType;
 import org.orbeon.saxon.type.SchemaType;
 import org.orbeon.saxon.type.Type;
-import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.value.UntypedAtomicValue;
 import org.orbeon.saxon.value.Value;
 
@@ -71,7 +70,6 @@ public class TypedNodeWrapper extends NodeWrapper {
 
     @Override
     public SequenceIterator getTypedValue() throws XPathException {
-
         int annotation = getTypeAnnotation();
         if ((annotation & NodeInfo.IS_DTD_TYPE) != 0) {
             annotation = StandardNames.XS_UNTYPED_ATOMIC;
@@ -80,22 +78,40 @@ public class TypedNodeWrapper extends NodeWrapper {
         if (annotation == -1 || annotation == StandardNames.XS_UNTYPED_ATOMIC || annotation == StandardNames.XS_UNTYPED) {
             return SingletonIterator.makeIterator(new UntypedAtomicValue(getStringValueCS()));
         } else {
-            SchemaType stype = getConfiguration().getSchemaType(annotation);
+            final SchemaType stype = getConfiguration().getSchemaType(annotation);
             if (stype == null) {
-                String typeName;
-                try {
-                    typeName = getNamePool().getDisplayName(annotation);
-                } catch (Exception err) {
-                    typeName = annotation + "";
-                }
                 throw new XPathException("Unknown type annotation " +
-                        Err.wrap(typeName) + " in document instance");
+                        Err.wrap(getAnnotationTypeName(annotation)) + " in document instance");
             } else {
-                return stype.getTypedValue(this);
+                try {
+                    return stype.getTypedValue(this);
+                } catch (Exception err) {
+                    throw new TypedValueException(getDisplayName(), getAnnotationTypeName(annotation), getStringValue());
+                }
             }
         }
     }
 
+    private String getAnnotationTypeName(int annotation) {
+        try {
+            return getNamePool().getDisplayName(annotation);
+        } catch (Exception err) {
+            return Integer.toString(annotation);
+        }
+    }
+
+    public static class TypedValueException extends RuntimeException {
+        public final String nodeName;
+        public final String typeName;
+        public final String nodeValue;
+        public TypedValueException(String nodeName, String typeName, String nodeValue) {
+            this.nodeName = nodeName;
+            this.typeName = typeName;
+            this.nodeValue = nodeValue;
+        }
+    }
+
+    // FIXME: This is almost 100% duplicated from getTypedValue above.
     @Override
     public Value atomize() throws XPathException {
         int annotation = getTypeAnnotation();
@@ -106,18 +122,16 @@ public class TypedNodeWrapper extends NodeWrapper {
         if (annotation == -1 || annotation == StandardNames.XS_UNTYPED_ATOMIC || annotation == StandardNames.XS_UNTYPED) {
             return new UntypedAtomicValue(getStringValueCS());
         } else {
-            SchemaType stype = getConfiguration().getSchemaType(annotation);
+            final SchemaType stype = getConfiguration().getSchemaType(annotation);
             if (stype == null) {
-                String typeName;
-                try {
-                    typeName = getNamePool().getDisplayName(annotation);
-                } catch (Exception err) {
-                    typeName = annotation + "";
-                }
                 throw new XPathException("Unknown type annotation " +
-                        Err.wrap(typeName) + " in document instance");
+                        Err.wrap(getAnnotationTypeName(annotation)) + " in document instance");
             } else {
-                return stype.atomize(this);
+                try {
+                    return stype.atomize(this);
+                } catch (Exception err) {
+                    throw new TypedValueException(getDisplayName(), getAnnotationTypeName(annotation), getStringValue());
+                }
             }
         }
     }
@@ -130,8 +144,13 @@ public class TypedNodeWrapper extends NodeWrapper {
             return getUntypedType();
         } else {
             // Extract QName
-            final String uri = nodeType.getNamespaceURI();
+            String uri = nodeType.getNamespaceURI();
             final String localname = nodeType.getName();
+
+            // For type annotation purposes, xforms:integer is translated into xs:integer. This is because XPath has no
+            // knowledge of the XForms union types.
+            if (uri.equals(XFormsConstants.XFORMS_NAMESPACE_URI) && Model.jXFormsVariationTypeNames().contains(localname))
+                uri = XMLConstants.XSD_URI;
 
             final int requestedTypeFingerprint = StandardNames.getFingerprint(uri, localname);
             if (requestedTypeFingerprint == -1) {
@@ -139,17 +158,7 @@ public class TypedNodeWrapper extends NodeWrapper {
                 return getUntypedType();
             } else {
                 // Return identified type
-                // NOTE: Return a type iif the value matches the type, because that's required by the XPath semantic.
-                final StringValue value = new StringValue(DataModel.getValue(this));
-
-                try {
-                    value.convert((AtomicType) BuiltInType.getSchemaType(requestedTypeFingerprint), getConfiguration().getConversionContext());
-                    // Value matches type, return it
-                    return requestedTypeFingerprint;
-                } catch (XPathException e) {
-                    // Back to default case
-                    return getUntypedType();
-                }
+                return requestedTypeFingerprint;
             }
         }
     }

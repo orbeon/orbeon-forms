@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
+import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
@@ -30,6 +31,7 @@ import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.saxon.dom4j.TypedNodeWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.om.Item;
@@ -71,15 +73,6 @@ public class XFormsModelBinds {
 
     private boolean isFirstCalculate;                           // whether this is the first recalculate for the associated XForms model
     private boolean isFirstRebuild;                             // whether this is the first rebuild for the associated XForms model
-
-    private static final Set<String> BUILTIN_XFORMS_SCHEMA_TYPES = new HashSet<String>();
-
-    static {
-        BUILTIN_XFORMS_SCHEMA_TYPES.add("dayTimeDuration");
-        BUILTIN_XFORMS_SCHEMA_TYPES.add("yearMonthDuration");
-        BUILTIN_XFORMS_SCHEMA_TYPES.add("email");
-        BUILTIN_XFORMS_SCHEMA_TYPES.add("card-number");
-    }
 
     /**
      * Create an instance of XFormsModelBinds if the given model has xf:bind elements.
@@ -344,11 +337,7 @@ public class XFormsModelBinds {
         }
     }
 
-    /**
-     * Iterate over all binds and for each one do the callback.
-     *
-     * @param bindRunner        bind runner
-     */
+    // Iterate over all binds and for each one do the callback.
     private void iterateBinds(BindRunner bindRunner) {
         // Iterate over top-level binds
         for (final Bind currentBind : topLevelBinds) {
@@ -361,10 +350,25 @@ public class XFormsModelBinds {
     }
     
     private void handleMIPXPathException(Exception e, Bind bind, String expression, String message) {
-        final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
-            bind.staticBind.element(), "expression", expression));
-
-        Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(model, ve.getMessage(), ve));
+        final Throwable root = Exceptions.getRootThrowable(e);
+        if (root instanceof TypedNodeWrapper.TypedValueException) {
+            // Consider validation errors as ignorable. The rationale is that if the function (the XPath
+            // expression) works on inputs that are not valid (hence the validation error), then the function cannot
+            // produce a meaningful result. We think that it is worth handling this condition slightly differently from
+            // other dynamic and static errors, so that users can just write expression without constant checks with
+            // `castable as` or `instance of`.
+            final TypedNodeWrapper.TypedValueException typeValueException = (TypedNodeWrapper.TypedValueException) root;
+            if (indentedLogger.isDebugEnabled())
+                indentedLogger.logDebug("", "typed value exception",
+                        "node name",     typeValueException.nodeName,
+                        "expected type", typeValueException.typeName,
+                        "actual value",  typeValueException.nodeValue);
+        } else {
+            // All other errors dispatch an event and will cause the usual fatal-or-not behavior
+            final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
+                bind.staticBind.element(), "expression", expression));
+            Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(model, ve.getMessage(), ve));
+        }
     }
 
     private String evaluateXXFormsDefaultBind(Bind bind, int position) {
@@ -411,7 +415,8 @@ public class XFormsModelBinds {
                 return evaluateStringExpression(bind.nodeset, position, bind, bind.staticBind.getCalculate(), getVariables(currentNodeInfo));
             } catch (Exception e) {
                 handleMIPXPathException(e, bind, bind.staticBind.getCalculate(), "evaluating XForms calculate bind");
-                return null;
+                // Blank value so we don't have stale calculated values
+                return "";
             }
         } else {
             return null;
@@ -756,9 +761,7 @@ public class XFormsModelBinds {
             final boolean isBuiltInXFormsType = XFormsConstants.XFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
             final boolean isBuiltInXXFormsType = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(typeNamespaceURI);
 
-            final boolean isBuiltInXFormsSchemaType = isBuiltInXFormsType && BUILTIN_XFORMS_SCHEMA_TYPES.contains(typeLocalname);
-
-            if (isBuiltInXFormsSchemaType) {
+            if (isBuiltInXFormsType && Model.jXFormsSchemaTypeNames().contains(typeLocalname)) {
                 // xf:dayTimeDuration, xf:yearMonthDuration, xf:email, xf:card-number
                 if (xformsValidator == null) {
                     xformsValidator = new XFormsModelSchemaValidator("oxf:/org/orbeon/oxf/xforms/xforms-types.xsd");

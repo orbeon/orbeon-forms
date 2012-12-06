@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.errorified.Exceptions;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -467,11 +466,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             // and event handlers for this have to be careful. It might be better to dispatch it *after* RRR.
 
             final XXFormsXPathErrorEvent ev = (XXFormsXPathErrorEvent) event;
-            final Throwable t = ev.throwable();
-            if (isIgnorableXPathError(t))
-                XFormsError.logNonFatalXPathErrorAsDebug(container(), scope(), t);
-            else
-                XFormsError.handleNonFatalXPathError(container(), t);
+            XFormsError.handleNonFatalXPathError(container(), ev.throwable());
         } else if (XFormsEvents.XXFORMS_BINDING_ERROR.equals(eventName)) {
             // Custom event for binding errors
             // NOTE: We don't like this event very much as it is dispatched in the middle of rebuild/recalculate/revalidate,
@@ -483,14 +478,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             final XXFormsActionErrorEvent ev = (XXFormsActionErrorEvent) event;
             XFormsError.handleNonFatalActionError(this, ev.throwable());
         }
-    }
-
-    private boolean isIgnorableXPathError(Throwable t) {
-        if (XFormsProperties.isIgnoreDynamicMIPXPathErrors(containingDocument)) {
-            final Throwable root = Exceptions.getRootThrowable(t);
-            return (root instanceof XPathException) && ! ((XPathException) root).isStaticError();
-        } else
-            return false;
     }
 
     private void doReset() {

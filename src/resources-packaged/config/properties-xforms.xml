@@ -87,7 +87,6 @@
     <property as="xs:boolean" name="oxf.xforms.datepicker.two-months"                       value="false"/>
     <property as="xs:boolean" name="oxf.xforms.show-error-dialog"                           value="true"/>
     <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                     value="0"/>
-    <property as="xs:boolean" name="oxf.xforms.ignore-dynamic-mip-xpath-errors"             value="false"/>
 
     <property as="xs:integer" name="oxf.xforms.internal-short-delay"                        value="100"/>
     <property as="xs:integer" name="oxf.xforms.delay-before-incremental-request"            value="500"/>

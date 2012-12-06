@@ -30,6 +30,7 @@
       xxf:external-events="show-fb-test-dialog"
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
+      xxf:expose-xpath-types="true"
 
       id="fr-form-model">
 

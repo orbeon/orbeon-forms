@@ -122,6 +122,9 @@ form.xforms-form .uneditable-input {
   box-sizing: border-box;
   height: 28px;
 }
+form.xforms-form textarea {
+  height: 68px;
+}
 form.xforms-form .pagination ul > li > .xforms-trigger {
   cursor: pointer;
 }

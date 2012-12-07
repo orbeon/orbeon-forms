@@ -14,7 +14,7 @@
 
 /* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
 
-/* See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden  */
+// See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden
 
 html body .xforms-form {
     .xforms-repeat-template,
@@ -32,15 +32,15 @@ html body .xforms-form {
     .xforms-disabled,
     .xforms-case-deselected,
     .xforms-case-deselected .xforms-case-selected {
-        top: -10000px; /* this so that no space is visible on the page */
-        left: -10000px; /* this so that no space is visible on the page */
+        top: -10000px; // this so that no space is visible on the page
+        left: -10000px; // this so that no space is visible on the page
         position: absolute;
     }
 
     br.xforms-disabled,
     br.xforms-case-deselected,
     .xforms-case-deselected br.xforms-case-selected {
-        /* Special case for <br> which takes space with IE and Chrome with the -10000px trick */
+        // Special case for <br> which takes space with IE and Chrome with the -10000px trick
         display: none;
     }
 
@@ -73,7 +73,7 @@ html body .xforms-form {
         }
     }
 
-    /* Special visibility rule for table borders */
+    // Special visibility rule for table borders
     tr.xforms-disabled,
     .xforms-disabled tr,
     th.xforms-disabled,
@@ -84,7 +84,7 @@ html body .xforms-form {
     }
 }
 
-/* Special text content that must remain hidden */
+// Special text content that must remain hidden
 #xforms-repeat-tree, #xforms-repeat-indexes {
     display: none;
 }
@@ -128,9 +128,9 @@ html body .xforms-form {
     width: 16px;
     height: 16px;
     overflow: hidden;
-    /* This is needed to hide the text of the alert! */
+    // This is needed to hide the text of the alert!
     text-indent: 16px;
-    /* text-indent doesn't work on Firefox 2 (but does in 3), but the following does the trick */
+    // text-indent doesn't work on Firefox 2 (but does in 3), but the following does the trick
     font-size: 0;
     margin-left: .25em;
     vertical-align: middle;
@@ -144,7 +144,7 @@ html body .xforms-form {
 
 /* ***** Controls *********************************************************************************** */
 
-/* Prevent display of border when static read-only */
+// Prevent display of border when static read-only
 .xforms-static { border: none }
 
 .xforms-output {
@@ -158,10 +158,10 @@ html body .xforms-form {
     border: none;
     background: transparent;
     cursor: hand;
-    *width: auto;  *overflow: visible; /* IE 6/7 HACK: remove funny variable padding within button */
+    *width: auto;  *overflow: visible; // IE 6/7 HACK: remove funny variable padding within button
 }
 
-/* Special rule for Firefox to remove extra padding inside noscript buttons working as links */
+// Special rule for Firefox to remove extra padding inside noscript buttons working as links
 button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner {
     border: 0; padding: 0;
 }
@@ -174,7 +174,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     background-repeat: no-repeat;
 }
 
-/* Reset to default platform styling for dates on iOS */
+// Reset to default platform styling for dates on iOS
 .xforms-ios .xforms-input input.xforms-type-date {
     width: initial;
     padding-right: initial;
@@ -194,7 +194,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     background-repeat: no-repeat;
 }
 
-/* Reset to default platform styling for dates on iOS */
+// Reset to default platform styling for dates on iOS
 .xforms-ios .xforms-input input.xforms-type-time {
     width: initial;
     padding-right: initial;
@@ -216,7 +216,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
 .xforms-form .xforms-textarea textarea {
     -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
     font-family: Arial,Helvetica,Geneva,sans-serif;
-    -webkit-overflow-scrolling: touch; /* Only supported by iOS 5, but should be good too if it becomes supported in the future by browsers on OS X */
+    -webkit-overflow-scrolling: touch; // Only supported by iOS 5, but should be good too if it becomes supported in the future by browsers on OS X
 }
 
 .xforms-secret input {
@@ -228,7 +228,7 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
     overflow: hidden;
 }
 
-/* Default size for YUI RTE (seems to work!) */
+// Default size for YUI RTE (seems to work!)
 .xforms-mediatype-text-html textarea { width: 550px; height: 300px }
 
 .xforms-select1-appearance-minimal {
@@ -236,11 +236,11 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner, .xforms-trig
 }
 
 .xforms-select1-appearance-full label { vertical-align: middle; margin-right: .5em }
-fieldset.xforms-select1-appearance-full { margin: 0; border: none } /* when fieldset is used for full selection controls */
+fieldset.xforms-select1-appearance-full { margin: 0; border: none } // when fieldset is used for full selection controls
 
 .xforms-select-appearance-full input { vertical-align: middle }
 .xforms-select-appearance-full label { vertical-align: middle; margin-right: .5em  }
-fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when fieldset is used for full selection controls */
+fieldset.xforms-select-appearance-full { margin: 0; border: none } // when fieldset is used for full selection controls
 
 .xforms-dialog .bd { overflow: auto }
 
@@ -349,11 +349,11 @@ fieldset.xforms-select-appearance-full { margin: 0; border: none } /* when field
 }
 
 .yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
-    border: 0;                                  /* Override border set in YUI's menu.css, which creates a thicker border around the menu bar titles on iOS */
-    padding-top: 2px; padding-bottom: 2px;      /* Compensate for the lost border by adding some padding */
+    border: 0;                                  // Override border set in YUI's menu.css, which creates a thicker border around the menu bar titles on iOS
+    padding-top: 2px; padding-bottom: 2px;      // Compensate for the lost border by adding some padding
 }
 
-.yui-tt-shadow { display: none }                /* Remove shadow, which now looks tacky, and also for issue #581 */
+.yui-tt-shadow { display: none }                // Remove shadow, which now looks tacky, and also for issue #581
 
 /* ***** Indicators and messages ************************************************************************************ */
 
@@ -376,7 +376,7 @@ div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../
     background-image: url(../../ops/images/xforms/warning_64.png);
     background-position: 20px 20px;
     background-repeat: no-repeat;
-    padding: 10px 20px 10px 110px !important; /* Override padding defined by YUI */
+    padding: 10px 20px 10px 110px !important; // Override padding defined by YUI
     overflow: auto; background-color: white;
 }
 .xforms-error-panel {
@@ -443,16 +443,16 @@ div.xforms-modal-progress { width: 40px; height: 40px; background-image: url(../
     .xforms-tree-label-selected,
     .xforms-tree-label-selected:hover { background-color: #ff6 }
 }
-/* Override YUI CSS which adds a light blue green background to "currently focused" label */
+// Override YUI CSS which adds a light blue green background to "currently focused" label
 .ygtvfocus .ygtvlabel,
 .ygtvfocus .ygtvlabel:hover { background-color: transparent }
 
-/* In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link */
+// In the tree, because we don't have an href, we use this CSS so the cursor is a pointer when over the link
 a.ygtvlabel { cursor: pointer; }
 
-/* YUI sets this to a color, but it is hindering more than anything else */
+// YUI sets this to a color, but it is hindering more than anything else
 .ygtvfocus { background-color: transparent }
-.xforms-select-appearance-xxforms-tree table, xforms-select1-appearance-xxforms-tree table { margin: 0 }/* as table style can be globally changed */
+.xforms-select-appearance-xxforms-tree table, xforms-select1-appearance-xxforms-tree table { margin: 0 }// as table style can be globally changed
 
 // Custom control widths
 #xforms-form {

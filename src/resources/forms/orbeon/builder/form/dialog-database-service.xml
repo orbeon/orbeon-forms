@@ -216,11 +216,14 @@
 
         <xf:bind ref="instance('fb-database-service-instance')">
             <!-- Make sure that the name is not already in use  -->
-            <xf:bind ref="name" type="xs:NCName"
-                         constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
-                                        or not(../submission-id = $model/fb:submission/@id
-                                            or ../instance-id = $model/fb:instance/@id)"
-                         readonly="normalize-space(../initial-name)"/>
+            <xf:bind
+                ref="name"
+                type="xs:NCName"
+                required="true()"
+                constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
+                                or not(../submission-id = $model/fb:submission/@id
+                                    or ../instance-id = $model/fb:instance/@id)"
+                readonly="normalize-space(../initial-name)"/>
             <xf:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
             <xf:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
             <!-- TODO: type of datasource. What's the format? jdbc/foobar? a/b/c? use regexp -->
@@ -228,7 +231,7 @@
             <!-- Check that the resulting XML document is well-formed -->
             <xf:bind ref="query-xml" type="xxf:xml"
                          calculate="concat('&lt;sql:query xmlns:sql=''http://orbeon.org/oxf/xml/sql''>', ../query, '&lt;/sql:query>')"/>
-            <xf:bind ref="query" constraint="xxf:valid(../query-xml)"/>
+            <xf:bind ref="query" constraint="xxf:valid(../query-xml)" required="true()"/>
 
             <xf:bind ref="delete-trigger" relevant="normalize-space(../initial-name)"/>
             <xf:bind ref="save-test-trigger" readonly="../@valid = 'false'"/>

@@ -58,7 +58,7 @@ html, body { background-color: @frBackground }
     &:focus {
         border-color: rgba(82, 168, 236, .8);
         outline: 0;
-        outline: thin dotted  \9; /* IE6-9 */
+        outline: thin dotted  \9; // IE6-9
         .box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6));
     }
 }
@@ -101,12 +101,12 @@ html, body { background-color: @frBackground }
     clear: both;
     font-size: smaller;
     margin-top: .2em;
-    margin-left: 0;/* used to have margin here but with new colors no margin seems better */
+    margin-left: 0;// used to have margin here but with new colors no margin seems better
     width: 100%;
     color: #6E6E6E;
 }
 
-/* Navbar */
+// Navbar
 .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
     color: @navbarLinkColorActive;
     font-size: 85%;
@@ -129,28 +129,28 @@ html, body { background-color: @frBackground }
     float: left;
 }
 
-/* Add a star before the label of required fields, but only in new/edit modes */
-/* NOTE: This only works in span layout (the default in FR since 2011-07-28) */
-/* NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here */
+// Add a star before the label of required fields, but only in new/edit modes
+// NOTE: This only works in span layout (the default in FR since 2011-07-28)
+// NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
 .fr-mode-new .xforms-required .xforms-label, .fr-mode-edit .xforms-required .xforms-label, .fr-mode-test .xforms-required .xforms-label,
         .fr-mode-new .fb-required-true .xforms-label, .fr-mode-edit .fb-required-true .xforms-label {
     background-image: url(asterisk.png);
-    background-position: 0 2px;             /* Lower the star, so it doesn't sit "too high" relative to the text of the label */
+    background-position: 0 2px;             // Lower the star, so it doesn't sit "too high" relative to the text of the label
     background-repeat: no-repeat;
     padding-left: 12px;
 }
 
-/* Colored border for invalid fields */
-/* NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label */
+// Colored border for invalid fields
+// NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label
 .xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: @error }
 
-/* Upload control information */
+// Upload control information
 .xforms-upload-info { background-color: transparent }
 
-/* Table of contents */
+// Table of contents
 .fr-toc a { text-decoration: none }
 
-/* Error summary */
+// Error summary
 .fr-view .xbl-fr-error-summary {
     .fr-error-title {
         font-size: smaller;
@@ -169,7 +169,7 @@ html, body { background-color: @frBackground }
     }
 }
 
-/* Section */
+// Section
 .xbl-fr-section {
 
     background-color: white;
@@ -216,7 +216,7 @@ html, body { background-color: @frBackground }
     }
 }
 
-/* Add background to static read-only fields and special output fields */
+// Add background to static read-only fields and special output fields
 .xforms-static, .fr-static { min-height: 1em }
 .fr-mode-view {
     .fr-grid-content { margin-bottom: 1em }
@@ -230,7 +230,7 @@ html, body { background-color: @frBackground }
 
 /* ***** Print and PDF ********************************************************************************************** */
 
-/* This is also used for PDF generation */
+// This is also used for PDF generation
 @media print {
     html {
         &, body { background-color: white; background-image: none }

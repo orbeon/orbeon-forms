@@ -83,7 +83,7 @@
                 <xf:bind ref="min-repeat" type="xs:nonNegativeInteger" calculate="normalize-space()" readonly="false()"/>
                 <xf:bind ref="max-repeat"
                          type="xf:positiveInteger"
-                         constraint="not(. castable as xs:integer) or not(../min-repeat castable as xs:integer) or xs:integer(.) ge xs:integer(../min-repeat)"
+                         constraint="not(string(.) castable as xs:integer) or not(string(../min-repeat) castable as xs:integer) or xs:integer(.) ge xs:integer(../min-repeat)"
                          calculate="normalize-space()" readonly="false()"/>
 
                 <xf:bind ref="control-xpath" relevant="../is-custom-mode = 'true'" type="xxf:xpath2" required="../is-custom-mode = 'true'"/>
@@ -133,7 +133,7 @@
                         controlOps:updateMip($form, $new-name, 'relevant', $local/relevant),
                         controlOps:updateMip($form, $new-name, 'readonly', $local/readonly),
                         gridOps:setMinMax($form, $new-name, xs:integer($local/min-repeat),
-                                          if ($local/max-repeat castable as xs:integer) then xs:integer($local/max-repeat) else -1)
+                                          if (string($local/max-repeat) castable as xs:integer) then xs:integer($local/max-repeat) else -1)
                     </xf:action>
                     <!-- No classes for sections for now -->
 
@@ -218,12 +218,12 @@
                                         </xf:item>
                                         <xf:itemset ref=".">
                                             <xf:label>Other</xf:label>
-                                            <xf:value value="if (. = '') then '1' else ."/>
+                                            <xf:value value="if (string(.) = '') then '1' else ."/>
                                         </xf:itemset>
                                         <!-- Focus on max-input when Other is selected -->
                                         <xf:setfocus ev:event="xforms-select" if="event('xxf:item-value') = '1'" control="max-input"/>
                                     </xf:select1>
-                                    <xf:input ref="$local/max-repeat[not(. = '')]" id="max-input">
+                                    <xf:input ref="$local/max-repeat[not(string(.) = '')]" id="max-input">
                                         <xf:alert ref="$resources/dialog-grid-details/max/alert"/>
                                         <xf:hint ref="$resources/dialog-grid-details/max/hint"/>
 

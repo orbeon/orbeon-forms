@@ -111,24 +111,22 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <xf:group ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
-                                                <xh:th class="fr-repeat-column fr-repeat-column-trigger">
-                                                    <xf:var name="can-add" as="xs:boolean"
-                                                             value="{if ($max-occurs = 'unbounded') then 'true()'
-                                                                       else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
-                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1">
-                                                        <xf:label><xh:i class="icon-plus-sign"/></xf:label>
-                                                        <xf:insert ev:event="DOMActivate"
-                                                                   context="$repeat-context"
-                                                                   ref="$repeat-sequence"
-                                                                   origin="$repeat-origin"
-                                                                   at="$repeat-index"/>
-                                                    </xf:trigger>
-                                                    <xf:group ref="$repeat-context[not($can-add)]">
-                                                        <xh:i class="icon-plus-sign disabled"/>
-                                                    </xf:group>
-                                                </xh:th>
-                                            </xf:group>
+                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
+                                                <xf:var name="can-add" as="xs:boolean"
+                                                         value="{if ($max-occurs = 'unbounded') then 'true()'
+                                                                   else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
+                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-add]" tabindex="-1">
+                                                    <xf:label><xh:i class="icon-plus-sign"/></xf:label>
+                                                    <xf:insert ev:event="DOMActivate"
+                                                               context="$repeat-context"
+                                                               ref="$repeat-sequence"
+                                                               origin="$repeat-origin"
+                                                               at="$repeat-index"/>
+                                                </xf:trigger>
+                                                <xf:group ref="$repeat-context[not($can-add)]">
+                                                    <xh:i class="icon-plus-sign disabled"/>
+                                                </xf:group>
+                                            </xh:th>
                                         </xsl:if>
                                         <xsl:for-each select="$grid-rows[1]/*:td">
                                             <xsl:variable name="control" select="*[1]"/>
@@ -184,20 +182,18 @@
 
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                            <xf:group ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
-                                                                <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}">
-                                                                    <!-- Remove trigger -->
-                                                                    <xf:var name="can-remove"
-                                                                             value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
-                                                                    <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]" tabindex="-1">
-                                                                        <xf:label><xh:i class="icon-minus-sign"/></xf:label>
-                                                                        <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
-                                                                    </xf:trigger>
-                                                                    <xf:group ref="$repeat-context[not($can-remove)]">
-                                                                        <xh:i class="icon-minus-sign disabled"/>
-                                                                    </xf:group>
-                                                                </xh:td>
-                                                            </xf:group>
+                                                            <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
+                                                                <!-- Remove trigger -->
+                                                                <xf:var name="can-remove"
+                                                                         value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
+                                                                <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]" tabindex="-1">
+                                                                    <xf:label><xh:i class="icon-minus-sign"/></xf:label>
+                                                                    <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>
+                                                                </xf:trigger>
+                                                                <xf:group ref="$repeat-context[not($can-remove)]">
+                                                                    <xh:i class="icon-minus-sign disabled"/>
+                                                                </xf:group>
+                                                            </xh:td>
                                                         </xsl:if>
                                                     </xsl:if>
 

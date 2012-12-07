@@ -18,6 +18,8 @@
  */
 var XFORMS_SEPARATOR_1 = "\xB7";
 var XFORMS_SEPARATOR_2 = "-";
+var XFORMS_SEPARATOR_3 = "\u2218";
+var XFORMS_SEPARATOR_4 = XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3;
 var XFORMS_SERVER_PATH = "/xforms-server";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
@@ -1135,12 +1137,16 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 }
 
-                // Escape dollar signs we might have in the placeholder or replacement so they can be used in regexp
-                placeholder = placeholder.replace(new RegExp("\\$", "g"), "\\$");
+                // Escape $ in replacement as it has a special meaning
                 replacement = replacement.replace(new RegExp("\\$", "g"), "$$$$");
 
-                var placeholderRegExp = new RegExp(placeholder, "g");
+                var placeholderRegExp = new RegExp(ORBEON.util.Utils.escapeRegex(placeholder), "g");
                 stringReplaceWorker(node, placeholderRegExp, replacement);
+            },
+
+            // Escape a literal search string so it can be used in String.replace()
+            escapeRegex: function(value) {
+                return value.replace(/[\-\[\]{}()*+?.,\\\^$|#\s]/g, "\\$&");
             },
 
             appendRepeatSuffix: function(id, suffix) {
@@ -1766,18 +1772,11 @@ ORBEON.xforms.Controls = {
     // Mapping between className (parameter of this method and added after "xforms-") and id of elements
     // in the case where they are outside of the control element.
     _classNameToId: {
-        "label": "$$l",
-        "hint": "$$t",
-        "help": "$$p",
-        "alert": "$$a",
-        "control": "$$c"
-    },
-
-    _classNameToRegexp: {
-        "label": "\\$\\$l",
-        "hint": "\\$\\$t",
-        "help": "\\$\\$p",
-        "alert": "\\$\\$a"
+        "label":   XFORMS_SEPARATOR_4 + "l",
+        "hint":    XFORMS_SEPARATOR_4 + "t",
+        "help":    XFORMS_SEPARATOR_4 + "p",
+        "alert":   XFORMS_SEPARATOR_4 + "a",
+        "control": XFORMS_SEPARATOR_4 + "c"
     },
 
     /**
@@ -1805,7 +1804,7 @@ ORBEON.xforms.Controls = {
         var suffix = ORBEON.xforms.Controls._classNameToId[lhhaType];
         // NOTE: could probably do without llhaType parameter
         return element.id.indexOf(suffix) != -1
-            ? ORBEON.util.Dom.get(element.id.replace(new RegExp(ORBEON.xforms.Controls._classNameToRegexp[lhhaType], "g"), ''))
+            ? ORBEON.util.Dom.get(element.id.replace(new RegExp(ORBEON.util.Utils.escapeRegex(ORBEON.xforms.Controls._classNameToId[lhhaType]), "g"), ''))
             : element.parentNode;
     },
 
@@ -4381,7 +4380,7 @@ ORBEON.xforms.Init = {
         var backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
 
         var thumbDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-thumb", "div", range)[0];
-        thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, "$$thumb");
+        thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, XFORMS_SEPARATOR_4 + "thumb");
 
         var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);

@@ -1550,12 +1550,12 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:attribute for="xf-1" name="xml:lang">it</xxf:attribute>
-                        <xxf:control id="my-foo-1$output1">it</xxf:control>
-                        <xxf:control id="my-foo-1$output2">it</xxf:control>
-                        <xxf:control id="my-foo-1$output3">zh</xxf:control>
-                        <xxf:control id="my-foo-2$output1">es</xxf:control>
-                        <xxf:control id="my-foo-2$output2">es</xxf:control>
-                        <xxf:control id="my-foo-2$output3">zh</xxf:control>
+                        <xxf:control id="my-foo-1∘output1">it</xxf:control>
+                        <xxf:control id="my-foo-1∘output2">it</xxf:control>
+                        <xxf:control id="my-foo-1∘output3">zh</xxf:control>
+                        <xxf:control id="my-foo-2∘output1">es</xxf:control>
+                        <xxf:control id="my-foo-2∘output2">es</xxf:control>
+                        <xxf:control id="my-foo-2∘output3">zh</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

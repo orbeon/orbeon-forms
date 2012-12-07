@@ -1025,7 +1025,7 @@
                             <xf:setfocus control="my-gaga"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Move focus within gaga -->
-                            <xf:setfocus control="|my-gaga$gaga-2|"/>
+                            <xf:setfocus control="|my-gaga∘gaga-2|"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Focus on toto -->
                             <xf:setfocus control="my-toto"/>
@@ -1097,10 +1097,10 @@
                                     <separator/>
                                     <event type="DOMFocusOut" target="|my-gaga|"/>
                                     <event type="DOMFocusIn" target="|my-toto|"/>
-                                    <event type="DOMFocusIn" target="|my-toto$toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto∘toto-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="|my-toto$toto-1|"/>
-                                    <event type="DOMFocusIn" target="|my-toto$toto-2|"/>
+                                    <event type="DOMFocusOut" target="|my-toto∘toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto∘toto-2|"/>
                                 </events>
                             </instance>
                         </instances>
@@ -1110,11 +1110,11 @@
                     <xxf:control-values>
                         <xxf:control id="my-input-1" visited="true"/>
                         <xxf:control id="my-gaga" visited="true"/>
-                        <xxf:control id="my-gaga$gaga-1" visited="true"/>
-                        <xxf:control id="my-gaga$gaga-2" visited="true"/>
-                        <xxf:control id="my-toto$toto-1" visited="true"/>
+                        <xxf:control id="my-gaga∘gaga-1" visited="true"/>
+                        <xxf:control id="my-gaga∘gaga-2" visited="true"/>
+                        <xxf:control id="my-toto∘toto-1" visited="true"/>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-toto$toto-2"/>
+                    <xxf:focus control-id="my-toto∘toto-2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1247,8 +1247,8 @@
                                     <separator/>
                                     <event type="DOMFocusOut" target="|my-gaga|"/>
                                     <event type="DOMFocusIn" target="|my-toto|"/>
-                                    <event type="DOMFocusIn" target="|my-toto$xf-9|"/>
-                                    <event type="DOMFocusIn" target="|my-toto$toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto∘xf-9|"/>
+                                    <event type="DOMFocusIn" target="|my-toto∘toto-1|"/>
                                     <separator/>
                                 </events>
                             </instance>
@@ -1259,7 +1259,7 @@
                     <xxf:control-values>
                         <xxf:control id="my-gaga" visited="true"/>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-toto$toto-1"/>
+                    <xxf:focus control-id="my-toto∘toto-1"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

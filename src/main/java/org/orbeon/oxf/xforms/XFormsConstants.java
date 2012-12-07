@@ -371,7 +371,7 @@ public class XFormsConstants {
 
     public static final QName XXFORMS_EVENT_MODE_QNAME = new QName("events-mode", XXFORMS_NAMESPACE);
 
-    public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7;
+    public static final char REPEAT_HIERARCHY_SEPARATOR_1 = 0xB7; // Unicode MIDDLE DOT
     public static final char REPEAT_HIERARCHY_SEPARATOR_2 = '-';
     public static final String REPEAT_HIERARCHY_SEPARATOR_2_STRING = "" + REPEAT_HIERARCHY_SEPARATOR_2;
 
@@ -379,9 +379,10 @@ public class XFormsConstants {
     // character, see https://github.com/orbeon/orbeon-forms/issues/551.
     public static final char ABSOLUTE_ID_SEPARATOR = 0x7C;
 
-    public static final char COMPONENT_SEPARATOR = '$';
+    public static final char COMPONENT_SEPARATOR = '\u2218'; // Unicode RING OPERATOR
+    public static final String COMPONENT_SEPARATOR_STRING = "" + COMPONENT_SEPARATOR;
     // Use "$$" to minimize chances of conflict with user-defined ids
-    public static final String LHHAC_SEPARATOR = "$$";
+    public static final String LHHAC_SEPARATOR = "" + COMPONENT_SEPARATOR + COMPONENT_SEPARATOR;
 
     public static final String DUMMY_IMAGE_URI = "/ops/images/xforms/spacer.gif";
     public static final String HELP_IMAGE_URI = "/ops/images/xforms/help.png";

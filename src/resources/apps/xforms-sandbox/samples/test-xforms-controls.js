@@ -64,8 +64,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         var elements = this.getFormControls();
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
-            if (element.id != "disabled-input$xforms-input-1" + XFORMS_SEPARATOR_1 + "1"
-                    && element.id != "readonly-input$xforms-input-1" + XFORMS_SEPARATOR_1 + "1")
+            if (element.id != "disabled-input" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1"
+                    && element.id != "readonly-input" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1")
                 YAHOO.util.Assert.areEqual(disabled, element.disabled, "element " + element.id + " supposed to have disabled = " + disabled);
         }
     },
@@ -130,8 +130,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              YAHOO.util.UserAction.click(setToStrawBerryTrigger);
          }, function() {
              // Check all the select/select1 changed
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full$$e1" + XFORMS_SEPARATOR_1 + "1").checked, "radio is checked");
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select-full$$e1" + XFORMS_SEPARATOR_1 + "1").checked, "checkbox is checked");
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e1" + XFORMS_SEPARATOR_1 + "1").checked, "radio is checked");
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e1" + XFORMS_SEPARATOR_1 + "1").checked, "checkbox is checked");
              YAHOO.util.Assert.isTrue(this.getSelect("flavor-select1-compact" + XFORMS_SEPARATOR_1 + "1").options[1].selected, "list single is selected");
              YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XFORMS_SEPARATOR_1 + "1").options[1].selected, "list multiple is selected");
         });
@@ -147,14 +147,14 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
              ORBEON.xforms.Events.change({target: select1Control});
          }, function() {
              // Check vanilla radio is checked
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full$$e3" + XFORMS_SEPARATOR_1 + "1").checked, "radio checked");
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e3" + XFORMS_SEPARATOR_1 + "1").checked, "radio checked");
         });
     },
 
     testUpdateCheckbox: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on key lime checkbox (in addition to already selected strawberry)
-             var dhlCheckbox = YAHOO.util.Dom.get("flavor-select-full$$e2" + XFORMS_SEPARATOR_1 + "1");
+             var dhlCheckbox = YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e2" + XFORMS_SEPARATOR_1 + "1");
              dhlCheckbox.click();
          }, function() {
              // Check strawberry and key lime are selected in the list
@@ -209,7 +209,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     name: "xf:input type xs:date",
 
     dateValueControlId: "date" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     testOpenHideCalendar: function() {
         // Click on text field
@@ -273,9 +273,9 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     name: "xf:input type xs:time",
 
     timeValueId: "time" + XFORMS_SEPARATOR_1 + "1",
-    timeValueInputId: "time$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    timeValueInputId: "time" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
     dateValueId: "date" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date$xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueInputId: "date" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
 
     workerTimeParsing: function(typedValue, expectedValue) {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {

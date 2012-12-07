@@ -647,10 +647,10 @@ object ControlOps {
             val containerIds = ancestorContainers map (_ attValue "id")
             val repeatDepth = ancestorContainers count IsRepeat
 
-            def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString "-"
-            val prefixedId = containerIds :+ staticId mkString "$"
+            def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
+            val prefixedId = containerIds :+ staticId mkString COMPONENT_SEPARATOR_STRING
 
-            DynamicControlId + "$" + prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
+            DynamicControlId + COMPONENT_SEPARATOR + prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
         }
 
     def buildControlAbsoluteId(inDoc: NodeInfo, staticId: String) =

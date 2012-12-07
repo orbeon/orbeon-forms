@@ -68,10 +68,8 @@ private object XFormsUIEvent {
 
     def binding(e: XFormsUIEvent) = Option(e.targetControl.binding)
 
-    def controlPosition(e: XFormsUIEvent) = {
-        val controlStaticPosition = e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
-        if (controlStaticPosition >= 0) Some(controlStaticPosition) else None
-    }
+    def controlPosition(e: XFormsUIEvent) =
+        e.targetControl.container.getPartAnalysis.getControlPosition(e.targetControl.getPrefixedId)
 
     def label(e: XFormsUIEvent) = Option(e.targetControl.getLabel)
     def help(e: XFormsUIEvent)  = Option(e.targetControl.getHelp)

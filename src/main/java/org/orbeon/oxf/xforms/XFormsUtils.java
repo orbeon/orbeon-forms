@@ -1127,6 +1127,13 @@ public class XFormsUtils {
         }
     }
 
+    public static String buildEffectiveId(String prefixedId, Object[] iterations) {
+        if (iterations.length == 0)
+            return prefixedId;
+        else
+            return prefixedId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(iterations, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
+    }
+
     /**
      * Compute an effective id based on an existing effective id and a static id. E.g.:
      *

@@ -67,16 +67,16 @@
 						ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                         	// Do nothing
                         }, function() {
-                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1$$e0").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
-                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1$$e1").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
-                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1$$e2").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
-                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1$$e3").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XFORMS_SEPARATOR_4 + "e0").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XFORMS_SEPARATOR_4 + "e1").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XFORMS_SEPARATOR_4 + "e2").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XFORMS_SEPARATOR_4 + "e3").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
                         });
 					},
 
                     testSelect1UpdateSelection: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        	var setToCoffee = YAHOO.util.Dom.get("select1$$e1");
+                        	var setToCoffee = YAHOO.util.Dom.get("select1" + XFORMS_SEPARATOR_4 + "e1");
 				        	setToCoffee.click();
                         }, function() {
                             YAHOO.util.Assert.isTrue(this.getSelect("select1-compact").options[1].selected, "coffee is selected");
@@ -93,7 +93,7 @@
 							ORBEON.xforms.Controls.setCurrentValue(select1Control, select1List.options[3].value);
 							ORBEON.xforms.Events.change({target: select1Control});
                         }, function() {
-                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("select1$$e3").checked, "Diet coke is selected");
+                            YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("select1" + XFORMS_SEPARATOR_4 + "e3").checked, "Diet coke is selected");
                         });
                     }
                 }));

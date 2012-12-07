@@ -50,9 +50,9 @@
             <!-- Internal state for this test -->
             <xf:instance id="selected-countries">
                 <selected-countries readonly="false" relevant="true">
-                    <static effective-target-id="">ca</static>
-                    <dynamic effective-target-id="" label="Canada">ca</dynamic>
-                    <resource effective-target-id="" label="Canada">ca</resource>
+                    <static absolute-target-id="">ca</static>
+                    <dynamic absolute-target-id="" label="Canada">ca</dynamic>
+                    <resource absolute-target-id="" label="Canada">ca</resource>
                 </selected-countries>
             </xf:instance>
             <!-- Constraint on selected country -->
@@ -127,12 +127,12 @@
                 </xf:trigger> |
                 <xf:trigger appearance="minimal" id="static-setfocus-inner">
                     <xf:label>Set focus inner</xf:label>
-                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/static/@effective-target-id}"/>
+                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/static/@absolute-target-id}"/>
                 </xf:trigger>
             </xh:div>
             <xh:div>
                 <xf:group ref="instance('selected-countries')/static">
-                    <xf:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')"/>
+                    <xf:setvalue ev:event="xforms-invalid" ref="@absolute-target-id" value="event('xxf:absolute-targetid')"/>
                     <fr:autocomplete ref="." id="static-autocomplete"
                                      dynamic-itemset="false" max-results-displayed="4" tabindex="1">
                         <xf:label>Country code: </xf:label>
@@ -179,12 +179,12 @@
                 </xf:trigger> |
                 <xf:trigger appearance="minimal" id="dynamic-setfocus-inner">
                     <xf:label>Set focus inner</xf:label>
-                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/dynamic/@effective-target-id}"/>
+                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/dynamic/@absolute-target-id}"/>
                 </xf:trigger>
             </xh:div>
             <xh:div>
                 <xf:group ref="instance('selected-countries')/dynamic">
-                    <xf:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')"/>
+                    <xf:setvalue ev:event="xforms-invalid" ref="@absolute-target-id" value="event('xxf:absolute-targetid')"/>
                     <fr:autocomplete ref="." id="dynamic-autocomplete" labelref="@label"
                                      dynamic-itemset="true">
                         <!-- React to user searching -->
@@ -251,12 +251,12 @@
                 </xf:trigger> |
                 <xf:trigger appearance="minimal" id="resource-setfocus-inner">
                     <xf:label>Set focus inner</xf:label>
-                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/resource/@effective-target-id}"/>
+                    <xf:setfocus ev:event="DOMActivate" control="{instance('selected-countries')/resource/@absolute-target-id}"/>
                 </xf:trigger>
             </xh:div>
             <xh:div>
                 <xf:group ref="instance('selected-countries')/resource">
-                    <xf:setvalue ev:event="xforms-invalid" ref="@effective-target-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')"/>
+                    <xf:setvalue ev:event="xforms-invalid" ref="@absolute-target-id" value="event('xxf:absolute-targetid')"/>
                     <fr:autocomplete ref="." labelref="@label" id="resource-autocomplete" resource="/xforms-controls/services/countries?country-name={$fr-search-value}" max-results-displayed="4">
                         <xf:label>Country code: </xf:label>
                         <xf:itemset ref="/countries/country">

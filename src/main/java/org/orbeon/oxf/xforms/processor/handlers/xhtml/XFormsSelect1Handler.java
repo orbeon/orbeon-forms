@@ -526,7 +526,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
     }
 
     public static String getItemId(String effectiveId, String itemIndex) {
-        return XFormsUtils.appendToEffectiveId(effectiveId, "$$e" + itemIndex);
+        return XFormsUtils.appendToEffectiveId(effectiveId, "" + XFormsConstants.COMPONENT_SEPARATOR + XFormsConstants.COMPONENT_SEPARATOR + "e" + itemIndex);
     }
 
     @Override

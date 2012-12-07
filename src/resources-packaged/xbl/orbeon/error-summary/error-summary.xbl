@@ -17,10 +17,9 @@
          xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
+         xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
 
     <!--
         Component to represent a reusable error summary.
@@ -42,13 +41,13 @@
         <xbl:handlers>
             <xbl:handler event="fr-visit-all" phase="target">
                 <!-- Mark all controls as visited -->
-                <xxf:setvisited iterate="xxf:split(instance('fr-state-instance')/observer)" control="{.}" visited="true" recurse="true"/>
+                <xxf:setvisited iterate="xxf:split(instance('fr-state-instance')/observers)" control="{.}" visited="true" recurse="true"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
             <xbl:handler event="fr-unvisit-all" phase="target">`
                 <!-- Mark all controls as not visited -->
-                <xxf:setvisited iterate="xxf:split(instance('fr-state-instance')/observer)" control="{.}" visited="false" recurse="true"/>
+                <xxf:setvisited iterate="xxf:split(instance('fr-state-instance')/observers)" control="{.}" visited="false" recurse="true"/>
                 <!-- There is no dependency handling with the xxf:visited() function. -->
                 <xf:recalculate xxf:deferred="true"/>
             </xbl:handler>
@@ -86,7 +85,7 @@
                         <!-- Whether errors are shown incrementally or not -->
                         <incremental>true</incremental>
                         <!-- Absolute ids of observers -->
-                        <observer/>
+                        <observers/>
                         <!-- Whether the form is valid or invalid -->
                         <valid>true</valid>
                         <!-- Number of alerts, total vs. per level -->
@@ -101,10 +100,7 @@
                     as="element(error)*"
                     value="for $e in instance(if (instance('fr-state-instance')/incremental != 'false') then 'fr-errors-instance' else 'fr-snapshot-instance')/error[normalize-space(@alert)]
                            return
-                             if (xxf:visited(xformsUtils:effectiveIdToAbsoluteId(
-                                    string-join(
-                                        ($e/@id, if (normalize-space($e/@indexes)) then string-join($e/@indexes, '-') else ()), '·'
-                                    ))))
+                               if (xxf:visited($e/@absolute-id))
                                then $e
                                else ()"/>
 
@@ -117,59 +113,40 @@
 
                 <!-- Template for error information -->
                 <xf:instance id="fr-error-template" xxf:readonly="true">
-                    <error xmlns="" id="" position="" repeats="" indexes="" label="" alert="" binds="" level=""/>
+                    <error xmlns="" absolute-id="" position="" label="" alert="" level=""/>
                 </xf:instance>
 
                 <!-- Reusable method to insert an error in the right place in the summary -->
                 <xf:action ev:event="fr-insert-error">
                     <!-- Useful stuff passed to us -->
-                    <xf:var name="prefixed-id"      value="event('prefixed-id')"/>
+                    <xf:var name="absolute-id"      value="event('absolute-id')"/>
                     <xf:var name="control-position" value="event('control-position')"/>
-                    <xf:var name="repeat-indexes"   value="event('fr-repeat-indexes')"/>
-                    <xf:var name="repeat-ancestors" value="event('fr-repeat-ancestors')"/>
                     <xf:var name="level"            value="event('level')"/>
                     <xf:var name="alert"            value="event('alert')"/>
                     <xf:var name="label"            value="event('label')"/>
-                    <xf:var name="invalid-binds"    value="event('invalid-binds')"/>
 
                     <!-- Debug -->
                     <!--
-                    <xf:message level="xxf:log-debug">
+<xf:message level="xxf:log-debug">
 Inserting error information into error list:
-
-    prefixed-id: <xf:output value="$prefixed-id"/>
-    control-position:   <xf:output value="$control-position"/>
-    repeat-indexes:     <xf:output value="string-join($repeat-indexes, ' ')"/>
-    repeat-ancestors:   <xf:output value="string-join($repeat-ancestors, ' ')"/>
-    alert:              <xf:output value="$alert"/>
-    label:              <xf:output value="$label"/>
-    invalid-binds:      <xf:output value="$invalid-binds"/>
-                    </xf:message>
+<xf:output value="for $n in ('absolute-id', 'control-position', 'level', 'alert', 'label') return concat($n, ': ', event($n), '\n')"/>
+</xf:message>
                     -->
 
-                    <xf:var name="repeat-indexes-i" value="for $v in $repeat-indexes return xs:integer($v)" as="xs:integer*"/>
-
-                    <!-- Here we compare the incoming error's position to existing error's positions by creating a
-                         comparison string for both sides -->
-                    <xf:var name="insert-position"
-                        value="count(error[
-                            string-join(for $v in (subsequence((for $t in xxf:split(@indexes) return xs:integer($t), 0, 0, 0, 0, 0, 0), 1, min((count($repeat-indexes-i), count(xxf:split(@indexes))))), xs:integer(@position))
-                                        return format-number($v, '000000'), '-')
-                         lt string-join(for $v in (subsequence(($repeat-indexes-i, 0, 0, 0, 0, 0, 0), 1, min((count($repeat-indexes-i), count(xxf:split(@indexes))))), $control-position)
-                                        return format-number($v, '000000'), '-')])"/>
+                    <xf:var
+                        name="insert-position"
+                        value="count(error[formRunner:controlSortString(@absolute-id, 4)
+                                        lt formRunner:controlSortString($absolute-id, 4)])"/>
 
                     <!-- Now that we have found the position, simply insert -->
                     <xf:insert context="." ref="error[$insert-position]" origin="instance('fr-error-template')"/>
                     <!-- Set all the attributes -->
                     <xf:action context="error[$insert-position + 1]">
-                        <xf:setvalue ref="@id"       value="$prefixed-id"/>
-                        <xf:setvalue ref="@position" value="$control-position"/>
-                        <xf:setvalue ref="@indexes"  value="string-join($repeat-indexes, ' ')"/>
-                        <xf:setvalue ref="@repeats"  value="string-join($repeat-ancestors, ' ')"/>
-                        <xf:setvalue ref="@level"    value="$level"/>
-                        <xf:setvalue ref="@alert"    value="$alert"/>
-                        <xf:setvalue ref="@label"    value="$label"/>
-                        <xf:setvalue ref="@binds"    value="$invalid-binds"/>
+                        <xf:setvalue ref="@absolute-id" value="$absolute-id"/>
+                        <xf:setvalue ref="@position"    value="$control-position"/>
+                        <xf:setvalue ref="@level"       value="$level"/>
+                        <xf:setvalue ref="@alert"       value="$alert"/>
+                        <xf:setvalue ref="@label"       value="$label"/>
                     </xf:action>
 
                 </xf:action>
@@ -207,7 +184,7 @@ Inserting error information into error list:
 
                             <xf:setvalue
                                 ev:event="xforms-enabled"
-                                ref="instance('fr-state-instance')/observer"
+                                ref="instance('fr-state-instance')/observers"
                                 value="string-join($observers, ' ')"/>
 
                         </xf:var>
@@ -225,12 +202,10 @@ Inserting error information into error list:
                             <xf:action xxbl:scope="inner">
 
                                 <!-- Useful stuff passed to us -->
-                                <xf:var name="prefixed-id"      value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')" as="xs:string"/>
-                                <xf:var name="repeat-indexes"   value="event('xxf:repeat-indexes')" as="xs:string*"/>
-                                <xf:var name="repeat-ancestors" value="event('xxf:repeat-ancestors')" as="xs:string*"/>
+                                <xf:var name="absolute-id" value="event('xxf:absolute-targetid')"/>
 
                                 <!-- Try to find existing error element -->
-                                <xf:var name="current-error" value="error[@id = $prefixed-id and @indexes = string-join($repeat-indexes, ' ')]" as="element(error)*"/>
+                                <xf:var name="current-error" value="error[@absolute-id = $absolute-id]"/>
 
                                 <!-- xforms-invalid indicates an error level, but doesn't always have constraints associated -->
                                 <xf:var
@@ -255,19 +230,15 @@ Inserting error information into error list:
                                     <xf:setvalue ref="$current-error/@level" value="$event-level" if="exists($event-level)"/>
                                     <xf:setvalue ref="$current-error/@alert" value="event('xxf:alert')"/>
                                     <xf:setvalue ref="$current-error/@label" value="event('xxf:label')"/>
-                                    <xf:setvalue ref="$current-error/@binds" value="string-join(xxf:invalid-binds(event('xxf:binding')), ' ')"/>
                                 </xf:action>
                                 <!-- Otherwise if the event is xforms-invalid, insert new element and sets its values -->
                                 <xf:action if="$must-insert">
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <xf:property name="prefixed-id"         value="$prefixed-id"/>
+                                        <xf:property name="absolute-id"         value="$absolute-id"/>
                                         <xf:property name="control-position"    value="event('xxf:control-position')"/>
-                                        <xf:property name="fr-repeat-indexes"   value="$repeat-indexes"/>
-                                        <xf:property name="fr-repeat-ancestors" value="event('xxf:repeat-ancestors')"/>
                                         <xf:property name="level"               value="$event-level"/>
                                         <xf:property name="alert"               value="event('xxf:alert')"/>
                                         <xf:property name="label"               value="event('xxf:label')"/>
-                                        <xf:property name="invalid-binds"       value="string-join(xxf:invalid-binds(event('xxf:binding')), ' ')"/>
                                     </xf:dispatch>
                                 </xf:action>
 
@@ -285,58 +256,28 @@ Inserting error information into error list:
                             <xf:action xxbl:scope="inner">
                                 <!-- One or more iterations have moved. This is a bit tricky: we must update the error summary properly. -->
 
-                                <!-- Useful stuff passed to us -->
-                                <xf:var name="prefixed-id" value="string-join((event('xxf:target-prefixes'), event('xxf:targetid')), '$')" as="xs:string"/>
-                                <!-- These represent the repeat hierarchy of this current repeat target -->
-                                <xf:var name="repeat-indexes" value="event('xxf:repeat-indexes')" as="xs:string*"/>
-                                <xf:var name="repeat-ancestors" value="event('xxf:repeat-ancestors')" as="xs:string*"/>
-                                <!-- These are the old positions of the iterations that moved on this current repeat target -->
-                                <xf:var name="from-positions" value="event('xxf:from-positions')" as="xs:integer*"/>
-                                <!-- These are the new positions of the iterations that moved on this current repeat target -->
-                                <xf:var name="to-positions" value="event('xxf:to-positions')" as="xs:integer*"/>
+                                <xf:var name="target-absolute-id" value="event('xxf:absolute-targetid')"/>
+                                <xf:var name="from-positions"     value="event('xxf:from-positions')"/>
+                                <xf:var name="to-positions"       value="event('xxf:to-positions')"/>
 
-                                <xf:var name="prefix-size" value="count($repeat-ancestors) + 1" as="xs:integer"/>
-                                <xf:var name="repeats-prefix" value="($repeat-ancestors, event('xxf:targetid'))" as="xs:string*"/>
-                                <xf:var name="repeats-string" value="string-join($repeats-prefix, ' ')" as="xs:string*"/>
-
-                                <xf:var name="indexes-strings" as="xs:string*"
-                                                  value="for $p in $from-positions
-                                                          return string-join(($repeat-indexes, xs:string($p)), ' ')" />
-
-                                <!-- Find affected errors, i.e. all controls that descend from any moved iteration -->
-                                <xf:var name="affected-errors" as="element(error)*"
-                                        value="error[string-join(subsequence(xxf:split(@repeats), 1, $prefix-size), ' ') = $repeats-string
-                                               and string-join(subsequence(xxf:split(@indexes), 1, $prefix-size), ' ') = $indexes-strings]"/>
-
-
-                                <!-- A full prefix looks like: "company-repeat·3/employee-repeat·2" -->
-                                <xf:var name="full-prefixes" as="xs:string*"
-                                        value="for $p in $from-positions
-                                               return string-join((for $r in $repeat-ancestors
-                                                   return concat($r, '·', $repeat-indexes[index-of($repeat-ancestors, $r)]), concat($prefixed-id, '·', $p)), '/')"/>
+                                <xf:var
+                                    name="affected-errors"
+                                    as="element(error)*"
+                                    value="error[@absolute-id != formRunner:updateIteration(@absolute-id, $target-absolute-id, $from-positions, $to-positions)]"/>
 
                                 <!-- Remove affected errors from instance -->
                                 <xf:delete ref="$affected-errors"/>
 
                                 <!-- Re-insert affected errors -->
                                 <xf:action iterate="$affected-errors">
-                                    <xf:var name="error" value="." as="element(error)"/>
-                                    <xf:var name="current-indexes" value="xxf:split($error/@indexes)" as="xs:string*"/>
-                                    <xf:var name="from-position" value="$current-indexes[$prefix-size]" as="xs:string"/>
-                                    <xf:var name="to-position" value="$to-positions[index-of($from-positions, xs:integer($from-position))[1]]" as="xs:integer"/>
+                                    <xf:var name="error" value="."/>
 
                                     <xf:dispatch name="fr-insert-error" targetid="fr-error-summary-model">
-                                        <!-- Unchanged -->
-                                        <xf:property name="prefixed-id"         value="$error/@id"/>
+                                        <xf:property name="absolute-id"         value="formRunner:updateIteration($error/@absolute-id, $target-absolute-id, $from-positions, $to-positions)"/>
                                         <xf:property name="control-position"    value="$error/@position"/>
-                                        <!-- Replace old iteration by new iteration and keep the rest the same -->
-                                        <xf:property name="fr-repeat-indexes"   value="($repeat-indexes, xs:string($to-position), subsequence($current-indexes, $prefix-size + 1))"/>
-                                        <!-- Unchanged -->
-                                        <xf:property name="fr-repeat-ancestors" value="$error/@repeats"/>
                                         <xf:property name="level"               value="$error/@level"/>
                                         <xf:property name="alert"               value="$error/@alert"/>
                                         <xf:property name="label"               value="$error/@label"/>
-                                        <xf:property name="invalid-binds"       value="$error/@invalid-binds"/>
                                     </xf:dispatch>
                                 </xf:action>
 
@@ -438,32 +379,22 @@ Inserting error information into error list:
                                     <xf:repeat ref="$visible-errors" id="er">
                                         <xh:li>
                                             <!-- Clickable / linkable label -->
-                                            <xf:var name="error" value="."/>
-                                            <xf:var name="has-label" value="not(normalize-space(@label) = '')"/>
-                                            <xf:var name="effective-id"
-                                                    value="string-join(($error/@id, if (normalize-space($error/@indexes)) then string-join(xxf:split($error/@indexes), '-') else ()), '·')"/>
+                                            <xf:var name="has-label"    value="exists(normalize-space(@label))"/>
 
                                             <xf:group ref=".[$has-label and property('xxf:noscript')]">
                                                 <!-- In noscript mode, use a plain link to the effective id -->
-                                                 <xh:a href="#{{$effective-id}}"><xf:output value="$error/@label" class="fr-error-label"/></xh:a>
+                                                <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output value="@label" class="fr-error-label"/></xh:a>
                                             </xf:group>
                                             <!-- Otherwise use trigger -->
-                                            <!-- Make sure variable is in outer scope so that id resolution works if id is a top-level id -->
-                                            <xf:var name="effective-id-outer" as="xs:string" xxbl:scope="outer">
-                                                <xxf:sequence value="$effective-id" xxbl:scope="inner"/>
-                                            </xf:var>
                                             <xf:trigger ref=".[$has-label and not(property('xxf:noscript'))]" appearance="minimal" class="fr-error-label">
-                                                <xf:label value="normalize-space($error/@label)"/>
+                                                <xf:label value="@label"/>
                                                 <!-- Set focus to control using absolute id -->
-                                                <xf:setfocus ev:event="DOMActivate" control="{{xformsUtils:effectiveIdToAbsoluteId($effective-id-outer)}}" xxbl:scope="outer"/>
+                                                <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
                                             </xf:trigger>
-                                            <!-- Repeat indexes -->
-                                            <xf:output ref=".[string-length(@indexes) > 0]" class="fr-error-row"
-                                                           value="concat(' [', @indexes, ']')" id="io"/>
                                             <!-- Separator -->
                                             <xf:output ref=".[$has-label]" value="': '" class="fr-error-dash"/>
                                             <!-- Alert message -->
-                                            <xf:output ref=".[normalize-space(@alert) != '']"
+                                            <xf:output ref=".[normalize-space(@alert)]"
                                                        class="fr-error-alert fr-error-alert-{{@level}}"
                                                        mediatype="text/html"
                                                        value="@alert"

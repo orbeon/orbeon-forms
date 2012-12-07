@@ -26,6 +26,7 @@ import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import java.io.File
 import java.util.concurrent.TimeUnit
 import org.scalatest.matchers.ShouldMatchers
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
@@ -92,7 +93,7 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     //
     // NOTE: This doesn't handle repeat iterations yet.
     def clientId(id: String) = {
-        val withPrefix = '$' + id
+        val withPrefix = COMPONENT_SEPARATOR + id
         // NOTE: XPath 1 doesn't have ends-with()
         xpath(s"//*[@id = '$id' or contains(@id, '$withPrefix') and @id = concat(substring-before(@id, '$withPrefix'), '$withPrefix')]").element.attribute("id").get
     }

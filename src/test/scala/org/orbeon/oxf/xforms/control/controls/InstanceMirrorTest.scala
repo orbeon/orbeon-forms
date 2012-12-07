@@ -18,6 +18,7 @@ import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.scalatest.junit.AssertionsForJUnit
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -185,7 +186,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
         var updates = 0
 
         // First update outer instance and check inner instance, then do the reverse
-        for ((targetPrefixedId, mirroredInstance) ← Seq("model" → innerInstance, "my-gaga$gaga-model" → outerInstance))
+        for ((targetPrefixedId, mirroredInstance) ← Seq("model" → innerInstance, ("my-gaga" + COMPONENT_SEPARATOR + "gaga-model") → outerInstance))
             expected.zipWithIndex foreach {
                 case (expectedInstanceValue, index) ⇒
                     // Dispatch event and assert result

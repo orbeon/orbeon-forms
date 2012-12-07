@@ -92,7 +92,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="my-foo$model">
+                            <instance id="instance" model-id="my-foo∘model">
                                 <instance>43</instance>
                             </instance>
                         </instances>
@@ -100,8 +100,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$xf-3" label="My label"/>
-                        <xxf:control id="my-foo$my-input">43</xxf:control>
+                        <xxf:control id="my-foo∘xf-3" label="My label"/>
+                        <xxf:control id="my-foo∘my-input">43</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -317,84 +317,84 @@
                                     <event type="xforms-value-changed" target="day-select" indexes="2"/>
                                 </events>
                             </instance>
-                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="date-instance" model-id="fr-dropdown-date∘date-model·1">
                                 <date>
                                     <year>2009</year>
                                     <month>1</month>
                                     <day>2</day>
                                 </date>
                             </instance>
-                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="years-itemset" model-id="fr-dropdown-date∘date-model·1">
                                 <years>
                                     <year>2009</year>
                                     <year>2008</year>
                                     <year>2007</year>
                                 </years>
                             </instance>
-                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="months-itemset" model-id="fr-dropdown-date∘date-model·1">
                                 <months>
                                     <month>1</month>
                                     <month>2</month>
                                     <month>3</month>
                                 </months>
                             </instance>
-                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·1">
+                            <instance id="days-itemset" model-id="fr-dropdown-date∘date-model·1">
                                 <days>
                                     <day>1</day>
                                     <day>2</day>
                                     <day>3</day>
                                 </days>
                             </instance>
-                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="date-instance" model-id="fr-dropdown-date∘date-model·2">
                                 <date>
                                     <year>2008</year>
                                     <month>2</month>
                                     <day>1</day>
                                 </date>
                             </instance>
-                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="years-itemset" model-id="fr-dropdown-date∘date-model·2">
                                 <years>
                                     <year>2009</year>
                                     <year>2008</year>
                                     <year>2007</year>
                                 </years>
                             </instance>
-                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="months-itemset" model-id="fr-dropdown-date∘date-model·2">
                                 <months>
                                     <month>1</month>
                                     <month>2</month>
                                     <month>3</month>
                                 </months>
                             </instance>
-                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·2">
+                            <instance id="days-itemset" model-id="fr-dropdown-date∘date-model·2">
                                 <days>
                                     <day>1</day>
                                     <day>2</day>
                                     <day>3</day>
                                 </days>
                             </instance>
-                            <instance id="date-instance" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="date-instance" model-id="fr-dropdown-date∘date-model·3">
                                 <date>
                                     <year>2008</year>
                                     <month>2</month>
                                     <day>1</day>
                                 </date>
                             </instance>
-                            <instance id="years-itemset" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="years-itemset" model-id="fr-dropdown-date∘date-model·3">
                                 <years>
                                     <year>2009</year>
                                     <year>2008</year>
                                     <year>2007</year>
                                 </years>
                             </instance>
-                            <instance id="months-itemset" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="months-itemset" model-id="fr-dropdown-date∘date-model·3">
                                 <months>
                                     <month>1</month>
                                     <month>2</month>
                                     <month>3</month>
                                 </months>
                             </instance>
-                            <instance id="days-itemset" model-id="fr-dropdown-date$date-model·3">
+                            <instance id="days-itemset" model-id="fr-dropdown-date∘date-model·3">
                                 <days>
                                     <day>1</day>
                                     <day>2</day>
@@ -409,27 +409,27 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                      <xxf:control-values>
-                        <xxf:control id="fr-dropdown-date$xf-25·1" label="Date: "/>
-                        <xxf:control id="fr-dropdown-date$year-select·1">2009</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$year-select·1">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$month-select·1">1</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$month-select·1">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$day-select·1">2</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$day-select·1">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$xf-25·2" label="Date: "/>
-                        <xxf:control id="fr-dropdown-date$year-select·2">2008</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$year-select·2">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$month-select·2">2</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$month-select·2">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$day-select·2">1</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$day-select·2">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$xf-25·3" label="Date: "/>
-                        <xxf:control id="fr-dropdown-date$year-select·3">2008</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$year-select·3">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$month-select·3">2</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$month-select·3">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
-                        <xxf:control id="fr-dropdown-date$day-select·3">1</xxf:control>
-                        <xxf:itemset id="fr-dropdown-date$day-select·3">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘xf-25·1" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date∘year-select·1">2009</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘year-select·1">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘month-select·1">1</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘month-select·1">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘day-select·1">2</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘day-select·1">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘xf-25·2" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date∘year-select·2">2008</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘year-select·2">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘month-select·2">2</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘month-select·2">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘day-select·2">1</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘day-select·2">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘xf-25·3" label="Date: "/>
+                        <xxf:control id="fr-dropdown-date∘year-select·3">2008</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘year-select·3">[{"label":"Year","value":""},{"label":"2009","value":"2009"},{"label":"2008","value":"2008"},{"label":"2007","value":"2007"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘month-select·3">2</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘month-select·3">[{"label":"Month","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
+                        <xxf:control id="fr-dropdown-date∘day-select·3">1</xxf:control>
+                        <xxf:itemset id="fr-dropdown-date∘day-select·3">[{"label":"Day","value":""},{"label":"1","value":"1"},{"label":"2","value":"2"},{"label":"3","value":"3"}]</xxf:itemset>
                         <xxf:control id="add-row-trigger" label="Add"/>
                         <xxf:control id="remove-row-trigger" label="Remove"/>
                     </xxf:control-values>
@@ -533,13 +533,13 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="super-control-instance" model-id="fr-super-control-1$super-control-model">
+                            <instance id="super-control-instance" model-id="fr-super-control-1∘super-control-model">
                                 <instance>
                                     <value>foo-value</value>
                                     <name>value1</name>
                                 </instance>
                             </instance>
-                            <instance id="super-control-instance" model-id="fr-super-control-2$super-control-model">
+                            <instance id="super-control-instance" model-id="fr-super-control-2∘super-control-model">
                                 <instance>
                                     <value>bar-value</value>
                                     <name>value2</name>
@@ -550,10 +550,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="fr-super-control-1$xf-9" label="Internal value 1: "/>
-                        <xxf:control id="fr-super-control-1$my-input">foo-value</xxf:control>
-                        <xxf:control id="fr-super-control-2$xf-21" label="Internal value 2: "/>
-                        <xxf:control id="fr-super-control-2$my-input">bar-value</xxf:control>
+                        <xxf:control id="fr-super-control-1∘xf-9" label="Internal value 1: "/>
+                        <xxf:control id="fr-super-control-1∘my-input">foo-value</xxf:control>
+                        <xxf:control id="fr-super-control-2∘xf-21" label="Internal value 2: "/>
+                        <xxf:control id="fr-super-control-2∘my-input">bar-value</xxf:control>
                         <xxf:control id="input-1" label="External value 1: ">foo-value</xxf:control>
                         <xxf:control id="input-2" label="External value 2: ">bar-value</xxf:control>
                     </xxf:control-values>
@@ -608,7 +608,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="xbl-instance" model-id="my-component$xbl-model">
+                            <instance id="xbl-instance" model-id="my-component∘xbl-model">
                                 <value>gotit</value>
                             </instance>
                         </instances>
@@ -616,7 +616,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-component$xbl-output">gotit</xxf:control>
+                        <xxf:control id="my-component∘xbl-output">gotit</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -730,7 +730,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="initial-instance" model-id="my-component$xbl-model">
+                            <instance id="initial-instance" model-id="my-component∘xbl-model">
                                 <instance>
                                     <value>2</value>
                                 </instance>
@@ -740,7 +740,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-component$xbl-output">2</xxf:control>
+                        <xxf:control id="my-component∘xbl-output">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -809,10 +809,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute for="fr-super-control-1$xf-5" name="style">color: red</xxf:attribute>
-                        <xxf:attribute for="fr-super-control-2$xf-9" name="style">font-weight: bold</xxf:attribute>
-                        <xxf:attribute for="fr-super-control-3$xf-13·1" name="style">color: red</xxf:attribute>
-                        <xxf:attribute for="fr-super-control-3$xf-13·2" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-1∘xf-5" name="style">color: red</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-2∘xf-9" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-3∘xf-13·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-3∘xf-13·2" name="style">font-weight: bold</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -935,9 +935,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foobar$internal-trigger-1" label="Dispatch outside"/>
-                        <xxf:control id="my-foobar$internal-trigger-2" label="Dispatch inside group"/>
-                        <xxf:control id="my-foobar$internal-trigger-3" label="Dispatch inside model"/>
+                        <xxf:control id="my-foobar∘internal-trigger-1" label="Dispatch outside"/>
+                        <xxf:control id="my-foobar∘internal-trigger-2" label="Dispatch inside group"/>
+                        <xxf:control id="my-foobar∘internal-trigger-3" label="Dispatch inside model"/>
                     </xxf:control-values>
                     <xxf:message level="modal">Got it: 42</xxf:message>
                 </xxf:action>
@@ -1014,8 +1014,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$clash" label="Read-only: ">false</xxf:control>
-                        <xxf:control id="my-bar$clash" label="Message: ">Hello, world!</xxf:control>
+                        <xxf:control id="my-foo∘clash" label="Read-only: ">false</xxf:control>
+                        <xxf:control id="my-bar∘clash" label="Message: ">Hello, world!</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1110,7 +1110,7 @@
                                     <record/>
                                 </instance>
                             </instance>
-                            <instance id="instance" model-id="my-bar$model">
+                            <instance id="instance" model-id="my-bar∘model">
                                 <instance>
                                     <record/>
                                     <record/>
@@ -1119,8 +1119,8 @@
                         </instances>
                         <controls>
                             <control effective-id="repeat-no-xbl" index="2"/>
-                            <control effective-id="my-foo$repeat-xbl-foo" index="2"/>
-                            <control effective-id="my-bar$repeat-xbl-bar" index="2"/>
+                            <control effective-id="my-foo∘repeat-xbl-foo" index="2"/>
+                            <control effective-id="my-bar∘repeat-xbl-bar" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1128,10 +1128,10 @@
                     <xxf:control-values>
                         <xxf:control id="my-output·1">2</xxf:control>
                         <xxf:control id="my-output·2">2</xxf:control>
-                        <xxf:control id="my-foo$my-output-foo·1">2</xxf:control>
-                        <xxf:control id="my-foo$my-output-foo·2">2</xxf:control>
-                        <xxf:control id="my-bar$my-output-bar·1">2</xxf:control>
-                        <xxf:control id="my-bar$my-output-bar·2">2</xxf:control>
+                        <xxf:control id="my-foo∘my-output-foo·1">2</xxf:control>
+                        <xxf:control id="my-foo∘my-output-foo·2">2</xxf:control>
+                        <xxf:control id="my-bar∘my-output-bar·1">2</xxf:control>
+                        <xxf:control id="my-bar∘my-output-bar·2">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1238,7 +1238,7 @@
                                     <record/>
                                 </instance>
                             </instance>
-                            <instance id="instance" model-id="my-bar$model">
+                            <instance id="instance" model-id="my-bar∘model">
                                 <instance>
                                     <record/>
                                     <record/>
@@ -1248,8 +1248,8 @@
                         </instances>
                         <controls>
                             <control effective-id="repeat-no-xbl" index="1"/>
-                            <control effective-id="my-foo$repeat-xbl-foo" index="2"/>
-                            <control effective-id="my-bar$repeat-xbl-bar" index="2"/>
+                            <control effective-id="my-foo∘repeat-xbl-foo" index="2"/>
+                            <control effective-id="my-bar∘repeat-xbl-bar" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1257,11 +1257,11 @@
                     <xxf:control-values>
                         <xxf:control id="my-output·1">1</xxf:control>
                         <xxf:control id="my-output·2">1</xxf:control>
-                        <xxf:control id="my-foo$my-output-foo·1">2</xxf:control>
-                        <xxf:control id="my-foo$my-output-foo·2">2</xxf:control>
-                        <xxf:control id="my-bar$my-output-bar·1">2</xxf:control>
-                        <xxf:control id="my-bar$my-output-bar·2">2</xxf:control>
-                        <xxf:control id="my-bar$my-output-bar·3">2</xxf:control>
+                        <xxf:control id="my-foo∘my-output-foo·1">2</xxf:control>
+                        <xxf:control id="my-foo∘my-output-foo·2">2</xxf:control>
+                        <xxf:control id="my-bar∘my-output-bar·1">2</xxf:control>
+                        <xxf:control id="my-bar∘my-output-bar·2">2</xxf:control>
+                        <xxf:control id="my-bar∘my-output-bar·3">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1331,18 +1331,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foobar$xf-3">global-instance-1</xxf:control>
-                        <xxf:control id="my-foobar$output-2">local-instance</xxf:control>
-                        <xxf:control id="my-foobar$output-3">local-instance</xxf:control>
-                        <xxf:control id="my-foobar$output-4">local-instance</xxf:control>
-                        <xxf:control id="my-foobar$output-5">global-instance-1</xxf:control>
-                        <xxf:control id="my-foobar$output-6">global-instance-2</xxf:control>
-                        <xxf:control id="my-foobar2$xf-6">global-instance-2</xxf:control>
-                        <xxf:control id="my-foobar2$output-2">local-instance</xxf:control>
-                        <xxf:control id="my-foobar2$output-3">local-instance</xxf:control>
-                        <xxf:control id="my-foobar2$output-4">local-instance</xxf:control>
-                        <xxf:control id="my-foobar2$output-5">global-instance-1</xxf:control>
-                        <xxf:control id="my-foobar2$output-6">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar∘xf-3">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar∘output-2">local-instance</xxf:control>
+                        <xxf:control id="my-foobar∘output-3">local-instance</xxf:control>
+                        <xxf:control id="my-foobar∘output-4">local-instance</xxf:control>
+                        <xxf:control id="my-foobar∘output-5">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar∘output-6">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar2∘xf-6">global-instance-2</xxf:control>
+                        <xxf:control id="my-foobar2∘output-2">local-instance</xxf:control>
+                        <xxf:control id="my-foobar2∘output-3">local-instance</xxf:control>
+                        <xxf:control id="my-foobar2∘output-4">local-instance</xxf:control>
+                        <xxf:control id="my-foobar2∘output-5">global-instance-1</xxf:control>
+                        <xxf:control id="my-foobar2∘output-6">global-instance-2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1444,25 +1444,25 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="instance" model-id="my-bar-1$model">
+                            <instance id="instance" model-id="my-bar-1∘model">
                                 <instance>
                                     <value1>Red</value1>
                                     <value2>Blue</value2>
                                 </instance>
                             </instance>
-                            <instance id="events" model-id="my-bar-1$model">
+                            <instance id="events" model-id="my-bar-1∘model">
                                 <events>
                                     <event type="xforms-enabled" target="my-bar-1" phase="target" original-target="my-bar-1" indexes="" original-indexes=""/>
                                     <event type="my-event" target="my-bar-1" phase="target" original-target="my-bar-1" indexes="" original-indexes=""/>
                                 </events>
                             </instance>
-                            <instance id="instance" model-id="my-bar-2$model">
+                            <instance id="instance" model-id="my-bar-2∘model">
                                 <instance>
                                     <value1>Cat</value1>
                                     <value2>Mouse</value2>
                                 </instance>
                             </instance>
-                            <instance id="events" model-id="my-bar-2$model">
+                            <instance id="events" model-id="my-bar-2∘model">
                                 <events>
                                     <event type="xforms-enabled" target="my-bar-2" phase="target" original-target="my-bar-2" indexes="" original-indexes=""/>
                                     <event type="my-event" target="my-bar-2" phase="target" original-target="my-bar-2" indexes="" original-indexes=""/>
@@ -1473,10 +1473,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-bar-1$input1">Red</xxf:control>
-                        <xxf:control id="my-bar-1$input2">Blue</xxf:control>
-                        <xxf:control id="my-bar-2$input1">Cat</xxf:control>
-                        <xxf:control id="my-bar-2$input2">Mouse</xxf:control>
+                        <xxf:control id="my-bar-1∘input1">Red</xxf:control>
+                        <xxf:control id="my-bar-1∘input2">Blue</xxf:control>
+                        <xxf:control id="my-bar-2∘input1">Cat</xxf:control>
+                        <xxf:control id="my-bar-2∘input2">Mouse</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1550,10 +1550,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$xf-4$xf-7" label="Life, etc.: ">42</xxf:control>
-                        <xxf:control id="my-foo$xf-4$xf-9" label="Life, etc.: ">42</xxf:control>
-                        <xxf:control id="my-foo$xf-5$xf-12" label="Life, etc.: ">42</xxf:control>
-                        <xxf:control id="my-foo$xf-5$xf-14" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo∘xf-4∘xf-7" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo∘xf-4∘xf-9" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo∘xf-5∘xf-12" label="Life, etc.: ">42</xxf:control>
+                        <xxf:control id="my-foo∘xf-5∘xf-14" label="Life, etc.: ">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1804,17 +1804,17 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="level1-component$level1-repeat" index="1"/>
-                            <control effective-id="level1-component$level2-component$level2-repeat·1" index="1"/>
-                            <control effective-id="level1-component$level2-component$level3-component$level3-repeat·1-1" index="1"/>
+                            <control effective-id="level1-component∘level1-repeat" index="1"/>
+                            <control effective-id="level1-component∘level2-component∘level2-repeat·1" index="1"/>
+                            <control effective-id="level1-component∘level2-component∘level3-component∘level3-repeat·1-1" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="level1-component$level2-component$level3-component$title-control·1-1-1">Cool title</xxf:control>
+                        <xxf:control id="level1-component∘level2-component∘level3-component∘title-control·1-1-1">Cool title</xxf:control>
                     </xxf:control-values>
-                    <xxf:focus control-id="level1-component$level2-component$level3-component$title-control·1-1-1"/>
+                    <xxf:focus control-id="level1-component∘level2-component∘level3-component∘title-control·1-1-1"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1857,14 +1857,14 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-foobar$my-switch" case-id="my-case-2"/>
+                            <control effective-id="my-foobar∘my-switch" case-id="my-case-2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-foobar$my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foobar$my-case-1" visibility="hidden"/>
+                        <xxf:div id="my-foobar∘my-case-2" visibility="visible"/>
+                        <xxf:div id="my-foobar∘my-case-1" visibility="hidden"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1918,14 +1918,14 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-foo$xf-5$my-switch" case-id="my-case-2"/>
+                            <control effective-id="my-foo∘xf-5∘my-switch" case-id="my-case-2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-foo$xf-5$my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foo$xf-5$my-case-1" visibility="hidden"/>
+                        <xxf:div id="my-foo∘xf-5∘my-case-2" visibility="visible"/>
+                        <xxf:div id="my-foo∘xf-5∘my-case-1" visibility="hidden"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1981,8 +1981,8 @@
                         <xxf:control id="xf-6">42</xxf:control>
                         <xxf:control id="xf-7">42</xxf:control>
                         <xxf:control id="xf-8">42</xxf:control>
-                        <xxf:control id="my-foo-1$xf-11">42</xxf:control>
-                        <xxf:control id="my-foo-2$xf-14">42</xxf:control>
+                        <xxf:control id="my-foo-1∘xf-11">42</xxf:control>
+                        <xxf:control id="my-foo-2∘xf-14">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2041,28 +2041,28 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-foo-1$my-switch" case-id="my-case-2"/>
-                            <control effective-id="my-foo-2$my-switch" case-id="my-case-2"/>
-                            <control effective-id="my-bar-1$my-switch" case-id="my-case-3"/>
-                            <control effective-id="my-bar-2$my-switch" case-id="my-case-3"/>
+                            <control effective-id="my-foo-1∘my-switch" case-id="my-case-2"/>
+                            <control effective-id="my-foo-2∘my-switch" case-id="my-case-2"/>
+                            <control effective-id="my-bar-1∘my-switch" case-id="my-case-3"/>
+                            <control effective-id="my-bar-2∘my-switch" case-id="my-case-3"/>
                             <control effective-id="my-switch" case-id="my-case-1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:div id="my-foo-1$my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foo-1$my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-foo-1$my-case-3" visibility="hidden"/>
-                        <xxf:div id="my-foo-2$my-case-2" visibility="visible"/>
-                        <xxf:div id="my-foo-2$my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-foo-2$my-case-3" visibility="hidden"/>
-                        <xxf:div id="my-bar-1$my-case-3" visibility="visible"/>
-                        <xxf:div id="my-bar-1$my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-bar-1$my-case-2" visibility="hidden"/>
-                        <xxf:div id="my-bar-2$my-case-3" visibility="visible"/>
-                        <xxf:div id="my-bar-2$my-case-1" visibility="hidden"/>
-                        <xxf:div id="my-bar-2$my-case-2" visibility="hidden"/>
+                        <xxf:div id="my-foo-1∘my-case-2" visibility="visible"/>
+                        <xxf:div id="my-foo-1∘my-case-1" visibility="hidden"/>
+                        <xxf:div id="my-foo-1∘my-case-3" visibility="hidden"/>
+                        <xxf:div id="my-foo-2∘my-case-2" visibility="visible"/>
+                        <xxf:div id="my-foo-2∘my-case-1" visibility="hidden"/>
+                        <xxf:div id="my-foo-2∘my-case-3" visibility="hidden"/>
+                        <xxf:div id="my-bar-1∘my-case-3" visibility="visible"/>
+                        <xxf:div id="my-bar-1∘my-case-1" visibility="hidden"/>
+                        <xxf:div id="my-bar-1∘my-case-2" visibility="hidden"/>
+                        <xxf:div id="my-bar-2∘my-case-3" visibility="visible"/>
+                        <xxf:div id="my-bar-2∘my-case-1" visibility="hidden"/>
+                        <xxf:div id="my-bar-2∘my-case-2" visibility="hidden"/>
                         <xxf:div id="my-case-1" visibility="visible"/>
                         <xxf:div id="my-case-2" visibility="hidden"/>
                         <xxf:div id="my-case-3" visibility="hidden"/>
@@ -2127,7 +2127,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-foo$my-repeat" index="2"/>
+                            <control effective-id="my-foo∘my-repeat" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -2271,10 +2271,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo-1$xf-4">42</xxf:control>
-                        <xxf:control id="my-foo-1$my-inner-output">42</xxf:control>
-                        <xxf:control id="my-foo-2$xf-9">43</xxf:control>
-                        <xxf:control id="my-foo-2$my-inner-output">43</xxf:control>
+                        <xxf:control id="my-foo-1∘xf-4">42</xxf:control>
+                        <xxf:control id="my-foo-1∘my-inner-output">42</xxf:control>
+                        <xxf:control id="my-foo-2∘xf-9">43</xxf:control>
+                        <xxf:control id="my-foo-2∘my-inner-output">43</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2365,10 +2365,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo-1$xf-4">42</xxf:control>
-                        <xxf:itemset id="my-foo-1$my-inner-select1">[{"label":"Apple","value":"apple"},{"label":"Banana","value":"banana"}]</xxf:itemset>
-                        <xxf:control id="my-foo-2$xf-12">43</xxf:control>
-                        <xxf:itemset id="my-foo-2$my-inner-select1">[{"label":"43","value":"","children":[{"label":"Pear","value":"pear"}]},{"label":"42","value":"","children":[{"label":"Orange","value":"orange"},{"label":"Kiwi","value":"kiwi"}]},{"label":"Apple","value":"apple"}]</xxf:itemset>
+                        <xxf:control id="my-foo-1∘xf-4">42</xxf:control>
+                        <xxf:itemset id="my-foo-1∘my-inner-select1">[{"label":"Apple","value":"apple"},{"label":"Banana","value":"banana"}]</xxf:itemset>
+                        <xxf:control id="my-foo-2∘xf-12">43</xxf:control>
+                        <xxf:itemset id="my-foo-2∘my-inner-select1">[{"label":"43","value":"","children":[{"label":"Pear","value":"pear"}]},{"label":"42","value":"","children":[{"label":"Orange","value":"orange"},{"label":"Kiwi","value":"kiwi"}]},{"label":"Apple","value":"apple"}]</xxf:itemset>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2427,10 +2427,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo-1$xf-4">42</xxf:control>
-                        <xxf:control id="my-foo-1$xf-9">42</xxf:control>
-                        <xxf:control id="my-foo-1$xf-10">42</xxf:control>
-                        <xxf:control id="my-foo-1$my-output-2">42</xxf:control>
+                        <xxf:control id="my-foo-1∘xf-4">42</xxf:control>
+                        <xxf:control id="my-foo-1∘xf-9">42</xxf:control>
+                        <xxf:control id="my-foo-1∘xf-10">42</xxf:control>
+                        <xxf:control id="my-foo-1∘my-output-2">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2516,11 +2516,11 @@
                         <xxf:control id="output3">42, 43, 42, 43</xxf:control>
                         <xxf:control id="output4">44, 45, 44, 45</xxf:control>
                         <xxf:control id="output5">42, 43, 42, 43</xxf:control>
-                        <xxf:control id="my-foo$output6">42, 43, 42, 43</xxf:control>
-                        <xxf:control id="my-foo$output7">44, 45, 44, 45</xxf:control>
-                        <xxf:control id="my-foo$output8">42, 43, 42, 43</xxf:control>
-                        <xxf:control id="my-foo$output9">44, 45, 44, 45</xxf:control>
-                        <xxf:control id="my-foo$output10">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="my-foo∘output6">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="my-foo∘output7">44, 45, 44, 45</xxf:control>
+                        <xxf:control id="my-foo∘output8">42, 43, 42, 43</xxf:control>
+                        <xxf:control id="my-foo∘output9">44, 45, 44, 45</xxf:control>
+                        <xxf:control id="my-foo∘output10">42, 43, 42, 43</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2593,20 +2593,20 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="foo10$xf-8">42 43</xxf:control>
-                        <xxf:control id="foo11$xf-11">43</xxf:control>
-                        <xxf:control id="foo12$xf-14">43</xxf:control>
-                        <xxf:control id="foo13$xf-17">42</xxf:control>
-                        <xxf:control id="foo14$xf-20">43</xxf:control>
-                        <xxf:control id="foo15$xf-23">44</xxf:control>
-                        <xxf:control id="foo16$xf-26">45</xxf:control>
-                        <xxf:control id="foo20$xf-29">44 45</xxf:control>
-                        <xxf:control id="foo21$xf-32">45</xxf:control>
-                        <xxf:control id="foo22$xf-35">45</xxf:control>
-                        <xxf:control id="foo23$xf-38">42</xxf:control>
-                        <xxf:control id="foo24$xf-41">43</xxf:control>
-                        <xxf:control id="foo25$xf-44">44</xxf:control>
-                        <xxf:control id="foo26$xf-47">45</xxf:control>
+                        <xxf:control id="foo10∘xf-8">42 43</xxf:control>
+                        <xxf:control id="foo11∘xf-11">43</xxf:control>
+                        <xxf:control id="foo12∘xf-14">43</xxf:control>
+                        <xxf:control id="foo13∘xf-17">42</xxf:control>
+                        <xxf:control id="foo14∘xf-20">43</xxf:control>
+                        <xxf:control id="foo15∘xf-23">44</xxf:control>
+                        <xxf:control id="foo16∘xf-26">45</xxf:control>
+                        <xxf:control id="foo20∘xf-29">44 45</xxf:control>
+                        <xxf:control id="foo21∘xf-32">45</xxf:control>
+                        <xxf:control id="foo22∘xf-35">45</xxf:control>
+                        <xxf:control id="foo23∘xf-38">42</xxf:control>
+                        <xxf:control id="foo24∘xf-41">43</xxf:control>
+                        <xxf:control id="foo25∘xf-44">44</xxf:control>
+                        <xxf:control id="foo26∘xf-47">45</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2724,7 +2724,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$my-input">43</xxf:control>
+                        <xxf:control id="my-foo∘my-input">43</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2940,7 +2940,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-foobar$my-repeat" index="2"/>
+                            <control effective-id="my-foobar∘my-repeat" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -3018,7 +3018,7 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-foobar$my-repeat" index="2"/>
+                            <control effective-id="my-foobar∘my-repeat" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -3067,7 +3067,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$gaga" label="My label">42</xxf:control>
+                        <xxf:control id="my-foo∘gaga" label="My label">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3117,7 +3117,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$gaga" label="My label">42</xxf:control>
+                        <xxf:control id="my-foo∘gaga" label="My label">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3162,7 +3162,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$gaga" label="My label">42</xxf:control>
+                        <xxf:control id="my-foo∘gaga" label="My label">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3226,7 +3226,7 @@
                     <xxf:control-values>
                         <xxf:control id="my-group" relevant="false"/>
                         <xxf:control id="my-button" relevant="false"/>
-                        <xxf:control id="my-button$xf-8" relevant="false"/>
+                        <xxf:control id="my-button∘xf-8" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3263,7 +3263,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$my-output">42</xxf:control>
+                        <xxf:control id="my-foo∘my-output">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3327,10 +3327,10 @@
                     <xxf:control-values>
                         <xxf:control id="my-group1" relevant="false"/>
                         <xxf:control id="my-foo2" relevant="false"/>
-                        <xxf:control id="my-foo2$my-output" relevant="false"/>
+                        <xxf:control id="my-foo2∘my-output" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:message level="modal">instance, my-foo1$my-xbl-instance</xxf:message>
-                    <xxf:message level="modal">instance, my-foo1$my-xbl-instance, my-foo3$my-xbl-instance</xxf:message>
+                    <xxf:message level="modal">instance, my-foo1∘my-xbl-instance</xxf:message>
+                    <xxf:message level="modal">instance, my-foo1∘my-xbl-instance, my-foo3∘my-xbl-instance</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -3365,7 +3365,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo1$xbl-trigger" label="Press Me!"/>
+                        <xxf:control id="my-foo1∘xbl-trigger" label="Press Me!"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3401,7 +3401,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo1$xbl-trigger" label="&lt;div id=&quot;my-foo1$xbl-avt&quot; style=&quot;background-color: red&quot;&gt;&lt;/div&gt;"/>
+                        <xxf:control id="my-foo1∘xbl-trigger" label="&lt;div id=&quot;my-foo1∘xbl-avt&quot; style=&quot;background-color: red&quot;&gt;&lt;/div&gt;"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3426,8 +3426,8 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="my-input$xf-3" class="xforms-control xforms-input">
-                    <xh:input id="my-input$xf-3$xforms-input-1" type="text" name="my-input$xf-3$xforms-input-1" value="" class="xforms-input-input"/>
+                <xh:span id="my-input∘xf-3" class="xforms-control xforms-input">
+                    <xh:input id="my-input∘xf-3∘xforms-input-1" type="text" name="my-input∘xf-3∘xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
             </controls>
         </output>
@@ -3470,9 +3470,9 @@
         </input>
         <output name="response">
             <controls>
-                <xh:span id="my-foo$foo-group" class="xforms-group">
-                    <xh:span id="my-foo$my-output" class="xforms-control xforms-output">
-                        <xh:span id="my-foo$my-output$$c" class="xforms-output-output">Hello</xh:span>
+                <xh:span id="my-foo∘foo-group" class="xforms-group">
+                    <xh:span id="my-foo∘my-output" class="xforms-control xforms-output">
+                        <xh:span id="my-foo∘my-output∘∘c" class="xforms-output-output">Hello</xh:span>
                     </xh:span>
                 </xh:span>
             </controls>
@@ -3506,8 +3506,8 @@
         <output name="response">
             <controls>
                 <xh:div class="xxforms-test-preserve-content">
-                    <xh:a id="my-foo$outer-a" href="/outer/1" xxbl:scope="outer"/>
-                    <xh:a id="my-foo$inner-a" href="/inner/1"/>
+                    <xh:a id="my-foo∘outer-a" href="/outer/1" xxbl:scope="outer"/>
+                    <xh:a id="my-foo∘inner-a" href="/inner/1"/>
                 </xh:div>
             </controls>
         </output>
@@ -3549,8 +3549,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo$output-foo1">Nothing!</xxf:control>
-                        <xxf:control id="my-foo$output-foo3">Something!</xxf:control>
+                        <xxf:control id="my-foo∘output-foo1">Nothing!</xxf:control>
+                        <xxf:control id="my-foo∘output-foo3">Something!</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3592,7 +3592,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-foo$my-repeat" index="1"/>
+                            <control effective-id="my-foo∘my-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -3611,9 +3611,9 @@
                     <xf:model id="model">
                         <!-- Upon ready, simulate click on button + close dialog for both XBL controls -->
                         <xf:action ev:event="xforms-ready">
-                            <xf:dispatch name="DOMActivate" targetid="|my-foo1$foo-trigger|"/>
+                            <xf:dispatch name="DOMActivate" targetid="|my-foo1∘foo-trigger|"/>
                             <xxf:hide dialog="my-dialog"/>
-                            <xf:dispatch name="DOMActivate" targetid="|my-foo2$foo-trigger|"/>
+                            <xf:dispatch name="DOMActivate" targetid="|my-foo2∘foo-trigger|"/>
                             <xxf:hide dialog="my-dialog"/>
                         </xf:action>
                     </xf:model>
@@ -3675,10 +3675,10 @@
                             <instance id="my-dialog-instance" model-id="my-dialog-model">
                                 <count>2</count>
                             </instance>
-                            <instance id="instance" model-id="my-foo1$model">
+                            <instance id="instance" model-id="my-foo1∘model">
                                 <count>1</count>
                             </instance>
-                            <instance id="instance" model-id="my-foo2$model">
+                            <instance id="instance" model-id="my-foo2∘model">
                                 <count>2</count>
                             </instance>
                         </instances>
@@ -3689,8 +3689,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-foo1$foo-trigger" label="Open me"/>
-                        <xxf:control id="my-foo2$foo-trigger" label="Open me"/>
+                        <xxf:control id="my-foo1∘foo-trigger" label="Open me"/>
+                        <xxf:control id="my-foo2∘foo-trigger" label="Open me"/>
                         <xxf:control id="my-dialog" label="My Dialog"/>
                         <xxf:div id="my-dialog" visibility="hidden"/>
                     </xxf:control-values>
@@ -3730,13 +3730,13 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-gaga$my-repeat" index="1"/>
+                            <control effective-id="my-gaga∘my-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-gaga$my-output">1</xxf:control>
+                        <xxf:control id="my-gaga∘my-output">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3786,8 +3786,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-gaga$o1">gaga</xxf:control>
-                        <xxf:control id="my-toto$o2">gaga</xxf:control>
+                        <xxf:control id="my-gaga∘o1">gaga</xxf:control>
+                        <xxf:control id="my-toto∘o2">gaga</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3835,8 +3835,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-gaga$gaga-output">Gaga</xxf:control>
-                        <xxf:control id="my-toto$toto-output">Toto</xxf:control>
+                        <xxf:control id="my-gaga∘gaga-output">Gaga</xxf:control>
+                        <xxf:control id="my-toto∘toto-output">Toto</xxf:control>
                     </xxf:control-values>
                     <xxf:message level="modal">Hello gaga!</xxf:message>
                 </xxf:action>
@@ -3884,7 +3884,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-gaga$my-toto$toto-output">Toto</xxf:control>
+                        <xxf:control id="my-gaga∘my-toto∘toto-output">Toto</xxf:control>
                     </xxf:control-values>
                     <xxf:message level="modal">Hello toto!</xxf:message>
                 </xxf:action>
@@ -3935,8 +3935,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-gaga$gaga-output">42</xxf:control>
-                        <xxf:control id="my-toto$toto-output">Oops!</xxf:control>
+                        <xxf:control id="my-gaga∘gaga-output">42</xxf:control>
+                        <xxf:control id="my-toto∘toto-output">Oops!</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -3981,18 +3981,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="gaga1$binding">foo</xxf:control>
-                        <xxf:control id="gaga1$binding-context">values</xxf:control>
-                        <xxf:control id="gaga1$component-context">values</xxf:control>
-                        <xxf:control id="gaga2$binding">foo</xxf:control>
-                        <xxf:control id="gaga2$binding-context">values</xxf:control>
-                        <xxf:control id="gaga2$component-context">values</xxf:control>
+                        <xxf:control id="gaga1∘binding">foo</xxf:control>
+                        <xxf:control id="gaga1∘binding-context">values</xxf:control>
+                        <xxf:control id="gaga1∘component-context">values</xxf:control>
+                        <xxf:control id="gaga2∘binding">foo</xxf:control>
+                        <xxf:control id="gaga2∘binding-context">values</xxf:control>
+                        <xxf:control id="gaga2∘component-context">values</xxf:control>
                         <xxf:control id="gaga3" readonly="true"/>
-                        <xxf:control id="gaga3$binding">1</xxf:control>
-                        <xxf:control id="gaga3$binding-context">values</xxf:control>
-                        <xxf:control id="gaga3$component-context">values</xxf:control>
-                        <xxf:control id="gaga4$binding-context">values</xxf:control>
-                        <xxf:control id="gaga4$component-context">values</xxf:control>
+                        <xxf:control id="gaga3∘binding">1</xxf:control>
+                        <xxf:control id="gaga3∘binding-context">values</xxf:control>
+                        <xxf:control id="gaga3∘component-context">values</xxf:control>
+                        <xxf:control id="gaga4∘binding-context">values</xxf:control>
+                        <xxf:control id="gaga4∘component-context">values</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4057,7 +4057,7 @@
                                     </xh:body>
                                 </xh:html>
                             </instance>
-                            <instance id="instance" model-id="my-dynamic$model">
+                            <instance id="instance" model-id="my-dynamic∘model">
                                 <value>42</value>
                             </instance>
                         </instances>
@@ -4065,7 +4065,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic$my-output">42</xxf:control>
+                        <xxf:control id="my-dynamic∘my-output">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4131,7 +4131,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic$my-output" level="error">42</xxf:control>
+                        <xxf:control id="my-dynamic∘my-output" level="error">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4209,8 +4209,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic$output1" relevant="false"/>
-                        <xxf:control id="my-dynamic$output2">42</xxf:control>
+                        <xxf:control id="my-dynamic∘output1" relevant="false"/>
+                        <xxf:control id="my-dynamic∘output2">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4318,7 +4318,7 @@
                                     </xh:body>
                                 </xh:html>
                             </instance>
-                            <instance id="bar-instance" model-id="my-dynamic$my-bar$bar-model">
+                            <instance id="bar-instance" model-id="my-dynamic∘my-bar∘bar-model">
                                 <bar>42</bar>
                             </instance>
                         </instances>
@@ -4326,8 +4326,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic$my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic$my-bar">&lt;span id="my-dynamic$my-bar$input1" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic$my-bar$input1$xforms-input-1" type="text" name="my-dynamic$my-bar$input1$xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/input&gt;&lt;/span&gt;&lt;span id="my-dynamic$my-bar$input2" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic$my-bar$input2$xforms-input-1" type="text" name="my-dynamic$my-bar$input2$xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/input&gt;&lt;/span&gt;</xxf:inner-html>
+                        <xxf:control id="my-dynamic∘my-bar" class="xforms-update-full"/>
+                        <xxf:inner-html id="my-dynamic∘my-bar">&lt;span id="my-dynamic∘my-bar∘input1" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic∘my-bar∘input1∘xforms-input-1" type="text" name="my-dynamic∘my-bar∘input1∘xforms-input-1" value="41" class="xforms-input-input"&gt;&lt;/input&gt;&lt;/span&gt;&lt;span id="my-dynamic∘my-bar∘input2" class="xforms-control xforms-input"&gt;&lt;input id="my-dynamic∘my-bar∘input2∘xforms-input-1" type="text" name="my-dynamic∘my-bar∘input2∘xforms-input-1" value="42" class="xforms-input-input"&gt;&lt;/input&gt;&lt;/span&gt;</xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4385,7 +4385,7 @@
                                     </xh:body>
                                 </xh:html>
                             </instance>
-                            <instance id="instance" model-id="my-dynamic$model">
+                            <instance id="instance" model-id="my-dynamic∘model">
                                 <bar/>
                             </instance>
                         </instances>
@@ -4484,8 +4484,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic$my-bar" class="xforms-update-full"/>
-                        <xxf:inner-html id="my-dynamic$my-bar">&lt;span id="my-dynamic$my-bar$output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic$my-bar$output2$$c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic$my-bar$output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic$my-bar$output1$$c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:inner-html>
+                        <xxf:control id="my-dynamic∘my-bar" class="xforms-update-full"/>
+                        <xxf:inner-html id="my-dynamic∘my-bar">&lt;span id="my-dynamic∘my-bar∘output2" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic∘my-bar∘output2∘∘c" class="xforms-output-output"&gt;Hello!&lt;/span&gt;&lt;/span&gt; &lt;span id="my-dynamic∘my-bar∘output1" class="xforms-control xforms-output"&gt;&lt;span id="my-dynamic∘my-bar∘output1∘∘c" class="xforms-output-output"&gt;42&lt;/span&gt;&lt;/span&gt;</xxf:inner-html>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -4544,7 +4544,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="gaga1$gaga-output">42</xxf:control>
+                        <xxf:control id="gaga1∘gaga-output">42</xxf:control>
                     </xxf:control-values>
                     <xxf:message level="modal">fr:gaga changed!</xxf:message>
                 </xxf:action>
@@ -4589,7 +4589,7 @@
                             <instance id="outer-instance" model-id="model">
                                 <instance>42</instance>
                             </instance>
-                            <instance id="gaga-instance" model-id="my-gaga$gaga-model">
+                            <instance id="gaga-instance" model-id="my-gaga∘gaga-model">
                                 <instance>42</instance>
                             </instance>
                         </instances>

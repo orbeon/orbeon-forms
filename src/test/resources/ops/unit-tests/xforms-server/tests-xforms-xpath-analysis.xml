@@ -2262,29 +2262,29 @@
                     </var>
                 </model>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
-                    <model scope="my-foo" prefixed-id="my-foo$model" default-instance-prefixed-id="my-foo$instance" analyzed-binds="true">
-                        <instance scope="my-foo" prefixed-id="my-foo$instance" model-prefixed-id="my-foo$model" binding="false" value="false"/>
+                    <model scope="my-foo" prefixed-id="my-foo∘model" default-instance-prefixed-id="my-foo∘instance" analyzed-binds="true">
+                        <instance scope="my-foo" prefixed-id="my-foo∘instance" model-prefixed-id="my-foo∘model" binding="false" value="false"/>
                     </model>
-                    <template scope="my-foo" prefixed-id="my-foo$xf-4" model-prefixed-id="my-foo$model" binding="false" value="false">
-                        <var scope="my-foo" prefixed-id="my-foo$iv" model-prefixed-id="my-foo$model" binding="false" value="false" name="internal">
+                    <template scope="my-foo" prefixed-id="my-foo∘xf-4" model-prefixed-id="my-foo∘model" binding="false" value="false">
+                        <var scope="my-foo" prefixed-id="my-foo∘iv" model-prefixed-id="my-foo∘model" binding="false" value="false" name="internal">
                             <value>
                                 <analysis expression="." analyzed="true">
                                     <returnable>
-                                        <path>instance('my-foo$instance')</path>
+                                        <path>instance('my-foo∘instance')</path>
                                     </returnable>
                                     <dependent-models>
-                                        <model>my-foo$model</model>
+                                        <model>my-foo∘model</model>
                                     </dependent-models>
                                     <dependent-instances>
-                                        <instance>my-foo$instance</instance>
+                                        <instance>my-foo∘instance</instance>
                                     </dependent-instances>
                                     <returnable-instances>
-                                        <instance>my-foo$instance</instance>
+                                        <instance>my-foo∘instance</instance>
                                     </returnable-instances>
                                 </analysis>
                             </value>
                         </var>
-                        <var scope="my-foo" prefixed-id="my-foo$ov" model-prefixed-id="my-foo$model" binding="false" value="false" name="external">
+                        <var scope="my-foo" prefixed-id="my-foo∘ov" model-prefixed-id="my-foo∘model" binding="false" value="false" name="external">
                             <value>
                                 <analysis expression="foo" analyzed="true">
                                     <returnable>
@@ -2302,12 +2302,12 @@
                                 </analysis>
                             </value>
                         </var>
-                        <var scope="my-foo" prefixed-id="my-foo$ro" model-prefixed-id="my-foo$model" binding="false" value="false" name="readonly">
+                        <var scope="my-foo" prefixed-id="my-foo∘ro" model-prefixed-id="my-foo∘model" binding="false" value="false" name="readonly">
                             <value>
                                 <analysis expression="exf:readonly($external)" analyzed="false"/>
                             </value>
                         </var>
-                        <group scope="my-foo" prefixed-id="my-foo$group-external" model-prefixed-id="my-foo$model" binding="true" value="false">
+                        <group scope="my-foo" prefixed-id="my-foo∘group-external" model-prefixed-id="my-foo∘model" binding="true" value="false">
                             <binding>
                                 <analysis expression="$external" analyzed="true">
                                     <returnable>
@@ -2325,7 +2325,7 @@
                                 </analysis>
                             </binding>
                         </group>
-                        <output scope="my-foo" prefixed-id="my-foo$oexternal" model-prefixed-id="my-foo$model" binding="false" value="true">
+                        <output scope="my-foo" prefixed-id="my-foo∘oexternal" model-prefixed-id="my-foo∘model" binding="false" value="true">
                             <value>
                                 <analysis expression="string(($external)[1])" analyzed="true">
                                     <value-dependent>
@@ -2340,7 +2340,7 @@
                                 </analysis>
                             </value>
                         </output>
-                        <output scope="my-foo" prefixed-id="my-foo$oro" model-prefixed-id="my-foo$model" binding="false" value="true">
+                        <output scope="my-foo" prefixed-id="my-foo∘oro" model-prefixed-id="my-foo∘model" binding="false" value="true">
                             <value>
                                 <analysis expression="string(($readonly)[1])" analyzed="false"/>
                             </value>
@@ -2534,8 +2534,8 @@
             <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
                 <model scope="" prefixed-id="model" analyzed-binds="true"/>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
-                    <template scope="my-foo" prefixed-id="my-foo$xf-2" binding="false" value="false">
-                        <output scope="my-foo" prefixed-id="my-foo$output" binding="false" value="true">
+                    <template scope="my-foo" prefixed-id="my-foo∘xf-2" binding="false" value="false">
+                        <output scope="my-foo" prefixed-id="my-foo∘output" binding="false" value="true">
                             <value>
                                 <analysis expression="string((current-date())[1])" analyzed="true"/>
                             </value>
@@ -5575,7 +5575,7 @@
         <output name="response">
             <controls xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-empty">
-                    <xh:input id="my-input$xforms-input-1" type="text" name="my-input$xforms-input-1" value="" class="xforms-input-input"/>
+                    <xh:input id="my-input∘xforms-input-1" type="text" name="my-input∘xforms-input-1" value="" class="xforms-input-input"/>
                     <xh:span class="xforms-active xforms-alert">First name is mandatory</xh:span>
                 </xh:span>
             </controls>
@@ -6184,12 +6184,12 @@
                     <instance scope="" prefixed-id="instance" model-prefixed-id="model" binding="false" value="false"/>
                 </model>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
-                    <model scope="my-foo" prefixed-id="my-foo$foo-model" default-instance-prefixed-id="my-foo$foo-instance" analyzed-binds="true">
-                        <instance scope="my-foo" prefixed-id="my-foo$foo-instance" model-prefixed-id="my-foo$foo-model" binding="false" value="false"/>
+                    <model scope="my-foo" prefixed-id="my-foo∘foo-model" default-instance-prefixed-id="my-foo∘foo-instance" analyzed-binds="true">
+                        <instance scope="my-foo" prefixed-id="my-foo∘foo-instance" model-prefixed-id="my-foo∘foo-model" binding="false" value="false"/>
                     </model>
-                    <template scope="my-foo" prefixed-id="my-foo$xf-2" model-prefixed-id="my-foo$foo-model" binding="false" value="false">
-                        <group scope="" prefixed-id="my-foo$foo-group" model-prefixed-id="model" binding="false" value="false">
-                            <var scope="" prefixed-id="my-foo$v1" model-prefixed-id="model" binding="false" value="false" name="v1">
+                    <template scope="my-foo" prefixed-id="my-foo∘xf-2" model-prefixed-id="my-foo∘foo-model" binding="false" value="false">
+                        <group scope="" prefixed-id="my-foo∘foo-group" model-prefixed-id="model" binding="false" value="false">
+                            <var scope="" prefixed-id="my-foo∘v1" model-prefixed-id="model" binding="false" value="false" name="v1">
                                 <value>
                                     <analysis expression="." analyzed="true">
                                         <returnable>
@@ -6207,7 +6207,7 @@
                                     </analysis>
                                 </value>
                             </var>
-                            <var scope="my-foo" prefixed-id="my-foo$v2" model-prefixed-id="my-foo$foo-model" binding="false" value="false" name="v2">
+                            <var scope="my-foo" prefixed-id="my-foo∘v2" model-prefixed-id="my-foo∘foo-model" binding="false" value="false" name="v2">
                                 <value>
                                     <analysis expression="$v1" analyzed="true">
                                         <returnable>
@@ -6225,7 +6225,7 @@
                                     </analysis>
                                 </value>
                             </var>
-                            <output scope="my-foo" prefixed-id="my-foo$output1" model-prefixed-id="my-foo$foo-model" binding="false" value="true">
+                            <output scope="my-foo" prefixed-id="my-foo∘output1" model-prefixed-id="my-foo∘foo-model" binding="false" value="true">
                                 <value>
                                     <analysis expression="string(($v2)[1])" analyzed="true">
                                         <value-dependent>
@@ -6240,53 +6240,53 @@
                                     </analysis>
                                 </value>
                             </output>
-                            <var scope="my-foo" prefixed-id="my-foo$v3" model-prefixed-id="my-foo$foo-model" binding="false" value="false" name="v3">
+                            <var scope="my-foo" prefixed-id="my-foo∘v3" model-prefixed-id="my-foo∘foo-model" binding="false" value="false" name="v3">
                                 <value>
                                     <analysis expression="." analyzed="true">
                                         <returnable>
-                                            <path>instance('my-foo$foo-instance')</path>
+                                            <path>instance('my-foo∘foo-instance')</path>
                                         </returnable>
                                         <dependent-models>
-                                            <model>my-foo$foo-model</model>
+                                            <model>my-foo∘foo-model</model>
                                         </dependent-models>
                                         <dependent-instances>
-                                            <instance>my-foo$foo-instance</instance>
+                                            <instance>my-foo∘foo-instance</instance>
                                         </dependent-instances>
                                         <returnable-instances>
-                                            <instance>my-foo$foo-instance</instance>
+                                            <instance>my-foo∘foo-instance</instance>
                                         </returnable-instances>
                                     </analysis>
                                 </value>
                             </var>
-                            <var scope="" prefixed-id="my-foo$v4" model-prefixed-id="model" binding="false" value="false" name="v4">
+                            <var scope="" prefixed-id="my-foo∘v4" model-prefixed-id="model" binding="false" value="false" name="v4">
                                 <value>
                                     <analysis expression="$v3" analyzed="true">
                                         <returnable>
-                                            <path>instance('my-foo$foo-instance')</path>
+                                            <path>instance('my-foo∘foo-instance')</path>
                                         </returnable>
                                         <dependent-models>
-                                            <model>my-foo$foo-model</model>
+                                            <model>my-foo∘foo-model</model>
                                         </dependent-models>
                                         <dependent-instances>
-                                            <instance>my-foo$foo-instance</instance>
+                                            <instance>my-foo∘foo-instance</instance>
                                         </dependent-instances>
                                         <returnable-instances>
-                                            <instance>my-foo$foo-instance</instance>
+                                            <instance>my-foo∘foo-instance</instance>
                                         </returnable-instances>
                                     </analysis>
                                 </value>
                             </var>
-                            <output scope="" prefixed-id="my-foo$output2" model-prefixed-id="model" binding="false" value="true">
+                            <output scope="" prefixed-id="my-foo∘output2" model-prefixed-id="model" binding="false" value="true">
                                 <value>
                                     <analysis expression="string(($v4)[1])" analyzed="true">
                                         <value-dependent>
-                                            <path>instance('my-foo$foo-instance')</path>
+                                            <path>instance('my-foo∘foo-instance')</path>
                                         </value-dependent>
                                         <dependent-models>
-                                            <model>my-foo$foo-model</model>
+                                            <model>my-foo∘foo-model</model>
                                         </dependent-models>
                                         <dependent-instances>
-                                            <instance>my-foo$foo-instance</instance>
+                                            <instance>my-foo∘foo-instance</instance>
                                         </dependent-instances>
                                     </analysis>
                                 </value>
@@ -6354,9 +6354,9 @@
                     </value>
                 </var>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
-                    <template scope="my-foo" prefixed-id="my-foo$xf-3" binding="false" value="false">
-                        <group scope="my-foo" prefixed-id="my-foo$foo-group" binding="false" value="false">
-                            <label scope="my-foo" prefixed-id="my-foo$foo-label" binding="false" value="false">
+                    <template scope="my-foo" prefixed-id="my-foo∘xf-3" binding="false" value="false">
+                        <group scope="my-foo" prefixed-id="my-foo∘foo-group" binding="false" value="false">
+                            <label scope="my-foo" prefixed-id="my-foo∘foo-label" binding="false" value="false">
                                 <value>
                                     <analysis expression="string(.)" analyzed="true">
                                         <value-dependent>
@@ -6659,46 +6659,46 @@
                     </value>
                 </output>
                 <foo scope="" prefixed-id="foo1" model-prefixed-id="m1" binding="false" value="false">
-                    <model scope="foo1" prefixed-id="foo1$m1" default-instance-prefixed-id="foo1$m1i1" analyzed-binds="true">
-                        <instance scope="foo1" prefixed-id="foo1$m1i1" model-prefixed-id="foo1$m1" binding="false" value="false"/>
-                        <instance scope="foo1" prefixed-id="foo1$m1i3" model-prefixed-id="foo1$m1" binding="false" value="false"/>
+                    <model scope="foo1" prefixed-id="foo1∘m1" default-instance-prefixed-id="foo1∘m1i1" analyzed-binds="true">
+                        <instance scope="foo1" prefixed-id="foo1∘m1i1" model-prefixed-id="foo1∘m1" binding="false" value="false"/>
+                        <instance scope="foo1" prefixed-id="foo1∘m1i3" model-prefixed-id="foo1∘m1" binding="false" value="false"/>
                     </model>
-                    <model scope="foo1" prefixed-id="foo1$m2" default-instance-prefixed-id="foo1$m2i1" analyzed-binds="true">
-                        <instance scope="foo1" prefixed-id="foo1$m2i1" model-prefixed-id="foo1$m2" binding="false" value="false"/>
-                        <instance scope="foo1" prefixed-id="foo1$m2i3" model-prefixed-id="foo1$m2" binding="false" value="false"/>
+                    <model scope="foo1" prefixed-id="foo1∘m2" default-instance-prefixed-id="foo1∘m2i1" analyzed-binds="true">
+                        <instance scope="foo1" prefixed-id="foo1∘m2i1" model-prefixed-id="foo1∘m2" binding="false" value="false"/>
+                        <instance scope="foo1" prefixed-id="foo1∘m2i3" model-prefixed-id="foo1∘m2" binding="false" value="false"/>
                     </model>
-                    <template scope="foo1" prefixed-id="foo1$xf-3" model-prefixed-id="foo1$m1" binding="false" value="false">
-                        <output scope="foo1" prefixed-id="foo1$o1" model-prefixed-id="foo1$m1" binding="false" value="true">
+                    <template scope="foo1" prefixed-id="foo1∘xf-3" model-prefixed-id="foo1∘m1" binding="false" value="false">
+                        <output scope="foo1" prefixed-id="foo1∘o1" model-prefixed-id="foo1∘m1" binding="false" value="true">
                             <value>
                                 <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                                     <value-dependent>
-                                        <path>instance('foo1$m1i1')</path>
+                                        <path>instance('foo1∘m1i1')</path>
                                     </value-dependent>
                                     <dependent-models>
-                                        <model>foo1$m1</model>
+                                        <model>foo1∘m1</model>
                                     </dependent-models>
                                     <dependent-instances>
-                                        <instance>foo1$m1i1</instance>
+                                        <instance>foo1∘m1i1</instance>
                                     </dependent-instances>
                                 </analysis>
                             </value>
                         </output>
-                        <output scope="foo1" prefixed-id="foo1$o2" model-prefixed-id="foo1$m1" binding="false" value="true">
+                        <output scope="foo1" prefixed-id="foo1∘o2" model-prefixed-id="foo1∘m1" binding="false" value="true">
                             <value>
                                 <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                                     <value-dependent>
-                                        <path>instance('foo1$m2i1')</path>
+                                        <path>instance('foo1∘m2i1')</path>
                                     </value-dependent>
                                     <dependent-models>
-                                        <model>foo1$m2</model>
+                                        <model>foo1∘m2</model>
                                     </dependent-models>
                                     <dependent-instances>
-                                        <instance>foo1$m2i1</instance>
+                                        <instance>foo1∘m2i1</instance>
                                     </dependent-instances>
                                 </analysis>
                             </value>
                         </output>
-                        <output scope="foo1" prefixed-id="foo1$o3" model-prefixed-id="foo1$m1" binding="false" value="true">
+                        <output scope="foo1" prefixed-id="foo1∘o3" model-prefixed-id="foo1∘m1" binding="false" value="true">
                             <value>
                                 <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                                     <value-dependent>
@@ -6713,7 +6713,7 @@
                                 </analysis>
                             </value>
                         </output>
-                        <output scope="foo1" prefixed-id="foo1$o4" model-prefixed-id="foo1$m1" binding="false" value="true">
+                        <output scope="foo1" prefixed-id="foo1∘o4" model-prefixed-id="foo1∘m1" binding="false" value="true">
                             <value>
                                 <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                                     <value-dependent>
@@ -6728,75 +6728,75 @@
                                 </analysis>
                             </value>
                         </output>
-                        <bar scope="foo1" prefixed-id="foo1$bar1" model-prefixed-id="foo1$m1" binding="false" value="false">
-                            <model scope="foo1$bar1" prefixed-id="foo1$bar1$m1" default-instance-prefixed-id="foo1$bar1$m1i1" analyzed-binds="true">
-                                <instance scope="foo1$bar1" prefixed-id="foo1$bar1$m1i1" model-prefixed-id="foo1$bar1$m1" binding="false" value="false"/>
+                        <bar scope="foo1" prefixed-id="foo1∘bar1" model-prefixed-id="foo1∘m1" binding="false" value="false">
+                            <model scope="foo1∘bar1" prefixed-id="foo1∘bar1∘m1" default-instance-prefixed-id="foo1∘bar1∘m1i1" analyzed-binds="true">
+                                <instance scope="foo1∘bar1" prefixed-id="foo1∘bar1∘m1i1" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="false"/>
                             </model>
-                            <model scope="foo1$bar1" prefixed-id="foo1$bar1$m2" default-instance-prefixed-id="foo1$bar1$m2i1" analyzed-binds="true">
-                                <instance scope="foo1$bar1" prefixed-id="foo1$bar1$m2i1" model-prefixed-id="foo1$bar1$m2" binding="false" value="false"/>
+                            <model scope="foo1∘bar1" prefixed-id="foo1∘bar1∘m2" default-instance-prefixed-id="foo1∘bar1∘m2i1" analyzed-binds="true">
+                                <instance scope="foo1∘bar1" prefixed-id="foo1∘bar1∘m2i1" model-prefixed-id="foo1∘bar1∘m2" binding="false" value="false"/>
                             </model>
-                            <template scope="foo1$bar1" prefixed-id="foo1$bar1$xf-4" model-prefixed-id="foo1$bar1$m1" binding="false" value="false">
-                                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o1" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                            <template scope="foo1∘bar1" prefixed-id="foo1∘bar1∘xf-4" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="false">
+                                <output scope="foo1∘bar1" prefixed-id="foo1∘bar1∘o1" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="true">
                                     <value>
                                         <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                                             <value-dependent>
-                                                <path>instance('foo1$bar1$m1i1')</path>
+                                                <path>instance('foo1∘bar1∘m1i1')</path>
                                             </value-dependent>
                                             <dependent-models>
-                                                <model>foo1$bar1$m1</model>
+                                                <model>foo1∘bar1∘m1</model>
                                             </dependent-models>
                                             <dependent-instances>
-                                                <instance>foo1$bar1$m1i1</instance>
+                                                <instance>foo1∘bar1∘m1i1</instance>
                                             </dependent-instances>
                                         </analysis>
                                     </value>
                                 </output>
-                                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o2" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                                <output scope="foo1∘bar1" prefixed-id="foo1∘bar1∘o2" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="true">
                                     <value>
                                         <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                                             <value-dependent>
-                                                <path>instance('foo1$bar1$m2i1')</path>
+                                                <path>instance('foo1∘bar1∘m2i1')</path>
                                             </value-dependent>
                                             <dependent-models>
-                                                <model>foo1$bar1$m2</model>
+                                                <model>foo1∘bar1∘m2</model>
                                             </dependent-models>
                                             <dependent-instances>
-                                                <instance>foo1$bar1$m2i1</instance>
+                                                <instance>foo1∘bar1∘m2i1</instance>
                                             </dependent-instances>
                                         </analysis>
                                     </value>
                                 </output>
-                                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o3" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                                <output scope="foo1∘bar1" prefixed-id="foo1∘bar1∘o3" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="true">
                                     <value>
                                         <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true">
                                             <value-dependent>
-                                                <path>instance('foo1$m1i3')</path>
+                                                <path>instance('foo1∘m1i3')</path>
                                             </value-dependent>
                                             <dependent-models>
-                                                <model>foo1$m1</model>
+                                                <model>foo1∘m1</model>
                                             </dependent-models>
                                             <dependent-instances>
-                                                <instance>foo1$m1i3</instance>
+                                                <instance>foo1∘m1i3</instance>
                                             </dependent-instances>
                                         </analysis>
                                     </value>
                                 </output>
-                                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o4" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                                <output scope="foo1∘bar1" prefixed-id="foo1∘bar1∘o4" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="true">
                                     <value>
                                         <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true">
                                             <value-dependent>
-                                                <path>instance('foo1$m2i3')</path>
+                                                <path>instance('foo1∘m2i3')</path>
                                             </value-dependent>
                                             <dependent-models>
-                                                <model>foo1$m2</model>
+                                                <model>foo1∘m2</model>
                                             </dependent-models>
                                             <dependent-instances>
-                                                <instance>foo1$m2i3</instance>
+                                                <instance>foo1∘m2i3</instance>
                                             </dependent-instances>
                                         </analysis>
                                     </value>
                                 </output>
-                                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o5" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                                <output scope="foo1∘bar1" prefixed-id="foo1∘bar1∘o5" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="true">
                                     <value>
                                         <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                                             <value-dependent>
@@ -6811,7 +6811,7 @@
                                         </analysis>
                                     </value>
                                 </output>
-                                <output scope="foo1$bar1" prefixed-id="foo1$bar1$o6" model-prefixed-id="foo1$bar1$m1" binding="false" value="true">
+                                <output scope="foo1∘bar1" prefixed-id="foo1∘bar1∘o6" model-prefixed-id="foo1∘bar1∘m1" binding="false" value="true">
                                     <value>
                                         <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                                             <value-dependent>
@@ -6826,68 +6826,68 @@
                                         </analysis>
                                     </value>
                                 </output>
-                                <group scope="foo1" prefixed-id="foo1$bar1$g2" model-prefixed-id="foo1$m1" binding="false" value="false">
-                                    <output scope="foo1" prefixed-id="foo1$bar1$o9" model-prefixed-id="foo1$m1" binding="false" value="true">
+                                <group scope="foo1" prefixed-id="foo1∘bar1∘g2" model-prefixed-id="foo1∘m1" binding="false" value="false">
+                                    <output scope="foo1" prefixed-id="foo1∘bar1∘o9" model-prefixed-id="foo1∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$m1i1')</path>
+                                                    <path>instance('foo1∘m1i1')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$m1</model>
+                                                    <model>foo1∘m1</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$m1i1</instance>
+                                                    <instance>foo1∘m1i1</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1" prefixed-id="foo1$bar1$o10" model-prefixed-id="foo1$m1" binding="false" value="true">
+                                    <output scope="foo1" prefixed-id="foo1∘bar1∘o10" model-prefixed-id="foo1∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$m2i1')</path>
+                                                    <path>instance('foo1∘m2i1')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$m2</model>
+                                                    <model>foo1∘m2</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$m2i1</instance>
+                                                    <instance>foo1∘m2i1</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1" prefixed-id="foo1$bar1$o11" model-prefixed-id="foo1$m1" binding="false" value="true">
+                                    <output scope="foo1" prefixed-id="foo1∘bar1∘o11" model-prefixed-id="foo1∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$m1i3')</path>
+                                                    <path>instance('foo1∘m1i3')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$m1</model>
+                                                    <model>foo1∘m1</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$m1i3</instance>
+                                                    <instance>foo1∘m1i3</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1" prefixed-id="foo1$bar1$o12" model-prefixed-id="foo1$m1" binding="false" value="true">
+                                    <output scope="foo1" prefixed-id="foo1∘bar1∘o12" model-prefixed-id="foo1∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$m2i3')</path>
+                                                    <path>instance('foo1∘m2i3')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$m2</model>
+                                                    <model>foo1∘m2</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$m2i3</instance>
+                                                    <instance>foo1∘m2i3</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1" prefixed-id="foo1$bar1$o13" model-prefixed-id="foo1$m1" binding="false" value="true">
+                                    <output scope="foo1" prefixed-id="foo1∘bar1∘o13" model-prefixed-id="foo1∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                                                 <value-dependent>
@@ -6902,7 +6902,7 @@
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1" prefixed-id="foo1$bar1$o14" model-prefixed-id="foo1$m1" binding="false" value="true">
+                                    <output scope="foo1" prefixed-id="foo1∘bar1∘o14" model-prefixed-id="foo1∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                                                 <value-dependent>
@@ -6920,8 +6920,8 @@
                                 </group>
                             </template>
                         </bar>
-                        <group scope="" prefixed-id="foo1$g1" model-prefixed-id="m1" binding="false" value="false">
-                            <output scope="" prefixed-id="foo1$o5" model-prefixed-id="m1" binding="false" value="true">
+                        <group scope="" prefixed-id="foo1∘g1" model-prefixed-id="m1" binding="false" value="false">
+                            <output scope="" prefixed-id="foo1∘o5" model-prefixed-id="m1" binding="false" value="true">
                                 <value>
                                     <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                                         <value-dependent>
@@ -6936,7 +6936,7 @@
                                     </analysis>
                                 </value>
                             </output>
-                            <output scope="" prefixed-id="foo1$o6" model-prefixed-id="m1" binding="false" value="true">
+                            <output scope="" prefixed-id="foo1∘o6" model-prefixed-id="m1" binding="false" value="true">
                                 <value>
                                     <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                                         <value-dependent>
@@ -6951,7 +6951,7 @@
                                     </analysis>
                                 </value>
                             </output>
-                            <output scope="" prefixed-id="foo1$o7" model-prefixed-id="m1" binding="false" value="true">
+                            <output scope="" prefixed-id="foo1∘o7" model-prefixed-id="m1" binding="false" value="true">
                                 <value>
                                     <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                                         <value-dependent>
@@ -6966,7 +6966,7 @@
                                     </analysis>
                                 </value>
                             </output>
-                            <output scope="" prefixed-id="foo1$o8" model-prefixed-id="m1" binding="false" value="true">
+                            <output scope="" prefixed-id="foo1∘o8" model-prefixed-id="m1" binding="false" value="true">
                                 <value>
                                     <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                                         <value-dependent>
@@ -6981,75 +6981,75 @@
                                     </analysis>
                                 </value>
                             </output>
-                            <bar scope="" prefixed-id="foo1$bar2" model-prefixed-id="m1" binding="false" value="false">
-                                <model scope="foo1$bar2" prefixed-id="foo1$bar2$m1" default-instance-prefixed-id="foo1$bar2$m1i1" analyzed-binds="true">
-                                    <instance scope="foo1$bar2" prefixed-id="foo1$bar2$m1i1" model-prefixed-id="foo1$bar2$m1" binding="false" value="false"/>
+                            <bar scope="" prefixed-id="foo1∘bar2" model-prefixed-id="m1" binding="false" value="false">
+                                <model scope="foo1∘bar2" prefixed-id="foo1∘bar2∘m1" default-instance-prefixed-id="foo1∘bar2∘m1i1" analyzed-binds="true">
+                                    <instance scope="foo1∘bar2" prefixed-id="foo1∘bar2∘m1i1" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="false"/>
                                 </model>
-                                <model scope="foo1$bar2" prefixed-id="foo1$bar2$m2" default-instance-prefixed-id="foo1$bar2$m2i1" analyzed-binds="true">
-                                    <instance scope="foo1$bar2" prefixed-id="foo1$bar2$m2i1" model-prefixed-id="foo1$bar2$m2" binding="false" value="false"/>
+                                <model scope="foo1∘bar2" prefixed-id="foo1∘bar2∘m2" default-instance-prefixed-id="foo1∘bar2∘m2i1" analyzed-binds="true">
+                                    <instance scope="foo1∘bar2" prefixed-id="foo1∘bar2∘m2i1" model-prefixed-id="foo1∘bar2∘m2" binding="false" value="false"/>
                                 </model>
-                                <template scope="foo1$bar2" prefixed-id="foo1$bar2$xf-5" model-prefixed-id="foo1$bar2$m1" binding="false" value="false">
-                                    <output scope="foo1$bar2" prefixed-id="foo1$bar2$o1" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                                <template scope="foo1∘bar2" prefixed-id="foo1∘bar2∘xf-5" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="false">
+                                    <output scope="foo1∘bar2" prefixed-id="foo1∘bar2∘o1" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$bar2$m1i1')</path>
+                                                    <path>instance('foo1∘bar2∘m1i1')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$bar2$m1</model>
+                                                    <model>foo1∘bar2∘m1</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$bar2$m1i1</instance>
+                                                    <instance>foo1∘bar2∘m1i1</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1$bar2" prefixed-id="foo1$bar2$o2" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                                    <output scope="foo1∘bar2" prefixed-id="foo1∘bar2∘o2" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$bar2$m2i1')</path>
+                                                    <path>instance('foo1∘bar2∘m2i1')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$bar2$m2</model>
+                                                    <model>foo1∘bar2∘m2</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$bar2$m2i1</instance>
+                                                    <instance>foo1∘bar2∘m2i1</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1$bar2" prefixed-id="foo1$bar2$o3" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                                    <output scope="foo1∘bar2" prefixed-id="foo1∘bar2∘o3" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$m1i3')</path>
+                                                    <path>instance('foo1∘m1i3')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$m1</model>
+                                                    <model>foo1∘m1</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$m1i3</instance>
+                                                    <instance>foo1∘m1i3</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1$bar2" prefixed-id="foo1$bar2$o4" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                                    <output scope="foo1∘bar2" prefixed-id="foo1∘bar2∘o4" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true">
                                                 <value-dependent>
-                                                    <path>instance('foo1$m2i3')</path>
+                                                    <path>instance('foo1∘m2i3')</path>
                                                 </value-dependent>
                                                 <dependent-models>
-                                                    <model>foo1$m2</model>
+                                                    <model>foo1∘m2</model>
                                                 </dependent-models>
                                                 <dependent-instances>
-                                                    <instance>foo1$m2i3</instance>
+                                                    <instance>foo1∘m2i3</instance>
                                                 </dependent-instances>
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1$bar2" prefixed-id="foo1$bar2$o5" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                                    <output scope="foo1∘bar2" prefixed-id="foo1∘bar2∘o5" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                                                 <value-dependent>
@@ -7064,7 +7064,7 @@
                                             </analysis>
                                         </value>
                                     </output>
-                                    <output scope="foo1$bar2" prefixed-id="foo1$bar2$o6" model-prefixed-id="foo1$bar2$m1" binding="false" value="true">
+                                    <output scope="foo1∘bar2" prefixed-id="foo1∘bar2∘o6" model-prefixed-id="foo1∘bar2∘m1" binding="false" value="true">
                                         <value>
                                             <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                                                 <value-dependent>
@@ -7079,8 +7079,8 @@
                                             </analysis>
                                         </value>
                                     </output>
-                                    <group scope="" prefixed-id="foo1$bar2$g2" model-prefixed-id="m1" binding="false" value="false">
-                                        <output scope="" prefixed-id="foo1$bar2$o9" model-prefixed-id="m1" binding="false" value="true">
+                                    <group scope="" prefixed-id="foo1∘bar2∘g2" model-prefixed-id="m1" binding="false" value="false">
+                                        <output scope="" prefixed-id="foo1∘bar2∘o9" model-prefixed-id="m1" binding="false" value="true">
                                             <value>
                                                 <analysis expression="string((xxf:instance('m1i1'))[1])" analyzed="true">
                                                     <value-dependent>
@@ -7095,7 +7095,7 @@
                                                 </analysis>
                                             </value>
                                         </output>
-                                        <output scope="" prefixed-id="foo1$bar2$o10" model-prefixed-id="m1" binding="false" value="true">
+                                        <output scope="" prefixed-id="foo1∘bar2∘o10" model-prefixed-id="m1" binding="false" value="true">
                                             <value>
                                                 <analysis expression="string((xxf:instance('m2i1'))[1])" analyzed="true">
                                                     <value-dependent>
@@ -7110,17 +7110,17 @@
                                                 </analysis>
                                             </value>
                                         </output>
-                                        <output scope="" prefixed-id="foo1$bar2$o11" model-prefixed-id="m1" binding="false" value="true">
+                                        <output scope="" prefixed-id="foo1∘bar2∘o11" model-prefixed-id="m1" binding="false" value="true">
                                             <value>
                                                 <analysis expression="string((xxf:instance('m1i3'))[1])" analyzed="true"/>
                                             </value>
                                         </output>
-                                        <output scope="" prefixed-id="foo1$bar2$o12" model-prefixed-id="m1" binding="false" value="true">
+                                        <output scope="" prefixed-id="foo1∘bar2∘o12" model-prefixed-id="m1" binding="false" value="true">
                                             <value>
                                                 <analysis expression="string((xxf:instance('m2i3'))[1])" analyzed="true"/>
                                             </value>
                                         </output>
-                                        <output scope="" prefixed-id="foo1$bar2$o13" model-prefixed-id="m1" binding="false" value="true">
+                                        <output scope="" prefixed-id="foo1∘bar2∘o13" model-prefixed-id="m1" binding="false" value="true">
                                             <value>
                                                 <analysis expression="string((xxf:instance('m1i2'))[1])" analyzed="true">
                                                     <value-dependent>
@@ -7135,7 +7135,7 @@
                                                 </analysis>
                                             </value>
                                         </output>
-                                        <output scope="" prefixed-id="foo1$bar2$o14" model-prefixed-id="m1" binding="false" value="true">
+                                        <output scope="" prefixed-id="foo1∘bar2∘o14" model-prefixed-id="m1" binding="false" value="true">
                                             <value>
                                                 <analysis expression="string((xxf:instance('m2i2'))[1])" analyzed="true">
                                                     <value-dependent>
@@ -7379,24 +7379,24 @@
                     </value>
                 </output>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
-                    <model scope="my-foo" prefixed-id="my-foo$model" default-instance-prefixed-id="my-foo$fr-form-resources" analyzed-binds="true">
-                        <instance scope="my-foo" prefixed-id="my-foo$fr-form-resources" model-prefixed-id="my-foo$model" binding="false" value="false"/>
+                    <model scope="my-foo" prefixed-id="my-foo∘model" default-instance-prefixed-id="my-foo∘fr-form-resources" analyzed-binds="true">
+                        <instance scope="my-foo" prefixed-id="my-foo∘fr-form-resources" model-prefixed-id="my-foo∘model" binding="false" value="false"/>
                     </model>
-                    <template scope="my-foo" prefixed-id="my-foo$xf-4" model-prefixed-id="my-foo$model" binding="false" value="false">
-                        <output scope="my-foo" prefixed-id="my-foo$my-output" model-prefixed-id="my-foo$model" binding="false" value="true">
+                    <template scope="my-foo" prefixed-id="my-foo∘xf-4" model-prefixed-id="my-foo∘model" binding="false" value="false">
+                        <output scope="my-foo" prefixed-id="my-foo∘my-output" model-prefixed-id="my-foo∘model" binding="false" value="true">
                             <value>
                                 <analysis expression="string((xxf:r('message'))[1])" analyzed="true">
                                     <value-dependent>
                                         <path>instance('fr-language-instance')</path>
-                                        <path>instance('my-foo$fr-form-resources')/resource/message</path>
+                                        <path>instance('my-foo∘fr-form-resources')/resource/message</path>
                                     </value-dependent>
                                     <dependent-models>
                                         <model>model</model>
-                                        <model>my-foo$model</model>
+                                        <model>my-foo∘model</model>
                                     </dependent-models>
                                     <dependent-instances>
                                         <instance>fr-language-instance</instance>
-                                        <instance>my-foo$fr-form-resources</instance>
+                                        <instance>my-foo∘fr-form-resources</instance>
                                     </dependent-instances>
                                 </analysis>
                             </value>
@@ -7469,8 +7469,8 @@
                     </value>
                 </output>
                 <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
-                    <template scope="my-foo" prefixed-id="my-foo$xf-4" binding="false" value="false">
-                        <output scope="my-foo" prefixed-id="my-foo$my-output" binding="false" value="true">
+                    <template scope="my-foo" prefixed-id="my-foo∘xf-4" binding="false" value="false">
+                        <output scope="my-foo" prefixed-id="my-foo∘my-output" binding="false" value="true">
                             <value>
                                 <analysis expression="string((xxf:lang())[1])" analyzed="true">
                                     <value-dependent>

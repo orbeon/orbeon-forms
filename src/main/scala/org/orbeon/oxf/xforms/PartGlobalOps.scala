@@ -76,9 +76,8 @@ trait PartGlobalOps {
     def getControlElement(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.element) orNull
     def hasBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) exists (_.hasBinding)
 
-    def getControlPosition(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
-        case Some(viewTrait: ViewTrait) ⇒ viewTrait.index
-        case _ ⇒ -1
+    def getControlPosition(prefixedId: String) = getControlAnalysisOption(prefixedId) collect {
+        case viewTrait: ViewTrait ⇒ viewTrait.index
     }
 
     def getSelect1Analysis(prefixedId: String) = getControlAnalysisOption(prefixedId) match {

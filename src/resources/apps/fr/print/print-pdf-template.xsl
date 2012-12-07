@@ -109,6 +109,7 @@
                 <xsl:variable name="iterations" select="tokenize(xformsUtils:getEffectiveIdSuffix(@id), '-')"/>
 
                 <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/fr:container-static-id(.)"/>
+                xxxxx ids
                 <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
 
                 <xsl:variable name="classes" select="p:classes(.)"/>

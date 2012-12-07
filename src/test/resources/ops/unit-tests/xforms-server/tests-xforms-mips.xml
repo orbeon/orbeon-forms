@@ -1195,10 +1195,10 @@
         <output name="response">
             <controls>
                 <xh:span id="my-input1" class="xforms-control xforms-input">
-                    <xh:input id="my-input1$xforms-input-1" type="text" name="my-input1$xforms-input-1" value="cA" class="xforms-input-input"/>
+                    <xh:input id="my-input1∘xforms-input-1" type="text" name="my-input1∘xforms-input-1" value="cA" class="xforms-input-input"/>
                 </xh:span>
                 <xh:span id="my-input2" class="xforms-control xforms-input xforms-type-custom-myType">
-                    <xh:input id="my-input2$xforms-input-1" type="text" name="my-input2$xforms-input-1" value="CA" class="xforms-input-input"/>
+                    <xh:input id="my-input2∘xforms-input-1" type="text" name="my-input2∘xforms-input-1" value="CA" class="xforms-input-input"/>
                 </xh:span>
             </controls>
         </output>

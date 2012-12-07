@@ -2923,20 +2923,20 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="|my-bar-1$my-department-repeat|" type="my-event" target="|my-bar-1$my-department-repeat|"/>
-                                    <event observer="|my-bar-1$my-department-repeat|" type="xforms-enabled" target="|my-bar-1$my-department-repeat|"/>
+                                    <event observer="|my-bar-1∘my-department-repeat|" type="my-event" target="|my-bar-1∘my-department-repeat|"/>
+                                    <event observer="|my-bar-1∘my-department-repeat|" type="xforms-enabled" target="|my-bar-1∘my-department-repeat|"/>
                                 </events>
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-bar-1$my-department-repeat" index="1"/>
+                            <control effective-id="my-bar-1∘my-department-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-bar-1$my-output·1">42</xxf:control>
-                        <xxf:control id="my-bar-1$my-output·2">42</xxf:control>
+                        <xxf:control id="my-bar-1∘my-output·1">42</xxf:control>
+                        <xxf:control id="my-bar-1∘my-output·2">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

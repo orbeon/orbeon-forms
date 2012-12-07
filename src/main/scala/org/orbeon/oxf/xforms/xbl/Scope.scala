@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import collection.mutable.HashMap
+import collection.mutable
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 /**
  * Represent an XBL scope, that is a set of ids associated with elements that can see each other.
@@ -27,8 +28,8 @@ class Scope(val parent: Scope, val scopeId: String) {
 
     assert((parent ne null) || scopeId == "")
 
-    private val idMap = new HashMap[String, String]
-    val fullPrefix = if (isTopLevelScope) "" else scopeId + '$'
+    private val idMap = mutable.HashMap[String, String]()
+    val fullPrefix = if (isTopLevelScope) "" else scopeId + COMPONENT_SEPARATOR
     
     def isTopLevelScope = scopeId.length == 0
 

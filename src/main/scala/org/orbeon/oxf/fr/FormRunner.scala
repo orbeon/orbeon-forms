@@ -16,16 +16,17 @@ package org.orbeon.oxf.fr
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 object FormRunner
         extends FormRunnerPersistence
         with FormRunnerPermissions
         with FormRunnerPDF
-        with FormRunnerLang {
+        with FormRunnerLang
+        with FormRunnerErrorSummary {
 
     val NS = "http://orbeon.org/oxf/xml/form-runner"
     val XF = XFORMS_NAMESPACE_URI

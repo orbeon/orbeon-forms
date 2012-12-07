@@ -563,10 +563,10 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         withActionAndDoc(formBuilderContainingDocument(SectionsRepeatsDoc)) { doc ⇒
 
             val expected = Map(
-                "|fb$section-1-section$tmp-11-tmp$control-1-control|"                      → "control-1-control",
-                "|fb$section-1-section$grid-4-grid$control-5-control·1|"                   → "control-5-control",
-                "|fb$section-1-section$section-3-section$tmp-12-tmp$control-6-control|"    → "control-6-control",
-                "|fb$section-1-section$section-3-section$grid-7-grid$control-8-control·1|" → "control-8-control"
+                "|fb∘section-1-section∘tmp-11-tmp∘control-1-control|"                      → "control-1-control",
+                "|fb∘section-1-section∘grid-4-grid∘control-5-control·1|"                   → "control-5-control",
+                "|fb∘section-1-section∘section-3-section∘tmp-12-tmp∘control-6-control|"    → "control-6-control",
+                "|fb∘section-1-section∘section-3-section∘grid-7-grid∘control-8-control·1|" → "control-8-control"
             )
 
             for ((expected, id) ← expected)

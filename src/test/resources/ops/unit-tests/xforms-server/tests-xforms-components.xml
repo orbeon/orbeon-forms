@@ -56,20 +56,20 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-inplace-input$xf-4" case-id="fr-inplace-view"/>
+                            <control effective-id="my-inplace-input∘xf-4" case-id="fr-inplace-view"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-inplace-input" label="Label me!" hint="Hint hint!"/>
-                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group"/>
-                        <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
-                        <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input$xf-6" class="xforms-activable fr-inplace-hint">Hint hint!</xxf:control>
-                        <xxf:control id="my-inplace-input$xf-11" class="fr-inplace-content fr-inplace-edit"/>
-                        <xxf:control id="my-inplace-input$apply" label="Apply"/>
-                        <xxf:control id="my-inplace-input$xf-13" label="Cancel"/>
+                        <xxf:control id="my-inplace-input∘xf-4" class="fr-component-group"/>
+                        <xxf:div id="my-inplace-input∘fr-inplace-view" visibility="visible"/>
+                        <xxf:div id="my-inplace-input∘fr-inplace-edit" visibility="hidden"/>
+                        <xxf:control id="my-inplace-input∘xf-6" class="xforms-activable fr-inplace-hint">Hint hint!</xxf:control>
+                        <xxf:control id="my-inplace-input∘xf-11" class="fr-inplace-content fr-inplace-edit"/>
+                        <xxf:control id="my-inplace-input∘apply" label="Apply"/>
+                        <xxf:control id="my-inplace-input∘xf-13" label="Cancel"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -105,21 +105,21 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="my-inplace-input$xf-4" case-id="fr-inplace-view"/>
+                            <control effective-id="my-inplace-input∘xf-4" case-id="fr-inplace-view"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="my-inplace-input" label="Label me!" hint="Hint hint!" readonly="true"/>
-                        <xxf:control id="my-inplace-input$xf-4" class="fr-component-group"/>
-                        <xxf:div id="my-inplace-input$fr-inplace-view" visibility="visible"/>
-                        <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
-                        <xxf:control id="my-inplace-input$xf-6" class="xforms-activable fr-inplace-hint" readonly="true">42</xxf:control>
-                        <xxf:control id="my-inplace-input$xf-11" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
-                        <xxf:control id="my-inplace-input$input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$apply" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-13" relevant="false"/>
+                        <xxf:control id="my-inplace-input∘xf-4" class="fr-component-group"/>
+                        <xxf:div id="my-inplace-input∘fr-inplace-view" visibility="visible"/>
+                        <xxf:div id="my-inplace-input∘fr-inplace-edit" visibility="hidden"/>
+                        <xxf:control id="my-inplace-input∘xf-6" class="xforms-activable fr-inplace-hint" readonly="true">42</xxf:control>
+                        <xxf:control id="my-inplace-input∘xf-11" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
+                        <xxf:control id="my-inplace-input∘input" relevant="false"/>
+                        <xxf:control id="my-inplace-input∘apply" relevant="false"/>
+                        <xxf:control id="my-inplace-input∘xf-13" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -225,7 +225,7 @@
                                     <event type="my-event" target="group4" indexes=""/>
                                 </events>
                             </instance>
-                            <instance id="tabview-instance" model-id="my-tabview$tabview-model">
+                            <instance id="tabview-instance" model-id="my-tabview∘tabview-model">
                                 <tabview-instance>
                                     <active-tab-position>1</active-tab-position>
                                 </tabview-instance>
@@ -235,14 +235,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="selected" id="my-tabview$nav-1"/>
-                        <xxf:control id="my-tabview$fr-tabview-content" class="yui-content"/>
-                        <xxf:control id="my-tabview$output1">42</xxf:control>
-                        <xxf:control id="my-tabview$output2">42</xxf:control>
-                        <xxf:control id="my-tabview$output3">42</xxf:control>
-                        <xxf:control id="my-tabview$output4">42</xxf:control>
+                        <xxf:control class="selected" id="my-tabview∘nav-1"/>
+                        <xxf:control id="my-tabview∘fr-tabview-content" class="yui-content"/>
+                        <xxf:control id="my-tabview∘output1">42</xxf:control>
+                        <xxf:control id="my-tabview∘output2">42</xxf:control>
+                        <xxf:control id="my-tabview∘output3">42</xxf:control>
+                        <xxf:control id="my-tabview∘output4">42</xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
+                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview∘fr-tabview-group" observer-id="my-tabview∘fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -307,7 +307,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="tabview-instance" model-id="my-tabview$tabview-model">
+                            <instance id="tabview-instance" model-id="my-tabview∘tabview-model">
                                 <tabview-instance>
                                     <active-tab-position>1</active-tab-position>
                                 </tabview-instance>
@@ -317,15 +317,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="selected" id="my-tabview$nav-1"/>
-                        <xxf:control id="my-tabview$xf-38">My label 3</xxf:control>
-                        <xxf:control id="my-tabview$xf-40">My label 4</xxf:control>
-                        <xxf:control id="my-tabview$xf-42">My label 5</xxf:control>
-                        <xxf:control id="my-tabview$xf-44">My label 6</xxf:control>
-                        <xxf:control id="my-tabview$xf-46">My label 7</xxf:control>
-                        <xxf:control id="my-tabview$fr-tabview-content" class="yui-content"/>
+                        <xxf:control class="selected" id="my-tabview∘nav-1"/>
+                        <xxf:control id="my-tabview∘xf-38">My label 3</xxf:control>
+                        <xxf:control id="my-tabview∘xf-40">My label 4</xxf:control>
+                        <xxf:control id="my-tabview∘xf-42">My label 5</xxf:control>
+                        <xxf:control id="my-tabview∘xf-44">My label 6</xxf:control>
+                        <xxf:control id="my-tabview∘xf-46">My label 7</xxf:control>
+                        <xxf:control id="my-tabview∘fr-tabview-content" class="yui-content"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview$fr-tabview-group" observer-id="my-tabview$fr-tabview-group"/>
+                    <xxf:script name="xf_fa3c6018b6aca63d2389f350f65e272530d03568" target-id="my-tabview∘fr-tabview-group" observer-id="my-tabview∘fr-tabview-group"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -419,21 +419,21 @@
                                     <visible-errors-count>2</visible-errors-count>
                                 </error-summary>
                             </instance>
-                            <instance id="fr-errors-instance" model-id="my-summary$fr-error-summary-model">
+                            <instance id="fr-errors-instance" model-id="my-summary∘fr-error-summary-model">
                                 <errors>
-                                    <error id="first-name-control" position="161" repeats="" indexes="" label="First name" alert="Invalid first name" binds="first-name-bind" level="error"/>
-                                    <error id="note-control" position="166" repeats="repeat" indexes="1" label="Note" alert="Invalid note" binds="note-bind" level="error"/>
-                                    <error id="note-control" position="166" repeats="repeat" indexes="2" label="Note" alert="Invalid note" binds="note-bind" level="error"/>
-                                    <error id="note-control" position="166" repeats="repeat" indexes="3" label="Note" alert="Invalid note" binds="" level="error"/>
-                                    <error id="last-name-control" position="169" repeats="" indexes="" label="Last name" alert="Invalid last name" binds="last-name-bind" level="error"/>
+                                    <error absolute-id="|first-name-control|" position="137" label="First name" alert="Invalid first name" level="error"/>
+                                    <error absolute-id="|last-name-control|" position="145" label="Last name" alert="Invalid last name" level="error"/>
+                                    <error absolute-id="|note-control·1|" position="142" label="Note" alert="Invalid note" level="error"/>
+                                    <error absolute-id="|note-control·2|" position="142" label="Note" alert="Invalid note" level="error"/>
+                                    <error absolute-id="|note-control·3|" position="142" label="Note" alert="Invalid note" level="error"/>
                                 </errors>
                             </instance>
-                            <instance id="fr-state-instance" model-id="my-summary$fr-error-summary-model">
+                            <instance id="fr-state-instance" model-id="my-summary∘fr-error-summary-model">
                                 <state>
                                     <!-- Whether errors are shown incrementally or not -->
                                     <incremental/>
                                     <!-- Absolute ids of observers -->
-                                    <observer/>
+                                    <observers/>
                                     <!-- Whether the form is valid or invalid -->
                                     <valid>false</valid>
                                     <!-- Number of alerts, total vs. per level -->
@@ -443,28 +443,26 @@
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-summary$er" index="2"/>
+                            <control effective-id="my-summary∘er" index="1"/>
                             <control effective-id="repeat" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-summary$body" class="fr-error-summary-body fr-level-error"/>
-                        <xxf:control id="my-summary$xf-135·1" relevant="false"/>
-                        <xxf:attribute for="my-summary$xf-136·1" name="href"/>
-                        <xxf:control id="my-summary$xf-138·1" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary$xf-141·1" class="fr-error-label" label="Note"/>
-                        <xxf:control id="my-summary$io·1" class="fr-error-row">[3]</xxf:control>
-                        <xxf:control id="my-summary$xf-144·1" class="fr-error-dash">:</xxf:control>
-                        <xxf:control id="my-summary$ao·1" class="fr-error-alert fr-error-alert-error">Invalid note</xxf:control>
-                        <xxf:control id="my-summary$xf-135·2" relevant="false"/>
-                        <xxf:attribute for="my-summary$xf-136·2" name="href"/>
-                        <xxf:control id="my-summary$xf-138·2" class="fr-error-label" relevant="false"/>
-                        <xxf:control id="my-summary$xf-141·2" class="fr-error-label" label="Last name"/>
-                        <xxf:control id="my-summary$io·2" class="fr-error-row" relevant="false"/>
-                        <xxf:control id="my-summary$xf-144·2" class="fr-error-dash">:</xxf:control>
-                        <xxf:control id="my-summary$ao·2" class="fr-error-alert fr-error-alert-error">Invalid last name</xxf:control>
+                        <xxf:control id="my-summary∘body" class="fr-error-summary-body fr-level-error"/>
+                        <xxf:control id="my-summary∘xf-114·1" relevant="false"/>
+                        <xxf:attribute for="my-summary∘xf-115·1" name="href"/>
+                        <xxf:control id="my-summary∘xf-117·1" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary∘xf-118·1" class="fr-error-label" label="Last name"/>
+                        <xxf:control id="my-summary∘xf-121·1" class="fr-error-dash">:</xxf:control>
+                        <xxf:control id="my-summary∘ao·1" class="fr-error-alert fr-error-alert-error">Invalid last name</xxf:control>
+                        <xxf:control id="my-summary∘xf-114·2" relevant="false"/>
+                        <xxf:attribute for="my-summary∘xf-115·2" name="href"/>
+                        <xxf:control id="my-summary∘xf-117·2" class="fr-error-label" relevant="false"/>
+                        <xxf:control id="my-summary∘xf-118·2" class="fr-error-label" label="Note"/>
+                        <xxf:control id="my-summary∘xf-121·2" class="fr-error-dash">:</xxf:control>
+                        <xxf:control id="my-summary∘ao·2" class="fr-error-alert fr-error-alert-error">Invalid note</xxf:control>
                         <xxf:control id="first-name-control" label="First name" alert="Invalid first name" required="true" level="error"/>
                         <xxf:control id="note-control·1" label="Note" alert="Invalid note" required="true" level="error"/>
                         <xxf:control id="note-control·2" label="Note" alert="Invalid note" required="true" level="error"/>
@@ -507,15 +505,15 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-date$xf-6">2010-01-13</xxf:control>
-                        <xxf:control id="my-date$xf-9" class="xbl-fr-date-mindate"/>
-                        <xxf:attribute for="my-date$xf-9" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-date$xf-12" class="xbl-fr-date-maxdate"/>
-                        <xxf:attribute for="my-date$xf-12" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-date$xf-15" class="xbl-fr-date-pagedate"/>
-                        <xxf:attribute for="my-date$xf-15" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date∘xf-6">2010-01-13</xxf:control>
+                        <xxf:control id="my-date∘xf-9" class="xbl-fr-date-mindate"/>
+                        <xxf:attribute for="my-date∘xf-9" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date∘xf-12" class="xbl-fr-date-maxdate"/>
+                        <xxf:attribute for="my-date∘xf-12" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-date∘xf-15" class="xbl-fr-date-pagedate"/>
+                        <xxf:attribute for="my-date∘xf-15" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-date$xf-6"/>
+                    <xxf:focus control-id="my-date∘xf-6"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -552,26 +550,26 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency$xf-10" class="xbl-fr-currency-prefix">$</xxf:control>
-                        <xxf:attribute for="my-currency$xf-10" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-13" class="xbl-fr-currency-suffix"/>
-                        <xxf:attribute for="my-currency$xf-13" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-16" class="xbl-fr-currency-decimal-separator">.</xxf:control>
-                        <xxf:attribute for="my-currency$xf-16" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-19" class="xbl-fr-currency-grouping-separator">,</xxf:control>
-                        <xxf:attribute for="my-currency$xf-19" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
-                        <xxf:attribute for="my-currency$xf-22" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency$xf-28" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
-                        <xxf:control class="fr-width-10em input-prepend" id="my-currency$xf-29"/>
-                        <xxf:control id="my-currency$xf-31" class="add-on"/>
-                        <xxf:control id="my-currency$xf-32">$</xxf:control>
-                        <xxf:control id="my-currency$xf-33" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency$xf-34" relevant="false"/>
-                        <xxf:control id="my-currency$xf-35" relevant="false"/>
-                        <xxf:control id="my-currency$xf-36" relevant="false"/>
+                        <xxf:control id="my-currency∘xf-10" class="xbl-fr-currency-prefix">$</xxf:control>
+                        <xxf:attribute for="my-currency∘xf-10" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency∘xf-13" class="xbl-fr-currency-suffix"/>
+                        <xxf:attribute for="my-currency∘xf-13" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency∘xf-16" class="xbl-fr-currency-decimal-separator">.</xxf:control>
+                        <xxf:attribute for="my-currency∘xf-16" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency∘xf-19" class="xbl-fr-currency-grouping-separator">,</xxf:control>
+                        <xxf:attribute for="my-currency∘xf-19" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency∘xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
+                        <xxf:attribute for="my-currency∘xf-22" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency∘xf-28" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
+                        <xxf:control class="fr-width-10em input-prepend" id="my-currency∘xf-29"/>
+                        <xxf:control id="my-currency∘xf-31" class="add-on"/>
+                        <xxf:control id="my-currency∘xf-32">$</xxf:control>
+                        <xxf:control id="my-currency∘xf-33" class="add-on" relevant="false"/>
+                        <xxf:control id="my-currency∘xf-34" relevant="false"/>
+                        <xxf:control id="my-currency∘xf-35" relevant="false"/>
+                        <xxf:control id="my-currency∘xf-36" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_bb240fc3ea943af5cb3019cdb5d43148021201ec" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
+                    <xxf:script name="xf_bb240fc3ea943af5cb3019cdb5d43148021201ec" target-id="my-currency∘xf-5" observer-id="my-currency∘xf-5"/>
                     <xxf:script name="xf_ee48e71b3ea5811ae186431b61fae15a32a302b5" target-id="my-currency" observer-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>
@@ -615,7 +613,7 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <instances>
-                            <instance id="local" model-id="my-autocomplete$autocomplete-model">
+                            <instance id="local" model-id="my-autocomplete∘autocomplete-model">
                                 <autocomplete>
                                     <relevant>true</relevant>
                                     <readonly>false</readonly>
@@ -627,21 +625,21 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-autocomplete$component-inner-group" class="fr-autocomplete-container"/>
-                        <xxf:control id="my-autocomplete$search" class="fr-autocomplete-search"/>
-                        <xxf:control id="my-autocomplete$show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
-                        <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
-                        <xxf:attribute for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$xf-68" class="xbl-fr-autocomplete-max-results-displayed"/>
-                        <xxf:attribute for="my-autocomplete$xf-68" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
-                        <xxf:attribute for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
-                        <xxf:itemset id="my-autocomplete$select1">[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
-                        <xxf:control id="my-autocomplete$external-value" class="fr-autocomplete-external-value">One</xxf:control>
-                        <xxf:attribute for="my-autocomplete$external-value" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete∘component-inner-group" class="fr-autocomplete-container"/>
+                        <xxf:control id="my-autocomplete∘search" class="fr-autocomplete-search"/>
+                        <xxf:control id="my-autocomplete∘show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
+                        <xxf:control id="my-autocomplete∘itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
+                        <xxf:attribute for="my-autocomplete∘itemset" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete∘xf-68" class="xbl-fr-autocomplete-max-results-displayed"/>
+                        <xxf:attribute for="my-autocomplete∘xf-68" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete∘select1" class="fr-autocomplete-select1">One</xxf:control>
+                        <xxf:attribute for="my-autocomplete∘select1" name="style">display: none</xxf:attribute>
+                        <xxf:itemset id="my-autocomplete∘select1">[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>
+                        <xxf:control id="my-autocomplete∘external-value" class="fr-autocomplete-external-value">One</xxf:control>
+                        <xxf:attribute for="my-autocomplete∘external-value" name="style">display: none</xxf:attribute>
                     </xxf:control-values>
-                    <xxf:script name="xf_586bd855f1f823eb047ce1f64fc89bcd15e36a85" target-id="my-autocomplete$component-inner-group" observer-id="my-autocomplete$component-inner-group"/>
-                    <xxf:focus control-id="my-autocomplete$search"/>
+                    <xxf:script name="xf_586bd855f1f823eb047ce1f64fc89bcd15e36a85" target-id="my-autocomplete∘component-inner-group" observer-id="my-autocomplete∘component-inner-group"/>
+                    <xxf:focus control-id="my-autocomplete∘search"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -721,30 +719,30 @@
                                     <event observer="|my-datatable|" type="fr-selection-changed" target="|my-datatable|" index="2"/>
                                 </events>
                             </instance>
-                            <instance id="datatable-instance" model-id="my-datatable$datatable-model">
+                            <instance id="datatable-instance" model-id="my-datatable∘datatable-model">
                                 <columns currentSortColumn="-1" default="true">
                                     <column nbColumns="1" index="1" currentSortOrder="none" nextSortOrder="ascending" type="" pathToFirstNode="xxf:component-context()/(department)[1]/()" sortKey=""/>
                                 </columns>
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-datatable$xf-37" index="2"/>
+                            <control effective-id="my-datatable∘xf-37" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control class="yui-dt-first yui-dt-even" id="my-datatable$xf-38·1"/>
-                        <xxf:control id="my-datatable$my-input·1">1</xxf:control>
-                        <xxf:control class="yui-dt-odd yui-dt-selected" id="my-datatable$xf-38·2"/>
-                        <xxf:control id="my-datatable$my-input·2">2</xxf:control>
-                        <xxf:control class="yui-dt-last yui-dt-even" id="my-datatable$xf-38·3"/>
-                        <xxf:control id="my-datatable$my-input·3">3</xxf:control>
+                        <xxf:control class="yui-dt-first yui-dt-even" id="my-datatable∘xf-38·1"/>
+                        <xxf:control id="my-datatable∘my-input·1">1</xxf:control>
+                        <xxf:control class="yui-dt-odd yui-dt-selected" id="my-datatable∘xf-38·2"/>
+                        <xxf:control id="my-datatable∘my-input·2">2</xxf:control>
+                        <xxf:control class="yui-dt-last yui-dt-even" id="my-datatable∘xf-38·3"/>
+                        <xxf:control id="my-datatable∘my-input·3">3</xxf:control>
                     </xxf:control-values>
-                    <xxf:script name="xf_d23c3ac47cd301b3f95dc8eefa47ad79bba4be9f" target-id="my-datatable$fr-dt-group" observer-id="my-datatable$fr-dt-group"/>
-                    <xxf:script name="xf_52595b4daac0bd02a78d55df0ac544208d73c48c" target-id="my-datatable$xf-37" observer-id="my-datatable$xf-37"/>
-                    <xxf:script name="xf_52595b4daac0bd02a78d55df0ac544208d73c48c" target-id="my-datatable$xf-37" observer-id="my-datatable$xf-37"/>
-                    <xxf:focus control-id="my-datatable$my-input·2"/>
+                    <xxf:script name="xf_d23c3ac47cd301b3f95dc8eefa47ad79bba4be9f" target-id="my-datatable∘fr-dt-group" observer-id="my-datatable∘fr-dt-group"/>
+                    <xxf:script name="xf_52595b4daac0bd02a78d55df0ac544208d73c48c" target-id="my-datatable∘xf-37" observer-id="my-datatable∘xf-37"/>
+                    <xxf:script name="xf_52595b4daac0bd02a78d55df0ac544208d73c48c" target-id="my-datatable∘xf-37" observer-id="my-datatable∘xf-37"/>
+                    <xxf:focus control-id="my-datatable∘my-input·2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

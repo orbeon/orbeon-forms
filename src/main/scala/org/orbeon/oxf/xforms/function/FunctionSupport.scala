@@ -50,15 +50,15 @@ protected trait FunctionSupport extends XFormsFunction {
     def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
         Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId, null))
 
-    def resolveEffectiveId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =
+    def resolveStaticOrAbsoluteId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =
         staticIdExpr match {
             case None ⇒
                 // If no argument is supplied, return the closest id (source id)
                 Option(getSourceEffectiveId)
             case Some(expr) ⇒
-                // Otherwise resolve the static id passed against the source id
-                val staticId = expr.evaluateAsString(xpathContext).toString
-                Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticId, null)) map
+                // Otherwise resolve the id passed against the source id
+                val staticOrAbsoluteId = expr.evaluateAsString(xpathContext).toString
+                Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId, null)) map
                     (_.getEffectiveId)
         }
 

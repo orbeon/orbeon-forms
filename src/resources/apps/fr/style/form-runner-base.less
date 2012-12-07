@@ -335,6 +335,14 @@ button.btn-link {
 
 .fr-grid {
 
+    table-layout: fixed;
+    width: 100%;
+    margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
+
+    thead tr th { text-align: left }
+    tbody tr td { vertical-align: top }
+
+    // Controls
     select,
     textarea,
     input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
@@ -356,16 +364,9 @@ button.btn-link {
         *padding: 0;                // IE7 doesn't support box-sizing, so undo Bootstrap padding, so width: 100% doesn't get the input doesn't overflow its container
     }
 
-    table-layout: fixed;
-    width: 100%;
-    margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
-
     .xforms-textarea textarea {
         width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
     }
-
-    thead tr th { text-align: left }
-    tbody tr td { vertical-align: top }
 
     // Override previous rule for autocomplete input, which can't be sized with width: 100%
     .xbl-fr-autocomplete .xforms-input input { width: 140px }

@@ -132,8 +132,12 @@ html, body { background-color: @frBackground }
 // Add a star before the label of required fields, but only in new/edit modes
 // NOTE: This only works in span layout (the default in FR since 2011-07-28)
 // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
-.fr-mode-new .xforms-required .xforms-label, .fr-mode-edit .xforms-required .xforms-label, .fr-mode-test .xforms-required .xforms-label,
-        .fr-mode-new .fb-required-true .xforms-label, .fr-mode-edit .fb-required-true .xforms-label {
+.fr-mode-new .xforms-required .xforms-label,
+.fr-mode-edit .xforms-required .xforms-label,
+.fr-mode-test .xforms-required .xforms-label,
+.xforms-dialog .xforms-required .xforms-label,
+.fr-mode-new .fb-required-true .xforms-label,
+.fr-mode-edit .fb-required-true .xforms-label {
     background-image: url(asterisk.png);
     background-position: 0 2px;             // Lower the star, so it doesn't sit "too high" relative to the text of the label
     background-repeat: no-repeat;

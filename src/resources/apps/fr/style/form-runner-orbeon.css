@@ -210,6 +210,7 @@ body {
 .fr-mode-new .xforms-required .xforms-label,
 .fr-mode-edit .xforms-required .xforms-label,
 .fr-mode-test .xforms-required .xforms-label,
+.xforms-dialog .xforms-required .xforms-label,
 .fr-mode-new .fb-required-true .xforms-label,
 .fr-mode-edit .fb-required-true .xforms-label {
   background-image: url(asterisk.png);

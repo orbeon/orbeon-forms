@@ -16,7 +16,8 @@
 
 // See also static-xforms-css.xml which contains inline rule for xforms-initially-hidden
 
-html body .xforms-form {
+// Try to make it a strong rule by using an id, as other selectors might use `display:` rules
+.xforms-form, #xforms-form {
     .xforms-repeat-template,
     .xforms-template,
     .xforms-repeat-delimiter,
@@ -25,6 +26,7 @@ html body .xforms-form {
     .xforms-disabled-subsequent,
     .xforms-case-begin-end,
     .xforms-case-deselected-subsequent,
+    .xforms-alert-inactive,
     .xforms-hidden {
         display: none;
     }

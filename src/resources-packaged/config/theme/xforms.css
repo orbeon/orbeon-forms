@@ -12,7 +12,8 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 /* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
-html body .xforms-form {
+.xforms-form,
+#xforms-form {
   /**
      * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
      * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
@@ -21,55 +22,88 @@ html body .xforms-form {
      */
 
 }
-html body .xforms-form .xforms-repeat-template,
-html body .xforms-form .xforms-template,
-html body .xforms-form .xforms-repeat-delimiter,
-html body .xforms-form .xforms-repeat-begin-end,
-html body .xforms-form .xforms-group-begin-end,
-html body .xforms-form .xforms-disabled-subsequent,
-html body .xforms-form .xforms-case-begin-end,
-html body .xforms-form .xforms-case-deselected-subsequent,
-html body .xforms-form .xforms-hidden {
+.xforms-form .xforms-repeat-template,
+#xforms-form .xforms-repeat-template,
+.xforms-form .xforms-template,
+#xforms-form .xforms-template,
+.xforms-form .xforms-repeat-delimiter,
+#xforms-form .xforms-repeat-delimiter,
+.xforms-form .xforms-repeat-begin-end,
+#xforms-form .xforms-repeat-begin-end,
+.xforms-form .xforms-group-begin-end,
+#xforms-form .xforms-group-begin-end,
+.xforms-form .xforms-disabled-subsequent,
+#xforms-form .xforms-disabled-subsequent,
+.xforms-form .xforms-case-begin-end,
+#xforms-form .xforms-case-begin-end,
+.xforms-form .xforms-case-deselected-subsequent,
+#xforms-form .xforms-case-deselected-subsequent,
+.xforms-form .xforms-alert-inactive,
+#xforms-form .xforms-alert-inactive,
+.xforms-form .xforms-hidden,
+#xforms-form .xforms-hidden {
   display: none;
 }
-html body .xforms-form .xforms-disabled,
-html body .xforms-form .xforms-case-deselected,
-html body .xforms-form .xforms-case-deselected .xforms-case-selected {
+.xforms-form .xforms-disabled,
+#xforms-form .xforms-disabled,
+.xforms-form .xforms-case-deselected,
+#xforms-form .xforms-case-deselected,
+.xforms-form .xforms-case-deselected .xforms-case-selected,
+#xforms-form .xforms-case-deselected .xforms-case-selected {
   top: -10000px;
   left: -10000px;
   position: absolute;
 }
-html body .xforms-form br.xforms-disabled,
-html body .xforms-form br.xforms-case-deselected,
-html body .xforms-form .xforms-case-deselected br.xforms-case-selected {
+.xforms-form br.xforms-disabled,
+#xforms-form br.xforms-disabled,
+.xforms-form br.xforms-case-deselected,
+#xforms-form br.xforms-case-deselected,
+.xforms-form .xforms-case-deselected br.xforms-case-selected,
+#xforms-form .xforms-case-deselected br.xforms-case-selected {
   display: none;
 }
-html body .xforms-form .xforms-disabled a,
-html body .xforms-form a.xforms-disabled,
-html body .xforms-form .xforms-case-deselected a,
-html body .xforms-form a.xforms-case-deselected {
+.xforms-form .xforms-disabled a,
+#xforms-form .xforms-disabled a,
+.xforms-form a.xforms-disabled,
+#xforms-form a.xforms-disabled,
+.xforms-form .xforms-case-deselected a,
+#xforms-form .xforms-case-deselected a,
+.xforms-form a.xforms-case-deselected,
+#xforms-form a.xforms-case-deselected {
   /* Prevent links from being able to get the focus. See bug:
            [ #315198 ] Non-relevant links and minimal triggers can get the focus
            http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
 
   display: none;
 }
-html body .xforms-form .xforms-disabled input,
-html body .xforms-form .xforms-disabled select,
-html body .xforms-form .xforms-disabled button {
+.xforms-form .xforms-disabled input,
+#xforms-form .xforms-disabled input,
+.xforms-form .xforms-disabled select,
+#xforms-form .xforms-disabled select,
+.xforms-form .xforms-disabled button,
+#xforms-form .xforms-disabled button {
   visibility: hidden;
 }
-html body .xforms-form .xforms-case-deselected input,
-html body .xforms-form .xforms-case-deselected select,
-html body .xforms-form .xforms-case-deselected button {
+.xforms-form .xforms-case-deselected input,
+#xforms-form .xforms-case-deselected input,
+.xforms-form .xforms-case-deselected select,
+#xforms-form .xforms-case-deselected select,
+.xforms-form .xforms-case-deselected button,
+#xforms-form .xforms-case-deselected button {
   visibility: hidden;
 }
-html body .xforms-form tr.xforms-disabled,
-html body .xforms-form .xforms-disabled tr,
-html body .xforms-form th.xforms-disabled,
-html body .xforms-form .xforms-disabled th,
-html body .xforms-form td.xforms-disabled,
-html body .xforms-form .xforms-disabled td {
+.xforms-form tr.xforms-disabled,
+#xforms-form tr.xforms-disabled,
+.xforms-form .xforms-disabled tr,
+#xforms-form .xforms-disabled tr,
+.xforms-form th.xforms-disabled,
+#xforms-form th.xforms-disabled,
+.xforms-form .xforms-disabled th,
+#xforms-form .xforms-disabled th,
+.xforms-form td.xforms-disabled,
+#xforms-form td.xforms-disabled,
+.xforms-form .xforms-disabled td,
+#xforms-form .xforms-disabled td {
   border-style: none ! important;
 }
 #xforms-repeat-tree,

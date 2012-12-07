@@ -1090,10 +1090,6 @@ public class XMLUtils {
      */
     public static void addOrAppendToAttribute(AttributesImpl attributes, String attributeName, String attributeValue) {
 
-        // Don't append if it's the empty string
-        if (attributeValue.equals(""))
-            return;
-
         final int oldAttributeIndex = attributes.getIndex(attributeName);
 
         if (oldAttributeIndex == -1) {

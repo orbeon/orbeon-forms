@@ -96,30 +96,6 @@
   *font: x-small;
 }
 /* ***** XForms Controls ******************************************************************************************** */
-#fr-view .xforms-disabled {
-  display: none;
-}
-#fr-view .xforms-template {
-  display: none;
-}
-#fr-view .xforms-repeat-template {
-  display: none;
-}
-#fr-view span.xforms-alert-inactive {
-  display: none;
-}
-#fr-view .xforms-disabled .xforms-label {
-  display: none;
-}
-#fr-view .xforms-case-deselected {
-  display: none;
-}
-#fr-view .xforms-case-deselected .xforms-label {
-  display: none;
-}
-#fr-view .xforms-hidden {
-  display: none;
-}
 .xforms-noscript .xforms-help-image {
   display: block;
   margin: 0 0 0 .5em;

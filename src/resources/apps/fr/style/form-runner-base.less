@@ -252,12 +252,12 @@ button.btn-link {
     }
 
     .fr-repeat-column-trigger {
-        width: @frGridPlusMinusIconWidth;
+        width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
         text-align: center;
         vertical-align: middle;
 
-        i { margin: 0; display: block } // for the Bootstrap icon
-        span i { *margin-left: 0px }    // IE buttons depress; is there a way to remove their 1px 3px padding?
+        i { margin: 0; display: block }                     // For the Bootstrap icon
+        span i { *margin-left: 0px }                        // IE buttons depress; is there a way to remove their 1px 3px padding?
         button { display: block; margin: auto }
     }
 

@@ -95,9 +95,9 @@
                         </xsl:if>
 
                         <!-- Grid table -->
-                        <xf:var name="id" xbl:attr="xbl:text=id"/>
                         <xh:table class="{'fr-grid',
                                           @class,
+                                          concat('fr-grid-', controlOps:controlName(@id)),
                                           if ($is-repeat)
                                                 then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
                                                       if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
@@ -105,6 +105,15 @@
                                           if ($is-editable)
                                                 then gridOps:canDoClasses(@id)
                                                 else ()}">
+                            <!-- Colgroup to make column sizing with CSS easier -->
+                            <xh:colgroup>
+                                <xsl:if test="$is-repeat">
+                                    <xh:col class="fr-repeat-column-trigger"/>
+                                </xsl:if>
+                                <xsl:for-each select="$grid-rows[1]/*:td">
+                                    <xh:col class="fr-grid-col-{position()}"/>
+                                </xsl:for-each>
+                            </xh:colgroup>
                             <!-- If repeat, add buttons and headers-->
                             <xsl:if test="$is-repeat">
                                 <xh:thead class="yui-dt-hd">
@@ -182,7 +191,7 @@
 
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                            <xh:td class="fr-repeat-column fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
+                                                            <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
                                                                 <!-- Remove trigger -->
                                                                 <xf:var name="can-remove"
                                                                          value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>

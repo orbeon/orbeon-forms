@@ -1824,7 +1824,7 @@
                                 var resource = ORBEON.util.Dom.getAttribute(loadElement, "resource");
                                 var show = ORBEON.util.Dom.getAttribute(loadElement, "show");
                                 var target = ORBEON.util.Dom.getAttribute(loadElement, "target");
-                                var showProcess = ORBEON.util.Dom.getAttribute(loadElement, "show-progress");
+                                var showProgress = ORBEON.util.Dom.getAttribute(loadElement, "show-progress");
 
                                 if (resource.indexOf("javascript:") == 0) {
                                     // JavaScript URL
@@ -1832,7 +1832,7 @@
                                 } else  if (show == "replace") {
                                     if (target == null) {
                                         // Display loading indicator unless the server tells us not to display it
-                                        if (resource.charAt(0) != '#' && showProcess != "false")
+                                        if (resource.charAt(0) != '#' && showProgress != "false")
                                             newDynamicStateTriggersReplace = true;
                                         try {
                                             window.location.href = resource;

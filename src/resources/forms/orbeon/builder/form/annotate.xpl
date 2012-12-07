@@ -147,6 +147,7 @@
                                     <xsl:attribute name="ev:defaultAction">cancel</xsl:attribute>
                                 </xsl:if>
                                 <!-- Dispatch custom event to FB model -->
+                                <!-- USE OF ABSOLUTE ID -->
                                 <xf:dispatch name="fb-{.}" targetid="|fr-form-model|"/>
                             </xf:action>
                         </xsl:for-each>

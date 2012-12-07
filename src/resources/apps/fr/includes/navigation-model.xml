@@ -91,8 +91,8 @@
         <xf:send submission="fr-pdf-submission"/>
     </xf:action>
 
-    <!-- Go back to the Form Runner summary page -->
-    <xf:action ev:event="fr-goto-summary">
+    <!-- Close the window and attempt to navigate to the configured close page (default to the summary page) -->
+    <xf:action ev:event="fr-close-window">
 
         <!-- Get close URI -->
         <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
@@ -109,8 +109,9 @@
         <!-- If we don't have a close URI, close window if we can, otherwise go to the summary -->
         <xf:action if="not($have-close-uri)">
             <xxf:script>window.close();</xxf:script>
-            <xf:load resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"
-                         xxf:show-progress="false"/>
+            <xf:load
+                resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"
+                xxf:show-progress="false"/>
         </xf:action>
 
     </xf:action>

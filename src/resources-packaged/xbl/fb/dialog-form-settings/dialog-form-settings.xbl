@@ -214,12 +214,12 @@
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
                         <xf:trigger appearance="minimal" class="fr-inplace-cancel">
-                            <xf:label value="$resources/cancel/label"/>
-                            <!-- Hide this dialog or go to the summary page -->
-                            <xf:action ev:event="DOMActivate">
-                                <xf:load if="$is-new-form" resource="/fr/orbeon/builder/summary"/>
-                                <xxf:hide if="not($is-new-form)" dialog="dialog"/>
-                            </xf:action>
+                            <xf:label value="if ($is-new-form) then $fr-resources/detail/labels/close else $resources/cancel/label"/>
+                            <!-- Hide this dialog without saving -->
+                            <xxf:hide ev:event="DOMActivate" if="not($is-new-form)" dialog="dialog"/>
+                            <!-- Or perform the close action -->
+                            <!-- USE OF ABSOLUTE ID -->
+                            <xf:dispatch ev:event="DOMActivate" if="$is-new-form" targetid="|fr-navigation-model|" name="fr-close-window"/>
                         </xf:trigger>
                     </xh:div>
 

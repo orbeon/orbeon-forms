@@ -46,9 +46,7 @@
                 <xh:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
                 <xf:output value="$fr-resources/detail/labels/close"/>
             </xf:label>
-            <xf:action ev:event="DOMActivate">
-                <xf:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>
-            </xf:action>
+            <xf:dispatch ev:event="DOMActivate" targetid="fr-navigation-model" name="fr-close-window"/>
         </xf:trigger>
         <!-- Trigger shown to go back if the data is dirty -->
         <!--<xf:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">-->
@@ -57,7 +55,7 @@
                 <!--<xf:output value="$fr-resources/detail/labels/discard"/>-->
             <!--</xf:label>-->
             <!--<xf:action ev:event="DOMActivate">-->
-                <!--<xf:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>-->
+                <!--<xf:dispatch targetid="fr-navigation-model" name="fr-close-window"/>-->
             <!--</xf:action>-->
         <!--</xf:trigger>-->
         <!-- Trigger shown to go back if the data is clean -->
@@ -67,7 +65,7 @@
                 <!--<xf:output value="$fr-resources/detail/labels/return"/>-->
             <!--</xf:label>-->
             <!--<xf:action ev:event="DOMActivate">-->
-                <!--<xf:dispatch targetid="fr-navigation-model" name="fr-goto-summary"/>-->
+                <!--<xf:dispatch targetid="fr-navigation-model" name="fr-close-window"/>-->
             <!--</xf:action>-->
         <!--</xf:trigger>-->
     </xsl:template>

@@ -15,14 +15,12 @@
       xmlns:xf="http://www.w3.org/2002/xforms"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
 
-      id="fb-action-dialog" level="modal" close="true" draggable="true" model="fb-bindings-model">
+      id="fb-action-dialog" level="modal" close="true" draggable="true" model="fb-actions-editor-model">
 
     <xf:label ref="$form-resources/dialog-actions/label"/>
 
@@ -52,7 +50,7 @@
         <xh:tr>
             <xh:td>
                 <!-- React to -->
-                <xf:select1 ref="$instance/fb:action/xf:action[1]/@ev:event">
+                <xf:select1 ref="$instance/fb:action/xf:action[1]/@*:event">
                     <xf:label ref="$form-resources/dialog-actions/event-type/label"/>
                     <xf:hint ref="$form-resources/dialog-actions/event-type/hint"/>
                     <xf:item>
@@ -108,7 +106,7 @@
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
 
                 <!-- Set request values -->
-                <xf:group ref="xf:action[@ev:event = 'xforms-submit']/xf:action">
+                <xf:group ref="xf:action[@*:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
                         <xh:tr>
@@ -134,7 +132,7 @@
                         </xh:tr>
                     </fr:grid>
                 </xf:group>
-                <xf:group ref="xf:action[@ev:event = 'xforms-submit']/xf:action">
+                <xf:group ref="xf:action[@*:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
                         <xh:tr>
@@ -161,7 +159,7 @@
                     </fr:grid>
                 </xf:group>
                 <!-- Set control values -->
-                <xf:group ref="xf:action[@ev:event = 'xforms-submit-done']">
+                <xf:group ref="xf:action[@*:event = 'xforms-submit-done']">
                     <xf:label ref="$form-resources/dialog-actions/response-values/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-control-value-action']">
                         <xh:tr>
@@ -188,7 +186,7 @@
                 </xf:group>
                 <!-- Only show this section if there are selection controls -->
                 <xf:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]" as="element()*"/>
-                <xf:group ref="xf:action[@ev:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
+                <xf:group ref="xf:action[@*:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xf:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-itemset-action']">
                         <xh:tr>
@@ -330,7 +328,7 @@
     </xf:action>
 
     <!-- Model for the bindings editor -->
-    <xf:model id="fb-bindings-model">
+    <xf:model id="fb-actions-editor-model">
 
         <xf:var name="fb-lang" value="xxf:instance('fb-language-instance')"/>
         <xf:var name="model" value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
@@ -353,8 +351,10 @@
         <xf:setvalue ev:event="xxforms-valid"   ev:observer="fb-bindings-editor-instance" ref="@valid">true</xf:setvalue>
 
         <xf:bind ref="instance('fb-bindings-editor-instance')">
-            <xf:bind ref="name" type="xs:NCName" required="true()"
-                         constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
+            <xf:bind ref="name"
+                     type="xs:NCName"
+                     required="true()"
+                     constraint="(normalize-space() != '' and normalize-space() = ../initial-name)
                                         or not(../xf:action[1]/@id = $model/fb:action/@id)"/>
             <xf:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
 
@@ -364,25 +364,24 @@
                 <!-- Action that triggers the submission -->
                 <xf:bind ref="xf:action[1]">
                     <!-- Event triggering the action -->
-                    <xf:bind ref="@ev:event" required="true()"/>
+                    <xf:bind ref="@*:event" required="true()"/>
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
                     <xf:bind ref="@ev:observer"
-                                 required="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 relevant="tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 calculate="if (tokenize(../@ev:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
+                                 required="tokenize(../@*:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 relevant="tokenize(../@*:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 calculate="if (tokenize(../@*:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
                                  readonly="false()"/>
                 </xf:bind>
                 <!-- xforms-submit -->
-                <xf:bind ref="xf:action[@ev:event = 'xforms-submit']">
+                <xf:bind ref="xf:action[@*:event = 'xforms-submit']">
                     <xf:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <xf:bind ref="(*:variable | *:var)[@name = 'request-instance-name']/(@value | @select)[1]"
-                                 calculate="concat('''', substring-before($submission-bind, '-submission'), '-instance''')"/>
                     <!--<xf:bind ref="xf:setvalue/@ref | xf:setvalue/@value" required="true()"/>-->
                     <!-- TODO: more validation -->
                 </xf:bind>
                 <!-- xforms-submit-done -->
-                <xf:bind ref="xf:action[@ev:event = 'xforms-submit-done']">
+                <xf:bind ref="xf:action[@*:event = 'xforms-submit-done']">
                     <xf:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <!-- Setvalue actions -->
                     <xf:bind ref="xf:action[@class = 'fr-set-control-value-action']">

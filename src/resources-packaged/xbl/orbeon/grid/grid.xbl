@@ -120,7 +120,7 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
+                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context">
                                                 <xf:var name="can-add" as="xs:boolean"
                                                          value="{if ($max-occurs = 'unbounded') then 'true()'
                                                                    else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
@@ -191,7 +191,7 @@
 
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                            <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not(xxf:readonly($repeat-sequence))]">
+                                                            <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context">
                                                                 <!-- Remove trigger -->
                                                                 <xf:var name="can-remove"
                                                                          value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>

@@ -23,7 +23,6 @@
 
         init: function() {
             var form = ORBEON.xforms.Controls.getForm(this.container);
-            this.outer = YD.getElementsByClassName("xbl-fr-code-mirror-editor-outer", null, this.container)[0];
             this.textarea = YD.getElementsByClassName("xforms-textarea", null, this.container)[0];
             var inner = YD.getElementsByClassName("xbl-fr-code-mirror-editor-inner", null, this.container)[0];
             this.editor = CodeMirror(inner, {
@@ -31,7 +30,7 @@
                 lineNumbers: true,
                 indentUnit: 4,
                 value: Document.getValue(this.textarea),
-                readOnly: YD.hasClass(this.outer, "xforms-readonly"),
+                readOnly: YD.hasClass(this.container, "xforms-readonly") ? 'nocursor' : false,
                 onChange: _.bind(this.codeMirrorChange, this),
                 onFocus: _.bind(this.codeMirrorFocus, this),
                 onBlur: _.bind(this.codeMirrorBlur, this)
@@ -42,12 +41,12 @@
         codeMirrorBlur: function() { this.hasFocus = false; },
         codeMirrorChange: function() {
             if (this.editor) {
-                YD.addClass(this.outer, "xforms-visited");
+                YD.addClass(this.container, "xforms-visited");
                 Document.setValue(this.textarea, this.editor.getValue());
             }
         },
 
-        xformsReadonly: function() { this.editor.setOption("readOnly", true); },
+        xformsReadonly: function() { this.editor.setOption("readOnly", 'nocursor'); },
         xformsReadwrite: function() { this.editor.setOption("readOnly", false); },
         xformsValueChanged: function() {
             // As a shortcut, don't update the control if the user is typing in it

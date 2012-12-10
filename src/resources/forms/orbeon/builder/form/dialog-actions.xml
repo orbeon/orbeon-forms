@@ -377,8 +377,10 @@
                 <xf:bind ref="xf:action[@*:event = 'xforms-submit']">
                     <xf:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <xf:bind ref="(*:variable | *:var)[@name = 'request-instance-name']/(@value | @select)[1]"
-                    <!--<xf:bind ref="xf:setvalue/@ref | xf:setvalue/@value" required="true()"/>-->
-                    <!-- TODO: more validation -->
+                                 calculate="concat('''', substring-before($submission-bind, '-submission'), '-instance''')" required="true()"/>
+                    <xf:bind ref="xf:action/xf:action[@class = ('fr-set-database-service-value-action', 'fr-set-service-value-action')]">
+                        <xf:bind ref="(*:variable | *:var)/(@value | @select)[1]" required="true()"/>
+                    </xf:bind>
                 </xf:bind>
                 <!-- xforms-submit-done -->
                 <xf:bind ref="xf:action[@*:event = 'xforms-submit-done']">

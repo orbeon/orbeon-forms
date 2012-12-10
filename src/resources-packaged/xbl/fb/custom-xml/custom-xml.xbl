@@ -128,27 +128,25 @@
                             <xf:value>custom</xf:value>
                         </xf:item>
                     </xf:select1>
-                    <xh:div class="fb-dialog-xml-buttons">
-                        <!-- Edit XML -->
-                        <xh:div class="fb-dialog-remaining-height">
-                            <fr:code-mirror ref="$ui/xml" id="instance-textarea" incremental="true">
-                                <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
-                            </fr:code-mirror>
-                        </xh:div>
-                        <!-- Buttons -->
-                        <xh:div class="fr-dialog-buttons">
-                            <xf:group appearance="xxf:internal" id="triggers">
-                                <xh:span>
-                                    <xf:trigger class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger" appearance="xxf:primary">
-                                        <xf:label ref="$resources/apply/label"/>
-                                    </xf:trigger>
-                                    <xf:output value="$resources/or/label"/>
-                                    <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
-                                        <xf:label ref="$resources/cancel/label"/>
-                                    </xf:trigger>
-                                </xh:span>
-                            </xf:group>
-                        </xh:div>
+                    <!-- Edit XML -->
+                    <xh:div class="fb-dialog-remaining-height">
+                        <fr:code-mirror ref="$ui/xml" id="instance-textarea" incremental="true">
+                            <xf:alert ref="$resources/dialog-edit-source/source/alert"/>
+                        </fr:code-mirror>
+                    </xh:div>
+                    <!-- Buttons -->
+                    <xh:div class="fr-dialog-buttons">
+                        <xf:group appearance="xxf:internal" id="triggers">
+                            <xh:span>
+                                <xf:trigger class="fr-inplace-rename" ref="$ui/save-trigger" id="save-trigger" appearance="xxf:primary">
+                                    <xf:label ref="$resources/apply/label"/>
+                                </xf:trigger>
+                                <xf:output value="$resources/or/label"/>
+                                <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                    <xf:label ref="$resources/cancel/label"/>
+                                </xf:trigger>
+                            </xh:span>
+                        </xf:group>
                     </xh:div>
                 </xxf:dialog>
             </xf:group>

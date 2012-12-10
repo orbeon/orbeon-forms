@@ -425,16 +425,20 @@ body {
   display: block;
   margin-left: 1em;
 }
-#fb-source-editor-dialog {
+#fb-source-editor-dialog,
+.fb-custom-xml-dialog {
   width: 70em;
 }
-#fb-source-editor-dialog .CodeMirror {
+#fb-source-editor-dialog .CodeMirror,
+.fb-custom-xml-dialog .CodeMirror {
   font-size: 12px;
 }
-#fb-source-editor-dialog .CodeMirror-scroll {
+#fb-source-editor-dialog .CodeMirror-scroll,
+.fb-custom-xml-dialog .CodeMirror-scroll {
   height: auto;
 }
-#fb-source-editor-dialog .xforms-alert-active {
+#fb-source-editor-dialog .xforms-alert-active,
+.fb-custom-xml-dialog .xforms-alert-active {
   display: block;
 }
 #fb-publish-dialog {

@@ -14,6 +14,9 @@
 .fb-custom-xml-dialog {
   width: 70em;
 }
+.fb-custom-xml-dialog.xxforms-set-height .xxforms-dialog-body .fb-dialog-remaining-height {
+  top: 100px;
+}
 .fb-custom-xml-dialog .xforms-select1 {
   margin: 0.5em 0 1em 0;
   display: block;

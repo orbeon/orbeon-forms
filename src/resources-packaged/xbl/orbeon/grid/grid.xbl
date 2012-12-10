@@ -143,15 +143,10 @@
                                                 <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
                                                 <xsl:copy-of select="@colspan"/>
                                                 <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
-                                                    <!-- NOTE: At this time, assume that XPath expressions on LHH elements are not relative to their enclosing control. -->
+                                                    <!-- NOTE: XPath expressions on LHH elements can't be relative to the controls in case there is no iteration. -->
+                                                    <!-- LATER: Change this once labels outside repeats are supported (http://goo.gl/tSz4i)? -->
                                                     <xf:group xxbl:scope="outer">
-                                                        <xsl:for-each select="$control/(xf:label | xf:help | xf:hint)">
-                                                            <xsl:copy>
-                                                                <!-- LATER: Once labels outside repeats are supported (http://goo.gl/tSz4i), uncomment the repeat and change the group to be internal -->
-                                                                <!--<xsl:attribute name="for" select="$control/@id"/>-->
-                                                                <xsl:copy-of select="@* | node()"/>
-                                                            </xsl:copy>
-                                                        </xsl:for-each>
+                                                        <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                     </xf:group>
                                                 </xsl:if>
                                             </xh:th>

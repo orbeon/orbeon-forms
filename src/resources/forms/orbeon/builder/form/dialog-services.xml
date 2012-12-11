@@ -264,10 +264,11 @@
                         <!--<xf:setvalue ref="@target" value="concat('instance(''', $instance-id, ''')/response')"/>-->
                         <xf:setvalue ref="@mediatype" value="$request/mediatype"/>
 
-                        <xf:action if="$request/is-auth = 'true'">
+                        <xf:var name="is-auth" value="string($request/is-auth) = 'true'"/>
+                        <xf:action if="$is-auth">
                             <xf:insert context="." origin="(xxf:attribute('xxf:username', $request/username), xxf:attribute('xxf:password', $request/password))"/>
                         </xf:action>
-                        <xf:action if="not($request/is-auth = 'true')">
+                        <xf:action if="not($is-auth)">
                             <xf:delete context="." ref="@xxf:username"/>
                             <xf:delete context="." ref="@xxf:password"/>
                         </xf:action>
@@ -323,7 +324,7 @@
         <xf:action if="$submission-name">
             <xf:setvalue ref="$instance/name" value="$submission-name"/>
             <xf:setvalue ref="$instance/initial-name" value="$submission-name"/>
-            
+
             <xf:var name="submission" value="$model/fb:submission[@id = concat($submission-name, '-submission')]"/>
             <xf:setvalue ref="$instance/request/method" value="$submission/@method"/>
             <xf:setvalue ref="$instance/request/serialization" value="$submission/@serialization"/>
@@ -341,7 +342,7 @@
 
             <xf:setvalue ref="$instance/request/is-soap" value="$is-soap"/>
             <xf:setvalue if="$is-soap" ref="$instance/request/soap-action" value="normalize-space(tokenize($soap-action, '=')[2])"/>
-            
+
             <xf:setvalue ref="$instance/request/is-auth" value="exists($submission/@xxf:username | $submission/@xxf:password)"/>
             <xf:setvalue ref="$instance/request/username" value="$submission/@xxf:username"/>
             <xf:setvalue ref="$instance/request/password" value="$submission/@xxf:password"/>

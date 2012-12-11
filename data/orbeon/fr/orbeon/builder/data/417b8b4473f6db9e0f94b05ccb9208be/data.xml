@@ -178,7 +178,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </number>
                         <currency>
                             <label>Currency</label>
-                            <hint>Custom currency field</hint>
+                            <hint>Currency field</hint>
                             <help/>
                             <alert/>
                         </currency>
@@ -189,7 +189,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <alert/>
                         </us-state>
                         <browser-button>
-                            <label>Browser Button</label>
+                            <label>Standard Button</label>
                             <hint>Standard browser button</hint>
                             <help/>
                             <alert/>
@@ -306,7 +306,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </single-list>
                         <multiple-list>
                             <label>Scrollable Checkboxes</label>
-                            <hint>Custom scrollable selector with checkboxes</hint>
+                            <hint>Scrollable selector with checkboxes</hint>
                             <help/>
                             <alert/>
                             <item>
@@ -467,7 +467,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </number>
                         <currency>
                             <label>Devise</label>
-                            <hint>Custom currency field</hint>
+                            <hint>Currency field</hint>
                             <help/>
                             <alert/>
                         </currency>
@@ -973,7 +973,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xf:select1>
                             </xh:td>
                             <xh:td>
-                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" xmlns:exf="http://www.exforms.org/exf/1-0" bind="multiple-list-bind" id="multiple-list-control">
+                                <fr:box-select xmlns="http://orbeon.org/oxf/xml/form-builder" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" bind="multiple-list-bind" id="multiple-list-control">
                                     <xf:label ref="$form-resources/multiple-list/label"/>
                                     <xf:hint ref="$form-resources/multiple-list/hint"/>
                                     <xf:help ref="$form-resources/multiple-list/help"/>

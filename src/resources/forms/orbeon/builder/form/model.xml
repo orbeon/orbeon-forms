@@ -210,14 +210,6 @@
                     <xf:bind id="description-bind" ref="description[@xml:lang = $fb-lang]"/>
                     <xf:bind id="logo-bind" ref="logo"/>
                 </xf:bind>
-                <!-- Resources -->
-                <xf:bind ref="xf:instance[@id = 'fr-form-resources']/*">
-                    <!-- Handle mandatory sections titles -->
-                    <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
-                    <xf:bind ref="resource/*[name() = $body//*:section/@id/substring-before(., '-section')]/label"
-                                 required="true()"
-                                 constraint="not((for $t in for $n in name(..) return ../../../resource/*[name() = $n]/label return normalize-space($t) = '') = true())"/>
-                </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*">
                     <xf:bind id="css-attachment-bind" ref="css" type="xs:anyURI"/>

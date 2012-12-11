@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.apache.commons.collections.map.CompositeMap;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.errorified.Exceptions;
@@ -426,7 +425,7 @@ public class XFormsModelBinds {
     private Map<String, ValueRepresentation> getVariables(NodeInfo contextNodeInfo) {
 
         if (staticModel.jBindsByName().size() > 0) {
-            final Map<String, ValueRepresentation> bindVariablesValues = new HashMap<String, ValueRepresentation>();
+            final Map<String, ValueRepresentation> map1 = new HashMap<String, ValueRepresentation>();
 
             // Add bind variables
             for (Map.Entry<String, BindTree.Bind> currentEntry : staticModel.jBindsByName().entrySet()) {
@@ -434,11 +433,13 @@ public class XFormsModelBinds {
                 final String currentBindId = currentEntry.getValue().staticId();
 
                 final List<Item> currentBindNodeset = getBindNodeset(currentBindId, contextNodeInfo);
-                bindVariablesValues.put(currentVariableName, new SequenceExtent(currentBindNodeset));
+                map1.put(currentVariableName, new SequenceExtent(currentBindNodeset));
             }
 
             // Combine bind variables with model variables
-            return new CompositeMap(bindVariablesValues, model.getContextStack().getCurrentVariables());
+            // NOTE: Assume no name collisions!
+            // TODO: enforce no collisions statically in Model
+            return new ComposedMap(map1, model.getContextStack().getCurrentVariables());
         } else {
             // Just return the regular variables in scope
             return model.getContextStack().getCurrentVariables();
@@ -1179,5 +1180,229 @@ public class XFormsModelBinds {
         public Map<String, String> getCustomMips() {
             return customMips == null ? null : Collections.unmodifiableMap(customMips);
         }
+    }
+}
+
+class ComposedMap<T, U> implements Map<T, U> {
+    
+    private final Map<T, U> map1;
+    private final Map<T, U> map2;
+
+    ComposedMap(Map<T, U> map1, Map<T, U> map2) {
+        this.map1 = map1;
+        this.map2 = map2;
+    }
+
+    public int size() {
+        return map1.size() + map2.size();
+    }
+
+    public boolean isEmpty() {
+        return map1.isEmpty() && map2.isEmpty();
+    }
+
+    public boolean containsKey(Object key) {
+        return map1.containsKey(key) || map2.containsKey(key);
+    }
+
+    public boolean containsValue(Object value) {
+        return map1.containsValue(value) || map2.containsValue(value);
+    }
+
+    public U get(Object key) {
+        final U r1 = map1.get(key);
+        return r1 != null ? r1 : map2.get(key);
+    }
+
+    public U put(T key, U value) {
+        throw new UnsupportedOperationException();
+    }
+
+    public U remove(Object key) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void putAll(Map<? extends T, ? extends U> m) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+
+    public Set<T> keySet() {
+        return new ComposedSet<T>(map1.keySet(), map2.keySet());
+    }
+
+    public Collection<U> values() {
+        return new CombinedCollection<U>(map1.values(), map2.values());
+    }
+
+    public Set<Entry<T, U>> entrySet() {
+        return new ComposedSet<Entry<T, U>>(map1.entrySet(), map2.entrySet());
+    }
+};
+
+class ComposedSet<T> implements Set<T> {
+    
+    private final Set<T> set1;
+    private final Set<T> set2;
+
+    ComposedSet(Set<T> set1, Set<T> set2) {
+        this.set1 = set1;
+        this.set2 = set2;
+    }
+
+    public int size() {
+        return set1.size() + set2.size();
+    }
+
+    public boolean isEmpty() {
+        return set1.isEmpty() && set2.isEmpty();
+    }
+
+    public boolean contains(Object o) {
+        return set1.contains(o) || set2.contains(o);
+    }
+
+    public Iterator<T> iterator() {
+        return new CombinedIterator(set1.iterator(), set2.iterator());
+    }
+
+    public Object[] toArray() {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T1 extends Object> T1[] toArray(T1[] a) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean add(T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean remove(Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean containsAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean addAll(Collection<? extends T> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+}
+
+class CombinedCollection<U> implements Collection<U> {
+
+    private final Collection<U> col1;
+    private final Collection<U> col2;
+
+    CombinedCollection(Collection<U> col1, Collection<U> col2) {
+        this.col1 = col1;
+        this.col2 = col2;
+    }
+
+    public int size() {
+        return col1.size() + col2.size();
+    }
+
+    public boolean isEmpty() {
+        return col1.isEmpty() && col2.isEmpty();
+    }
+
+    public boolean contains(Object o) {
+        return col1.contains(o) || col2.contains(o);
+    }
+
+    public Iterator<U> iterator() {
+        return new CombinedIterator(col1.iterator(), col2.iterator());
+    }
+
+    public Object[] toArray() {
+        throw new UnsupportedOperationException();
+    }
+
+    public <T> T[] toArray(T[] a) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean add(U u) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean remove(Object o) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean containsAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean addAll(Collection<? extends U> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean retainAll(Collection<?> c) {
+        throw new UnsupportedOperationException();
+    }
+
+    public void clear() {
+        throw new UnsupportedOperationException();
+    }
+};
+
+class CombinedIterator<T> implements Iterator<T> {
+
+    private final Iterator<T> it1;
+    private final Iterator<T> it2;
+    private Iterator<T> current;
+
+    CombinedIterator(Iterator<T> it1, Iterator<T> it2) {
+        this.it1 = it1;
+        this.it2 = it2;
+        current = it1;
+    }
+
+    public boolean hasNext() {
+        if (current == null) {
+            return false;
+        } else if (current.hasNext()) {
+            return true;
+        } else if (current == it1) {
+            current = it2;
+            return hasNext();
+        } else {
+            current = null;
+            return hasNext();
+        }
+    }
+
+    public T next() {
+        if (! hasNext())
+            throw new NoSuchElementException();
+        else
+            return current.next();
+    }
+
+    public void remove() {
+        throw new UnsupportedOperationException();
     }
 }

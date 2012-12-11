@@ -393,10 +393,16 @@ object XPathCache {
                 cacheKeyString.append('|')
                 cacheKeyString.append(namespaceMapping.hash)
             }
-            if ((variableToValueMap ne null) && variableToValueMap.size > 0) {
+
+            // NOTE: Make sure to copy the values in the key set, as the set returned by the map keeps a pointer to the
+            // Map! This can cause the XPath cache to keep a reference to variable values, which in turn can keep a
+            // reference all the way to e.g. an XFormsContainingDocument.
+            val variableNames = Option(variableToValueMap) map (_.keySet.asScala.toList) getOrElse List()
+
+            if (variableNames.size > 0) {
                 // There are some variables in scope. They must be part of the key
                 // TODO: Put this in static state as this can be determined statically once and for all
-                for (variableName ← variableToValueMap.asScala.keys) {
+                for (variableName ← variableNames) {
                     cacheKeyString.append('|')
                     cacheKeyString.append(variableName)
                 }
@@ -407,11 +413,6 @@ object XPathCache {
             cacheKeyString.append(isAvt.toString)
 
             // TODO: Add baseURI to cache key (currently, baseURI is pretty much unused)
-
-            // NOTE: Make sure to copy the values in the key set, as the set returned by the map keeps a pointer to the
-            // Map! This can cause the XPath cache to keep a reference to variable values, which in turn can keep a
-            // reference all the way to e.g. an XFormsContainingDocument.
-            val variableNames = Option(variableToValueMap) map (_.keySet.asScala.toList) getOrElse List()
 
             val pooledXPathExpression = {
                 val cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString)

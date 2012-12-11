@@ -112,6 +112,20 @@
                cancel: "\u041E\u0442\u043C\u0435\u043D\u0438\u0442\u044C",
                invalidYear: "\u0413\u043E\u0434 \u0434\u043E\u043B\u0436\u0435\u043D \u0431\u044B\u0442\u044C \u0447\u0438\u0441\u043B\u043E\u043C"
             }
+        },
+		"pl": {
+            properties: {
+                "MONTHS_LONG": [ "Stycze\u0144", "Luty", "Marzec", "Kwiecie\u0144", "Maj", "Czerwiec", "Lipiec", "Sierpie\u0144",  "Wrzesie\u0144",  "Pa\u017Adziernik",  "Listopad",  "Grudzie\u0144" ],
+                "WEEKDAYS_SHORT": ["Nd", "Pn", "Wt", "\u015Ar", "Cz", "Pt", "Sb"],
+                "START_WEEKDAY": 0
+            },
+            navigator: {
+                month: "Miesi\u0105c",
+                year: "Rok",
+                submit: "OK",
+                cancel: "Anuluj",
+                invalidYear: "Rok powinien byæ liczb¹"
+            }
         }
     };
 })();

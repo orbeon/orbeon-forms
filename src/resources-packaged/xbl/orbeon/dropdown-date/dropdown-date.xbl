@@ -112,18 +112,18 @@
             <xf:var name="value" as="xs:string" value="$binding/string()">
                 <xf:action ev:event="xforms-value-changed xforms-enabled">
                     <!-- Only set local values if the bound node is an xs:date -->
-                    <xf:action if="$binding castable as xs:date">
+                    <xf:action if="$value castable as xs:date">
                         <xf:setvalue ref="instance('date-instance')/year" value="year-from-date($binding)"/>
                         <xf:setvalue ref="instance('date-instance')/month" value="month-from-date($binding)"/>
                         <xf:setvalue ref="instance('date-instance')/day" value="day-from-date($binding)"/>
                     </xf:action>
-                    <xf:action if="not($binding castable as xs:date) and normalize-space($binding) = ''">
+                    <xf:action if="not($value castable as xs:date) and normalize-space($value) = ''">
                         <xf:setvalue ref="instance('date-instance')/year"/>
                         <xf:setvalue ref="instance('date-instance')/month"/>
                         <xf:setvalue ref="instance('date-instance')/day"/>
                     </xf:action>
-                    <xf:action if="not($binding castable as xs:date) and count(tokenize($binding, '-')) ge 3">
-                        <xf:action iterate="tokenize($binding, '-')">
+                    <xf:action if="not($value castable as xs:date) and count(tokenize($value, '-')) ge 3">
+                        <xf:action iterate="tokenize($value, '-')">
                             <xf:var name="position" value="position()" as="xs:integer"/>
                             <xf:setvalue ref="instance('date-instance')/*[$position]"
                                              value="if (context() castable as xs:integer) then xs:integer(context()) else ''"/>

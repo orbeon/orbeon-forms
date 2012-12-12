@@ -16,11 +16,11 @@
     <!-- ==== Files ================================================================================================ -->
 
     <!-- NOTE: We leave this here so that the page flow creates the list of path matchers for XForms versioned resources -->
-    <files path-info="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)"/>
+    <files path="(?!/([^/]+)/service/).+\.(gif|css|pdf|json|js|png|jpg|xsd|htc|ico|swf|html|htm|txt)"/>
 
     <!-- ==== Pages ================================================================================================ -->
 
-    <page path-info="/xforms-renderer" model="xforms-renderer.xpl"/>
+    <page path="/xforms-renderer" model="xforms-renderer.xpl"/>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

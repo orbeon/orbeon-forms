@@ -15,7 +15,7 @@
 
     <!-- ==== XForms Server ======================================================================================== -->
 
-    <page path-info="/xforms-server.*" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
+    <page path="/xforms-server.*" model="/ops/xforms/xforms-server.xpl" public-methods="HEAD GET POST"/>
 
     <!-- ==== Forward application services ========================================================================= -->
 
@@ -28,10 +28,10 @@
     <!-- ==== Pages ================================================================================================ -->
 
     <!-- Home / welcome application -->
-    <page path-info="/" model="apps/home/page-flow.xml"/>
+    <page path="/" model="apps/home/page-flow.xml"/>
 
     <!-- Dispatch request to a specific application -->
-    <page path-info="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>
+    <page path="/([^/]+)/.*" model="apps/${1}/page-flow.xml" public-methods="#all"/>
 
     <!-- ==== Epilogue and handlers ================================================================================ -->
 

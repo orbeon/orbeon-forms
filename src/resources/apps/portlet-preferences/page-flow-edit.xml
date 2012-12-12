@@ -11,11 +11,11 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller">
+<controller xmlns="http://www.orbeon.com/oxf/controller">
 
-    <page id="edit" path-info="/portlet-preferences/" model="get-preferences.xpl" view="edit.xhtml"/>
+    <page id="edit" path="/portlet-preferences/" model="get-preferences.xpl" view="edit.xhtml"/>
 
-    <page id="save" path-info="/portlet-preferences/save-preferences">
+    <page id="save" path="/portlet-preferences/save-preferences">
         <action action="save-preferences.xpl">
              <result page="edit"/>
         </action>
@@ -23,4 +23,4 @@
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
-</config>
+</controller>

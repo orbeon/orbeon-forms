@@ -76,6 +76,8 @@ form.xforms-form {
         height: @controlsHeight;
     }
 
+    input[type="file"] { line-height: normal }      // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
+
     // Don't set height for textarea
     textarea {
         height: @textareaHeight;

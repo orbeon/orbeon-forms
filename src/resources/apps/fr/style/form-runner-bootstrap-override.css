@@ -122,6 +122,9 @@ form.xforms-form .uneditable-input {
   box-sizing: border-box;
   height: 28px;
 }
+form.xforms-form input[type="file"] {
+  line-height: normal;
+}
 form.xforms-form textarea {
   height: 68px;
 }

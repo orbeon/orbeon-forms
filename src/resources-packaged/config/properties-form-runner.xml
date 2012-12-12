@@ -154,6 +154,8 @@
     <property as="xs:string"  name="oxf.fr.resource.orbeon.dmv-14.*.print.formats.date"         value="[Y0001]-[M01]-[D01]"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state"                   value="select-value"/>
     <property as="xs:boolean" name="oxf.fr.noscript-link.orbeon.contact"                        value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
+    <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
 
     <!-- Register and license forms -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.register.form"           value="resource"/>

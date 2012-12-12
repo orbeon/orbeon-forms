@@ -114,7 +114,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                     ec.getResponse.setStatus(500)
                     if (ProcessorService.showExceptions)
                         pc.setAttribute(ProcessorService.Throwable, t)
-                    errorRoute.process(pc, ec, MatchResult(matches = false))
+                    errorRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
                 case None ⇒
                     // We don't have an error route so throw instead
                     throw t
@@ -129,7 +129,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 case Some(notFoundRoute) ⇒
                     // Run the not found route
                     ec.getResponse.setStatus(404)
-                    try notFoundRoute.process(pc, ec, MatchResult(matches = false))
+                    try notFoundRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
                     catch { case t: Throwable ⇒ runErrorRoute(t) }
                 case None ⇒
                     // We don't have a not found route so try the error route instead
@@ -146,7 +146,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 case Some(unauthorizedRoute) ⇒
                     // Run the unauthorized route
                     ec.getResponse.setStatus(e.code)
-                    unauthorizedRoute.process(pc, ec, MatchResult(matches = false))
+                    unauthorizedRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
                 case None ⇒
                     // We don't have an unauthorized route so throw instead
                     throw e
@@ -422,12 +422,12 @@ object PageFlowControllerProcessor {
     // Routes
     sealed trait Route {
         def routeElement: RouteElement
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger)
+        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, authorize: Boolean = true)(implicit logger: IndentedLogger)
     }
 
     case class FileRoute(routeElement: FileElement) extends Route with Logging {
         // Serve a file by path
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger) = {
+        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, authorize: Boolean = true)(implicit logger: IndentedLogger) = {
             debug("processing route", Seq("route" → this.toString))
             if (ec.getRequest.getMethod == "GET")
                 ResourceServer.serveResource(MimeTypes, ec.getRequest.getRequestPath, routeElement.versioned)
@@ -448,12 +448,13 @@ object PageFlowControllerProcessor {
         lazy val pipelineConfig = compile(routeElement)
 
         // Run a page
-        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult)(implicit logger: IndentedLogger) = {
+        def process(pc: PipelineContext, ec: ExternalContext, matchResult: MatchResult, mustAuthorize: Boolean = true)(implicit logger: IndentedLogger) = {
 
             debug("processing route", Seq("route" → this.toString))
 
             // Make sure the request is authorized
-            authorize(ec)
+            if (mustAuthorize)
+                authorize(ec)
 
             // PipelineConfig is reusable, but PipelineProcessor is not
             val pipeline = new PipelineProcessor(pipelineConfig)

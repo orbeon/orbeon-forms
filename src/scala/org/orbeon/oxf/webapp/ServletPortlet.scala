@@ -74,7 +74,7 @@ trait ServletPortlet {
         searchDefinition(MainProcessorPropertyPrefix, MainProcessorInputPropertyPrefix) match {
             case Some(definition) ⇒
                 // Create and initialize service
-                new ProcessorService(definition, searchDefinition(ErrorProcessorPropertyPrefix, ErrorProcessorInputPropertyPrefix).orNull)
+                new ProcessorService(definition, searchDefinition(ErrorProcessorPropertyPrefix, ErrorProcessorInputPropertyPrefix))
             case _ ⇒
                 throw new OXFException("Unable to find main processor definition")
         }

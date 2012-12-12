@@ -25,11 +25,11 @@ import org.orbeon.oxf.util.LoggerFactory
 import java.io.PrintWriter
 import org.orbeon.oxf.util.task.TaskScheduler
 
-class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProcessorDefinition: ProcessorDefinition) {
+class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProcessorDefinition: Option[ProcessorDefinition]) {
 
     val jndiContext    = new InitialContext
     val mainProcessor  = InitUtils.createProcessor(mainProcessorDefinition)
-    val errorProcessor = Option(errorProcessorDefinition) map InitUtils.createProcessor
+    val errorProcessor = errorProcessorDefinition map InitUtils.createProcessor
 
     // Run
     def service(pipelineContext: PipelineContext, externalContext: ExternalContext) {

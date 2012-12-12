@@ -90,7 +90,7 @@ public abstract class BaseSubmission implements Submission {
 
             // Tell caller he doesn't need to do anything
             return null;
-        } else if (p.isDeferredSubmissionSecondPass && p.isReplaceAll) {
+        } else if (p.isDeferredSubmissionSecondPass) {
             // Tell XFCD that we have a submission replace="all" ready for a second pass
             containingDocument.setReplaceAllCallable(callable);
             // Tell caller he doesn't need to do anything
@@ -123,20 +123,25 @@ public abstract class BaseSubmission implements Submission {
     protected ConnectionResult openLocalConnection(ExternalContext externalContext,
                                                    ExternalContext.Response response,
                                                    final IndentedLogger indentedLogger,
-                                                   XFormsContainingDocument containingDocument, // used in case we need to dispatch XFormsSubmitErrorEvent
-                                                   String httpMethod, final String resource,
-                                                   String actualRequestMediatype, String encoding,
-                                                   byte[] messageBody, String queryString,
-                                                   final boolean isReplaceAll, String headerNames,
+                                                   final String resource,
+                                                   XFormsModelSubmission.SubmissionParameters p,
+                                                   String actualRequestMediatype,
+                                                   String encoding,
+                                                   byte[] messageBody,
+                                                   String queryString,
+                                                   String headerNames,
                                                    Map<String, String[]> customHeaderNameValues,
                                                    SubmissionProcess submissionProcess,
-                                                   boolean isContextRelative, boolean isDefaultContext) {
+                                                   boolean isContextRelative,
+                                                   boolean isDefaultContext) {
 
         // Action must be an absolute path
         if (!resource.startsWith("/"))
             throw new OXFException("Action does not start with a '/': " + resource);
 
         try {
+
+            final String httpMethod = p.actualHttpMethod;
 
             // Case of empty body
             if (messageBody == null)
@@ -201,7 +206,7 @@ public abstract class BaseSubmission implements Submission {
                             "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
 
             // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
-            final ExternalContext.Response effectiveResponse = !isReplaceAll ? null : response;
+            final ExternalContext.Response effectiveResponse = !p.isReplaceAll ? null : response;
 
             final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
                 @Override
@@ -239,7 +244,7 @@ public abstract class BaseSubmission implements Submission {
                     }
                 }
             };
-            if (isReplaceAll) {
+            if (p.isReplaceAll) {
                 final AllReplacer.ReplaceAllResponse replaceAllResponse = new AllReplacer.ReplaceAllResponse(effectiveResponse);
                 submissionProcess.process(requestAdapter, replaceAllResponse);
                 if (replaceAllResponse.getStatus() > 0)
@@ -249,10 +254,15 @@ public abstract class BaseSubmission implements Submission {
                 // Here we cause dispatch xforms-submit-error upon getting a non-success error code, even though the
                 // response has already been written out. This gives the form author a chance to do something in cases
                 // the response is buffered, for example do a sendError().
-                if (! NetUtils.isSuccessCode(connectionResult.statusCode))
-                    throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                            new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
-
+                // HOWEVER: We don't do this
+                if (! p.isDeferredSubmissionSecondPass) {
+                    if (! NetUtils.isSuccessCode(connectionResult.statusCode) && ! p.isDeferredSubmissionSecondPass)
+                        throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                                new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
+                } else {
+                    // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document
+                    // lock, see XFormsServer.
+                }
             } else {
                 // We must intercept the reply
                 final ResponseAdapter responseAdapter = new ResponseAdapter(response);

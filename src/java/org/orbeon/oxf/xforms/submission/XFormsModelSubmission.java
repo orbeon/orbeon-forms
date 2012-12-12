@@ -420,22 +420,28 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 }
 
                 final String overriddenSerializedData;
-                if (p.serialize && !p.isDeferredSubmissionSecondPassReplaceAll) { // we don't want any changes to happen to the document upon xxforms-submit when producing a new document
-                    // Fire xforms-submit-serialize
+                if (!p.isDeferredSubmissionSecondPass) {
+                    if (p.serialize) {
+                        // Fire xforms-submit-serialize
 
-                    // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
-                    // is changed from the initial value of empty string, then the content of the submission-body
-                    // property string is used as the submission serialization. Otherwise, the submission serialization
-                    // consists of a serialization of the selected instance data according to the rules stated at 11.9
-                    // Submission Options."
+                        // "The event xforms-submit-serialize is dispatched. If the submission-body property of the event
+                        // is changed from the initial value of empty string, then the content of the submission-body
+                        // property string is used as the submission serialization. Otherwise, the submission serialization
+                        // consists of a serialization of the selected instance data according to the rules stated at 11.9
+                        // Submission Options."
 
-                    final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
-                    Dispatch.dispatchEvent(serializeEvent);
+                        final XFormsSubmitSerializeEvent serializeEvent = new XFormsSubmitSerializeEvent(XFormsModelSubmission.this, p.refNodeInfo, requestedSerialization);
+                        Dispatch.dispatchEvent(serializeEvent);
 
-                    // TODO: rest of submission should happen upon default action of event
+                        // TODO: rest of submission should happen upon default action of event
 
-                    overriddenSerializedData = serializeEvent.submissionBodyAsString();
+                        overriddenSerializedData = serializeEvent.submissionBodyAsString();
+                    } else {
+                        overriddenSerializedData = null;
+                    }
                 } else {
+                    // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document
+                    // lock, see XFormsServer.
                     overriddenSerializedData = null;
                 }
 
@@ -474,7 +480,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 final String resolvedActionOrResourceVal = resolvedActionOrResource;
                 submitDoneOrErrorRunnable = new Runnable() {
                     public void run() {
-                        if (pVal != null && pVal.isDeferredSubmissionSecondPassReplaceAll && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
+                        if (pVal != null && pVal.isDeferredSubmissionSecondPass && XFormsProperties.isLocalSubmissionForward(containingDocument)) {
                             // It doesn't serve any purpose here to dispatch an event, so we just propagate the exception
                             throw new XFormsSubmissionException(XFormsModelSubmission.this, throwable, "Error while processing xf:submission", "processing submission");
                         } else {
@@ -760,8 +766,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         final boolean isDeferredSubmissionFirstPass;
         final boolean isDeferredSubmissionSecondPass;
 
-        final boolean isDeferredSubmissionSecondPassReplaceAll;
-
         public void initializeXPathContext() {
 
             final BindingContext bindingContext; {
@@ -851,8 +855,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             isDeferredSubmission = isAllowDeferredSubmission && isPossibleDeferredSubmission;
             isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
             isDeferredSubmissionSecondPass = isDeferredSubmission && !isDeferredSubmissionFirstPass; // here we get XXFORMS_SUBMIT
-
-            isDeferredSubmissionSecondPassReplaceAll = isDeferredSubmissionSecondPass && isReplaceAll;
         }
     }
 

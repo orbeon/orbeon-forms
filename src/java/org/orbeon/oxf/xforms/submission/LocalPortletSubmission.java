@@ -133,9 +133,8 @@ public class LocalPortletSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openLocalConnection(newExternalContext, response,
-                        detailsLogger, containingDocument,
-                        p.actualHttpMethod, resolvedURI.toString(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
-                        sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues, new SubmissionProcess() {
+                        detailsLogger, resolvedURI.toString(), p, sp.actualRequestMediatype, p2.encoding, sp.messageBody,
+                        sp.queryString, headersToForward, customHeaderNameValues, new SubmissionProcess() {
                             public void process(final ExternalContext.Request request, final ExternalContext.Response response) {
                                 // Delegate to portlet
                                 currentPortlet.processorService().service(new PipelineContext(), new ExternalContextWrapper(newExternalContext) {

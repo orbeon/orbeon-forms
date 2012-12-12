@@ -53,7 +53,7 @@ public class AllReplacer extends BaseReplacer {
         // Error: "either the document is replaced with an implementation-specific indication of an error or submission
         // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
         // error-type of resource-error"
-        if (! p.isDeferredSubmissionSecondPassReplaceAll) {
+        if (! p.isDeferredSubmissionSecondPass) {
             if (NetUtils.isSuccessCode(connectionResult.statusCode))
                 return submission.sendSubmitDone(connectionResult);
             else
@@ -63,8 +63,8 @@ public class AllReplacer extends BaseReplacer {
                 throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
                         new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
         } else {
-            // We don't want any changes to happen to the document upon xxforms-submit when producing a new document, so
-            // we don't dispatch success/error events.
+            // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document
+            // lock, see XFormsServer.
             return null;
         }
     }

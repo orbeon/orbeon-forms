@@ -161,9 +161,9 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                 ConnectionResult connectionResult = null;
                 try {
                     connectionResult = openRequestDispatcherConnection(NetUtils.getExternalContext(),
-                        containingDocument, detailsLogger, p.actualHttpMethod, resolvedURI.toString(),
+                        containingDocument, detailsLogger, resolvedURI.toString(), p,
                         submission.isURLNorewrite(), sp.actualRequestMediatype, p2.encoding, sp.messageBody,
-                        sp.queryString, p.isReplaceAll, headersToForward, customHeaderNameValues);
+                        sp.queryString, headersToForward, customHeaderNameValues);
 
                     // Update status
                     status[0] = true;
@@ -201,10 +201,14 @@ public class RequestDispatcherSubmission extends BaseSubmission {
     public ConnectionResult openRequestDispatcherConnection(ExternalContext externalContext,
                                                             XFormsContainingDocument containingDocument,
                                                             IndentedLogger indentedLogger,
-                                                            String httpMethod, final String resource, boolean isNorewrite,
-                                                            String actualRequestMediatype, String encoding,
-                                                            byte[] messageBody, String queryString,
-                                                            final boolean isReplaceAll, String headerNames,
+                                                            final String resource,
+                                                            final XFormsModelSubmission.SubmissionParameters p,
+                                                            boolean isNorewrite,
+                                                            String actualRequestMediatype,
+                                                            String encoding,
+                                                            byte[] messageBody,
+                                                            String queryString,
+                                                            String headerNames,
                                                             Map<String, String[]> customHeaderNameValues) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether
@@ -234,11 +238,11 @@ public class RequestDispatcherSubmission extends BaseSubmission {
 
         final ExternalContext.Response response = containingDocument.getResponse() != null ? containingDocument.getResponse() : externalContext.getResponse();
         return openLocalConnection(externalContext, response, indentedLogger,
-           containingDocument, httpMethod, effectiveResource, actualRequestMediatype, encoding,
-           messageBody, queryString, isReplaceAll, headerNames, customHeaderNameValues, new SubmissionProcess() {
+           effectiveResource, p, actualRequestMediatype, encoding,
+           messageBody, queryString, headerNames, customHeaderNameValues, new SubmissionProcess() {
                public void process(ExternalContext.Request request, ExternalContext.Response response) {
                   try {
-                      if (isReplaceAll)
+                      if (p.isReplaceAll)
                           requestDispatcher.forward(request, response);
                       else
                           requestDispatcher.include(request, response);

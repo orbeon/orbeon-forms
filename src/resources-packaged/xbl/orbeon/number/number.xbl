@@ -106,7 +106,7 @@
                             can be blank: https://github.com/orbeon/orbeon-forms/issues/587
                         -->
                         <xf:var name="formatted" id="formatted-value"
-                            value="if ($binding castable as xs:decimal)
+                            value="if (string($binding) castable as xs:decimal)
                                    then translate(format-number(xs:decimal($binding), $picture-string), '.,', concat($decimal-separator, $grouping-separator))
                                    else string($binding)">
                         </xf:var>

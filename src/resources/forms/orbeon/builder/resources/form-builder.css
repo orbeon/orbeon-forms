@@ -289,28 +289,28 @@ body {
 .fb-dialog-form-settings .fb-dialog-form-settings-stats > .xforms-label {
   border-bottom: 1px solid #ddddee;
 }
-.fb-itemset-editor-dialog {
+.fb-dialog-itemsets {
   width: 35em;
 }
-.fb-itemset-editor-dialog .xbl-fr-grid {
+.fb-dialog-itemsets .xbl-fr-grid {
   height: 30em;
   overflow-y: auto;
   padding: 0;
 }
-.fb-itemset-editor-dialog .xbl-fr-grid table {
+.fb-dialog-itemsets .xbl-fr-grid table {
   background-color: white;
 }
-.fb-itemset-editor-dialog .fr-grid-2-columns .xforms-input input {
+.fb-dialog-itemsets .fr-grid-2-columns .xforms-input input {
   width: 13em;
 }
-.fb-itemset-editor-dialog .xbl-fr-link-select1 {
+.fb-dialog-itemsets .xbl-fr-link-select1 {
   margin-bottom: .5em;
   float: right;
 }
-.fb-itemset-editor-dialog .xbl-fr-link-select1 .xforms-label {
+.fb-dialog-itemsets .xbl-fr-link-select1 .xforms-label {
   display: none;
 }
-.fb-itemset-editor-dialog .xforms-invalid .xforms-input-input {
+.fb-dialog-itemsets .xforms-invalid .xforms-input-input {
   border-color: #df731b;
 }
 #fb-service-dialog {
@@ -378,32 +378,17 @@ body {
 #fb-add-language-dialog {
   width: 20em;
 }
-#dialog-control-details\$dialog .xforms-input input {
-  width: 98%;
-}
-#dialog-control-details\$dialog {
+.fb-dialog-control-details {
   width: 20em;
 }
-#dialog-control-details\$dialog .xforms-input input {
+.fb-dialog-control-details .xforms-input input {
   width: 98%;
 }
-#fb-edit-validation-dialog {
-  width: 30em;
+.fb-dialog-validation-details {
+  width: 800px;
 }
-#fb-edit-validation-dialog textarea {
-  width: 98%;
-  height: 4em;
-}
-#fb-edit-validation-dialog .xforms-label {
-  display: block;
-  clear: both;
-}
-#fb-edit-validation-dialog .xforms-hint {
-  display: block;
-  clear: both;
-}
-#fb-edit-validation-dialog .xforms-disabled {
-  display: none;
+.fb-dialog-validation-details .xforms-label {
+  margin-top: 5px;
 }
 #fb-schema-upload-dialog {
   width: 35em;

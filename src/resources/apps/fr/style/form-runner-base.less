@@ -385,7 +385,8 @@ button.btn-link {
     }
 
     .xforms-label {
-        margin-bottom: .5em;                        // Insert some space between the label / help and the control (we add spacing below the label rather
+        margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
+        margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
                                                     // than above the control to make the CSS more generally applicable to XBL components)
         overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
         zoom: 1;                                    // For the overflow: hidden to have an effect on IE6

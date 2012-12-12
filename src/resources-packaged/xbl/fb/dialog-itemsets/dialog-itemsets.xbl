@@ -100,7 +100,7 @@
                     <xf:setfocus control="fb-itemset-label-input"/>
                 </xf:action>
 
-                <xxf:dialog id="dialog" class="fb-itemset-editor-dialog" appearance="full" model="model" level="modal">             <!-- Actual dialog -->
+                <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">             <!-- Actual dialog -->
                     <xf:label ref="$resources/dialog-itemsets/label"/>
                     <xh:div class="fb-dialog-body fb-hide-alert">
                         <xf:group ref="$local/items">

@@ -208,7 +208,7 @@ body {
 
 // Itemset editor dialog
 // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
-.fb-itemset-editor-dialog {
+.fb-dialog-itemsets {
     width: 35em;
 
     .xbl-fr-grid {
@@ -286,20 +286,15 @@ body {
 
 #fb-section-details-dialog,
     #fb-add-language-dialog { width: 20em }
-#dialog-control-details\$dialog .xforms-input input { width: 98% }
 
-#dialog-control-details\$dialog {
+.fb-dialog-control-details {
     width: 20em;
     .xforms-input input { width: 98% }
 }
 
-#fb-edit-validation-dialog {
-    width: 30em;
-
-    textarea { width: 98%; height: 4em }
-    .xforms-label { display: block; clear: both }
-    .xforms-hint { display: block; clear: both }
-    .xforms-disabled { display: none }
+.fb-dialog-validation-details {
+    width: 800px;
+    .xforms-label { margin-top: 5px; }
 }
 
 #fb-schema-upload-dialog {

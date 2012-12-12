@@ -451,7 +451,8 @@ button.btn-link {
   background-position: -120px -96px;
 }
 .fr-grid .xforms-label {
-  margin-bottom: .5em;
+  margin-top: 2px;
+  margin-bottom: 4px;
   overflow: hidden;
   zoom: 1;
 }

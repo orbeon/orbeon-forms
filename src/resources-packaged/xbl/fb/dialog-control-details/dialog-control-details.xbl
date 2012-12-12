@@ -160,7 +160,7 @@
                 <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>
 
                 <!-- Actual dialog -->
-                <xxf:dialog id="dialog" appearance="full" level="modal">
+                <xxf:dialog id="dialog" appearance="full" level="modal" class="fb-dialog-control-details">
                     <xf:label ref="$resources/dialog-control-details/label"/>
                     <xh:div>
                         <xh:div class="fr-grid">

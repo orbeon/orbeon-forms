@@ -82,7 +82,7 @@ object InitUtils {
             success = true
         } catch {
             case t: Throwable ⇒
-                val locationData = ValidationException.getRootLocationData(t)
+                def locationData = ValidationException.getRootLocationData(t)
 
                 Exceptions.getRootThrowable(t) match {
                     case e: HttpStatusCodeException ⇒

@@ -23,6 +23,7 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
+      xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
@@ -140,25 +141,32 @@
             value="$resources/resource[1]/@xml:lang"/>
 
         <!-- Check permissions if there are roles -->
-        <xf:var name="has-roles" value="not(xxf:instance('fr-permissions')/@has-roles = 'false')" as="xs:boolean"/>
+        <xf:var name="has-roles" value="not(xxf:instance('fr-permissions')/@has-roles = 'false')"/>
         <xf:action if="$has-roles">
+            <xf:var name="app"         value="xxf:bind('application-name-bind')"/>
+            <xf:var name="form"        value="xxf:bind('form-name-bind')"/>
+            <xf:var name="permissions" value="xxf:instance('fr-permissions')"/>
+
             <xf:action if="xxf:instance('fr-parameters-instance')/mode = 'new'">
-                <!-- New form: set default value for app and form if needed -->
-                <!-- NOTE: we use xxf:bind() instead of @bind because @bind doesn't seem to work properly (incorrect context?) -->
-                <xf:action context="xxf:instance('fr-permissions')/app[1]" if="not(@name = '*')">
-                    <xf:setvalue ref="xxf:bind('application-name-bind')" value="context()/@name"/>
-                    <!-- XXXXXXX -->
-                    <xf:setvalue ref="instance('fb-metadata-instance')/application-name" value="context()/@name"/>
+                <!-- New form -->
+                <xf:action if="not($permissions/app/@name = '*')">
+                    <!-- Set default value for app if we only support specific app names -->
+                    <xf:setvalue ref="$app" value="$permissions/app[1]/@name"/>
+
+                    <xf:action if="not($permissions/app[1]/form/@name = '*')">
+                        <!-- Set default value for form if we only support specific form names -->
+                        <xf:setvalue ref="$form" value="$permissions/app[1]/form[1]/@name"/>
+                    </xf:action>
                 </xf:action>
             </xf:action>
             <xf:action if="not(xxf:instance('fr-parameters-instance')/mode = 'new')">
-                <!-- E.g. we are reading an existing doc: IF there are roles and roles don't match THEN send redirection -->
-                <xf:var name="app" value="xxf:bind('application-name-bind')" as="xs:string"/>
-                <xf:var name="form" value="xxf:bind('form-name-bind')" as="xs:string"/>
-                <!-- See similar logic in FR -->
-                <xf:load if="not(exists(xxf:instance('fr-permissions')/app[@name = '*'])
-                                    or exists(xxf:instance('fr-permissions')/app[@name = $app]/form[@name = ('*', $form)]))"
-                             resource="/fr/unauthorized"/>
+                <!-- Existing form -->
+
+                <!-- If roles don't match then access is unauthorized. See similar logic in FR. -->
+                <xf:action if="not(   exists($permissions/app[@name = '*'])
+                                   or exists($permissions/app[@name = $app]/form[@name = ('*', $form)]))">
+                    formRunner:sendError(403)
+                </xf:action>
             </xf:action>
         </xf:action>
 

@@ -17,8 +17,9 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <xsl:variable name="has-version" select="p:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
-    <xsl:variable name="css-uri"     select="tokenize(normalize-space(p:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="has-version"    select="p:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
+    <xsl:variable name="css-uri"        select="tokenize(normalize-space(p:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="custom-css-uri" select="tokenize(normalize-space(p:property('oxf.fr.css.custom.uri.*.*')), '\s+')" as="xs:string*"/>
 
     <xsl:template match="/">
         <xsl:processing-instruction name="orbeon-serializer">status-code="404"</xsl:processing-instruction>
@@ -27,7 +28,7 @@
                 <xh:title>Not Found</xh:title>
         
                 <!-- Form Runner CSS stylesheets -->
-                <xsl:for-each select="$css-uri">
+                <xsl:for-each select="$css-uri, $custom-css-uri">
                     <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
                 </xsl:for-each>
             </xh:head>

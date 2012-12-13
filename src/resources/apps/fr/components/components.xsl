@@ -65,6 +65,7 @@
     <xsl:variable name="hide-top" select="p:property(string-join(('oxf.fr.detail.hide-top', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="tokenize(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
+    <xsl:variable name="custom-css-uri" select="tokenize(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
     <xsl:variable name="buttons" select="tokenize(p:property(string-join(($buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="has-alfresco" select="p:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
@@ -128,7 +129,7 @@
             <xsl:apply-templates select="@*"/>
 
             <!-- Form Runner CSS stylesheets -->
-            <xsl:for-each select="$css-uri">
+            <xsl:for-each select="$css-uri, $custom-css-uri">
                 <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
             </xsl:for-each>
 

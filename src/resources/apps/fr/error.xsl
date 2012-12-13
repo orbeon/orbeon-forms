@@ -20,12 +20,13 @@
 
     <xsl:variable name="has-version" select="xpl:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="tokenize(normalize-space(xpl:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="custom-css-uri" select="tokenize(normalize-space(xpl:property('oxf.fr.css.custom.uri.*.*')), '\s+')" as="xs:string*"/>
 
     <head>
         <title>Orbeon Forms Error</title>
 
         <!-- Form Runner CSS stylesheets -->
-        <xsl:for-each select="$css-uri">
+        <xsl:for-each select="$css-uri, $custom-css-uri">
             <link rel="stylesheet" href="{.}" type="text/css" media="all"/>
         </xsl:for-each>
     </head>

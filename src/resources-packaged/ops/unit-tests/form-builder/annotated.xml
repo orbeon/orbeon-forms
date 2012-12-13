@@ -66,7 +66,7 @@
                     </xf:action>
                 </xf:action>
             </xf:group>
-            <fr:buttons>Custom buttons here</fr:buttons>
+            <xf:group class="fr-buttons" ref="()">Custom buttons here</xf:group>
         </fr:view>
     </xh:body>
 </xh:html>

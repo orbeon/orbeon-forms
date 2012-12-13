@@ -21,6 +21,7 @@
 @fbToolbarWidth: 192px;
 @fbBottomHeight: 54px;
 @fbGridIconsGutter: 22px;
+@fbIconsHeight: 16px;
 
 // Overwrite definition in form-runner-orbeon.css if any
 html {
@@ -183,6 +184,26 @@ body {
 
 /* ***** Dialogs **************************************************************************************************** */
 
+// All dialogs
+.xforms-dialog {
+
+    .xforms-label {
+        margin-top: 5px;
+
+        // Try to make icons appear vertically centered
+        img {
+            vertical-align: middle;
+            margin-bottom: (@baseLineHeight - @fbIconsHeight) / 2;
+        }
+    }
+
+    // Add colon after labels to make them more distinct. Do we like this?
+    // See also https://github.com/orbeon/orbeon-forms/issues/383
+    .xforms-label:after { content: ": " }
+    // Exceptions to above rule
+    .fr-grid-th .xforms-label:after, .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
+}
+
 // Metadata editor dialog
 .fb-dialog-form-settings {
     width: 600px;
@@ -209,7 +230,7 @@ body {
 // Itemset editor dialog
 // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
 .fb-dialog-itemsets {
-    width: 35em;
+    width: 400px;
 
     .xbl-fr-grid {
         height: 30em;
@@ -226,7 +247,7 @@ body {
 
 // Submission editor dialog
 #fb-service-dialog {
-    width: 45em;
+    width: 550px;
     .fb-service-dialog-error {
         border: 2px solid red; padding: .25em;
         select {
@@ -247,10 +268,9 @@ body {
     }
 }
 
-
 // Bindings editor dialog
 #fb-action-dialog {
-    width: 45em;
+    width: 550px;
     .xforms-select1 { width: auto }
     .fr-repeat-table {
         .fb-parameters {
@@ -263,7 +283,7 @@ body {
 }
 
 #fb-database-service-dialog {
-    width: 45em;
+    width: 550px;
     textarea {
         height: 10em;
         font-family: monospace;
@@ -273,7 +293,7 @@ body {
 
 // Help dialog
 #fb-edit-help-dialog {
-    width: 40em;
+    width: 400px;
     textarea {
         width: 98%;
         height: 12em;
@@ -281,15 +301,12 @@ body {
 }
 
 // Other dialogs
-.xforms-dialog .bd { padding-left: .5em; padding-right: .5em }
-.xforms-dialog .xforms-label img { vertical-align: middle }
-
-#fb-section-details-dialog,
-    #fb-add-language-dialog { width: 20em }
+#fb-section-details-dialog, #fb-add-language-dialog {
+    width: 400px;
+}
 
 .fb-dialog-control-details {
-    width: 20em;
-    .xforms-input input { width: 98% }
+    width: 400px;
 }
 
 .fb-dialog-validation-details {
@@ -298,7 +315,7 @@ body {
 }
 
 #fb-schema-upload-dialog {
-    width: 35em;
+    width: 400px;
 
     .xforms-hint { width: 100% }
     .xforms-select1 { height: 10em; width: 100% }
@@ -307,19 +324,22 @@ body {
 }
 
 #fb-source-editor-dialog, .fb-custom-xml-dialog {
-    width: 70em;
+    width: 900px;
     .CodeMirror { font-size: 12px; }            // Pick slightly smaller font size, default being 13px
     .CodeMirror-scroll { height: auto }
     .xforms-alert-active { display: block }
 }
 
 // Publish dialog
-#fb-publish-dialog { width: 35em }
-.fb-publish-message {
-    background-color: white;
-    border: 1px solid #DDDDDD;
-    display: block;
-    padding: .5em;
+#fb-publish-dialog {
+    width: 400px;
+
+    .fb-publish-message {
+        background-color: white;
+        border: 1px solid #DDDDDD;
+        display: block;
+        padding: .5em;
+    }
 }
 
 .xxforms-set-height {                           // Dialogs for which we want the main area to take remaining height
@@ -359,10 +379,6 @@ body {
     }
 }
 
-// PE dialog
-// NOTE: This should not be needed because alert dialog should not use label for message content
-.xbl-fr-alert-dialog-message .xforms-label { font-weight: normal }
-
 /* ***** In-Place Editing ******************************************************************************************* */
 
 // Label and hint editors
@@ -374,8 +390,7 @@ body {
 }
 
 h2 .fr-section-label {
-    height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css
-                                                                                                                        // Goes on the label, not the h2, so the collaps background image shows even when empty
+    height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
 }
 
 /* ***** Grid ******************************************************************************************************* */
@@ -406,7 +421,7 @@ h2 .fr-section-label {
 .fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
-    display: block; width: 16px;
+    display: block; width: @fbIconsHeight;
     height: 60px;
     text-align: center }
 

@@ -15,9 +15,8 @@
 @controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
 @textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
 
-body, label, input, button,         // Bootstrap sets a default font-size of 14px, and here we reset it to the
-select, textarea, .btn {            // YUI's default value of 13px
-    font-size: 13px;
+body, label, button, .btn  {
+    font-size: @frFontSize;         // Use our own preferred font size
 }
 
 a {
@@ -70,6 +69,7 @@ form.xforms-form {
     input[type="tel"],
     input[type="color"],
     .uneditable-input {
+        font-size: @frFontSize;         // Use our own preferred font size
         margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
         color: black;                   // Make text inside the fields stand out, as this is the most important information
         .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap

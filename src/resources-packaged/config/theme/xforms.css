@@ -212,9 +212,6 @@ button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner,
   width: 550px;
   height: 300px;
 }
-.xforms-select1-appearance-minimal {
-  font-family: Arial, Helvetica, Geneva, sans-serif;
-}
 .xforms-select1-appearance-full label {
   vertical-align: middle;
   margin-right: 0.5em;

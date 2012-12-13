@@ -230,8 +230,7 @@
                                 <xf:textarea ref="help" incremental="true">
                                     <xf:label>
                                         <xh:img src="/ops/images/xforms/help.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/help/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/help/label"/></xf:label>
                                     <xf:hint ref="$resources/dialog-validation-details/help/hint"/>
                                 </xf:textarea>
 
@@ -239,8 +238,7 @@
                                 <xf:textarea ref="alert" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/exclamation.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/alert/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/alert/label"/></xf:label>
                                     <xf:hint ref="$resources/dialog-validation-details/alert/hint"/>
                                 </xf:textarea>
                             </xh:td>
@@ -250,8 +248,7 @@
                                 <xf:input ref="constraint" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/link.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/constraint/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/constraint/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-validation-details/constraint/alert"/>
                                     <xf:hint ref="$resources/dialog-validation-details/constraint/hint"/>
                                 </xf:input>
@@ -259,8 +256,7 @@
                                 <xf:input ref="relevant" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/visibility/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/visibility/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-validation-details/visibility/alert"/>
                                     <xf:hint ref="$resources/dialog-validation-details/visibility/hint"/>
                                 </xf:input>
@@ -268,8 +264,7 @@
                                 <xf:input ref="readonly" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/readonly/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/readonly/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-validation-details/readonly/alert"/>
                                     <xf:hint ref="$resources/dialog-validation-details/readonly/hint"/>
                                 </xf:input>
@@ -277,8 +272,7 @@
                                 <xf:input ref="default" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/flag_yellow.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/default/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/default/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-validation-details/default/alert"/>
                                     <xf:hint ref="$resources/dialog-validation-details/default/hint"/>
                                 </xf:input>
@@ -286,8 +280,7 @@
                                 <xf:input ref="calculate" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/calculate/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-validation-details/calculate/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-validation-details/calculate/alert"/>
                                     <xf:hint ref="$resources/dialog-validation-details/calculate/hint"/>
                                 </xf:input>

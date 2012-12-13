@@ -492,7 +492,7 @@
         <dialog-add-language>
             <label>Add Language</label>
             <new-language>
-                <label>Add the following language:</label>
+                <label>Add the following language</label>
             </new-language>
             <add-language>
                 <label>Add language</label>
@@ -1312,7 +1312,7 @@
         <dialog-add-language>
             <label>Ajouter une langue</label>
             <new-language>
-                <label>Ajouter la langue suivante :</label>
+                <label>Ajouter la langue suivante</label>
             </new-language>
             <add-language>
                 <label>Ajouter une langue</label>
@@ -2134,7 +2134,7 @@
         <dialog-add-language>
             <label>Legg til språk</label>
             <new-language>
-                <label>Legg til det følgende språket:</label>
+                <label>Legg til det følgende språket</label>
             </new-language>
             <add-language>
                 <label>Legg til språk</label>
@@ -2955,7 +2955,7 @@
         <dialog-add-language>
             <label>Добавить язык</label>
             <new-language>
-                <label>Добавить следующий язык:</label>
+                <label>Добавить следующий язык</label>
             </new-language>
             <add-language>
                 <label>Добавить язык</label>

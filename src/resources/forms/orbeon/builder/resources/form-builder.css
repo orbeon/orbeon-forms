@@ -257,6 +257,20 @@ body {
   color: white;
 }
 /* ***** Dialogs **************************************************************************************************** */
+.xforms-dialog .xforms-label {
+  margin-top: 5px;
+}
+.xforms-dialog .xforms-label img {
+  vertical-align: middle;
+  margin-bottom: 2px;
+}
+.xforms-dialog .xforms-label:after {
+  content: ": ";
+}
+.xforms-dialog .fr-grid-th .xforms-label:after,
+.xforms-dialog .xbl-fr-alert-dialog-message .xforms-label:after {
+  content: none;
+}
 .fb-dialog-form-settings {
   width: 600px;
 }
@@ -290,7 +304,7 @@ body {
   border-bottom: 1px solid #ddddee;
 }
 .fb-dialog-itemsets {
-  width: 35em;
+  width: 400px;
 }
 .fb-dialog-itemsets .xbl-fr-grid {
   height: 30em;
@@ -314,7 +328,7 @@ body {
   border-color: #df731b;
 }
 #fb-service-dialog {
-  width: 45em;
+  width: 550px;
 }
 #fb-service-dialog .fb-service-dialog-error {
   border: 2px solid red;
@@ -336,7 +350,7 @@ body {
   height: 10em;
 }
 #fb-action-dialog {
-  width: 45em;
+  width: 550px;
 }
 #fb-action-dialog .xforms-select1 {
   width: auto;
@@ -354,35 +368,25 @@ body {
   white-space: nowrap;
 }
 #fb-database-service-dialog {
-  width: 45em;
+  width: 550px;
 }
 #fb-database-service-dialog textarea {
   height: 10em;
   font-family: monospace;
 }
 #fb-edit-help-dialog {
-  width: 40em;
+  width: 400px;
 }
 #fb-edit-help-dialog textarea {
   width: 98%;
   height: 12em;
 }
-.xforms-dialog .bd {
-  padding-left: .5em;
-  padding-right: 0.5em;
-}
-.xforms-dialog .xforms-label img {
-  vertical-align: middle;
-}
 #fb-section-details-dialog,
 #fb-add-language-dialog {
-  width: 20em;
+  width: 400px;
 }
 .fb-dialog-control-details {
-  width: 20em;
-}
-.fb-dialog-control-details .xforms-input input {
-  width: 98%;
+  width: 400px;
 }
 .fb-dialog-validation-details {
   width: 800px;
@@ -391,7 +395,7 @@ body {
   margin-top: 5px;
 }
 #fb-schema-upload-dialog {
-  width: 35em;
+  width: 400px;
 }
 #fb-schema-upload-dialog .xforms-hint {
   width: 100%;
@@ -412,7 +416,7 @@ body {
 }
 #fb-source-editor-dialog,
 .fb-custom-xml-dialog {
-  width: 70em;
+  width: 900px;
 }
 #fb-source-editor-dialog .CodeMirror,
 .fb-custom-xml-dialog .CodeMirror {
@@ -427,9 +431,9 @@ body {
   display: block;
 }
 #fb-publish-dialog {
-  width: 35em;
+  width: 400px;
 }
-.fb-publish-message {
+#fb-publish-dialog .fb-publish-message {
   background-color: white;
   border: 1px solid #DDDDDD;
   display: block;
@@ -473,9 +477,6 @@ body {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   border: none;
-}
-.xbl-fr-alert-dialog-message .xforms-label {
-  font-weight: normal;
 }
 /* ***** In-Place Editing ******************************************************************************************* */
 .fr-grid .xforms-label input,

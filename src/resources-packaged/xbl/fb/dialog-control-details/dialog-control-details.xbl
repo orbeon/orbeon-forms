@@ -169,8 +169,7 @@
                                 <xf:input ref="$local/control-name" incremental="true" id="fb-edit-details-control-name-input">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-control-details/control-name/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-control-details/control-name/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-control-details/control-name/alert"/>
                                     <xf:hint ref="$resources/dialog-control-details/control-name/hint"/>
                                 </xf:input>
@@ -178,8 +177,7 @@
                                 <xf:input ref="$local/control-xpath" incremental="true" id="fb-edit-details-control-xpath">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/database.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-control-details/control-xpath/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-control-details/control-xpath/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-control-details/control-xpath/alert"/>
                                     <xf:hint ref="$resources/dialog-control-details/control-xpath/hint"/>
                                 </xf:input>

@@ -50,10 +50,7 @@
 }
 body,
 label,
-input,
 button,
-select,
-textarea,
 .btn {
   font-size: 13px;
 }
@@ -115,6 +112,7 @@ form.xforms-form input[type="search"],
 form.xforms-form input[type="tel"],
 form.xforms-form input[type="color"],
 form.xforms-form .uneditable-input {
+  font-size: 13px;
   margin-bottom: 0;
   color: black;
   -webkit-box-sizing: border-box;

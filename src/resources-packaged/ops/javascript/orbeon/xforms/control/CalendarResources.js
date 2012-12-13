@@ -124,7 +124,7 @@
                 year: "Rok",
                 submit: "OK",
                 cancel: "Anuluj",
-                invalidYear: "Rok powinien byæ liczb¹"
+                invalidYear: "Rok powinien by\u0107 liczb\u0105"
             }
         }
     };

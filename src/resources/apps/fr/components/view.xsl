@@ -92,7 +92,7 @@
         <xf:group id="fr-form-group" class="fr-body{if ($is-detail) then ' fr-border' else ''}" model="fr-form-model" ref="instance('fr-form-instance')">
             <xh:a name="fr-form"/>
             <xsl:choose>
-                <xsl:when test="not($mode = ('edit', 'new')) or $is-form-builder or $view-appearance = ('full', '')">
+                <xsl:when test="not($mode = ('edit', 'new', 'test')) or $is-form-builder or $view-appearance = ('full', '')">
                     <!-- Just place the content as is -->
                     <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
                 </xsl:when>

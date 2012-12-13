@@ -152,6 +152,10 @@
                             </xf:action>
                         </xsl:for-each>
 
+                        <!-- Dummy variable values so that user XPath expressions find them -->
+                        <xf:var name="fr-roles" value="''" class="fb-annotation"/>
+                        <xf:var name="fr-mode" value="'edit'" class="fb-annotation"/>
+
                     </xsl:copy>
                 </xsl:template>
 

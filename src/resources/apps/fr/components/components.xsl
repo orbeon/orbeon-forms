@@ -345,7 +345,7 @@
             <!-- Variable exposing all the user roles -->
             <xf:var name="fr-roles" value="tokenize(xxf:instance('fr-permissions')/@all-roles, '\s+')" as="xs:string*"/>
             <!-- Variable exposing the form mode -->
-            <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode"/>
+            <xf:var name="fr-mode" value="string(xxf:instance('fr-parameters-instance')/mode)"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
             <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>

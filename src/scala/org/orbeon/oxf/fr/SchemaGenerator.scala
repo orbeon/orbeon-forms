@@ -98,7 +98,7 @@ class SchemaGenerator extends ProcessorImpl {
         val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
         val connectionResult = Connection("GET", url, credentials = None, messageBody = None, headers = headers, loadState = true, logBody = false).connect(saveState = true)
 
-        if (connectionResult.hasContent)
+        if (connectionResult.statusCode == 200)
             Some(useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                 TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
             })

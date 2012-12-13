@@ -175,26 +175,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
         return result;
     }
 
-//    public void updateContent(PropertyContext propertyContext, boolean isVisible) {
-//        final XFormsControls controls = containingDocument.getControls();
-//        final ControlTree currentControlTree = controls.getCurrentControlTree();
-//
-//        final List<XFormsControl> children = getChildren();
-//
-//        if (isVisible) {
-//            // Became visible: create children
-//            if (children == null || children.size() == 0) {
-//                currentControlTree.createSubTree(propertyContext, this);
-//            }
-//        } else {
-//            // Became invisible: remove children
-//            if (children != null && children.size() > 0) {
-//                currentControlTree.deindexSubtree(this, false);
-//                this.setChildren(null);
-//            }
-//        }
-//    }
-
     @Override
     public boolean equalsExternal(XFormsControl other) {
 
@@ -229,15 +209,6 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
                 (neighbor != null && isVisible()) ? "neighbor" : null, XFormsUtils.namespaceId(containingDocument(), neighbor),
                 isVisible() ? "constrain" : null, Boolean.toString(isConstrainToViewport())
         });
-    }
-
-    // NOTE: Duplicated in XFormsSwitchControl
-    public boolean isXForms11Switch() {
-        final String localXForms11Switch = element().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
-        if (localXForms11Switch != null)
-            return Boolean.parseBoolean(localXForms11Switch);
-        else
-            return XFormsProperties.isXForms11Switch(containingDocument());
     }
 
     public boolean contentVisible() {

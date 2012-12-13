@@ -291,7 +291,6 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
         }
     }
 
-    // NOTE: Duplicated in XXFormsDialogControl
     public boolean isXForms11Switch() {
         final String localXForms11Switch = element().attributeValue(XFormsConstants.XXFORMS_XFORMS11_SWITCH_QNAME);
         if (localXForms11Switch != null)

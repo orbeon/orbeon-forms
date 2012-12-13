@@ -195,6 +195,9 @@ button.btn-link {
   margin-bottom: .5em;
   border-bottom: 2px solid #ddddee;
 }
+.xforms-textarea.xforms-static pre {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 /* ***** General Layout ********************************************************************************************* */
 .fr-goto-content,
 .fr-language-choice,

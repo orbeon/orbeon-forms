@@ -463,6 +463,7 @@
                 <exclude name="ops/**/*.ico"/>
                 <exclude name="ops/**/*.jpg"/>
                 <exclude name="ops/**/*.html"/>
+                <exclude name="ops/**/*.htm"/>
                 <exclude name="ops/**/*.htc"/>
                 <include name="oxf/**"/>
                 <include name="config/**"/>
@@ -482,6 +483,7 @@
                 <include name="xbl/**/*.png"/>
                 <include name="xbl/**/*.jpg"/>
                 <include name="xbl/**/*.html"/>
+                <include name="xbl/**/*.htm"/>
                 <include name="xbl/**/*.xhtml"/>
                 <include name="xbl/**/*.htc"/>
                 <include name="ops/**/*.css"/>
@@ -491,6 +493,7 @@
                 <include name="ops/**/*.ico"/>
                 <include name="ops/**/*.jpg"/>
                 <include name="ops/**/*.html"/>
+                <include name="ops/**/*.htm"/>
                 <include name="ops/**/*.htc"/>
                 <include name="config/theme/**/*.*"/>
             </fileset>
@@ -831,6 +834,7 @@
             <include name="**/*.jsp"/>
             <include name="**/*.jspx"/>
             <include name="**/*.html"/>
+            <include name="**/*.htm"/>
             <include name="**/*.js"/>
             <include name="**/*.css"/>
             <include name="**/*.java"/>
@@ -850,6 +854,7 @@
             <include name="**/*.jsp"/>
             <include name="**/*.jspx"/>
             <include name="**/*.html"/>
+            <include name="**/*.htm"/>
             <include name="**/*.js"/>
             <include name="**/*.css"/>
             <include name="**/*.java"/>

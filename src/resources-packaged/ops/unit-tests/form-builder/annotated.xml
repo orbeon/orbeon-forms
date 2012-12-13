@@ -31,6 +31,8 @@
             <xf:action ev:event="xxforms-xpath-error" ev:target="#observer" class="fb-annotation" ev:defaultAction="cancel">
                 <xf:dispatch name="fb-xxforms-xpath-error" targetid="|fr-form-model|"/>
             </xf:action>
+            <xf:var xmlns:ev="http://www.w3.org/2001/xml-events" name="fr-roles" value="''" class="fb-annotation"/>
+            <xf:var xmlns:ev="http://www.w3.org/2001/xml-events" name="fr-mode" value="'edit'" class="fb-annotation"/>
         </xf:model>
     </xh:head>
     <xh:body>

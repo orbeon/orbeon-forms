@@ -104,6 +104,13 @@
                 <!-- Remove xbl:xbl containing section templates bindings -->
                 <xsl:template match="xbl:xbl[xbl:binding[p:has-class('fr-section-component')]]"/>
 
+                <!-- Restore fr:buttons -->
+                <xsl:template match="xf:group[p:has-class('fr-buttons')]">
+                    <fr:buttons>
+                        <xsl:apply-templates select="node()"/>
+                    </fr:buttons>
+                </xsl:template>
+
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" ref="data"/>

@@ -155,6 +155,13 @@
                     </xsl:copy>
                 </xsl:template>
 
+                <!-- Prevent fr:buttons from showing/running -->
+                <xsl:template match="fr:buttons">
+                    <xf:group class="fr-buttons" ref="()">
+                        <xsl:apply-templates select="node()"/>
+                    </xf:group>
+                </xsl:template>
+
                 <!-- TODO: convert legacy fr:repeat -->
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->

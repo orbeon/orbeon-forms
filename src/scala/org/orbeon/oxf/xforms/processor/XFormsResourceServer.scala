@@ -69,7 +69,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
                     response.setResourceCaching(resource.lastModified, 0)
 
-                    if (resource.size > 0)
+                    if (resource.size >= 0)
                         response.setContentLength(resource.size.asInstanceOf[Int]) // Q: Why does this API (and Servlet counterpart) take an int?
 
                     // TODO: for Safari, try forcing application/octet-stream

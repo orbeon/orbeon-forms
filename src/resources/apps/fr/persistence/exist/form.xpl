@@ -35,14 +35,13 @@
                 (: Retrieve the metadata for the deployed form, which are under /db/orbeon/fr/*/*/form/form.xhtml :)
                 (: The beginning of the path, /db/orbeon/fr, is part of the eXist URI we get from the orbeon-exist-uri header :)
 
-                (: TODO: use "current collection" instead of hard coding /db/orbeon/fr, once we know how to get the current collection in XQuery :)
-
-                if (xmldb:collection-available('/db/orbeon/fr')) then
-                    for $app in xmldb:get-child-collections('/db/orbeon/fr'),
-                        $form in xmldb:get-child-collections(concat('/db/orbeon/fr/', $app))
+                declare variable $fr-path := request:get-path-info();
+                if (xmldb:collection-available($fr-path)) then
+                    for $app in xmldb:get-child-collections($fr-path),
+                        $form in xmldb:get-child-collections(concat($fr-path, '/', $app))
                     return
                         element form {
-                            doc(concat('/db/orbeon/fr/', $app, '/', $form, '/form/form.xhtml'))
+                            doc(concat($fr-path, '/', $app, '/', $form, '/form/form.xhtml'))
                             /xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*
                         }
                 else ()

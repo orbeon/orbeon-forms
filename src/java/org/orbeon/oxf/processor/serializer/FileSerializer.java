@@ -320,7 +320,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = XFormsResourceServer.proxyURI(null, localURL, null, config.getRequestedContentType(), -1, Connection.EmptyHeaders(), null);
+                            resultURL = XFormsResourceServer.jProxyURI(localURL, config.getRequestedContentType());
                         else
                             resultURL = localURL;
                     }

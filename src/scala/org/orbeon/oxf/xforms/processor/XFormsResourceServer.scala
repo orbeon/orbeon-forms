@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.Caches
 import org.orbeon.oxf.xforms.Loggers
 import org.orbeon.oxf.xforms.XFormsProperties
 import ExternalContext.Session.APPLICATION_SCOPE
+import ExternalContext._
 import ScalaUtils._
 import org.orbeon.exception.OrbeonFormatter
 
@@ -37,143 +38,151 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
     import XFormsResourceServer._
 
-    override def start(pipelineContext: PipelineContext) {
-        val externalContext = NetUtils.getExternalContext
-        val request = externalContext.getRequest
-        val response = externalContext.getResponse
+    override def start(pipelineContext: PipelineContext): Unit = {
 
-        val requestPath = request.getRequestPath
-        val filename = requestPath.substring(requestPath.lastIndexOf('/') + 1)
+        implicit val externalContext = NetUtils.getExternalContext
+        val requestPath = externalContext.getRequest.getRequestPath
 
-        implicit val indentedLogger = getIndentedLogger
+        if (requestPath.startsWith(DynamicResourcesPath))
+            serveDynamicResource(requestPath)
+        else
+            serveCSSOrJavaScript(requestPath)
+    }
 
-        if (requestPath.startsWith(DynamicResourcesPath)) {
-            // Dynamic resource requested
-            val session = externalContext.getRequest.getSession(false)
-            if (session ne null) {
-                // Store mapping into session
-                val lookupKey = DynamicResourcesSessionKey + filename
-                // Use same session scope as proxyURI()
-                val resource = session.getAttributesMap(APPLICATION_SCOPE).get(lookupKey).asInstanceOf[DynamicResource]
-                if ((resource ne null) && (resource.url ne null)) {
-                    // Found URL, stream it out
+    private def serveDynamicResource(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
+        val session = externalContext.getRequest.getSession(false)
+        if (session ne null) {
+            val filenameFromRequest = filename(requestPath)
+            val response = externalContext.getResponse
 
-                    // Set caching headers
+            // Store mapping into session
+            val lookupKey = DynamicResourcesSessionKey + filenameFromRequest
+            // Use same session scope as proxyURI()
+            val resource = session.getAttributesMap(APPLICATION_SCOPE).get(lookupKey).asInstanceOf[DynamicResource]
+            if (resource ne null) {
+                // Found URL, stream it out
 
-                    // NOTE: Algorithm is that XFOutputControl currently passes either -1 or the last modified of the
-                    // resource if "fast" to obtain last modified ("oxf:" or "file:"). Would be nice to do better: pass
-                    // whether resource is cacheable or not; here, when dereferencing the resource, we get the last
-                    // modified (Last-Modified header from HTTP even) and store it. Then we can handle conditional get.
-                    // This is some work though. Might have to proxy conditional GET as well. So for now we don't
-                    // handle conditional GET and produce a non-now last modified only in a few cases.
+                // Set caching headers
 
-                    response.setResourceCaching(resource.lastModified, 0)
+                // NOTE: Algorithm is that XFOutputControl currently passes either -1 or the last modified of the
+                // resource if "fast" to obtain last modified ("oxf:" or "file:"). Would be nice to do better: pass
+                // whether resource is cacheable or not; here, when dereferencing the resource, we get the last
+                // modified (Last-Modified header from HTTP even) and store it. Then we can handle conditional get.
+                // This is some work though. Might have to proxy conditional GET as well. So for now we don't
+                // handle conditional GET and produce a non-now last modified only in a few cases.
 
-                    if (resource.size >= 0)
-                        response.setContentLength(resource.size.asInstanceOf[Int]) // Q: Why does this API (and Servlet counterpart) take an int?
+                response.setResourceCaching(resource.lastModified, 0)
 
-                    // TODO: for Safari, try forcing application/octet-stream
-                    // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
-                    response.setContentType(Option(resource.contentType) getOrElse "application/octet-stream")
+                if (resource.size >= 0)
+                    response.setContentLength(resource.size.asInstanceOf[Int]) // Q: Why does this API (and Servlet counterpart) take an int?
 
-                    // File name visible by the user
-                    val contentFilename = Option(resource.filename) getOrElse filename
+                // TODO: for Safari, try forcing application/octet-stream
+                // NOTE: IE 6/7 don't display a download box when detecting an HTML document (known IE bug)
+                response.setContentType(resource.contentType getOrElse "application/octet-stream")
 
-                    // Handle as attachment
-                    // TODO: should try to provide extension based on mediatype if file name is not provided?
-                    // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
-                    response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, "UTF-8"))
+                // File name visible by the user
+                val contentFilename = resource.filename getOrElse filenameFromRequest
 
-                    // Copy stream out
-                    try {
-                        val connection = resource.url.openConnection
+                // Handle as attachment
+                // TODO: should try to provide extension based on mediatype if file name is not provided?
+                // TODO: filename should be encoded somehow, as 1) spaces don't work and 2) non-ISO-8859-1 won't work
+                response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(contentFilename, "UTF-8"))
 
-                        // Set outgoing headers
-                        for {
-                            (name, values) ← resource.headers
-                            value          ← values
-                        } connection.addRequestProperty(name, value)
+                // Copy stream out
+                try {
+                    val connection = resource.url.openConnection
 
-                        copyStream(connection.getInputStream, response.getOutputStream)
-                    } catch {
-                        case e: Exception ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(e)))
-                    }
-                } else {
-                    // Not found
-                    response.setStatus(ExternalContext.SC_NOT_FOUND)
-                }
-            }
-        } else {
-            // CSS or JavaScript resource requested
-            val isCSS = filename.endsWith(".css")
-            val isJS = filename.endsWith(".js")
+                    // Set outgoing headers
+                    for { (name, values) ← resource.headers; value ← values }
+                        connection.addRequestProperty(name, value)
 
-            // Eliminate funny requests
-            if (! isCSS && ! isJS) {
-                response.setStatus(ExternalContext.SC_NOT_FOUND)
-                return
-            }
-            val isMinimal = false
-            val resources =
-                if (filename.startsWith("orbeon-")) {
-                    // New hash-based mechanism
-                    val resourcesHash = filename.substring("orbeon-".length, filename.lastIndexOf("."))
-                    val cacheElement = Caches.resourcesCache.get(resourcesHash)
-                    if (cacheElement ne null) {
-                        // Mapping found
-                        val resourcesStrings = cacheElement.getValue.asInstanceOf[Array[String]].toList
-                        resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
-                    } else {
-                        // Not found, either because the hash is invalid, or because the cache lost the mapping
-                        response.setStatus(ExternalContext.SC_NOT_FOUND)
-                        return
-                    }
-                } else {
-                    response.setStatus(ExternalContext.SC_NOT_FOUND)
-                    return
-                }
-
-            // Get last modified date
-            val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resources, isMinimal)
-
-            // Set Last-Modified, required for caching and conditional get
-            if (URLRewriterUtils.isResourcesVersioned)
-                // Use expiration far in the future
-                response.setResourceCaching(combinedLastModified, combinedLastModified + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
-            else
-                // Use standard expiration policy
-                response.setResourceCaching(combinedLastModified, 0)
-
-            // Check If-Modified-Since and don't return content if condition is met
-            if (! response.checkIfModifiedSince(combinedLastModified, false)) {
-                response.setStatus(ExternalContext.SC_NOT_MODIFIED)
-                return
-            }
-
-            response.setContentType(if (isCSS) "text/css" else "application/x-javascript")
-
-            def debugParameters = Seq("request path" → requestPath)
-
-            if (XFormsProperties.isCacheCombinedResources) {
-                // Caching requested
-                val resourceFile = XFormsResourceRewriter.cacheResources(resources, requestPath, combinedLastModified, isCSS, isMinimal)
-                if (resourceFile ne null) {
-                    // Caching could take place, send out cached result
-                    debug("serving from cache ", debugParameters)
-                    copyStream(new FileInputStream(resourceFile), response.getOutputStream)
-                } else {
-                    // Was unable to cache, just serve
-                    debug("caching requested but not possible, serving directly", debugParameters)
-                    useAndClose(response.getOutputStream) { os ⇒
-                        XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal)
-                    }
+                    copyStream(connection.getInputStream, response.getOutputStream)
+                } catch {
+                    case e: Exception ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(e)))
                 }
             } else {
-                // Should not cache, just serve
-                debug("caching not requested, serving directly", debugParameters)
+                // Not found
+                response.setStatus(SC_NOT_FOUND)
+            }
+        }
+    }
+
+    private def serveCSSOrJavaScript(requestPath: String)(implicit externalContext: ExternalContext): Unit = {
+
+        val filenameFromRequest = filename(requestPath)
+
+        val isCSS = filenameFromRequest endsWith ".css"
+        val isJS  = filenameFromRequest endsWith ".js"
+
+        val response = externalContext.getResponse
+
+        // Eliminate funny requests
+        if (! isCSS && ! isJS) {
+            response.setStatus(SC_NOT_FOUND)
+            return
+        }
+
+        val resources =
+            if (filenameFromRequest.startsWith("orbeon-")) {
+                // New hash-based mechanism
+                val resourcesHash = filenameFromRequest.substring("orbeon-".length, filenameFromRequest.lastIndexOf("."))
+                val cacheElement = Caches.resourcesCache.get(resourcesHash)
+                if (cacheElement ne null) {
+                    // Mapping found
+                    val resourcesStrings = cacheElement.getValue.asInstanceOf[Array[String]].toList
+                    resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
+                } else {
+                    // Not found, either because the hash is invalid, or because the cache lost the mapping
+                    response.setStatus(SC_NOT_FOUND)
+                    return
+                }
+            } else {
+                response.setStatus(SC_NOT_FOUND)
+                return
+            }
+
+        val isMinimal = false
+
+        // Get last modified date
+        val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resources, isMinimal)
+
+        // Set Last-Modified, required for caching and conditional get
+        if (URLRewriterUtils.isResourcesVersioned)
+            // Use expiration far in the future
+            response.setResourceCaching(combinedLastModified, combinedLastModified + ResourceServer.ONE_YEAR_IN_MILLISECONDS)
+        else
+            // Use standard expiration policy
+            response.setResourceCaching(combinedLastModified, 0)
+
+        // Check If-Modified-Since and don't return content if condition is met
+        if (! response.checkIfModifiedSince(combinedLastModified, false)) {
+            response.setStatus(SC_NOT_MODIFIED)
+            return
+        }
+
+        response.setContentType(if (isCSS) "text/css" else "application/x-javascript")
+
+        def debugParameters = Seq("request path" → requestPath)
+
+        if (XFormsProperties.isCacheCombinedResources) {
+            // Caching requested
+            val resourceFile = XFormsResourceRewriter.cacheResources(resources, requestPath, combinedLastModified, isCSS, isMinimal)
+            if (resourceFile ne null) {
+                // Caching could take place, send out cached result
+                debug("serving from cache ", debugParameters)
+                copyStream(new FileInputStream(resourceFile), response.getOutputStream)
+            } else {
+                // Was unable to cache, just serve
+                debug("caching requested but not possible, serving directly", debugParameters)
                 useAndClose(response.getOutputStream) { os ⇒
                     XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal)
                 }
+            }
+        } else {
+            // Should not cache, just serve
+            debug("caching not requested, serving directly", debugParameters)
+            useAndClose(response.getOutputStream) { os ⇒
+                XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal)
             }
         }
     }
@@ -184,20 +193,17 @@ object XFormsResourceServer {
     val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
     val DynamicResourcesPath       = "/xforms-server/dynamic/"
 
-    def getIndentedLogger = Loggers.getIndentedLogger("resources")
+    implicit def indentedLogger = Loggers.getIndentedLogger("resources")
 
-    /**
-     * Transform an URI accessible from the server into a URI accessible from the client. The mapping expires with the
-     * session.
-     *
-     * @param uri               server URI to transform
-     * @param filename          file name
-     * @param contentType       type of the content referred to by the URI, or null if unknown
-     * @param lastModified      last modification timestamp
-     * @param headers           connection headers
-     * @return                  client URI
-     */
-    def proxyURI(indentedLogger: IndentedLogger, uri: String, filename: String, contentType: String, lastModified: Long, headers: Map[String, Array[String]], headersToForward: String): String = {
+    // Transform an URI accessible from the server into a URI accessible from the client.
+    // The mapping expires with the session.
+    def proxyURI(
+        uri: String,
+        filename: Option[String],
+        contentType: Option[String],
+        lastModified: Long,
+        headers: Map[String, Array[String]],
+        headersToForward: Option[String])(implicit logger: IndentedLogger): String = {
 
         // Create a digest, so that for a given URI we always get the same key
         val digest = SecureUtils.digestString(uri, "hex")
@@ -214,7 +220,7 @@ object XFormsResourceServer {
             }
 
             // Store mapping into session
-            val outgoingHeaders = Connection.buildConnectionHeaders(url.getProtocol, None, headers, Option(headersToForward))(indentedLogger)
+            val outgoingHeaders = Connection.buildConnectionHeaders(url.getProtocol, None, headers, headersToForward)(logger)
             session.getAttributesMap(APPLICATION_SCOPE).put(DynamicResourcesSessionKey + digest, DynamicResource(url, filename, contentType, -1, lastModified, outgoingHeaders))
         }
 
@@ -222,9 +228,16 @@ object XFormsResourceServer {
         DynamicResourcesPath + digest
     }
 
+    // For Java callers
+    def jProxyURI(uri: String, contentType: String) =
+        proxyURI(uri, None, Option(contentType), -1, Map(), None)(null)
+
     // For unit tests only (called from XSLT)
     def testGetResources(key: String)  =
         Option(Caches.resourcesCache.get(key)) map (_.getValue.asInstanceOf[Array[String]]) orNull
 
-    case class DynamicResource(url: URL, filename: String, contentType: String, size: Long, lastModified: Long, headers: Map[String, Array[String]])
+    // Information about the resource, stored into the session
+    case class DynamicResource(url: URL, filename: Option[String], contentType: Option[String], size: Long, lastModified: Long, headers: Map[String, Array[String]])
+
+    private def filename(requestPath: String) = requestPath.substring(requestPath.lastIndexOf('/') + 1)
 }

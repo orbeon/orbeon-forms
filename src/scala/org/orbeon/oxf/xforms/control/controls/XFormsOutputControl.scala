@@ -87,11 +87,11 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
                 // Download appearance
                 // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
-                proxyValueIfNeeded(internalValue, "", filename, Option(fileMediatype) orElse mediatypeAttribute orNull)
+                proxyValueIfNeeded(internalValue, "", Option(filename), Option(fileMediatype) orElse mediatypeAttribute)
             } else if (mediatypeAttribute exists (_.startsWith("image/"))) {
                 // Image mediatype
                 // Use dummy image as default value so that client always has something to load
-                proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, mediatypeAttribute.get)
+                proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, Option(filename), mediatypeAttribute)
             } else if (mediatypeAttribute exists (_ == "text/html")) {
                 // HTML mediatype
                 internalValue
@@ -121,7 +121,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         }
     }
 
-    private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: String, mediatype: String): String =
+    private def proxyValueIfNeeded(internalValue: String, defaultValue: String, filename: Option[String], mediatype: Option[String]): String =
         try {
             // If the value is a file:, we make sure it is signed before returning it
             def hmacValueOrDefault(initial: String, value: ⇒ String, default: ⇒ String) =
@@ -131,7 +131,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                     value
 
             def doProxyURI(uri: String, lastModified: Long) =
-                proxyURI(getIndentedLogger, uri, filename, mediatype, lastModified, evaluatedHeaders, XFormsProperties.getForwardSubmissionHeaders(containingDocument))
+                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument)))(getIndentedLogger)
 
             val typeName = getBuiltinTypeName
 

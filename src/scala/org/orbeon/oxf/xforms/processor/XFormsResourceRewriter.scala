@@ -150,7 +150,7 @@ object XFormsResourceRewriter extends Logging {
 
     def cacheResources(resources: Seq[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {
 
-        implicit val indentedLogger = XFormsResourceServer.getIndentedLogger
+        implicit val indentedLogger = XFormsResourceServer.indentedLogger
         val rm = ResourceManagerWrapper.instance
         
         Option(rm.getRealPath(resourcePath)) match {

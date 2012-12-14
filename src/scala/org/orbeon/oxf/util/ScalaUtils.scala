@@ -34,6 +34,7 @@ object ScalaUtils {
     type Writable[T] = {
         def close()
         def write(cbuf: Array[T], off: Int, len: Int)
+        def flush()
     }
 
     // Copy a stream, with optional progress callback
@@ -66,6 +67,7 @@ object ScalaUtils {
                     progress(read)
                     out.write(buffer, 0, read)
                 }
+                out.flush()
             }
         }
     }

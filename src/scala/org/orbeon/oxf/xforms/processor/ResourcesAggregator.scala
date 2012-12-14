@@ -21,7 +21,6 @@ import net.sf.ehcache.{Element ⇒ EhElement }
 import org.orbeon.oxf.common.Version
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.util._
-import scala.collection.JavaConverters._
 import org.orbeon.oxf.processor._
 import collection.mutable.{Buffer, LinkedHashSet}
 import org.orbeon.oxf.xforms._
@@ -283,7 +282,7 @@ object ResourcesAggregator {
             val resourcesHash = SecureUtils.digestString(itemsToHash mkString "|", "hex")
 
             // Cache mapping so that resource can be served by oxf:resource-server
-            Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is serializable and usable from Java
+            Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is compact, serializable and usable from Java
 
             // Output link to resource
             val path = "" :: "xforms-server" ::
@@ -298,8 +297,8 @@ object ResourcesAggregator {
 
                 assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
 
-                val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig.asJava, isMinimal = false)
-                XFormsResourceRewriter.cacheResources(resourcesConfig.asJava, path, combinedLastModified, isCSS, isMinimal = false)
+                val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, isMinimal = false)
+                XFormsResourceRewriter.cacheResources(resourcesConfig, path, combinedLastModified, isCSS, isMinimal = false)
             }
 
             Some(result)

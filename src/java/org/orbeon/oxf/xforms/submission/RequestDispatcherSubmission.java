@@ -142,7 +142,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         // in that case
 
         // Headers
-        final Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
+        final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
         final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
 
         final String submissionEffectiveId = submission.getEffectiveId();
@@ -209,7 +209,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                                                             byte[] messageBody,
                                                             String queryString,
                                                             String headerNames,
-                                                            Map<String, String[]> customHeaderNameValues) {
+                                                            scala.collection.immutable.Map<String, String[]> customHeaderNameValues) {
 
         // NOTE: This code does custom rewriting of the path on the action, taking into account whether
         // the page was produced through a filter in separate deployment or not.

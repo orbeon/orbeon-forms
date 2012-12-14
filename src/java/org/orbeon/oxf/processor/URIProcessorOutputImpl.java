@@ -385,11 +385,11 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
 
                 // Open connection
                 final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
-                final Map<String, String[]> headers =
+                final scala.collection.immutable.Map<String, String[]> headers =
                     Connection.jBuildConnectionHeaders(submissionURL.getProtocol(), credentials, null, headersToForward, indentedLogger);
 
                 final ConnectionResult connectionResult
-                    = Connection.apply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
+                    = Connection.jApply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
 
                 // Throw if connection failed (this is caught by the caller)
                 if (connectionResult.statusCode != 200)

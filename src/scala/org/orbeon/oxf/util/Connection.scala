@@ -260,10 +260,10 @@ object Connection extends Logging {
     val TokenKey = "orbeon-token"
     val AuthorizationHeader = "Authorization"
 
+    val EmptyHeaders = Map.empty[String, Array[String]]
+
     private val HttpForwardCookiesProperty = "oxf.http.forward-cookies"
     private val HttpForwardHeadersProperty = "oxf.http.forward-headers"
-
-    private val EmptyHeaders = Map.empty[String, Array[String]]
 
     case class Credentials(username: String, password: String, preemptiveAuthentication: String, domain: String) {
         assert(username ne null)
@@ -279,34 +279,41 @@ object Connection extends Logging {
     // Whether the scheme is http: or https:
     def isHTTPOrHTTPS(scheme: String) = Set("http", "https")(scheme)
 
+    // Build all the connection headers
+    def buildConnectionHeaders(
+            scheme: String,
+            credentials: Option[Credentials],
+            headers: Map[String, Array[String]],
+            headersToForward: Option[String])(logger: IndentedLogger): Map[String, Array[String]] =
+        if (requiresHeaders(scheme))
+            buildConnectionHeaders(credentials, headers, headersToForward)(logger)
+        else
+            EmptyHeaders
+
     // For Java callers
     def jBuildConnectionHeaders(
             scheme: String,
             credentialsOrNull: Credentials,
             headersOrNull: JMap[String, Array[String]],
             headersToForward: String,
-            logger: IndentedLogger): JMap[String, Array[String]] =
-        if (requiresHeaders(scheme)) {
-            val headers = Option(headersOrNull) map (_.asScala.toMap) getOrElse EmptyHeaders
-            buildConnectionHeaders(Option(credentialsOrNull), headers, Option(headersToForward))(logger).asJava
-        } else
-            EmptyHeaders.asJava
+            logger: IndentedLogger): Map[String, Array[String]] =
+        buildConnectionHeaders(scheme, Option(credentialsOrNull), Option(headersOrNull) map (_.asScala.toMap) getOrElse EmptyHeaders, Option(headersToForward))(logger)
 
     // For Java callers
-    def jBuildConnectionHeadersWithSOAP(
+    def buildConnectionHeadersWithSOAP(
             httpMethod: String,
             credentialsOrNull: Credentials,
             mediatype: String,
             encodingForSOAP: String,
-            headersOrNull: JMap[String, Array[String]],
+            headersOrNull: Map[String, Array[String]],
             headersToForward: String,
-            logger: IndentedLogger): JMap[String, Array[String]] = {
+            logger: IndentedLogger): Map[String, Array[String]] = {
 
         // "If a header element defines the Content-Type header, then this setting overrides a Content-type set by the
         // mediatype attribute"
         val headersWithContentType = {
 
-            val headers = Option(headersOrNull) map (_.asScala.toMap) getOrElse EmptyHeaders
+            val headers = Option(headersOrNull) map (_.toMap) getOrElse EmptyHeaders
 
             if (requiresRequestBody(httpMethod) && ! headers.contains("content-type"))
                 headers + ("content-type" → Array(mediatype ensuring (_ ne null)))
@@ -320,16 +327,16 @@ object Connection extends Logging {
         // NOTE: SOAP processing overrides Content-Type in the case of a POST
         // So we have: @serialization → @mediatype →  xf:header → SOAP
         buildConnectionHeaders(Option(credentialsOrNull), headersWithContentType, Option(headersToForward))(logger) ++
-            soapHeaders(httpMethod, soapMediatypeWithContentType, encodingForSOAP)(logger) asJava
+            soapHeaders(httpMethod, soapMediatypeWithContentType, encodingForSOAP)(logger)
     }
 
     // For Java callers
-    def apply(
+    def jApply(
             httpMethod: String,
             connectionURL: URL,
             credentialsOrNull: Credentials,
             messageBodyOrNull: Array[Byte],
-            headers: JMap[String, Array[String]],
+            headers: Map[String, Array[String]],
             loadState: Boolean,
             logBody: Boolean,
             logger: IndentedLogger): Connection = {
@@ -337,7 +344,7 @@ object Connection extends Logging {
         val messageBody: Option[Array[Byte]] =
             if (requiresRequestBody(httpMethod)) Option(messageBodyOrNull) orElse Some(Array()) else None
 
-        apply(httpMethod, connectionURL, Option(credentialsOrNull), messageBody, headers.asScala, loadState, logBody)(logger)
+        apply(httpMethod, connectionURL, Option(credentialsOrNull), messageBody, headers, loadState, logBody)(logger)
     }
 
     // Create a new Connection

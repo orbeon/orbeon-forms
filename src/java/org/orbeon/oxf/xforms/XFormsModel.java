@@ -666,11 +666,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
             final URL absoluteResolvedURL = URLFactory.createURL(absoluteURLString);
 
-            final Map<String, String[]> headers =
+            final scala.collection.immutable.Map<String, String[]> headers =
                 Connection.jBuildConnectionHeaders(absoluteResolvedURL.getProtocol(), instance.credentialsOrNull(), null,
-                    XFormsProperties.getForwardSubmissionHeaders(containingDocument), indentedLogger);
+                        XFormsProperties.getForwardSubmissionHeaders(containingDocument), indentedLogger);
 
-            final ConnectionResult connectionResult = Connection.apply(
+            final ConnectionResult connectionResult = Connection.jApply(
                 "GET", absoluteResolvedURL, instance.credentialsOrNull(), null,
                 headers, true, BaseSubmission.isLogBody(), indentedLogger).connect(true);
 

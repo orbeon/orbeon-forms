@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,11 +120,11 @@ public class XHTMLToPDFProcessor extends HttpBinarySerializer {// TODO: HttpBina
                     final IndentedLogger indentedLogger = new IndentedLogger(logger, "");
 
                     final URL url = URLFactory.createURL(resolvedURI);
-                    final Map<String, String[]> headers =
+                    final scala.collection.immutable.Map<String, String[]> headers =
                         Connection.jBuildConnectionHeaders(url.getProtocol(), null, explicitHeaders, Connection.getForwardHeaders(), indentedLogger);
 
                     final ConnectionResult connectionResult =
-                        Connection.apply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);
+                        Connection.jApply("GET", url, null, null, headers, true, false, indentedLogger).connect(true);
 
                     if (connectionResult.statusCode != 200) {
                         connectionResult.close();

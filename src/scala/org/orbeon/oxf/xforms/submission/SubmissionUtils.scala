@@ -63,21 +63,18 @@ object SubmissionUtils {
     private def getHeadersToForward(containingDocument: XFormsContainingDocument) =
         Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument))
 
-    def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): JMap[String, Array[String]] = {
+    def evaluateHeaders(submission: XFormsModelSubmission, forwardClientHeaders: Boolean): Map[String, Array[String]] = {
         try {
             val headersToForward =
                 clientHeadersToForward(submission.containingDocument.getRequestHeaders, forwardClientHeaders)
 
-            val newHeaders =
-                Headers.evaluateHeaders(
-                    submission.container,
-                    submission.getModel.getContextStack,
-                    submission.getEffectiveId,
-                    submission.getSubmissionElement,
-                    headersToForward
-                )
-
-            newHeaders asJava
+            Headers.evaluateHeaders(
+                submission.container,
+                submission.getModel.getContextStack,
+                submission.getEffectiveId,
+                submission.getSubmissionElement,
+                headersToForward
+            )
 
         } catch {
             case e: OXFException ⇒ throw new XFormsSubmissionException(submission, e, e.getMessage, "processing <header> elements")

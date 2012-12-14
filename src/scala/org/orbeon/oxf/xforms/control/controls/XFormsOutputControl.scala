@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import collection.JavaConverters._
-import java.util.Collections
-import java.util.{Map ⇒ JMap}
 import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
 import org.dom4j.QName
@@ -111,16 +109,15 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     // Keep public for unit tests
-    def evaluatedHeaders: JMap[String, Array[String]] = {
+    def evaluatedHeaders: Map[String, Array[String]] = {
         // TODO: pass BindingContext directly
         getContextStack.setBinding(bindingContext)
         val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
-        try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward).asJava
+        try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward)
         catch {
-            case e: Exception ⇒ {
+            case e: Exception ⇒
                 XFormsError.handleNonFatalXPathError(container, e)
-                Collections.emptyMap()
-            }
+                Map()
         }
     }
 

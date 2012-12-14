@@ -896,11 +896,11 @@ public class URLGenerator extends ProcessorImpl {
                     new Connection.Credentials(config.getUsername(), config.getPassword(), config.isPreemptiveAuthentication() ? "true" : "false", config.getDomain());
 
                 final URL url = config.getURL();
-                final Map<String, String[]> headers =
+                final scala.collection.immutable.Map<String, String[]> headers =
                     Connection.jBuildConnectionHeaders(url.getProtocol(), credentials, newHeaders, config.getForwardHeaders(), indentedLogger);
 
                 connectionResult =
-                    Connection.apply("GET", url, credentials, null, headers, true, false, indentedLogger).connect(true);
+                    Connection.jApply("GET", url, credentials, null, headers, true, false, indentedLogger).connect(true);
                 inputStream =
                     connectionResult.getResponseInputStream(); // empty stream if conditional GET succeeded
             }

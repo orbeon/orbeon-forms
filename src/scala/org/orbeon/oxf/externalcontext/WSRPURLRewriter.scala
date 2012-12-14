@@ -13,16 +13,16 @@
  */
 package org.orbeon.oxf.externalcontext
 
+import URLRewriter._
+import WSRPURLRewriter._
+import java.net.URL
+import java.net.URLEncoder
+import java.util.concurrent.Callable
+import java.util.{List ⇒ JList}
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.URLRewriterUtils
-import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DYNAMIC_RESOURCES_PATH
-import java.net.URL
-import java.net.URLEncoder
-import java.util.{List ⇒ JList}
-import java.util.concurrent.Callable
-import WSRPURLRewriter._
-import URLRewriter._
+import org.orbeon.oxf.xforms.processor.XFormsResourceServer.DynamicResourcesPath
 
 // This URL rewriter rewrites URLs using the WSRP encoding
 class WSRPURLRewriter(
@@ -100,7 +100,7 @@ class WSRPURLRewriter(
 
     def rewriteResourceURL(urlString: String, wsrpEncodeResources: Boolean): String = {
         // Always encode dynamic resources
-        if (wsrpEncodeResources || urlString == "/xforms-server" || urlString.startsWith(DYNAMIC_RESOURCES_PATH)) {
+        if (wsrpEncodeResources || urlString == "/xforms-server" || urlString.startsWith(DynamicResourcesPath)) {
             // First rewrite path to support versioned resources
             val rewrittenPath = URLRewriterUtils.rewriteResourceURL(request, urlString, getPathMatchers, REWRITE_MODE_ABSOLUTE_PATH_NO_CONTEXT)
 

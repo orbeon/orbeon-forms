@@ -31,7 +31,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
     @Test def forwardHeaders(): Unit = {
         
         // Custom headers
-        val customHeaderValuesMap = mutable.LinkedHashMap(
+        val customHeaderValuesMap = Map(
             "my-stuff"   → Array("my-value"),
             "your-stuff" → Array("your-value-1", "your-value-2")
         )
@@ -56,7 +56,7 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         // NOTE: Should instead use withExternalContext()
         PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)
         val headers =
-            Connection.jBuildConnectionHeadersWithSOAP("GET", null, null, "UTF-8", customHeaderValuesMap.asJava,
+            Connection.buildConnectionHeadersWithSOAP("GET", null, null, "UTF-8", customHeaderValuesMap,
             "cookie authorization user-agent", ResourceManagerTestBase.newIndentedLogger)
 
         val request = new LocalRequest(externalContext, null, "/orbeon", "/foo/bar", "GET", headers)
@@ -83,10 +83,10 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         // POST configuration
         val method = "POST"
         val bodyMediaType = "application/x-www-form-urlencoded"
-        val explicitHeaders = mutable.LinkedHashMap[String, Array[String]]("content-type" → Array(bodyMediaType)).asJava
+        val explicitHeaders = Map("content-type" → Array(bodyMediaType))
 
         val headers =
-            Connection.jBuildConnectionHeadersWithSOAP(method, null, bodyMediaType, "UTF-8", explicitHeaders, "",
+            Connection.buildConnectionHeadersWithSOAP(method, null, bodyMediaType, "UTF-8", explicitHeaders, "",
             ResourceManagerTestBase.newIndentedLogger)
 
         val wrapper =

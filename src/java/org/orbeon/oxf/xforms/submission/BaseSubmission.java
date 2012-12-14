@@ -130,7 +130,7 @@ public abstract class BaseSubmission implements Submission {
                                                    byte[] messageBody,
                                                    String queryString,
                                                    String headerNames,
-                                                   Map<String, String[]> customHeaderNameValues,
+                                                   scala.collection.immutable.Map<String, String[]> customHeaderNameValues,
                                                    SubmissionProcess submissionProcess,
                                                    boolean isContextRelative,
                                                    boolean isDefaultContext) {
@@ -151,8 +151,8 @@ public abstract class BaseSubmission implements Submission {
             final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
 
             // Determine headers
-            final Map<String, String[]> headers =
-                Connection.jBuildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
+            final scala.collection.immutable.Map<String, String[]> headers =
+                Connection.buildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
 
             // Create requestAdapter depending on method
             final LocalRequest requestAdapter;

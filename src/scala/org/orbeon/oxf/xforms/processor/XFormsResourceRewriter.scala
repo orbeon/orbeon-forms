@@ -37,7 +37,7 @@ object XFormsResourceRewriter extends Logging {
      * @param isCSS                 whether to generate CSS or JavaScript resources
      * @param isMinimal             whether to use minimal resources
      */
-    def generate(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
+    def generate(logger: IndentedLogger, resources: Seq[ResourceConfig], os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
         if (isCSS)
             generateCSS(logger, resources, os, isMinimal)
         else
@@ -47,7 +47,7 @@ object XFormsResourceRewriter extends Logging {
         os.close()
     }
 
-    private def generateCSS(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateCSS(logger: IndentedLogger, resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
 
         val response = NetUtils.getExternalContext.getResponse
         val outputWriter = new OutputStreamWriter(os, "utf-8")
@@ -63,7 +63,7 @@ object XFormsResourceRewriter extends Logging {
         // Output Orbeon Forms version
         outputWriter.write("/* This file was produced by " + Version.VersionString + " */\n")
 
-        for (resource ← resources.asScala) {
+        for (resource ← resources) {
             val resourcePath = resource.getResourcePath(isMinimal)
 
             // Read CSS into a string
@@ -115,13 +115,13 @@ object XFormsResourceRewriter extends Logging {
         r.replaceAllIn(css, e ⇒ (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
     }
 
-    private def generateJS(logger: IndentedLogger, resources: JList[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateJS(logger: IndentedLogger, resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
         outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
         outputWriter.flush()
 
-        for (resourceConfig ← resources.asScala) {
+        for (resourceConfig ← resources) {
             useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is ⇒
                 NetUtils.copyStream(is, os)
             }
@@ -129,8 +129,11 @@ object XFormsResourceRewriter extends Logging {
         }
     }
 
+    def jComputeCombinedLastModified(resources: JList[ResourceConfig], isMinimal: Boolean) =
+        computeCombinedLastModified(resources.asScala, isMinimal)
+
     // Compute the last modification date of the given resources.
-    def computeCombinedLastModified(resources: JList[ResourceConfig], isMinimal: Boolean): Long = {
+    def computeCombinedLastModified(resources: Seq[ResourceConfig], isMinimal: Boolean): Long = {
 
         val rm = ResourceManagerWrapper.instance
 
@@ -139,10 +142,13 @@ object XFormsResourceRewriter extends Logging {
             try rm.lastModified(r.getResourcePath(isMinimal), false)
             catch { case _: Throwable ⇒ 0L }
 
-        if (resources.isEmpty) 0L else resources.asScala map lastModified max
+        if (resources.isEmpty) 0L else resources map lastModified max
     }
 
-    def cacheResources(resources: JList[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {
+    def jCacheResources(resources: JList[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean) =
+        cacheResources(resources.asScala, resourcePath, combinedLastModified, isCSS, isMinimal)
+
+    def cacheResources(resources: Seq[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {
 
         implicit val indentedLogger = XFormsResourceServer.getIndentedLogger
         val rm = ResourceManagerWrapper.instance

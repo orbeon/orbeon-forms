@@ -50,18 +50,18 @@ public class RegularSubmission extends BaseSubmission {
         final IndentedLogger detailsLogger = getDetailsLogger(p, p2);
 
         // Headers
-        final Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
+        final scala.collection.immutable.Map<String, String[]> customHeaderNameValues = SubmissionUtils.evaluateHeaders(submission, p.isReplaceAll);
         final String headersToForward = XFormsProperties.getForwardSubmissionHeaders(containingDocument);
 
-        final Map<String, String[]> headers =
-            Connection.jBuildConnectionHeadersWithSOAP(p.actualHttpMethod, p2.credentials, sp.actualRequestMediatype,
-            p2.encoding, customHeaderNameValues, headersToForward, detailsLogger);
+        final scala.collection.immutable.Map<String, String[]> headers =
+            Connection.buildConnectionHeadersWithSOAP(p.actualHttpMethod, p2.credentials, sp.actualRequestMediatype,
+                    p2.encoding, customHeaderNameValues, headersToForward, detailsLogger);
 
         final String submissionEffectiveId = submission.getEffectiveId();
 
         // Prepare Connection in this thread as async submission can't access the request object
         final Connection connection =
-            Connection.apply(p.actualHttpMethod, absoluteResolvedURL,
+            Connection.jApply(p.actualHttpMethod, absoluteResolvedURL,
                 p2.credentials, sp.messageBody, headers, true, isLogBody(), detailsLogger);
 
         // Pack external call into a Callable so it can be run:

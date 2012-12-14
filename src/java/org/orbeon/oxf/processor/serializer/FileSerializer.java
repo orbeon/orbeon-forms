@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
+import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.processor.XFormsResourceServer;
@@ -35,7 +36,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 
 /**
  * The File Serializer serializes text and binary documents to files on disk.
@@ -320,7 +320,7 @@ public class FileSerializer extends ProcessorImpl {
                     {
                         final String localURL = ((DiskFileItem) fileItem).getStoreLocation().toURI().toString();
                         if ("session".equals(config.getScope()) && config.isProxyResult())
-                            resultURL = XFormsResourceServer.proxyURI(null, localURL, null, config.getRequestedContentType(), -1, Collections.<String, String[]>emptyMap(), null);
+                            resultURL = XFormsResourceServer.proxyURI(null, localURL, null, config.getRequestedContentType(), -1, Connection.EmptyHeaders(), null);
                         else
                             resultURL = localURL;
                     }

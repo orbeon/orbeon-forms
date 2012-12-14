@@ -32,7 +32,7 @@ object Headers {
      */
     def evaluateHeaders(xblContainer: XBLContainer, contextStack: XFormsContextStack,
                         sourceEffectiveId: String, enclosingElement: Element,
-                        initialHeaders: Map[String, Array[String]]): collection.Map[String, Array[String]] = {
+                        initialHeaders: Map[String, Array[String]]): Map[String, Array[String]] = {
 
         val fullPrefix = xblContainer.getFullPrefix
 
@@ -106,7 +106,7 @@ object Headers {
 
                 contextStack.popBinding()
             }
-            headerNameValues
+            headerNameValues.toMap
         } else
             initialHeaders
     }

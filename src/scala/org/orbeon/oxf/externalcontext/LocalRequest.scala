@@ -34,12 +34,12 @@ class LocalRequest(
         pathQuery: String,
         method: String,
         messageBodyOrNull: Array[Byte],
-        headers: JMap[String, Array[String]]) // primary constructor simulates a POST or a PUT
+        headers: Map[String, Array[String]]) // primary constructor simulates a POST or a PUT
     extends RequestWrapper(externalContext.getRequest) {
 
     require(StringUtils.isAllUpperCase(method))
 
-    private val contentType = headers.asScala.get("content-type") flatMap (_.lift(0)) getOrElse "application/octet-stream"
+    private val contentType = headers.get("content-type") flatMap (_.lift(0)) getOrElse "application/octet-stream"
     private val messageBody = Option(messageBodyOrNull) getOrElse Array[Byte]()
 
     // Add content-length for POST/PUT
@@ -50,7 +50,7 @@ class LocalRequest(
         else
             Seq()
 
-    private val headerValuesMap = headers.asScala ++ bodyHeaders asJava
+    private val headerValuesMap = headers ++ bodyHeaders asJava
 
     // Secondary constructor simulates a GET or a DELETE
     def this(
@@ -59,7 +59,7 @@ class LocalRequest(
             contextPath: String,
             pathQuery: String,
             method: String,
-            headers: JMap[String, Array[String]]) =
+            headers: Map[String, Array[String]]) =
         this(externalContext, indentedLogger, contextPath, pathQuery, method, null, headers)
 
     private lazy val queryString = {

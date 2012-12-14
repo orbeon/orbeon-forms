@@ -342,6 +342,7 @@ button.btn-link {
 .xforms-dialog .fr-dialog-buttons {
   text-align: right;
   padding: 10px 5px 0 5px;
+  margin-top: 5px;
   border-top: 2px solid #ddddee;
   clear: both;
 }

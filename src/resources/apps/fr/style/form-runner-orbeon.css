@@ -357,8 +357,8 @@ textarea.xforms-invalid-visited {
   form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label {
     padding-left: 0;
   }
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-opened,
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-closed {
+  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-opened,
+  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
     background-image: none;
   }
 }

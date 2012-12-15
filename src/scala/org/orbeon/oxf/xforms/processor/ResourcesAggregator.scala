@@ -28,6 +28,7 @@ import org.dom4j.QName
 import org.apache.commons.lang3.StringUtils
 import ResourcesAggregator._
 import org.orbeon.oxf.externalcontext.URLRewriter
+import ScalaUtils._
 
 /**
  * Aggregate CSS and JS resources under <head>.
@@ -64,20 +65,23 @@ class ResourcesAggregator extends ProcessorImpl {
                         var currentInlineElement: InlineElement = _
 
                         // Resources gathered
-                        val baselineCSS = LinkedHashSet[String]()
-                        val baselineJS = LinkedHashSet[String]()
+                        val baselineCSS     = LinkedHashSet[String]()
+                        val baselineJS      = LinkedHashSet[String]()
                         val supplementalCSS = LinkedHashSet[String]()
-                        val supplementalJS = LinkedHashSet[String]()
+                        val supplementalJS  = LinkedHashSet[String]()
 
-                        val preservedCSS = Buffer[HeadElement]()
-                        val preservedJS = Buffer[HeadElement]()
+                        val preservedCSS    = Buffer[HeadElement]()
+                        val preservedJS     = Buffer[HeadElement]()
 
                         // Whether we are in separate deployment as in that case we don't combine paths to user resources
-                        val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(NetUtils.getExternalContext.getRequest)
+                        val request  = NetUtils.getExternalContext.getRequest
+                        val response = NetUtils.getExternalContext.getResponse
+                        val isSeparateDeployment = URLRewriterUtils.isSeparateDeployment(request)
 
                         // In this mode, resources are described in JSON within a <div>
-                        val request = NetUtils.getExternalContext.getRequest
-                        val isAsyncPortletLoad = request.getContainerType == "portlet" && XFormsProperties.isAsyncPortletLoad && request.getMethod == "GET" // limited to GET for now
+                        val isPortlet = request.getContainerType == "portlet"
+                        val namespaceOpt = isPortlet option response.getNamespacePrefix
+                        val isAsyncPortletLoad = isPortlet && XFormsProperties.isAsyncPortletLoad && request.getMethod == "GET" // limited to GET for now
                         val isMinimal = XFormsProperties.isMinimalResources
                         val isCacheCombinedResources = XFormsProperties.isCacheCombinedResources
                         val asyncPortletLoadScripts = if (isAsyncPortletLoad) XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimal)) else Array.empty[String]
@@ -158,7 +162,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
                                 // NOTE: oxf:xhtml-rewrite usually takes care of URL rewriting, but not in JSON content.
                                 // So we rewrite here.
-                                def rewritePath(path: String) = NetUtils.getExternalContext.getResponse.rewriteResourceURL(path, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
+                                def rewritePath(path: String) = response.rewriteResourceURL(path, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
 
                                 def appendJS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
                                 def appendCSS(path: String) = """{"src":"""" + rewritePath(path) + """"}"""
@@ -179,15 +183,15 @@ class ResourcesAggregator extends ProcessorImpl {
 //                                outputStuff(baselineJS, supplementalJS, preservedJS, false, appendJS, appendPreservedElement)
 
                                 builder append
-                                    (aggregate(baselineJS -- asyncPortletLoadScripts, appendJS, isCacheCombinedResources, isCSS = false) ++
-                                        aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, appendJS, isCacheCombinedResources, isCSS = false) ++
+                                    (aggregate(baselineJS -- asyncPortletLoadScripts, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
+                                        aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, appendJS, namespaceOpt, isCacheCombinedResources, isCSS = false) ++
                                             (preservedJS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
                                 
                                 builder append """],"styles":["""
 
                                 builder append
-                                    (aggregate(baselineCSS, appendCSS, isCacheCombinedResources, isCSS = true) ++
-                                        aggregate(supplementalCSS -- baselineCSS, appendCSS, isCacheCombinedResources, isCSS = true) ++
+                                    (aggregate(baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
+                                        aggregate(supplementalCSS -- baselineCSS, appendCSS, namespaceOpt, isCacheCombinedResources, isCSS = true) ++
                                             (preservedCSS flatMap (appendPreservedElement(_).toSeq)) mkString ",")
                                 
                                 builder append """]}"""
@@ -199,15 +203,15 @@ class ResourcesAggregator extends ProcessorImpl {
 
                             def outputCSS() = {
                                 val outputCSSElement = outputElement(resource ⇒ Array("rel", "stylesheet", "href", resource, "type", "text/css", "media", "all"), "link")(_)
-                                aggregate(baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
-                                aggregate(supplementalCSS -- baselineCSS, outputCSSElement, isCacheCombinedResources, isCSS = true)
+                                aggregate(baselineCSS, outputCSSElement, namespaceOpt, isCacheCombinedResources, isCSS = true)
+                                aggregate(supplementalCSS -- baselineCSS, outputCSSElement, namespaceOpt, isCacheCombinedResources, isCSS = true)
                                 preservedCSS foreach outputPreservedElement
                             }
 
                             def outputJS() = {
                                 val outputJSElement = outputElement(resource ⇒ Array("type", "text/javascript", "src", resource), "script")(_)
-                                aggregate(baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
-                                aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, outputJSElement, isCacheCombinedResources, isCSS = false)
+                                aggregate(baselineJS -- asyncPortletLoadScripts, outputJSElement, namespaceOpt, isCacheCombinedResources, isCSS = false)
+                                aggregate(supplementalJS -- baselineJS -- asyncPortletLoadScripts, outputJSElement, namespaceOpt, isCacheCombinedResources, isCSS = false)
                                 preservedJS foreach outputPreservedElement
                             }
 
@@ -271,7 +275,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
 object ResourcesAggregator {
     // Output combined resources
-    def aggregate[T](resources: scala.collection.Set[String], outputElement: String ⇒ T, isCacheCombinedResources: Boolean, isCSS: Boolean): Option[T] = {
+    def aggregate[T](resources: scala.collection.Set[String], outputElement: String ⇒ T, namespaceOpt: Option[String], isCacheCombinedResources: Boolean, isCSS: Boolean): Option[T] =
         if (resources.nonEmpty) {
             // If there is at least one non-platform path, we also hash the app version number
             val hasAppResource = resources exists (! URLRewriterUtils.isPlatformPath(_))
@@ -284,10 +288,14 @@ object ResourcesAggregator {
             // Cache mapping so that resource can be served by oxf:resource-server
             Caches.resourcesCache.put(new EhElement(resourcesHash, resources.toArray)) // use Array which is compact, serializable and usable from Java
 
+            // Extension and optional namespace parameter
+            def extension = if (isCSS) ".css" else ".js"
+            def namespace = namespaceOpt map ("?ns=" + _) getOrElse ""
+
             // Output link to resource
             val path = "" :: "xforms-server" ::
-                (if (URLRewriterUtils.isResourcesVersioned) List(Version.VersionNumber) else Nil) :::
-                "orbeon-" + resourcesHash + (if (isCSS) ".css" else ".js") :: Nil mkString "/"
+                (URLRewriterUtils.isResourcesVersioned list Version.VersionNumber) :::
+                "orbeon-" + resourcesHash + extension + namespace :: Nil mkString "/"
 
             val result = outputElement(path)
 
@@ -298,11 +306,10 @@ object ResourcesAggregator {
                 assert(resourcesConfig.head.getResourcePath(false) == resources.head) // set order is tricky so make sure order is kept
 
                 val combinedLastModified = XFormsResourceRewriter.computeCombinedLastModified(resourcesConfig, isMinimal = false)
-                XFormsResourceRewriter.cacheResources(resourcesConfig, path, combinedLastModified, isCSS, isMinimal = false)
+                XFormsResourceRewriter.cacheResources(resourcesConfig, path, namespaceOpt, combinedLastModified, isCSS, isMinimal = false)
             }
 
             Some(result)
         } else
             None
-    }
 }

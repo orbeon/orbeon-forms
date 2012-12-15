@@ -37,17 +37,17 @@ object XFormsResourceRewriter extends Logging {
      * @param isCSS                 whether to generate CSS or JavaScript resources
      * @param isMinimal             whether to use minimal resources
      */
-    def generate(logger: IndentedLogger, resources: Seq[ResourceConfig], os: OutputStream, isCSS: Boolean, isMinimal: Boolean): Unit = {
-        if (isCSS)
-            generateCSS(logger, resources, os, isMinimal)
-        else
-            generateJS(logger, resources, os, isMinimal)
+    def generate(resources: Seq[ResourceConfig], namespaceOpt: Option[String], os: OutputStream, isCSS: Boolean, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit =
+        useAndClose(os) { _ ⇒
+            if (isCSS)
+                generateCSS(resources, namespaceOpt, os, isMinimal)
+            else
+                generateJS(resources, os, isMinimal)
 
-        os.flush()
-        os.close()
-    }
+            os.flush()
+        }
 
-    private def generateCSS(logger: IndentedLogger, resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateCSS(resources: Seq[ResourceConfig], namespaceOpt: Option[String], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
 
         val response = NetUtils.getExternalContext.getResponse
         val outputWriter = new OutputStreamWriter(os, "utf-8")
@@ -74,28 +74,31 @@ object XFormsResourceRewriter extends Logging {
                         sbw.write("/* Original CSS path: " + resourcePath + " */\n")
                     copyReader(new InputStreamReader(is, "utf-8"), sbw)
                 } catch {
-                    case _: Throwable ⇒ logger.logWarning("resources", "could not aggregate CSS file", "path", resourcePath)
+                    case _: Throwable ⇒ warn("could not aggregate CSS file", Seq("path" → resourcePath))
                 }
                 sbw.toString
             }
 
             // Rewrite it all
-            outputWriter write rewriteCSS(originalCSS, resourcePath, response, logger)
+            outputWriter write rewriteCSS(originalCSS, resourcePath, namespaceOpt, response)(logger)
         }
         outputWriter.flush()
     }
 
-    def rewriteCSS(css: String, resourcePath: String, response: ExternalContext.Response, logger: IndentedLogger) = {
+    private val MatchId = """#([\w]+)""".r
+    private val MatchURL = """url\(("|')?([^"^'^\)]*)("|')?\)""".r
 
-        val namespace = response.getNamespacePrefix
+    // Public for unit tests
+    def rewriteCSS(css: String, resourcePath: String, namespaceOpt: Option[String], response: ExternalContext.Response)(implicit logger: IndentedLogger) = {
 
         // Match and rewrite an id within a selector
-        val matchId = """#([\w]+)""".r
-        def rewriteSelector(s: String) = matchId.replaceAllIn(s, e ⇒ "#" + namespace + e.group(1))
+        def rewriteSelector(s: String) = namespaceOpt match {
+            case Some(namespace) ⇒ MatchId.replaceAllIn(s, e ⇒ "#" + namespace + e.group(1))
+            case None            ⇒ s
+        }
 
         // Match and rewrite a URL within a block
-        val matchURL = """url\(("|')?([^"^'^\)]*)("|')?\)""".r
-        def rewriteBlock(s: String) = matchURL.replaceAllIn(s, e ⇒ rewriteURL(e.group(2)))
+        def rewriteBlock(s: String) = MatchURL.replaceAllIn(s, e ⇒ rewriteURL(e.group(2)))
 
         // Rewrite an individual URL
         def rewriteURL(url: String) =
@@ -105,17 +108,17 @@ object XFormsResourceRewriter extends Logging {
                 "url(" + rewrittenURI + ")"
             } catch {
                 case _: Throwable ⇒
-                    logger.logWarning("resources", "found invalid URI in CSS file", "uri", url)
+                    warn("found invalid URI in CSS file", Seq("uri" → url))
                     "url(" + url + ")"
             }
 
         // Find approximately pairs of selectors/blocks and rewrite each part
         // Ids are rewritten only if the namespace is not empty
         val r = """([^\{]*\s*)(\{[^\}]*\})""".r
-        r.replaceAllIn(css, e ⇒ (if (namespace.size == 0) e.group(1) else rewriteSelector(e.group(1))) + rewriteBlock(e.group(2)))
+        r.replaceAllIn(css, e ⇒ rewriteSelector(e.group(1)) + rewriteBlock(e.group(2)))
     }
 
-    private def generateJS(logger: IndentedLogger, resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean): Unit = {
+    private def generateJS(resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
         outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
@@ -145,10 +148,7 @@ object XFormsResourceRewriter extends Logging {
         if (resources.isEmpty) 0L else resources map lastModified max
     }
 
-    def jCacheResources(resources: JList[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean) =
-        cacheResources(resources.asScala, resourcePath, combinedLastModified, isCSS, isMinimal)
-
-    def cacheResources(resources: Seq[ResourceConfig], resourcePath: String, combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {
+    def cacheResources(resources: Seq[ResourceConfig], resourcePath: String, namespaceOpt: Option[String], combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {
 
         implicit val indentedLogger = XFormsResourceServer.indentedLogger
         val rm = ResourceManagerWrapper.instance
@@ -166,7 +166,7 @@ object XFormsResourceRewriter extends Logging {
                         // Resource is out of date, generate
                         debug("cached combined resources out of date, saving", logParameters)
                         val fos = new FileOutputStream(resourceFile)
-                        generate(indentedLogger, resources, fos, isCSS, isMinimal)
+                        generate(resources, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
                     } else
                         debug("cached combined resources exist and are up-to-date", logParameters)
                 } else {
@@ -175,7 +175,7 @@ object XFormsResourceRewriter extends Logging {
                     resourceFile.getParentFile.mkdirs()
                     resourceFile.createNewFile()
                     val fos = new FileOutputStream(resourceFile)
-                    generate(indentedLogger, resources, fos, isCSS, isMinimal)
+                    generate(resources, namespaceOpt, fos, isCSS, isMinimal)(indentedLogger)
                 }
                 resourceFile
             case None ⇒

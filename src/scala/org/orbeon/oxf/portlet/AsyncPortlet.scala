@@ -86,14 +86,14 @@ trait AsyncPortlet extends BufferedPortlet {
                 rewriter.rewriteResourceURL(path, encode)
 
             val resources = LinkedHashSet(XFormsFeatures.getAsyncPortletLoadScripts map (_.getResourcePath(isMinimalResources)): _*)
-            ResourcesAggregator.aggregate(resources, path ⇒ sb append rewrite(path, isWSRPEncodeResources), isCacheCombinedResources = false, isCSS = false)
+            ResourcesAggregator.aggregate(resources, path ⇒ sb append rewrite(path, isWSRPEncodeResources), None, isCacheCombinedResources = false, isCSS = false)
 
             sb append """"></script>"""
 
             // Output placeholder <div>
             // Append time so that the browser doesn't cache the resource
             val resourcePath = IFrameContentResourcePath + "?" + "orbeon-time=" + System.currentTimeMillis.toString
-            sb append """<div class="orbeon-portlet-deferred" style="display: none">""" + rewrite(resourcePath, true) + """</div>"""
+            sb append """<div class="orbeon-portlet-deferred" style="display: none">""" + rewrite(resourcePath, encode = true) + """</div>"""
 
             Content(Left(sb.toString), Some("text/html"), None)
 

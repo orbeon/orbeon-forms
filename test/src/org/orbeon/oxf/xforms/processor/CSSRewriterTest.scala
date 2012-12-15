@@ -23,15 +23,7 @@ import org.orbeon.oxf.externalcontext.ResponseWrapper
 
 class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
-    var response: Response = _
-
-    @Before def setup() {
-        response = new ResponseWrapper(NetUtils.getExternalContext.getResponse) {
-            override def getNamespacePrefix = "_ns_"
-        }
-    }
-
-    @Test def urls() {
+    @Test def urls(): Unit = {
 
         // Relative and absolute paths
         assert("""div { background-image: url(/orbeon/styles/a.png) }""" === rewriteCSS("""div { background-image: url(a.png) }"""))
@@ -48,7 +40,7 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert(rewritten === rewriteCSS("""div { background-image: url('a.png') }"""))
     }
 
-    @Test def namespaces() {
+    @Test def namespaces(): Unit = {
         // Multiple id rewrites
         assert("""div #_ns_foo.bar div #_ns_gaga.toto div {}""" === rewriteCSS("""div #foo.bar div #gaga.toto div {}"""))
 
@@ -56,11 +48,11 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
         assert("""#_ns_foo.bar {} #_ns_gaga.toto {}""" === rewriteCSS("""#foo.bar {} #gaga.toto {}"""))
     }
 
-    @Test def both() {
+    @Test def both(): Unit = {
         assert("div #_ns_foo.bar { background-image: url(/orbeon/styles/a.png) }" ===
             rewriteCSS("""div #foo.bar { background-image: url(a.png) }"""))
     }
 
     private def rewriteCSS(css: String) =
-        XFormsResourceRewriter.rewriteCSS(css, "/styles/style.css", response, null)
+        XFormsResourceRewriter.rewriteCSS(css, "/styles/style.css", Some("_ns_"), NetUtils.getExternalContext.getResponse)(null)
 }

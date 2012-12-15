@@ -52,8 +52,8 @@ trait BufferedPortlet {
                 // implement the redirect loop here. The issue would be what happens upon subsequent renders, as they
                 // would again request the first path, not the redirected path. For now we throw.
                 render match {
-                    case content: Content ⇒ writeResponseWithParameters(request, response, content)
-                    case _ ⇒ throw new IllegalStateException("Processor execution did not return content.")
+                    case content: Content   ⇒ writeResponseWithParameters(request, response, content)
+                    case redirect: Redirect ⇒ throw new IllegalStateException("Processor execution did not return content.")
                 }
         }
 

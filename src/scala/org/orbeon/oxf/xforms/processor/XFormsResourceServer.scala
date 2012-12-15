@@ -117,29 +117,25 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
         val response = externalContext.getResponse
 
         // Eliminate funny requests
-        if (! isCSS && ! isJS) {
+        if (! isCSS && ! isJS && ! filenameFromRequest.startsWith("orbeon-")) {
             response.setStatus(SC_NOT_FOUND)
             return
         }
 
-        val resources =
-            if (filenameFromRequest.startsWith("orbeon-")) {
-                // New hash-based mechanism
-                val resourcesHash = filenameFromRequest.substring("orbeon-".length, filenameFromRequest.lastIndexOf("."))
-                val cacheElement = Caches.resourcesCache.get(resourcesHash)
-                if (cacheElement ne null) {
-                    // Mapping found
-                    val resourcesStrings = cacheElement.getValue.asInstanceOf[Array[String]].toList
-                    resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
-                } else {
-                    // Not found, either because the hash is invalid, or because the cache lost the mapping
-                    response.setStatus(SC_NOT_FOUND)
-                    return
-                }
+        val resources = {
+            // New hash-based mechanism
+            val resourcesHash = filenameFromRequest.substring("orbeon-".length, filenameFromRequest.lastIndexOf("."))
+            val cacheElement = Caches.resourcesCache.get(resourcesHash)
+            if (cacheElement ne null) {
+                // Mapping found
+                val resourcesStrings = cacheElement.getValue.asInstanceOf[Array[String]].toList
+                resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
             } else {
+                // Not found, either because the hash is invalid, or because the cache lost the mapping
                 response.setStatus(SC_NOT_FOUND)
                 return
             }
+        }
 
         val isMinimal = false
 
@@ -162,11 +158,19 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
         response.setContentType(if (isCSS) "text/css" else "application/x-javascript")
 
+        // Namespace to use, must be None if empty
+        def namespaceOpt = {
+            def nsFromParameters = Option(externalContext.getRequest.getParameterMap.get(NamespaceParameter)) map (_(0).asInstanceOf[String])
+            def nsFromContainer  = Some(response.getNamespacePrefix)
+
+            nsFromParameters orElse nsFromContainer filter (_.nonEmpty)
+        }
+
         def debugParameters = Seq("request path" → requestPath)
 
         if (XFormsProperties.isCacheCombinedResources) {
             // Caching requested
-            val resourceFile = XFormsResourceRewriter.cacheResources(resources, requestPath, combinedLastModified, isCSS, isMinimal)
+            val resourceFile = XFormsResourceRewriter.cacheResources(resources, requestPath, namespaceOpt, combinedLastModified, isCSS, isMinimal)
             if (resourceFile ne null) {
                 // Caching could take place, send out cached result
                 debug("serving from cache ", debugParameters)
@@ -175,14 +179,14 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
                 // Was unable to cache, just serve
                 debug("caching requested but not possible, serving directly", debugParameters)
                 useAndClose(response.getOutputStream) { os ⇒
-                    XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal)
+                    XFormsResourceRewriter.generate(resources, namespaceOpt, os, isCSS, isMinimal)(indentedLogger)
                 }
             }
         } else {
             // Should not cache, just serve
             debug("caching not requested, serving directly", debugParameters)
             useAndClose(response.getOutputStream) { os ⇒
-                XFormsResourceRewriter.generate(indentedLogger, resources, os, isCSS, isMinimal)
+                XFormsResourceRewriter.generate(resources, namespaceOpt, os, isCSS, isMinimal)(indentedLogger)
             }
         }
     }
@@ -192,6 +196,7 @@ object XFormsResourceServer {
 
     val DynamicResourcesSessionKey = "orbeon.resources.dynamic."
     val DynamicResourcesPath       = "/xforms-server/dynamic/"
+    val NamespaceParameter         = "ns"
 
     implicit def indentedLogger = Loggers.getIndentedLogger("resources")
 

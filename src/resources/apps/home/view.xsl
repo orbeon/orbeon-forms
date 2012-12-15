@@ -26,11 +26,11 @@
         <xh:html>
             <xh:head>
                 <xh:title><xsl:value-of select="@title"/></xh:title>
-                <xh:link rel="stylesheet" href="home.css" type="text/css"/>
+                <xh:link rel="stylesheet" href="/home/home.css" type="text/css"/>
             </xh:head>
             <xh:body>
                 <xh:ul class="thumbnails">
-                    <xsl:apply-templates select="node()"/>
+                    <xsl:apply-templates select="*"/>
                 </xh:ul>
                 <xh:div class="license">
                     Images on this pages are licensed by their respective author under Creative Commons, and are,
@@ -63,6 +63,9 @@
             </xh:p>
         </xh:li>
     </xsl:template>
+
+    <!-- Filter everything else -->
+    <xsl:template match="node() | @*"/>
 
 </xsl:stylesheet>
 

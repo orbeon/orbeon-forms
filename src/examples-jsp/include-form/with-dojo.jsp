@@ -16,7 +16,6 @@
         <title>XForms with Dojo</title>
             <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/dojo/1.1.1/dojo/dojo.xd.js" djConfig="parseOnLoad: true"/>
 		<script type="text/javascript">dojo.require("dojox.layout.ContentPane");</script>
-        <link type="text/css" href="../config/theme/orbeon.css" rel="stylesheet"/>
         <link type="text/css" href="../config/theme/xforms.css" rel="stylesheet"/>
         <style type="text/css">
             .form-pane              { border: 2px solid #999; background-color: #FCF6D3; width: 400px; }

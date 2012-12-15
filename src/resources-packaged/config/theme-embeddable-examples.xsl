@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2006-2007 Orbeon, Inc.
+    Copyright (C) 2006-2012 Orbeon, Inc.
 
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,9 +11,6 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<!--
-    Simple portlet theme. Inserts orbeon.css and a link back to the portlet home.
--->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -22,6 +19,13 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
+    <!-- Try to obtain a meaningful title for the example -->
+    <xsl:variable name="title" select="if (/xh:html/xh:head/xh:title != '')
+                                       then /xh:html/xh:head/xh:title
+                                       else if (/xh:html/xh:body/xh:h1)
+                                            then (/xh:html/xh:body/xh:h1)[1]
+                                            else '[Untitled]'" as="xs:string"/>
+
     <xsl:template match="/">
         <xh:div class="orbeon-portlet-div">
             <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
@@ -29,8 +33,10 @@
             <xsl:if test="exists($classes-to-copy)">
                 <xsl:attribute name="class" select="$classes-to-copy"/>
             </xsl:if>
-            <!-- Styles and scripts -->
-            <xh:link rel="stylesheet" href="/config/theme/orbeon.css" type="text/css"/>
+            <!-- Styles -->
+            <xh:link rel="stylesheet" href="/fr/style/bootstrap/css/bootstrap.css" type="text/css"/>
+            <xh:link rel="stylesheet" href="/fr/style/form-runner-bootstrap-override.css" type="text/css"/>
+            <xh:link rel="stylesheet" href="/config/theme/examples.css" type="text/css" media="all"/>
             <!-- Handle head elements except scripts -->
             <xsl:for-each select="/xh:html/xh:head/(xh:meta | xh:link | xh:style)">
                 <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">
@@ -44,15 +50,29 @@
             </xsl:if>
             <!-- Handle head scripts if present -->
             <xsl:apply-templates select="/xh:html/xh:head/xh:script"/>
-            <!-- Body -->
-            <xh:div id="orbeon" class="orbeon-portlet-body orbeon">
-                <xh:div class="maincontent">
-                    <xsl:apply-templates select="/xh:html/xh:body/node()"/>
+            <!-- Navbar -->
+            <xh:div class="navbar navbar-inverse">
+                <xh:div class="navbar-inner">
+                    <xh:div class="container">
+                        <xh:a href="http://www.orbeon.com/">
+                            <xh:img src="/fr/style/orbeon-navbar-logo.png" alt="Orbeon Forms"/>
+                        </xh:a>
+                        <xh:h1>
+                            <xsl:value-of select="$title"/>
+                        </xh:h1>
+                        <xh:ul class="nav">
+                            <xh:li class="active">
+                                <xh:a xmlns:f="http://orbeon.org/oxf/xml/formatting" href="/" f:portlet-mode="view">Home</xh:a>
+                            </xh:li>
+                        </xh:ul>
+                    </xh:div>
                 </xh:div>
             </xh:div>
-            <!-- This is for demo purposes only -->
-            <xh:div class="orbeon-portlet-home">
-                <xh:a xmlns:f="http://orbeon.org/oxf/xml/formatting" href="/" f:portlet-mode="view">Home</xh:a>
+            <!-- Body -->
+            <xh:div class="container-fluid">
+                <xh:div class="orbeon-portlet-body">
+                    <xsl:apply-templates select="/xh:html/xh:body/node()"/>
+                </xh:div>
             </xh:div>
             <!-- Handle post-body scripts if present. They can be placed here by oxf:resources-aggregator -->
             <xsl:apply-templates select="/xh:html/xh:script"/>

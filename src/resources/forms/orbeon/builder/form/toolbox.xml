@@ -228,7 +228,6 @@
 
         <!-- To facilitate marking buttons read-only -->
         <xf:var name="trigger" value="instance('fb-metadata-instance')/toolbox/services-actions" as="element()"/>
-        <!--<xh:legend><xf:output value="$form-resources/services-actions/label"/></xh:legend>-->
 
         <!-- Services -->
         <xh:div class="fb-tools">

@@ -55,5 +55,5 @@ object KeypressEvent {
     val ModifiersProperty = XXFORMS_EVENTS_MODIFIERS_ATTRIBUTE_QNAME.getName
     val TextProperty      = XXFORMS_EVENTS_TEXT_ATTRIBUTE_QNAME.getName
 
-    val StandardProperties = Seq(ModifiersProperty, TextProperty)
+    val StandardProperties = Map(KEYPRESS → Seq(ModifiersProperty, TextProperty))
 }

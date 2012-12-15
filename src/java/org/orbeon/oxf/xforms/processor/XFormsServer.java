@@ -463,7 +463,7 @@ public class XFormsServer extends ProcessorImpl {
                                     final Element eventElement = eventsElement.addElement(XFormsConstants.XXFORMS_EVENT_QNAME);
                                     // Dispatch to #document
                                     eventElement.addAttribute("source-control-id", "#document");
-                                    eventElement.setText(load.getResource());
+                                    eventElement.addAttribute("resource", load.getResource());
                                     // NOTE: don't care about the target for portlets
                                     eventElement.addAttribute("name", XFormsEvents.XXFORMS_LOAD);
                                     requireClientSubmission = true;

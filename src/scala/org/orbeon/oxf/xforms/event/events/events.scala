@@ -99,6 +99,10 @@ class XXFormsLoadEvent(target: XFormsEventTarget, properties: PropertyGetter)
     def resource = property[String]("resource").get
 }
 
+object XXFormsLoadEvent {
+    val StandardProperties = Map(XXFORMS_LOAD → Seq("resource"))
+}
+
 class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XXFORMS_UPLOAD_DONE, target, properties, bubbles = true, cancelable = false) {
 
@@ -110,7 +114,7 @@ class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGett
 }
 
 object XXFormsUploadDoneEvent {
-    val StandardProperties = Seq("file", "filename", "content-type", "content-length")
+    val StandardProperties = Map(XXFORMS_UPLOAD_DONE → Seq("file", "filename", "content-type", "content-length"))
 }
 
 class XXFormsInstanceInvalidate(target: XFormsEventTarget, properties: PropertyGetter)

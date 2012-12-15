@@ -36,7 +36,12 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 object ClientEvents extends Logging {
 
     // Only a few events specify custom properties that can be set by the client
-    private val AllStandardProperties = XXFormsDndEvent.StandardProperties ++ KeypressEvent.StandardProperties ++ XXFormsUploadDoneEvent.StandardProperties
+    private val AllStandardProperties =
+        XXFormsDndEvent.StandardProperties        ++
+        KeypressEvent.StandardProperties          ++
+        XXFormsUploadDoneEvent.StandardProperties ++
+        XXFormsLoadEvent.StandardProperties
+
     private val DummyEvent = List(new LocalEvent(Dom4jUtils.createElement("dummy"), false))
 
     private case class LocalEvent(private val element: Element, trusted: Boolean) {
@@ -280,11 +285,12 @@ object ClientEvents extends Logging {
 
             def standardProperties =
                 for {
-                    attributeName ← AllStandardProperties
+                    attributeNames ← AllStandardProperties.get(eventName).toList
+                    attributeName  ← attributeNames
                     attributeValue = event.attributeValue(attributeName)
                     if attributeValue ne null
                 } yield
-                    (attributeName → Option(attributeValue))
+                    attributeName → Option(attributeValue)
 
             def eventValue = if (eventName == XXFORMS_VALUE) Seq("value" → Option(event.value)) else Seq()
 

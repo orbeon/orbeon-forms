@@ -109,14 +109,16 @@ public class ContentHandlerOutputStream extends OutputStream {
     }
 
     public void flush() throws IOException {
-        try {
-            // NOTE: This will only flush on Base64 line boundaries. Is that what we want? Or
-            // should we just ignore? We can't output an incomplete encoded line unless we have a
-            // number of bytes in the buffer multiple of 3. Otherwise, we would have to output '='
-            // characters, which do signal an end of transmission.
-            contentHandler.processingInstruction("orbeon-serializer", "flush");
-        } catch (SAXException e) {
-            throw new OXFException(e);
+        if (!closed) {
+            try {
+                // NOTE: This will only flush on Base64 line boundaries. Is that what we want? Or
+                // should we just ignore? We can't output an incomplete encoded line unless we have a
+                // number of bytes in the buffer multiple of 3. Otherwise, we would have to output '='
+                // characters, which do signal an end of transmission.
+                contentHandler.processingInstruction("orbeon-serializer", "flush");
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
         }
     }
 
@@ -133,7 +135,10 @@ public class ContentHandlerOutputStream extends OutputStream {
         addBytes(singleByte, 0, 1);
     }
 
-    private void addBytes(byte b[], int off, int len)  {
+    private void addBytes(byte b[], int off, int len) throws IOException {
+        if (closed)
+            throw new IOException("ContentHandlerOutputStream already closed");
+
         // Check bounds
         if ((off < 0) || (len < 0) || (off > b.length) || ((off + len) > b.length))
 	        throw new IndexOutOfBoundsException();

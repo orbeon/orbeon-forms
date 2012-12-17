@@ -34,20 +34,20 @@ object FormRunner {
     val NS = "http://orbeon.org/oxf/xml/form-runner"
     val XF = XFORMS_NAMESPACE_URI
 
-    val propertyPrefix = "oxf.fr.authentication."
+    val PropertyPrefix = "oxf.fr.authentication."
 
-    val methodPropertyName = propertyPrefix + "method"
-    val containerRolesPropertyName = propertyPrefix + "container.roles" // NOTE: this could be inferred from form-builder-permissions.xml, right?
-    val headerUsernamePropertyName = propertyPrefix + "header.username"
-    val headerRolesPropertyName = propertyPrefix + "header.roles"
-    val headerRolesPropertyNamePropertyName = propertyPrefix + "header.roles.property-name"
+    val MethodPropertyName                  = PropertyPrefix + "method"
+    val ContainerRolesPropertyName          = PropertyPrefix + "container.roles" // NOTE: this could be inferred from form-builder-permissions.xml, right?
+    val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
+    val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
+    val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
     private def properties = Properties.instance.getPropertySet
 
     type UserRoles = {
-        def getRemoteUser(): String
+        def getRemoteUser: String
         def isUserInRole(role: String): Boolean
     }
 
@@ -57,11 +57,11 @@ object FormRunner {
     def getUserRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[Array[String]]) = {
 
         val propertySet = properties
-        propertySet.getString(methodPropertyName, "container") match {
+        propertySet.getString(MethodPropertyName, "container") match {
             case "container" ⇒
 
                 val username    = Option(userRoles.getRemoteUser)
-                val rolesString = propertySet.getString(containerRolesPropertyName)
+                val rolesString = propertySet.getString(ContainerRolesPropertyName)
 
                 if (rolesString eq null) {
                     (username, None)
@@ -89,7 +89,7 @@ object FormRunner {
 
             case "header" ⇒
 
-                val headerPropertyName = propertySet.getString(headerRolesPropertyNamePropertyName, "").trim match {
+                val headerPropertyName = propertySet.getString(HeaderRolesPropertyNamePropertyName, "").trim match {
                     case "" ⇒ None
                     case value ⇒ Some(value)
                 }
@@ -108,12 +108,12 @@ object FormRunner {
                     case _ ⇒ Seq(value)
                 }
 
-                val username = headerOption(headerUsernamePropertyName) map (_.head)
-                val roles = headerOption(headerRolesPropertyName) map (_ flatMap split1 flatMap (split2(_)))
+                val username = headerOption(HeaderUsernamePropertyName) map (_.head)
+                val roles = headerOption(HeaderRolesPropertyName) map (_ flatMap split1 flatMap (split2(_)))
 
                 (username, roles)
 
-            case other ⇒ throw new OXFException("Unsupported authentication method, check the '" + methodPropertyName + "' property:" + other)
+            case other ⇒ throw new OXFException("Unsupported authentication method, check the '" + MethodPropertyName + "' property:" + other)
         }
     }
 

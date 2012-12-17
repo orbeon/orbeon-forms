@@ -60,25 +60,32 @@ object FormRunner {
         propertySet.getString(methodPropertyName, "container") match {
             case "container" ⇒
 
+                val username    = Option(userRoles.getRemoteUser)
                 val rolesString = propertySet.getString(containerRolesPropertyName)
 
-                assert(rolesString != null)
+                if (rolesString eq null) {
+                    (username, None)
+                } else {
 
-                val username = Option(userRoles.getRemoteUser)
+                    // Wrap exceptions as Liferay throws if the role is not available instead of returning false
+                    def isUserInRole(role: String) =
+                        try userRoles.isUserInRole(role)
+                        catch { case e: Exception ⇒ false}
 
-                val rolesArray = (
-                    for {
-                        role ← rolesString.split(""",|\s+""")
-                        if userRoles.isUserInRole(role)
-                    } yield
-                        role)
+                    val rolesArray = (
+                        for {
+                            role ← rolesString.split(""",|\s+""")
+                            if isUserInRole(role)
+                        } yield
+                            role)
 
-                val roles = rolesArray match {
-                    case Array() ⇒ None
-                    case array ⇒ Some(array)
+                    val roles = rolesArray match {
+                        case Array() ⇒ None
+                        case array   ⇒ Some(array)
+                    }
+
+                    (username, roles)
                 }
-
-                (username, roles)
 
             case "header" ⇒
 

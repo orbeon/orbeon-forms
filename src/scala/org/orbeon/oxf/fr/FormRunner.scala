@@ -47,7 +47,7 @@ object FormRunner {
     private def properties = Properties.instance.getPropertySet
 
     type UserRoles = {
-        def getRemoteUser: String
+        def getRemoteUser(): String
         def isUserInRole(role: String): Boolean
     }
 

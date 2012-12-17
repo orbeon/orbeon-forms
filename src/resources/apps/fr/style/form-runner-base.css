@@ -100,13 +100,19 @@
   display: block;
   margin: 0 0 0 .5em;
 }
-.xforms-noscript .fr-section-title button.btn-link {
+.xforms-noscript .fr-section-title .fr-section-label button.btn-link {
   color: #555555;
   font-size: inherit;
   *font-size: 20px;
 }
-.xforms-noscript .fr-section-title .xforms-help-image {
+.xforms-noscript .fr-section-title .fr-section-label .xforms-help-image {
   display: inline;
+}
+.xforms-noscript .fr-section-title .fr-section-label .xforms-help {
+  display: inline;
+}
+.xforms-noscript .fr-section-title .fr-section-label .xforms-help-anchor {
+  display: none;
 }
 .xforms-noscript .xforms-help-panel {
   display: block;
@@ -118,12 +124,6 @@
 }
 .xforms-noscript .xforms-help-panel .xforms-label {
   display: inline;
-}
-.xforms-noscript .xforms-help-panel .xforms-help {
-  display: inline;
-}
-.xforms-noscript .xforms-help-panel .xforms-help-anchor {
-  display: none;
 }
 .xforms-noscript .xforms-help-panel .xforms-help-image {
   display: none;
@@ -199,12 +199,11 @@ button.btn-link {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 /* ***** General Layout ********************************************************************************************* */
-.fr-goto-content,
 .fr-language-choice,
 .fr-noscript-choice {
   margin-right: 1em;
 }
-.fr-goto-content .xforms-label,
+.xforms-label,
 .fr-language-choice .xforms-label,
 .fr-noscript-choice .xforms-label {
   display: inline;

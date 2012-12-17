@@ -173,8 +173,7 @@ body {
   color: #6E6E6E;
 }
 .fr-language-choice,
-.fr-noscript-choice,
-.fr-goto-content {
+.fr-noscript-choice {
   color: #555555;
   font-size: 85%;
   float: right;
@@ -182,30 +181,19 @@ body {
 }
 .fr-language-choice a,
 .fr-noscript-choice a,
-.fr-goto-content a,
 .fr-language-choice button.btn-link,
-.fr-noscript-choice button.btn-link,
-.fr-goto-content button.btn-link {
+.fr-noscript-choice button.btn-link {
   color: #777777;
 }
 .navbar-inverse .fr-language-choice,
-.navbar-inverse .fr-noscript-choice,
-.navbar-inverse .fr-goto-content {
+.navbar-inverse .fr-noscript-choice {
   color: #bbbbbb;
 }
 .navbar-inverse .fr-language-choice a,
 .navbar-inverse .fr-noscript-choice a,
-.navbar-inverse .fr-goto-content a,
 .navbar-inverse .fr-language-choice button.btn-link,
-.navbar-inverse .fr-noscript-choice button.btn-link,
-.navbar-inverse .fr-goto-content button.btn-link {
+.navbar-inverse .fr-noscript-choice button.btn-link {
   color: #999999;
-}
-.fr-goto-content {
-  border: 2px solid #999999;
-  padding: 2px 6px;
-  margin-top: 7px;
-  float: left;
 }
 .fr-mode-new .xforms-required .xforms-label,
 .fr-mode-edit .xforms-required .xforms-label,

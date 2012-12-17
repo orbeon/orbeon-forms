@@ -147,9 +147,9 @@
                                 <xsl:variable name="default-objects" as="element()+">
                                     <fr:logo/>
                                     <fr:title/>
+                                    <fr:goto-content/>
                                     <fr:language-selector/>
                                     <fr:noscript-selector/>
-                                    <fr:goto-content/>
                                 </xsl:variable>
 
                                 <xsl:apply-templates select="$default-objects"/>
@@ -358,17 +358,18 @@
     </xsl:template>
 
     <xsl:template match="fr:goto-content">
-        <!-- Go to content link in noscript mode -->
         <xsl:if test="$is-noscript">
-            <xh:div class="fr-goto-content">
-                <!-- Group to scope variables -->
-                <xf:group appearance="xxf:internal" model="fr-error-summary-model">
-                    <!-- Link to form content or to errors if any -->
-                    <xh:a href="#{{if (errors-count castable as xs:integer and xs:integer(errors-count) > 0) then 'fr-errors' else 'fr-form'}}">
-                        <xf:output value="$fr-resources/summary/labels/goto-content"/>
-                    </xh:a>
-                </xf:group>
-            </xh:div>
+            <xh:ul class="nav">
+                <xh:li>
+                    <!-- Group to scope variables -->
+                    <xf:group appearance="xxf:internal" model="fr-error-summary-model">
+                        <!-- Link to form content or to errors if any -->
+                        <xh:a href="#{{if (errors-count castable as xs:integer and xs:integer(errors-count) > 0) then 'fr-errors' else 'fr-form'}}">
+                            <xf:output value="$fr-resources/summary/labels/goto-content"/>
+                        </xh:a>
+                    </xf:group>
+                </xh:li>
+            </xh:ul>
         </xsl:if>
     </xsl:template>
 

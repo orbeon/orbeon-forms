@@ -107,7 +107,7 @@ html, body { background-color: @frBackground }
 }
 
 // Navbar
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+.fr-language-choice, .fr-noscript-choice {
     color: @navbarLinkColorActive;
     font-size: 85%;
     float: right;
@@ -116,17 +116,10 @@ html, body { background-color: @frBackground }
 }
 
 .navbar-inverse {
-    .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+    .fr-language-choice, .fr-noscript-choice {
         color: @frNavBarTextColor;
         a, button.btn-link { color: @navbarInverseLinkColor }
     }
-}
-
-.fr-goto-content {
-    border: 2px solid @navbarInverseLinkColor;
-    padding: 2px 6px;
-    margin-top: 7px;
-    float: left;
 }
 
 // Add a star before the label of required fields, but only in new/edit modes

@@ -111,19 +111,9 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
             // Use local or default config
             final String[] config = (localOrder != null) ? StringUtils.split(localOrder) : handlerContext.getDocumentOrder();
 
-            // Output named anchor if the control has a help or alert. This is so that a separate help and error
-            // sections can link back to the control.
-            if (handlerContext.isNoScript()) {
-                if (getControl() != null
-                        && (LHHASupport.hasHelp(containingDocument, getPrefixedId())
-                            || LHHASupport.hasAlert(containingDocument, getPrefixedId()))) {
-                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
-                    reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, getControl().getEffectiveId());
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
-                }
-            }
+            // 2012-12-17: Removed nested <a name="effective-id"> because the enclosing <span> for the control has the
+            // same id and will be handled first by the browser as per HTML 5. This means the named anchor is actually
+            // redundant.
 
             // Process everything up to and including the control
             for (int i = 0; i < config.length; i++) {

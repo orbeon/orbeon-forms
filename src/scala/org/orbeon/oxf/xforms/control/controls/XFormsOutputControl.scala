@@ -87,11 +87,11 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
                 // Download appearance
                 // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
-                proxyValueIfNeeded(internalValue, "", Option(filename), Option(fileMediatype) orElse mediatypeAttribute)
+                proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatypeAttribute)
             } else if (mediatypeAttribute exists (_.startsWith("image/"))) {
                 // Image mediatype
                 // Use dummy image as default value so that client always has something to load
-                proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, Option(filename), mediatypeAttribute)
+                proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, mediatypeAttribute)
             } else if (mediatypeAttribute exists (_ == "text/html")) {
                 // HTML mediatype
                 internalValue

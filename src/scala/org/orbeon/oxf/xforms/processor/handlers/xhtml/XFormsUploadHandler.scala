@@ -79,9 +79,9 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) {
                     }
                 }
 
-                outputSpan("filename",  control ⇒ Option(control.filename))
-                outputSpan("mediatype", control ⇒ Option(control.fileMediatype))
-                outputSpan("size",      control ⇒ Option(control.fileSize))
+                outputSpan("filename",  _.filename)
+                outputSpan("mediatype", _.fileMediatype)
+                outputSpan("size",      _.humanReadableFileSize)
 
                 // Clickable image
                 reusableAttributes.clear()

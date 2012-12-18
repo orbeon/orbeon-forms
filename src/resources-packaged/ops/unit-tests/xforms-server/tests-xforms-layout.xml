@@ -717,6 +717,7 @@
                         <xf:instance id="tests">
                             <instance>
                                 <default xsi:type="xs:anyURI"/>
+                                <file xsi:type="xs:anyURI" filename="help.png" mediatype="image/png" size="123456">oxf:/ops/images/xforms/help.png</file>
                             </instance>
                         </xf:instance>
                     </xf:model>
@@ -736,6 +737,16 @@
                         <xf:upload id="my-new-upload-2" ref="default"/>
                         <xf:help for="my-new-upload-2">My help</xf:help>
                         <xf:alert for="my-new-upload-2">My alert</xf:alert>
+                        <!-- With an initial file -->
+                        <xf:upload id="my-new-upload-file" ref="file">
+                            <xf:label>My label</xf:label>
+                            <xf:hint>My hint</xf:hint>
+                            <xf:help>My help</xf:help>
+                            <xf:alert>My alert</xf:alert>
+                            <xf:filename ref="@filename"/>
+                            <xf:mediatype ref="@mediatype"/>
+                            <xxf:size ref="@size"/>
+                        </xf:upload>
                     </xf:repeat>
                 </xh:body>
             </xh:html>
@@ -784,6 +795,23 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-upload-2$$a·1">My alert</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
+                <xh:span id="my-new-upload-file·1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1">
+                    <xh:label class="xforms-label" for="my-new-upload-file$xforms-input·1">My label</xh:label>
+                    <xh:span id="my-new-upload-file$$c·1">
+                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file$xforms-input·1" name="my-new-upload-file·1" unselectable="on"/>
+                        <xh:span class="xforms-upload-info">
+                            <xh:span class="xforms-upload-filename">help.png</xh:span>
+                            <xh:span class="xforms-upload-mediatype">image/png</xh:span>
+                            <xh:span class="xforms-upload-size">120 KB</xh:span>
+                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
+                        </xh:span>
+                    </xh:span>
+                    <xh:span class="xforms-help-image" title="" alt=""/>
+                    <xh:span class="xforms-help">My help</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-hint">My hint</xh:span>
+                </xh:span>
+                <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-upload" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
@@ -824,6 +852,23 @@
                 <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-upload-2$$p"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-upload-2$$a"/>
+                <xh:span class="xforms-repeat-template"/>
+                <xh:span id="my-new-upload-file" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
+                    <xh:label class="xforms-label" for="my-new-upload-file$xforms-input"/>
+                    <xh:span id="my-new-upload-file$$c">
+                        <xh:input class="xforms-upload-select" type="file" id="my-new-upload-file$xforms-input" name="my-new-upload-file" unselectable="on"/>
+                        <xh:span class="xforms-upload-info">
+                            <xh:span class="xforms-upload-filename"/>
+                            <xh:span class="xforms-upload-mediatype"/>
+                            <xh:span class="xforms-upload-size"/>
+                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
+                        </xh:span>
+                    </xh:span>
+                    <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
+                    <xh:span class="xforms-disabled xforms-help"/>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-hint"/>
+                </xh:span>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>

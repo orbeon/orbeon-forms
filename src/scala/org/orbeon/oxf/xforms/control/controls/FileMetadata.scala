@@ -25,6 +25,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.control.{XFormsValueControl, AjaxSupport, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
+import org.apache.commons.io.FileUtils
 
 // This trait is used by controls that support nested file metadata such as "filename"
 trait FileMetadata extends XFormsValueControl {
@@ -67,10 +68,12 @@ trait FileMetadata extends XFormsValueControl {
         props.values foreach (_.handleMarkDirty())
 
     // Getters
-    def state                = props("state")    .value
-    def fileMediatype        = props("mediatype").value
-    def filename             = props("filename") .value
-    def fileSize             = props("size")     .value
+    def state                 = props("state")           .value
+    def fileMediatype         = Option(props("mediatype").value)
+    def filename              = Option(props("filename") .value)
+    def fileSize              = Option(props("size")     .value)
+
+    def humanReadableFileSize = fileSize filter StringUtils.isNotBlank map humanReadableBytes
 
     // "Instant" evaluators which go straight to the bound nodes if possible
     def boundFileMediatype  = Evaluators("mediatype").evaluate(self)
@@ -110,8 +113,10 @@ trait FileMetadata extends XFormsValueControl {
         }
 
         // Add attributes for each property with a different value
-        props foreach
-            { case (name, _) ⇒ addAtt(name, _.props(name).value) }
+        props foreach {
+            case (name @ "size", _) ⇒ addAtt(name, _.humanReadableFileSize.orNull) // special case size so we can format
+            case (name, _)          ⇒ addAtt(name, _.props(name).value)
+        }
 
         added
     }
@@ -173,4 +178,10 @@ object FileMetadata {
         contextStack.pushBinding(element, m.getEffectiveId, m.getChildElementScope(element))
         DataModel.getValue(contextStack.getCurrentSingleItem)
     }
+
+    // Format a string containing a number of bytes to a human-readable string
+    // If the input string doesn't represent a Long, return the string unchanged
+    def humanReadableBytes(size: String) =
+        try FileUtils.byteCountToDisplaySize(size.toLong)
+        catch { case _: Exception ⇒ size }
 }

@@ -1606,12 +1606,8 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.setStringValue(fileNameSpan, attribute2);
             if (attribute3 != null)
                 ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
-            if (attribute4 != null) {
-                var displaySize = attribute4 > 1024 * 1024 ? Math.round(attribute4 / (1024 * 1024) * 10) / 10 + " MB"
-                        : attribute4 > 1024 ? Math.round(attribute4 / 1024 * 10) / 10 + " KB"
-                        : attribute4 + " B";
-                ORBEON.util.Dom.setStringValue(sizeSpan, displaySize);
-            }
+            if (attribute4 != null)
+                ORBEON.util.Dom.setStringValue(sizeSpan, attribute4);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
             // Only update value if different from the one we have. This handle the case where the fields contain invalid
             // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how

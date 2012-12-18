@@ -96,11 +96,7 @@
                                                     </attribute>
                                                 </optional>
                                                 <optional>
-                                                    <attribute name="size">
-                                                        <optional>
-                                                            <data type="nonNegativeInteger"/>
-                                                        </optional>
-                                                    </attribute>
+                                                    <attribute name="size"/>
                                                 </optional>
                                                 <optional>
                                                     <attribute name="filename"/>

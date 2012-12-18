@@ -44,7 +44,10 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, outputControl);
 
         {
-            final AttributesImpl aAttributes = getAnchorAttributes(outputControl, containerAttributes);
+            // For f:url-type="resource"
+            final String formattingPrefix = handlerContext.findFormattingPrefixDeclare();
+
+            final AttributesImpl aAttributes = getAnchorAttributes(outputControl, containerAttributes, formattingPrefix);
 
             // Handle accessibility attributes on <a>
             handleAccessibilityAttributes(attributes, aAttributes);
@@ -57,10 +60,12 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
                 outputLabelText(xmlReceiver, control, labelValue, xhtmlPrefix, mustOutputHTMLFragment);
             }
             xmlReceiver.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
+
+            handlerContext.findFormattingPrefixUndeclare(formattingPrefix);
         }
     }
 
-    private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes) {
+    private AttributesImpl getAnchorAttributes(XFormsOutputControl outputControl, AttributesImpl containerAttributes, String formattingPrefix) {
         final String hrefValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, null);
 
         if (hrefValue == null || hrefValue.trim().equals("")) {
@@ -71,6 +76,13 @@ public class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             // URL value
             containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue);
         }
+
+        // Specify resource URL type for proxy portlet
+        containerAttributes.addAttribute(
+            XMLConstants.FORMATTING_URL_TYPE_QNAME.getNamespaceURI(),
+            XMLConstants.FORMATTING_URL_TYPE_QNAME.getName(),
+            XMLUtils.buildQName(formattingPrefix, XMLConstants.FORMATTING_URL_TYPE_QNAME.getName()),
+            ContentHandlerHelper.CDATA, "resource");
 
         // Add _blank target in order to prevent:
         // 1. The browser replacing the current page, and

@@ -11,6 +11,11 @@
             color: #b94a48;
         }
 
+        li {
+            // Make li the same height as section title
+            line-height: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
+        }
+
         ul ul {
             list-style-type: none;
         }

@@ -44,7 +44,7 @@
   *margin-right: .3em;
   line-height: 14px;
   vertical-align: text-top;
-  background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings.png);
+  background-image: url(bootstrap/img/glyphicons-halflings.png);
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
@@ -56,6 +56,9 @@
 }
 .xbl-fr-wizard .fr-wizard-toc .invalid > span > a {
   color: #b94a48;
+}
+.xbl-fr-wizard .fr-wizard-toc li {
+  line-height: 30px;
 }
 .xbl-fr-wizard .fr-wizard-toc ul ul {
   list-style-type: none;

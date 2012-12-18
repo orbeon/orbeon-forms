@@ -220,7 +220,7 @@ object XFormsResourceServer {
         if (session ne null) {
             val url = {
                 // The resource URI may already be absolute, or may be relative to the server base. Make sure we work with an absolute URI.
-                val absoluteResourceURI: String = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
+                val absoluteResourceURI = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
                 URLFactory.createURL(absoluteResourceURI)
             }
 

@@ -173,7 +173,7 @@ public class HandlerContext {
         final boolean isNewPrefix;
 
         final String existingFormattingPrefix = findFormattingPrefix();
-        if (existingFormattingPrefix == null || "".equals(existingFormattingPrefix)) {
+        if (StringUtils.isEmpty(existingFormattingPrefix)) {
             // No prefix is currently mapped
             formattingPrefix = findNewPrefix();
             isNewPrefix = true;

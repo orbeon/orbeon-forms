@@ -25,7 +25,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          script-type="application/xhtml+xml">
 
-    <xbl:binding id="fr-attachment" element="fr|attachment" xxbl:mode="binding">
+    <xbl:binding id="fr-attachment" element="fr|attachment" xxbl:mode="binding lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -54,19 +54,16 @@
         </metadata>
 
         <xbl:template>
-            <xf:group class="fr-component-group" ref="xxf:binding('fr-attachment')">
-                <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert"/>
-                <xf:upload ref=".">
-                    <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
-                </xf:upload>
-                <xf:output appearance="xxf:download" ref=".[normalize-space()]">
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/images/pixelmixer/down_16.png" alt=""/>
-                        <xh:span>Download</xh:span>
-                    </xf:label>
-                    <xbl:content includes=":root > xf|filename, :root > xf|mediatype"/>
-                </xf:output>
-            </xf:group>
+            <xf:upload ref="xxf:binding('fr-attachment')">
+                <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
+            </xf:upload>
+            <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[normalize-space()]">
+                <xf:label>
+                    <xh:img src="/apps/fr/style/images/pixelmixer/down_16.png" alt=""/>
+                    <xh:span>Download</xh:span>
+                </xf:label>
+                <xbl:content includes=":root > xf|filename, :root > xf|mediatype"/>
+            </xf:output>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

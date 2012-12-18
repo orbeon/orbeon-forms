@@ -25,7 +25,7 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          script-type="application/xhtml+xml">
 
-    <xbl:binding id="fr-image-attachment" element="fr|image-attachment">
+    <xbl:binding id="fr-image-attachment" element="fr|image-attachment" xxbl:mode="binding lhha">
 
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
@@ -54,12 +54,10 @@
         </metadata>
 
         <xbl:template>
-            <xf:group appearance="xxf:internal" xbl:attr="model context ref bind" xxbl:scope="outer">
-                <xf:upload ref=".">
-                    <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert, :root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
-                </xf:upload>
-                <xf:output mediatype="image/*" ref=".[normalize-space()]"/>
-            </xf:group>
+            <xf:upload ref="xxf:binding('fr-image-attachment')">
+                <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
+            </xf:upload>
+            <xf:output mediatype="image/*" ref="xxf:binding('fr-image-attachment')[normalize-space()]"/>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

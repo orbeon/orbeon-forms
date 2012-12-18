@@ -40,6 +40,11 @@
         position: absolute;
     }
 
+    // Table elements don't work properly with the -10000px trick
+    col, th, td, tr, thead, tbody, tfoot {
+        &.xforms-disabled { display: none; }
+    }
+
     br.xforms-disabled,
     br.xforms-case-deselected,
     .xforms-case-deselected br.xforms-case-selected {

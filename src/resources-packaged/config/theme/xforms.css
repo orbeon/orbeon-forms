@@ -40,6 +40,15 @@
   left: -10000px;
   position: absolute;
 }
+#xforms-form col.xforms-disabled,
+#xforms-form th.xforms-disabled,
+#xforms-form td.xforms-disabled,
+#xforms-form tr.xforms-disabled,
+#xforms-form thead.xforms-disabled,
+#xforms-form tbody.xforms-disabled,
+#xforms-form tfoot.xforms-disabled {
+  display: none;
+}
 #xforms-form br.xforms-disabled,
 #xforms-form br.xforms-case-deselected,
 #xforms-form .xforms-case-deselected br.xforms-case-selected {

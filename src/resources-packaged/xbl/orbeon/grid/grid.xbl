@@ -92,6 +92,8 @@
                                 <!-- Replace quote by two quotes in the repeat id to avoid possible XPath injection -->
                                 <xxf:sequence value="index('{replace($repeat-id, '''', '''''')}')" xxbl:scope="outer"/>
                             </xf:var>
+                            <!-- NOTE: We need a better way to get the Form Runner mode. See also #673 and #629. -->
+                            <xf:var name="view-mode" value="xxf:readonly($repeat-context)"/>
                         </xsl:if>
 
                         <!-- Grid table -->
@@ -108,7 +110,7 @@
                             <!-- Colgroup to make column sizing with CSS easier -->
                             <xh:colgroup>
                                 <xsl:if test="$is-repeat">
-                                    <xh:col class="fr-repeat-column-trigger"/>
+                                    <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not($view-mode)]"/>
                                 </xsl:if>
                                 <xsl:for-each select="$grid-rows[1]/*:td">
                                     <xh:col class="fr-grid-col-{position()}"/>
@@ -120,7 +122,7 @@
                                     <!-- Row with column headers -->
                                     <xh:tr class="fr-dt-master-row">
                                         <xsl:if test="not($readonly)">
-                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context">
+                                            <xh:th class="fr-repeat-column fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not($view-mode)]">
                                                 <xf:var name="can-add" as="xs:boolean"
                                                          value="{if ($max-occurs = 'unbounded') then 'true()'
                                                                    else concat('count($repeat-sequence) lt ', $max-occurs)}"/>
@@ -186,7 +188,7 @@
 
                                                     <xsl:if test="$is-repeat">
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
-                                                            <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context">
+                                                            <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not($view-mode)]">
                                                                 <!-- Remove trigger -->
                                                                 <xf:var name="can-remove"
                                                                          value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>

@@ -753,7 +753,7 @@
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
                             <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
+                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
@@ -773,7 +773,7 @@
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
                             <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
+                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>
                 </xh:span>
@@ -794,7 +794,7 @@
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
                             <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
+                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
@@ -814,7 +814,7 @@
                             <xh:span class="xforms-upload-filename"/>
                             <xh:span class="xforms-upload-mediatype"/>
                             <xh:span class="xforms-upload-size"/>
-                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File" title="Remove File"/>
+                            <xh:img class="xforms-upload-remove" src="/ops/images/xforms/remove.gif" alt="Remove File"/>
                         </xh:span>
                     </xh:span>
                 </xh:span>

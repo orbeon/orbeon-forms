@@ -17,6 +17,7 @@ import org.orbeon.oxf.xml.{XMLUtils, DeferredXMLReceiver}
 import org.xml.sax.Attributes
 
 object HandlerHelper {
+
     def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes )(body: ⇒ T)(implicit receiver: DeferredXMLReceiver): T = {
         val qName = XMLUtils.buildQName(prefix, localName)
         receiver.startElement(uri, localName, qName, atts)
@@ -27,4 +28,11 @@ object HandlerHelper {
 
     def element(prefix: String, uri: String, localName: String, atts: Attributes )(implicit receiver: DeferredXMLReceiver) =
         withElement(prefix, uri, localName, atts) {}
+
+    def withFormattingPrefix[T](body: String ⇒ T)(implicit context: HandlerContext): T = {
+        val formattingPrefix = context.findFormattingPrefixDeclare
+        val result = body(formattingPrefix)
+        context.findFormattingPrefixUndeclare(formattingPrefix)
+        result
+    }
 }

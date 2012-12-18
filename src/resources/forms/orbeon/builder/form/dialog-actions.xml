@@ -50,7 +50,7 @@
         <xh:tr>
             <xh:td>
                 <!-- React to -->
-                <xf:select1 ref="$instance/fb:action/xf:action[1]/@*:event">
+                <xf:select1 ref="$instance/fb:action/xf:action[1]/@fb:event">
                     <xf:label ref="$form-resources/dialog-actions/event-type/label"/>
                     <xf:hint ref="$form-resources/dialog-actions/event-type/hint"/>
                     <xf:item>
@@ -65,7 +65,7 @@
             </xh:td>
             <xh:td>
                 <!-- Control -->
-                <xf:select1 ref="$instance/fb:action/xf:action[1]/@ev:observer">`
+                <xf:select1 ref="$instance/fb:action/xf:action[1]/@ev:observer">
                     <xf:label ref="$form-resources/dialog-actions/event-control/label"/>
                     <xf:item>
                         <xf:label ref="$form-resources/select/label"/>
@@ -106,7 +106,7 @@
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
 
                 <!-- Set request values -->
-                <xf:group ref="xf:action[@*:event = 'xforms-submit']/xf:action">
+                <xf:group ref="xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
                         <xh:tr>
@@ -132,7 +132,7 @@
                         </xh:tr>
                     </fr:grid>
                 </xf:group>
-                <xf:group ref="xf:action[@*:event = 'xforms-submit']/xf:action">
+                <xf:group ref="xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
                         <xh:tr>
@@ -159,7 +159,7 @@
                     </fr:grid>
                 </xf:group>
                 <!-- Set control values -->
-                <xf:group ref="xf:action[@*:event = 'xforms-submit-done']">
+                <xf:group ref="xf:action[@fb:event = 'xforms-submit-done']">
                     <xf:label ref="$form-resources/dialog-actions/response-values/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-control-value-action']">
                         <xh:tr>
@@ -186,7 +186,7 @@
                 </xf:group>
                 <!-- Only show this section if there are selection controls -->
                 <xf:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]" as="element()*"/>
-                <xf:group ref="xf:action[@*:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
+                <xf:group ref="xf:action[@fb:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xf:label ref="$form-resources/dialog-actions/response-itemset/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-itemset-action']" id="fb-bindings-itemset-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-itemset-action']">
                         <xh:tr>
@@ -332,7 +332,7 @@
 
         <xf:var name="fb-lang" value="xxf:instance('fb-language-instance')"/>
         <xf:var name="model" value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
-        <xf:var name="resources" value="$model/fb:instance[@id = 'fr-form-resources']/*"/>
+        <xf:var name="resources" value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
         <xf:var name="current-resources" value="$resources/resource[@xml:lang = $fb-lang]"/>
 
         <xf:instance id="fb-bindings-editor-instance">
@@ -364,17 +364,17 @@
                 <!-- Action that triggers the submission -->
                 <xf:bind ref="xf:action[1]">
                     <!-- Event triggering the action -->
-                    <xf:bind ref="@*:event" required="true()"/>
+                    <xf:bind ref="@fb:event" required="true()"/>
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
                     <xf:bind ref="@ev:observer"
-                                 required="tokenize(../@*:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 relevant="tokenize(../@*:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 calculate="if (tokenize(../@*:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
+                                 required="tokenize(../@fb:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 relevant="tokenize(../@fb:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 calculate="if (tokenize(../@fb:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
                                  readonly="false()"/>
                 </xf:bind>
                 <!-- xforms-submit -->
-                <xf:bind ref="xf:action[@*:event = 'xforms-submit']">
+                <xf:bind ref="xf:action[@fb:event = 'xforms-submit']">
                     <xf:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <xf:bind ref="(*:variable | *:var)[@name = 'request-instance-name']/(@value | @select)[1]"
                                  calculate="concat('''', substring-before($submission-bind, '-submission'), '-instance''')" required="true()"/>
@@ -383,7 +383,7 @@
                     </xf:bind>
                 </xf:bind>
                 <!-- xforms-submit-done -->
-                <xf:bind ref="xf:action[@*:event = 'xforms-submit-done']">
+                <xf:bind ref="xf:action[@fb:event = 'xforms-submit-done']">
                     <xf:bind ref="@ev:observer" calculate="$submission-bind"/>
                     <!-- Setvalue actions -->
                     <xf:bind ref="xf:action[@class = 'fr-set-control-value-action']">
@@ -403,12 +403,12 @@
         <xf:instance id="fb-binding-template" xxf:readonly="true" xxf:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
             <fb:action id="">
                 <!-- React to event... on control... -->
-                <xf:action ev:event="" ev:observer="" if="true()">
+                <xf:action fb:event="" ev:observer="" if="true()">
                     <!-- Service to call -->
                     <xf:send submission="SET ME"/>
                 </xf:action>
                 <!-- Request actions -->
-                <xf:action ev:event="xforms-submit" ev:observer="SET ME">
+                <xf:action fb:event="xforms-submit" ev:observer="SET ME">
                     <!-- Get reference to initial request -->
                     <xf:var name="request-instance-name" value="SET ME" as="xs:string"/>
                     <!-- Copy over to read-write request instance -->
@@ -420,7 +420,7 @@
                     </xf:action>
                 </xf:action>
                 <!-- Response actions -->
-                <xf:action ev:event="xforms-submit-done" ev:observer="SET ME" context="instance('fr-service-response-instance')">
+                <xf:action fb:event="xforms-submit-done" ev:observer="SET ME" context="instance('fr-service-response-instance')">
                     <!-- Response actions will be here -->
                 </xf:action>
             </fb:action>

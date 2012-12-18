@@ -43,7 +43,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
 
     override type Control <: OutputControl
 
-    def supportedFileMetadata = Seq("mediatype", "filename")
+    def supportedFileMetadata = Seq("mediatype", "filename") // could add "state"?
 
     // Optional format and mediatype
     private def format = Option(staticControl) flatMap (_.format)

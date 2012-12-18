@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
+import org.orbeon.oxf.xforms.control.controls.FileMetadata;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
 import org.orbeon.oxf.xml.*;
 import org.xml.sax.*;
@@ -33,12 +34,9 @@ public class XFormsUploadHandler extends XFormsControlLifecyleHandler {
 
         // Control value
         final XFormsUploadControl uploadControl = (XFormsUploadControl) control;
-        final String value = handlerContext.isTemplate() || uploadControl == null || uploadControl.getExternalValue() == null ? "" : uploadControl.getExternalValue();
+        final String value = handlerContext.isTemplate() || uploadControl == null ? "empty" : ((FileMetadata) uploadControl).state();
 
-        if (value.equals(""))
-            classes.append(" xforms-upload-state-empty");
-        else
-            classes.append(" xforms-upload-state-file");
+        classes.append(" xforms-upload-state-" + value);
     }
 
     protected void handleControlStart(String uri, String localname, String qName, Attributes attributes, String effectiveId, XFormsControl control) throws SAXException {

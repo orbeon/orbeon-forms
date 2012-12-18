@@ -67,6 +67,7 @@ trait FileMetadata extends XFormsValueControl {
         props.values foreach (_.handleMarkDirty())
 
     // Getters
+    def state                = props("state")    .value
     def fileMediatype        = props("mediatype").value
     def filename             = props("filename") .value
     def fileSize             = props("size")     .value

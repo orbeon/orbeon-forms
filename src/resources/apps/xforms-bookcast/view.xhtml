@@ -173,22 +173,30 @@
         </xf:model>
         <!-- CSS style specific to this page -->
         <style type="text/css">
-            .xforms-label { font-weight: bold }
-            .books-label { display: -moz-inline-box; display: inline-block; width: expression('9em'); min-width: 9em; }
-            .xforms-textarea-appearance-xxforms-autosize, .xforms-textarea-appearance-xxforms-autosize textarea { width: 20em; margin-bottom: 2px  }
-            .xforms-input input { width: 20em; margin-bottom: 2px }
-            .xforms-select1 { margin-bottom: 2px }
-            .xforms-select1 input { margin-bottom: 2px }
-            .books-table { background-color: #fce5b6 }
-            .books-table .add-td { width: 33em }
-            .books-table .form-td { width: 33em; background: white; padding: .5em }
-            .xforms-repeat-selected-item-1 .form-td { background: #ffc }
-            .books-action-table { margin-bottom: 1em }
-            .books-action-table td { white-space: nowrap; vertical-align: middle; padding-right: 1em }
-            .books-action-table .xforms-submit img { vertical-align: middle }
-            .books-action-table .xforms-trigger img, .books-action-table .xforms-submit img { margin-right: 5px; vertical-align: middle }
-            .books-action-table .xforms-trigger span, .books-action-table .xforms-submit span { vertical-align: middle }
-            .books-action-table a:hover { text-decoration: none }
+            .books-action-table { margin-bottom: 10px }
+            .books-action-table button { margin-right: 5px }
+            .books-action-table .xforms-submit img { margin-right: 5px; vertical-align: middle }
+            .books-action-table .xforms-submit span { vertical-align: middle }
+
+            .books-table { background-color: #f5f5f5 }
+            .books-table .add-td { width: 440px }
+            .books-table .form-td { width: 440px; padding: 10px; background-color: white }
+            
+            .xforms-control {
+                display: block;
+                margin-bottom: 2px;
+            }
+
+            .xforms-label { font-weight: bold; display: inline-block; min-width: 9em }
+
+            .xforms-input input, .xforms-textarea textarea, .xforms-select1 select {
+                width: 20em;
+                margin-bottom: 2px;
+            }
+            
+            .xforms-repeat-selected-item-1 .form-td { background-color: #f5f5f5 }
+
+            .xforms-items { display: inline-block }
         </style>
     </head>
     <body>
@@ -200,17 +208,17 @@
         <table class="books-action-table">
             <tr>
                 <td>
-                    <xf:submit submission="save-submission" appearance="minimal">
+                    <xf:submit submission="save-submission">
                         <xf:label><img src="/apps/xforms-bookcast/images/save.gif" alt="Save"/><span>Save</span></xf:label>
                     </xf:submit>
                 </td>
                 <td>
-                    <xf:submit submission="list-submission" appearance="minimal">
+                    <xf:submit submission="list-submission">
                         <xf:label><img src="/apps/xforms-bookcast/images/recycle-green.png" alt="Revert"/><span>Revert</span></xf:label>
                     </xf:submit>
                 </td>
                 <td>
-                    <xf:submit submission="sample-data-submission" appearance="minimal">
+                    <xf:submit submission="sample-data-submission">
                         <xf:label><img src="/apps/xforms-bookcast/images/add-all.gif" alt="Load Sample Data"/><span>Load Sample Data</span></xf:label>
                     </xf:submit>
                 </td>
@@ -243,17 +251,15 @@
                     </td>
                     <td class="form-td">
                         <xf:input ref="title">
-                            <xf:label class="books-label">Title</xf:label>
+                            <xf:label>Title</xf:label>
                             <xf:alert>The title is required</xf:alert>
                         </xf:input>
-                        <br/>
                         <xf:input ref="author">
-                            <xf:label class="books-label">Author</xf:label>
+                            <xf:label>Author</xf:label>
                             <xf:alert>The author is required</xf:alert>
                         </xf:input>
-                        <br/>
                         <xf:select1 ref="language">
-                            <xf:label class="books-label">Language</xf:label>
+                            <xf:label>Language</xf:label>
                             <xf:item>
                                 <xf:label>Choose One...</xf:label>
                                 <xf:value/>
@@ -263,14 +269,12 @@
                                 <xf:value ref="value"/>
                             </xf:itemset>
                         </xf:select1>
-                        <br/>
                         <xf:input ref="link">
-                            <xf:label class="books-label">Link</xf:label>
+                            <xf:label>Link</xf:label>
                             <xf:alert>The link is incorrect</xf:alert>
                         </xf:input>
-                        <br/>
                         <xf:select1 ref="rating" appearance="full">
-                            <xf:label class="books-label">Rating</xf:label>
+                            <xf:label>Rating</xf:label>
                             <xf:item>
                                 <xf:label>None</xf:label>
                                 <xf:value/>
@@ -280,9 +284,8 @@
                                 <xf:value ref="value"/>
                             </xf:itemset>
                         </xf:select1>
-                        <br/>
-                        <xf:textarea ref="notes" appearance="xxf:autosize">
-                            <xf:label class="books-label">Notes</xf:label>
+                        <xf:textarea ref="notes">
+                            <xf:label>Notes</xf:label>
                         </xf:textarea>
                     </td>
                 </tr>

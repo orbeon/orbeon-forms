@@ -217,13 +217,15 @@ textarea.xforms-invalid-visited {
   text-decoration: none;
 }
 .fr-view .xbl-fr-error-summary .fr-error-title {
-  font-size: smaller;
-  font-weight: bold;
+  padding: 5px;
   background-color: #b94a48;
   color: white;
-  -webkit-border-radius: 4px;
-  -moz-border-radius: 4px;
-  border-radius: 4px;
+  -webkit-border-top-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  border-top-left-radius: 4px;
+  -webkit-border-top-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  border-top-right-radius: 4px;
 }
 .fr-view .xbl-fr-error-summary .fr-error-label,
 .fr-view .xbl-fr-error-summary .fr-error-row {

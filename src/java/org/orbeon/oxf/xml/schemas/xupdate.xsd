@@ -1,0 +1,217 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xs:schema targetNamespace="http://www.xmldb.org/xupdate" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xupdate="http://www.xmldb.org/xupdate" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:element name="modifications">
+        <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="xupdate:InstructionsContainer">
+                    <xs:attribute name="version" type="xs:string" use="required"/>
+                </xs:extension>
+            </xs:complexContent>
+        </xs:complexType>
+    </xs:element>
+    <!-- begin attribs that commonly occur -->
+    <xs:attributeGroup name="qname">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="namespace" type="xs:anyURI" use="optional"/>
+    </xs:attributeGroup>
+    <!-- end attribs that commonly occur -->
+    <!-- begin all types -->
+    <xs:complexType name="append-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+                <xs:attribute name="child" type="xs:string" use="optional"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="assign-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" use="optional"/>
+                <xs:attributeGroup ref="xupdate:qname"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="choose-type" mixed="true">
+        <xs:sequence>
+            <xs:element name="when" maxOccurs="unbounded">
+                <xs:complexType mixed="true">
+                    <xs:complexContent mixed="true">
+                        <xs:extension base="xupdate:EverythingContainer">
+                            <xs:attribute name="test" type="xs:string" use="required"/>
+                        </xs:extension>
+                    </xs:complexContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="otherwise" type="xupdate:EverythingContainer" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="copy-of-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="function-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:sequence>
+                    <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
+                        <xs:complexType mixed="true">
+                            <xs:attribute name="select" type="xs:string" use="optional"/>
+                            <xs:attributeGroup ref="xupdate:qname"/>
+                        </xs:complexType>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attributeGroup ref="xupdate:qname"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="for-each-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="if-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="test" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="insert-after-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="insert-before-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="remove-type" mixed="true">
+        <xs:attribute name="select" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="update-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="value-of-type" mixed="true">
+        <xs:attribute name="select" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="node-set-type" mixed="true">
+        <xs:attribute name="select" type="xs:string" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="variable-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" use="optional"/>
+                <xs:attributeGroup ref="xupdate:qname"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="while-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attribute name="select" type="xs:string" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="element-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attributeGroup ref="xupdate:qname"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="attribute-type" mixed="true">
+        <xs:complexContent mixed="true">
+            <xs:extension base="xupdate:EverythingContainer">
+                <xs:attributeGroup ref="xupdate:qname"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="namespace-type" mixed="true">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:attribute name="namespace" type="xs:anyURI" use="optional"/>
+    </xs:complexType>
+    <!-- end all types -->
+    <!-- bag of all types  -->
+    <xs:complexType name="EverythingContainer" mixed="true">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="append" type="xupdate:append-type"/>
+            <xs:element name="assign" type="xupdate:assign-type"/>
+            <xs:element name="choose" type="xupdate:choose-type"/>
+            <xs:element name="copy-of" type="xupdate:copy-of-type"/>
+            <xs:element name="error" type="xupdate:EverythingContainer"/>
+            <xs:element name="function" type="xupdate:function-type"/>
+            <xs:element name="for-each" type="xupdate:for-each-type"/>
+            <xs:element name="if" type="xupdate:if-type"/>
+            <xs:element name="insert-after" type="xupdate:insert-after-type"/>
+            <xs:element name="insert-before" type="xupdate:insert-before-type"/>
+            <xs:element name="message" type="xupdate:EverythingContainer"/>
+            <xs:element name="remove" type="xupdate:remove-type"/>
+            <xs:element name="update" type="xupdate:update-type"/>
+            <xs:element name="value-of" type="xupdate:value-of-type"/>
+            <xs:element name="node-set" type="xupdate:node-set-type"/>
+            <xs:element name="variable" type="xupdate:variable-type"/>
+            <xs:element name="while" type="xupdate:while-type"/>
+            <xs:element name="element" type="xupdate:element-type"/>
+            <xs:element name="attribute" type="xupdate:attribute-type"/>
+            <xs:element name="namespace" type="xupdate:namespace-type"/>
+            <xs:any namespace="##other" processContents="lax"/>
+            <xs:any namespace="##local" processContents="lax"/> 
+        </xs:choice>
+    </xs:complexType>
+    <!-- bag of instruction types only.  
+         NOTE:  This type is used in other schemas.  ( So you cannot
+                eliminate this def and just make element 'modifications' a
+                restriction of EverythingContainer. ) -->
+    <xs:complexType name="InstructionsContainer">
+        <xs:complexContent>
+            <xs:restriction base="xupdate:EverythingContainer">
+                <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element name="append" type="xupdate:append-type"/>
+                    <xs:element name="assign" type="xupdate:assign-type"/>
+                    <xs:element name="choose" type="xupdate:choose-type"/>
+                    <xs:element name="copy-of" type="xupdate:copy-of-type"/>
+                    <xs:element name="error" type="xupdate:EverythingContainer"/>
+                    <xs:element name="function" type="xupdate:function-type"/>
+                    <xs:element name="for-each" type="xupdate:for-each-type"/>
+                    <xs:element name="if" type="xupdate:if-type"/>
+                    <xs:element name="insert-after" type="xupdate:insert-after-type"/>
+                    <xs:element name="insert-before" type="xupdate:insert-before-type"/>
+                    <xs:element name="message" type="xupdate:EverythingContainer"/>
+                    <xs:element name="remove" type="xupdate:remove-type"/>
+                    <xs:element name="update" type="xupdate:update-type"/>
+                    <xs:element name="value-of" type="xupdate:value-of-type"/>
+                    <xs:element name="node-set" type="xupdate:node-set-type"/>
+                    <xs:element name="variable" type="xupdate:variable-type"/>
+                    <xs:element name="while" type="xupdate:while-type"/>
+                </xs:choice>
+            </xs:restriction>
+        </xs:complexContent>
+    </xs:complexType>
+</xs:schema>

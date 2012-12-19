@@ -76,14 +76,14 @@
                          type="xs:NCName"
                          calculate="normalize-space()"
                          readonly="false()"
-                         constraint=". = ../original-grid-name or not(. = tokenize(../control-names, '\s+'))"/>
+                         constraint="string() = ../original-grid-name or not(string() = tokenize(../control-names, '\s+'))"/>
 
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
 
                 <xf:bind ref="min-repeat" type="xs:nonNegativeInteger" calculate="normalize-space()" readonly="false()"/>
                 <xf:bind ref="max-repeat"
                          type="xf:positiveInteger"
-                         constraint="not(string(.) castable as xs:integer) or not(string(../min-repeat) castable as xs:integer) or xs:integer(.) ge xs:integer(../min-repeat)"
+                         constraint="not(string() castable as xs:integer) or not(string(../min-repeat) castable as xs:integer) or xs:integer(.) ge xs:integer(../min-repeat)"
                          calculate="normalize-space()" readonly="false()"/>
 
                 <xf:bind ref="control-xpath" relevant="../is-custom-mode = 'true'" type="xxf:xpath2" required="../is-custom-mode = 'true'"/>
@@ -153,8 +153,7 @@
                                 <xf:input ref="$local/grid-name" incremental="true" id="fb-edit-details-control-name-input">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-grid-details/grid-name/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-grid-details/grid-name/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-grid-details/grid-name/alert"/>
                                     <xf:hint ref="$resources/dialog-grid-details/grid-name/hint"/>
                                 </xf:input>
@@ -162,8 +161,7 @@
                                 <xf:input ref="relevant" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-grid-details/visibility/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-grid-details/visibility/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-grid-details/visibility/alert"/>
                                     <xf:hint ref="$resources/dialog-grid-details/visibility/hint"/>
                                 </xf:input>
@@ -171,33 +169,28 @@
                                 <xf:input ref="readonly" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-grid-details/readonly/label"/>
-                                    </xf:label>
+                                        <xf:output value="$resources/dialog-grid-details/readonly/label"/></xf:label>
                                     <xf:alert ref="$resources/dialog-grid-details/readonly/alert"/>
                                     <xf:hint ref="$resources/dialog-grid-details/readonly/hint"/>
                                 </xf:input>
                                 <!-- Min -->
                                 <xf:group appearance="xxf:fieldset">
-
-                                    <xf:label>
-                                        <!--<xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>-->
-                                        <xf:output value="$resources/dialog-grid-details/min/label"/>
-                                    </xf:label>
+                                    <xf:label value="$resources/dialog-grid-details/min/label"/>
                                     <xf:select1 ref="$local/min-repeat" appearance="full">
                                         <xf:item>
-                                            <xf:label>None</xf:label>
+                                            <xf:label value="$resources/dialog-grid-details/unlimited"/>
                                             <xf:value>0</xf:value>
                                         </xf:item>
                                         <xf:item>
-                                            <xf:label>One</xf:label>
+                                            <xf:label value="$resources/dialog-grid-details/one"/>
                                             <xf:value>1</xf:value>
                                         </xf:item>
                                         <xf:itemset ref=".">
-                                            <xf:label>Other</xf:label>
-                                            <xf:value value="if (. = ('0', '1')) then '' else ."/>
+                                            <xf:label value="$resources/dialog-grid-details/other"/>
+                                            <xf:value value="if (string() = ('0', '1')) then '' else ."/>
                                         </xf:itemset>
                                     </xf:select1>
-                                    <xf:input ref="$local/min-repeat[not(. = ('0', '1'))]" id="min-input">
+                                    <xf:input ref="$local/min-repeat[not(string() = ('0', '1'))]" id="min-input">
                                         <xf:alert ref="$resources/dialog-grid-details/min/alert"/>
                                         <xf:hint ref="$resources/dialog-grid-details/min/hint"/>
 
@@ -207,23 +200,20 @@
                                 </xf:group>
                                 <!-- Max -->
                                 <xf:group appearance="xxf:fieldset">
-                                    <xf:label>
-                                        <!--<xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>-->
-                                        <xf:output value="$resources/dialog-grid-details/max/label"/>
-                                    </xf:label>
+                                    <xf:label value="$resources/dialog-grid-details/max/label"/>
                                     <xf:select1 ref="$local/max-repeat" appearance="full">
                                         <xf:item>
-                                            <xf:label>None</xf:label>
+                                            <xf:label value="$resources/dialog-grid-details/no-minimum"/>
                                             <xf:value/>
                                         </xf:item>
                                         <xf:itemset ref=".">
-                                            <xf:label>Other</xf:label>
-                                            <xf:value value="if (string(.) = '') then '1' else ."/>
+                                            <xf:label value="$resources/dialog-grid-details/other"/>
+                                            <xf:value value="if (string() = '') then '1' else ."/>
                                         </xf:itemset>
                                         <!-- Focus on max-input when Other is selected -->
                                         <xf:setfocus ev:event="xforms-select" if="event('xxf:item-value') = '1'" control="max-input"/>
                                     </xf:select1>
-                                    <xf:input ref="$local/max-repeat[not(string(.) = '')]" id="max-input">
+                                    <xf:input ref="$local/max-repeat[not(string() = '')]" id="max-input">
                                         <xf:alert ref="$resources/dialog-grid-details/max/alert"/>
                                         <xf:hint ref="$resources/dialog-grid-details/max/hint"/>
 

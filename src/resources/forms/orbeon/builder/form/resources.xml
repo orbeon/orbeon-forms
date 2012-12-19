@@ -332,6 +332,10 @@
                 <alert>Incorrect value</alert>
                 <hint>Positive number</hint>
             </max>
+            <other>Other</other>
+            <one>One repetition</one>
+            <unlimited>Unlimited</unlimited>
+            <no-minimum>No minimum</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
             <label>Edit Validation Properties</label>
@@ -1152,6 +1156,10 @@
                 <alert>Valeur incorrecte</alert>
                 <hint>Nombre positif</hint>
             </max>
+            <other>Autre</other>
+            <one>Une répétition</one>
+            <unlimited>Illimité</unlimited>
+            <no-minimum>Pas de minimum</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
             <label>Propriétés de validation</label>
@@ -1974,6 +1982,10 @@
                 <alert>[Incorrect value]</alert>
                 <hint>[Positive number]</hint>
             </max>
+            <other>[Other]</other>
+            <one>[One repetition]</one>
+            <unlimited>[Unlimited]</unlimited>
+            <no-minimum>[None]</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
             <label>Rediger elementegenskaper</label>
@@ -2795,6 +2807,10 @@
                 <alert>Некорректное значение</alert>
                 <hint>Положительное число</hint>
             </max>
+            <other>[Other]</other>
+            <one>[One repetition]</one>
+            <unlimited>[Unlimited]</unlimited>
+            <no-minimum>[None]</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
             <label>Настройки автоматической проверки</label>

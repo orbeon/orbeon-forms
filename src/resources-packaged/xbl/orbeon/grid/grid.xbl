@@ -184,7 +184,7 @@
                                                             </xsl:attribute>
                                                         </xsl:when>
                                                         <xsl:otherwise>
-                                                            <xsl:attribute name="class"><xsl:value-of select="@class"/></xsl:attribute>
+                                                            <xsl:attribute name="class"><xsl:value-of select="'fb-grid-tr', @class"/></xsl:attribute>
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                     <xsl:copy-of select="@* except @class"/>

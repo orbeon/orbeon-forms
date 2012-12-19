@@ -263,7 +263,7 @@ body {
   content: ": ";
 }
 .xforms-dialog legend.xforms-label:after,
-.xforms-dialog .fr-grid-th .xforms-label:after,
+.xforms-dialog .fb-grid-th .xforms-label:after,
 .xforms-dialog .xbl-fr-alert-dialog-message .xforms-label:after {
   content: none;
 }
@@ -505,16 +505,16 @@ h2 .fr-section-label {
 .fr-view table.fr-grid.fr-norepeat {
   border-collapse: collapse;
 }
-.fr-view table.fr-grid.fr-norepeat:hover .fr-grid-td {
+.fr-view table.fr-grid.fr-norepeat:hover .fb-grid-td {
   border: 1px solid #ddeeff;
 }
-.fr-view .fr-grid-tr {
+.fr-view .fb-grid-tr {
   height: 60px;
 }
-.fr-grid-td {
+.fb-grid-td {
   border: 1px solid transparent;
 }
-.fr-grid.fr-norepeat:hover .fr-grid-td {
+.fr-grid.fr-norepeat:hover .fb-grid-td {
   border: 1px solid #ddeeff;
 }
 .fb-grid-cell-icons,
@@ -534,7 +534,7 @@ h2 .fr-section-label {
   margin-bottom: 0;
   padding: 0;
 }
-.fr-grid .fr-grid-td .fb-grid-cell-icons img {
+.fr-grid .fb-grid-td .fb-grid-cell-icons img {
   display: inline;
 }
 .fb-grid-control-icons {
@@ -565,7 +565,7 @@ h2 .fr-section-label {
 #fr-form-group .fb-static-upload .xforms-upload-remove {
   padding: 0;
 }
-.fr-grid .fr-grid-td .fb-grid-control-icons img {
+.fr-grid .fb-grid-td .fb-grid-control-icons img {
   display: inline;
 }
 .fb-label-hint-placeholder,
@@ -590,7 +590,7 @@ h2 .fr-section-label {
 .fb-mock-link:hover {
   background-color: #ffffd3;
 }
-.fr-grid-td .fb-hover {
+.fb-grid-td .fb-hover {
   position: relative;
 }
 .fb-selected {
@@ -598,15 +598,15 @@ h2 .fr-section-label {
   border-collapse: separate;
 }
 .fr-view .fr-grid .fr-grid-content .xforms-hint:hover,
-.fr-view .fr-grid .fr-grid-th .xforms-label:hover,
-.fr-view .fr-grid .fr-grid-th .xforms-hint:hover,
+.fr-view .fr-grid .fb-grid-th .xforms-label:hover,
+.fr-view .fr-grid .fb-grid-th .xforms-hint:hover,
 .fr-view .fr-grid .btn span:hover {
   background-color: #ffffd3;
 }
 .fr-view .fr-grid .fr-grid-content .xforms-label,
 .fr-view .fr-grid .fr-grid-content .xforms-hint,
-.fr-view .fr-grid .fr-grid-th .xforms-label,
-.fr-view .fr-grid .fr-grid-th .xforms-hint {
+.fr-view .fr-grid .fb-grid-th .xforms-label,
+.fr-view .fr-grid .fb-grid-th .xforms-hint {
   min-height: 20px;
 }
 .fr-view .fr-grid .fr-grid-content {
@@ -647,7 +647,7 @@ td.fb-selected:hover .fb-click-message {
 .fb-component-icon {
   display: block;
 }
-.fb-section-component .fr-grid-td {
+.fb-section-component .fb-grid-td {
   background-image: none;
   background-color: #F8F8F8;
   border: solid 1px #f8f8f8;

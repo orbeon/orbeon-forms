@@ -141,8 +141,11 @@
                                         </xsl:if>
                                         <xsl:for-each select="$grid-rows[1]/*:td">
                                             <xsl:variable name="control" select="*[1]"/>
-                                            <xh:th class="fr-grid-th{if ($is-editable) then ' xforms-activable' else ''}">
-                                                <xsl:if test="$is-editable"><xsl:attribute name="xxf:control">true</xsl:attribute></xsl:if>
+                                            <xh:th>
+                                                <xsl:if test="$is-editable">
+                                                    <xsl:attribute name="class"       select="'fb-grid-th', 'xforms-activable'"/>
+                                                    <xsl:attribute name="xxf:control" select="'true'"/>
+                                                </xsl:if>
                                                 <xsl:copy-of select="@colspan"/>
                                                 <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
                                                     <!-- NOTE: XPath expressions on LHH elements can't be relative to the controls in case there is no iteration. -->
@@ -175,13 +178,13 @@
                                                     <xsl:choose>
                                                         <xsl:when test="$is-repeat">
                                                             <xsl:attribute name="class">
-                                                                <xsl:value-of select="'fr-grid-tr', @class"/>
+                                                                <xsl:value-of select="'fb-grid-tr', @class"/>
                                                                 <xsl:text> {if (xxf:repeat-position() mod 2 = 1) then 'yui-dt-even' else 'yui-dt-odd'}</xsl:text>
                                                                 <xsl:if test="$static-row-pos = 1">{if (xxf:repeat-position() = 1) then ' yui-dt-first' else ()}</xsl:if>
                                                             </xsl:attribute>
                                                         </xsl:when>
                                                         <xsl:otherwise>
-                                                            <xsl:attribute name="class"><xsl:value-of select="'fr-grid-tr', @class"/></xsl:attribute>
+                                                            <xsl:attribute name="class"><xsl:value-of select="@class"/></xsl:attribute>
                                                         </xsl:otherwise>
                                                     </xsl:choose>
                                                     <xsl:copy-of select="@* except @class"/>
@@ -224,10 +227,10 @@
                                                             <xsl:choose>
                                                                 <xsl:when test="$is-editable">
                                                                     <xsl:attribute name="xxf:control">true</xsl:attribute>
-                                                                    <xsl:attribute name="class"><xsl:value-of select="'xforms-activable', 'fr-grid-td', @class"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="'xforms-activable', 'fb-grid-td', @class"/>{if (xxf:get-variable('fr-form-model', 'selected-cell') = $td/@id) then ' fb-selected' else ''}</xsl:attribute>
                                                                 </xsl:when>
                                                                 <xsl:otherwise>
-                                                                    <xsl:attribute name="class"><xsl:value-of select="'fr-grid-td', @class"/></xsl:attribute>
+                                                                    <xsl:attribute name="class"><xsl:value-of select="@class"/></xsl:attribute>
                                                                 </xsl:otherwise>
                                                             </xsl:choose>
                                                             <xsl:copy-of select="@* except (@class, @xxf:control)"/>

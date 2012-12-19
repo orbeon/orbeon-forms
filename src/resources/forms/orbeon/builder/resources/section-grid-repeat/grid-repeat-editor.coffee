@@ -19,12 +19,12 @@ $ ->
                     gridInfo.head =
                         offset: Builder.adjustedOffset head
                         height: f$.height head
-                gridInfo.rows = _.map (f$.find '.fr-grid-tr', grid), (tr) ->                                            # .fr-grid-tr leaves out the header row in the repeat
+                gridInfo.rows = _.map (f$.find '.fb-grid-tr', grid), (tr) ->                                            # .fb-grid-tr leaves out the header row in the repeat
                     grid: gridInfo
                     el: $ tr
                     offset: Builder.adjustedOffset $ tr
                     height: f$.height $ tr
-                gridInfo.cols = _.map (f$.find '.fr-grid-tr:first .fr-grid-td', grid), (td) ->
+                gridInfo.cols = _.map (f$.find '.fb-grid-tr:first .fb-grid-td', grid), (td) ->
                     grid: gridInfo
                     el: $ td
                     offset: Builder.adjustedOffset $ td

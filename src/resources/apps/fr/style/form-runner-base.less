@@ -337,7 +337,12 @@ button.btn-link {
     margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
 
     thead tr th { text-align: left }
-    tbody tr td { vertical-align: top }
+    tbody tr td {
+        vertical-align: top;
+        width: auto;
+        /*overflow: hidden*/                                    /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
+                                                                   absolute positioning of the cell editors, this crops overlays, in particular the date picker */
+    }
 
     // Controls
     select,
@@ -436,13 +441,6 @@ button.btn-link {
         .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
         .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
     }
-
-    // Cell widths
-    .fr-grid-td {
-        width: auto; vertical-align: top;
-        /*overflow: hidden*/                                    /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
-                                                                   absolute positioning of the cell editors, this crops overlays, in particular the date picker */
-    }
 }
 
 #fr-view {
@@ -454,7 +452,7 @@ button.btn-link {
      .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
         { *width: 13em }
 
-    .fr-grid .fr-grid-td .fr-grid-content {
+    .fr-grid td .fr-grid-content {
 
         img.xforms-input-input { *width: auto } // Undo effect of previous rule for image in minimal date picker
 

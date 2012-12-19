@@ -200,7 +200,7 @@ body {
     .xforms-label:after { content: ": " }
     // Exceptions to above rule
     legend.xforms-label:after,
-    .fr-grid-th .xforms-label:after,
+    .fb-grid-th .xforms-label:after,
     .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
 }
 
@@ -412,13 +412,13 @@ h2 .fr-section-label {
     display: block;                                                                                                     // So we can get its width in `position.coffee`
     table.fr-grid.fr-norepeat {                                                                                         // For non-repeat grid (`table` to override collapse in FR.less)
         border-collapse: collapse;
-        &:hover .fr-grid-td { border: 1px solid @lightBlue }
+        &:hover .fb-grid-td { border: 1px solid @lightBlue }
     }
-    .fr-grid-tr { height: 60px }                                                                                        // Enough space to hold row icons so hovering doesn't cause the row to expand
+    .fb-grid-tr { height: 60px }                                                                                        // Enough space to hold row icons so hovering doesn't cause the row to expand
 }
 
-.fr-grid-td { border: 1px solid transparent }
-.fr-grid.fr-norepeat:hover .fr-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
+.fb-grid-td { border: 1px solid transparent }
+.fr-grid.fr-norepeat:hover .fb-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
 
 .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
     display: block; width: @fbIconsHeight;
@@ -428,7 +428,7 @@ h2 .fr-section-label {
 // Delete, expand, shrink shown to the left of the cell
 .fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
 .fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
-.fr-grid .fr-grid-td .fb-grid-cell-icons img { display: inline }
+.fr-grid .fb-grid-td .fb-grid-cell-icons img { display: inline }
 // Control details and validation shown to the top right of the cell
 .fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
 .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
@@ -444,7 +444,7 @@ h2 .fr-section-label {
     .xforms-upload-info, .xforms-upload-size, .xforms-upload-remove { padding: 0 }
 }
 
-.fr-grid .fr-grid-td .fb-grid-control-icons img { display: inline }
+.fr-grid .fb-grid-td .fb-grid-control-icons img { display: inline }
 .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
 .fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
 .fr-grid .fr-grid-content .xforms-trigger .btn input,                               // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
@@ -455,7 +455,7 @@ h2 .fr-section-label {
 .fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     // When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder
 .fb-mock-link:hover { background-color: @yellow }                                   // Simulated link get yellow background on mouse over to suggest it can be edited
 
-.fr-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
+.fb-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
                                                                                     // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
 
 .fb-selected {                                                                      // Selected cell in grids
@@ -467,14 +467,14 @@ h2 .fr-section-label {
 .fr-view .fr-grid {
 
     .fr-grid-content .xforms-hint:hover,           // .fr-grid-content for label/hint in body
-    .fr-grid-th .xforms-label:hover,               // .fr-grid-th for label/hint in thead of a repeat
-    .fr-grid-th .xforms-hint:hover,
+    .fb-grid-th .xforms-label:hover,               // .fb-grid-th for label/hint in thead of a repeat
+    .fb-grid-th .xforms-hint:hover,
     .btn span:hover
         { background-color: @yellow }
 
     // Even if the label or hint is empty, we still want space for 1 line to be reserved
     .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                                      // In regular grid content
-    .fr-grid-th .xforms-label, .fr-grid-th .xforms-hint                                                                 // In grid header, for the repeat single line
+    .fb-grid-th .xforms-label, .fb-grid-th .xforms-hint                                                                 // In grid header, for the repeat single line
         { min-height: 20px }                                                                                            // Use min-height instead of height so text wraps if it doesn't fit on 1 line
 
     .fr-grid-content {
@@ -506,7 +506,7 @@ td.fb-selected:hover .fb-click-message { display: none }
 .fb-component-icon { display: block }
 
 // Read-only components
-.fb-section-component .fr-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
+.fb-section-component .fb-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
 .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
 .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
 

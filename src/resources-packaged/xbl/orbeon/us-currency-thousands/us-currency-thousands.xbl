@@ -48,12 +48,6 @@
             </templates>
         </metadata>
 
-        <xbl:resources>
-            <xbl:style>
-                <!-- This is not very elegant but we need a strong rule to override the FR defaults -->
-                #doc4 .fr-grid .fr-grid-td .fr-grid-content .xbl-fr-us-currency-thousands .fr-component-group .xforms-input input { width: 6em }
-            </xbl:style>
-        </xbl:resources>
         <xbl:implementation>
             <!-- Local model -->
             <xf:model>

@@ -82,15 +82,15 @@ $ ->
                     trigger.style.display = if triggerRelevant then '' else 'none'
         lastPositionTriggers()
 
-    # Normally, we add the div.fb-hover when the mouse first enters the td.fr-grid-td, but for the TinyMCE, if we do
+    # Normally, we add the div.fb-hover when the mouse first enters the td.fb-grid-td, but for the TinyMCE, if we do
     # this after the TinyMCE is initialized, the TinyMCE looses its state as we need to wrap the TinyMCE iframe,
-    # which require us to detach the TinyMCE iframe from the DOM. So here we preempltively add the td.fr-grid-td around
+    # which require us to detach the TinyMCE iframe from the DOM. So here we preempltively add the td.fb-grid-td around
     # the TinyMCE just before it is initialized.
     tinyMCE.onAddEditor.add (sender, editor) ->
         Builder.beforeAddingEditorCallbacks.fire $ document.getElementById editor.id
 
     Builder.beforeAddingEditorCallbacks.add (editor) ->
-        gridThTd = f$.closest 'th.fr-grid-th, td.fr-grid-td', editor
+        gridThTd = f$.closest 'th.fb-grid-th, td.fb-grid-td', editor
         createHoverDiv gridThTd
 
     # We leave the div.fb-hover that was created on mouseEntersGridTdEvent, as removing it would dispatch a blur to the control

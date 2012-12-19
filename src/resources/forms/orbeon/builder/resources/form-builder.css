@@ -93,10 +93,6 @@ body {
   z-index: 1030;
   background-color: #f3f3f3;
 }
-#fr-view fieldset,
-.xforms-dialog fieldset {
-  border: 1px solid #CCCCCC;
-}
 .fb-section-editor {
   position: absolute;
   display: none;
@@ -266,6 +262,7 @@ body {
 .xforms-dialog .xforms-label:after {
   content: ": ";
 }
+.xforms-dialog legend.xforms-label:after,
 .xforms-dialog .fr-grid-th .xforms-label:after,
 .xforms-dialog .xbl-fr-alert-dialog-message .xforms-label:after {
   content: none;

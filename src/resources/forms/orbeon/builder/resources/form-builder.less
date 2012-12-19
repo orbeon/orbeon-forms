@@ -56,8 +56,6 @@ body {
     background-color: @frBackground;
 }
 
-#fr-view fieldset, .xforms-dialog fieldset { border: 1px solid #CCCCCC; }
-
 .fb-section-editor {
     position: absolute;                                                                                                 // Its left/right set in CoffeeScript relative to the current section
     display: none;                                                                                                      // Shown in CoffeeScript when mouse over section
@@ -201,7 +199,9 @@ body {
     // See also https://github.com/orbeon/orbeon-forms/issues/383
     .xforms-label:after { content: ": " }
     // Exceptions to above rule
-    .fr-grid-th .xforms-label:after, .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
+    legend.xforms-label:after,
+    .fr-grid-th .xforms-label:after,
+    .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
 }
 
 // Metadata editor dialog

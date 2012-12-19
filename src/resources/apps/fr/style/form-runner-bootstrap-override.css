@@ -145,13 +145,13 @@ form.xforms-form .table {
 form.xforms-form table th {
   font-weight: normal;
 }
+form.xforms-form fieldset {
+  padding-left: 0;
+  padding-right: 0;
+}
 form.xforms-form fieldset > legend {
   line-height: inherit;
-  width: auto;
-  border: none;
-  padding-left: 4px;
-  padding-right: 4px;
-  font-size: 16px;
+  font-size: 14.3px;
 }
 form.xforms-form .nav > li > span > a {
   display: block;

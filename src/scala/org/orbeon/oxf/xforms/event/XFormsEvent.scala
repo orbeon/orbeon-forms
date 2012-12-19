@@ -90,6 +90,19 @@ abstract class XFormsEvent(
             None
         }
 
+    // Return a property of the given type or the default value
+    // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!
+    //
+    // Return the default value if:
+    // - the property is not supported
+    // - it is supported but no value is available for it
+    final def propertyOrDefault[T](name: String, default: T): T =
+        if (allProperties.isDefinedAt(name))
+            // NOTE: With Scala 2.10, move to `applyOrElse`
+            allProperties(name) map (_.asInstanceOf[T]) getOrElse default
+        else
+            default
+
     // Get an attribute as an XPath SequenceIterator
     final def getAttribute(name: String): SequenceIterator = {
 

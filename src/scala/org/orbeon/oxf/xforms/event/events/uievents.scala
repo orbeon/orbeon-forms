@@ -37,7 +37,7 @@ class XFormsFocusEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_FOCUS, target.asInstanceOf[XFormsControl], properties, bubbles = false, cancelable = true) {
     def this(target: XFormsEventTarget, inputOnly: Boolean = false) = this(target, Map("input-only" → Some(inputOnly)))
 
-    def inputOnly = property[Boolean]("input-only") getOrElse false
+    def inputOnly = propertyOrDefault[Boolean]("input-only", default = false)
 }
 
 class DOMFocusInEvent(target: XFormsEventTarget, properties: PropertyGetter)

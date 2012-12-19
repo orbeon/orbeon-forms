@@ -18,8 +18,6 @@ import org.dom4j.QName;
 
 public class XMLConstants {
 
-    public static final String XMLNS_URI = "http://www.w3.org/2000/xmlns/";
-
     public static final String XML_PREFIX = "xml";
     public static final String XML_URI = "http://www.w3.org/XML/1998/namespace";
     public static final QName XML_BASE_QNAME = new QName("base", new Namespace(XML_PREFIX, XML_URI));
@@ -35,7 +33,6 @@ public class XMLConstants {
 
     public final static QName XML_SCHEMA_QNAME = new QName("schema", XSD_NAMESPACE);
 
-    public static final String XINCLUDE_PREFIX = "xi";
     // NOTE: "2003" was used at some point; the correct value for XInclude 1.0 is "2001"
     public static final String XINCLUDE_URI = "http://www.w3.org/2001/XInclude";
     public static final String OLD_XINCLUDE_URI = "http://www.w3.org/2003/XInclude";
@@ -43,8 +40,6 @@ public class XMLConstants {
     public static final Namespace XXINCLUDE_NAMESPACE = new Namespace("xxi", XXINCLUDE_NAMESPACE_URI);
     public static final QName XXINCLUDE_OMIT_XML_BASE = new QName("omit-xml-base", XXINCLUDE_NAMESPACE);
     public static final QName XINCLUDE_FIXUP_XML_BASE = new QName("fixup-xml-base", Namespace.NO_NAMESPACE);
-
-    public static final Namespace XINCLUDE_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
 
     public static final String OPS_FORMATTING_URI = "http://orbeon.org/oxf/xml/formatting";
     public static final Namespace OPS_FORMATTING_NAMESPACE = new Namespace("f", XMLConstants.OPS_FORMATTING_URI);
@@ -62,24 +57,15 @@ public class XMLConstants {
     public final static QName PAGE_FLOW_PROCESSOR_QNAME = new QName("page-flow", OXF_PROCESSORS_NAMESPACE);
     public final static QName REDIRECT_PROCESSOR_QNAME = new QName("redirect", OXF_PROCESSORS_NAMESPACE);
     public final static QName HTML_SERIALIZER_PROCESSOR_QNAME = new QName("html-serializer", OXF_PROCESSORS_NAMESPACE);
-    public final static QName XFORMS_INPUT_PROCESSOR_QNAME = new QName("xforms-input", OXF_PROCESSORS_NAMESPACE);
-    public final static QName XFORMS_SUBMISSION_PROCESSOR_QNAME = new QName("xforms-submission", OXF_PROCESSORS_NAMESPACE);
-    public final static QName XFORMS_OUTPUT_PROCESSOR_QNAME = new QName("xforms-output", OXF_PROCESSORS_NAMESPACE);
     public final static QName UNSAFE_XSLT_PROCESSOR_QNAME = new QName("unsafe-xslt", OXF_PROCESSORS_NAMESPACE);
     public final static QName XSLT_PROCESSOR_QNAME = new QName("xslt", OXF_PROCESSORS_NAMESPACE);
-    public final static QName XSLT10_PROCESSOR_QNAME = new QName("xslt-1.0", OXF_PROCESSORS_NAMESPACE);
-    public final static QName XSLT20_PROCESSOR_QNAME = new QName("xslt-2.0", OXF_PROCESSORS_NAMESPACE);
     public final static QName PFC_XSLT10_PROCESSOR_QNAME = new QName("pfc-xslt-1.0", OXF_PROCESSORS_NAMESPACE);
     public final static QName PFC_XSLT20_PROCESSOR_QNAME = new QName("pfc-xslt-2.0", OXF_PROCESSORS_NAMESPACE);
     public final static QName INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME = new QName("instance-to-parameters", OXF_PROCESSORS_NAMESPACE);
-    public final static QName SCOPE_SERIALIZER_PROCESSOR_QNAME = new QName("scope-serializer", OXF_PROCESSORS_NAMESPACE);
-    public final static QName RESOURCE_SERVER_PROCESSOR_QNAME = new QName("resource-server", OXF_PROCESSORS_NAMESPACE);
     public final static QName URL_GENERATOR_PROCESSOR_QNAME = new QName("url-generator", OXF_PROCESSORS_NAMESPACE);
     public final static QName DOM_GENERATOR_PROCESSOR_QNAME = new QName("dom-generator", OXF_PROCESSORS_NAMESPACE);
-    public final static QName EXCEPTION_PROCESSOR_QNAME = new QName("exception", OXF_PROCESSORS_NAMESPACE);
     public final static QName ERROR_PROCESSOR_QNAME = new QName("error", OXF_PROCESSORS_NAMESPACE);
     public final static QName XINCLUDE_PROCESSOR_QNAME = new QName("xinclude", OXF_PROCESSORS_NAMESPACE);
-    public final static QName SAX_DEBUGGER_PROCESSOR_QNAME = new QName("sax-debugger", OXF_PROCESSORS_NAMESPACE);
     public final static QName DEBUG_PROCESSOR_QNAME = new QName("debug", OXF_PROCESSORS_NAMESPACE);
 
     public final static QName XS_STRING_QNAME = new QName("string", XSD_NAMESPACE);
@@ -118,12 +104,8 @@ public class XMLConstants {
     public static final String XHTML_PREFIX = "xhtml";
     public static final String XHTML_SHORT_PREFIX = "xh";
     public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
-    public static final Namespace XHTML_NAMESPACE = new Namespace(XHTML_PREFIX, XHTML_NAMESPACE_URI);
-    public static final QName XHTML_HTML_QNAME = new QName("html", XMLConstants.XHTML_NAMESPACE);
 
     public static final String XPATH_FUNCTIONS_NAMESPACE_URI = "http://www.w3.org/2005/xpath-functions";
-
-    public static final String NBSP = "\u00a0";
 
     public static final String SAX_LEXICAL_HANDLER = "http://xml.org/sax/properties/lexical-handler";
 

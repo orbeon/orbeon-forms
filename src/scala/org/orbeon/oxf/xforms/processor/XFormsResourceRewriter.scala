@@ -18,14 +18,16 @@ import org.orbeon.oxf.util._
 import ScalaUtils._
 import java.io._
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.pipeline.api.{PipelineContext, ExternalContext}
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
 import scala.collection.JavaConverters._
+import org.orbeon.oxf.common.Version
+import org.orbeon.oxf.pipeline.api.ExternalContext
+import org.orbeon.oxf.xforms.XFormsProperties
 
 object XFormsResourceRewriter extends Logging {
     /**
@@ -61,7 +63,8 @@ object XFormsResourceRewriter extends Logging {
         }
 
         // Output Orbeon Forms version
-        outputWriter.write("/* This file was produced by " + Version.VersionString + " */\n")
+        if (! XFormsProperties.isEncodeVersion)
+            outputWriter.write("/* This file was produced by " + Version.VersionString + " */\n")
 
         for (resource ← resources) {
             val resourcePath = resource.getResourcePath(isMinimal)
@@ -121,8 +124,10 @@ object XFormsResourceRewriter extends Logging {
     private def generateJS(resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
         // Output Orbeon Forms version
         val outputWriter = new OutputStreamWriter(os, "utf-8")
-        outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
-        outputWriter.flush()
+        if (! XFormsProperties.isEncodeVersion) {
+            outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
+            outputWriter.flush()
+        }
 
         for (resourceConfig ← resources) {
             useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is ⇒

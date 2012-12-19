@@ -22,6 +22,7 @@ import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.RegexpMatcher;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
+import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -277,7 +278,7 @@ public class URLRewriterUtils {
             // 3. Iterate through matchers and see if we get a match
             if (isVersionedURL(absolutePathNoContext, pathMatchers)) {
                 // 4. Found a match, perform additional rewrite at the beginning
-                final String version = isPlatformURL ? Version.VersionNumber() : applicationVersion;
+                final String version = isPlatformURL ? URLRewriterUtils.getOrbeonVersionForClient() : applicationVersion;
                 // Call full method so that we can get the proper client context path
                 return rewriteURL(request.getScheme(), request.getServerName(), request.getServerPort(),
                         request.getClientContextPath(urlString), request.getRequestPath(), "/" + version + absoluteURINoContext, rewriteMode);
@@ -390,6 +391,16 @@ public class URLRewriterUtils {
     public static String getApplicationResourceVersion() {
         final String propertyString = Properties.instance().getPropertySet().getString(RESOURCES_VERSION_NUMBER_PROPERTY);
         return StringUtils.isBlank(propertyString) ? null : propertyString.trim();
+    }
+
+    // Return the version string either in clear or encoded with HMAC depending on configuration
+    public static String getOrbeonVersionForClient() {
+        final boolean isEncodeVersion = XFormsProperties.isEncodeVersion();
+        return isEncodeVersion ? getHmacVersion() : Version.VersionNumber();
+    }
+
+    private static String getHmacVersion() {
+        return SecureUtils.hmacString(Version.VersionNumber(), "hex");
     }
 
     public static List<URLRewriterUtils.PathMatcher> getMatchAllPathMatcher() {

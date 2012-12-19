@@ -17,7 +17,6 @@ import org.dom4j.Document;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.externalcontext.TemplateURLRewriter;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -145,7 +144,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResourceRewrite() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
-        final String version = Version.VersionNumber();
+        final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -252,7 +251,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResourceRewriteForward() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
-        final String version = Version.VersionNumber();
+        final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -300,7 +299,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
     public void testResourceRewriteFilter() {
 
         final List<URLRewriterUtils.PathMatcher> pathMatchers = URLRewriterUtils.MATCH_ALL_PATH_MATCHERS;
-        final String version = Version.VersionNumber();
+        final String version = URLRewriterUtils.getOrbeonVersionForClient();
 
         // Test against request
         int mode = ExternalContext.Response.REWRITE_MODE_ABSOLUTE;
@@ -350,7 +349,7 @@ public class URLRewriterTest extends ResourceManagerTestBase {
         // NOTE: Unclear case: /xforms-server/foobar. URLRewriterUtils.rewriteResourceURL() does not rewrite
         // /xforms-server/foobar as a resource URL and it is not clear why.
 
-        final String orbeonVersion = Version.VersionNumber();
+        final String orbeonVersion = URLRewriterUtils.getOrbeonVersionForClient();
         final String[] propertiesURLs = { "oxf:/ops/unit-tests/properties-versioned-all.xml", "oxf:/ops/unit-tests/properties-versioned-orbeon.xml" };
         final String[] platformPaths = { "/ops/bar", "/config/bar", "/xbl/orbeon/bar", "/forms/orbeon/bar", "/apps/fr/bar", "/xforms-server" };
 

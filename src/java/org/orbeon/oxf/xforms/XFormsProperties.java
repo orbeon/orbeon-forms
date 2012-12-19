@@ -291,6 +291,9 @@ public class XFormsProperties {
     private static final String JAVASCRIPT_AT_BOTTOM_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.javascript-at-bottom";
     private static final boolean JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT = true;
 
+    private static final String ENCODE_VERSION_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.encode-version";
+    private static final boolean ENCODE_VERSION_PROPERTY_DEFAULT = true;
+
     private static final String BASELINE_PROPERTY = XFORMS_PROPERTY_PREFIX + "resources.baseline";
 
     private static final String ASYNC_PORTLET_LOAD_PROPERTY = XFORMS_PROPERTY_PREFIX + "async-portlet-load";
@@ -410,6 +413,11 @@ public class XFormsProperties {
     public static boolean isJavaScriptAtBottom() {
         return Properties.instance().getPropertySet().getBoolean
                 (JAVASCRIPT_AT_BOTTOM_PROPERTY, JAVASCRIPT_AT_BOTTOM_PROPERTY_DEFAULT);
+    }
+
+    public static boolean isEncodeVersion() {
+        return Properties.instance().getPropertySet().getBoolean
+                (ENCODE_VERSION_PROPERTY, ENCODE_VERSION_PROPERTY_DEFAULT);
     }
 
     public static PropertySet.Property getResourcesBaseline() {

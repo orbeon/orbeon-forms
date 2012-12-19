@@ -18,7 +18,6 @@ import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
 import net.sf.ehcache.{Element ⇒ EhElement }
-import org.orbeon.oxf.common.Version
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.processor._
@@ -294,7 +293,7 @@ object ResourcesAggregator {
 
             // Output link to resource
             val path = "" :: "xforms-server" ::
-                (URLRewriterUtils.isResourcesVersioned list Version.VersionNumber) :::
+                (URLRewriterUtils.isResourcesVersioned list URLRewriterUtils.getOrbeonVersionForClient) :::
                 "orbeon-" + resourcesHash + extension + namespace :: Nil mkString "/"
 
             val result = outputElement(path)

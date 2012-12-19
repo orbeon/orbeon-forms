@@ -27,6 +27,7 @@
 
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                            value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.resources.encode-version"                     value="false"/>
     <property as="xs:integer" name="oxf.xforms.show-recoverable-errors"                      value="10"/>
 
     <property as="xs:boolean" name="oxf.fr.version.*.*"                                      value="true"/>

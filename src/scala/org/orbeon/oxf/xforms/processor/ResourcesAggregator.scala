@@ -277,7 +277,7 @@ object ResourcesAggregator {
     def aggregate[T](resources: scala.collection.Set[String], outputElement: String ⇒ T, namespaceOpt: Option[String], isCacheCombinedResources: Boolean, isCSS: Boolean): Option[T] =
         if (resources.nonEmpty) {
             // If there is at least one non-platform path, we also hash the app version number
-            val hasAppResource = resources exists (! URLRewriterUtils.isPlatformPath(_))
+            val hasAppResource = ! (resources forall URLRewriterUtils.isPlatformPath)
             val appVersion = URLRewriterUtils.getApplicationResourceVersion
 
             // All resource paths are hashed

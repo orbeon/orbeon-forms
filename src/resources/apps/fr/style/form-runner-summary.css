@@ -15,7 +15,7 @@
 .fr-summary-table-div,
 .fr-summary-search-count {
   display: block;
-  margin: 20px 0;
+  margin: 10px 0;
 }
 .fr-summary-search .fr-search-free {
   display: inline-block;
@@ -28,7 +28,7 @@
 }
 .fr-summary-search .fr-search-options .fr-summary-search-item {
   display: inline-block;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 .fr-summary-search .fr-search-options .fr-summary-search-item input,
 .fr-summary-search .fr-search-options .fr-summary-search-item select {

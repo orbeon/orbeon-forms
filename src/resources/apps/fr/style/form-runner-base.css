@@ -40,7 +40,7 @@
 }
 .fr-border {
   padding: 0;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   background-color: #f5f5f5;
   border: 1px solid #e3e3e3;
   -webkit-border-radius: 6px;
@@ -510,66 +510,58 @@ button.btn-link {
        http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
 
 }
-#fr-view .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input {
-  *width: auto;
-}
-#fr-view .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
-#fr-view .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time {
-  *width: 6.3em;
-}
 #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
   *width: 13em;
 }
-#fr-view .fr-buttons-placeholder {
-  width: 100%;
-  display: block;
-  text-align: center;
+#fr-view .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input {
+  *width: auto;
 }
-#fr-view .fr-buttons-placeholder div {
-  margin: 0.5em;
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time {
+  *width: 6.3em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-2em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-2em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-2em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-2em select {
   width: 2em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-3em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-3em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-3em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-3em select {
   width: 3em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-4em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-4em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-4em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-4em select {
   width: 4em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-5em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-5em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-5em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-5em select {
   width: 5em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-7em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-7em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-7em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-7em select {
   width: 7em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-10em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-10em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-10em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-10em select {
   width: 10em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-12em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-12em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-12em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-12em select {
   width: 12em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-15em input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-15em select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-15em input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-15em select {
   width: 15em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-100pc input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-100pc select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-100pc input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-100pc select {
   width: 100%;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-2digits input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-2digits select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-2digits input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-2digits select {
   width: 2.2em;
 }
-#fr-view .fr-grid .fr-grid-content .fr-width-4digits input.xforms-input-input,
-#fr-view .fr-grid .fr-grid-content .fr-width-4digits select {
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-4digits input.xforms-input-input,
+#fr-view .fr-grid .fr-grid-td .fr-grid-content .fr-width-4digits select {
   width: 3.3em;
 }
 /* ***** View, PDF, email ******************************************************************************************* */

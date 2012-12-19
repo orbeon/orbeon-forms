@@ -504,6 +504,12 @@ button.btn-link {
                                                                    absolute positioning of the cell editors, this crops overlays, in particular the date picker */
 
 }
+#fr-view {
+  margin-bottom: 10px;
+  /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
+       http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
+
+}
 #fr-view .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input {
   *width: auto;
 }
@@ -511,17 +517,15 @@ button.btn-link {
 #fr-view .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time {
   *width: 6.3em;
 }
-/* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-   http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
 #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
   *width: 13em;
 }
-.fr-buttons-placeholder {
+#fr-view .fr-buttons-placeholder {
   width: 100%;
   display: block;
   text-align: center;
 }
-.fr-buttons-placeholder div {
+#fr-view .fr-buttons-placeholder div {
   margin: 0.5em;
 }
 #fr-view .fr-grid .fr-grid-content .fr-width-2em input.xforms-input-input,

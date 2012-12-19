@@ -664,8 +664,16 @@ td.fb-selected:hover .fb-click-message {
   background-image: none;
   background-color: #cccccc;
 }
+.fr-buttons-placeholder {
+  width: 100%;
+  display: block;
+  text-align: center;
+}
 .fr-buttons-placeholder .xforms-output {
   color: #808080;
+}
+.fr-buttons-placeholder div {
+  margin: 0.5em;
 }
 /* ***** Message **************************************************************************************************** */
 .fr-messages,

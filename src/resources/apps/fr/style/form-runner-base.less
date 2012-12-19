@@ -445,35 +445,37 @@ button.btn-link {
     }
 }
 
-#fr-view .fr-grid .fr-grid-td .fr-grid-content img.xforms-input-input { *width: auto } // Undo effect of previous rule for image in minimal date picker
+#fr-view {
 
-#fr-view .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-date,
-#fr-view .fr-grid-td .fr-grid-content .xforms-input input.xforms-type-time
-    { *width: 6.3em }
+    margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
+    
+    /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
+       http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
+     .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
+        { *width: 13em }
 
-/* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-   http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
-#fr-view  .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
-    { *width: 13em }
+    .fr-grid .fr-grid-td .fr-grid-content {
 
-// Show placeholder frame for buttons
-.fr-buttons-placeholder { width: 100%; display: block; text-align: center }
-.fr-buttons-placeholder div { margin: .5em }
+        img.xforms-input-input { *width: auto } // Undo effect of previous rule for image in minimal date picker
 
-// Custom control widths
-#fr-view .fr-grid .fr-grid-content {
-    .fr-width-2em   input.xforms-input-input, .fr-width-2em select   { width: 2em }
-    .fr-width-3em   input.xforms-input-input, .fr-width-3em select   { width: 3em }
-    .fr-width-4em   input.xforms-input-input, .fr-width-4em select   { width: 4em }
-    .fr-width-5em   input.xforms-input-input, .fr-width-5em select   { width: 5em }
-    .fr-width-7em   input.xforms-input-input, .fr-width-7em select   { width: 7em }
-    .fr-width-10em  input.xforms-input-input, .fr-width-10em select  { width: 10em }
-    .fr-width-12em  input.xforms-input-input, .fr-width-12em select  { width: 12em }
-    .fr-width-15em  input.xforms-input-input, .fr-width-15em select  { width: 15em }
-    .fr-width-100pc input.xforms-input-input, .fr-width-100pc select { width: 100% }
+        .xforms-input input.xforms-type-date,
+        .xforms-input input.xforms-type-time
+            { *width: 6.3em }
 
-    .fr-width-2digits input.xforms-input-input, .fr-width-2digits select  { width: 2.2em }
-    .fr-width-4digits input.xforms-input-input, .fr-width-4digits select  { width: 3.3em }
+        // Custom control widths
+        .fr-width-2em     input.xforms-input-input, .fr-width-2em select      { width: 2em }
+        .fr-width-3em     input.xforms-input-input, .fr-width-3em select      { width: 3em }
+        .fr-width-4em     input.xforms-input-input, .fr-width-4em select      { width: 4em }
+        .fr-width-5em     input.xforms-input-input, .fr-width-5em select      { width: 5em }
+        .fr-width-7em     input.xforms-input-input, .fr-width-7em select      { width: 7em }
+        .fr-width-10em    input.xforms-input-input, .fr-width-10em select     { width: 10em }
+        .fr-width-12em    input.xforms-input-input, .fr-width-12em select     { width: 12em }
+        .fr-width-15em    input.xforms-input-input, .fr-width-15em select     { width: 15em }
+        .fr-width-100pc   input.xforms-input-input, .fr-width-100pc select    { width: 100% }
+    
+        .fr-width-2digits input.xforms-input-input, .fr-width-2digits select  { width: 2.2em }
+        .fr-width-4digits input.xforms-input-input, .fr-width-4digits select  { width: 3.3em }
+    }
 }
 
 /* ***** View, PDF, email ******************************************************************************************* */

@@ -510,7 +510,16 @@ td.fb-selected:hover .fb-click-message { display: none }
 .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
 .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
 
-.fr-buttons-placeholder .xforms-output { color: gray }
+// Placeholder frame for buttons in test mode
+.fr-buttons-placeholder {
+
+    width: 100%;
+    display: block;
+    text-align: center;
+
+    .xforms-output { color: gray }
+    div { margin: .5em }
+}
 
 /* ***** Message **************************************************************************************************** */
 

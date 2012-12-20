@@ -107,33 +107,33 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
          *  
          */
         final long ret;
-        done : try {
+        try {
             final java.net.URLConnection uc = getConnection( key, doNotThrowResourceNotFound);
             if (uc == null) {
                 ret = -1;
-                break done;
-            }
-            if ( uc instanceof java.net.JarURLConnection ) {
-                final JarEntry je 
-                    = ( ( java.net.JarURLConnection )uc ).getJarEntry();
-                ret = je.getTime();
-                break done;
-            } 
-            final java.net.URL url = uc.getURL();
-            final String prot = url.getProtocol();
-            if ( "file".equalsIgnoreCase( prot ) ) {
-                final String fnam = url.getPath();
-                final java.io.File f = new java.io.File( fnam );
-                if ( f.exists() ) {
-                    ret = f.lastModified();
-                } else {
-                    final String fnamDec = java.net.URLDecoder.decode( fnam, "utf-8" );
-                    final java.io.File fdec = new java.io.File( fnamDec );
-                    ret = f.lastModified();
-                }
             } else {
-                final long l = NetUtils.getLastModified( uc );
-                ret = l == 0 ? 1 : l;
+                if ( uc instanceof java.net.JarURLConnection ) {
+                    final JarEntry je
+                        = ( ( java.net.JarURLConnection )uc ).getJarEntry();
+                    ret = je.getTime();
+                }  else {
+                    final java.net.URL url = uc.getURL();
+                    final String prot = url.getProtocol();
+                    if ( "file".equalsIgnoreCase( prot ) ) {
+                        final String fnam = url.getPath();
+                        final java.io.File f = new java.io.File( fnam );
+                        if ( f.exists() ) {
+                            ret = f.lastModified();
+                        } else {
+                            final String fnamDec = java.net.URLDecoder.decode( fnam, "utf-8" );
+                            final java.io.File fdec = new java.io.File( fnamDec );
+                            ret = f.lastModified();
+                        }
+                    } else {
+                        final long l = NetUtils.getLastModified( uc );
+                        ret = l == 0 ? 1 : l;
+                    }
+                }
             }
         } catch ( final java.io.IOException e ) {
             throw new OXFException( e );

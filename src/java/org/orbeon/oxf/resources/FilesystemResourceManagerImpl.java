@@ -36,10 +36,7 @@ public class FilesystemResourceManagerImpl extends ResourceManagerBase {
         super(props);
 
         // Try to get sandbox directory
-        String sandbox = (String) props.get(FilesystemResourceManagerFactory.SANDBOX_DIRECTORY_PROPERTY);
-        if (sandbox == null) // also try backward-compatibility property
-            sandbox = (String) props.get(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY);
-
+        final String sandbox = (String) props.get(FilesystemResourceManagerFactory.SANDBOX_DIRECTORY_PROPERTY);
         if (sandbox != null) {
             // A sandbox directory was found
             rootDirectory = new File(sandbox);

@@ -71,16 +71,6 @@ public class URLResourceManagerImpl extends ResourceManagerBase {
     }
 
     /**
-     * Returns a character reader from the resource manager for the specified
-     * key. The key could point to any text document.
-     * @param key A Resource Manager key
-     * @return a character reader
-     */
-    public Reader getContentAsReader(String key) {
-        return new InputStreamReader(getContentAsStream(key));
-    }
-
-    /**
      * Gets the last modified timestamp for the specified resource
      * @param key A Resource Manager key
      * @param doNotThrowResourceNotFound

@@ -18,6 +18,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 
+import java.io.*;
+import java.net.*;
 import java.util.jar.JarEntry;
 
 
@@ -32,11 +34,11 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
     private final Class clazz;
     private final boolean prependSlash;
-    
 
-    private java.net.URLConnection getConnection(final String key, boolean doNotThrowResourceNotFound) throws java.io.IOException {
-        final String adjustedKey = prependSlash && !key.startsWith( "/" ) ? "/" + key : key;
-        final java.net.URL u = clazz.getResource( adjustedKey );
+
+    private URLConnection getConnection(final String key, boolean doNotThrowResourceNotFound) throws IOException {
+        final String adjustedKey = prependSlash && !key.startsWith("/") ? "/" + key : key;
+        final URL u = clazz.getResource(adjustedKey);
         if (u == null) {
             if (doNotThrowResourceNotFound) return null;
             else throw new ResourceNotFoundException(key);
@@ -47,114 +49,103 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
     /**
      * Initialize this resource manager.
      */
-    public ClassLoaderResourceManagerImpl( final java.util.Map props ) {
-        this( props, null );
+    public ClassLoaderResourceManagerImpl(final java.util.Map props) {
+        this(props, null);
     }
 
     /**
      * Initialize this resource manager with rooted in the specified class
+     *
      * @param c a root class
      */
-    public ClassLoaderResourceManagerImpl( final java.util.Map props, final Class c ) {
-        super( props );
+    public ClassLoaderResourceManagerImpl(final java.util.Map props, final Class c) {
+        super(props);
         clazz = c == null ? getClass() : c;
         prependSlash = c == null;
     }
 
     /**
-     * Returns a character reader from the resource manager for the specified
-     * key. The key could point to any text document.
-     * @param key A Resource Manager key
-     * @return a character reader
-     */
-    public java.io.Reader getContentAsReader(String key) {
-        return new java.io.InputStreamReader(getContentAsStream(key));
-    }
-
-    /**
      * Returns a binary input stream for the specified key. The key could point
      * to any document type (text or binary).
+     *
      * @param key A Resource Manager key
      * @return a input stream
      */
-    public java.io.InputStream getContentAsStream( String key ) {
+    public InputStream getContentAsStream(String key) {
         if (logger.isDebugEnabled())
             logger.debug("getContentAsStream(" + key + ")");
 
-        final java.io.InputStream ret;
+        final InputStream ret;
         try {
-            final java.net.URLConnection uc = getConnection( key, false);
-            uc.setUseCaches( false );
+            final URLConnection uc = getConnection(key, false);
+            uc.setUseCaches(false);
             ret = uc.getInputStream();
-        } catch ( final java.io.IOException e ) {
-            throw new OXFException( e );
+        } catch (final IOException e) {
+            throw new OXFException(e);
         }
         return ret;
     }
 
     /**
      * Gets the last modified timestamp for the specified resource
-     * @param key A Resource Manager key
+     *
+     * @param key                        A Resource Manager key
      * @param doNotThrowResourceNotFound
      * @return a timestamp
      */
     protected long lastModifiedImpl(final String key, boolean doNotThrowResourceNotFound) {
-        /*
-         * Slower implentations are commented out below.  Left them in place so we don't
-         * re-implentment them...
-         * 
-         * Old impl was generating 303K of garbage per request to / in the examples app.
-         *  
-         */
+        // NOTE: Slower implementations in the VCS history (back to 2004!).
+        // Old impl was generating 303K of garbage per request to / in the examples app.
         final long ret;
         try {
-            final java.net.URLConnection uc = getConnection( key, doNotThrowResourceNotFound);
+            final URLConnection uc = getConnection(key, doNotThrowResourceNotFound);
             if (uc == null) {
                 ret = -1;
             } else {
-                if ( uc instanceof java.net.JarURLConnection ) {
-                    final JarEntry je
-                        = ( ( java.net.JarURLConnection )uc ).getJarEntry();
+                if (uc instanceof JarURLConnection) {
+                    final JarEntry je = ((JarURLConnection) uc).getJarEntry();
                     ret = je.getTime();
-                }  else {
-                    final java.net.URL url = uc.getURL();
+                } else {
+                    final URL url = uc.getURL();
                     final String prot = url.getProtocol();
-                    if ( "file".equalsIgnoreCase( prot ) ) {
+                    if ("file".equalsIgnoreCase(prot)) {
                         final String fnam = url.getPath();
-                        final java.io.File f = new java.io.File( fnam );
-                        if ( f.exists() ) {
+                        final File f = new File(fnam);
+                        if (f.exists()) {
                             ret = f.lastModified();
                         } else {
-                            final String fnamDec = java.net.URLDecoder.decode( fnam, "utf-8" );
-                            final java.io.File fdec = new java.io.File( fnamDec );
-                            ret = f.lastModified();
+                            final String fnamDec = URLDecoder.decode(fnam, "utf-8");
+                            final File fdec = new File(fnamDec);
+                            ret = fdec.lastModified();
                         }
                     } else {
-                        final long l = NetUtils.getLastModified( uc );
+                        final long l = NetUtils.getLastModified(uc);
                         ret = l == 0 ? 1 : l;
                     }
                 }
             }
-        } catch ( final java.io.IOException e ) {
-            throw new OXFException( e );
+        } catch (final IOException e) {
+            throw new OXFException(e);
         }
         return ret;
     }
 
     /**
      * Returns the length of the file denoted by this abstract pathname.
+     *
      * @return The length, in bytes, of the file denoted by this abstract pathname, or 0L if the file does not exist
      */
     public int length(String key) {
         try {
-            return getConnection( key, false).getContentLength();
-        } catch (java.io.IOException e) {
+            return getConnection(key, false).getContentLength();
+        } catch (IOException e) {
             throw new OXFException(e);
         }
     }
 
     /**
      * Indicates if the resource manager implementation suports write operations
+     *
      * @return true if write operations are allowed
      */
     public boolean canWrite(String key) {
@@ -163,24 +154,25 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
     /**
      * Allows writing to the resource
+     *
      * @param key A Resource Manager key
      * @return an output stream
      */
-    public java.io.OutputStream getOutputStream(String key) {
+    public OutputStream getOutputStream(String key) {
         throw new OXFException("Write Operation not supported");
     }
 
     /**
      * Allow writing to the resource
+     *
      * @param key A Resource Manager key
-     * @return  a writer
+     * @return a writer
      */
-    public java.io.Writer getWriter(String key) {
+    public Writer getWriter(String key) {
         throw new OXFException("Write Operation not supported");
     }
 
     public String getRealPath(String key) {
         return null;
     }
-
 }

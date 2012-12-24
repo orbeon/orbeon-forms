@@ -171,9 +171,8 @@
                             <xf:dispatch name="get-value-from-itemset" targetid="component-inner-group"><xf:property name="fr-value" value="$value"/></xf:dispatch>
                             <xf:setvalue ref="$binding" value="$value"/>
                             <!-- If no value is found, clear the search field -->
-                            <xf:setvalue if="$value = ''" ref="$local/textfield-value"/>
-                            <!-- HACK: We'll be able to move the if on the setvalue once the following is fixed: https://github.com/orbeon/orbeon-forms/issues/57 -->
-                            <xf:action if="$has-labelref"><xf:setvalue ref="$external-label" value="$local/textfield-value"/></xf:action>
+                            <xf:setvalue if="$value = ''"   ref="$local/textfield-value"/>
+                            <xf:setvalue if="$has-labelref" ref="$external-label" value="$local/textfield-value"/>
                             <xxf:script id="out-arp" if="event('ajax-response-processed') and $script">YAHOO.xbl.fr.Autocomplete.instance(this).ajaxResponseProcessed();</xxf:script>
                         </xf:action>
                         <xf:action ev:event="get-label-from-itemset">

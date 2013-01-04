@@ -96,7 +96,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
 
         var bodyRepeated = false
         
-        def repeatBody(generateTemplate: Boolean, iteration: Int, repeatSelected: Boolean, classes: StringBuilder) {
+        def repeatBody(iteration: Int, classes: StringBuilder, generateTemplate: Boolean, repeatSelected: Boolean) {
 
             if (isMustGenerateDelimiters) {
                 // User and DnD classes
@@ -151,7 +151,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                     appendClasses(addedClasses, "xforms-disabled")
 
                 // Apply the content of the body for this iteration
-                repeatBody(false, i, selected, addedClasses)
+                repeatBody(i, addedClasses, generateTemplate = false, repeatSelected = selected)
             }
         }
 
@@ -165,7 +165,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             val addedClasses = new StringBuilder(if (isTopLevelRepeat) "xforms-repeat-template" else "")
 
             // Apply the content of the body for this iteration
-            repeatBody(true, 0, false, addedClasses)
+            repeatBody(0, addedClasses, generateTemplate = true, repeatSelected = false)
         }
 
         // 3. Handle case where no delimiter was output by repeat iterations or template
@@ -174,7 +174,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
             // the other delimiters)
             outputInterceptor.setForward(false)
             mustOutputFirstDelimiter = false
-            repeatBody(true, 0, false, new StringBuilder)
+            repeatBody(0, new StringBuilder, generateTemplate = true, repeatSelected = false)
         }
 
         // Restore output
@@ -188,6 +188,6 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
     // Don't output any LHHA
     override def handleLabel() = ()
     override def handleHint()  = ()
-    override def handleAlert() = ()
     override def handleHelp()  = ()
+    override def handleAlert() = ()
 }

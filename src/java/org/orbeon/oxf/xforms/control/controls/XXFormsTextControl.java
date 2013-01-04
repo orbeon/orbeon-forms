@@ -36,10 +36,6 @@ public class XXFormsTextControl extends XFormsOutputControl {
         this.forAttribute = element.attributeValue(XFormsConstants.FOR_QNAME);
     }
 
-    public String getForAttribute() {
-        return forAttribute;
-    }
-
     public String getEffectiveForAttribute() {
         // A kind of hacky way of getting the effective id of the HTML element
         return forAttribute + getEffectiveId().substring(getId().length());

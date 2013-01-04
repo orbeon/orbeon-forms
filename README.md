@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 4.0 M19 December 2012
+Last updated for Orbeon Forms 4.0 Beta January 2013
 
 NOTE: This is a milestone build, not a final release.
 
@@ -224,4 +224,4 @@ about individual licenses.
 
 ---
 
-Copyright 1999-2012 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2013 (C) Orbeon, Inc. All rights reserved.

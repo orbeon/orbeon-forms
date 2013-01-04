@@ -14,11 +14,12 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.XFormsConstants.XBL_XBL_QNAME
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler.LAST_ID_QNAME
 
 /**
  * Single root container for the entire controls hierarchy.
@@ -31,11 +32,12 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     override val prefixedId     = part.startScope.fullPrefix + staticId
     override def containerScope = part.startScope
 
-    // Ignore xbl:xbl elements that can be at the top-level, as the static state document produced by the extractor
+    // Ignore <xbl:xbl> elements that can be at the top-level, as the static state document produced by the extractor.
+    // Also ignore <properties> and <last-id> elements
     // might place them there.
     override def findRelevantChildrenElements =
         super.findRelevantChildrenElements filterNot
-            { case (e, _) ⇒ e.getQName == XBL_XBL_QNAME }
+            { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LAST_ID_QNAME)(e.getQName) }
 
     override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)
     override val externalEvents              = externalEventsDef

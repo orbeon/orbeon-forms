@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.dom4j.QName
+
 import org.orbeon.oxf.xforms._
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -21,6 +21,7 @@ import collection.mutable.LinkedHashSet
 import org.apache.commons.lang3.StringUtils
 import AjaxSupport._
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper}
+import ContentHandlerHelper.CDATA
 
 trait ControlAjaxSupport {
 
@@ -41,9 +42,10 @@ trait ControlAjaxSupport {
         var added = false
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+        attributesImpl.addAttribute("", "id", "id", CDATA, XFormsUtils.namespaceId(containingDocument, getEffectiveId))
 
         // Class attribute
+        // This is handled specially because it's a list of tokens, some of which can be added and removed
         added |= addAjaxClasses(attributesImpl, isNewlyVisibleSubtree, other, this)
 
         // LHHA
@@ -56,7 +58,7 @@ trait ControlAjaxSupport {
         }
 
         // Output control-specific attributes
-        added |= addAjaxCustomAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+        added |= addAjaxExtensionAttributes(attributesImpl, isNewlyVisibleSubtree, other)
 
         added
     }
@@ -86,45 +88,37 @@ trait ControlAjaxSupport {
      * @param other                 original control, possibly null
      * @return                      true if any attribute was added, false otherwise
      */
-    def addAjaxCustomAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
+    // FIXME: overridden by XFormsOutputControl and XFormsUploadControl: why?
+    def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
 
-        def addAttributesDiffs(attributeQNames: Seq[QName], namespaceURI: String) = {
-            var added = false
-            for {
-                avtAttributeQName ← attributeQNames
-                // Skip if namespace URI is excluded
-                if (namespaceURI eq null) || namespaceURI == avtAttributeQName.getNamespaceURI
-                value1 = if (other eq null) null else other.getExtensionAttributeValue(avtAttributeQName)
-                value2 = self.getExtensionAttributeValue(avtAttributeQName)
-                if value1 != value2
-                attributeValue = if (value2 ne null) value2 else ""
-            } yield
-                // NOTE: For now we use the local name; may want to use a full name?
-                added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.getName, attributeValue, isNewRepeatIteration, attributeValue == "")
-
-            added
-        }
-
-        // By default, diff only attributes in the xxf:* namespace
-        val extensionAttributes = staticControl.extensionAttributeNames
-        extensionAttributes.nonEmpty && addAttributesDiffs(extensionAttributes, XXFORMS_NAMESPACE_URI)
-    }
-
-    final def addAjaxStandardAttributes(originalControl: XFormsSingleNodeControl, ch: ContentHandlerHelper, isNewRepeatIteration: Boolean): Unit = {
-        val control2 = this
-
+        var added = false
         for {
-            avtAttributeQName ← ControlExtensionAttributesSupport.StandardExtensionAttributes
-            if avtAttributeQName != CLASS_QNAME
-            value1 = if (originalControl eq null) null else originalControl.getExtensionAttributeValue(avtAttributeQName)
-            value2 = control2.getExtensionAttributeValue(avtAttributeQName)
+            avtAttributeQName ← staticControl.extensionAttributes
+            if avtAttributeQName.getNamespaceURI == XXFORMS_NAMESPACE_URI // only keep xxf:* attributes which are defined statically
+            value1 = if (other eq null) null else other.getExtensionAttributeValue(avtAttributeQName)
+            value2 = self.getExtensionAttributeValue(avtAttributeQName)
             if value1 != value2
             attributeValue = if (value2 ne null) value2 else ""
-            attributesImpl = new AttributesImpl
-        } yield {
-            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId))
-            addAttributeIfNeeded(attributesImpl, "for", control2.getEffectiveId, isNewRepeatIteration, false)
-            addAttributeIfNeeded(attributesImpl, "name", avtAttributeQName.getName, isNewRepeatIteration, false)
+        } yield
+            // NOTE: For now we use the local name; may want to use a full name?
+            added |= addAttributeIfNeeded(attributesImpl, avtAttributeQName.getName, attributeValue, isNewRepeatIteration, attributeValue == "")
+
+        added
+    }
+
+    // Output an xxf:attribute element for the given name and value extractor if the value has changed
+    final def outputAttributeElement(originalControl: XFormsControl, name: String, value: XFormsControl ⇒ String, isNewRepeatIteration: Boolean)(ch: ContentHandlerHelper): Unit = {
+
+        val value1 = Option(originalControl) map value
+        val value2 = Some(this)              map value
+
+        if (value1 != value2) {
+            val attributeValue = value2 getOrElse ""
+            val attributesImpl = new AttributesImpl
+
+            attributesImpl.addAttribute("", "id", "id", CDATA, XFormsUtils.namespaceId(containingDocument, getEffectiveId))
+            addAttributeIfNeeded(attributesImpl, "for", getEffectiveId, isNewRepeatIteration, isDefaultValue = false)
+            addAttributeIfNeeded(attributesImpl, "name", name, isNewRepeatIteration, isDefaultValue = false)
             ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
             ch.text(attributeValue)
             ch.endElement()
@@ -136,7 +130,7 @@ trait ControlAjaxSupport {
 
     final def writeMIPsAsAttributes(newAttributes: AttributesImpl): Unit = {
         def write(name: String, value: String) =
-            newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, XXFORMS_PREFIX + ':' + name, ContentHandlerHelper.CDATA, value)
+            newAttributes.addAttribute(XXFORMS_NAMESPACE_URI, name, XXFORMS_PREFIX + ':' + name, CDATA, value)
 
         writeMIPs(write)
     }
@@ -145,6 +139,7 @@ trait ControlAjaxSupport {
 // NOTE: Use name different from trait so that the Java compiler is happy
 object AjaxSupport {
 
+    // NOTE: Similar to XFormsSingleNodeControl.addAjaxCustomMIPs. Should unify handling of classes.
     def addAjaxClasses(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
         var added = false
         val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(CLASS_QNAME)))
@@ -187,7 +182,7 @@ object AjaxSupport {
         if (isNewRepeatIteration && isDefaultValue)
             false
         else {
-            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value)
+            attributesImpl.addAttribute("", name, name, CDATA, value)
             true
         }
 }

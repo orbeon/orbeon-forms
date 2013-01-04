@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.processor.handlers.HandlerHelper._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.ContentHandlerHelper.CDATA
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
@@ -62,11 +62,11 @@ class XFormsOutputDownloadHandler extends XFormsOutputHandler {
 
         if (StringUtils.isBlank(hrefValue)) {
             // No URL so make sure a click doesn't cause navigation, and add class
-            containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#")
+            containerAttributes.addAttribute("", "href", "href", CDATA, "#")
             XMLUtils.addOrAppendToAttribute(containerAttributes, "class", "xforms-readonly")
         } else {
             // URL value
-            containerAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, hrefValue)
+            containerAttributes.addAttribute("", "href", "href", CDATA, hrefValue)
         }
 
         // Specify resource URL type for proxy portlet
@@ -74,17 +74,17 @@ class XFormsOutputDownloadHandler extends XFormsOutputHandler {
             FORMATTING_URL_TYPE_QNAME.getNamespaceURI,
             FORMATTING_URL_TYPE_QNAME.getName,
             XMLUtils.buildQName(formattingPrefix, FORMATTING_URL_TYPE_QNAME.getName),
-            ContentHandlerHelper.CDATA, "resource")
+            CDATA, "resource")
 
         // Add _blank target in order to prevent:
         // 1. The browser replacing the current page, and
         // 2. The browser displaying the "Are you sure you want to navigate away from this page?" warning dialog
         // This, as of 2009-05, seems to be how most sites handle this
-        containerAttributes.addAttribute("", "target", "target", ContentHandlerHelper.CDATA, "_blank")
+        containerAttributes.addAttribute("", "target", "target", CDATA, "_blank")
 
         // Output xxf:* extension attributes
         if (outputControl ne null)
-            outputControl.addExtensionAttributes(containerAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI)
+            outputControl.addExtensionAttributesExceptClassForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
         containerAttributes
     }

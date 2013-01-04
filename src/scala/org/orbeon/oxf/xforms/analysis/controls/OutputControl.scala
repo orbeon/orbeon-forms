@@ -35,7 +35,7 @@ class OutputControl(staticStateContext: StaticStateContext, element: Element, pa
     // Unlike other value controls, don't restrict to simple content (even though the spec says it should!)
     override def isAllowedBoundItem(item: Item) = DataModel.isAllowedBoundItem(item)
 
-    override val extensionAttributeNames = appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) list XXFORMS_TARGET_QNAME
+    override protected val allowedExtensionAttributes = appearances(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) set XXFORMS_TARGET_QNAME
 
     override protected def externalEventsDef = super.externalEventsDef ++ Set(XFORMS_HELP, DOM_ACTIVATE)
     override val externalEvents              = externalEventsDef

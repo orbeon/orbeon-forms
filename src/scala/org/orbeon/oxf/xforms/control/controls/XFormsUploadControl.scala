@@ -191,7 +191,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             case _ ⇒ false
         }
 
-    override def addAjaxCustomAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) =
+    override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) =
         addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
 
     override def getBackCopy: AnyRef = {

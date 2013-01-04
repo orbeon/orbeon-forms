@@ -44,6 +44,7 @@
                                         <attribute name="id">
                                             <data type="string"/>
                                         </attribute>
+                                        <!-- Optional attributes for all controls -->
                                         <optional>
                                             <attribute name="visited">
                                                 <choice>
@@ -64,14 +65,11 @@
                                         <optional>
                                             <attribute name="help"/>
                                         </optional>
-                                        <!-- Optional attributes for all controls -->
                                         <optional>
-                                            <attribute name="style"/>
-                                        </optional>
-                                        <optional>
-                                            <!-- This attribute is a space-separate list of attributes names prefixed with either '-' or an optional '+' -->
+                                            <!-- Space-separated list of attributes names prefixed with either '-' or an optional '+' -->
                                             <attribute name="class"/>
                                         </optional>
+                                        <!-- NOTE: style attribute is output via xxf:attribute -->
                                         <choice>
                                             <!-- Optional attributes for xf:output -->
                                             <group>

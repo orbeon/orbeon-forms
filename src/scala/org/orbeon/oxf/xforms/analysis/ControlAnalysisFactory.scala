@@ -51,7 +51,7 @@ object ControlAnalysisFactory {
     class SelectionControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends InputValueControl(staticStateContext, element, parent, preceding, scope)
             with SelectionControlTrait {
-        override val extensionAttributeNames = ! isMultiple && isFull list XXFORMS_GROUP_QNAME
+        override protected val allowedExtensionAttributes = ! isMultiple && isFull set XXFORMS_GROUP_QNAME
     }
 
     class TriggerControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
@@ -72,17 +72,17 @@ object ControlAnalysisFactory {
 
     class InputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
-        override val extensionAttributeNames = Seq(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
+        override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
     }
 
     class SecretControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
-        override val extensionAttributeNames = Seq(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
+        override protected val allowedExtensionAttributes = Set(XXFORMS_SIZE_QNAME, XXFORMS_MAXLENGTH_QNAME, XXFORMS_AUTOCOMPLETE_QNAME)
     }
 
     class TextareaControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
-        override val extensionAttributeNames = Seq(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
+        override protected val allowedExtensionAttributes = Set(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
     }
 
     private val VariableControlFactory: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
@@ -98,11 +98,11 @@ object ControlAnalysisFactory {
             with ChildrenBuilderTrait {
 
         // Extension attributes depend on the name of the element
-        override val extensionAttributeNames =
-            if ((elementQName ne null) && elementQName.getName == "td")
-                Seq(QName.get("rowspan"), QName.get("colspan"))
+        override protected val allowedExtensionAttributes =
+            if ((elementQName ne null) && Set("td", "th")(elementQName.getName))
+                Set(QName.get("rowspan"), QName.get("colspan"))
             else
-                Seq()
+                Set.empty[QName]
 
         override val externalEvents = super.externalEvents + DOM_ACTIVATE // allow DOMActivate
     }

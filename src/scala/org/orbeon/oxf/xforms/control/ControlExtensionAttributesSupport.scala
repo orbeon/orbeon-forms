@@ -14,16 +14,13 @@
 package org.orbeon.oxf.xforms.control
 
 import org.dom4j.QName
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.xml.sax.helpers.AttributesImpl
+import org.orbeon.oxf.xforms.XFormsConstants._
 
 trait ControlExtensionAttributesSupport {
 
     self: XFormsControl ⇒
-
-    import ControlExtensionAttributesSupport._
 
     // Optional extension attributes supported by the control
     private[ControlExtensionAttributesSupport] var _extensionAttributes: Option[Map[QName, String]] = None
@@ -32,10 +29,10 @@ trait ControlExtensionAttributesSupport {
         _extensionAttributes getOrElse {
             val result = (
                 for {
-                    avtAttributeQName ← StandardExtensionAttributes ++ (if (staticControl ne null) staticControl.extensionAttributeNames else Seq())
+                    avtAttributeQName ← if (staticControl ne null) staticControl.extensionAttributes else Seq()
                     attributeValue = element.attributeValue(avtAttributeQName)
                     if attributeValue ne null
-                    resolvedValue = evaluateAvt(attributeValue) // NOTE: This can return null if there is no context
+                    resolvedValue = evaluateAvt(attributeValue) // FIXME: This can return null if there is no context
                 } yield
                     avtAttributeQName → resolvedValue
             ).toMap
@@ -55,24 +52,21 @@ trait ControlExtensionAttributesSupport {
     def getExtensionAttributeValue(attributeName: QName) =
         evaluatedExtensionAttributes.get(attributeName) orNull
 
-    /**
-     * Add all non-null values of extension attributes to the given list of attributes.
-     *
-     * @param attributesImpl    attributes to add to
-     * @param namespaceURI      restriction on namespace URI, or null if all attributes
-     */
-    final def addExtensionAttributes(attributesImpl: AttributesImpl, namespaceURI: String) =
+    // Add all non-null values to the given list of attributes, filtering by namespace URI
+    // NOTE: the class attribute is excluded because handled separately
+    final def addExtensionAttributesExceptClassForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
         for {
-            (currentName, currentValue) ← evaluatedExtensionAttributes
-            // Skip if namespace URI is excluded
-            if (namespaceURI eq null) || namespaceURI == currentName.getNamespaceURI
-            if currentName != XFormsConstants.CLASS_QNAME
-            if currentValue ne null
-            localName = currentName.getName
+            (name, value) ← evaluatedExtensionAttributes
+            if name.getNamespaceURI == namespaceURI && name != CLASS_QNAME
+            if value ne null
+            localName = name.getName
         } yield
-            attributesImpl.addAttribute("", localName, localName, ContentHandlerHelper.CDATA, currentValue)
-}
+            attributesImpl.addAttribute("", localName, localName, ContentHandlerHelper.CDATA, value)
 
-object ControlExtensionAttributesSupport {
-    val StandardExtensionAttributes = Seq(STYLE_QNAME, CLASS_QNAME)
+    final def addExtensionAttributesExceptClassForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: ContentHandlerHelper): Unit =
+        for {
+            name ← staticControl.extensionAttributes
+            if name.getNamespaceURI == namespaceURI && name != CLASS_QNAME
+        } yield
+            outputAttributeElement(originalControl, name.getName, _.getExtensionAttributeValue(name), isNewlyVisibleSubtree)(ch)
 }

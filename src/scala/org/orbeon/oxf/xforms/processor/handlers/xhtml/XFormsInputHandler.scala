@@ -134,7 +134,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(repeating = false)
                         appendAppearances(elementAnalysis, inputClasses)
 
                         // Output xxf:* extension attributes
-                        inputControl.addExtensionAttributes(reusableAttributes, XXFORMS_NAMESPACE_URI)
+                        inputControl.addExtensionAttributesExceptClassForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
                     } else {
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "")
                     }

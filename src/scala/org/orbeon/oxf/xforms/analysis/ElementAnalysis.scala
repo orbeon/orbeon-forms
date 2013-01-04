@@ -26,6 +26,8 @@ import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Target, Capture, Phase
 import org.orbeon.oxf.xforms.event.EventHandler
 import scala.collection.mutable
 import scala.util.control.Breaks
+import org.orbeon.oxf.xforms.XFormsConstants._
+import scala.Some
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -39,6 +41,8 @@ abstract class ElementAnalysis(
     with ElementRepeats {
 
     self ⇒
+
+    import ElementAnalysis._
 
     require(element ne null)
 
@@ -118,7 +122,8 @@ abstract class ElementAnalysis(
     val classes = ""
 
     // Extension attributes
-    def extensionAttributeNames = Seq[QName]()
+    protected def allowedExtensionAttributes = Set[QName]()
+    final lazy val extensionAttributes       = CommonExtensionAttributes ++ allowedExtensionAttributes filter (element.attribute(_) ne null)
 
     // XPath analysis
     private var contextAnalysis: Option[XPathAnalysis] = None
@@ -374,6 +379,8 @@ trait ElementRepeats {
 }
 
 object ElementAnalysis {
+
+    val CommonExtensionAttributes = Set(STYLE_QNAME, CLASS_QNAME)
 
     val propagateBreaks = new Breaks
 

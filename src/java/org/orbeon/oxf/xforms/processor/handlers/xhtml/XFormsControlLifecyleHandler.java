@@ -16,9 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
-import org.orbeon.oxf.xforms.control.LHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -97,7 +95,6 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         if (isMustOutputControl(getControl())) {
 
             final ContentHandler contentHandler = handlerContext.getController().getOutput();
-            final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (isMustOutputContainerElement()) {
                 // Open control element, usually <span>
                 final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes);
@@ -296,7 +293,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
         // Add extension attributes in no namespace if possible
         if (xformsControl != null) {
-            xformsControl.addExtensionAttributes(newAttributes, "");
+            xformsControl.addExtensionAttributesExceptClassForHandler(newAttributes, "");
         }
         return newAttributes;
     }

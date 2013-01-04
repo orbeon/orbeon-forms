@@ -261,9 +261,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
         }
 
-        // Output extension attributes in no namespace
+        // Output attributes (like style) in no namespace which must be output via xxf:attribute
         // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
-        control2.addAjaxStandardAttributes(control1, ch, isNewlyVisibleSubtree)
+        addExtensionAttributesExceptClassForAjax(control1, "", isNewlyVisibleSubtree)(ch)
     }
 
     override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {
@@ -433,6 +433,7 @@ object XFormsSingleNodeControl {
     // Convenience method to figure out when a control is relevant, assuming a "null" control is non-relevant.
     def isRelevant(control: XFormsSingleNodeControl) = Option(control) exists (_.isRelevant)
 
+    // NOTE: Similar to AjaxSupport.addAjaxClasses. Should unify handling of classes.
     def addAjaxCustomMIPs(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsSingleNodeControl, control2: XFormsSingleNodeControl): Boolean = {
 
         require(control2 ne null)
@@ -455,21 +456,16 @@ object XFormsSingleNodeControl {
 
             val customMIPs1 = control1.customMIPs
 
-            val classesToRemove =
+            def diff(mips1: Map[String, String], mips2: Map[String, String], prefix: Char) =
                 for {
-                    (name, oldValue) ← customMIPs1
-                    newValue = customMIPs2.get(name)
-                    if Option(oldValue) != newValue
+                    (name, value1) ← mips1
+                    value2 = mips2.get(name)
+                    if Option(value1) != value2
                 } yield
-                    '-' + name + '-' + oldValue // TODO: encode so that there are no spaces
+                    prefix + name + '-' + value1 // TODO: encode so that there are no spaces
 
-            val classesToAdd =
-                for {
-                    (name, newValue) ← customMIPs2
-                    oldValue = customMIPs1.get(name)
-                    if Option(newValue) != oldValue
-                } yield
-                    '+' + name + '-' + newValue // TODO: encode so that there are no spaces
+            val classesToRemove = diff(customMIPs1, customMIPs2, '-')
+            val classesToAdd    = diff(customMIPs2, customMIPs1, '+')
 
             addOrAppend(classesToRemove ++ classesToAdd mkString " ")
         } else

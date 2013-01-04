@@ -640,8 +640,8 @@
                         <xxf:control id="my-autocomplete$show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
                         <xxf:control id="my-autocomplete$itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
                         <xxf:attribute id="my-autocomplete$itemset" for="my-autocomplete$itemset" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete$xf-69" class="xbl-fr-autocomplete-max-results-displayed"/>
-                        <xxf:attribute id="my-autocomplete$xf-69" for="my-autocomplete$xf-69" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-autocomplete$xf-68" class="xbl-fr-autocomplete-max-results-displayed"/>
+                        <xxf:attribute id="my-autocomplete$xf-68" for="my-autocomplete$xf-68" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete$select1" class="fr-autocomplete-select1">One</xxf:control>
                         <xxf:attribute id="my-autocomplete$select1" for="my-autocomplete$select1" name="style">display: none</xxf:attribute>
                         <xxf:itemset id="my-autocomplete$select1">[{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"},{"label":"One","value":"One"},{"label":"Two","value":"Two"},{"label":"Three","value":"Three"}]</xxf:itemset>

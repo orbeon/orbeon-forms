@@ -512,5 +512,75 @@
             </xxf:event-response>
         </output>
     </test>
+    
+    <test description="#684: xxforms:if / xxforms:while don't work anymore" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/684 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <values>
+                                <condition/>
+                            </values>
+                        </xf:instance>
+                        
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-model-construct-done">
+                            <xf:setvalue ref="condition">true</xf:setvalue>
+                            <xf:dispatch targetid="model" name="if"/>
+                            <xf:dispatch targetid="model" name="xxf-if"/>
+                            <xf:dispatch targetid="model" name="exf-if"/>
+                            
+                            <xf:setvalue ref="condition">false</xf:setvalue>
+                            <xf:dispatch targetid="model" name="if"/>
+                            <xf:dispatch targetid="model" name="xxf-if"/>
+                            <xf:dispatch targetid="model" name="exf-if"/>
+                        </xf:action>
+
+                        <xf:insert ev:event="if"     if="instance()/condition = 'true'"  context="instance('events')" ref="*" origin="xf:element('if-true')"/>
+                        <xf:insert ev:event="xxf-if" if="instance()/condition = 'true'"  context="instance('events')" ref="*" origin="xf:element('xxf-if-true')"/>
+                        <xf:insert ev:event="exf-if" if="instance()/condition = 'true'"  context="instance('events')" ref="*" origin="xf:element('exf-if-true')"/>
+                        
+                        <xf:insert ev:event="if"     if="instance()/condition = 'false'" context="instance('events')" ref="*" origin="xf:element('if-false')"/>
+                        <xf:insert ev:event="xxf-if" if="instance()/condition = 'false'" context="instance('events')" ref="*" origin="xf:element('xxf-if-false')"/>
+                        <xf:insert ev:event="exf-if" if="instance()/condition = 'false'" context="instance('events')" ref="*" origin="xf:element('exf-if-false')"/>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <values>
+                                    <condition>false</condition>
+                                </values>
+                            </instance>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <if-true/>
+                                    <xxf-if-true/>
+                                    <exf-if-true/>
+                                    <if-false/>
+                                    <xxf-if-false/>
+                                    <exf-if-false/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
 </group>

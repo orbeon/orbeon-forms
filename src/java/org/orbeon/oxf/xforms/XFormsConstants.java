@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Namespace;
 import org.dom4j.QName;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.om.Item;
 
@@ -139,9 +138,7 @@ public class XFormsConstants {
     public static final String EXFORMS_NAMESPACE_URI = "http://www.exforms.org/exf/1-0";
     public static final String EXFORMS_PREFIX = "exf";
     public static final Namespace EXFORMS_NAMESPACE = new Namespace(EXFORMS_PREFIX, EXFORMS_NAMESPACE_URI);
-    public static final QName EXFORMS_IF_ATTRIBUTE_QNAME = new QName("if", EXFORMS_NAMESPACE);
-    public static final QName EXFORMS_WHILE_ATTRIBUTE_QNAME = new QName("while", EXFORMS_NAMESPACE);
-    public static final QName EXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", EXFORMS_NAMESPACE);
+
 
     // XBL
     public static final String XBL_PREFIX = "xbl";
@@ -186,11 +183,6 @@ public class XFormsConstants {
     public static final QName XFORMS_VARIABLE_QNAME = new QName("variable", XFORMS_NAMESPACE);
     public static final QName EXFORMS_VARIABLE_QNAME = new QName("variable", EXFORMS_NAMESPACE);
     public static final QName XXFORMS_SEQUENCE_QNAME = new QName("sequence", XXFORMS_NAMESPACE);
-
-    public static final QName IF_ATTRIBUTE_QNAME = new QName("if");
-    public static final QName WHILE_ATTRIBUTE_QNAME = new QName("while");
-    public static final QName ITERATE_ATTRIBUTE_QNAME = new QName("iterate");
-    public static final QName XXFORMS_ITERATE_ATTRIBUTE_QNAME = new QName("iterate", XXFORMS_NAMESPACE);
 
     public static final String XML_EVENTS_PREFIX = "ev";
     public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";

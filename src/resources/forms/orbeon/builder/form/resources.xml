@@ -495,6 +495,8 @@
             <new-language>
                 <label>Add the following language</label>
             </new-language>
+            <common>Most common languages</common>
+            <all>Other languages</all>
             <add-language>
                 <label>Add language</label>
             </add-language>
@@ -1316,6 +1318,8 @@
             <new-language>
                 <label>Ajouter la langue suivante</label>
             </new-language>
+            <common>Langues les plus courantes</common>
+            <all>Autres languages</all>
             <add-language>
                 <label>Ajouter une langue</label>
             </add-language>
@@ -2139,6 +2143,8 @@
             <new-language>
                 <label>Legg til det følgende språket</label>
             </new-language>
+            <common>[Most common languages]</common>
+            <all>[Other languages]</all>
             <add-language>
                 <label>Legg til språk</label>
             </add-language>
@@ -2961,6 +2967,8 @@
             <new-language>
                 <label>Добавить следующий язык</label>
             </new-language>
+            <common>[Most common languages]</common>
+            <all>[Other languages]</all>
             <add-language>
                 <label>Добавить язык</label>
             </add-language>

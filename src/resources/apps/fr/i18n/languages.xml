@@ -33,6 +33,27 @@
 
 -->
 <languages>
+    <!-- Top languages roughly based on http://en.wikipedia.org/wiki/List_of_languages_by_total_number_of_speakers -->
+    <language top="true" code="en" english-name="English" native-name="English"/>
+    <language top="true" code="es" english-name="Spanish" native-name="Español"/>
+    <language top="true" code="ru" english-name="Russian" native-name="Русский"/>
+    <language top="true" code="fr" english-name="French" native-name="Français"/>
+    <language top="true" code="pt" english-name="Portuguese" native-name="Português"/>
+    <language top="true" code="de" english-name="German" native-name="Deutsch"/>
+
+    <language top="true" code="zh-Hant" english-name="Traditional Chinese" native-name="中文 (正體字)"/>
+    <language top="true" code="zh-Hans" english-name="Simplified Chinese" native-name="中文 (简化字)"/>
+    <language top="true" code="hi" english-name="Hindi" native-name="हिन्दी"/>
+    <language top="true" code="ar" english-name="Arabic" native-name="‫العربية"/>
+    <language top="true" code="bn" english-name="Bengali" native-name="বাংলা"/>
+    <language top="true" code="ms" english-name="Malay" native-name="Bahasa Melayu"/>
+    <language top="true" code="id" english-name="Indonesian" native-name="Bahasa Indonesia"/>
+    <language top="true" code="ja" english-name="Japanese" native-name="日本語"/>
+    <language top="true" code="fa" english-name="Persian" native-name="‫فارسی"/>
+    <language top="true" code="ur" english-name="Urdu" native-name="‫اردو"/>
+    <language top="true" code="pa" english-name="Punjabi" native-name="ਪੰਜਾਬੀ"/>
+
+    <!-- Remaining languages -->
     <language code="aa" english-name="Afar" native-name="Afaraf"/>
     <language code="ab" english-name="Abkhaz" native-name="Аҧсуа"/>
     <language code="ae" english-name="Avestan" native-name="avesta"/>
@@ -40,7 +61,6 @@
     <language code="ak" english-name="Akan" native-name="Akan"/>
     <language exclude="true" code="am" english-name="Amharic" native-name="አማርኛ"/>
     <language code="an" english-name="Aragonese" native-name="Aragonés"/>
-    <language code="ar" english-name="Arabic" native-name="‫العربية"/>
     <language exclude="true" code="as" english-name="Assamese" native-name="অসমীয়া"/>
     <language code="av" english-name="Avar" native-name="авар мацӀ"/>
     <language code="ay" english-name="Aymara" native-name="aymar aru"/>
@@ -51,7 +71,6 @@
     <language code="bh" english-name="Biharis" native-name="भोजपुरी"/>
     <language code="bi" english-name="Bislama" native-name="Bislama"/>
     <language code="bm" english-name="Bambara" native-name="bamanankan"/>
-    <language exclude="true" code="bn" english-name="Bengali" native-name="বাংলা"/>
     <language code="bo" english-name="Tibetan" native-name="བོད་ཡིག"/>
     <language code="br" english-name="Breton" native-name="brezhoneg"/>
     <language code="bs" english-name="Bosnian" native-name="bosanski jezik"/>
@@ -65,22 +84,17 @@
     <language code="cv" english-name="Chuvash" native-name="чӑваш чӗлхи"/>
     <language code="cy" english-name="Welsh" native-name="Cymraeg"/>
     <language code="da" english-name="Danish" native-name="dansk"/>
-    <language code="de" english-name="German" native-name="Deutsch"/>
     <language exclude="true" code="dv" english-name="Dhivehi" native-name="‫ދިވެހި"/>
     <language code="dz" english-name="Dzongkha" native-name="རྫོང་ཁ"/>
     <language code="ee" english-name="Ewe" native-name="Ɛʋɛgbɛ"/>
     <language code="el" english-name="Greek" native-name="Ελληνικά"/>
-    <language code="en" english-name="English" native-name="English"/>
     <language code="eo" english-name="Esperanto" native-name="Esperanto"/>
-    <language code="es" english-name="Spanish" native-name="Español"/>
     <language code="et" english-name="Estonian" native-name="Eesti keel"/>
     <language code="eu" english-name="Basque" native-name="euskara"/>
-    <language code="fa" english-name="Persian" native-name="‫فارسی"/>
     <language code="ff" english-name="Fula" native-name="Fulfulde"/>
     <language code="fi" english-name="Finnish" native-name="suomen kieli"/>
     <language code="fj" english-name="Fijian" native-name="vosa Vakaviti"/>
     <language code="fo" english-name="Faroese" native-name="Føroyskt"/>
-    <language code="fr" english-name="French" native-name="Français"/>
     <language code="fy" english-name="West Frisian" native-name="Frysk"/>
     <language code="ga" english-name="Irish" native-name="Gaeilge"/>
     <language code="gd" english-name="Scottish Gaelic" native-name="Gàidhlig"/>
@@ -90,7 +104,6 @@
     <language code="gv" english-name="Manx" native-name="Ghaelg"/>
     <language code="ha" english-name="Hausa" native-name="‫هَوُسَ"/>
     <language code="he" english-name="Hebrew" native-name="‫עברית"/>
-    <language code="hi" english-name="Hindi" native-name="हिन्दी"/>
     <language code="ho" english-name="Hiri Motu" native-name="Hiri Motu"/>
     <language code="hr" english-name="Croatian" native-name="Hrvatski"/>
     <language code="ht" english-name="Haitian Creole" native-name="Kreyòl ayisyen"/>
@@ -98,7 +111,6 @@
     <language code="hy" english-name="Armenian" native-name="Հայերեն"/>
     <language code="hz" english-name="Herero" native-name="Otjiherero"/>
     <language code="ia" english-name="Interlingua" native-name="interlingua"/>
-    <language code="id" english-name="Indonesian" native-name="Bahasa Indonesia"/>
     <language code="ie" english-name="Interlingue" native-name="Interlingue"/>
     <language code="ig" english-name="Igbo" native-name="Igbo"/>
     <language exclude="true" code="ii" english-name="Yi" native-name="ꆇꉙ"/>
@@ -107,7 +119,6 @@
     <language code="is" english-name="Icelandic" native-name="Íslenska"/>
     <language code="it" english-name="Italian" native-name="Italiano"/>
     <language code="iu" english-name="Inuktitut" native-name="ᐃᓄᒃᑎᑐᑦ"/>
-    <language code="ja" english-name="Japanese" native-name="日本語"/>
     <language code="jv" english-name="Javanese" native-name="basa Jawa"/>
     <language code="ka" english-name="Georgian" native-name="ქართული"/>
     <language code="kg" english-name="Kongo" native-name="KiKongo"/>
@@ -141,7 +152,6 @@
     <language code="mn" english-name="Mongolian" native-name="Монгол"/>
     <language code="mo" english-name="Moldovan" native-name="лимба молдовеняскэ"/>
     <language code="mr" english-name="Marathi" native-name="मराठी"/>
-    <language code="ms" english-name="Malay" native-name="bahasa Melayu"/>
     <language code="mt" english-name="Maltese" native-name="Malti"/>
     <language exclude="true" code="my" english-name="Burmese" native-name="ဗမာစာ"/>
     <language code="na" english-name="Nauruan" native-name="Ekakairũ Naoero"/>
@@ -160,16 +170,13 @@
     <language code="om" english-name="Oromo" native-name="Afaan Oromoo"/>
     <language exclude="true" code="or" english-name="Oriya" native-name="ଓଡ଼ିଆ"/>
     <language code="os" english-name="Ossetic" native-name="Ирон æвзаг"/>
-    <language code="pa" english-name="Punjabi" native-name="ਪੰਜਾਬੀ"/>
     <language code="pi" english-name="Pāli" native-name="पाऴि"/>
     <language code="pl" english-name="Polish" native-name="polski"/>
     <language code="ps" english-name="Pashto" native-name="‫پښتو"/>
-    <language code="pt" english-name="Portuguese" native-name="Português"/>
     <language code="qu" english-name="Quechua" native-name="Runa Simi"/>
     <language code="rm" english-name="Romansh" native-name="rumantsch grischun"/>
     <language code="rn" english-name="Kirundi" native-name="kiRundi"/>
     <language code="ro" english-name="Romanian" native-name="română"/>
-    <language code="ru" english-name="Russian" native-name="Русский"/>
     <language code="rw" english-name="Kinyarwanda" native-name="Kinyarwanda"/>
     <language code="sa" english-name="Sanskrit" native-name="संस्कृतम्"/>
     <language code="sc" english-name="Sardinian" native-name="sardu"/>
@@ -206,7 +213,6 @@
     <language code="ty" english-name="Tahitian" native-name="Reo Mā`ohi"/>
     <language code="ug" english-name="Uyghur" native-name="Uyƣurqə"/>
     <language code="uk" english-name="Ukrainian" native-name="Українська"/>
-    <language code="ur" english-name="Urdu" native-name="‫اردو"/>
     <language code="uz" english-name="Uzbek" native-name="O'zbek"/>
     <language code="ve" english-name="Venda" native-name="tshiVenḓa"/>
     <language code="vi" english-name="Vietnamese" native-name="Tiếng Việt"/>
@@ -217,7 +223,5 @@
     <language code="yi" english-name="Yiddish" native-name="‫ייִדיש"/>
     <language code="yo" english-name="Yoruba" native-name="Yorùbá"/>
     <language code="za" english-name="Zhuang" native-name="Saɯ cueŋƅ"/>
-    <language code="zh-Hant" english-name="Traditional Chinese" native-name="中文 (正體字)"/>
-    <language code="zh-Hans" english-name="Simplified Chinese" native-name="中文 (简化字)"/>
     <language code="zu" english-name="Zulu" native-name="isiZulu"/>
 </languages>

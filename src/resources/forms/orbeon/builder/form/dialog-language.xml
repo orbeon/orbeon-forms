@@ -16,8 +16,6 @@
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -34,6 +32,11 @@
             <xf:group class="fb-hide-alert">
                 <xh:div class="fr-grid">
                     <xh:div class="fr-grid-content">
+                        <xf:var
+                            name="languages"
+                            model="fr-resources-model"
+                            value="instance('fr-languages-instance')/language[not(@exclude = 'true')]"/>
+
                         <xf:select1 ref="$variables/new-language" id="fb-add-language-select1">
                             <xf:label ref="$form-resources/dialog-add-language/new-language/label"/>
                             <xf:item>
@@ -41,17 +44,26 @@
                                 <xf:value/>
                             </xf:item>
                             <!-- All the languages except the languages already selected -->
-                            <xf:itemset model="fr-resources-model"
-                                            ref="instance('fr-languages-instance')/language[not(@exclude = 'true') and not(@code = $resources/resource/@xml:lang)]">
-                                <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
-                                <xf:value ref="@code"/>
-                            </xf:itemset>
+                            <xf:choices>
+                                <xf:label ref="$form-resources/dialog-add-language/common"/>
+                                <xf:itemset ref="xxf:sort($languages[@top = 'true' and not(@code = $resources/resource/@xml:lang)], @english-name, 'text', 'ascending')">
+                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                    <xf:value ref="@code"/>
+                                </xf:itemset>
+                            </xf:choices>
+                            <xf:choices>
+                                <xf:label ref="$form-resources/dialog-add-language/all"/>
+                                <xf:itemset ref="$languages[not(@top = 'true') and not(@code = $resources/resource/@xml:lang)]">
+                                    <xf:label value="if (@native-name != @english-name) then concat(@native-name, ' (', @english-name, ')') else @native-name"/>
+                                    <xf:value ref="@code"/>
+                                </xf:itemset>
+                            </xf:choices>
                         </xf:select1>
                     </xh:div>
                 </xh:div>
             </xf:group>
             <xh:span>
-                <xf:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger">
+                <xf:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger" appearance="xxf:primary">
                     <xf:label ref="$form-resources/add/label"/>
                     <xf:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->

@@ -209,9 +209,6 @@
         <help-icon>
             <label>Edit Help</label>
         </help-icon>
-        <edit-metadata>
-            <label>Edit Metadata</label>
-        </edit-metadata>
         <!-- Common -->
         <add>
             <label>Add</label>
@@ -256,7 +253,7 @@
             <all>All</all>
         </dialog-form-settings>
         <dialog-control-details>
-            <label>Edit Control Details</label>
+            <label>Control Details</label>
             <control-name>
                 <label>Control Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -288,7 +285,7 @@
             </classes>
         </dialog-control-details>
         <dialog-section-details>
-            <label>Edit Section Details</label>
+            <label>Section Details</label>
             <control-name>
                 <label>Section Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -306,7 +303,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>Edit Grid Details</label>
+            <label>Grid Details</label>
             <grid-name>
                 <label>Grid Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -338,7 +335,7 @@
             <no-minimum>No minimum</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
-            <label>Edit Validation Properties</label>
+            <label>Validation Properties</label>
             <types>
                 <label>Data Type</label>
             </types>
@@ -475,7 +472,7 @@
             <label>Confirm</label>
         </dialog-confirmation>
         <dialog-help>
-            <label>Edit Help</label>
+            <label>Help</label>
             <help-message>
                 <label>Help Message</label>
             </help-message>
@@ -539,7 +536,7 @@
             </messages>
         </dialog-upload-schema>
         <dialog-edit-source>
-            <label>Edit Source</label>
+            <label>Source</label>
             <source>
                 <alert>Please make sure the content is well-formed XML</alert>
             </source>
@@ -1038,9 +1035,6 @@
         <help-icon>
             <label>Editer l'aide</label>
         </help-icon>
-        <edit-metadata>
-            <label>Editer métadonnées</label>
-        </edit-metadata>
         <!-- Common -->
         <add>
             <label>Ajouter</label>
@@ -1864,9 +1858,6 @@
         <help-icon>
             <label>Rediger hjelpetekst</label>
         </help-icon>
-        <edit-metadata>
-            <label>Rediger metadata</label>
-        </edit-metadata>
         <!-- Common -->
         <add>
             <label>Legg til</label>
@@ -1956,7 +1947,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>[Edit Grid Details]</label>
+            <label>[Grid Details]</label>
             <grid-name>
                 <label>[Grid Name]</label>
                 <alert>[Name is already in use or incorrect]</alert>
@@ -2689,9 +2680,6 @@
         <help-icon>
             <label>Редактировать справку</label>
         </help-icon>
-        <edit-metadata>
-            <label>Редактировать метаданные</label>
-        </edit-metadata>
         <!-- Common -->
         <add>
             <label>Добавить</label>

@@ -128,7 +128,7 @@
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:group appearance="xxf:internal">
-            <xf:trigger class="fr-inplace-rename" id="fb-edit-schema-trigger" appearance="xxf:primary">
+            <xf:trigger id="fb-edit-schema-trigger" appearance="xxf:primary">
                 <xf:label ref="$form-resources/apply/label"/>
 
                 <xf:action ev:event="DOMActivate">
@@ -143,7 +143,7 @@
 
             </xf:trigger>
             <xf:output value="$form-resources/or/label"/>
-            <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+            <xf:trigger appearance="minimal">
                 <xf:label ref="$form-resources/cancel/label"/>
             </xf:trigger>
 

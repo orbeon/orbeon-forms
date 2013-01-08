@@ -100,11 +100,11 @@
                         <xf:input id="input" xbl:attr="navindex navindex=tabindex incremental" ref="instance()"/>
                         <!-- TODO: i18n -->
                         <xh:span class="fr-inplace-buttons">
-                            <xf:trigger class="fr-inplace-rename" id="apply">
+                            <xf:trigger id="apply">
                                 <xf:label>Apply</xf:label>
                             </xf:trigger>
                             or
-                            <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+                            <xf:trigger appearance="minimal">
                                 <xf:label>Cancel</xf:label>
                             </xf:trigger>
                         </xh:span>

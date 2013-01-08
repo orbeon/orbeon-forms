@@ -68,8 +68,8 @@
                         <xxf:div id="my-inplace-input$fr-inplace-edit" visibility="hidden"/>
                         <xxf:control id="my-inplace-input$xf-6" class="xforms-activable fr-inplace-hint">Hint hint!</xxf:control>
                         <xxf:control id="my-inplace-input$xf-11" class="fr-inplace-content fr-inplace-edit"/>
-                        <xxf:control id="my-inplace-input$apply" class="fr-inplace-rename" label="Apply"/>
-                        <xxf:control id="my-inplace-input$xf-13" class="fr-inplace-cancel" label="Cancel"/>
+                        <xxf:control id="my-inplace-input$apply" label="Apply"/>
+                        <xxf:control id="my-inplace-input$xf-13" label="Cancel"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -118,8 +118,8 @@
                         <xxf:control id="my-inplace-input$xf-6" class="xforms-activable fr-inplace-hint" readonly="true">42</xxf:control>
                         <xxf:control id="my-inplace-input$xf-11" class="fr-inplace-content fr-inplace-edit" relevant="false"/>
                         <xxf:control id="my-inplace-input$input" relevant="false"/>
-                        <xxf:control id="my-inplace-input$apply" class="fr-inplace-rename" relevant="false"/>
-                        <xxf:control id="my-inplace-input$xf-13" class="fr-inplace-cancel" relevant="false"/>
+                        <xxf:control id="my-inplace-input$apply" relevant="false"/>
+                        <xxf:control id="my-inplace-input$xf-13" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

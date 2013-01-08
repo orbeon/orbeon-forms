@@ -213,7 +213,7 @@
                             <xf:label value="$resources/(if ($is-new-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
-                        <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+                        <xf:trigger appearance="minimal">
                             <xf:label value="if ($is-new-form) then $fr-resources/detail/labels/close else $resources/cancel/label"/>
                             <!-- Hide this dialog without saving -->
                             <xxf:hide ev:event="DOMActivate" if="not($is-new-form)" dialog="dialog"/>

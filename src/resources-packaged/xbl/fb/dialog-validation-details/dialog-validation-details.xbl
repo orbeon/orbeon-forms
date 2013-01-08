@@ -305,7 +305,7 @@
                     </fr:grid>
 
                     <xh:div class="fr-dialog-buttons">
-                        <xf:trigger ref="save-trigger" class="fr-inplace-rename" appearance="xxf:primary">
+                        <xf:trigger ref="save-trigger" appearance="xxf:primary">
                             <xf:label ref="$resources/apply/label"/>
                             <!-- Close and save upon DOMActivate -->
                             <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
@@ -313,7 +313,7 @@
                             </xf:dispatch>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
-                        <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+                        <xf:trigger appearance="minimal">
                             <xf:label ref="$resources/cancel/label"/>
                             <!-- Close and cancel upon DOMActivate -->
                             <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">

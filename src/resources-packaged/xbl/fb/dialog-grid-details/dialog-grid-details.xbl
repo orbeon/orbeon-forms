@@ -225,11 +225,11 @@
                         </xh:div>
                         <xh:div class="fr-dialog-buttons">
                             <xf:group id="triggers">
-                                <xf:trigger class="fr-inplace-rename" ref="save-trigger" id="save-trigger" appearance="xxf:primary">
+                                <xf:trigger ref="save-trigger" id="save-trigger" appearance="xxf:primary">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>
-                                <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                                <xf:trigger appearance="minimal" id="cancel-trigger">
                                     <xf:label ref="$resources/cancel/label"/>
                                 </xf:trigger>
                             </xf:group>

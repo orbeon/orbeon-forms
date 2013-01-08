@@ -63,7 +63,7 @@
                 </xh:div>
             </xf:group>
             <xh:span>
-                <xf:trigger class="fr-inplace-rename" ref="$variables/new-language-trigger" appearance="xxf:primary">
+                <xf:trigger ref="$variables/new-language-trigger" appearance="xxf:primary">
                     <xf:label ref="$form-resources/add/label"/>
                     <xf:action ev:event="DOMActivate">
                         <!-- Copy first resources into new resources and set new language -->
@@ -89,7 +89,7 @@
                     </xf:action>
                 </xf:trigger>
                 <xf:output value="$form-resources/or/label"/>
-                <xf:trigger appearance="minimal" class="fr-inplace-cancel">
+                <xf:trigger appearance="minimal">
                     <xf:label ref="$form-resources/cancel/label"/>
                 </xf:trigger>
             </xh:span>

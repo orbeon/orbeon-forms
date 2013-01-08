@@ -122,11 +122,11 @@
                             </fr:grid>
                         </xf:group>
                         <xh:div class="fr-dialog-buttons">
-                            <xf:trigger ref="$local/triggers/(if (xxf:valid($local, true())) then enabled else disabled)" class="fr-inplace-rename" id="save-trigger" appearance="xxf:primary">
+                            <xf:trigger ref="$local/triggers/(if (xxf:valid($local, true())) then enabled else disabled)" id="save-trigger" appearance="xxf:primary">
                                 <xf:label ref="$resources/apply/label"/>
                             </xf:trigger>
                             <xf:output value="$resources/or/label"/>
-                            <xf:trigger appearance="minimal" class="fr-inplace-cancel" id="cancel-trigger">
+                            <xf:trigger appearance="minimal" id="cancel-trigger">
                                 <xf:label ref="$resources/cancel/label"/>
                             </xf:trigger>
                         </xh:div>

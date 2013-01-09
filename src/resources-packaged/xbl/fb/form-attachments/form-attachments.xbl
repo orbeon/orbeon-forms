@@ -155,7 +155,7 @@
                                 <!-- Classes -->
                                 <xf:select ref="$local/classes" appearance="full">
                                     <xf:label ref="$resources/dialog-control-details/classes/label"/>
-                                    <xf:itemset ref="$resources/dialog-control-details/classes/item" xxf:refresh-items="false">
+                                    <xf:itemset ref="$resources/dialog-control-details/classes/item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>

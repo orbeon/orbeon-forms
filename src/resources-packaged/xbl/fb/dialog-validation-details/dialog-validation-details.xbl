@@ -187,7 +187,7 @@
                         <xh:tr>
                             <xh:td>
                                 <!-- Built-in type -->
-                                <xf:select1 ref="$local/builtin-type" xxf:refresh-items="false">
+                                <xf:select1 ref="$local/builtin-type">
                                     <xf:label ref="$resources/dialog-validation-details/builtin-type/label"/>
                                     <xf:hint ref="$resources/dialog-validation-details/builtin-type/hint"/>
                                     <!-- Add placeholder if there is a schema type -->
@@ -204,7 +204,7 @@
                             </xh:td>
                             <xh:td>
                                 <!-- Schema type selection if applicable -->
-                                <xf:select1 ref="$local/schema-type[exists($schema)]" xxf:refresh-items="true">
+                                <xf:select1 ref="$local/schema-type[exists($schema)]">
                                     <xf:label>
                                         <xh:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
                                         <xf:output value="$resources/dialog-validation-details/schema-type/label"/>
@@ -225,7 +225,7 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="required" appearance="full" xxf:refresh-items="false">
+                                <xf:select1 ref="required" appearance="full">
                                     <xf:label ref="$resources/dialog-validation-details/required/label"/>
                                     <xf:hint ref="$resources/dialog-validation-details/required/hint"/>
                                     <xf:itemset ref="$resources/dialog-validation-details/required//item">

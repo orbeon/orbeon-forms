@@ -34,12 +34,13 @@
             <xf:var name="is-existing-schema" value="exists($model/xs:schema)" as="xs:boolean"/>
             <xf:var name="is-new-schema" value="exists($instance/schema/xs:schema)" as="xs:boolean"/>
 
-            <xf:group ref="$schema-element" class="fb-hide-alert">
+            <xf:group ref="$schema-element" class="fb-hide-alert" appearance="xxf:fieldset">
                 <xf:label class="fb-dialog-h2" value="$form-resources/dialog-upload-schema/messages/(if ($is-new-schema) then new-schema-information else existing-schema-information)"/>
 
                 <xh:div class="fb-dialog-section">
                     <xf:group ref=".[xs:simpleType]">
                         <!-- Schema types -->
+                        <!-- NOTE: Maybe we should simply output the types with xf:output instead -->
                         <xf:select1 ref="$instance/temp-type" appearance="compact">
                             <xf:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
                             <xf:hint ref="$form-resources/dialog-upload-schema/schema-type/hint"/>
@@ -51,7 +52,7 @@
                     </xf:group>
                     <xf:group ref=".[not(xs:simpleType)]">
                         <xf:label ref="$form-resources/dialog-upload-schema/schema-type/label"/>
-                        <!-- Display message when no simpletypes are available -->
+                        <!-- Display message when no simple types are available -->
                         <xf:output value="$form-resources/dialog-upload-schema/messages/no-simple-types"/>
                     </xf:group>
                     <xf:group ref=".[@targetNamespace]">
@@ -63,7 +64,7 @@
                 </xh:div>
 
             </xf:group>
-            <xf:group class="fb-hide-alert">
+            <xf:group class="fb-hide-alert" appearance="xxf:fieldset">
                 <xf:label class="fb-dialog-h2" ref="$form-resources/dialog-upload-schema/operations/label"/>
 
                 <xh:div class="fb-dialog-section">

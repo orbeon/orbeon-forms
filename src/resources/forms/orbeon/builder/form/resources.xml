@@ -508,7 +508,7 @@
             <label>XML Schema Upload</label>
             <schema-type>
                 <label>Available Schema Types</label>
-                <hint>This lists the simple types available in the uploaded schema</hint>
+                <hint>The simple types available in the uploaded schema</hint>
             </schema-type>
             <namespace-uri>
                 <label>Schema Namespace URI</label>
@@ -1331,7 +1331,7 @@
             <label>Insertion de schéma XML</label>
             <schema-type>
                 <label>Types disponibles</label>
-                <hint>Liste les types simples disponibles dans le schéma</hint>
+                <hint>Types simples disponibles dans le schéma</hint>
             </schema-type>
             <namespace-uri>
                 <label>URI de l'espace de nom</label>

@@ -1984,7 +1984,7 @@
             <other>[Other]</other>
             <one>[One repetition]</one>
             <unlimited>[Unlimited]</unlimited>
-            <no-minimum>[None]</no-minimum>
+            <no-minimum>[No minimum]</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
             <label>Rediger elementegenskaper</label>
@@ -2810,7 +2810,7 @@
             <other>[Other]</other>
             <one>[One repetition]</one>
             <unlimited>[Unlimited]</unlimited>
-            <no-minimum>[None]</no-minimum>
+            <no-minimum>[No minimum]</no-minimum>
         </dialog-grid-details>
         <dialog-validation-details>
             <label>Настройки автоматической проверки</label>

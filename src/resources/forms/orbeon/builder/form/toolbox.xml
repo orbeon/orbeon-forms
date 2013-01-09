@@ -213,7 +213,7 @@
                 <xf:group ref="instance('fb-metadata-instance')/toolbox/permissions">
                     <!-- Permissions -->
                     <fb:permissions id="fb-permissions" resources-ref="$form-resources"
-                        metadata-ref="instance('fr-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+                        metadata-ref="instance('fb-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
                     <xf:trigger>
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/silk/lock.png" alt=""/>

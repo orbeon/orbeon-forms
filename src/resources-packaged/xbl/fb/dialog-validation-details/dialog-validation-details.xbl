@@ -109,8 +109,7 @@
                         <xf:var name="is-builtin-type" value="starts-with($type-bind, 'xs:') or starts-with($type-bind, 'xf:')"/>
                         <xf:setvalue if="$is-builtin-type" ref="$local/builtin-type" value="substring-after($type-bind, ':')"/>
                         <!-- TODO: Handle namespace and prefix for namespace -->
-                        <xf:setvalue if="not($is-builtin-type)"
-                                         ref="$local/schema-type" value="$type-bind"/>
+                        <xf:setvalue if="not($is-builtin-type)" ref="$local/schema-type" value="$type-bind"/>
                         <xf:setvalue ref="$local/required" value="starts-with($type-bind, 'xs:')"/>
                     </xf:action>
 
@@ -188,15 +187,15 @@
                         <xh:tr>
                             <xh:td>
                                 <!-- Built-in type -->
-                                <xf:select1 ref="$local/builtin-type">
+                                <xf:select1 ref="$local/builtin-type" xxf:refresh-items="false">
                                     <xf:label ref="$resources/dialog-validation-details/builtin-type/label"/>
                                     <xf:hint ref="$resources/dialog-validation-details/builtin-type/hint"/>
-                                    <xf:itemset ref="$resources/dialog-validation-details/builtin-type/choices//(choices | type)" xxf:refresh-items="false">
                                     <!-- Add placeholder if there is a schema type -->
                                     <xf:itemset ref=".[../schema-type != '']">
                                         <xf:label value="$resources/dialog-validation-details/builtin-type/use-schema-type"/>
                                         <xf:value/>
                                     </xf:itemset>
+                                    <xf:itemset ref="$resources/dialog-validation-details/builtin-type/choices//(choices | type)">
                                         <xf:label value="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
                                         <xf:value ref="if (self::choices) then () else if (value) then value else ."/>
                                     </xf:itemset>
@@ -205,7 +204,7 @@
                             </xh:td>
                             <xh:td>
                                 <!-- Schema type selection if applicable -->
-                                <xf:select1 ref="$local/schema-type[exists($schema)]">
+                                <xf:select1 ref="$local/schema-type[exists($schema)]" xxf:refresh-items="true">
                                     <xf:label>
                                         <xh:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
                                         <xf:output value="$resources/dialog-validation-details/schema-type/label"/>
@@ -216,7 +215,7 @@
                                         <xf:value/>
                                     </xf:item>
                                     <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                                    <xf:itemset ref="$schema/xs:simpleType" xxf:refresh-items="true">
+                                    <xf:itemset ref="$schema/xs:simpleType">
                                         <xf:label value="string-join(($schema-prefix, @name), ':')"/>
                                         <xf:value value="string-join(($schema-prefix, @name), ':')"/>
                                     </xf:itemset>
@@ -226,10 +225,10 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <xf:select1 ref="required" appearance="full">
+                                <xf:select1 ref="required" appearance="full" xxf:refresh-items="false">
                                     <xf:label ref="$resources/dialog-validation-details/required/label"/>
                                     <xf:hint ref="$resources/dialog-validation-details/required/hint"/>
-                                    <xf:itemset ref="$resources/dialog-validation-details/required//item" xxf:refresh-items="false">
+                                    <xf:itemset ref="$resources/dialog-validation-details/required//item">
                                         <xf:label ref="label"/>
                                         <xf:value ref="value"/>
                                     </xf:itemset>

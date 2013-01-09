@@ -281,7 +281,7 @@ public class XFormsConstants {
 
     public static final String XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME = "external-events";
 
-    public static final QName ENCRYPT_ITEM_VALUES = new QName("encrypt-item-values", XXFORMS_NAMESPACE);
+    public static final QName ENCRYPT_ITEM_VALUES = new QName(XFormsProperties.ENCRYPT_ITEM_VALUES_PROPERTY, XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_FULL_APPEARANCE_QNAME = new QName("full");
     public static final QName XFORMS_COMPACT_APPEARANCE_QNAME = new QName("compact");

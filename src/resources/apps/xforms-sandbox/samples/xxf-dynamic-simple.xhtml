@@ -15,8 +15,8 @@
             <xf:instance id="form">
                 <xh:html>
                     <xh:head>
-                        <xf:model id="model">
-                            <!-- NOTE: An id is required at this time -->
+                        <xf:model>
+                            <!-- NOTE: An id is required here -->
                             <xf:instance id="instance">
                                 <instance>
                                     <value>42</value>
@@ -33,17 +33,17 @@
     </xh:head>
     <xh:body>
         <!-- The dynamic sub-form -->
-        <xxf:dynamic ref="." id="my-dynamic"/>
+        <xxf:dynamic ref="instance('form')" id="my-dynamic"/>
         <!-- Button to insert a new input field -->
         <xf:trigger>
             <xf:label>Insert new xf:input</xf:label>
             <xf:action ev:event="DOMActivate">
                 <xf:insert
-                    context="xh:head/xf:model/xf:instance/*"
+                    context="instance('form')/xh:head/xf:model/xf:instance/*"
                     ref="*"
                     origin="xf:element('value', 42 + count(value))"/>
                 <xf:insert
-                    context="xh:body"
+                    context="instance('form')/xh:body"
                     ref="xf:input"
                     origin="xf:element('xf:input', xxf:attribute('ref', concat('value[', count(xf:input) + 1, ']')))"/>
             </xf:action>

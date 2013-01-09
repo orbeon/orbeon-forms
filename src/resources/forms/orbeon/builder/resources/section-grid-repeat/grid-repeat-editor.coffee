@@ -125,7 +125,7 @@ $ ->
         # Functions maintaining current row/col position
         resetPos = (pos) -> -> current[pos] = -1
         setPos = (pos) -> (rowCol) ->
-            selector = '.fr-grid-' + rowCol.el[0].nodeName.toLowerCase()
+            selector = '.fb-grid-' + rowCol.el[0].nodeName.toLowerCase()
             current[pos] = f$.length f$.prevAll selector, rowCol.el
 
         Builder.currentRowColChanged gridsCache,

@@ -343,6 +343,8 @@
                 <label>Built-in Type</label>
                 <hint>Built-in data type</hint>
 
+                <use-schema-type>Use schema type</use-schema-type>
+
                 <choices>
                     <choices>
                         <label>Common Types</label>
@@ -1165,6 +1167,8 @@
             <builtin-type>
                 <label>Type de base</label>
                 <hint>Type de donnée de base</hint>
+
+                <use-schema-type>Utiliser le type de schéma</use-schema-type>
 
                 <choices>
                     <choices>
@@ -1991,6 +1995,8 @@
                 <label>Innebygd type</label>
                 <hint>Inngebygd datatype</hint>
 
+                <use-schema-type>[Use schema type]</use-schema-type>
+
                 <choices>
                     <choices>
                         <label>Vanlige typer</label>
@@ -2814,6 +2820,8 @@
             <builtin-type>
                 <label>Встроенный тип</label>
                 <hint>Встроенный тип данных</hint>
+
+                <use-schema-type>[Use schema type]</use-schema-type>
 
                 <choices>
                     <choices>

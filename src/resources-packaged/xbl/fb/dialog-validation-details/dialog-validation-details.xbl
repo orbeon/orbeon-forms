@@ -192,6 +192,11 @@
                                     <xf:label ref="$resources/dialog-validation-details/builtin-type/label"/>
                                     <xf:hint ref="$resources/dialog-validation-details/builtin-type/hint"/>
                                     <xf:itemset ref="$resources/dialog-validation-details/builtin-type/choices//(choices | type)" xxf:refresh-items="false">
+                                    <!-- Add placeholder if there is a schema type -->
+                                    <xf:itemset ref=".[../schema-type != '']">
+                                        <xf:label value="$resources/dialog-validation-details/builtin-type/use-schema-type"/>
+                                        <xf:value/>
+                                    </xf:itemset>
                                         <xf:label value="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
                                         <xf:value ref="if (self::choices) then () else if (value) then value else ."/>
                                     </xf:itemset>

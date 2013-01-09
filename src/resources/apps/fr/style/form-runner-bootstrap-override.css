@@ -126,6 +126,11 @@ form.xforms-form input[type="file"] {
 form.xforms-form textarea {
   height: 68px;
 }
+form.xforms-form select[multiple],
+form.xforms-form .xforms-select1-appearance-compact select,
+form.xforms-form .xforms-select-appearance-compact select {
+  height: 68px;
+}
 form.xforms-form .pagination ul > li > .xforms-trigger {
   cursor: pointer;
 }

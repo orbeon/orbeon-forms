@@ -429,7 +429,6 @@ button.btn-link {
     }
 
     .xforms-upload input { width: auto } // The upload field responds to 100% width on IE, which gives strange result
-    .xforms-select1-appearance-compact select, .xforms-select-appearance-compact select { height: 7em }
 
     // Image output
     .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
@@ -524,7 +523,9 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
         .xforms-upload-info { background: transparent none repeat scroll 0 0; padding-left: 2px }
 
         // Since only value is shown, no need for special height
-        .fr-grid .xforms-select1-appearance-compact, .fr-grid .xforms-select-appearance-compact { height: auto }
+        select[multiple], .xforms-select1-appearance-compact select, .xforms-select-appearance-compact select {
+            height: auto;
+        }
 
         // Flying Saucer doesn't like display: block and 0 font sizes
         .clearfix:before, .clearfix:after,

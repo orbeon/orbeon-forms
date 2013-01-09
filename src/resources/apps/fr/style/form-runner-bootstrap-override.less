@@ -14,6 +14,7 @@
 
 @controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
 @textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
+@multipleSelectHeight: @textareaHeight;
 
 body, label, button, .btn  {
     font-size: @frFontSize;         // Use our own preferred font size
@@ -81,6 +82,10 @@ form.xforms-form {
     // Don't set height for textarea
     textarea {
         height: @textareaHeight;
+    }
+
+    select[multiple], .xforms-select1-appearance-compact select, .xforms-select-appearance-compact select {
+        height: @multipleSelectHeight;
     }
 
     // Adapt pagination to use of xf:trigger

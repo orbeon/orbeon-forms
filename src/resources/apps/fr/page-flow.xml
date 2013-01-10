@@ -180,6 +180,7 @@
     <page path="/fr/?" model="home/home.xhtml" view="html-view.xpl" default-submission="request-parameters.xml">
         <setvalue ref="/*/app">*</setvalue>
         <setvalue ref="/*/form">*</setvalue>
+        <setvalue ref="/*/mode">home</setvalue>
     </page>
 
     <!-- Summary -->

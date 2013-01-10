@@ -184,10 +184,8 @@
                 <selection xmlns=""/>
             </xf:instance>
 
-            <!-- Model initialization -->
+            <!-- 1. Load source form -->
             <xf:action ev:event="xforms-model-construct-done">
-
-                <!-- Load source form -->
                 <xf:var name="source-form" value="xxf:get-request-attribute('fr-form-definition')"/>
                 <xf:action if="exists($source-form)">
                     <!-- Got it from the request -->
@@ -204,10 +202,34 @@
                 <xf:action if="empty(instance('fr-source-form-instance')/xh:head/xf:model)" type="xpath">
                     formRunner:sendError(404)
                 </xf:action>
+            </xf:action>
 
-                <!-- Store resources from configuration instance -->
+            <!-- 2. Check for authorized operations -->
+            <xf:action ev:event="xforms-model-construct-done">
+
+                <xf:var name="ops"
+                        value="formRunner:authorizedOperationsOnForm($source-form-metadata/permissions)"/>
+
+                <xf:setvalue
+                    ref="xxf:instance('fr-authorized-operations')"
+                    value="string-join($ops, ' ')"/>
+
+                <xf:message level="xxf:log-debug">
+                    AUTHORIZED OPERATIONS ON FORM (SUMMARY PAGE): <xf:output value="$ops"/>
+                </xf:message>
+
+                <!-- Send an "Unauthorized" error if the user is unauthorized -->
+                <xf:action if="not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">
+                    formRunner:sendError(403)
+                </xf:action>
+            </xf:action>
+
+            <!-- 3. Rest of initialization -->
+            <xf:action ev:event="xforms-model-construct-done">
+
+                <!-- Load resources -->
                 <xf:var name="resources-instance" as="element(xf:instance)"
-                            value="instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']"/>
+                        value="instance('fr-source-form-instance')/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']"/>
 
                 <xf:action if="not($resources-instance/@src)">
                     <!-- Copy inline instance -->
@@ -223,7 +245,7 @@
                 <!-- Set page size -->
                 <xf:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
                 <xf:setvalue ref="$page-size" model="fr-persistence-model"
-                                 value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
+                             value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
 
                 <!-- Rebuild resource variables after source form has been loaded, because resources model variables
                      (e.g. $fr-form-resources) are used right after we are called. If you don't rebuild, control labels
@@ -231,7 +253,7 @@
                 <xf:rebuild model="fr-resources-model"/>
 
                 <xf:var name="summary-elements" as="element()*"
-                            value="instance('fr-source-form-instance')/xh:body//*[(@ref or @bind) and @class and xxf:classes() = ('fr-summary', 'fr-search')]"/>
+                        value="instance('fr-source-form-instance')/xh:body//*[(@ref or @bind) and @class and xxf:classes() = ('fr-summary', 'fr-search')]"/>
 
                 <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
@@ -559,7 +581,6 @@
 
                                             <!-- Document name and href for edition -->
                                             <xf:var name="document-name" value="@name" as="xs:string"/>
-                                            <xf:var name="operations" value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
                                             <xf:var name="edit-view" value="if ($operations = ('*', 'update')) then 'edit' else if ($operations = 'read') then 'view' else ''"/>
                                             <xf:var name="document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
                                                     $document-name, if (property('xxf:noscript')) then '?fr-noscript=true' else '')"/>

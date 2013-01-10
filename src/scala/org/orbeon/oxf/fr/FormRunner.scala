@@ -202,7 +202,7 @@ object FormRunner {
                         (p \ "user-role" forall (r ⇒                                   // If we have user-role constraints, they must all pass
                             (r \@ "any-of" stringValue) split "\\s+"                    // Constraint is satisfied if user has at least one of the roles
                             map (_.replace("%20", " "))                                 // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
-                            exists request.isUserInRole)))
+                            exists request.isUserInRole)))                              // TODO: Remove limitation of only using container roles
                     flatMap (p ⇒ (p \@ "operations" stringValue) split "\\s+")         // For the permissions that passed, return the list operations
                     distinct)                                                           // Remove duplicate operations
 

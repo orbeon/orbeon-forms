@@ -59,7 +59,10 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
 
     public SAXParser newSAXParser() {
         try {
-            return new XercesJAXPSAXParser(this, features, parserConfiguration);
+            final SAXParser result = new XercesJAXPSAXParser(this, features, parserConfiguration);
+            // Set security manager before returning the parser
+            result.setProperty("http://apache.org/xml/properties/security-manager", new orbeon.apache.xerces.util.SecurityManager());
+            return result;
         } catch (final SAXException se) {
             // Translate to ParserConfigurationException
             throw new OXFException(se); // so we see a decent stack trace!

@@ -53,10 +53,10 @@
 
         <!-- If user can't perform the required operations, deny access to this page -->
         <xf:var name="unauthorized-access" value="
-            ($mode = ('new', 'import', 'validate') and not($ops = ('*', 'create'))) or
-            ($mode = 'edit'                        and not($ops = ('*', 'update'))) or
-            ($mode = ('view', 'pdf', 'email')      and not($ops = ('*', 'read')))   or
-            not($mode = ('new', 'import', 'validate', 'edit', 'view', 'pdf', 'email'))"/>
+            ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create'))) or
+            ($mode = 'edit'                                and not($ops = ('*', 'update'))) or
+            ($mode = ('view', 'pdf', 'email')              and not($ops = ('*', 'read')))   or
+            not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'email'))"/>
 
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xf:action if="$unauthorized-access" type="xpath">
@@ -75,8 +75,8 @@
             <xf:insert context="instance('fr-service-parameters')" origin="xxf:element($parameter-name, $parameter-value)"/>
         </xf:action>
 
-        <!-- Handle loading of initial data for new/edit/view/pdf/email modes only -->
-        <xf:action if="$mode = ('new', 'edit', 'view', 'pdf', 'email')">
+        <!-- Handle loading of initial data for new/test/edit/view/pdf/email modes only -->
+        <xf:action if="$mode = ('new', 'test', 'edit', 'view', 'pdf', 'email')">
 
             <xf:var name="is-new-id" value="normalize-space($document) = ''"/>
             <xf:var name="is-xml-submit" value="exists(xxf:get-request-attribute('fr-form-data'))"/>
@@ -87,7 +87,7 @@
             <xf:setvalue if="$is-new-id" ref="$document" value="secure:randomHexId()"/>
 
             <!-- Case of 'new' mode where we load the initial data via a service -->
-            <xf:var name="new-from-service" value="$mode = 'new' and xxf:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
+            <xf:var name="new-from-service" value="$mode = ('new', 'test') and xxf:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
             <xf:action if="$new-from-service">
                 <xf:message level="xxf:log-debug">Loading new data from service</xf:message>
                 <xf:send submission="fr-get-instance-from-service"/>
@@ -126,7 +126,7 @@
 
             <!-- In 'new' mode only, after an external document has been set, recalculate defaults (and rebuild so the refs
                  in the binds are updated). -->
-            <xf:action if="$new-from-service or ($mode = 'new' and $is-submit)">
+            <xf:action if="$new-from-service or ($mode = ('new', 'test') and $is-submit)">
                 <!-- After we get the document from the persistence layer, recalculate defaults (and rebuild so the refs in the binds are updated) -->
                 <xf:message level="xxf:log-debug">Updating initial values for externally-loaded new document</xf:message>
                 <xf:rebuild model="fr-form-model"/>
@@ -134,7 +134,7 @@
             </xf:action>
 
             <!-- Case of modes other than new where the data to be edited or viewed is loaded from the persistence layer -->
-            <xf:action if="$mode != 'new' and not($is-new-id) and not($is-submit)">
+            <xf:action if="not($mode = ('new', 'test')) and not($is-new-id) and not($is-submit)">
                 <!-- Load document with the provided id from persistence layer -->
                 <xf:message level="xxf:log-debug">Loading data by id from persistence layer: <xf:output value="$document"/></xf:message>
                 <xf:send submission="fr-get-document-submission"/>
@@ -150,7 +150,7 @@
 
                  NOTE: 403 applies well to the first condition. For the second condition, a 404 could also be possible.
              -->
-            <xf:action if="not($is-submit) and not($is-new-id and $mode = 'new' or $mode != 'new')" type="xpath">
+            <xf:action if="not($is-submit) and not($is-new-id and $mode = ('new', 'test') or not($mode = ('new', 'test')))" type="xpath">
                 formRunner:sendError(403)
             </xf:action>
         </xf:action>

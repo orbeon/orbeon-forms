@@ -53,6 +53,9 @@
 }
 .xbl-fr-wizard .fr-wizard-toc a {
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .xbl-fr-wizard .fr-wizard-toc .invalid > span > a {
   color: #b94a48;

@@ -72,16 +72,21 @@
                                 </xh:ul>
 
                                 <xf:var
+                                    name="relevant-cases"
+                                    value="xxf:cases('switch')[for $c in replace(., '-case$', '')
+                                                               return exists(xxf:binding($c)) and exf:relevant(xxf:binding($c))]"/>
+
+                                <xf:var
                                     name="case-index"
-                                    value="index-of(xxf:cases('switch'), xxf:case('switch'))"/>
+                                    value="index-of($relevant-cases, xxf:case('switch'))"/>
 
                                 <xf:var
                                     name="prev-cases"
-                                    value="xxf:cases('switch')[position() lt $case-index][exf:relevant(xxf:binding(replace(., '-case$', '')))]"/>
+                                    value="$relevant-cases[position() lt $case-index]"/>
 
                                 <xf:var
                                     name="next-cases"
-                                    value="xxf:cases('switch')[position() gt $case-index][exf:relevant(xxf:binding(replace(., '-case$', '')))]"/>
+                                    value="$relevant-cases[position() gt $case-index]"/>
 
                                 <xf:var name="prev-button-ref" value="xxf:instance('local')/(if (exists($prev-cases)) then readwrite else readonly)"/>
                                 <xf:var name="next-button-ref" value="xxf:instance('local')/(if (exists($next-cases)) then readwrite else readonly)"/>
@@ -103,7 +108,7 @@
                                             <span>
                                                 <xf:output value="$case-index"/>
                                                 <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
-                                                <xf:output value="count(xxf:cases('switch'))"/>
+                                                <xf:output value="count($relevant-cases)"/>
                                             </span>
                                         </li>
                                         <li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">

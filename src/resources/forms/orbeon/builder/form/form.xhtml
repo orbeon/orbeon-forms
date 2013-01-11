@@ -166,7 +166,10 @@
                     <xh:div class="navbar-inner">
                         <xh:div class="container">
                             <!-- Custom logo upload is removed in 4.0 -->
-                            <xh:img src="{xxf:property(string-join(('oxf.fr.default-logo.uri', xxf:bind('application-name-bind'), xxf:bind('form-name-bind')), '.'))}" alt=""/>
+                            <xf:var name="logo" value="xxf:property(string-join(('oxf.fr.default-logo.uri', xxf:bind('application-name-bind'), xxf:bind('form-name-bind')), '.'))"/>
+                            <xf:group ref=".[normalize-space($logo)]">
+                                <xh:img src="{$logo}" alt=""/>
+                            </xf:group>
                             <fr:title ref="xxf:bind('title-bind')"/>
 
                             <!-- Form settings -->

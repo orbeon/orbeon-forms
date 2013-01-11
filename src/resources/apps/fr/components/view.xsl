@@ -291,7 +291,7 @@
     </xsl:template>
 
     <xsl:template match="fr:logo">
-        <xsl:if test="not($hide-logo)">
+        <xsl:if test="not($hide-logo) and normalize-space($default-logo-uri)">
             <xh:img src="{$default-logo-uri}" alt=""/>
         </xsl:if>
     </xsl:template>

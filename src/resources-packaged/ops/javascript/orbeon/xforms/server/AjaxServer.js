@@ -626,17 +626,18 @@
             }
         } else {
             if (o.responseText
-                    && (
-                        // Don't rely on IE's XML parsing, as it doesn't preserve white spaces
-                        $.browser.msie
-                        // Handle cases where somehoe, the XML document does not come in o.responseXML: parse o.responseText.
+                    && (// Handle cases where somehow, the XML document does not come in o.responseXML: parse o.responseText.
                         // This happens in particular when we get a response after a background upload.
-                        || !responseXML
-                        // Suspecting this wa put there as the browser doesn't necessarily parse the response if it is HTML (e.g. an error)
+                        !responseXML
+                        // Suspecting this was put there as the browser doesn't necessarily parse the response if it is HTML (e.g. an error)
                         || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")
                     )) {
+                // It's unclear why this replacement is needed. See: https://github.com/orbeon/orbeon-forms/issues/718
                 var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
+            } else if (o.responseText && $.browser.msie) {
+                // Don't rely on IE's XML parsing, as it doesn't preserve white spaces
+                responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
             }
 
             if (o.responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {

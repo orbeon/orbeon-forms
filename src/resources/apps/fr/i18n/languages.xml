@@ -53,6 +53,9 @@
     <language top="true" code="ur" english-name="Urdu" native-name="‫اردو"/>
     <language top="true" code="pa" english-name="Punjabi" native-name="ਪੰਜਾਬੀ"/>
 
+    <language top="true" code="it" english-name="Italian" native-name="Italiano"/>
+    <language top="true" code="ko" english-name="Korean" native-name="한국어"/>
+
     <!-- Remaining languages -->
     <language code="aa" english-name="Afar" native-name="Afaraf"/>
     <language code="ab" english-name="Abkhaz" native-name="Аҧсуа"/>
@@ -117,7 +120,6 @@
     <language code="ik" english-name="Inupiaq" native-name="Iñupiaq"/>
     <language code="io" english-name="Ido" native-name="Ido"/>
     <language code="is" english-name="Icelandic" native-name="Íslenska"/>
-    <language code="it" english-name="Italian" native-name="Italiano"/>
     <language code="iu" english-name="Inuktitut" native-name="ᐃᓄᒃᑎᑐᑦ"/>
     <language code="jv" english-name="Javanese" native-name="basa Jawa"/>
     <language code="ka" english-name="Georgian" native-name="ქართული"/>
@@ -128,7 +130,6 @@
     <language code="kl" english-name="Kalaallisut" native-name="kalaallisut"/>
     <language exclude="true" code="km" english-name="Khmer" native-name="ភាសាខ្មែរ"/>
     <language exclude="true" code="kn" english-name="Kannada" native-name="ಕನ್ನಡ"/>
-    <language code="ko" english-name="Korean" native-name="한국어"/>
     <language code="kr" english-name="Kanuri" native-name="Kanuri"/>
     <language code="ks" english-name="Kashmiri" native-name="कश्मीरी"/>
     <language code="ku" english-name="Kurdish" native-name="Kurdî"/>

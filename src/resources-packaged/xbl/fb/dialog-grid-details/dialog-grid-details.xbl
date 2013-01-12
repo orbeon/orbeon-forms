@@ -166,6 +166,7 @@
                                     <xf:hint ref="$resources/dialog-grid-details/visibility/hint"/>
                                 </xf:input>
                                 <!-- Readonly -->
+                                <!--
                                 <xf:input ref="readonly" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
@@ -173,6 +174,7 @@
                                     <xf:alert ref="$resources/dialog-grid-details/readonly/alert"/>
                                     <xf:hint ref="$resources/dialog-grid-details/readonly/hint"/>
                                 </xf:input>
+                                -->
                                 <!-- Min -->
                                 <xf:group appearance="xxf:fieldset">
                                     <xf:label value="$resources/dialog-grid-details/min/label"/>

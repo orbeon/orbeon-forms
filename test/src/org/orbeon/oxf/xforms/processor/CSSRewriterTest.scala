@@ -17,9 +17,7 @@ package org.orbeon.oxf.xforms.processor
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.pipeline.api.ExternalContext.Response
 import org.junit._
-import org.orbeon.oxf.externalcontext.ResponseWrapper
 
 class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
@@ -51,6 +49,21 @@ class CSSRewriterTest extends ResourceManagerTestBase with AssertionsForJUnit {
     @Test def both(): Unit = {
         assert("div #_ns_foo.bar { background-image: url(/orbeon/styles/a.png) }" ===
             rewriteCSS("""div #foo.bar { background-image: url(a.png) }"""))
+    }
+
+    @Test def keepBackslashes(): Unit = {
+
+        val rule = """input[type="radio"],
+                     |input[type="checkbox"] {
+                     |  margin: 4px 0 0;
+                     |  margin-top: 1px\9;
+                     |  *margin-top: 0;
+                     |  line-height: normal;
+                     |  cursor: pointer;
+                     |}
+                     |""".stripMargin
+
+        assert(rule === rewriteCSS(rule).stripMargin)
     }
 
     private def rewriteCSS(css: String) =

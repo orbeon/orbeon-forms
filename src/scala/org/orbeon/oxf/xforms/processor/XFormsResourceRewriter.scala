@@ -28,6 +28,7 @@ import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.xforms.XFormsProperties
+import java.util.regex.Matcher
 
 object XFormsResourceRewriter extends Logging {
     /**
@@ -88,20 +89,22 @@ object XFormsResourceRewriter extends Logging {
         outputWriter.flush()
     }
 
-    private val MatchId = """#([\w]+)""".r
-    private val MatchURL = """url\(("|')?([^"^'^\)]*)("|')?\)""".r
+    private val MatchSelectorAndBlock = """([^\{]*\s*)(\{[^\}]*\})""".r
+    private val MatchId               = """#([\w]+)""".r
+    private val MatchURL              = """url\(("|')?([^"^'^\)]*)("|')?\)""".r
 
     // Public for unit tests
     def rewriteCSS(css: String, resourcePath: String, namespaceOpt: Option[String], response: ExternalContext.Response)(implicit logger: IndentedLogger) = {
 
         // Match and rewrite an id within a selector
         def rewriteSelector(s: String) = namespaceOpt match {
-            case Some(namespace) ⇒ MatchId.replaceAllIn(s, e ⇒ "#" + namespace + e.group(1))
+            case Some(namespace) ⇒ MatchId.replaceAllIn(s, e ⇒ Matcher.quoteReplacement("#" + namespace + e.group(1)))
             case None            ⇒ s
         }
 
         // Match and rewrite a URL within a block
-        def rewriteBlock(s: String) = MatchURL.replaceAllIn(s, e ⇒ rewriteURL(e.group(2)))
+        def rewriteBlock(s: String) =
+            MatchURL.replaceAllIn(s, e ⇒ Matcher.quoteReplacement(rewriteURL(e.group(2))))
 
         // Rewrite an individual URL
         def rewriteURL(url: String) =
@@ -117,8 +120,7 @@ object XFormsResourceRewriter extends Logging {
 
         // Find approximately pairs of selectors/blocks and rewrite each part
         // Ids are rewritten only if the namespace is not empty
-        val r = """([^\{]*\s*)(\{[^\}]*\})""".r
-        r.replaceAllIn(css, e ⇒ rewriteSelector(e.group(1)) + rewriteBlock(e.group(2)))
+        MatchSelectorAndBlock.replaceAllIn(css, e ⇒ Matcher.quoteReplacement(rewriteSelector(e.group(1)) + rewriteBlock(e.group(2))))
     }
 
     private def generateJS(resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {

@@ -248,26 +248,6 @@
                         </xh:tr>
                         <xh:tr>
                             <xh:td>
-                                <!-- Help message -->
-                                <xf:textarea ref="help" incremental="true">
-                                    <xf:label>
-                                        <xh:img src="/ops/images/xforms/help.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/help/label"/></xf:label>
-                                    <xf:hint ref="$resources/dialog-validation-details/help/hint"/>
-                                </xf:textarea>
-                            </xh:td>
-                            <xh:td>
-                                <!-- Alert message -->
-                                <xf:textarea ref="alert" incremental="true">
-                                    <xf:label>
-                                        <xh:img src="/apps/fr/style/images/silk/exclamation.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-validation-details/alert/label"/></xf:label>
-                                    <xf:hint ref="$resources/dialog-validation-details/alert/hint"/>
-                                </xf:textarea>
-                            </xh:td>
-                        </xh:tr>
-                        <xh:tr>
-                            <xh:td>
                                 <xf:input ref="calculate" incremental="true">
                                     <xf:label>
                                         <xh:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
@@ -304,6 +284,26 @@
                                     <xf:alert ref="$resources/dialog-validation-details/readonly/alert"/>
                                     <xf:hint ref="$resources/dialog-validation-details/readonly/hint"/>
                                 </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <!-- Help message -->
+                                <xf:textarea ref="help" incremental="true">
+                                    <xf:label>
+                                        <xh:img src="/ops/images/xforms/help.png" alt="" title=""/>
+                                        <xf:output value="$resources/dialog-validation-details/help/label"/></xf:label>
+                                    <xf:hint ref="$resources/dialog-validation-details/help/hint"/>
+                                </xf:textarea>
+                            </xh:td>
+                            <xh:td>
+                                <!-- Alert message -->
+                                <xf:textarea ref="alert" incremental="true">
+                                    <xf:label>
+                                        <xh:img src="/apps/fr/style/images/silk/exclamation.png" alt="" title=""/>
+                                        <xf:output value="$resources/dialog-validation-details/alert/label"/></xf:label>
+                                    <xf:hint ref="$resources/dialog-validation-details/alert/hint"/>
+                                </xf:textarea>
                             </xh:td>
                         </xh:tr>
                     </fr:grid>

@@ -14,7 +14,8 @@
 
 @controlsHeight: @baseLineHeight + 8px;     // Because of the border-box on the controls
 @textareaHeight: @baseLineHeight * 3 + 8px; // 3 lines
-@multipleSelectHeight: @textareaHeight;
+@controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
+@multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
 
 body, label, button, .btn  {
     font-size: @frFontSize;         // Use our own preferred font size
@@ -84,7 +85,19 @@ form.xforms-form {
         height: @textareaHeight;
     }
 
-    select[multiple], .xforms-select1-appearance-compact select, .xforms-select-appearance-compact select {
+    label.radio, label.checkbox {
+        margin-bottom: @controlsBottomMargin;
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-top: 3px;    // override Bootstrap
+            *margin-top: 0;     // IE7
+            margin-top: 0px\9;  // IE8-9
+        }
+    }
+
+    select[multiple],
+    .xforms-select1-appearance-compact select,
+    .xforms-select-appearance-compact select {
         height: @multipleSelectHeight;
     }
 

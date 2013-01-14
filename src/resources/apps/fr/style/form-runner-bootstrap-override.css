@@ -126,10 +126,22 @@ form.xforms-form input[type="file"] {
 form.xforms-form textarea {
   height: 68px;
 }
+form.xforms-form label.radio,
+form.xforms-form label.checkbox {
+  margin-bottom: 5px;
+}
+form.xforms-form label.radio input[type="radio"],
+form.xforms-form label.checkbox input[type="radio"],
+form.xforms-form label.radio input[type="checkbox"],
+form.xforms-form label.checkbox input[type="checkbox"] {
+  margin-top: 3px;
+  *margin-top: 0;
+  margin-top: 0px\9;
+}
 form.xforms-form select[multiple],
 form.xforms-form .xforms-select1-appearance-compact select,
 form.xforms-form .xforms-select-appearance-compact select {
-  height: 68px;
+  height: 78px;
 }
 form.xforms-form .pagination ul > li > .xforms-trigger {
   cursor: pointer;

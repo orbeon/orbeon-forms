@@ -91,6 +91,16 @@
                                 <xf:var name="prev-button-ref" value="xxf:instance('local')/(if (exists($prev-cases)) then readwrite else readonly)"/>
                                 <xf:var name="next-button-ref" value="xxf:instance('local')/(if (exists($next-cases)) then readwrite else readonly)"/>
 
+                                <!-- Make sure the first relevant case is shown initially -->
+                                <!-- NOTE: Ideally, we should also handle the case where the fr:section in the
+                                     currently-selected case becomes non-relevant. However, this should not happen
+                                     in a well-designed form (that would be very user unfriendly). If xf:case supported
+                                     relevance, we might be able to let this behavior be handled by the XForms engine.
+                                 -->
+                                <xf:toggle
+                                    ev:event="xforms-enabled"
+                                    case="{{$relevant-cases[1]}}"/>
+
                                 <div class="pagination pagination-centered" xmlns="http://www.w3.org/1999/xhtml">
                                     <ul>
                                         <li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">

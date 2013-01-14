@@ -104,7 +104,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <xf:bind id="fields-date-bind" ref="fields-date" type="xf:date" name="fields-date"/>
                     <xf:bind id="date-picker-bind" ref="date-picker" type="xf:date" name="date-picker"/>
                 </xf:bind>
-                <xf:bind id="buttons-bind" ref="buttons" name="buttons">
+                <xf:bind id="buttons-bind" ref="buttons" name="buttons" relevant="$fr-mode = ('new', 'edit')">
                     <xf:bind id="browser-button-bind" ref="browser-button" name="browser-button"/>
                     <xf:bind id="link-button-bind" ref="link-button" name="link-button"/>
                 </xf:bind>

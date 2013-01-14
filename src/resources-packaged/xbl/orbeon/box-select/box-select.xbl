@@ -64,7 +64,7 @@
                     display: block;
                     box-sizing: border-box;
                     border: 1px solid gray;
-                    height: 7em;
+                    height: 78px;
                     width: 100%;
                     overflow-y: scroll;
                     background-color: white;

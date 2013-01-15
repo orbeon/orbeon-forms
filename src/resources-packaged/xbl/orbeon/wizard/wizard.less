@@ -5,22 +5,26 @@
     .fr-wizard-toc {
         width: 198px;
 
-        a {
-            text-decoration: none;
-            .text-overflow();
-        }
+        .nav {
 
-        .invalid > span > a {
-            color: #b94a48;
-        }
+            a {
+                text-decoration: none;
+                .text-overflow();
+            }
 
-        li {
-            // Make li the same height as section title
-            line-height: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
-        }
+            .invalid > span > a {
+                color: #b94a48;
+            }
 
-        ul ul {
-            list-style-type: none;
+            li {
+                // Make li the same height as section title
+                line-height: @frSectionTitleLineHeight - 2 * 3px; // 3px is the Bootstrap padding on .nav-list > li > [span >] a
+                *height:     100%;                                // seems to work for IE7, see #722
+            }
+
+            ul ul {
+                list-style-type: none;
+            }
         }
     }
 

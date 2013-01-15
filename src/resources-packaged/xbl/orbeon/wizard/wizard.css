@@ -51,19 +51,20 @@
 .xbl-fr-wizard .fr-wizard-toc {
   width: 198px;
 }
-.xbl-fr-wizard .fr-wizard-toc a {
+.xbl-fr-wizard .fr-wizard-toc .nav a {
   text-decoration: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.xbl-fr-wizard .fr-wizard-toc .invalid > span > a {
+.xbl-fr-wizard .fr-wizard-toc .nav .invalid > span > a {
   color: #b94a48;
 }
-.xbl-fr-wizard .fr-wizard-toc li {
+.xbl-fr-wizard .fr-wizard-toc .nav li {
   line-height: 30px;
+  *height: 100%;
 }
-.xbl-fr-wizard .fr-wizard-toc ul ul {
+.xbl-fr-wizard .fr-wizard-toc .nav ul ul {
   list-style-type: none;
 }
 .xbl-fr-wizard .fr-wizard-body {

@@ -70,9 +70,15 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../common-search.xpl"/>
+        <p:input name="search" href="#instance"/>
+        <p:output name="search" id="search-input"/>
+    </p:processor>
+
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search-input"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
@@ -192,7 +198,7 @@
         <p:output name="data" id="sql-config"/>
     </p:processor>
     <p:processor name="oxf:sql">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search-input"/>
         <p:input name="config" href="#sql-config"/>
         <p:output name="data" id="sql-output"/>
     </p:processor>

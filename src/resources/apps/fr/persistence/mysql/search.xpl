@@ -61,6 +61,12 @@
     -->
     <p:param name="data" type="output"/>
 
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../common-search.xpl"/>
+        <p:input name="search" href="#instance"/>
+        <p:output name="search" id="search-input"/>
+    </p:processor>
+
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
@@ -73,7 +79,7 @@
     <!-- Hacky rewrite of the XPath to support both short (xh, xf) and long (xhtml, xforms) prefixes
          See: https://github.com/orbeon/orbeon-forms/issues/598 -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search-input"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>

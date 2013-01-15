@@ -29,6 +29,12 @@
     <!-- Search result -->
     <p:param name="data" type="output"/>
 
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../common-search.xpl"/>
+        <p:input name="search" href="#instance"/>
+        <p:output name="search" id="search-input"/>
+    </p:processor>
+
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
@@ -40,7 +46,7 @@
 
     <!-- Prepare submission -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search-input"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xf:submission xsl:version="2.0" method="post"
@@ -62,7 +68,7 @@
 
     <!-- Prepare query -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="#search-input"/>
         <p:input name="query" href="search.xml"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">

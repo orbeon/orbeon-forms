@@ -25,10 +25,7 @@
 
     <!-- Search -->
     <service path="/fr/service/exist/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/exist/search.xpl">
-        <setvalue ref="/*/app"  matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-    </service>
+             view="persistence/exist/search.xpl"/>
 
     <!-- List deployed forms for a given application -->
     <service path="/fr/service/exist/list/([^/^.]+)"
@@ -48,10 +45,7 @@
 
     <!-- Search -->
     <service path="/fr/service/oracle/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/oracle/search.xpl">
-        <setvalue ref="/*/app"  matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-    </service>
+             view="persistence/oracle/search.xpl"/>
 
     <!-- List deployed forms for a given application -->
     <service path="/fr/service/oracle/list/([^/^.]+)"
@@ -71,10 +65,7 @@
 
     <!-- Search -->
     <service path="/fr/service/mysql/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/mysql/search.xpl">
-        <setvalue ref="/*/app"  matcher-group="1"/>
-        <setvalue ref="/*/form" matcher-group="2"/>
-    </service>
+             view="persistence/mysql/search.xpl"/>
 
     <!-- List deployed forms for a given application -->
     <service path="/fr/service/mysql/list/([^/^.]+)"
@@ -148,8 +139,7 @@
     </service>
 
     <service path="/fr/service/custom/([^/^.]+)/search/[^/]+/[^/]+"
-             view="/forms/${1}/service/search.xpl">
-    </service>
+             view="/forms/${1}/service/search.xpl"/>
 
     <!-- Custom services provided by the application -->
     <service path="/fr/service/custom/([^/^.]+)/([^/^.]+)"

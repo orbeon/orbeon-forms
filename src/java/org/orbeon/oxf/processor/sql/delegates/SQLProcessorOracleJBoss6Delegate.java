@@ -24,9 +24,9 @@ import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
 import java.sql.*;
 
 /**
- * Custom Delegate for Oracle / JBoss.
+ * Custom Delegate for Oracle / JBoss 6.
  */
-public class SQLProcessorOracleJBossDelegate extends SQLProcessorOracleDelegateBase implements DatabaseDelegate {
+public class SQLProcessorOracleJBoss6Delegate extends SQLProcessorOracleDelegateBase implements DatabaseDelegate {
 
     protected OraclePreparedStatement getOraclePreparedStatement(PreparedStatement stmt) {
 

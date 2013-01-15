@@ -145,16 +145,26 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                     } catch (Throwable t) {
                         // Ignore
                     }
-                    // Try JBoss delegate
+                    // Try JBoss 7 delegate
                     if (clazz == null) {
                         try {
-                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJBossDelegate");
-                            SQLProcessor.logger.info("Using Oracle JBoss delegate.");
+                            getClass().getClassLoader().loadClass("org.jboss.jca.adapters.jdbc.WrappedPreparedStatement");
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJBoss7Delegate");
+                            SQLProcessor.logger.info("Using Oracle JBoss 7 delegate.");
                         } catch (Throwable t) {
                             // Ignore
                         }
                     }
-
+                    // Try JBoss 6 delegate
+                    if (clazz == null) {
+                        try {
+                            getClass().getClassLoader().loadClass("org.jboss.resource.adapter.jdbc.WrappedPreparedStatement");
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJBoss6Delegate");
+                            SQLProcessor.logger.info("Using Oracle JBoss 6 delegate.");
+                        } catch (Throwable t) {
+                            // Ignore
+                        }
+                    }
                     // First try Tomcat 4
                     if (clazz == null) {
                         try {

@@ -114,7 +114,10 @@ form.xforms-form {
     }
 
     .input-append .add-on, .input-prepend .add-on {
-        height: 18px;
+        height: @baseLineHeight - 2px;
+        // IE7: align with input field
+        *margin-top: 1px;
+        *height: @baseLineHeight;
     }
 
     .fr-grid tr th label {

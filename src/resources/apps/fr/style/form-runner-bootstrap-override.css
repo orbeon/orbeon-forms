@@ -156,6 +156,8 @@ form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
 form.xforms-form .input-append .add-on,
 form.xforms-form .input-prepend .add-on {
   height: 18px;
+  *margin-top: 1px;
+  *height: 20px;
 }
 form.xforms-form .fr-grid tr th label {
   margin: 0;

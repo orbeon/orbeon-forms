@@ -101,11 +101,15 @@
                                     ev:event="xforms-enabled"
                                     case="{{$relevant-cases[1]}}"/>
 
-                                <div class="pagination pagination-centered" xmlns="http://www.w3.org/1999/xhtml">
-                                    <ul>
-                                        <li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
+                                <xh:div class="pagination pagination-centered">
+                                    <xh:ul>
+                                        <xh:li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
                                             <xf:trigger ref="$prev-button-ref" appearance="minimal">
-                                                <xf:label>
+                                                <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
+                                                     a CSS  bug with IE 7:
+                                                     https://github.com/orbeon/orbeon-forms/issues/723
+                                                 -->
+                                                <xf:label xml:space="preserve">
                                                     <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
                                                 </xf:label>
                                                 <xf:action ev:event="DOMActivate">
@@ -113,17 +117,21 @@
                                                     <xf:setfocus control="{{$prev-cases[last()]}}" input-only="true"/>
                                                 </xf:action>
                                             </xf:trigger>
-                                        </li>
-                                        <li>
-                                            <span>
+                                        </xh:li>
+                                        <xh:li>
+                                            <xh:span>
                                                 <xf:output value="$case-index"/>
                                                 <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
                                                 <xf:output value="count($relevant-cases)"/>
-                                            </span>
-                                        </li>
-                                        <li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
+                                            </xh:span>
+                                        </xh:li>
+                                        <xh:li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
                                             <xf:trigger ref="$next-button-ref" appearance="minimal">
-                                                <xf:label>
+                                                <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
+                                                     a CSS  bug with IE 7:
+                                                     https://github.com/orbeon/orbeon-forms/issues/723
+                                                 -->
+                                                <xf:label xml:space="preserve">
                                                     <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
                                                 </xf:label>
                                                 <xf:action ev:event="DOMActivate">
@@ -131,9 +139,9 @@
                                                     <xf:setfocus control="{{$next-cases[1]}}" input-only="true"/>
                                                 </xf:action>
                                             </xf:trigger>
-                                        </li>
-                                    </ul>
-                                </div>
+                                        </xh:li>
+                                    </xh:ul>
+                                </xh:div>
 
                             </xf:group>
                         </xh:div>

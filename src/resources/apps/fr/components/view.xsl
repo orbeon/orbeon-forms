@@ -145,11 +145,14 @@
                             <xsl:otherwise>
                                 <!-- Standard header -->
                                 <xsl:variable name="default-objects" as="element()+">
+                                    <!-- These are typically to the right, but to help with IE7 we put them first. See:
+                                         https://github.com/orbeon/orbeon-forms/issues/721 -->
+                                    <fr:language-selector/>
+                                    <fr:noscript-selector/>
+                                    <!-- These are typically to the left -->
                                     <fr:logo/>
                                     <fr:title/>
                                     <fr:goto-content/>
-                                    <fr:language-selector/>
-                                    <fr:noscript-selector/>
                                 </xsl:variable>
 
                                 <xsl:apply-templates select="$default-objects"/>

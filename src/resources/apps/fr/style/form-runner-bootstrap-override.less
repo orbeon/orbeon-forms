@@ -109,8 +109,9 @@ form.xforms-form {
 
     // Adapt pagination to use of xf:trigger
     .pagination ul > li {
-        &> .xforms-trigger { cursor: pointer; }
+        &> .xforms-trigger { cursor: pointer }
         &> .xforms-trigger.xforms-readonly { cursor: auto; }
+        a { text-decoration: none; }
     }
 
     .input-append .add-on, .input-prepend .add-on {

@@ -153,6 +153,9 @@ form.xforms-form .pagination ul > li > .xforms-trigger {
 form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
   cursor: auto;
 }
+form.xforms-form .pagination ul > li a {
+  text-decoration: none;
+}
 form.xforms-form .input-append .add-on,
 form.xforms-form .input-prepend .add-on {
   height: 18px;

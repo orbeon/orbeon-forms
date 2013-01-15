@@ -466,6 +466,7 @@ button.btn-link {
 .fr-grid .fr-grid-content {
   padding: 4px;
   *padding-right: 6px;
+  *zoom: 1;
 }
 .fr-repeat-table .fr-grid-content {
   padding-top: 0;

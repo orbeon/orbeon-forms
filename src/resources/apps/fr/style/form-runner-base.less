@@ -409,7 +409,8 @@ button.btn-link {
     // Cell content
     .fr-grid-content {
         padding: @frGridCellPadding;                // Add some space around control
-        *padding-right: 6px;                        // To help IE move back controls within .fr-grid-content
+        *padding-right: 6px;                        // IE7: help move back controls within .fr-grid-content
+        *zoom: 1;                                   // IE7: fix handling of padding
     }
 }
 

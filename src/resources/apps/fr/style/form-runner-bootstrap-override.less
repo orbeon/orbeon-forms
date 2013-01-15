@@ -76,6 +76,12 @@ form.xforms-form {
         color: black;                   // Make text inside the fields stand out, as this is the most important information
         .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap
         height: @controlsHeight;
+
+        // IE7: due to missing box-sizing support
+        *height: @controlsHeight - 2 * 2px;
+        *line-height: @controlsHeight - 2 * 2px;
+        *padding: 2px;
+        *width: 98%;
     }
 
     input[type="file"] { line-height: normal }      // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome

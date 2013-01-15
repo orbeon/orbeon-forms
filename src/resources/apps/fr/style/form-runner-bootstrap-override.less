@@ -84,7 +84,10 @@ form.xforms-form {
         *width: 98%;
     }
 
-    input[type="file"] { line-height: normal }      // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
+    input[type="file"] {
+        line-height: normal;            // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
+        *width: 98%;                    // IE7: due to missing box-sizing support
+    }
 
     // Don't set height for textarea
     textarea {

@@ -76,7 +76,8 @@
                 <!-- Binary PUT -->
                 <p:when test="/*/method = 'PUT' and not(/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
 
-                    <!-- TODO: fix oxf:url-serializer to support binary documents -->
+                    <!-- TODO: fix oxf:url-serializer to support binary documents 
+                               Note that the file serializer can now be used with oxf:/ URLs... -->
 
                 </p:when>
                 <!-- XML PUT -->
@@ -84,7 +85,7 @@
 
                     <p:processor name="oxf:url-serializer">
                         <p:input name="config" transform="oxf:xslt" href="#matcher-groups">
-                            <config>
+                            <config xsl:version="2.0">
                                 <url><xsl:value-of select="concat('oxf:/forms/', /*/group[1])"/></url>
                             </config>
                         </p:input>

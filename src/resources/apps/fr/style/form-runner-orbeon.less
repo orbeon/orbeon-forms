@@ -176,7 +176,9 @@ html, body { background-color: @frBackground }
         .fr-section-label {
             display: block;                                 // So the line expands all the way to the right
             padding-left: @frSectionTitleLeftPadding;
-            height: 100%;               // - So it take the whole height, even when the section title is empty
+            // NOTE: Was meant to make title take space even when empty, but this doesn't seem to work. However,
+            // removing this breaks multi-line titles. Need a better solution probably.
+            height: 100%;
             overflow: hidden;           // Avoid wrapping under help image for long title
             font-size: @frSectionTitleHeight;
 

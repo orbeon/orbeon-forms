@@ -99,6 +99,7 @@
                                  -->
                                 <xf:toggle
                                     ev:event="xforms-enabled"
+                                    ev:target="#observer"
                                     case="{{$relevant-cases[1]}}"/>
 
                                 <xh:div class="pagination pagination-centered">

@@ -2403,6 +2403,73 @@
         </output>
     </test>
 
+    <test description="#739: Event handler with incorrect `ev:observer` associates with parent" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/739 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="events">
+                            <events/>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-model-construct-done">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('correct1')"/>
+                        </xf:action>
+
+                        <xf:action ev:event="xforms-model-construct-done" ev:observer="model">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('correct2')"/>
+                        </xf:action>
+
+                        <xf:action ev:event="xforms-model-construct-done" ev:target="model">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('correct3')"/>
+                        </xf:action>
+
+                        <xf:action ev:event="xforms-model-construct-done" ev:observer="model" ev:target="model">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('correct4')"/>
+                        </xf:action>
+
+                        <xf:action ev:event="xforms-model-construct-done" ev:observer="DONTEXIST">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('incorrect1')"/>
+                        </xf:action>
+
+                        <xf:action ev:event="xforms-model-construct-done" ev:target="DONTEXIST">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('incorrect2')"/>
+                        </xf:action>
+
+                        <xf:action ev:event="xforms-model-construct-done" ev:observer="DONTEXIST" ev:target="DONTEXIST">
+                            <xf:insert context="instance()" ref="*" origin="xf:element('incorrect3')"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body/>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="events" model-id="model">
+                                <events>
+                                    <correct1/>
+                                    <correct2/>
+                                    <correct3/>
+                                    <correct4/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 <!--
 
 TODO:

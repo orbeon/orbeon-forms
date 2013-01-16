@@ -17,8 +17,8 @@ import events.XXFormsActionErrorEvent
 import org.orbeon.oxf.xforms._
 import action.{XFormsActions, XFormsAPI, XFormsActionInterpreter}
 import analysis.controls.{RepeatControl, RepeatIterationControl}
-import analysis.ElementAnalysis._
-import analysis.{ElementAnalysis, StaticStateContext, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis._
+import analysis.{ElementAnalysis, SimpleElementAnalysis}
 import control.controls.XFormsRepeatControl
 import control.XFormsComponentControl
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -27,6 +27,8 @@ import org.orbeon.oxf.util.Logging
 import collection.JavaConverters._
 import org.dom4j.{QName, Element}
 import xbl.Scope
+import org.orbeon.oxf.xforms.analysis.StaticStateContext
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 /**
  * XForms (or just plain XML Events) event handler implementation.
@@ -50,6 +52,8 @@ class EventHandlerImpl(
     with Logging {
 
     self ⇒
+
+    import EventHandlerImpl._
 
     // NOTE: We check attributes in the ev:* or no namespace. We don't need to handle attributes in the xbl:* namespace.
     private def att(name: QName): String = element.attributeValue(name)
@@ -104,56 +108,95 @@ class EventHandlerImpl(
         // This must run only once
         assert(_observersPrefixedIds eq null)
         assert(_targetPrefixedIds eq null)
-        
-        // Extract unique prefixed ids given an attribute name
-        // NOTE: Supporting space-separated observer/target ids is an extension, which may make it into XML Events 2
-        // TODO: error or warn if scope.prefixedIdForStaticId(id) eq null? or just ignore?
-        def prefixedIds(name: QName) = attSet(element, name) collect {
-            case id if id.startsWith("#") ⇒ id
-            case id if scope.prefixedIdForStaticId(id) ne null ⇒ scope.prefixedIdForStaticId(id)
+
+        // Logging
+        implicit val logger = staticStateContext.partAnalysis.getIndentedLogger
+
+        def unknownTargetId(id: String) = {
+            warn("unknown id", Seq("id" → id))
+            Set.empty[String]
+        }
+
+        def ignoringHandler(attName: String) = {
+            warn(attName + " attribute present but does not refer to at least one valid id, ignoring event handler",
+                 Seq("element" → Dom4jUtils.elementToDebugString(element)))
+            Set.empty[String]
+        }
+
+        // Resolver for tokens
+        type TokenResolver = PartialFunction[String, Set[String]]
+
+        val staticIdResolver: TokenResolver = {
+            case id ⇒
+                val prefixedId = scope.prefixedIdForStaticId(id)
+                if (prefixedId ne null)
+                    Set(prefixedId)
+                else
+                    unknownTargetId(id)
+        }
+
+        // 1. Resolve observer(s)
+
+        // Resolve a token starting with a hash (#)
+        val observerHashResolver: TokenResolver = {
+            case ObserverIsPrecedingSibling ⇒
+                preceding match {
+                    case Some(p) ⇒ Set(p.prefixedId)
+                    case None    ⇒ unknownTargetId(ObserverIsPrecedingSibling)
+                }
         }
 
         // Support `ev:observer` and plain `observer`
-        val observersPrefixedIds = prefixedIds(XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME) ++ prefixedIds(XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME)
-        
+        // NOTE: Supporting space-separated observer/target ids is an extension, which may make it into XML Events 2
+        val observersTokens               = attSet(element, XML_EVENTS_EV_OBSERVER_ATTRIBUTE_QNAME) ++ attSet(element, XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME)
+        val observersPrefixedIdsAndHashes = observersTokens flatMap (observerHashResolver orElse staticIdResolver)
+
+        val ignoreDueToObservers = observersTokens.nonEmpty && observersPrefixedIdsAndHashes.isEmpty
+
+        val observersPrefixedIds =
+            if (ignoreDueToObservers)
+                ignoringHandler("observer")
+            else {
+                if (observersPrefixedIdsAndHashes.nonEmpty)
+                    observersPrefixedIdsAndHashes
+                else
+                    parent collect {
+                        case iteration: RepeatIterationControl ⇒
+                            // Case where the handler doesn't have an explicit observer and is within a repeat
+                            // iteration. As of 2012-05-18, the handler observes the enclosing repeat container.
+                            Set(iteration.parent.get.prefixedId)
+                        case parent: ElementAnalysis ⇒
+                            // Case where the handler doesn't have an explicit observer. It observes its parent.
+                            Set(parent.prefixedId)
+                    } getOrElse Set.empty[String]
+            }
+
+        // 2. Resolve target(s)
+
+        // Resolve a token starting with a hash (#)
+        val targetHashResolver: TokenResolver = {
+            case TargetIsObserver ⇒ observersPrefixedIds
+        }
+
         // Handle backward compatibility for <dispatch ev:event="…" ev:target="…" name="…" target="…">. In this case,
         // if the user didn't specify the `targetid` attribute, the meaning of the `target` attribute in no namespace is
         // the target of the dispatch action, not the incoming XML Events target. In this case to specify the incoming
         // XML Events target, the attribute must be qualified as `ev:target`.
-        val targetsPrefixedIds = 
-            if (XFormsActions.isDispatchAction(element.getQName) && (element.attribute(TARGET_QNAME) ne null) && (element.attribute(TARGETID_QNAME) eq null))
-                prefixedIds(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME)
-            else
-                prefixedIds(XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ prefixedIds(XML_EVENTS_TARGET_ATTRIBUTE_QNAME)
+        val isDispatchActionNoTargetId = XFormsActions.isDispatchAction(element.getQName) && (element.attribute(TARGET_QNAME) ne null) && (element.attribute(TARGETID_QNAME) eq null)
 
-        _observersPrefixedIds = {
-            // Special observer id indicating that the observer is the preceding sibling control
-            val ObserverIsPrecedingSibling = "#preceding-sibling"
+        val targetTokens                = attSet(element, XML_EVENTS_EV_TARGET_ATTRIBUTE_QNAME) ++ (if (isDispatchActionNoTargetId) Set() else attSet(element, XML_EVENTS_TARGET_ATTRIBUTE_QNAME))
+        val targetsPrefixedIdsAndHashes = targetTokens flatMap (targetHashResolver orElse staticIdResolver)
 
-            if (observersPrefixedIds(ObserverIsPrecedingSibling))
-                observersPrefixedIds - ObserverIsPrecedingSibling ++ (preceding map (p ⇒ Set(p.prefixedId)) getOrElse Set())
-            else if (observersPrefixedIds.nonEmpty)
-                observersPrefixedIds
-            else
-                parent collect {
-                    case iteration: RepeatIterationControl ⇒
-                        // Special case where the handler doesn't have an explicit observer and is within a repeat
-                        // iteration. As of 2012-05-18, the handler observes the enclosing repeat container.
-                        Set(iteration.parent.get.prefixedId)
-                    case parent: ElementAnalysis ⇒
-                        // Special case where the handler doesn't have an explicit observer. It observes its parent.
-                        Set(parent.prefixedId)
-                } getOrElse Set()
-        }
+        val ignoreDueToTarget = targetTokens.nonEmpty && targetsPrefixedIdsAndHashes.isEmpty
+        if (ignoreDueToTarget)
+            ignoringHandler("target")
 
-        _targetPrefixedIds = {
-            // Special target id indicating that the target is the observer
-            val TargetIsObserver = "#observer"
-
-            if (targetsPrefixedIds(TargetIsObserver))
-                targetsPrefixedIds - TargetIsObserver ++ _observersPrefixedIds
-            else
-                targetsPrefixedIds
+        if (ignoreDueToObservers || ignoreDueToTarget) {
+            _observersPrefixedIds = Set.empty[String]
+            _targetPrefixedIds    = Set.empty[String]
+        } else {
+            _observersPrefixedIds = observersPrefixedIds
+            _targetPrefixedIds    = targetsPrefixedIdsAndHashes
         }
     }
 
@@ -232,6 +275,13 @@ class EventHandlerImpl(
 }
 
 object EventHandlerImpl extends Logging {
+
+    // Special observer id indicating that the observer is the preceding sibling control
+    val ObserverIsPrecedingSibling = "#preceding-sibling"
+
+    // Special target id indicating that the target is the observer
+    val TargetIsObserver = "#observer"
+
     // Whether the element is an event handler (a known action element with @*:event)
     def isEventHandler(element: Element) =
         XFormsActions.isAction(element.getQName) && (element.attribute(XML_EVENTS_EV_EVENT_ATTRIBUTE_QNAME.getName) ne null)

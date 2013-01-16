@@ -344,6 +344,22 @@ button.btn-link {
                                                                    absolute positioning of the cell editors, this crops overlays, in particular the date picker */
     }
 
+    .xforms-help-image {
+        float: left;
+        margin-top: (@baseLineHeight - 14)/2;      // Vertically center help image on first line
+        margin-right: 3px;
+
+        .help-icon();
+    }
+
+    .xforms-label {
+        margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
+        margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
+                                                    // than above the control to make the CSS more generally applicable to XBL components)
+        overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
+        zoom: 1;                                    // For the overflow: hidden to have an effect on IE6
+    }
+
     // Controls
     select,
     textarea,
@@ -363,11 +379,17 @@ button.btn-link {
     input[type="color"],
     .uneditable-input {
         width: 100%;
-        *padding: 0;                // IE7 doesn't support box-sizing, so undo Bootstrap padding, so width: 100% doesn't get the input doesn't overflow its container
+        *padding: 2px;              // IE7: due to missing box-sizing support
+        *width: 98%;
     }
 
     .xforms-textarea textarea {
         width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
+    }
+
+    input[type="file"] {
+        width: auto;
+        *width: 98%;                // IE7: due to missing box-sizing support
     }
 
     // Override previous rule for autocomplete input, which can't be sized with width: 100%
@@ -376,7 +398,10 @@ button.btn-link {
     // Better to be wide as well
     .xbl-fr-inplace-input {
         width: 100%;
-        input { width: 100%; }
+        input {
+            width: 100%;
+            *width: 98%;
+        }
     }
 
     // Make HTML editor shorter by default
@@ -390,20 +415,20 @@ button.btn-link {
         }
     }
 
-    .xforms-help-image {
-        float: left;
-        margin-top: (@baseLineHeight - 14)/2;      // Vertically center help image on first line
-        margin-right: 3px;
-
-        .help-icon();
+    // But for boolean inputs, don't size (for IE)
+    .xforms-type-boolean input {
+        width: auto;
     }
 
-    .xforms-label {
-        margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
-        margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
-                                                    // than above the control to make the CSS more generally applicable to XBL components)
-        overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
-        zoom: 1;                                    // For the overflow: hidden to have an effect on IE6
+    // Image output
+    .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
+    .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }// IE HACK
+    .xforms-mediatype-image img { display: block }
+
+    //  Buttons
+    .fr-grid-content {
+        .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
+        .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
     }
 
     // Cell content
@@ -419,27 +444,6 @@ button.btn-link {
         // No top/bottom padding in repeated grid cells
         padding-top: 0;
         padding-bottom: 0;
-    }
-}
-
-.fr-grid {
-
-    // But for boolean inputs, don't size (for IE)
-    .xforms-type-boolean input {
-        width: auto;
-    }
-
-    .xforms-upload input { width: auto } // The upload field responds to 100% width on IE, which gives strange result
-
-    // Image output
-    .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
-    .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }// IE HACK
-    .xforms-mediatype-image img { display: block }
-
-    //  Buttons
-    .fr-grid-content {
-        .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
-        .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
     }
 }
 

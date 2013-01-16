@@ -404,45 +404,6 @@ button.btn-link {
                                                                    absolute positioning of the cell editors, this crops overlays, in particular the date picker */
 
 }
-.fr-grid select,
-.fr-grid textarea,
-.fr-grid input[type="text"],
-.fr-grid input[type="password"],
-.fr-grid input[type="datetime"],
-.fr-grid input[type="datetime-local"],
-.fr-grid input[type="date"],
-.fr-grid input[type="month"],
-.fr-grid input[type="time"],
-.fr-grid input[type="week"],
-.fr-grid input[type="number"],
-.fr-grid input[type="email"],
-.fr-grid input[type="url"],
-.fr-grid input[type="search"],
-.fr-grid input[type="tel"],
-.fr-grid input[type="color"],
-.fr-grid .uneditable-input {
-  width: 100%;
-  *padding: 0;
-}
-.fr-grid .xforms-textarea textarea {
-  width: 100%;
-}
-.fr-grid .xbl-fr-autocomplete .xforms-input input {
-  width: 140px;
-}
-.fr-grid .xbl-fr-inplace-input {
-  width: 100%;
-}
-.fr-grid .xbl-fr-inplace-input input {
-  width: 100%;
-}
-.fr-grid .xforms-mediatype-text-html textarea {
-  height: 10.1em;
-}
-.fr-grid .xforms-input input.xforms-type-date,
-.fr-grid .xforms-input input.xforms-type-time {
-  width: 7.5em;
-}
 .fr-grid .xforms-help-image {
   float: left;
   margin-top: 3px;
@@ -463,19 +424,52 @@ button.btn-link {
   overflow: hidden;
   zoom: 1;
 }
-.fr-grid .fr-grid-content {
-  padding: 4px;
-  *padding-right: 6px;
-  *zoom: 1;
+.fr-grid select,
+.fr-grid textarea,
+.fr-grid input[type="text"],
+.fr-grid input[type="password"],
+.fr-grid input[type="datetime"],
+.fr-grid input[type="datetime-local"],
+.fr-grid input[type="date"],
+.fr-grid input[type="month"],
+.fr-grid input[type="time"],
+.fr-grid input[type="week"],
+.fr-grid input[type="number"],
+.fr-grid input[type="email"],
+.fr-grid input[type="url"],
+.fr-grid input[type="search"],
+.fr-grid input[type="tel"],
+.fr-grid input[type="color"],
+.fr-grid .uneditable-input {
+  width: 100%;
+  *padding: 2px;
+  *width: 98%;
 }
-.fr-repeat-table .fr-grid-content {
-  padding-top: 0;
-  padding-bottom: 0;
+.fr-grid .xforms-textarea textarea {
+  width: 100%;
+}
+.fr-grid input[type="file"] {
+  width: auto;
+  *width: 98%;
+}
+.fr-grid .xbl-fr-autocomplete .xforms-input input {
+  width: 140px;
+}
+.fr-grid .xbl-fr-inplace-input {
+  width: 100%;
+}
+.fr-grid .xbl-fr-inplace-input input {
+  width: 100%;
+  *width: 98%;
+}
+.fr-grid .xforms-mediatype-text-html textarea {
+  height: 10.1em;
+}
+.fr-grid .xforms-input input.xforms-type-date,
+.fr-grid .xforms-input input.xforms-type-time {
+  width: 7.5em;
 }
 .fr-grid .xforms-type-boolean input {
-  width: auto;
-}
-.fr-grid .xforms-upload input {
   width: auto;
 }
 .fr-grid .xforms-mediatype-image {
@@ -497,6 +491,15 @@ button.btn-link {
 .fr-grid .fr-grid-content .xforms-trigger button,
 .fr-grid .fr-grid-content .yui-button .xforms-trigger input {
   margin-top: 0;
+}
+.fr-grid .fr-grid-content {
+  padding: 4px;
+  *padding-right: 6px;
+  *zoom: 1;
+}
+.fr-repeat-table .fr-grid-content {
+  padding-top: 0;
+  padding-bottom: 0;
 }
 #fr-view {
   margin-bottom: 10px;

@@ -285,9 +285,9 @@
             <xbl:template>
                 <!-- Point to the context of the current element.
                      NOTE: FB doesn't place a @ref. -->
-                <xf:var name="context" value="xxf:binding-context('{$component-id}-component')"/>
+                <xf:var name="context" id="context" value="xxf:binding-context('{$component-id}-component')"/>
 
-                <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="binding">
+                <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="context">
                     <!-- Section becomes visible OR binding changes -->
                     <xf:action>
                         <xf:action if="$context/*">

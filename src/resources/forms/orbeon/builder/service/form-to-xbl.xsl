@@ -219,8 +219,8 @@
                     <xsl:copy-of select="$fr-form-model/@schema"/>
 
                     <!-- Section data model -->
-                    <xf:instance id="fr-form-instance">
-                        <xsl:copy-of select="$section-data"/>
+                    <xf:instance id="fr-form-instance" xxbl:mirror="true">
+                        <empty/>
                     </xf:instance>
 
                     <!-- Template -->
@@ -289,19 +289,10 @@
 
                 <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="context">
                     <!-- Section becomes visible OR binding changes -->
-                    <xf:action>
-                        <xf:action if="$context/*">
-                            <!-- There are already some nodes, copy them in. This handles the case where existing
-                                 external data must be loaded in, for example when editing a form. -->
-                            <xf:delete ref="instance()/*"/>
-                            <xf:insert context="instance()" origin="$context/*"/>
-                        </xf:action>
-                        <xf:action if="not($context/*)">
-                            <!-- No nodes, copy template out. This handles the case where there is not yet existing
-                                 external data. -->
-                            <xf:insert context="$context" origin="instance('fr-form-template')/*"/>
-                            <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
-                        </xf:action>
+                    <!-- No nodes outside so copy template to local and external instances -->
+                    <xf:action if="not(exists($context/*))">
+                        <xf:delete ref="instance()/*"/>
+                        <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
                     </xf:action>
                 </xf:action>
 
@@ -316,16 +307,8 @@
                 </xf:var>
 
                 <xf:group appearance="xxf:internal">
-                    <!-- Synchronize data with external world upon local value change -->
-                    <!-- This assumes the element QName match, or the value is not copied -->
-                    <xf:action ev:event="xforms-value-changed" if="exists($context/*) and exists(event('xxf:binding'))">
-                        <xf:var name="source-binding" value="event('xxf:binding')" as="element()"/>
-                        <xf:setvalue ref="$context/*[resolve-QName(name(), .) = resolve-QName(name($source-binding), $source-binding)]" value="$source-binding"/>
-                    </xf:action>
-
                     <!-- Copy grids within section -->
                     <xsl:copy-of select="$fr-section/(fr:grid | fb:grid)"/>
-
                 </xf:group>
             </xbl:template>
         </xbl:binding>

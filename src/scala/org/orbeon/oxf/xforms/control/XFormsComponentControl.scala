@@ -15,13 +15,19 @@ package org.orbeon.oxf.xforms.control
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
-import org.orbeon.oxf.xforms.event.XFormsEvents
+import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEvents}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.{XFormsInstance, BindingContext}
 import org.xml.sax.helpers.AttributesImpl
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
+import org.orbeon.saxon.om.VirtualNode
+import org.w3c.dom.Node.ELEMENT_NODE
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.scaxon.XML.unwrapElement
 
 // A component control with native support for a value
 class XFormsValueComponentControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
@@ -41,6 +47,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     private var _nestedContainer: Option[XBLContainer] = None
     def nestedContainer = _nestedContainer.get
 
+    private var _outerListener: Option[(XFormsInstance, JEventListener)] = None
+
     // Create nested container upon creation
     createNestedContainer()
 
@@ -59,19 +67,23 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     // Destroy container and models if any
     def destroyNestedContainer(): Unit = {
+        destroyMirrorListener()
         nestedContainer.destroy()
         _nestedContainer = None
     }
 
+    // For xxf:dynamic updates of top-level XBL shadow trees
     def recreateNestedContainer(): Unit = {
         createNestedContainer()
         if (isRelevant)
             initializeModels()
     }
 
+    private def modeBinding = staticControl.binding.abstractBinding.modeBinding
+
     // Only handle binding if we support modeBinding
     override protected def computeBinding(parentContext: BindingContext) =
-        if (staticControl.binding.abstractBinding.modeBinding)
+        if (modeBinding)
             super.computeBinding(parentContext)
         else
             super.computeBindingCopy(parentContext)
@@ -92,13 +104,82 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
             nestedContainer.restoreModelsState()
         else
             initializeModels()
+
+        createMirrorListener()
     }
 
-    private def initializeModels(): Unit =
+    // Attach a mirror listener if needed
+    // Return the reference node if a listener was created
+    private def createMirrorListener(): Option[VirtualNode] = {
+
+        val mirrorInstanceOpt = nestedContainer.models.iterator flatMap (_.getInstances.asScala) find (i ⇒ i.instance.element.attributeValue("mirror") == "true")
+
+        mirrorInstanceOpt flatMap { case mirrorInstance ⇒
+
+            // Reference node must be a wrapped element
+            // Also support case where there is no binding, and in which case use the binding context. This is done
+            // because Form Builder doesn't place a ref or bind on section template components as of 2013-01-17.
+            val referenceNodeOpt = (if (modeBinding) binding else contextForBinding).headOption collect {
+                case node: VirtualNode if node.getNodeKind == ELEMENT_NODE ⇒ node
+            }
+
+            referenceNodeOpt flatMap { referenceNode ⇒
+
+                implicit val logger = getIndentedLogger
+
+                val outerDocument = referenceNode.getDocumentRoot
+                val outerInstance = containingDocument.getInstanceForNode(outerDocument)
+
+                val outerListener: JEventListener = mirrorListener(
+                    containingDocument,
+                    toInnerInstanceNode(
+                        outerDocument,
+                        nestedContainer.partAnalysis,
+                        nestedContainer,
+                        findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)))
+
+                val innerListener: JEventListener = mirrorListener(
+                    containingDocument,
+
+                    toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis))
+
+                // Update initial instance before attaching the listeners
+                val initialDocumentInfo = XFormsInstance.createDocumentInfo(Dom4jUtils.createDocumentCopyParentNamespaces(unwrapElement(referenceNode)), mirrorInstance.instance.exposeXPathTypes)
+                mirrorInstance.replace(initialDocumentInfo)
+
+                // Set outer and inner listeners
+                InstanceMirror.addListener(outerInstance, outerListener)
+                InstanceMirror.addListener(mirrorInstance, innerListener)
+
+                _outerListener = Some((outerInstance, outerListener))
+
+                Some(referenceNode)
+            }
+        }
+    }
+
+    private def destroyMirrorListener(): Unit = {
+        _outerListener foreach { case (outerInstance, outerListener) ⇒
+            InstanceMirror.removeListener(outerInstance, outerListener)
+        }
+
+        _outerListener = None
+    }
+
+    override def onDestroy() {
+        destroyMirrorListener()
+        super.onDestroy()
+    }
+
+    private def initializeModels(): Unit = {
+
+
+
         nestedContainer.initializeModels(Array[String](
             XFormsEvents.XFORMS_MODEL_CONSTRUCT,
             XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE
         ))
+    }
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) {
         super.onBindingUpdate(oldBinding, newBinding)

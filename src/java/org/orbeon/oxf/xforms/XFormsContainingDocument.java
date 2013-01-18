@@ -1083,7 +1083,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         xformsControls.initialize();
     }
 
-    private Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();
+    public Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();
 
     public void startHandleEvent(XFormsEvent event) {
         eventStack.push(event);

@@ -234,13 +234,13 @@ trait ModelContainer {
     def getModelsJava: JList[XFormsModel] = _models.asJava
 
     // Get a list of all the relevant models in this container and all sub-containers
-    def getAllModels: Seq[XFormsModel] =
+    def allModels: Iterator[XFormsModel] =
         if (isRelevant)
-            _models ++ (childrenXBLContainers flatMap (_.getAllModels))
+            models.iterator ++ (childrenXBLContainers flatMap (_.allModels))
         else
-            Seq()
+            Iterator.empty
 
-    def getAllModelsJava = getAllModels.asJava
+    def getAllModelsJava = allModels.toList.asJava
 
     // Performance: for some reason, with Scala 2.9.2 at least, using for (model ← models) { ... return ... } is much
     // slower than using an Iterator (profiler).
@@ -466,9 +466,16 @@ trait ContainerResolver {
         findInSelfAndDescendants[XFormsInstance](m ⇒ Option(m.getInstanceForNode(nodeInfo)), Some(c ⇒ Option(c.getInstanceForNode(nodeInfo)))) orNull
 
     // Locally find the instance with the specified id, searching in any relevant model
-    def findInstance(instanceId: String): Option[XFormsInstance] =
+    def findInstance(instanceStaticId: String): Option[XFormsInstance] =
         if (isRelevant && models.nonEmpty)
-            models.iterator map (_.getInstance(instanceId)) find (_ ne null)
+            models.iterator map (_.getInstance(instanceStaticId)) find (_ ne null)
+        else
+            None
+
+    // Find the instance in this or descendant containers
+    def findInstanceInDescendantOrSelf(instanceStaticId: String) =
+        if (isRelevant && models.nonEmpty)
+            allModels flatMap (_.getInstances.asScala) find (_.getId == instanceStaticId)
         else
             None
 

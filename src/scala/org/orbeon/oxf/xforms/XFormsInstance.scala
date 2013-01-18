@@ -278,6 +278,37 @@ class XFormsInstance(
 
         XFormsUtils.logDebugDocument("MIPs: ", result)
     }
+
+    // Replace the instance with the given document
+    // This includes marking the structural change as well as dispatching events
+    def replace(newDocumentInfo: DocumentInfo, instanceCaching: Option[InstanceCaching] = instanceCaching, isReadonly: Boolean = readonly): Unit = {
+        // Update the instance (this also marks it as modified)
+        update(
+            instanceCaching,
+            newDocumentInfo,
+            isReadonly)
+
+        // Call this directly, since we are not using insert/delete here
+        model.markStructuralChange(this)
+
+        val newDocumentRootElement = instanceRoot
+
+        // Dispatch xforms-delete event
+        // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
+        // (see below). In the future, we might want to dispatch this, especially if
+        // XFormsInsertAction dispatches xforms-delete when removing the root element
+        //Dispatch.dispatchEvent(new XFormsDeleteEvent(this, Seq(destinationNodeInfo).asJava, 1));
+
+        // Dispatch xforms-insert event
+        // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
+        Dispatch.dispatchEvent(
+            new XFormsInsertEvent(
+                this,
+                Seq[Item](newDocumentRootElement).asJava,
+                null,
+                newDocumentRootElement.getDocumentRoot, "after")
+        )
+    }
 }
 
 object XFormsInstance extends Logging {

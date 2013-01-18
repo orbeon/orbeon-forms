@@ -128,14 +128,14 @@ public class InstanceReplacer extends BaseReplacer {
             }
 
             // This is the instance which is effectively going to be updated
-            final XFormsInstance updatedInstance = containingDocument.getInstanceForNode(destinationNodeInfo);
-            if (updatedInstance == null) {
+            final XFormsInstance instanceToUpdate = containingDocument.getInstanceForNode(destinationNodeInfo);
+            if (instanceToUpdate == null) {
                 throw new XFormsSubmissionException(submission, "targetref attribute doesn't point to an element in an existing instance for replace=\"instance\".", "processing targetref attribute",
                         new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.TARGET_ERROR(), connectionResult));
             }
 
             // Whether the destination node is the root element of an instance
-            final boolean isDestinationRootElement = updatedInstance.instanceRoot().isSameNodeInfo(destinationNodeInfo);
+            final boolean isDestinationRootElement = instanceToUpdate.instanceRoot().isSameNodeInfo(destinationNodeInfo);
             if (p2.isReadonly && !isDestinationRootElement) {
                 // Only support replacing the root element of an instance when using a shared instance
                 throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",
@@ -147,7 +147,7 @@ public class InstanceReplacer extends BaseReplacer {
             // Obtain root element to insert
             if (detailsLogger.isDebugEnabled())
                 detailsLogger.logDebug("", p2.isReadonly ? "replacing instance with read-only instance" : "replacing instance with mutable instance",
-                    "instance", updatedInstance.getEffectiveId());
+                    "instance", instanceToUpdate.getEffectiveId());
 
             // Perform insert/delete. This will dispatch xforms-insert/xforms-delete events.
             // "the replacement is performed by an XForms action that performs some
@@ -158,38 +158,15 @@ public class InstanceReplacer extends BaseReplacer {
             // NOTE: As of 2009-03-18 decision, XForms 1.1 specifies that deferred event handling flags are set instead of
             // performing RRRR directly.
             final DocumentInfo newDocumentInfo =
-                    wrappedDocumentInfo != null ? wrappedDocumentInfo : XFormsInstance.createDocumentInfo(resultingDocumentOrDocumentInfo, updatedInstance.instance().exposeXPathTypes());
+                    wrappedDocumentInfo != null ? wrappedDocumentInfo : XFormsInstance.createDocumentInfo(resultingDocumentOrDocumentInfo, instanceToUpdate.instance().exposeXPathTypes());
 
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
-
-                // Update the instance (this also marks it as modified)
-                updatedInstance.update(
-                    Option.<InstanceCaching>apply(instanceCaching),
-                    newDocumentInfo,
-                    p2.isReadonly);
-
-                final NodeInfo newDocumentRootElement = updatedInstance.instanceRoot();
-
-                // Call this directly, since we are not using insert/delete here
-                updatedInstance.model().markStructuralChange(updatedInstance);
-
-                // Dispatch xforms-delete event
-                // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
-                // (see below). In the future, we might want to dispatch this, especially if
-                // XFormsInsertAction dispatches xforms-delete when removing the root element
-                //updatedInstance.getXBLContainer(containingDocument).dispatchEvent(pipelineContext, new XFormsDeleteEvent(updatedInstance, Collections.singletonList(destinationNodeInfo), 1));
-
-                // Dispatch xforms-insert event
-                // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-                Dispatch.dispatchEvent(
-                        new XFormsInsertEvent(updatedInstance, Collections.singletonList((Item) newDocumentRootElement), null, newDocumentRootElement.getDocumentRoot(),
-                                "after"));
-
+                instanceToUpdate.replace(newDocumentInfo, Option.<InstanceCaching>apply(instanceCaching), p2.isReadonly);
             } else {
                 // Generic insertion
 
-                updatedInstance.markModified();
+                instanceToUpdate.markModified();
                 final Item newDocumentRootElement = DataModel.firstChildElement(newDocumentInfo);
 
                 final List<NodeInfo> destinationCollection = Collections.singletonList(destinationNodeInfo);

@@ -193,7 +193,7 @@ object ScalaUtils {
 
     // Extensions on Boolean
     class BooleanWrapper(b: Boolean) {
-        def option[A](a: ⇒ A) = if (b) Some(a) else None
+        def option[A](a: ⇒ A) = if (b) Option(a) else None
         def list[A](a: ⇒ A)   = if (b) List(a) else Nil
         def set[A](a: ⇒ A)    = if (b) Set(a)  else Set.empty[A]
     }

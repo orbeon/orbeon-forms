@@ -33,6 +33,7 @@ import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEven
 import org.orbeon.oxf.xforms.event.events.{XXFormsValueChanged, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
+import InstanceMirror._
 
 /**
  * xxf:dynamic control
@@ -54,7 +55,7 @@ import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
     extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    class Nested(val container: XBLContainer, val partAnalysis: PartAnalysisImpl, val template: SAXStore, val outerListener: JEventListener)
+    case class Nested(container: XBLContainer, partAnalysis: PartAnalysisImpl, template: SAXStore, outerListener: JEventListener)
 
     private var _nested: Option[Nested] = None
     def nested = _nested
@@ -72,8 +73,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     // TODO: This might blow if the control is non-relevant
     override def bindingContextForChild =
-        _nested map { n ⇒
-            val contextStack = n.container.getContextStack
+        _nested map { case Nested(container, _, _, _) ⇒
+            val contextStack = container.getContextStack
             contextStack.setParentBindingContext(bindingContext)
             contextStack.resetBindingContext()
             contextStack.getCurrentBindingContext
@@ -132,15 +133,15 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             clearChildren()
         }
 
-        _nested foreach { n ⇒
+        _nested foreach { case Nested(container, partAnalysis, _, outerListener) ⇒
             // Remove container and associated models
-            n.container.destroy()
+            container.destroy()
             // Remove part and associated scopes
-            containingDocument.getStaticOps.removePart(n.partAnalysis)
+            containingDocument.getStaticOps.removePart(partAnalysis)
             // Remove listeners we added to the outer instance (better do this or we will badly leak)
-            // WARNING: Make sure n.outerListener is the exact same object passed to addListener. There can be a
+            // WARNING: Make sure outerListener is the exact same object passed to addListener. There can be a
             // conversion from a function to a listener, in which case identity won't be preserved!
-            InstanceMirror.removeListener(outerInstance, n.outerListener)
+            InstanceMirror.removeListener(outerInstance, outerListener)
         }
 
         // Create new part
@@ -166,6 +167,8 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         // Add listener to the single outer instance
         val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
 
+        implicit val logger = getIndentedLogger
+
         // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
         val outerListener: JEventListener = {
 
@@ -190,10 +193,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             }
 
             // Instance mirror listener
-            val instanceListener = InstanceMirror.mirrorListener(
+            val instanceListener = mirrorListener(
                 containingDocument,
-                getIndentedLogger,
-                InstanceMirror.toInnerInstanceNode(docWrapper, partAnalysis, childContainer))
+                toInnerInstanceNode(docWrapper, partAnalysis, childContainer, findOuterInstanceDetailsDynamic))
 
             // Compose listeners
             toJEventListener(composeListeners(Seq(
@@ -207,10 +209,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
         // Add mutation listeners to all top-level inline instances, which upon value change propagate the value
         // change to the related node in the source
-        val innerListener: JEventListener = InstanceMirror.mirrorListener(
+        val innerListener: JEventListener = mirrorListener(
             containingDocument,
-            getIndentedLogger,
-            InstanceMirror.toOuterInstanceNode(docWrapper, partAnalysis))
+            toOuterInstanceNodeDynamic(outerInstance, docWrapper, partAnalysis))
 
         partAnalysis.getModelsForScope(partAnalysis.startScope) foreach {
             _.instances.values filter (_.useInlineContent) foreach { instance ⇒
@@ -322,14 +323,6 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 }
 
 object XXFormsDynamicControl {
-
-    // Type of an event listener
-    type EventListener = XFormsEvent ⇒ Boolean
-
-    // Implicitly convert an EventListener to a Java EventListener
-    implicit def toJEventListener(f: EventListener) = new JEventListener {
-        def handleEvent(event: XFormsEvent) { f(event) }
-    }
 
     // Compose a Seq of listeners by calling them in order until one has successfully processed the event
     def composeListeners(listeners: Seq[EventListener]): EventListener =

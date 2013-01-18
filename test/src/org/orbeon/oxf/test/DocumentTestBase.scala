@@ -21,9 +21,10 @@ import org.orbeon.oxf.xforms.control._
 import controls.XFormsSelect1Control
 import org.dom4j.{Element, Document ⇒ JDocument}
 import xml.{XML, Elem}
-import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget}
-import org.orbeon.oxf.xforms.{XFormsStaticStateImpl, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.event.{XFormsCustomEvent, Dispatch, ClientEvents, XFormsEventTarget}
+import org.orbeon.oxf.xforms.{XFormsInstance, XFormsStaticStateImpl, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xml.TransformerUtils
 
 abstract class DocumentTestBase extends ResourceManagerTestBase {
 
@@ -53,6 +54,20 @@ abstract class DocumentTestBase extends ResourceManagerTestBase {
 
         _document
     }
+
+    // Dispatch a custom event to the object with the given prefixed id
+    def dispatch(name: String, prefixedId: String) =
+        Dispatch.dispatchEvent(
+            new XFormsCustomEvent(
+                name,
+                document.getObjectByEffectiveId(prefixedId).asInstanceOf[XFormsEventTarget],
+                Map(),
+                bubbles = true,
+                cancelable = true)
+        )
+
+    // Get an instance value as a string
+    def instanceAsString(instance: XFormsInstance) = TransformerUtils.tinyTreeToString(instance.documentInfo)
 
     def getControlValue(controlId: String) = getValueControl(controlId).getValue
     def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue

@@ -13,21 +13,16 @@
  */
 package org.orbeon.oxf.xforms.control.controls
 
-import org.orbeon.oxf.test.DocumentTestBase
-import org.scalatest.junit.AssertionsForJUnit
-import org.junit.Test
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import XXFormsDynamicControl._
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsCustomEvent, Dispatch, XFormsEventTarget, XFormsEvent}
+import org.junit.Test
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
+import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener}
+import org.scalatest.junit.AssertionsForJUnit
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
-    implicit def toEventListener(f: XFormsEvent ⇒ Any) = new JEventListener {
-        def handleEvent(event: XFormsEvent) { f(event) }
-    }
-
-    @Test def mirrorInSamePart() {
+    @Test def mirrorInSamePart(): Unit = {
         this setupDocument
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
                      xmlns:xf="http://www.w3.org/2002/xforms"
@@ -53,25 +48,27 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                             <instance xmlns=""/>
                         </xf:instance>
 
-                        <xf:insert   ev:event="update1" context="//xf:instance/instance" origin="xxf:element('first', 'Arthur')"/>
-                        <xf:insert   ev:event="update2" ref="//xf:instance/instance/first" origin="xxf:element('last', 'Clark')" position="after"/>
-                        <xf:insert   ev:event="update3" ref="//xf:instance/instance/last" origin="xxf:element('middle', 'C.')" position="before"/>
-                        <xf:setvalue ev:event="update4" ref="//xf:instance/instance/last">Clarke</xf:setvalue>
-                        <xf:delete   ev:event="update5" ref="//xf:instance/instance/*"/>
-                        <xf:insert   ev:event="update6" context="//xf:instance/instance" origin="xxf:attribute('first', 'Arthur')"/>
-                        <xf:insert   ev:event="update7" ref="//xf:instance/instance/@*" origin="xxf:attribute('last', 'Clarke')" position="after"/>
-                        <xf:insert   ev:event="update8" context="/*/xh:body" origin="xxf:element('xh:div')"/>
-                        <xf:setvalue ev:event="update9" ref="/*/xh:body/xh:div">Hello!</xf:setvalue>
+                        <xf:insert   ev:event="update1"  context="//xf:instance/instance"   origin="xf:element('first', 'Arthur')"/>
+                        <xf:insert   ev:event="update2"  ref="//xf:instance/instance/first" origin="xf:element('last', 'Clark')"    position="after"/>
+                        <xf:insert   ev:event="update3"  ref="//xf:instance/instance/last"  origin="xf:element('middle', 'C.')"     position="before"/>
+                        <xf:setvalue ev:event="update4"  ref="//xf:instance/instance/last">Clarke</xf:setvalue>
+                        <xf:delete   ev:event="update5"  ref="//xf:instance/instance/*"/>
+                        <xf:insert   ev:event="update6"  context="//xf:instance/instance"   origin="xf:attribute('first', 'Arthur')"/>
+                        <xf:insert   ev:event="update7"  ref="//xf:instance/instance/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
+                        <xf:setvalue ev:event="update8"  ref="//xf:instance/instance/@last">Conan Doyle</xf:setvalue>
+                        <xf:delete   ev:event="update9"  ref="//xf:instance/instance/@*"/>
+                        <xf:insert   ev:event="update10" context="/*/xh:body"               origin="xf:element('xh:div')"/>
+                        <xf:setvalue ev:event="update11" ref="/*/xh:body/xh:div">Hello!</xf:setvalue>
 
-                        <xf:delete   ev:event="update10" ref="//xf:instance/instance"/>
-                        <xf:insert   ev:event="update11" context="//xf:instance" origin="xxf:element('root')"/>
+                        <xf:delete   ev:event="update12" ref="//xf:instance/instance"/>
+                        <xf:insert   ev:event="update13" context="//xf:instance"            origin="xf:element('root')"/>
 
                     </xf:model>
                 </xh:head>
                 <xh:body/>
             </xh:html>
 
-        val logger = document.getIndentedLogger
+        implicit val logger = document.getIndentedLogger
 
         val outerInstance = document.findInstance("form-instance").get
         val innerInstance = document.findInstance("my-instance").get
@@ -87,16 +84,12 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             }
 
             val outerMirrorListener =
-                mirrorListener(document, logger, toInnerInstanceNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document))
+                mirrorListener(document, toInnerInstanceNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document, findOuterInstanceDetailsDynamic))
 
             composeListeners(Seq(outerMirrorListener, unknownChange))
         }
 
         addListener(outerInstance, outerListener)
-
-        // Local helpers
-        def dispatch(name: String) = Dispatch.dispatchEvent(new XFormsCustomEvent(name, document.getObjectByEffectiveId("model").asInstanceOf[XFormsEventTarget], Map(), true, true))
-        def innerInstanceValue = TransformerUtils.tinyTreeToString(innerInstance.documentInfo)
 
         // Test insert, value change and delete
         val expected = Seq(
@@ -107,8 +100,10 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             ("""<instance/>""" , 0),
             ("""<instance first="Arthur"/>""" , 0),
             ("""<instance first="Arthur" last="Clarke"/>""" , 0),
-            ("""<instance first="Arthur" last="Clarke"/>""" , 1),
-            ("""<instance first="Arthur" last="Clarke"/>""" , 2)
+            ("""<instance first="Arthur" last="Conan Doyle"/>""" , 0),
+            ("""<instance/>""" , 0),
+            ("""<instance/>""" , 1),
+            ("""<instance/>""" , 2)
             // NOTE: Removing root element doesn't work right now, maybe because doDelete() doesn't support it
 //            ("""""" , 2),
 //            ("""<root/>""" , 2)
@@ -117,10 +112,96 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
         expected.zipWithIndex foreach {
             case ((expectedInnerInstanceValue, expectedNonInstanceChanges), index) ⇒
                 // Dispatch event and assert result
-                dispatch("update" + (index + 1))
+                dispatch("update" + (index + 1), "model")
 
-                assert(innerInstanceValue === expectedInnerInstanceValue)
+                assert(instanceAsString(innerInstance) === expectedInnerInstanceValue)
                 assert(nonInstanceChanges === expectedNonInstanceChanges)
         }
+    }
+
+    @Test def mirrorXBL(): Unit = {
+
+        this setupDocument
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:ev="http://www.w3.org/2001/xml-events"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="outer-instance" xxf:exclude-result-prefixes="#all">
+                            <instance/>
+                        </xf:instance>
+
+                        <xf:insert   ev:event="update1" context="instance()"   origin="xf:element('first', 'Arthur')"/>
+                        <xf:insert   ev:event="update2" ref="instance()/first" origin="xf:element('last', 'Clark')"    position="after"/>
+                        <xf:insert   ev:event="update3" ref="instance()/last"  origin="xf:element('middle', 'C.')"     position="before"/>
+                        <xf:setvalue ev:event="update4" ref="instance()/last">Clarke</xf:setvalue>
+                        <xf:delete   ev:event="update5" ref="instance()/*"/>
+                        <xf:insert   ev:event="update6" context="instance()"   origin="xf:attribute('first', 'Arthur')"/>
+                        <xf:insert   ev:event="update7" ref="instance()/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
+                        <xf:setvalue ev:event="update8" ref="instance()/@last">Conan Doyle</xf:setvalue>
+                        <xf:delete   ev:event="update9" ref="instance()/@*"/>
+
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
+                            <xbl:template>
+                                <xf:model id="gaga-model">
+                                    <xf:instance id="gaga-instance" xxbl:mirror="true">
+                                        <empty/>
+                                    </xf:instance>
+
+                                    <xf:insert   ev:event="update1" context="instance()"   origin="xf:element('first', 'Arthur')"/>
+                                    <xf:insert   ev:event="update2" ref="instance()/first" origin="xf:element('last', 'Clark')"    position="after"/>
+                                    <xf:insert   ev:event="update3" ref="instance()/last"  origin="xf:element('middle', 'C.')"     position="before"/>
+                                    <xf:setvalue ev:event="update4" ref="instance()/last">Clarke</xf:setvalue>
+                                    <xf:delete   ev:event="update5" ref="instance()/*"/>
+                                    <xf:insert   ev:event="update6" context="instance()"   origin="xf:attribute('first', 'Arthur')"/>
+                                    <xf:insert   ev:event="update7" ref="instance()/@*"    origin="xf:attribute('last', 'Clarke')" position="after"/>
+                                    <xf:setvalue ev:event="update8" ref="instance()/@last">Conan Doyle</xf:setvalue>
+                                    <xf:delete   ev:event="update9" ref="instance()/@*"/>
+                                </xf:model>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="my-gaga" ref="instance()"/>
+                </xh:body>
+            </xh:html>
+
+        val outerInstance = document.findInstanceInDescendantOrSelf("outer-instance").get
+        val innerInstance = document.findInstanceInDescendantOrSelf("gaga-instance").get
+
+        // Test insert, value change and delete
+        val expected = Seq(
+            """<instance><first>Arthur</first></instance>""",
+            """<instance><first>Arthur</first><last>Clark</last></instance>""",
+            """<instance><first>Arthur</first><middle>C.</middle><last>Clark</last></instance>""",
+            """<instance><first>Arthur</first><middle>C.</middle><last>Clarke</last></instance>""",
+            """<instance/>""",
+            """<instance first="Arthur"/>""",
+            """<instance first="Arthur" last="Clarke"/>""",
+            """<instance first="Arthur" last="Conan Doyle"/>""",
+            """<instance/>"""
+        )
+
+        var updates = 0
+
+        // First update outer instance and check inner instance, then do the reverse
+        for ((targetPrefixedId, mirroredInstance) ← Seq("model" → innerInstance, "my-gaga$gaga-model" → outerInstance))
+            expected.zipWithIndex foreach {
+                case (expectedInstanceValue, index) ⇒
+                    // Dispatch event and assert result
+                    dispatch("update" + (index + 1), targetPrefixedId)
+                    assert(instanceAsString(mirroredInstance) === expectedInstanceValue)
+                    updates += 1
+            }
+
+        assert(updates === expected.size * 2)
     }
 }

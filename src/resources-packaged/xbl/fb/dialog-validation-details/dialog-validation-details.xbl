@@ -69,7 +69,19 @@
                 <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
 
                 <xf:bind ref="required" readonly="../schema-type != ''"/>
-                <xf:bind ref="relevant | readonly | constraint | default | calculate" type="xxf:xpath2" required="false()"/>
+                <!-- Scope xhtml/xforms/xxforms/exforms prefixes for compatibility with existing forms. This is because
+                     xxf:xpath2 uses the namespaces in scope on xf:bind. Ideally, this should use the namespaces in
+                     scope on the xf:bind of the edited form, not of this dialog. Alternatively, could xxf:xpath2
+                     consider any namespace as being in scope? This might not be possible with Saxon. -->
+                <xf:bind
+                    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                    xmlns:xforms="http://www.w3.org/2002/xforms"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                    xmlns:exforms="http://www.exforms.org/exf/1-0"
+                    xmlns:exf="http://www.exforms.org/exf/1-0"
+                    ref="relevant | readonly | constraint | default | calculate"
+                    type="xxf:xpath2"
+                    required="false()"/>
                 <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
 
             </xf:model>

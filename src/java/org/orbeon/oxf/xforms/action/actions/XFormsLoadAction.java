@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.BindingContext;
 import org.orbeon.oxf.xforms.XFormsConstants;
@@ -75,7 +76,15 @@ public class XFormsLoadAction extends XFormsAction {
                 return;
 
             // Resolve AVT
-            final String resolvedResource = actionInterpreter.resolveAVT(actionElement, "resource");
+            final String resolvedResource = actionInterpreter.resolveAVTProvideValue(actionElement, resourceAttributeValue);
+            if (resolvedResource == null) {
+                final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();
+                if (indentedLogger.isDebugEnabled())
+                    indentedLogger.logDebug("xf:load", "resource AVT returned an empty sequence, ignoring action",
+                        "resource", resourceAttributeValue);
+                return;
+            }
+
             final String encodedResource = NetUtils.encodeHRRI(resolvedResource, true);
             resolveStoreLoadValue(containingDocument, actionElement, doReplace, encodedResource, target, urlType, urlNorewrite, isShowProgress);
             // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?

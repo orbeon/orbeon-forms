@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.errorified.Exceptions;
@@ -29,6 +30,7 @@ import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.dom4j.TypedNodeWrapper;
 import org.orbeon.saxon.expr.XPathContext;
@@ -49,6 +51,7 @@ import org.orbeon.saxon.value.QNameValue;
 import org.orbeon.saxon.value.SequenceExtent;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.scaxon.XML;
+import org.w3c.dom.Node;
 
 import java.util.*;
 
@@ -823,7 +826,26 @@ public class XFormsModelBinds {
                     typeValid = isOptionalAndEmpty || XMLUtils.isWellFormedXML(nodeValue);
                 } else if (typeLocalname.equals("xpath2")) {
                     // xxf:xpath2 type
-                    typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(XPathCache.getGlobalConfiguration(), nodeValue, bind.staticBind.namespaceMapping());
+
+                    // Find element which scopes namespaces
+                    final NodeInfo namespaceNodeInfo;
+                    if (currentNodeInfo.getNodeKind() == Node.ELEMENT_NODE)
+                        namespaceNodeInfo = currentNodeInfo;
+                    else
+                        namespaceNodeInfo = currentNodeInfo.getParent();
+
+                    if (namespaceNodeInfo != null && namespaceNodeInfo.getNodeKind() == Node.ELEMENT_NODE) {
+                        // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
+                        final Element namespaceElement = XML.unwrapElement(namespaceNodeInfo);
+                        final NamespaceMapping namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement));
+                        typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(XPathCache.getGlobalConfiguration(), nodeValue, namespaceMapping);
+                    } else {
+                        // This means that we are bound to a node which is not an element and which does not have a
+                        // parent element. This could be a detached attribute, or an element node, etc. Unsure if we
+                        // would have made it this far anyway! We can't validate the expression so we only consider
+                        // the "optional-and-empty" case.
+                        typeValid = isOptionalAndEmpty;
+                    }
                 } else {
                     throw new ValidationException("Invalid schema type '" + bind.staticBind.getType() + "'", bind.staticBind.locationData());
 

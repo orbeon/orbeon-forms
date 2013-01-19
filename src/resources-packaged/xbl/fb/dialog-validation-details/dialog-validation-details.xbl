@@ -69,16 +69,7 @@
                 <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
 
                 <xf:bind ref="required" readonly="../schema-type != ''"/>
-                <!-- Scope xhtml/xforms/xxforms/exforms prefixes for compatibility with existing forms. This is because
-                     xxf:xpath2 uses the namespaces in scope on xf:bind. Ideally, this should use the namespaces in
-                     scope on the xf:bind of the edited form, not of this dialog. Alternatively, could xxf:xpath2
-                     consider any namespace as being in scope? This might not be possible with Saxon. -->
                 <xf:bind
-                    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-                    xmlns:xforms="http://www.w3.org/2002/xforms"
-                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-                    xmlns:exforms="http://www.exforms.org/exf/1-0"
-                    xmlns:exf="http://www.exforms.org/exf/1-0"
                     ref="relevant | readonly | constraint | default | calculate"
                     type="xxf:xpath2"
                     required="false()"/>
@@ -132,6 +123,11 @@
                     <xf:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'readonly')"/>
                     <xf:setvalue ref="$local/calculate"  value="controlOps:getMipOrEmpty($form, $local/control-name, 'calculate')"/>
                     <xf:setvalue ref="$local/default"    value="controlOps:getMipOrEmpty($form, $local/control-name, 'default')"/>
+
+                    <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
+                         allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
+                    <xf:delete ref="$local/namespace::node()"/>
+                    <xf:insert context="$local" origin="controlOps:findBindByNameOrEmpty($form, $local/control-name)/namespace::node()"/>
 
                 </xf:action>
 

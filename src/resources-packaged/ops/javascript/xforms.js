@@ -354,8 +354,15 @@ var DEFAULT_LOADING_TEXT = "Loading...";
              * we would get if we didn't catch the exception would be: "Can't move focus to the control because it is
              * invisible, not enabled, or if a type that does not accept the focus."
              *
-             * @param {HTMLElement} element
-             * @return void
+             * We don't use jQuery to set the focus, as this would trigger our listener on the focus event to be [called
+             * twice][1]. Since we use a mask to avoid telling the server about a focus the server just told us about,
+             * the focus listener running twice would [send the focus event to the server on the second run][2], which
+             * we don't want. We'll be able to simply use jQuery when we [implement code keeping track of the control
+             * that has the focus from the server's perspective][3].
+             *
+             *   [1]: http://jquery.com/upgrade-guide/1.9/#order-of-triggered-focus-events
+             *   [2]: https://github.com/orbeon/orbeon-forms/issues/747
+             *   [3]: https://github.com/orbeon/orbeon-forms/issues/755
              */
             focus: function(element) {
                 try { element.focus(); }
@@ -2182,7 +2189,7 @@ ORBEON.xforms.Controls = {
             // Generic code to find focusable descendant-or-self HTML element and focus on it
             var htmlControl = $(control).find('input:visible, textarea:visible, select:visible, button:visible, a:visible');
             if (htmlControl.is('*'))
-                ORBEON.util.Dom.focus(htmlControl);
+                ORBEON.util.Dom.focus(htmlControl.get(0));
             else
                 // We haven't found anything to set the focus on, so don't mask the focus event, since we won't receive it
                 ORBEON.xforms.Globals.maskFocusEvents = false;

@@ -24,8 +24,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:exf="http://www.exforms.org/exf/1-0" >
+         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <xbl:binding id="fr-dialog-editor" element="fr|dialog-editor">
         <xbl:resources>

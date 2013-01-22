@@ -236,7 +236,7 @@
                         <xsl:copy-of select="$section-bind/xf:bind"/>
                     </xf:bind>
 
-                    <!-- Sections resources -->
+                    <!-- Sections resources: include resource for section and for all leaf controls -->
                     <xf:instance id="fr-form-resources">
                         <resources xmlns="">
                             <xsl:for-each select="$fr-resources-instance/*/resource">
@@ -244,7 +244,7 @@
 
                                 <resource xml:lang="{$lang}">
                                     <xsl:copy-of select="*[name() = $section-name]"/>
-                                    <xsl:copy-of select="*[name() = (for $n in $section-data/* return name($n))]"/>
+                                    <xsl:copy-of select="*[name() = (for $n in $section-data//*[not(*)] return name($n))]"/>
                                 </resource>
                             </xsl:for-each>
                         </resources>

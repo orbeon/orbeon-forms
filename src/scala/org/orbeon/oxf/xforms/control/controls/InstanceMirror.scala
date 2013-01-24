@@ -284,7 +284,7 @@ object InstanceMirror {
 
                         // Find the corresponding parent of the removed node and run the body on it. The body returns Some(Node)
                         // if that node can be removed.
-                        def withNewParent(body: Node ⇒ Option[Node]) = {
+                        def withNewParent(body: Node ⇒ (Option[Node], Boolean)) = {
 
                             // If parent is available, find matching node and call body
                             Option(deleteInfo.parent) match {
@@ -296,12 +296,12 @@ object InstanceMirror {
                                             val newParentNode = XFormsUtils.getNodeFromNodeInfo(matchingParentNode, "")
 
                                             body(newParentNode) match {
-                                                case Some(nodeToRemove: Node) ⇒
+                                                case (Some(nodeToRemove: Node), result) ⇒
                                                     if (! isInLoop(matchingInstance, event))
                                                         doDelete(containingDocument, logger, Seq(docWrapper.wrap(nodeToRemove)).asJava, -1, doDispatch = true)
-                                                    true
-                                                case _ ⇒
-                                                    false
+                                                    result
+                                                case (_, result) ⇒
+                                                    result
                                             }
                                         case _ ⇒ false
                                     }
@@ -318,23 +318,22 @@ object InstanceMirror {
                                         // Find the attribute  by name (as attributes are unique for a given QName)
                                         val removedAttribute = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Attribute]
                                         newParentElement.attribute(removedAttribute.getQName) match {
-                                            case newAttribute: Attribute ⇒ Some(newAttribute)
-                                            case _ ⇒ None // out of sync, so probably safer
+                                            case newAttribute: Attribute ⇒ (Some(newAttribute), true)
+                                            case _ ⇒ (None, false) // out of sync, so probably safer
                                         }
-                                    case _ ⇒ None
+                                    case _ ⇒ (None, false)
                                 }
                             case ELEMENT_NODE ⇒
                                 // An element was removed
                                 withNewParent {
                                     case newParentDocument: Document ⇒
                                         // Element removed was root element
-                                        val removedElement = XFormsUtils.getNodeFromNodeInfo(removedNodeInfo, "").asInstanceOf[Element]
-                                        val newRootElement =  newParentDocument.getRootElement
 
-                                        if (newRootElement.getQName == removedElement.getQName)
-                                            Some(newRootElement)
-                                        else
-                                            None
+                                        // Don't perform the deletion of the root element because we don't support
+                                        // this in the data model (although maybe we should). However, consider this
+                                        // a supported change. If the root element is replaced, the subsequent
+                                        // insert event will take care of the replacement.
+                                        (None, true)
 
                                     case newParentElement: Element ⇒
                                         // Element removed had a parent element
@@ -344,12 +343,12 @@ object InstanceMirror {
                                         val content = newParentElement.content.asInstanceOf[JList[Node]]
                                         if (content.size > removedNodeIndex) {
                                             content.get(removedNodeIndex) match {
-                                                case newElement: Element if newElement.getQName == removedElement.getQName ⇒ Some(newElement)
-                                                case _ ⇒ None // out of sync, so probably safer
+                                                case newElement: Element if newElement.getQName == removedElement.getQName ⇒ (Some(newElement), true)
+                                                case _ ⇒ (None, false) // out of sync, so probably safer
                                             }
                                         } else
-                                            None // out of sync, so probably safer
-                                    case _ ⇒ None
+                                            (None, false) // out of sync, so probably safer
+                                    case _ ⇒ (None, false)
                                 }
                             case TEXT_NODE ⇒
                                 false // TODO

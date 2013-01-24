@@ -67,6 +67,9 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
         super.findRelevantChildrenElements collect
             { case (e, s) if XFormsActions.isAction(e.getQName) || Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)(e.getQName) ⇒ (e, s) }
 
+    // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
+    override def indexedElements = super.indexedElements ++ bindsById.values
+
     override def analyzeXPath() {
         // Analyze this
         super.analyzeXPath()
@@ -185,8 +188,8 @@ trait ModelSubmissions {
     self: Model ⇒
 
     // Submissions (they are all direct children)
-    private lazy val _submissions = children collect { case s: Submission ⇒ s }
-    def jSubmissions = _submissions.asJava
+    lazy val submissions = children collect { case s: Submission ⇒ s }
+    def jSubmissions = submissions.asJava
 }
 
 trait ModelEventHandlers {

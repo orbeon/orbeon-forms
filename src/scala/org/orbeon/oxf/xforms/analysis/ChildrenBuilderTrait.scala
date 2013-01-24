@@ -26,22 +26,32 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
 
     // This element's children (valid after build() has been called)
     private var _children = Seq[ElementAnalysis]()
-    def children = _children
+    final def children = _children
 
     // NOTE: Should probably make it so that controls add themselves to their container upon creation
-    def addChildren(children: Seq[ElementAnalysis]) =
+    final def addChildren(children: Seq[ElementAnalysis]) =
         _children ++= children
 
-    def removeChild(child: ElementAnalysis): Unit =
+    final def removeChild(child: ElementAnalysis): Unit =
         _children = _children filterNot (_ eq child)
 
     // All this element's descendants (valid after build() has been called)
-    def descendants: Seq[ElementAnalysis] = {
+    final def descendants: Seq[ElementAnalysis] = {
 
         def nestedChildrenBuilderTraits =
             _children collect { case child: ChildrenBuilderTrait ⇒ child }
 
         _children ++ (nestedChildrenBuilderTraits flatMap (_.descendants))
+    }
+
+    // Some elements can create and index elements which are not processed as descendants above. To enable de-indexing,
+    // they can override indexedElements to add elements to de-index.
+    def indexedElements: Seq[ElementAnalysis] = {
+
+        def nestedChildrenBuilderTraits =
+            _children collect { case child: ChildrenBuilderTrait ⇒ child }
+
+        _children ++ (nestedChildrenBuilderTraits flatMap (_.indexedElements))
     }
     
     // Build this element's children and its descendants

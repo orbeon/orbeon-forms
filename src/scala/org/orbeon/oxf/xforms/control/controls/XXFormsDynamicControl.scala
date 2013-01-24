@@ -248,7 +248,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                     //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
                     componentControl.destroyNestedContainer()
 
-                    // Remove static controls
+                    // Remove dynamic controls
                     tree.deindexSubtree(componentControl, false)
                     componentControl.clearChildren()
 

@@ -4223,6 +4223,8 @@
         <input name="document">
             <xh:html>
                 <xh:head>
+                    <!-- Create nested model with instance, bind and action to test de-indexing
+                         See: https://github.com/orbeon/orbeon-forms/issues/770 -->
                     <xf:model id="model">
                         <xf:instance id="instance">
                             <xh:html>
@@ -4240,6 +4242,11 @@
                                     <xbl:xbl>
                                         <xbl:binding id="fr-bar" element="fr|bar">
                                             <xbl:template>
+                                                <xf:model id="bar-model">
+                                                    <xf:instance id="bar-instance"><bar/></xf:instance>
+                                                    <xf:bind id="bar-bind" ref="."/>
+                                                    <xf:setvalue ev:event="xforms-model-construct-done" id="bar-setvalue" ref=".">42</xf:setvalue>
+                                                </xf:model>
                                                 <xbl:content/>
                                             </xbl:template>
                                         </xbl:binding>
@@ -4290,6 +4297,13 @@
                                         <xbl:xbl>
                                             <xbl:binding id="fr-bar" element="fr|bar">
                                                 <xbl:template>
+                                                    <xf:model id="bar-model" xxf:state-handling="client">
+                                                        <xf:instance id="bar-instance">
+                                                            <bar/>
+                                                        </xf:instance>
+                                                        <xf:bind id="bar-bind" ref="."/>
+                                                        <xf:setvalue ev:event="xforms-model-construct-done" id="bar-setvalue" ref=".">42</xf:setvalue>
+                                                    </xf:model>
                                                     <xbl:content/>
                                                 </xbl:template>
                                             </xbl:binding>
@@ -4304,6 +4318,9 @@
                                         </xf:group>
                                     </xh:body>
                                 </xh:html>
+                            </instance>
+                            <instance id="bar-instance" model-id="my-dynamic$my-bar$bar-model">
+                                <bar>42</bar>
                             </instance>
                         </instances>
                     </dynamic-state>

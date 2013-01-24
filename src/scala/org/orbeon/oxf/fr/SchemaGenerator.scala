@@ -98,7 +98,10 @@ class SchemaGenerator extends ProcessorImpl {
         val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
         val connectionResult = Connection("GET", url, credentials = None, messageBody = None, headers = headers, loadState = true, logBody = false).connect(saveState = true)
 
-        if (connectionResult.statusCode == 200)
+        // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the first test),
+        // but the MySQL persistence layer returns a [200 with an empty body][1] (thus the second test).
+        //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
+        if (connectionResult.statusCode == 200 && connectionResult.hasContent)
             Some(useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                 TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
             })

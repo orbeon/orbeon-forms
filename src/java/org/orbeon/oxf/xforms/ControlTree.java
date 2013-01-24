@@ -19,8 +19,6 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl;
-import org.orbeon.oxf.xforms.event.Dispatch;
-import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 
 import java.util.*;
@@ -182,7 +180,6 @@ public class ControlTree implements ExternalCopyable {
     public XFormsRepeatIterationControl createRepeatIterationTree(XFormsContainingDocument containingDocument,
                                                                   XFormsRepeatControl repeatControl, int iterationIndex) {
 
-        // Index for the controls created in the iteration
         // NOTE: We used to create a separate index, but this caused this bug:
         // [ #316177 ] When new repeat iteration is created upon repeat update, controls are not immediately accessible by id
         return Controls.createRepeatIterationTree(containingDocument, controlIndex, repeatControl, iterationIndex);
@@ -204,13 +201,12 @@ public class ControlTree implements ExternalCopyable {
         dispatchRefreshEvents(effectiveIdsToControls.keySet());
     }
 
-    public void createAndInitializeSubTree(XBLContainer container, XFormsContainerControl containerControl, ElementAnalysis elementAnalysis) {
+    public void createAndInitializeDynamicSubTree(XBLContainer container, XFormsContainerControl containerControl, ElementAnalysis elementAnalysis) {
 
-        // Index for the controls created in the subtree
-        // NOTE: We used to create a separate index, but this caused this bug:
-        // [ #316177 ] When new repeat iteration is created upon repeat update, controls are not immediately accessible by id
         Controls.createSubTree(container, controlIndex, containerControl, elementAnalysis);
 
+        // NOTE: We dispatch refresh events for the subtree right away, by consistency with repeat iterations. But we
+        // don't really have to do this, we could wait for the following refresh.
         initializeSubTree(containerControl, false);
     }
 

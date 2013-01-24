@@ -224,7 +224,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         _nested = Some(new Nested(childContainer, partAnalysis, template, outerListener))
 
         // Create new control subtree
-        tree.createAndInitializeSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
+        tree.createAndInitializeDynamicSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
     }
 
     // If more than one change touches a given id, processed it once using the last element
@@ -260,7 +260,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
                     val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
                     templateTree foreach
-                        (tree.createAndInitializeSubTree(componentControl.nestedContainer, componentControl, _))
+                        (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _))
 
                     // Tell client
                     containingDocument.addControlStructuralChange(componentControl.prefixedId)

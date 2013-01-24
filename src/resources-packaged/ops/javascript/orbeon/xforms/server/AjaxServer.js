@@ -1330,9 +1330,15 @@
                                         }
 
                                         // Add new class
-                                        var typeResult = /}(.*)/.exec(newSchemaType);
-                                        if (typeResult != null && typeResult.length >= 2)
-                                            YAHOO.util.Dom.addClass(documentElement, typePrefix + typeResult[1]);
+                                        var typeResult = /{(.*)}(.*)/.exec(newSchemaType);
+                                        if (typeResult != null && typeResult.length == 3) {
+                                            var typeNamespace = typeResult[1];
+                                            var typeLocalName = typeResult[2];
+                                            var isBuiltIn = typeNamespace == 'http://www.w3.org/2001/XMLSchema'
+                                                         || typeNamespace == 'http://www.w3.org/2002/xforms';
+                                            var newClass = typePrefix + (isBuiltIn ? '' : 'custom-') + typeLocalName;
+                                            $(documentElement).addClass(newClass);
+                                        }
                                     }
 
                                     // Handle readonly

@@ -614,7 +614,8 @@ span.xforms-textarea pre {
   form.xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
   form.xforms-form .xforms-help-image,
   form.xforms-form .fr-section-title .xforms-help-image,
-  form.xforms-form .xforms-hint {
+  form.xforms-form .xforms-hint,
+  form.xforms-form .fr-buttons {
     display: none;
   }
   form.xforms-form .xforms-upload-info {
@@ -669,5 +670,10 @@ span.xforms-textarea pre {
   form.xforms-form .btn-group,
   form.xforms-form .btn-toolbar {
     font-size: .5px;
+  }
+}
+@page  {
+  @bottom-center {
+    content: counter(page) " / " counter(pages);
   }
 }

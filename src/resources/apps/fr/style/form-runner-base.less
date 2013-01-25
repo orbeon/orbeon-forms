@@ -521,7 +521,8 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
         .xforms-upload-remove,                                         // upload remove button
         .xbl-fr-attachment .xforms-output-appearance-xxforms-download, // no download link
         .xforms-help-image, .fr-section-title .xforms-help-image,      // no help
-        .xforms-hint                                                   // no hints
+        .xforms-hint,                                                  // no hints
+        .fr-buttons                                                    // no buttons at bottom
         { display: none }
 
         // Remove background attachment image
@@ -561,5 +562,13 @@ pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; whit
         .btn-toolbar {
             font-size: .5px;
         }
+    }
+}
+
+// Add page number at bottom
+// NOTE: Not sure how to internationalize this, so use "/"
+@page {
+    @bottom-center {
+        content: counter(page) " / " counter(pages);
     }
 }

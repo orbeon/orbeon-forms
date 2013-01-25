@@ -253,36 +253,53 @@ html, body { background-color: @frBackground }
 
         h2 {
             border-bottom: 1px solid darken(@wellBackground, 7%);
+            color: black;
         }
 
-        .navbar {
-            position: static; // override Bootstrap otherwise navbar appears on all pages
-        }
+        // Sections
+        .xbl-fr-section {
+            .fr-section-title {
+                background: none;
+                .fr-section-label {
+                    padding-left: 0;            // remove padding as we don't have section arrows
+                    &.fr-section-open, &.fr-section-closed {
+                        background-image: none; // remove section arrows
+                    }
 
-        .navbar-inner {
-            background-color: white;
-            border-bottom: 1px solid darken(@wellBackground, 7%);
-
-            .fr-language-choice {
-                display: none;
+                    a {
+                        color: black;
+                    }
+                }
             }
+        }
 
-            .brand {
-                color: @frHeaderColor;
-                font-size: 25px;
+        // Navbar
+        .navbar, .navbar.navbar-inverse {
+            position: static; // override Bootstrap otherwise navbar appears on all pages
+
+            .navbar-inner {
+                background-color: white;
+                border-bottom: 1px solid darken(@wellBackground, 7%);
+                padding-left: 0;
+
+                .container h1 {
+                    font-size: 24px;
+                    color: black;
+                }
+
+                .fr-language-choice {
+                    display: none;
+                }
+
+                .brand {
+                    color: @frHeaderColor;
+                    font-size: 25px;
+                }
             }
         }
 
         .fr-form-description {
             display: none;
-        }
-
-        .xbl-fr-section .fr-section-title {
-            // Remove open/close arrows
-            .fr-section-label { padding-left: 0; }
-            .fr-section-label.fr-section-opened, .fr-section-label.fr-section-closed {
-                background-image: none;
-            }
         }
     }
 }

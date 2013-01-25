@@ -326,29 +326,46 @@ textarea.xforms-invalid-visited {
   }
   form.xforms-form h2 {
     border-bottom: 1px solid #e3e3e3;
+    color: black;
   }
-  form.xforms-form .navbar {
+  form.xforms-form .xbl-fr-section .fr-section-title {
+    background: none;
+  }
+  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label {
+    padding-left: 0;
+  }
+  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
+  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+    background-image: none;
+  }
+  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label a {
+    color: black;
+  }
+  form.xforms-form .navbar,
+  form.xforms-form .navbar.navbar-inverse {
     position: static;
   }
-  form.xforms-form .navbar-inner {
+  form.xforms-form .navbar .navbar-inner,
+  form.xforms-form .navbar.navbar-inverse .navbar-inner {
     background-color: white;
     border-bottom: 1px solid #e3e3e3;
+    padding-left: 0;
   }
-  form.xforms-form .navbar-inner .fr-language-choice {
+  form.xforms-form .navbar .navbar-inner .container h1,
+  form.xforms-form .navbar.navbar-inverse .navbar-inner .container h1 {
+    font-size: 24px;
+    color: black;
+  }
+  form.xforms-form .navbar .navbar-inner .fr-language-choice,
+  form.xforms-form .navbar.navbar-inverse .navbar-inner .fr-language-choice {
     display: none;
   }
-  form.xforms-form .navbar-inner .brand {
+  form.xforms-form .navbar .navbar-inner .brand,
+  form.xforms-form .navbar.navbar-inverse .navbar-inner .brand {
     color: #555555;
     font-size: 25px;
   }
   form.xforms-form .fr-form-description {
     display: none;
-  }
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label {
-    padding-left: 0;
-  }
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-opened,
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
-    background-image: none;
   }
 }

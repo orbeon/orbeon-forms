@@ -30,9 +30,11 @@
         <p:output name="data" id="unrolled-form-definition"/>
     </p:processor>
 
-    <p:processor name="fr:schema-generator">
-        <p:input name="unrolled-form-definition" href="#unrolled-form-definition"/>
-        <p:output name="schema" ref="data"/>
+    <p:processor name="fr:xforms-to-schema">
+        <p:input name="instance" href="#instance"/>
+        <p:input name="data" href="#unrolled-form-definition"/>
+        <p:input name="annotated-document" href="#unrolled-form-definition"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{ExternalContext, XMLReceiver, PipelineContext}
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.xml.{XMLUtils, XMLConstants, TransformerUtils}
+import org.orbeon.oxf.processor.{ProcessorInputOutputInfo, ProcessorImpl}
+import org.orbeon.oxf.xml.{ElementHandlerController, XMLUtils, XMLConstants, TransformerUtils}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
 import org.orbeon.oxf.util.ScalaUtils._
@@ -32,6 +32,12 @@ import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import scala.Some
 import xml.Text
 import xml.NamespaceBinding
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsStaticStateImpl}
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.processor.handlers.xhtml.XHTMLBodyHandler
+import org.orbeon.oxf.xforms.processor.XFormsToSomething
+import org.orbeon.oxf.xforms.processor.XFormsToSomething.Stage2CacheableState
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 
 /**
  *  Supported:
@@ -46,47 +52,49 @@ import xml.NamespaceBinding
  *  Not supported:
  *  - Custom XML instance (adds lots of complexity, thinking of dropping for 4.0, and maybe foreseeable future)
  */
-class SchemaGenerator extends ProcessorImpl {
+class XFormsToSchema extends XFormsToSomething {
 
     private val SchemaPath = """/fr/([^/^.]+)/([^/^.]+)/schema""".r
     private val ComponentNSPrefix = "http://orbeon.org/oxf/xml/form-builder/component/"
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SchemaGenerator]), "")
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[XFormsToSchema]), "")
 
     case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
 
-    override def createOutput(name: String) =
-        addOutput(name, new ProcessorOutputImpl(this, name) {
-            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) {
-                // This is a PE feature
-                Version.instance.requirePEFeature("XForms schema generator service")
+    protected def produceOutput(pipelineContext: PipelineContext,
+                                outputName: String,
+                                externalContext: ExternalContext,
+                                indentedLogger: IndentedLogger,
+                                stage2CacheableState: Stage2CacheableState,
+                                containingDocument: XFormsContainingDocument,
+                                xmlReceiver: XMLReceiver): Unit = {
+        // This is a PE feature
+        Version.instance.requirePEFeature("XForms schema generator service")
 
-                // Read form and library
-                val ec = NetUtils.getExternalContext
-                val response = ec.getResponse
-                val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
-                val formSource = readPublishedForm(appName, formName).get
-                val library = Libraries(readPublishedForm("orbeon", "library"), readPublishedForm(appName, "library"))
+        // Read form and library
+        val ec = NetUtils.getExternalContext
+        val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
+        val formSource = readPublishedForm(appName, formName).get
+        val library = Libraries(readPublishedForm("orbeon", "library"), readPublishedForm(appName, "library"))
 
-                // Compute root xs:element
-                val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
-                val rootXsElement: Elem = handleBind(library, rootBind)
+        // Compute root xs:element
+        val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
+        val rootXsElement: Elem = handleBind(library, rootBind)
 
-                // Import XForms schema if necessary
-                val schema =
-                    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                        {
-                            val hasXFormsNamespace = rootXsElement.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
-                            if (hasXFormsNamespace)
-                                <xs:import namespace="http://www.w3.org/2002/xforms"
-                                           schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
-                        }
-                        { rootXsElement }
-                    </xs:schema>
+        // Import XForms schema if necessary
+        val schema =
+            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                {
+                    val hasXFormsNamespace = rootXsElement.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
+                    if (hasXFormsNamespace)
+                        <xs:import namespace="http://www.w3.org/2002/xforms"
+                                   schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
+                }
+                { rootXsElement }
+            </xs:schema>
 
-                // Send result to output
-                XMLUtils.stringToSAX(schema.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
-            }
-        })
+        // Send result to output
+        XMLUtils.stringToSAX(schema.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
+    }
 
     // Retrieves a form from the persistence layer
     private def readPublishedForm(appName: String, formName: String): Option[DocumentInfo] = {

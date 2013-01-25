@@ -52,11 +52,12 @@
         </xf:message>
 
         <!-- If user can't perform the required operations, deny access to this page -->
+        <!-- Don't require any 'schema', don't require any authorized permission, as this is instead protected as a service -->
         <xf:var name="unauthorized-access" value="
             ($mode = ('new', 'test', 'import', 'validate') and not($ops = ('*', 'create'))) or
             ($mode = 'edit'                                and not($ops = ('*', 'update'))) or
-            ($mode = ('view', 'pdf', 'email')              and not($ops = ('*', 'read')))   or
-            not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'email'))"/>
+            ($mode = ('view', 'pdf', 'email')              and not($ops = ('*', 'read'))  ) or
+            not($mode = ('new', 'test', 'import', 'validate', 'edit', 'view', 'pdf', 'email', 'schema'))"/>
 
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xf:action if="$unauthorized-access" type="xpath">

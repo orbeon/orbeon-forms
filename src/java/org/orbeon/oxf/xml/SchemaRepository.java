@@ -40,7 +40,6 @@ import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.xforms.XFormsConstants;
 
 import java.util.HashMap;
 import java.util.Iterator;

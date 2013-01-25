@@ -172,9 +172,6 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     }
 
     private def initializeModels(): Unit = {
-
-
-
         nestedContainer.initializeModels(Array[String](
             XFormsEvents.XFORMS_MODEL_CONSTRUCT,
             XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE

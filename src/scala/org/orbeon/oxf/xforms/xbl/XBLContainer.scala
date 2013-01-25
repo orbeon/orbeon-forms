@@ -404,7 +404,7 @@ trait ContainerResolver {
         def isEffectiveIdResolvableByThisContainer(effectiveId: String) =
             self eq findScopeRoot(XFormsUtils.getPrefixedId(effectiveId))
 
-        // Handle "absolute ids" of format "/foo/bar.1-2"
+        // Handle "absolute ids"
         // NOTE: Experimental, definitive format TBD
         if (XFormsUtils.isAbsoluteId(staticOrAbsoluteId))
             return containingDocument.getObjectByEffectiveId(XFormsUtils.absoluteIdToEffectiveId(staticOrAbsoluteId))

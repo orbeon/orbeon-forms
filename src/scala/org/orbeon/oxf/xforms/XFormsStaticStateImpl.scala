@@ -18,7 +18,6 @@ import collection.JavaConversions._
 import collection.JavaConverters._
 import org.orbeon.oxf.xml._
 import dom4j.{LocationDocumentResult, Dom4jUtils, LocationData}
-import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml.XMLConstants._
 import java.util.{List ⇒ JList, Set ⇒ JSet, Map ⇒ JMap}
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -30,7 +29,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{NumberUtils, XPathCache}
+import org.orbeon.oxf.util.{StringReplacer, NumberUtils}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 class XFormsStaticStateImpl(
@@ -63,6 +62,8 @@ class XFormsStaticStateImpl(
     lazy val isNoscript            = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
     lazy val isHTMLDocument        = staticStateDocument.isHTMLDocument
     lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
+    lazy val inputFilter           = StringReplacer(getProperty[String](P.INPUT_FILTER_PROPERTY))(getIndentedLogger)
+    lazy val textareaFilter        = StringReplacer(getProperty[String](P.TEXTAREA_FILTER_PROPERTY))(getIndentedLogger)
 
     def isCacheDocument       = staticStateDocument.isCacheDocument
     def isClientStateHandling = staticStateDocument.isClientStateHandling

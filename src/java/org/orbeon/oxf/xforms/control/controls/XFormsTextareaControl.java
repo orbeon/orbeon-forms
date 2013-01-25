@@ -70,6 +70,10 @@ public class XFormsTextareaControl extends XFormsValueFocusableControlBase { // 
             if (isDebugEnabled)
                 indentedLogger.endHandleOperation("value", externalValue);
         }
+
+        // String replacement based on configuration
+        externalValue = containingDocument().getStaticState().textareaFilter().apply(externalValue);
+
         return externalValue;
     }
 }

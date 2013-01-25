@@ -182,6 +182,11 @@
         <include name="xqj2-0.0.1.jar"/>
         <include name="exist-xqj-1.0.1.jar"/>
 
+        <!-- JSON -->
+        <include name="parboiled-core-1.1.4.jar"/>
+        <include name="parboiled-scala_2.9.2-1.1.4.jar"/>
+        <include name="spray-json_2.9.2-1.2.3.jar"/>
+
     </fileset>
 
     <target name="init">

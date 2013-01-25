@@ -45,6 +45,11 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
     private def format   = Option(staticControl) flatMap (_.format)
     private def unformat = Option(staticControl) flatMap (_.unformat)
 
+    private def unformatTransform(v: String) = unformat match {
+        case Some(expr) ⇒ evaluateAsString(expr, Seq(StringValue.makeStringValue(v)), 1) getOrElse ""
+        case None       ⇒ v
+    }
+
     // Control name becomes "label" or "hint". This is a special case as even non-external labels and hints can
     // have the placeholder appearance, and those are not really controls.
     override def getJavaScriptInitialization =
@@ -107,8 +112,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                     // Special case of empty parts
                     ""
             case _ ⇒
-                unformat flatMap
-                    (evaluateAsString(_, Seq(StringValue.makeStringValue(externalValue)), 1)) getOrElse externalValue
+                containingDocument.getStaticState.inputFilter(unformatTransform(externalValue))
         }
     }
 

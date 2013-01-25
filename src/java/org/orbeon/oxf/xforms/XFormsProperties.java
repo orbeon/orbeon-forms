@@ -126,6 +126,9 @@ public class XFormsProperties {
 
     private static final String DATATABLE_INIT_IN_VIEWPORT = "xbl.fr.datatable.init-in-viewport";
 
+    public static final String INPUT_FILTER_PROPERTY = "filter.input";
+    public static final String TEXTAREA_FILTER_PROPERTY = "filter.textarea";
+
     public static class PropertyDefinition {
 
         public final String name;
@@ -217,6 +220,8 @@ public class XFormsProperties {
             new PropertyDefinition(XFORMS11_SWITCH_PROPERTY, false, false), // false for now, but default should change at some point
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY, false, false),
             new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
+            new PropertyDefinition(INPUT_FILTER_PROPERTY, "", false),
+            new PropertyDefinition(TEXTAREA_FILTER_PROPERTY, "", false),
 
             // Properties to propagate to the client
             new PropertyDefinition(RETRY_DELAY_INCREMENT, 5000, true),

@@ -99,9 +99,6 @@
 
     <!-- ==== Other services ======================================================================================= -->
 
-    <!-- Generate a schema for a form -->
-    <service path="/fr/service/schema/([^/^.]+)/([^/^.]+)" model="ws/schema.xpl"/>
-
     <!-- Email document -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(email)(/([^/^.]+))?"
              view="email/email-form.xpl"/>
@@ -192,6 +189,11 @@
     <page path="/fr/([^/^.]+)/([^/^.]+)/(pdf)(/([^/^.]+))?"
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
+
+    <!-- Generate a schema for a form -->
+    <service path="/fr/([^/^.]+)/([^/^.]+)/(schema)"
+          model="detail/detail-model.xpl" view="schema/schema.xpl">
+    </service>
 
     <!-- Test form by retrieving form from the database first -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(test)/([^/^.]+)"

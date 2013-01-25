@@ -13,26 +13,25 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.xml.{XMLConstants, TransformerUtils}
+import org.orbeon.oxf.xml.{XMLUtils, XMLConstants, TransformerUtils}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
-import java.io.OutputStream
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import xml._
 import xml.Attribute
 import org.dom4j.QName
 import org.orbeon.oxf.common.{Version, OXFException}
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import scala.Some
 import xml.Text
 import xml.NamespaceBinding
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
-import javax.xml.transform.stream.StreamResult
 
 /**
  *  Supported:
@@ -49,48 +48,48 @@ import javax.xml.transform.stream.StreamResult
  */
 class SchemaGenerator extends ProcessorImpl {
 
-    private val SchemaPath = """/fr/service/schema/([^/]+)/([^/]+)""".r
+    private val SchemaPath = """/fr/([^/^.]+)/([^/^.]+)/schema""".r
     private val ComponentNSPrefix = "http://orbeon.org/oxf/xml/form-builder/component/"
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[SchemaGenerator]), "")
 
     case class Libraries(orbeon: Option[DocumentInfo], app: Option[DocumentInfo])
 
-    override def start(pipelineContext: PipelineContext) {
+    override def createOutput(name: String) =
+        addOutput(name, new ProcessorOutputImpl(this, name) {
+            def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) {
+                // This is a PE feature
+                Version.instance.requirePEFeature("XForms schema generator service")
 
-        // This is a PE feature
-        Version.instance.requirePEFeature("XForms schema generator service")
+                // Read form and library
+                val ec = NetUtils.getExternalContext
+                val response = ec.getResponse
+                val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
+                val formSource = readPublishedForm(appName, formName).get
+                val library = Libraries(readPublishedForm("orbeon", "library"), readPublishedForm(appName, "library"))
 
-        // Read form and library
-        val ec = NetUtils.getExternalContext
-        val response = ec.getResponse
-        val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
-        val formSource = read(appName, formName).get
-        val library = Libraries(read("orbeon", "library"), read(appName, "library"))
+                // Compute root xs:element
+                val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
+                val rootXsElement: Elem = handleBind(library, rootBind)
 
-        // Compute root xs:element
-        val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
-        val rootXsElement: Elem = handleBind(library, rootBind)
+                // Import XForms schema if necessary
+                val schema =
+                    <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                        {
+                            val hasXFormsNamespace = rootXsElement.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
+                            if (hasXFormsNamespace)
+                                <xs:import namespace="http://www.w3.org/2002/xforms"
+                                           schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
+                        }
+                        { rootXsElement }
+                    </xs:schema>
 
-        // Import XForms schema if necessary and return
-        val schema =
-            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                {
-                    val hasXFormsNamespace = rootXsElement.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
-                    if (hasXFormsNamespace)
-                        <xs:import namespace="http://www.w3.org/2002/xforms"
-                                   schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
-                }
-                { rootXsElement }
-            </xs:schema>
-        response.setContentType("application/xml")
-        val schemaDocument = elemToDocumentInfo(schema)
-        val writeDocument = (new StreamResult(_: OutputStream)) andThen
-                (TransformerUtils.getXMLIdentityTransformer.transform(schemaDocument, _))
-        useAndClose(response.getOutputStream)(writeDocument)
-    }
+                // Send result to output
+                XMLUtils.stringToSAX(schema.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
+            }
+        })
 
     // Retrieves a form from the persistence layer
-    private def read(appName: String, formName: String): Option[DocumentInfo] = {
+    private def readPublishedForm(appName: String, formName: String): Option[DocumentInfo] = {
         val uri = "/fr/service/persistence/crud/" + appName + "/" + formName + "/form/form.xhtml"
         val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
         val url = URLFactory.createURL(urlString)

@@ -68,6 +68,8 @@
                 </xsl:template>
                 <!-- While we are at it filter out scripts as they won't be used -->
                 <xsl:template match="*:script | *:noscript"/>
+                <!-- These are unneeded and can make iText choke (values too long) -->
+                <xsl:template match="*:input[@type = 'hidden']"/>
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->
                 <xsl:template match="*:form">
                     <xsl:copy>

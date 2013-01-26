@@ -51,9 +51,8 @@ import xml.NamespaceBinding
  */
 class XFormsToSchema extends XFormsToSomething {
 
-    private val SchemaPath        = """/fr/([^/^.]+)/([^/^.]+)/schema""".r
-    private val ComponentNS       = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library"""
-    private val ComponentNSPrefix = "http://orbeon.org/oxf/xml/form-builder/component/"
+    private val SchemaPath  = """/fr/([^/^.]+)/([^/^.]+)/schema""".r
+    private val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
 
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[XFormsToSchema]), "")
 
@@ -165,7 +164,7 @@ class XFormsToSchema extends XFormsToSomething {
 
                 // For controls with an itemset, generate a xs:simpleType
                 val xformsObject = resolve(elemName + "-control")
-                val itemset = xformsObject collectFirst { case select1: XFormsSelect1Control ⇒ select1.getItemset }
+                val itemset = xformsObject collectFirst { case select1: XFormsSelect1Control if select1.isRelevant ⇒ select1.getItemset }
                 val itemsetValues = itemset.toSeq flatMap (_.children) map (_.value) toSeq
                 val simpleType = if (itemsetValues.length == 0) Seq() else {
                     <xs:simpleType>
@@ -183,21 +182,19 @@ class XFormsToSchema extends XFormsToSomething {
             }
         }
 
+        def matchesComponent(uri: String) = ComponentNS.findFirstIn(uri).isDefined
+
         // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from the library
         // If there are no children, and this is a section template, return the nestedContainer for the XBL component
         val (childBinds, newResolve) = bind \ * match {
             case Nil ⇒
                 val section = control(bind, "*:section")
-                val component = section.toSeq \ * filter (_.getURI startsWith ComponentNSPrefix) headOption
+                val component = section.toSeq \ * filter (e ⇒ matchesComponent(e.getURI)) headOption
                 val binds = {
-                    val library = component flatMap ( c ⇒ {
-                            val componentNamespaceURISuffix = c.getURI.substring(ComponentNSPrefix.length)
-                            componentNamespaceURISuffix match {
-                                case "orbeon/library" ⇒ libraries.orbeon
-                                case _ ⇒ libraries.app
-                            }
-                        }
-                    )
+                    val library = component map (_.getURI) flatMap {
+                        case ComponentNS("orbeon") ⇒ libraries.orbeon
+                        case _ ⇒ libraries.app
+                    }
                     val libraryRootBind = library.toSeq \ "*:html" \ "*:head" \ "*:model" \ "*:bind"
                     val componentBind = libraryRootBind \ "*:bind" filter (_ \@ "name" === component.get.getLocalPart)
                     componentBind \ "*:bind"
@@ -215,7 +212,7 @@ class XFormsToSchema extends XFormsToSomething {
 
                     // Find the concrete section template component (component:foo)
                     val sectionTemplateComponent = {
-                        val sectionTemplateElementOpt = sectionComponent.staticControl.descendants find (_.element.getNamespaceURI.startsWith(ComponentNSPrefix))
+                        val sectionTemplateElementOpt = sectionComponent.staticControl.descendants find (c ⇒ matchesComponent(c.element.getNamespaceURI))
                         asComponent(sectionTemplateElementOpt flatMap (e ⇒ sectionComponent.resolve(e.staticId))).get
                     }
 

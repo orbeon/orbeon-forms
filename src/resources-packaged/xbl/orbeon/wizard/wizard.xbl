@@ -164,8 +164,9 @@
                         <xsl:variable
                             name="top-level-section-case-id"
                             select="concat((ancestor-or-self::fr:section/@id)[1], '-case')"/>
-                        <xh:li class="{{if (xxf:case('switch') = '{$top-level-section-case-id}') then 'active' else (),
-                                        if (xxf:visited('{$top-level-section-case-id}') and not(xxf:valid(context(), true()))) then 'invalid' else ()}}">
+                        <!-- NOTE: Only make active top-level sections -->
+                        <xh:li class="{{if (xxf:case('switch') = '{concat(@id, '-case')}') then 'active' else (),
+                                        if (xxf:visited('{$top-level-section-case-id}') and not(xxf:valid(context(), true(), true()))) then 'invalid' else ()}}">
 
                             <!--visited: <xf:output value="xxf:visited('{$top-level-section-case-id}')"/>-->
                             <!--valid: <xf:output value="xxf:valid(context(), true())"/>-->

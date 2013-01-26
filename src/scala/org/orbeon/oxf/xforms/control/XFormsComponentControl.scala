@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.{XFormsInstance, BindingContext}
 import org.xml.sax.helpers.AttributesImpl
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
-import org.orbeon.oxf.xforms.control.controls.InstanceMirror
+import org.orbeon.oxf.xforms.control.controls.{XXFormsComponentRootControl, InstanceMirror}
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.saxon.om.VirtualNode
 import org.w3c.dom.Node.ELEMENT_NODE
@@ -208,6 +208,9 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Simply delegate but switch the container
     override def buildChildren(buildTree: (XBLContainer, BindingContext, ElementAnalysis, Seq[Int]) ⇒ Option[XFormsControl], idSuffix: Seq[Int]) =
         Controls.buildChildren(this, staticControl.children, (_, bindingContext, staticElement, idSuffix) ⇒ buildTree(nestedContainer, bindingContext, staticElement, idSuffix), idSuffix)
+
+    // Get the control at the root of the inner scope of the component
+    def innerRootControl = children collectFirst { case root: XXFormsComponentRootControl ⇒ root } get
 
     private lazy val handleLHHA = staticControl.binding.abstractBinding.modeLHHA && ! staticControl.binding.abstractBinding.modeLHHACustom
 

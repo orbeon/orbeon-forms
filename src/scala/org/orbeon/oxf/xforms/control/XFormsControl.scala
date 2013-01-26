@@ -96,6 +96,10 @@ class XFormsControl(
     final def getResolutionScope =
         container.getPartAnalysis.scopeForPrefixedId(prefixedId)
 
+    // Resolve an object relative to this control
+    final def resolve(staticId: String, contextItem: Item = null) =
+        Option(container.resolveObjectById(getEffectiveId, staticId, contextItem))
+
     final def getChildElementScope(element: Element) =
         container.getPartAnalysis.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
 

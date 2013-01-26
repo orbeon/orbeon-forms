@@ -148,5 +148,4 @@ public class XFormsToXHTML extends XFormsToSomething {
         // Output XML response
         XFormsServer.outputAjaxResponse(containingDocument, indentedLogger, null, null, null, null, xmlReceiver, false, true);
     }
-
 }

@@ -50,6 +50,9 @@
 }
 .xbl-fr-wizard .fr-wizard-toc {
   width: 198px;
+  border-right: 1px solid #e3e3e3;
+  margin-bottom: 0;
+  overflow: hidden;
 }
 .xbl-fr-wizard .fr-wizard-toc .nav a {
   text-decoration: none;
@@ -68,7 +71,7 @@
   list-style-type: none;
 }
 .xbl-fr-wizard .fr-wizard-body {
-  width: 740px;
+  width: 738px;
   float: right;
 }
 .xbl-fr-wizard .fr-buttons {

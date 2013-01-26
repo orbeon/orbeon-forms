@@ -185,7 +185,7 @@
                             </xf:trigger>
 
                             <xsl:if test="exists(.//fr:section)">
-                                <xh:ul>
+                                <xh:ul class="nav nav-list">
                                     <xsl:apply-templates mode="toc-sections"/>
                                 </xh:ul>
                             </xsl:if>

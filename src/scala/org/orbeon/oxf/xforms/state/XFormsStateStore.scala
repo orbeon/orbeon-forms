@@ -21,8 +21,8 @@ trait XFormsStateStore {
     def storeDocumentState(containingDocument: XFormsContainingDocument, session: ExternalContext.Session, isInitialState: Boolean)
     def findState(session: ExternalContext.Session, documentUUID: String, isInitialState: Boolean): XFormsState
 
-    def getMaxSize: Int
-    def getCurrentSize: Int
+    def getMaxSize: Long
+    def getCurrentSize: Long
 
     // For unit tests
     def addStateCombined(staticStateUUID: String, dynamicStateUUID: String, xformsState: XFormsState, sessionId: String)

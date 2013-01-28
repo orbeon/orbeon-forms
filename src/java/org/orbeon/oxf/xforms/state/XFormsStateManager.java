@@ -457,8 +457,8 @@ public class XFormsStateManager implements XFormsStateLifecycle {
             if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug(LOG_TYPE, "Getting document state from store.",
                         "current cache size", Integer.toString(XFormsDocumentCache.instance().getCurrentSize()),
-                        "current store size", Integer.toString(stateStore.getCurrentSize()),
-                        "max store size", Integer.toString(stateStore.getMaxSize())
+                        "current store size", Long.toString(stateStore.getCurrentSize()),
+                        "max store size", Long.toString(stateStore.getMaxSize())
                 );
 
             final ExternalContext.Session session = externalContext.getRequest().getSession(XFormsStateManager.FORCE_SESSION_CREATION);

@@ -127,7 +127,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
             val cacheElement = Caches.resourcesCache.get(resourcesHash)
             if (cacheElement ne null) {
                 // Mapping found
-                val resourcesStrings = cacheElement.getValue.asInstanceOf[Array[String]].toList
+                val resourcesStrings = cacheElement.getObjectValue.asInstanceOf[Array[String]].toList
                 resourcesStrings map (r ⇒ new XFormsFeatures.ResourceConfig(r, r))
             } else {
                 // Not found, either because the hash is invalid, or because the cache lost the mapping
@@ -236,7 +236,7 @@ object XFormsResourceServer {
 
     // For unit tests only (called from XSLT)
     def testGetResources(key: String)  =
-        Option(Caches.resourcesCache.get(key)) map (_.getValue.asInstanceOf[Array[String]]) orNull
+        Option(Caches.resourcesCache.get(key)) map (_.getObjectValue.asInstanceOf[Array[String]]) orNull
 
     // Information about the resource, stored into the session
     case class DynamicResource(uri: URI, filename: Option[String], contentType: Option[String], size: Long, lastModified: Long, headers: Map[String, Array[String]])

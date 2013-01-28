@@ -36,7 +36,7 @@ object BindingCache {
             // http://jira.terracotta.org/jira/browse/EHC-666
             val cacheLastModified = element.getVersion
             if (lastModified <= cacheLastModified) {
-                Some(element.getValue.asInstanceOf[AbstractBinding])
+                Some(element.getObjectValue.asInstanceOf[AbstractBinding])
             } else {
                 cache.remove(key)
                 None

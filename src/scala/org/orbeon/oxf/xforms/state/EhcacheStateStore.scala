@@ -55,7 +55,7 @@ object EhcacheStateStore extends XFormsStateStore {
             debug("store size before finding: " + getCurrentSize + " entries.")
 
         def findOne(key: String) = stateCache.get(key) match {
-            case element: EhElement ⇒ element.getValue
+            case element: EhElement ⇒ element.getObjectValue
             case _ ⇒ null
         }
 
@@ -81,8 +81,8 @@ object EhcacheStateStore extends XFormsStateStore {
         }
     }
 
-    def getMaxSize = stateCache.getCacheConfiguration.getMaxElementsInMemory
-    def getCurrentSize = stateCache.getMemoryStoreSize.toInt
+    def getMaxSize = stateCache.getCacheConfiguration.getMaxEntriesLocalHeap
+    def getCurrentSize = stateCache.getMemoryStoreSize
 
     def findStateCombined(staticStateDigest: String, dynamicStateUUID: String) = null
     def addStateCombined(staticStateDigest: String, dynamicStateUUID: String, xformsState: XFormsState, sessionId: String) = ()

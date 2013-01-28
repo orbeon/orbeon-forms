@@ -139,7 +139,7 @@
         <include name="exist-dependency-lucene-regex-2.9.2.jar"/>
         <include name="exist-dependency-resolver-1.2.jar"/>
 
-        <include name="ehcache-core-2.4.4.jar"/>
+        <include name="ehcache-core-2.6.3.jar"/>
         <include name="ehcache-dependency-slf4j-api-1.6.1.jar"/>
         <include name="ehcache-dependency-slf4j-log4j12-1.6.1.jar"/>
 

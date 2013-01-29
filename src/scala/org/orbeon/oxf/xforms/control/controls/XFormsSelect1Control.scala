@@ -72,25 +72,23 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
     }
 
     // Get this control's itemset
+    // This requires the control to be relevant.
     def getItemset: Itemset =
         try {
-            // Non-relevant control does not return an itemset
-            if (! isRelevant)
-                return null
+            // Non-relevant control doesn't have an itemset
+            require(isRelevant)
 
-            if (staticControl.isNorefresh) {
+            if (staticControl.isNorefresh)
                 // Items are not automatically refreshed and stored globally
                 // NOTE: Store them by prefixed id because the itemset might be different between XBL template instantiations
-                var constantItemset = containingDocument.getControls.getConstantItems(getPrefixedId)
-                if (constantItemset eq null) {
-                    constantItemset = XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this)
-                    containingDocument.getControls.setConstantItems(getPrefixedId, constantItemset)
+                Option(containingDocument.getControls.getConstantItems(getPrefixedId)) getOrElse {
+                    val newItemset = XFormsItemUtils.evaluateItemset(XFormsSelect1Control.this)
+                    containingDocument.getControls.setConstantItems(getPrefixedId, newItemset)
+                    newItemset
                 }
-                constantItemset
-            } else {
+            else
                 // Items are stored in the control
                 itemsetProperty.value()
-            }
         } catch {
             case e: Exception ⇒
                 throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
@@ -191,7 +189,6 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
                 false
             } else {
                 // If the itemsets changed, then we need to send an update
-                // NOTE: This also covers the case where the control was and is non-relevant
                 otherSelect1Control.getItemset != getItemset
             }
         }

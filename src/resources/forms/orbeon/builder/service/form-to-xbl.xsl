@@ -108,6 +108,12 @@
       <xsl:sequence select="distinct-values($arg1[not(. = $arg2)])"/>
     </xsl:function>
 
+    <!-- We only want to run xxf:default in "new" mode to conform to the semantic of the top-level form. So we rewrite
+         xxf:default expressions to test on the mode. See: https://github.com/orbeon/orbeon-forms/issues/786 -->
+    <xsl:template match="xf:bind/@xxf:default">
+        <xsl:attribute name="{name()}" select="concat('if ($fr-mode = (''new'', ''test'')) then (', ., ') else .')"/>
+    </xsl:template>
+
     <!-- When copying actions, update references to instance and resources -->
     <xsl:template match="xf:setvalue/@ref[starts-with(., 'instance(''fr-form-instance'')/*')] |
                          xf:setvalue/@value[starts-with(., 'instance(''fr-form-instance'')/*')]" mode="filter-actions">
@@ -233,7 +239,7 @@
 
                     <!-- Section constraints -->
                     <xf:bind>
-                        <xsl:copy-of select="$section-bind/xf:bind"/>
+                        <xsl:apply-templates select="$section-bind/xf:bind"/>
                     </xf:bind>
 
                     <!-- Sections resources: include resource for section and for all leaf controls -->
@@ -265,6 +271,22 @@
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->
                     <xsl:copy-of select="$fr-form-model/xs:schema"/>
 
+                    <!-- Section becomes relevant -->
+                    <xf:action ev:event="xforms-model-construct-done">
+                        <!-- At this point, the outside instance has already been copied inside. If there are no child
+                             elements, it means that the data has not yet been copied out (the section could also be
+                             empty, but this is not allowed currently). See also:
+                             https://github.com/orbeon/orbeon-forms/issues/786 -->
+                        <xf:action if="empty(instance()/*)">
+                            <!-- Copy again from the template (the mirror copies it out too) -->
+                            <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>>
+                            <!-- RRR with defaults -->
+                            <xf:rebuild/>
+                            <xf:recalculate xxf:defauls="true"/>
+                            <xf:revalidate/>
+                        </xf:action>
+                    </xf:action>
+
                     <!-- Services and actions -->
                     <xsl:if test="exists(($relevant-services, $relevant-actions))">
                         <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
@@ -286,15 +308,6 @@
                 <!-- Point to the context of the current element.
                      NOTE: FB doesn't place a @ref. -->
                 <xf:var name="context" id="context" value="xxf:binding-context('{$component-id}-component')"/>
-
-                <xf:action ev:event="xforms-enabled xforms-value-changed" ev:observer="context">
-                    <!-- Section becomes visible OR binding changes -->
-                    <!-- No nodes outside so copy template to local and external instances -->
-                    <xf:action if="not(exists($context/*))">
-                        <xf:delete ref="instance()/*"/>
-                        <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>
-                    </xf:action>
-                </xf:action>
 
                 <!-- Propagate readonly of containing section -->
                 <xf:var name="readonly" as="xs:boolean" value="exf:readonly($context)">

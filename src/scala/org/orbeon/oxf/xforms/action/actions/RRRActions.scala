@@ -18,19 +18,24 @@ import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
 import org.orbeon.oxf.xforms.event.events.{XFormsRevalidateEvent, XFormsRecalculateEvent, XFormsRebuildEvent}
+import org.dom4j.QName
 
 class XFormsRebuildAction extends RRRAction {
-    def setFlag(model: XFormsModel) = model.getDeferredActionContext.rebuild = true
+    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.getDeferredActionContext.rebuild = true
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRebuildEvent(model)
 }
 
 class XFormsRecalculateAction extends RRRAction {
-    def setFlag(model: XFormsModel) = model.getDeferredActionContext.recalculate = true
+    def setFlag(model: XFormsModel, applyDefaults: Boolean) = {
+        model.getDeferredActionContext.recalculate = true
+        if (applyDefaults)
+            model.getBinds.resetFirstCalculate()
+    }
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRecalculateEvent(model, applyDefaults)
 }
 
 class XFormsRevalidateAction extends RRRAction {
-    def setFlag(model: XFormsModel) = model.getDeferredActionContext.revalidate = true
+    def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.getDeferredActionContext.revalidate = true
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRevalidateEvent(model)
 }
 
@@ -42,11 +47,14 @@ trait RRRAction extends XFormsAction {
         val interpreter = context.interpreter
         val model       = interpreter.actionXPathContext.getCurrentModel
 
-        val deferred      = (Option(interpreter.resolveAVT(context.element, XXFORMS_DEFERRED_QNAME)) getOrElse  "false").toBoolean
-        val applyDefaults = (Option(interpreter.resolveAVT(context.element, XXFORMS_DEFAULTS_QNAME)) getOrElse  "false").toBoolean
+        def resolve(qName: QName) =
+            (Option(interpreter.resolveAVT(context.element, qName)) getOrElse "false").toBoolean
+
+        val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
+        val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 
         // Set the flag in any case
-        setFlag(model)
+        setFlag(model, deferred)
 
         // Perform the action immediately if needed
         // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the
@@ -55,6 +63,6 @@ trait RRRAction extends XFormsAction {
             Dispatch.dispatchEvent(createEvent(model, applyDefaults))
     }
 
-    def setFlag(model: XFormsModel)
+    def setFlag(model: XFormsModel, applyDefaults: Boolean)
     def createEvent(model: XFormsModel, applyDefaults: Boolean): XFormsEvent
 }

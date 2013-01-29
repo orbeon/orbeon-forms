@@ -462,7 +462,7 @@
                 <hint>XPath expression</hint>
             </calculate>
             <help>
-                <label>Help message</label>
+                <label>Help Message</label>
                 <hint>Message displayed when users click on the help icon next to the label</hint>
             </help>
             <alert>
@@ -2114,7 +2114,7 @@
                 <hint>XPath-uttrykk</hint>
             </calculate>
             <help>
-                <label>[Help message]</label>
+                <label>[Help Message]</label>
                 <hint>[Message displayed when users click on the help icon next to the label]</hint>
             </help>
             <alert>
@@ -2940,7 +2940,7 @@
                 <hint>Булево выражение XPath</hint>
             </calculate>
             <help>
-                <label>[Help message]</label>
+                <label>[Help Message]</label>
                 <hint>[Message displayed when users click on the help icon next to the label]</hint>
             </help>
             <alert>

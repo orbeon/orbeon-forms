@@ -15,23 +15,28 @@ package org.orbeon.oxf.xforms.analysis.model
 
 
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{XPathCache, NetUtils}
 import org.orbeon.oxf.xforms._
 import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import xbl.Scope
 import org.orbeon.oxf.util.Connection.Credentials
 import XFormsConstants._
-import org.dom4j.{QName, Element}
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
+import org.dom4j.{Document, QName, Element}
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.common.{ValidationException, Version}
-import org.orbeon.oxf.xml.{ContentHandlerHelper, Dom4j}
+import org.orbeon.oxf.xml.{TransformerUtils, ContentHandlerHelper, Dom4j}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.saxon.om.DocumentInfo
+import scala.collection.JavaConverters._
+import org.orbeon.saxon.dom4j.{DocumentWrapper, TypedDocumentWrapper}
 
 /**
  * Static analysis of an XForms instance.
  */
 class Instance(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) {
+
+    import Instance._
 
     val readonly = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
     val cache = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
@@ -58,8 +63,12 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val excludeResultPrefixes = stringOptionToSet(Option(element.attributeValue(XXFORMS_EXCLUDE_RESULT_PREFIXES)))
 
     // Inline root element if any
-    val root = Dom4j.elements(element) headOption
+    private val root = Dom4j.elements(element) headOption
     private def hasInlineContent = root.isDefined
+
+    // Create inline instance document if any
+    // NOTE: Result can't be shared. In the future we could share the extracted document and copy as needed.
+    def inlineContent = root map (extractDocument(_, excludeResultPrefixes, readonly, exposeXPathTypes))
 
     // Don't allow more than one child element
     if (Dom4j.elements(element).size > 1)
@@ -99,4 +108,40 @@ object Instance {
         val timeToLiveValue = element.attributeValue(XXFORMS_TIME_TO_LIVE_QNAME)
         Option(timeToLiveValue) map (_.toLong) getOrElse -1L
     }
+
+    // Extract the document starting at the given root element
+    // This always creates a copy of the original sub-tree
+    //
+    // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
+    // @exposeXPathTypes if true, use a TypedDocumentWrapper
+    def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
+
+        // Extract a document and adjust namespaces if requested
+        // NOTE: Should implement exactly as per XSLT 2.0
+        // NOTE: Should implement namespace fixup, the code below can break serialization
+        def extractDocument =
+            excludeResultPrefixes match {
+                case prefixes if prefixes("#all") ⇒
+                    // Special #all
+                    Dom4jUtils.createDocumentCopyElement(element)
+                case prefixes if prefixes.nonEmpty ⇒
+                    // List of prefixes
+                    Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
+                case _ ⇒
+                    // No exclusion
+                    Dom4jUtils.createDocumentCopyParentNamespaces(element)
+            }
+
+        val document = extractDocument
+        if (readonly)
+            TransformerUtils.dom4jToTinyTree(XPathCache.getGlobalConfiguration, document, false)
+        else
+            wrapDocument(document, exposeXPathTypes)
+    }
+
+    def wrapDocument(document: Document, exposeXPathTypes: Boolean) =
+        if (exposeXPathTypes)
+            new TypedDocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPathCache.getGlobalConfiguration)
+        else
+            new DocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPathCache.getGlobalConfiguration)
 }

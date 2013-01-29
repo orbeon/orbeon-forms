@@ -144,7 +144,10 @@ class XFormsModelConstructDoneEvent(target: XFormsEventTarget, properties: Prope
 
 class XFormsModelConstructEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_MODEL_CONSTRUCT, target, properties, bubbles = true, cancelable = false) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+    def this(target: XFormsEventTarget, rrr: Boolean) =
+        this(target, Map("rrr" → Option(rrr)))
+
+    def rrr = propertyOrDefault[Boolean]("rrr", default = true)
 }
 
 class XFormsModelDestructEvent(target: XFormsEventTarget, properties: PropertyGetter)

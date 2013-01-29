@@ -25,7 +25,6 @@ import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.orbeon.saxon.dom4j.TypedDocumentWrapper
 import javax.xml.transform.stream.StreamResult
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
@@ -281,7 +280,7 @@ class XFormsInstance(
 
     // Replace the instance with the given document
     // This includes marking the structural change as well as dispatching events
-    def replace(newDocumentInfo: DocumentInfo, instanceCaching: Option[InstanceCaching] = instanceCaching, isReadonly: Boolean = readonly): Unit = {
+    def replace(newDocumentInfo: DocumentInfo, dispatch: Boolean = true, instanceCaching: Option[InstanceCaching] = instanceCaching, isReadonly: Boolean = readonly): Unit = {
         // Update the instance (this also marks it as modified)
         update(
             instanceCaching,
@@ -301,17 +300,20 @@ class XFormsInstance(
 
         // Dispatch xforms-insert event
         // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-        Dispatch.dispatchEvent(
-            new XFormsInsertEvent(
-                this,
-                Seq[Item](newDocumentRootElement).asJava,
-                null,
-                newDocumentRootElement.getDocumentRoot, "after")
-        )
+        if (dispatch)
+            Dispatch.dispatchEvent(
+                new XFormsInsertEvent(
+                    this,
+                    Seq[Item](newDocumentRootElement).asJava,
+                    null,
+                    newDocumentRootElement.getDocumentRoot, "after")
+            )
     }
 }
 
 object XFormsInstance extends Logging {
+
+    import Instance._
 
     // Create an initial instance without caching information
     def apply(model: XFormsModel, instance: Instance, documentInfo: DocumentInfo) =
@@ -335,12 +337,6 @@ object XFormsInstance extends Logging {
             TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, xmlString, false, true)
         else
             wrapDocument(Dom4jUtils.readDom4j(xmlString), exposeXPathTypes)
-
-    def wrapDocument(document: Document, exposeXPathTypes: Boolean) =
-        if (exposeXPathTypes)
-            new TypedDocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPathCache.getGlobalConfiguration)
-        else
-            new DocumentWrapper(Dom4jUtils.normalizeTextNodes(document).asInstanceOf[Document], null, XPathCache.getGlobalConfiguration)
 
     // Take a non-wrapped DocumentInfo and wrap it if needed
     def wrapDocumentInfo(documentInfo: DocumentInfo, readonly: Boolean, exposeXPathTypes: Boolean) = {
@@ -387,35 +383,5 @@ object XFormsInstance extends Logging {
                 instanceState.readonly,
                 instanceState.modified,
                 instanceState.valid))
-    }
-
-    // Extract the document starting at the given root element
-    // This always creates a copy of the original sub-tree
-    //
-    // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
-    // @exposeXPathTypes if true, use a TypedDocumentWrapper
-    def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
-
-        // Extract a document and adjust namespaces if requested
-        // NOTE: Should implement exactly as per XSLT 2.0
-        // NOTE: Should implement namespace fixup, the code below can break serialization
-        def extractDocument =
-            excludeResultPrefixes match {
-                case prefixes if prefixes("#all") ⇒
-                    // Special #all
-                    Dom4jUtils.createDocumentCopyElement(element)
-                case prefixes if prefixes.nonEmpty ⇒
-                    // List of prefixes
-                    Dom4jUtils.createDocumentCopyParentNamespaces(element, prefixes.asJava)
-                case _ ⇒
-                    // No exclusion
-                    Dom4jUtils.createDocumentCopyParentNamespaces(element)
-            }
-
-        val document = extractDocument
-        if (readonly)
-            TransformerUtils.dom4jToTinyTree(XPathCache.getGlobalConfiguration, document, false)
-        else
-            wrapDocument(document, exposeXPathTypes)
     }
 }

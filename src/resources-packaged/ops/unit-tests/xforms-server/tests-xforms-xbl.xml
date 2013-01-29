@@ -4553,6 +4553,56 @@
         </output>
     </test>
 
+    <test description="#787: xxf:default result is ignored in XBL mirror instance" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/787 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="outer-instance" xxf:exclude-result-prefixes="#all">
+                            <instance/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="binding">
+                            <xbl:template>
+                                <xf:model id="gaga-model">
+                                    <xf:instance id="gaga-instance" xxbl:mirror="true">
+                                        <empty/>
+                                    </xf:instance>
+                                    <xf:bind ref="." xxf:default="42"/>
+                                </xf:model>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <fr:gaga id="my-gaga" ref="instance()"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="outer-instance" model-id="model">
+                                <instance>42</instance>
+                            </instance>
+                            <instance id="gaga-instance" model-id="my-gaga$gaga-model">
+                                <instance>42</instance>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
     <!--
 
     TODO: more XBL ids tests:

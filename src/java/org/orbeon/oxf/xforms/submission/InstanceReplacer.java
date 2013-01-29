@@ -19,8 +19,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.action.actions.XFormsDeleteAction;
 import org.orbeon.oxf.xforms.action.actions.XFormsInsertAction;
-import org.orbeon.oxf.xforms.event.Dispatch;
-import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -162,7 +160,7 @@ public class InstanceReplacer extends BaseReplacer {
 
             if (isDestinationRootElement) {
                 // Optimized insertion for instance root element replacement
-                instanceToUpdate.replace(newDocumentInfo, Option.<InstanceCaching>apply(instanceCaching), p2.isReadonly);
+                instanceToUpdate.replace(newDocumentInfo, true, Option.<InstanceCaching>apply(instanceCaching), p2.isReadonly);
             } else {
                 // Generic insertion
 

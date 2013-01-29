@@ -14,14 +14,14 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.dom4j.Element
-import org.orbeon.oxf.xforms.XFormsInstance
+import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.oxf.xforms.analysis.model.Instance
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContext}
 import org.orbeon.saxon.om.Item
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.om.VirtualNode
-import org.orbeon.saxon.expr.{Expression, ExpressionTool, XPathContext}
-import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 /**
  * xxf:extract-document() takes an element as parameter and extracts a document.
@@ -44,6 +44,6 @@ class XXFormsExtractDocument extends XFormsFunction {
                 case _ ⇒ return null
             }
 
-        XFormsInstance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false)
+        Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false)
     }
 }

@@ -420,7 +420,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
-            doModelConstruct();
+            final XFormsModelConstructEvent modelConstructEvent = (XFormsModelConstructEvent) event;
+            doModelConstruct(modelConstructEvent.rrr());
         } else if (XFormsEvents.XXFORMS_READY.equals(eventName)) {
             // This is called after xforms-ready events have been dispatched to all models
             doAfterReady();
@@ -496,7 +497,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     private void doAfterReady() {
     }
 
-    private void doModelConstruct() {
+    private void doModelConstruct(boolean rrr) {
         final Element modelElement = staticModel.element();
 
         // 1. All XML Schema loaded (throws xforms-link-exception)
@@ -518,9 +519,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             int instancePosition = 0;
             for (final Instance instance : staticModel.instancesMap().values()) {
                 // Skip processing in case somebody has already set this particular instance
+                // FIXME: can this ever happen?
                 if (instances.get(instancePosition++) == null) {
                     // Load instance. This might throw an exception event (and therefore a Java exception) in case of fatal problem.
-                    loadInitialInstance(instance.staticId());
+                    loadInitialInstance(instance);
                 }
             }
         }
@@ -536,14 +538,14 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
         // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
         deferredActionContext.markStructuralChange();
 
-        doRebuild();
-        doRecalculate(false);
-        doRevalidate();
+        if (rrr) {
+            doRebuild();
+            doRecalculate(false);
+            doRevalidate();
+        }
     }
 
-    private void loadInitialInstance(String instanceStaticId) {
-
-        final Instance instance = staticModel.instancesMap().get(instanceStaticId);
+    private void loadInitialInstance(Instance instance) {
 
         indentedLogger.startHandleOperation("load", "loading instance", "instance id", instance.staticId());
         {
@@ -562,7 +564,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
             } else {
                 // Everything missing
                 final LocationData extendedLocationData = new ExtendedLocationData(instance.locationData(), "processing XForms instance", instance.element());
-                final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instanceStaticId, extendedLocationData);
+                final Throwable throwable = new ValidationException("Required @src attribute, @resource attribute, or inline content for instance: " + instance.staticId(), extendedLocationData);
                 Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(XFormsModel.this, "", throwable));
             }
         }
@@ -571,8 +573,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
 
     private void setInlineInstance(Instance instance) {
         // Extract document
-        final DocumentInfo instanceDocument =
-            XFormsInstance.extractDocument(instance.root().get(), instance.excludeResultPrefixes(), instance.readonly(), instance.exposeXPathTypes());
+        final DocumentInfo instanceDocument = instance.inlineContent().get();
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now

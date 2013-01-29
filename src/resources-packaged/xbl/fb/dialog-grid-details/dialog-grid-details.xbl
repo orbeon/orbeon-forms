@@ -180,7 +180,7 @@
                                     <xf:label value="$resources/dialog-grid-details/min/label"/>
                                     <xf:select1 ref="$local/min-repeat" appearance="full">
                                         <xf:item>
-                                            <xf:label value="$resources/dialog-grid-details/unlimited"/>
+                                            <xf:label value="$resources/dialog-grid-details/no-minimum"/>
                                             <xf:value>0</xf:value>
                                         </xf:item>
                                         <xf:item>
@@ -205,7 +205,7 @@
                                     <xf:label value="$resources/dialog-grid-details/max/label"/>
                                     <xf:select1 ref="$local/max-repeat" appearance="full">
                                         <xf:item>
-                                            <xf:label value="$resources/dialog-grid-details/no-minimum"/>
+                                            <xf:label value="$resources/dialog-grid-details/unlimited"/>
                                             <xf:value/>
                                         </xf:item>
                                         <xf:itemset ref=".">

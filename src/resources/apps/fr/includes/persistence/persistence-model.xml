@@ -303,7 +303,7 @@
                 <!-- Find all instance nodes containing upload file URLs -->
                 <xf:var name="upload-holders"
                             model="fr-form-model"
-                            value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(normalize-space(.))]"/>
+                            value="instance('fr-form-instance')/root()//(*[not(*)] | @*)[formRunner:isUploadedFileURL(normalize-space(string(.)))]"/>
 
                 <xf:var name="before-urls"
                             value="$upload-holders/normalize-space()"/>

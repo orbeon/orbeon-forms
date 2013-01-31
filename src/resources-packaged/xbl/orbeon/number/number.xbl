@@ -143,7 +143,7 @@
                         </xf:group>
                         <!-- Static readonly mode -->
                         <xf:group ref="$binding[exf:readonly() and property('xxf:readonly-appearance') = 'static']">
-                            <xf:output value="$formatted"/>
+                            <xf:output value="string-join(($prefix, $formatted, $suffix), ' ')"/>
                         </xf:group>
                     </xf:group>
                 </xsl:template>

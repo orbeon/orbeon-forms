@@ -1,0 +1,408 @@
+<?xml version="1.0" encoding="UTF-8"?><xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xxi="http://orbeon.org/oxf/xml/xinclude" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:saxon="http://saxon.sf.net/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:fb="http://orbeon.org/oxf/xml/form-builder" xmlns:sql="http://orbeon.org/oxf/xml/sql" xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:exf="http://www.exforms.org/exf/1-0">
+    <xh:head>
+        <xh:title>Request for Taxpayer Identification Number and Certification</xh:title>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance">
+                <form>
+                    <applicant>
+                        <name/>
+                        <business-name/>
+                    </applicant>
+                    <classification>
+                        <federal-tax-classification/>
+                        <llc-classification/>
+                        <other-classification/>
+                        <exempt-payee/>
+                    </classification>
+                    <address-account>
+                        <address-1/>
+                        <address-2/>
+                        <account-numbers/>
+                        <requester-name-address/>
+                    </address-account>
+                    <tin><ssn-or-ein/>
+                        <ssn/><ein/>
+
+                    </tin>
+                    <hidden>
+                        <current-date/>
+                    </hidden>
+                </form>
+            </xf:instance>
+            <xf:bind xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="applicant-bind" name="applicant" ref="applicant">
+                    <xf:bind id="name-bind" name="name" ref="name" required="true()"/>
+                    <xf:bind name="business-name" id="business-name-bind" ref="business-name"/>
+                </xf:bind>
+                <xf:bind name="classification" id="classification-bind" ref="classification">
+                    <xf:bind name="federal-tax-classification" id="federal-tax-classification-bind" ref="federal-tax-classification" required="true()"/>
+                    <xf:bind name="llc-classification" id="llc-classification-bind" ref="llc-classification" relevant="$federal-tax-classification = '6'" required="true()"/>
+                    <xf:bind name="other-classification" id="other-classification-bind" ref="other-classification" relevant="$federal-tax-classification = '7'"/>
+                    <xf:bind name="exempt-payee" id="exempt-payee-bind" ref="exempt-payee" type="xf:boolean"/>
+                </xf:bind>
+                <xf:bind name="address-account" id="address-account-bind" ref="address-account">
+                    <xf:bind name="address-1" id="address-1-bind" ref="address-1" required="true()"/>
+                    <xf:bind name="address-2" id="address-2-bind" ref="address-2" required="true()"/>
+                    <xf:bind name="account-numbers" id="account-numbers-bind" ref="account-numbers"/>
+                    <xf:bind name="requester-name-address" id="requester-name-address-bind" ref="requester-name-address"/>
+                </xf:bind>
+                <xf:bind name="tin" id="tin-bind" ref="tin">
+                    <xf:bind name="ssn" id="ssn-bind" ref="ssn" constraint="matches(., '\d{3}-\d{2}-\d{4}')" relevant="$ssn-or-ein = 'ssn'"/>
+                    <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein"/><xf:bind name="ein" id="ein-bind" ref="ein" constraint="matches(., '\d{2}-\d{7}')" relevant="$ssn-or-ein = 'ein'"/>
+                </xf:bind>
+                <xf:bind name="hidden" id="hidden-bind" ref="hidden" relevant="$fr-mode = 'pdf'">
+                    <xf:bind name="current-date" id="current-date-bind" ref="current-date" calculate="current-date()" type="xf:date"/>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance xxf:readonly="true" id="fr-form-metadata">
+                <metadata>
+                    <application-name>orbeon</application-name>
+                    <form-name>w9</form-name>
+                    <title xml:lang="en">Request for Taxpayer Identification Number and Certification</title>
+                    <description xml:lang="en"/>
+                </metadata>
+            </xf:instance>
+            <xf:instance id="fr-form-attachments">
+                <attachments>
+                    <css mediatype="text/css" filename="" size=""/>
+                    <pdf mediatype="application/pdf" filename="fw9-orbeon.pdf" size="183843">/fr/service/persistence/crud/orbeon/w9/form/831113e3ef799f2c9f57ee0b10f789a8951360ba.bin</pdf>
+                </attachments>
+            </xf:instance>
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
+                <resources>
+                    <resource xml:lang="en"><ssn-or-ein><label>SSN/EIN</label><hint/><help/><alert/><item>
+                                <label>SSN</label>
+                                <value>ssn</value>
+                            </item><item>
+                                <label>EIN</label>
+                                <value>ein</value>
+                            </item></ssn-or-ein>
+                        <current-date>
+                            <label>Date</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </current-date>
+                        <ssn>
+                            <label>Social security number</label>
+                            <hint>Format: 555-55-5555</hint>
+                            <help/>
+                            <alert/>
+                        </ssn><ein>
+                            <label>Employer identification number</label>
+                            <hint>Format: 55-5555555</hint>
+                            <help/>
+                            <alert/>
+                        </ein>
+
+                        <name>
+                            <label>Name</label>
+                            <hint>as shown on your income tax return</hint>
+                            <help/>
+                            <alert/>
+                        </name>
+                        <business-name>
+                            <label>Business name/disregarded entity name</label>
+                            <hint>if different from above</hint>
+                            <help/>
+                            <alert/>
+                        </business-name>
+                        <federal-tax-classification>
+                            <label>Federal tax classification</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                            <item>
+                                <label>Individual/sole proprietor</label>
+                                <value>1</value>
+                            </item>
+                            <item>
+                                <label>C Corporation</label>
+                                <value>2</value>
+                            </item>
+                            <item>
+                                <label>S Corporation</label>
+                                <value>3</value>
+                            </item>
+                            <item>
+                                <label>Partnership</label>
+                                <value>4</value>
+                            </item>
+                            <item>
+                                <label>Trust/estate</label>
+                                <value>5</value>
+                            </item>
+                            <item>
+                                <label>Limited liability company</label>
+                                <value>6</value>
+                            </item>
+                            <item>
+                                <label>Other</label>
+                                <value>7</value>
+                            </item>
+                        </federal-tax-classification>
+                        <llc-classification>
+                            <label>Tax classification</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                            <item>
+                                <label>C corporation</label>
+                                <value>c</value>
+                            </item>
+                            <item>
+                                <label>S corporation</label>
+                                <value>s</value>
+                            </item>
+                            <item>
+                                <label>Partnership</label>
+                                <value>p</value>
+                            </item>
+                        </llc-classification>
+                        <other-classification>
+                            <label>Other</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </other-classification>
+                        <exempt-payee>
+                            <label>Exempt payee</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </exempt-payee>
+                        <address-1>
+                            <label>Address, part 1</label>
+                            <hint>number, street, and apt. or suite no.</hint>
+                            <help/>
+                            <alert/>
+                        </address-1>
+                        <address-2>
+                            <label>Address, part 2</label>
+                            <hint>city, state, and ZIP code</hint>
+                            <help/>
+                            <alert/>
+                        </address-2>
+                        <account-numbers>
+                            <label>List account number(s) here (optional)</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </account-numbers>
+                        <requester-name-address>
+                            <label>Requester’s name and address (optional)</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </requester-name-address>
+                        <classification>
+                            <label>Classification</label>
+                            <help/>
+                        </classification>
+                        <applicant>
+                            <label>Name</label>
+                            <help/>
+                        </applicant>
+                        <address-account>
+                            <label>Addresses and accounts</label>
+                            <help/>
+                        </address-account>
+                        <tin>
+                            <label>Taxpayer Identification Number (TIN)</label>
+                            <help/>
+                        </tin>
+                        <hidden>
+                            <label>Hidden</label>
+                            <help/>
+                        </hidden>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:instance id="fr-service-request-instance" xxf:exclude-result-prefixes="#all">
+                <request/>
+            </xf:instance>
+            <xf:instance id="fr-service-response-instance" xxf:exclude-result-prefixes="#all">
+                <response/>
+            </xf:instance>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <fr:view>
+            <fr:body xmlns:xbl="http://www.w3.org/ns/xbl" xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                <fr:section id="applicant-control" bind="applicant-bind">
+                    <xf:label ref="$form-resources/applicant/label"/>
+                    <xf:help ref="$form-resources/applicant/help"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="name-control" bind="name-bind" class="fr-summary fr-search">
+                                    <xf:label ref="$form-resources/name/label"/>
+                                    <xf:hint ref="$form-resources/name/hint"/>
+                                    <xf:help ref="$form-resources/name/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="business-name-control" bind="business-name-bind" class="fr-summary fr-search">
+                                    <xf:label ref="$form-resources/business-name/label"/>
+                                    <xf:hint ref="$form-resources/business-name/hint"/>
+                                    <xf:help ref="$form-resources/business-name/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="classification-control" bind="classification-bind">
+                    <xf:label ref="$form-resources/classification/label"/>
+                    <xf:help ref="$form-resources/classification/help"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td rowspan="2">
+                                <xf:select1 id="federal-tax-classification-control" appearance="full" bind="federal-tax-classification-bind">
+                                    <xf:label ref="$form-resources/federal-tax-classification/label"/>
+                                    <xf:hint ref="$form-resources/federal-tax-classification/hint"/>
+                                    <xf:help ref="$form-resources/federal-tax-classification/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:itemset ref="$form-resources/federal-tax-classification/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xh:td>
+                            <xh:td>
+                                <xf:select1 id="llc-classification-control" appearance="full" bind="llc-classification-bind">
+                                    <xf:label ref="$form-resources/llc-classification/label"/>
+                                    <xf:hint ref="$form-resources/llc-classification/hint"/>
+                                    <xf:help ref="$form-resources/llc-classification/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:itemset ref="$form-resources/llc-classification/item">
+                                        <xf:label ref="label"/>
+                                        <xf:value ref="value"/>
+                                    </xf:itemset>
+                                </xf:select1>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="other-classification-control" bind="other-classification-bind">
+                                    <xf:label ref="$form-resources/other-classification/label"/>
+                                    <xf:hint ref="$form-resources/other-classification/hint"/>
+                                    <xf:help ref="$form-resources/other-classification/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="exempt-payee-control" bind="exempt-payee-bind">
+                                    <xf:label ref="$form-resources/exempt-payee/label"/>
+                                    <xf:hint ref="$form-resources/exempt-payee/hint"/>
+                                    <xf:help ref="$form-resources/exempt-payee/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                            <xh:td/>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="address-account-control" bind="address-account-bind">
+                    <xf:label ref="$form-resources/address-account/label"/>
+                    <xf:help ref="$form-resources/address-account/help"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="address-1-control" bind="address-1-bind">
+                                    <xf:label ref="$form-resources/address-1/label"/>
+                                    <xf:hint ref="$form-resources/address-1/hint"/>
+                                    <xf:help ref="$form-resources/address-1/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="address-2-control" bind="address-2-bind">
+                                    <xf:label ref="$form-resources/address-2/label"/>
+                                    <xf:hint ref="$form-resources/address-2/hint"/>
+                                    <xf:help ref="$form-resources/address-2/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:input id="account-numbers-control" bind="account-numbers-bind">
+                                    <xf:label ref="$form-resources/account-numbers/label"/>
+                                    <xf:hint ref="$form-resources/account-numbers/hint"/>
+                                    <xf:help ref="$form-resources/account-numbers/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:textarea id="requester-name-address-control" bind="requester-name-address-bind">
+                                    <xf:label ref="$form-resources/requester-name-address/label"/>
+                                    <xf:hint ref="$form-resources/requester-name-address/hint"/>
+                                    <xf:help ref="$form-resources/requester-name-address/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:textarea>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="tin-control" bind="tin-bind">
+                    <xf:label ref="$form-resources/tin/label"/>
+                    <xf:help ref="$form-resources/tin/help"/>
+                    <fr:grid>
+                        <xh:tr><xh:td><xf:select1 id="ssn-or-ein-control" appearance="full" bind="ssn-or-ein-bind">
+                        <xf:label ref="$form-resources/ssn-or-ein/label"/>
+                        <xf:hint ref="$form-resources/ssn-or-ein/hint"/>
+                        <xf:help ref="$form-resources/ssn-or-ein/help"/>
+                        <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                        <xf:itemset ref="$form-resources/ssn-or-ein/item">
+                            <xf:label ref="label"/>
+                            <xf:value ref="value"/>
+                        </xf:itemset>
+                    </xf:select1></xh:td>
+                            <xh:td>
+                                <xf:input id="ssn-control" bind="ssn-bind">
+                                    <xf:label ref="$form-resources/ssn/label"/>
+                                    <xf:hint ref="$form-resources/ssn/hint"/>
+                                    <xf:help ref="$form-resources/ssn/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input>
+                            </xh:td><xh:td><xf:input id="ein-control" bind="ein-bind">
+                                    <xf:label ref="$form-resources/ein/label"/>
+                                    <xf:hint ref="$form-resources/ein/hint"/>
+                                    <xf:help ref="$form-resources/ein/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:input></xh:td>
+
+                        </xh:tr>
+
+                    </fr:grid>
+                </fr:section>
+                <fr:section id="hidden-control" bind="hidden-bind">
+                    <xf:label ref="$form-resources/hidden/label"/>
+                    <xf:help ref="$form-resources/hidden/help"/>
+                    <fr:grid>
+                        <xh:tr>
+                            <xh:td>
+                                <xf:output id="current-date-control" bind="current-date-bind">
+                                    <xf:label ref="$form-resources/current-date/label"/>
+                                    <xf:hint ref="$form-resources/current-date/hint"/>
+                                    <xf:help ref="$form-resources/current-date/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                </xf:output>
+                            </xh:td>
+                        </xh:tr>
+                    </fr:grid>
+                </fr:section>
+            </fr:body>
+        </fr:view>
+    </xh:body>
+</xh:html>

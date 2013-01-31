@@ -18,28 +18,32 @@
         Create forms with Form Builder, the Orbeon Forms visual form designer. It allows you to build and deploy forms
         in minutes right from your web browser. Add form fields, including rich controls such as date, currency,
         file attachments and more. Group your fields in sections. Define validation logic, visibility rules, initial
-        values. Prepopulate fields calling web or REST services. And much more, all right from your web browser, with
-        Form Builder.
+        values. Pre-populate fields from Web or REST services. And there is more!
     </example>
     <example title="Bookshelf Form" href="/fr/orbeon/bookshelf/summary" img="/home/images/form-bookshelf-small.jpg" size="4"
              source="http://www.flickr.com/photos/takens/5506884677/">
         This sample form shows image attachments, rich text, repeating form fields, as-you-type validation,
-        the error summary, localization, automatic preview page and automatic PDF generation.
+        the error summary, localization, and automatic preview and PDF.
     </example>
     <example title="DMV-14 Form" href="/fr/orbeon/dmv-14/edit/6b01fa4cd1605b8f736fac09be6cf9b2" img="/home/images/form-dmv14-small.jpg" size="4"
              source="http://www.flickr.com/photos/photochiel/124883754/">
-        This sample form is based on a real-life form (a California Department of
-        Motor Vehicles form). It shows data capture and validation, repeating sections,
+        This sample form is based on a real-life California DMV form. It shows data capture and validation, repeating sections,
         and generating great-looking PDF from templates.
     </example>
-    <example title="Controls Form" href="/fr/orbeon/controls/new" img="/home/images/form-controls-small.jpg" size="4"
+    <example title="W-9 Form" href="/fr/orbeon/w9/edit/4a83b4cf2b905fbe105d7e57ddc5597b5e78c0a3" img="/home/images/form-w9-small.jpg" size="8"
+             source="http://www.flickr.com/photos/68751915@N05/6355404323/">
+        This sample form is also based on a real-life US form, "US Request for Taxpayer Identification Number and
+        Certification". It uses the wizard view, shows and hides controls depending on conditions, and fills-out a PDF
+        from a template.
+    </example>
+    <example title="Controls Form" href="/fr/orbeon/controls/new" img="/home/images/form-controls-small.jpg" size="8"
              source="http://www.flickr.com/photos/andreajoseph/2249951011/">
-        This sample forms showcases, in one single forms, all the form controls available out of the box in
-        Form Builder.
+        This sample forms showcases, in one single form, all the form controls available out of the box in
+        Form Builder. It also uses the wizard view to present a form as a series of separate pages.
     </example>
     <example title="Contact Form" href="/fr/orbeon/contact/summary" img="/home/images/form-contact-small.jpg" size="4"
              source="http://www.flickr.com/photos/kt/32660952/">
-        This sample form is very simple and can be entirely created in about 10
+        This simple form can be entirely created in about 10
         minutes as shown in the <xh:a href="http://www.orbeon.com/forms/screencast/form-builder">Form Builder screencast</xh:a>.
     </example>
     <banner>

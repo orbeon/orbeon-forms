@@ -1,0 +1,28 @@
+<form>
+    <applicant>
+        <name>Barack Obama</name>
+        <business-name>Federal government of the United States</business-name>
+    </applicant>
+    <classification>
+        <federal-tax-classification>7</federal-tax-classification>
+        <llc-classification>p</llc-classification>
+        <other-classification>Defies classification</other-classification>
+        <exempt-payee>true</exempt-payee>
+    </classification>
+    <address-account>
+        <address-1>1600 Pennsylvania Ave NW</address-1>
+        <address-2>Washington, DC 20500</address-2>
+        <account-numbers>123456, 987654</account-numbers>
+        <requester-name-address>The White House
+1600 Pennsylvania Ave NW
+Washington, DC 20500</requester-name-address>
+    </address-account>
+    <tin>
+        <ssn-or-ein>ein</ssn-or-ein>
+        <ssn/>
+        <ein>55-5555555</ein>
+    </tin>
+    <hidden>
+        <current-date>2013-01-31-08:00</current-date>
+    </hidden>
+</form>

@@ -1787,13 +1787,16 @@ ORBEON.xforms.Controls = {
      */
     getControlLHHA: function(control, lhhaType) {
 
-        // Try to look for label under the control element
-        var lhhaElements = YAHOO.util.Dom.getElementsByClassName("xforms-" + lhhaType, null, control);
-        if (lhhaElements.length > 0) return lhhaElements[0];
-
-        // If we couldn't find the element, look by id
+        // Search by id first
+        // See https://github.com/orbeon/orbeon-forms/issues/793
         var lhhaElementId = ORBEON.util.Utils.appendToEffectiveId(control.id, ORBEON.xforms.Controls._classNameToId[lhhaType]);
-        return ORBEON.util.Dom.get(lhhaElementId);
+        var byId = ORBEON.util.Dom.get(lhhaElementId);
+        if (byId != null)
+            return byId;
+
+        // Search under the control element
+        var lhhaElements = YAHOO.util.Dom.getElementsByClassName("xforms-" + lhhaType, null, control);
+        return (lhhaElements.length > 0) ? lhhaElements[0] : null;
     },
 
     /**

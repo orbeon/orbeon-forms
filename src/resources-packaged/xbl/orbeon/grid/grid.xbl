@@ -193,8 +193,18 @@
                                                         <xsl:if test="not($readonly) and $static-row-pos = 1">
                                                             <xh:td class="fr-repeat-column-trigger" rowspan="{$static-row-count}" xxf:control="true" ref="$repeat-context[not($view-mode)]">
                                                                 <!-- Remove trigger -->
-                                                                <xf:var name="can-remove"
-                                                                         value="{if ($remove-constraint) then concat($remove-constraint, ' and ') else ''} {concat('count($repeat-sequence) gt ', $min-occurs)}"/>
+                                                                <xsl:choose>
+                                                                    <xsl:when test="$remove-constraint">
+                                                                        <xf:var name="remove-constraint">
+                                                                            <!-- Evaluate the constraint in the context of the iteration -->
+                                                                            <xxf:sequence value="{$remove-constraint}" xxbl:scope="outer"/>
+                                                                        </xf:var>
+                                                                        <xf:var name="can-remove" value="$remove-constraint and count($repeat-sequence) gt {$min-occurs}"/>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <xf:var name="can-remove" value="count($repeat-sequence) gt {$min-occurs}"/>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose>
                                                                 <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]" tabindex="-1">
                                                                     <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                                                     <xf:delete ev:event="DOMActivate" ref="$repeat-sequence" at="$repeat-index"/>

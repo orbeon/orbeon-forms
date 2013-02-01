@@ -120,6 +120,7 @@
         <xsl:attribute name="{name()}" select="concat('instance(''fr-form-instance'')', substring-after(., 'instance(''fr-form-instance'')/*'))"/>
     </xsl:template>
     <xsl:template match="xxf:variable[@name = 'control-resources'] | xf:var[@name = 'control-resources']" mode="filter-actions">
+        <!-- Original is `$fr-form-resources` -->
         <xf:var name="control-resources" value="$form-resources/*[name() = $control-name]"/>
     </xsl:template>
 
@@ -256,10 +257,6 @@
                         </resources>
                     </xf:instance>
 
-                    <!-- Try to match the current form language, or use the first language available if not found -->
-                    <xf:var name="form-resources"
-                                value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
-
                     <!-- Keep track of whether fields should be readonly because the node we're bound to is readonly -->
                     <xf:instance id="readonly"><readonly/></xf:instance>
 
@@ -318,6 +315,12 @@
                 <xf:var name="fr-resources" as="element()?">
                     <xxf:sequence value="$fr-resources" xxbl:scope="outer"/>
                 </xf:var>
+
+                <!-- Try to match the current form language, or use the first language available if not found -->
+                <!-- NOTE: Put this in the view, as the variable doesn't update properly if in the model.
+                     See: https://github.com/orbeon/orbeon-forms/issues/738 -->
+                <xf:var name="form-resources"
+                        value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 
                 <xf:group appearance="xxf:internal">
                     <!-- Copy grids within section -->

@@ -93,7 +93,7 @@ trait ControlAjaxSupport {
 
         var added = false
         for {
-            avtAttributeQName ← staticControl.extensionAttributes
+            avtAttributeQName ← staticControl.extensionAttributes.keys
             if avtAttributeQName.getNamespaceURI == XXFORMS_NAMESPACE_URI // only keep xxf:* attributes which are defined statically
             value1 = if (other eq null) null else other.getExtensionAttributeValue(avtAttributeQName)
             value2 = self.getExtensionAttributeValue(avtAttributeQName)

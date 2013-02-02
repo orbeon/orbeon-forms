@@ -27,15 +27,18 @@ trait ControlExtensionAttributesSupport {
 
     private final def evaluatedExtensionAttributes =
         _extensionAttributes getOrElse {
-            val result = (
-                for {
-                    avtAttributeQName ← if (staticControl ne null) staticControl.extensionAttributes else Seq()
-                    attributeValue = element.attributeValue(avtAttributeQName)
-                    if attributeValue ne null
-                    resolvedValue = evaluateAvt(attributeValue) // FIXME: This can return null if there is no context
-                } yield
-                    avtAttributeQName → resolvedValue
-            ).toMap
+
+            val result =
+                if (staticControl eq null)
+                    Map.empty[QName, String]
+                else if (isRelevant)
+                    // NOTE: evaluateAvt can return null if there is no context
+                    // WARNING: don't use `mapValues`, which return a view which can't be stored in the back control tree
+                    staticControl.extensionAttributes map { case (k, v) ⇒ k → (Option(evaluateAvt(v)) getOrElse "") }
+                else
+                    // Don't attempt to evaluate expression when the control is non-relevant
+                    staticControl.nonRelevantExtensionAttributes
+
             _extensionAttributes = Some(result)
             result
         }
@@ -65,7 +68,7 @@ trait ControlExtensionAttributesSupport {
 
     final def addExtensionAttributesExceptClassForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: ContentHandlerHelper): Unit =
         for {
-            name ← staticControl.extensionAttributes
+            name ← staticControl.extensionAttributes.keys
             if name.getNamespaceURI == namespaceURI && name != CLASS_QNAME
         } yield
             outputAttributeElement(originalControl, name.getName, _.getExtensionAttributeValue(name), isNewlyVisibleSubtree)(ch)

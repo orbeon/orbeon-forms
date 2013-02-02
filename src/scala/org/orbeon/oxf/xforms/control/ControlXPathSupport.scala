@@ -34,6 +34,9 @@ trait ControlXPathSupport {
      * @return                  value of the AVT or null if cannot be computed
      */
     def evaluateAvt(attributeValue: String) = {
+
+        assert(isRelevant)
+
         if (! XFormsUtils.maybeAVT(attributeValue))
             // Definitely not an AVT
             attributeValue
@@ -67,6 +70,9 @@ trait ControlXPathSupport {
 
     // Evaluate an XPath expression as a string in the context of this control.
     def evaluateAsString(xpathString: String, contextItems: Seq[Item], contextPosition: Int): Option[String] = {
+
+        assert(isRelevant)
+
         // NOTE: the control may or may not be bound, so don't use getBoundNode()
         if (contextItems.isEmpty)
             None

@@ -123,7 +123,8 @@ abstract class ElementAnalysis(
 
     // Extension attributes
     protected def allowedExtensionAttributes = Set[QName]()
-    final lazy val extensionAttributes       = CommonExtensionAttributes ++ allowedExtensionAttributes filter (element.attribute(_) ne null)
+    final lazy val extensionAttributes       = Map() ++ (CommonExtensionAttributes ++ allowedExtensionAttributes map (qName ⇒ (qName, element.attributeValue(qName))) filter (_._2 ne null))
+    final def nonRelevantExtensionAttributes = extensionAttributes mapValues (v ⇒ if (XFormsUtils.maybeAVT(v)) "" else v) // view with all blank values for AVTs
 
     // XPath analysis
     private var contextAnalysis: Option[XPathAnalysis] = None

@@ -1243,14 +1243,16 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </xf:output>
                             </xh:td>
                             <xh:td>
-                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal" resource="" bind="dynamic-data-dropdown-bind">
+                                <fr:databound-select1 xmlns:xxbl="http://orbeon.org/oxf/xml/xbl" id="dynamic-data-dropdown-control" appearance="minimal"
+                                                      resource="/fr/service/custom/orbeon/controls/countries?all=true"
+                                                      bind="dynamic-data-dropdown-bind">
                                     <xf:label ref="$form-resources/dynamic-data-dropdown/label"/>
                                     <xf:hint ref="$form-resources/dynamic-data-dropdown/hint"/>
                                     <xf:help ref="$form-resources/dynamic-data-dropdown/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
-                                    <xf:itemset ref="item">
-                                        <xf:label ref="label"/>
-                                        <xf:value ref="value"/>
+                                    <xf:itemset ref="/*/country">
+                                        <xf:label ref="name"/>
+                                        <xf:value ref="us-code"/>
                                     </xf:itemset>
                                 </fr:databound-select1>
                             </xh:td>

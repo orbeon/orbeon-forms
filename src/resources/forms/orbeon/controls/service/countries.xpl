@@ -25,6 +25,7 @@
         <p:input name="config">
             <config>
                 <include>/request/parameters/parameter[name = 'country-name']</include>
+                <include>/request/parameters/parameter[name = 'all']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
@@ -36,13 +37,18 @@
         <p:input name="instance" href="#instance" debug="instance"/>
         <p:input name="config">
             <countries xsl:version="2.0">
-                <xsl:variable name="name" select="if (doc('input:instance')/*/@xsi:nil = 'true')            (: No instance was posted to this service :)
-                    then doc('input:request')/request/parameters/parameter[name = 'country-name']/value     (: Try getting request parameter :)
-                    else doc('input:instance')/instance/country-name                                        (: Use name in posted instance :)"/>
+                <xsl:variable
+                    name="name"
+                    select="if (doc('input:instance')/*/@xsi:nil = 'true')                                      (: No instance was posted to this service :)
+                            then doc('input:request')/request/parameters/parameter[name = 'country-name']/value (: Try getting request parameter :)
+                            else doc('input:instance')/instance/country-name                                    (: Use name in posted instance :)"/>
+                <xsl:variable
+                    name="all"
+                    select="doc('input:request')/request/parameters/parameter[name = 'all']/value = 'true'"/>
                 <xsl:choose>
-                    <!-- If no name is specified, just take the first 10 countries -->
+                    <!-- If no name is specified, just take the first 10 countries unless all=true -->
                     <xsl:when test="empty($name)">
-                        <xsl:copy-of select="/countries/country[10 >= position()]"/>
+                        <xsl:copy-of select="/countries/country[$all or position() le 10]"/>
                     </xsl:when>
                     <!-- Get first 10 countries that start with provided name -->
                     <xsl:otherwise>

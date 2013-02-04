@@ -1338,10 +1338,10 @@ YAHOO.util.Connect =
 		// pattern is required for IE.
         // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
 		var frameId = 'yuiIO' + this._transaction_id,
-			ie9 = (dM === 9) ? true : false,
+			ie9Plus = (dM >= 9) ? true : false,
 			io;
 
-		if(YAHOO.env.ua.ie && !ie9){
+		if(YAHOO.env.ua.ie && !ie9Plus){
 			io = document.createElement('<iframe id="' + frameId + '" name="' + frameId + '" />');
 
 			// IE will throw a security exception in an SSL environment if the

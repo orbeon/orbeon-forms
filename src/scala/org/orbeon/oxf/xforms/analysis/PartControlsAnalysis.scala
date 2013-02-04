@@ -99,9 +99,10 @@ trait PartControlsAnalysis extends TransientState {
             val newAttributes =
                 triples groupBy
                     (_.forPrefixedId) mapValues
-                        (_ groupBy (_.attributeName) mapValues {a ⇒ assert(a.size == 1); a.head.attributeControl})
+                        (_ groupBy (_.attributeName) mapValues { _.ensuring(_.size == 1).head.attributeControl })
 
             // Accumulate new attributes into existing map by combining values for a given "for id"
+            // NOTE: mapValues above ok, since we accumulate the values below into new immutable Maps.
             _attributeControls = newAttributes.foldLeft(_attributeControls) {
                 case (existingMap, (forId, newAttributes)) ⇒
                     val existingAttributes = existingMap.get(forId) getOrElse Map[String, AttributeControl]()

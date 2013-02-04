@@ -283,7 +283,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
     // In-scope variable on binds include variables implicitly declared with bind/@name
     // Used by XPath analysis
-    private lazy val bindsVariablesSeq = model.variablesMap ++ (bindsByName mapValues (new BindAsVariable(_)))
+    private lazy val bindsVariablesSeq = model.variablesMap ++ (bindsByName map { case (k, v) ⇒ k → new BindAsVariable(v) })
 
     class BindAsVariable(bind: Bind) extends VariableTrait {
         def name = bind.name

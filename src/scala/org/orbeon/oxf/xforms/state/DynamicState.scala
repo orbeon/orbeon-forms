@@ -55,20 +55,20 @@ case class DynamicState(
     def decodeControls = fromByteSeq[List[ControlState]](controls)
 
     // For Java callers
-    def decodeDeploymentTypeJava = deploymentType.orNull
+    def decodeDeploymentTypeJava     = deploymentType.orNull
     def decodeRequestContextPathJava = requestContextPath.orNull
-    def decodeRequestPathJava = requestPath.orNull
-    def decodeRequestHeadersJava = requestHeaders.toMap mapValues (_.toArray)
-    def decodeRequestParametersJava = requestParameters.toMap mapValues (_.toArray)
-    def decodeContainerTypeJava = containerType.orNull
+    def decodeRequestPathJava        = requestPath.orNull
+    def decodeRequestHeadersJava     = requestHeaders.toMap    map { case (k, v) ⇒ k → v.toArray }
+    def decodeRequestParametersJava  = requestParameters.toMap map { case (k, v) ⇒ k → v.toArray }
+    def decodeContainerTypeJava      = containerType.orNull
     def decodeContainerNamespaceJava = containerNamespace.orNull
-    def decodePathMatchersJava = decodePathMatchers.asJava
-    def decodeFocusedControlJava = focusedControl.orNull
-    def decodePendingUploadsJava = decodePendingUploads.asJava
-    def decodeAnnotatedTemplateJava = decodeAnnotatedTemplate.orNull
-    def decodeLastAjaxResponseJava = decodeLastAjaxResponse.orNull
-    def decodeInstancesJava = decodeInstances.asJava
-    def decodeControlsJava = decodeControls.asJava
+    def decodePathMatchersJava       = decodePathMatchers.asJava
+    def decodeFocusedControlJava     = focusedControl.orNull
+    def decodePendingUploadsJava     = decodePendingUploads.asJava
+    def decodeAnnotatedTemplateJava  = decodeAnnotatedTemplate.orNull
+    def decodeLastAjaxResponseJava   = decodeLastAjaxResponse.orNull
+    def decodeInstancesJava          = decodeInstances.asJava
+    def decodeControlsJava           = decodeControls.asJava
 
     case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState]) {
         def instancesJava = instances.asJava
@@ -259,8 +259,8 @@ object DynamicState {
             Option(document.getDeploymentType) map (_.toString),
             Option(document.getRequestContextPath),
             Option(document.getRequestPath),
-            document.getRequestHeaders mapValues (_.toList) toList,
-            document.getRequestParameters mapValues (_.toList) toList,
+            document.getRequestHeaders mapValues (_.toList) toList, // mapValues ok because of toList
+            document.getRequestParameters mapValues (_.toList) toList, // mapValues ok because of toList
             Option(document.getContainerType),
             Option(document.getContainerNamespace),
             toByteSeq(document.getVersionedPathMatchers.asScala.toList),

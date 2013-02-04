@@ -47,7 +47,7 @@ trait PartEventHandlerAnalysis {
                 (observerPrefixedId, handler)
 
         // Group event handlers by observer
-        val newHandlers = tuples groupBy (_._1) mapValues (_ map (_._2) toList)
+        val newHandlers = tuples groupBy (_._1) map { case (k, v) ⇒ k → (v map (_._2) toList) }
 
         // Accumulate new handlers into existing map by combining values for a given observer
         _handlersForObserver = newHandlers.foldLeft(_handlersForObserver) {

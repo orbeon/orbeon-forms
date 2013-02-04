@@ -194,7 +194,7 @@ class XBLContainer(
 
     // Helper for XFormsContainingDocument
     def immutableParametersMap(request: Request): Map[String, Array[String]] =
-        request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray toMap
+        request.getParameterMap.asScala mapValues StringConversions.objectArrayToStringArray toMap // mapValues ok because of toMap
 }
 
 trait ModelContainer {

@@ -139,11 +139,11 @@ object BufferedPortlet {
 
     // Convert to immutable String → List[String] so that map equality works as expected
     def toScalaMap(m: JMap[String, Array[String]]) =
-        m.asScala mapValues (_.toList) toMap
+        m.asScala map { case (k, v) ⇒ k → v.toList } toMap
 
     // Convert back an immutable String → List[String] to a Java String → Array[String] map
     def toJavaMap(m: Map[String, List[String]]) =
-        m mapValues (_.toArray) asJava
+        m map { case (k, v) ⇒ k → v.toArray } asJava
 
     // Immutable portletNamespace → idNamespace information stored in the portlet context
     private object NamespaceMappings {

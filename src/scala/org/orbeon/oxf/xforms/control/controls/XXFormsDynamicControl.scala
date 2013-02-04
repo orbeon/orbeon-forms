@@ -229,7 +229,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     // If more than one change touches a given id, processed it once using the last element
     private def groupChanges(changes: Seq[(String, Element)]) =
-        changes groupBy (_._1) mapValues (_ map (_._2) last) toList
+        changes groupBy (_._1) mapValues (_ map (_._2) last) toList // mapValues ok because of toList
 
     private def processXBLUpdates(): Unit = {
 

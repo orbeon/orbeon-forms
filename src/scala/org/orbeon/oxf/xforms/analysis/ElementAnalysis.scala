@@ -15,7 +15,8 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.analysis.controls.{ValueTrait, RepeatControl}
 import model.Model
-import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
+import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
@@ -97,7 +98,7 @@ abstract class ElementAnalysis(
     def containerScope: Scope
 
     // Ids
-    val staticId = XFormsUtils.getElementId(element)
+    val staticId = getElementId(element)
     val prefixedId = scope.prefixedIdForStaticId(staticId) // NOTE: we could also pass the prefixed id during construction
 
     // Location
@@ -122,9 +123,9 @@ abstract class ElementAnalysis(
     val classes = ""
 
     // Extension attributes
-    protected def allowedExtensionAttributes = Set[QName]()
-    final lazy val extensionAttributes       = Map() ++ (CommonExtensionAttributes ++ allowedExtensionAttributes map (qName ⇒ (qName, element.attributeValue(qName))) filter (_._2 ne null))
-    final def nonRelevantExtensionAttributes = extensionAttributes mapValues (v ⇒ if (XFormsUtils.maybeAVT(v)) "" else v) // view with all blank values for AVTs
+    protected def allowedExtensionAttributes      = Set[QName]()
+    final lazy val extensionAttributes            = Map() ++ (CommonExtensionAttributes ++ allowedExtensionAttributes map (qName ⇒ (qName, element.attributeValue(qName))) filter (_._2 ne null))
+    final lazy val nonRelevantExtensionAttributes = extensionAttributes map { case (k, v) ⇒ k → (if (maybeAVT(v)) "" else v) } // all blank values for AVTs
 
     // XPath analysis
     private var contextAnalysis: Option[XPathAnalysis] = None

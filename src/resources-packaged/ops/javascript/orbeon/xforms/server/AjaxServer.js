@@ -386,7 +386,6 @@
                         if (_.detect(eventsToSend, function(event) { return event.eventName != "xxforms-upload-progress" && event.eventName != "xxforms-session-heartbeat"; })) {
                             var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
                             requestDocumentString.push(currentSequenceNumber);
-                            ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
                         }
                         requestDocumentString.push('</xxf:sequence>\n');
 
@@ -625,19 +624,31 @@
                 ORBEON.xforms.Init.document();
             }
         } else {
-            if (o.responseText
-                    && (// Handle cases where somehow, the XML document does not come in o.responseXML: parse o.responseText.
-                        // This happens in particular when we get a response after a background upload.
-                        !responseXML
-                        // Suspecting this was put there as the browser doesn't necessarily parse the response if it is HTML (e.g. an error)
-                        || (responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html")
-                    )) {
-                // It's unclear why this replacement is needed. See: https://github.com/orbeon/orbeon-forms/issues/718
+            var responseXmlIsHTML = responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html";
+            var formID = o.argument.formId;
+            if (o.responseText && (!responseXML || responseXmlIsHTML)) {
+                // Background uploads
+                //      In this case, the server sends a xxf:event-response embedded in an HTML document:
+                //      <!DOCTYPE HTML><html><body>&lt;xxf:event-response ... </body></html>
+                //      When it happens, responseXML may be the HTML document, so we also test on the root element being 'html'
+                //      But, surprisingly, responseText only contains the text inside the body, i.e. &lt;xxf:event-response ...
+                //      So here we "unescape" the text inside <body>
                 var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
-            } else if (o.responseText && $.browser.msie) {
-                // Don't rely on IE's XML parsing, as it doesn't preserve white spaces
-                responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
+            } else {
+                // Regular Ajax response
+
+                // Increment sequence number, now that we know the server processed our request
+                //      If we were to do this after the request was processed, we might fail to increment the sequence
+                //      if we were unable to process the response (i.e. JS error). Doing this here, before the
+                //      response is processed, we incur the risk of incrementing the counter while the response is
+                //      garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
+                var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
+                ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
+
+                // On IE, don't rely on the browser's XML parsing, as it doesn't preserve white spaces
+                if (o.responseText && $.browser.msie)
+                    responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
             }
 
             if (o.responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
@@ -657,7 +668,6 @@
                     ORBEON.util.Utils.hideModalProgressPanel();
                 }
 
-                var formID = o.argument.formId;
                 AjaxServer.handleResponseDom(responseXML, formID);
                 // Reset changes, as changes are included in this bach of events
                 ORBEON.xforms.Globals.changedIdsRequest = {};

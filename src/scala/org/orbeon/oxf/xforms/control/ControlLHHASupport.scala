@@ -64,13 +64,8 @@ trait ControlLHHASupport {
     // Whether we support HTML LHHA
     def lhhaHTMLSupport = DefaultLHHAHTMLSupport
 
-    def compareLHHA(other: XFormsControl): Boolean = {
-        for (lhhaType ← LHHA.values)
-            if (getLHHA(lhhaType).value() != other.getLHHA(lhhaType).value())
-                return false
-
-        true
-    }
+    def compareLHHA(other: XFormsControl) =
+        LHHA.values forall (lhhaType ⇒ getLHHA(lhhaType).value() == other.getLHHA(lhhaType).value())
 
     // Convenience accessors
     final def getLabel = getLHHA(LHHA.label).value()

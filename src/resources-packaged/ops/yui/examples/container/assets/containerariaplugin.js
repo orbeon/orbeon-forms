@@ -436,7 +436,7 @@
 
 				if (sRole) {
 
-                    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+                    // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
                     oBody = this.body;
                     sID = oBody.id || Dom.generateId(oBody);
                     this.cfg.setProperty(_DESCRIBED_BY, sID);

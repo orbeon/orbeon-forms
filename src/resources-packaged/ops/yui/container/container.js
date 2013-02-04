@@ -7609,7 +7609,7 @@ version: 2.8.1
         * @method registerForm
         */
         registerForm: function() {
-            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+            // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
             return;
 
             var form = this.element.getElementsByTagName("form")[0];

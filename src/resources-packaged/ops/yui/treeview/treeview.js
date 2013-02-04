@@ -842,7 +842,7 @@ TV.prototype = {
         }
     },
 
-    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+    // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
     _onFocusEvent: function (ev) {
         var target = Event.getTarget(ev);
         var node = this.getNodeByElement(target);
@@ -863,7 +863,7 @@ TV.prototype = {
             Event.on(el, 'mouseover', this._onMouseOverEvent, this, true);
             Event.on(el, 'mouseout', this._onMouseOutEvent, this, true);
             Event.on(el, 'keydown', this._onKeyDownEvent, this, true);
-            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+            // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
             var anchors = this.getEl().getElementsByTagName("a");
             for (var anchorIndex = 0; anchorIndex < anchors.length; anchorIndex++) {
                 var anchor = anchors[anchorIndex];

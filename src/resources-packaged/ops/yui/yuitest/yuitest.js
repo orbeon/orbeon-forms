@@ -2253,7 +2253,7 @@ YAHOO.tool.TestManager = {
             //create iframe if not already available
             if (!this._frame){
                 var frame /*:HTMLElement*/ = document.createElement("iframe");
-                // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+                // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
                 //frame.style.visibility = "hidden";
                 frame.style.position = "absolute";
                 frame.style.top = "0";
@@ -2527,7 +2527,7 @@ YAHOO.tool.TestFormat.JSON = function(results /*:Object*/) /*:String*/ {
  */
 YAHOO.tool.TestFormat.XML = function(results /*:Object*/) /*:String*/ {
 
-    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+    // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
     function xmlEscape(text){
         return text.replace(/["'<>&]/g, function(c){
             switch(c){
@@ -2541,7 +2541,7 @@ YAHOO.tool.TestFormat.XML = function(results /*:Object*/) /*:String*/ {
     }
 
     var l = YAHOO.lang;
-    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+    // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
     var xml /*:String*/ = "<" + results.type + " name=\"" + xmlEscape(results.name) + "\"";
 
     if (l.isNumber(results.duration)){
@@ -2549,7 +2549,7 @@ YAHOO.tool.TestFormat.XML = function(results /*:Object*/) /*:String*/ {
     }
 
     if (results.type == "test"){
-        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+        // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
         xml += " result=\"" + results.result + "\" message=\"" + xmlEscape(results.message) + "\">";
     } else {
         xml += " passed=\"" + results.passed + "\" failed=\"" + results.failed + "\" ignored=\"" + results.ignored + "\" total=\"" + results.total + "\">";

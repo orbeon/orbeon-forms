@@ -1086,7 +1086,7 @@ YAHOO.util.Connect =
   * @for Connect
   */
 (function(){
-    // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+    // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
 	var YCM = YAHOO.util.Connect,
 		YE = YAHOO.util.Event,
         dM = document.documentMode ? document.documentMode : false;
@@ -1336,7 +1336,7 @@ YAHOO.util.Connect =
 		// IE does not allow the setting of id and name attributes as object
 		// properties via createElement().  A different iframe creation
 		// pattern is required for IE.
-        // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+        // Orbeon change. See http://wiki.orbeon.com/forms/doc/contributor-guide/yahoo-ui-library-yui
 		var frameId = 'yuiIO' + this._transaction_id,
 			ie9 = (dM === 9) ? true : false,
 			io;

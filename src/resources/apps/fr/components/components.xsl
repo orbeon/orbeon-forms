@@ -143,8 +143,6 @@
             <!-- Process the rest -->
             <xsl:apply-templates select="node() except (xh:link | xh:style)"/>
 
-            <xh:script language="javascript" type="text/javascript" src="/apps/fr/style/bootstrap/js/bootstrap.js"/>
-
             <!-- For IE debugging -->
             <!--<xh:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>-->
             <!--<xh:script language="javascript" type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->

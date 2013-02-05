@@ -149,10 +149,10 @@
                                          https://github.com/orbeon/orbeon-forms/issues/721 -->
                                     <fr:language-selector/>
                                     <fr:noscript-selector/>
+                                    <fr:goto-content/>
                                     <!-- These are typically to the left -->
                                     <fr:logo/>
                                     <fr:title/>
-                                    <fr:goto-content/>
                                 </xsl:variable>
 
                                 <xsl:apply-templates select="$default-objects"/>
@@ -324,19 +324,20 @@
     <xsl:template match="fr:noscript-selector">
         <!-- Switch script/noscript -->
         <xsl:if test="$mode = ('edit', 'new') and not($has-noscript-link = false()) and not($is-form-builder) and $is-noscript-support">
-            <xh:div class="fr-noscript-choice">
+            <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes a CSS  bug with IE 7:
+                 https://github.com/orbeon/orbeon-forms/issues/733 -->
+            <xh:div class="fr-noscript-choice" xml:space="preserve">
                 <xf:group appearance="xxf:internal">
                     <xf:group ref=".[not(property('xxf:noscript'))]">
                         <xf:trigger appearance="minimal">
-                            <xf:label>
+                            <xf:label xml:space="preserve">
                                 <xf:output value="$fr-resources/summary/labels/noscript"/>
                             </xf:label>
                         </xf:trigger>
-                        <!--<xh:img class="fr-noscript-icon" width="16" height="16" src="/apps/fr/style/images/silk/script_delete.png" alt="Noscript Mode" title="Noscript Mode"/>-->
                     </xf:group>
                     <xf:group ref=".[property('xxf:noscript')]">
                         <xf:trigger appearance="minimal">
-                            <xf:label>
+                            <xf:label xml:space="preserve">
                                 <xf:output value="$fr-resources/summary/labels/script"/>
                             </xf:label>
                         </xf:trigger>
@@ -362,17 +363,13 @@
 
     <xsl:template match="fr:goto-content">
         <xsl:if test="$is-noscript">
-            <xh:ul class="nav">
-                <xh:li>
-                    <!-- Group to scope variables -->
-                    <xf:group appearance="xxf:internal" model="fr-error-summary-model">
-                        <!-- Link to form content or to errors if any -->
-                        <xh:a href="#{{if (errors-count castable as xs:integer and xs:integer(errors-count) > 0) then 'fr-errors' else 'fr-form'}}">
-                            <xf:output value="$fr-resources/summary/labels/goto-content"/>
-                        </xh:a>
-                    </xf:group>
-                </xh:li>
-            </xh:ul>
+            <!-- Group to scope variables -->
+            <xf:group appearance="xxf:internal" model="fr-error-summary-model">
+                <!-- Link to form content or to errors if any -->
+                <xh:a class="fr-goto-content" href="#{{if (errors-count castable as xs:integer and xs:integer(errors-count) > 0) then 'fr-errors' else 'fr-form'}}">
+                    <xf:output value="$fr-resources/summary/labels/goto-content"/>
+                </xh:a>
+            </xf:group>
         </xsl:if>
     </xsl:template>
 

@@ -200,11 +200,13 @@ button.btn-link {
 }
 /* ***** General Layout ********************************************************************************************* */
 .fr-language-choice,
-.fr-noscript-choice {
+.fr-noscript-choice,
+.fr-goto-content {
   margin-right: 1em;
 }
 .fr-language-choice .xforms-label,
-.fr-noscript-choice .xforms-label {
+.fr-noscript-choice .xforms-label,
+.fr-goto-content .xforms-label {
   display: inline;
   margin-right: .5em;
 }

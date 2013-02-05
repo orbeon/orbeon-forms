@@ -107,16 +107,23 @@ html, body { background-color: @frBackground }
 }
 
 // Navbar
-.fr-language-choice, .fr-noscript-choice {
+.fr-language-choice, .fr-noscript-choice, .fr-goto-content {
     color: @navbarLinkColorActive;
     font-size: 85%;
-    float: right;
     text-align: right;
     a, button.btn-link { color: @navbarLinkColor }
 }
 
+.fr-language-choice, .fr-noscript-choice {
+    float: right;
+}
+
+.fr-goto-content {
+    float: left;
+}
+
 .navbar-inverse {
-    .fr-language-choice, .fr-noscript-choice {
+    .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
         color: @frNavBarTextColor;
         a, button.btn-link { color: @navbarInverseLinkColor }
     }

@@ -255,7 +255,8 @@
 				}
 			});
 
-			DOM.loadCSS(s.editor_css ? ed.documentBaseURI.toAbsolute(s.editor_css) : url + "/skins/" + ed.settings.skin + "/ui.css");
+            if (s.editor_css != "") // ORBEON: don't load anything if blank (https://github.com/orbeon/orbeon-forms/issues/798)
+			    DOM.loadCSS(s.editor_css ? ed.documentBaseURI.toAbsolute(s.editor_css) : url + "/skins/" + ed.settings.skin + "/ui.css");
 
 			if (s.skin_variant)
 				DOM.loadCSS(url + "/skins/" + ed.settings.skin + "/ui_" + s.skin_variant + ".css");

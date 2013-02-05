@@ -29,7 +29,8 @@
 				});
 			});
 
-			DOM.loadCSS((s.editor_css ? ed.documentBaseURI.toAbsolute(s.editor_css) : '') || url + "/skins/" + s.skin + "/ui.css");
+            if (s.editor_css != "") // ORBEON: don't load anything if blank (https://github.com/orbeon/orbeon-forms/issues/798)
+			    DOM.loadCSS((s.editor_css ? ed.documentBaseURI.toAbsolute(s.editor_css) : '') || url + "/skins/" + s.skin + "/ui.css");
 		},
 
 		renderUI : function(o) {

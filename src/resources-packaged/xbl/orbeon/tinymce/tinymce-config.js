@@ -19,5 +19,7 @@ YAHOO.xbl.fr.Tinymce.DefaultConfig = {
     forced_root_block:                      'div',
     remove_redundant_brs:                   true,
     verify_html:                            true,
-    editor_css:                             ""      // don't let the editor load CSS because that fails in portlets
+    editor_css:                             "",      // don't let the editor load UI CSS because that fails in portlets
+    theme_advanced_statusbar_location:      "none",
+    theme_advanced_path:                    false
 };

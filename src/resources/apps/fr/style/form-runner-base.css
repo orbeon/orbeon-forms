@@ -195,9 +195,6 @@ button.btn-link {
   margin-bottom: .5em;
   border-bottom: 2px solid #ddddee;
 }
-.xforms-textarea.xforms-static pre {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-}
 /* ***** General Layout ********************************************************************************************* */
 .fr-language-choice,
 .fr-noscript-choice,
@@ -564,11 +561,12 @@ button.btn-link {
   width: 3.3em;
 }
 /* ***** View, PDF, email ******************************************************************************************* */
-pre.xforms-textarea,
-span.xforms-textarea pre {
+.xforms-textarea pre {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
   *white-space: normal;
+  word-break: normal;
 }
 .fr-mode-view .xforms-hint,
 .fr-mode-view .fr-mode-pdf .xforms-hint,

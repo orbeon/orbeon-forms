@@ -147,11 +147,6 @@ button.btn-link {
     border-bottom: 2px solid @frBorderColor;
 }
 
-// Static readonly textarea
-.xforms-textarea.xforms-static pre {
-    font-family: @sansFontFamily;   // use regular font, not monospaced font
-}
-
 /* ***** General Layout ********************************************************************************************* */
 
 // Language and mode selectors
@@ -483,7 +478,13 @@ button.btn-link {
 /* ***** View, PDF, email ******************************************************************************************* */
 
 // Textarea in output mode can contain line breaks so try to keep them
-pre.xforms-textarea, span.xforms-textarea pre { white-space: -moz-pre-wrap; white-space: pre-wrap; *white-space: normal }
+.xforms-textarea pre {
+    font-family: @sansFontFamily;   // use regular font, not monospaced font
+    white-space: -moz-pre-wrap;
+    white-space: pre-wrap;
+    *white-space: normal;
+    word-break: normal;             // Boostrap overrides word-break
+}
 
 .fr-mode-view {
     .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }

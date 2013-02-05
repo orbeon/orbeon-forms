@@ -466,7 +466,7 @@
                         <xf:var name="item-label" value="" as="xs:string"/>
                         <xf:var name="item-value" value="" as="xs:string"/>
                         <xf:insert ref="$control-resources/*"
-                                       origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
+                                   origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
                     </xf:action>
                 </xf:action>
             </action>

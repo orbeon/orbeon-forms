@@ -55,7 +55,7 @@
                 <xh:div class="navbar-inner">
                     <xh:div class="container">
                         <xh:a href="http://www.orbeon.com/">
-                            <xh:img src="/fr/style/orbeon-navbar-logo.png" alt="Orbeon Forms"/>
+                            <xh:img src="/apps/fr/style/orbeon-navbar-logo.png" alt="Orbeon Forms"/>
                         </xh:a>
                         <xh:h1>
                             <xsl:value-of select="$title"/>

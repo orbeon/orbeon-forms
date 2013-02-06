@@ -29,573 +29,576 @@ html {
     background-color: #999;
     background-image: url('../../../../forms/orbeon/builder/images/low_contrast_linen.png');
 }
+
 body {
     padding-top: 0;
     margin-right: 4px;
 }
 
-.fb-main {
-    position: absolute;
-    top: 40px + @fbGutter;
-    right: @fbGutter;
-    left: @fbGutter + @fbToolbarWidth + @fbGutter/2;    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
-    bottom: @fbBottomHeight + @fbGutter;
-    overflow-y: auto;
+.orbeon {
+    .fb-main {
+        position: absolute;
+        top: 40px + @fbGutter;
+        right: @fbGutter;
+        left: @fbGutter + @fbToolbarWidth + @fbGutter/2;    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+        bottom: @fbBottomHeight + @fbGutter;
+        overflow-y: auto;
 
-    .fb-main-inner {
-        background-color: @wellBackground;
-        .border-radius(6px);
-        .box-sizing(border-box);
-        margin-bottom: 0;
-        min-height: 100%;               // So the main area uses all the available space, not revealing a large porting of the background
+        .fb-main-inner {
+            background-color: @wellBackground;
+            .border-radius(6px);
+            .box-sizing(border-box);
+            margin-bottom: 0;
+            min-height: 100%;               // So the main area uses all the available space, not revealing a large porting of the background
+        }
     }
-}
 
-.fb-bottom {
-    z-index: @zindexFixedNavbar;        // put in front like the navbar
-    background-color: @frBackground;
-}
-
-.fb-section-editor {
-    position: absolute;                                                                                                 // Its left/right set in CoffeeScript relative to the current section
-    display: none;                                                                                                      // Shown in CoffeeScript when mouse over section
-    padding: 0 10px 20px 20px;                                                                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
-    .xforms-trigger { display: block; }                                                                                 // Icons shown vertically
-}
-
-.fb-grid-repeat-editor {                                                                                                // Section that contains the grid/repeat icons that are moved based on pointer position
-    .xforms-trigger {
-        display: none;                                                                                                  // Shown in CoffeeScript based on pointer position
-        position: absolute;                                                                                             // Left/right set in CoffeeScript
+    .fb-bottom {
+        z-index: @zindexFixedNavbar;        // put in front like the navbar
+        background-color: @frBackground;
     }
-}
 
-.fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse
-    position: absolute;                                                                                                 // Is left/right set in CoffeeScript relative to the current section label
-    cursor: pointer;
-    font-size: 20px;                                                                                                    // Matching the title font size
-    line-height: 40px;                                                                                                  // So text is vertically centered
-    color: #BBB;                                                                                                        // Light gray denoting hint
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;                                                        // Matching font defined by Bootstrap for titles
-    z-index: 1;                                                                                                         // Show on top of the page (default is 0)
-}
+    .fb-section-editor {
+        position: absolute;                                                                                                 // Its left/right set in CoffeeScript relative to the current section
+        display: none;                                                                                                      // Shown in CoffeeScript when mouse over section
+        padding: 0 10px 20px 20px;                                                                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
+        .xforms-trigger { display: block; }                                                                                 // Icons shown vertically
+    }
 
-.fb-edit-section-label {                                                                                                // Input created dynamically to edit section label
-    position: absolute;
-    z-index: 2;                                                                                                         // Display on top of click interceptor
-    font-size: 20px;                                                                                                    // Same as the one on .xforms-form h2 in f-r-o.css
-    box-sizing: border-box;                                                                                             // Makes relative sizing easier
-}
+    .fb-grid-repeat-editor {                                                                                                // Section that contains the grid/repeat icons that are moved based on pointer position
+        .xforms-trigger {
+            display: none;                                                                                                  // Shown in CoffeeScript based on pointer position
+            position: absolute;                                                                                             // Left/right set in CoffeeScript
+        }
+    }
 
-.fr-section-title.hover {                                                                                               // .hover added by CS on mouse over click interceptor
-    #gradient > .vertical(white, #DDD);
-}
+    .fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse
+        position: absolute;                                                                                                 // Is left/right set in CoffeeScript relative to the current section label
+        cursor: pointer;
+        font-size: 20px;                                                                                                    // Matching the title font size
+        line-height: 40px;                                                                                                  // So text is vertically centered
+        color: #BBB;                                                                                                        // Light gray denoting hint
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;                                                        // Matching font defined by Bootstrap for titles
+        z-index: 1;                                                                                                         // Show on top of the page (default is 0)
+    }
 
-.fb-delete-grid-trigger {
-    position: absolute;                                                                                                 // Its left/right set in JS relative to the current grid
-    display: none;                                                                                                      // Shown in JS when mouse over grid
-    padding: 0;                                                                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
-}
+    .fb-edit-section-label {                                                                                                // Input created dynamically to edit section label
+        position: absolute;
+        z-index: 2;                                                                                                         // Display on top of click interceptor
+        font-size: 20px;                                                                                                    // Same as the one on .xforms-form h2 in f-r-o.css
+        box-sizing: border-box;                                                                                             // Makes relative sizing easier
+    }
 
-.fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
+    .fr-section-title.hover {                                                                                               // .hover added by CS on mouse over click interceptor
+        #gradient > .vertical(white, #DDD);
+    }
 
-.fb-nowrap { white-space: nowrap }
-.fb-hide-alert .xforms-alert { display: none }
+    .fb-delete-grid-trigger {
+        position: absolute;                                                                                                 // Its left/right set in JS relative to the current grid
+        display: none;                                                                                                      // Shown in JS when mouse over grid
+        padding: 0;                                                                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
+    }
 
-/* ***** Toolbox **************************************************************************************************** */
+    .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
-.fb-toolbox {
-    position: fixed;
-    left: @fbGutter;
-    top: 40px + @fbGutter;
-    bottom: @fbBottomHeight + @fbGutter;
-    width: 192px;
-    .box-sizing(border-box);
+    .fb-nowrap { white-space: nowrap }
+    .fb-hide-alert .xforms-alert { display: none }
 
-    .fb-toolbox-inside {
-        width: 100%;
-        height: 100%;
-        padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
-        overflow-y: auto;                       // Make inside box scrollable, as if we make the outside box scrollable, IE9 sizes it width incorrectly
+    /* ***** Toolbox **************************************************************************************************** */
+
+    .fb-toolbox {
+        position: fixed;
+        left: @fbGutter;
+        top: 40px + @fbGutter;
+        bottom: @fbBottomHeight + @fbGutter;
+        width: 192px;
         .box-sizing(border-box);
 
-        .fb-tools {
-            .fr-border();
-            padding: 8px;
-            margin-bottom: @fbGutter;
-            &:last-child { margin-bottom: 0 }
+        .fb-toolbox-inside {
+            width: 100%;
+            height: 100%;
+            padding: 0 @fbGutter/2 0 0;             // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+            overflow-y: auto;                       // Make inside box scrollable, as if we make the outside box scrollable, IE9 sizes it width incorrectly
+            .box-sizing(border-box);
 
-            legend {
-                font-size: 11px;
-                margin-top: -8px;
-                margin-bottom: 4px;
-                text-indent: 9px;
-                line-height: 24px;
-            }
+            .fb-tools {
+                .fr-border();
+                padding: 8px;
+                margin-bottom: @fbGutter;
+                &:last-child { margin-bottom: 0 }
 
-            .xforms-label {
-                display: block;
-                margin: 1em 0 .5em 0;
-                font-size: 93%;
-            }
+                legend {
+                    font-size: 11px;
+                    margin-top: -8px;
+                    margin-bottom: 4px;
+                    text-indent: 9px;
+                    line-height: 24px;
+                }
 
-            .fb-tool {
-                margin: 0 0 0 4px;
+                .xforms-label {
+                    display: block;
+                    margin: 1em 0 .5em 0;
+                    font-size: 93%;
+                }
 
-                .xforms-trigger button {
-                    padding: 2px 4px;
-                    border: none; background: none; box-shadow: none;                                                   // remove button default styling
-                    font-size: 85%;                                                                                     // smaller text next icon
-                    width: 100%;                 // to increase clicking area
-                    text-align: left;
+                .fb-tool {
+                    margin: 0 0 0 4px;
 
-                    i {
-                        margin-top: -1px;        // so that Bootstrap icons are better aligned
-                    }
-                    img {
-                        margin-top: -3px;        // so that Bootstrap icons are better aligned
-                    }
+                    .xforms-trigger button {
+                        padding: 2px 4px;
+                        border: none; background: none; box-shadow: none;                                                   // remove button default styling
+                        font-size: 85%;                                                                                     // smaller text next icon
+                        width: 100%;                 // to increase clicking area
+                        text-align: left;
 
-                    i, img { margin-right: 3px } // space between icon and text
+                        i {
+                            margin-top: -1px;        // so that Bootstrap icons are better aligned
+                        }
+                        img {
+                            margin-top: -3px;        // so that Bootstrap icons are better aligned
+                        }
 
-                    &:hover {
-                        #gradient > .vertical(white, #DDD);                                                             // effect on hover
+                        i, img { margin-right: 3px } // space between icon and text
+
+                        &:hover {
+                            #gradient > .vertical(white, #DDD);                                                             // effect on hover
+                        }
                     }
                 }
+
+                // Services and actions
+                ul { margin: 0; overflow: auto }
+                li { list-style-type: none; white-space: nowrap; font-size: 11px }
+                .xforms-trigger a { text-decoration: none }
             }
 
-            // Services and actions
-            ul { margin: 0; overflow: auto }
-            li { list-style-type: none; white-space: nowrap; font-size: 11px }
-            .xforms-trigger a { text-decoration: none }
-        }
+            // Cut / Copy / Paste
+            .fb-xvc { text-align: center }
+            .fb-xvc .xforms-trigger { margin-right: .5em }
 
-        // Cut / Copy / Paste
-        .fb-xvc { text-align: center }
-        .fb-xvc .xforms-trigger { margin-right: .5em }
+            .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
 
-        .xbl-fr-alert-dialog {display: none }   // because w/ Chrome, a DIV of the dialog remains under the toolbox DIV and causes the toolbox to scroll
-
-        .fr-orbeon-version { color: white; }
-    }
-}
-
-/* ***** Dialogs **************************************************************************************************** */
-
-// All dialogs
-.xforms-dialog {
-
-    .xforms-label {
-        margin-top: 5px;
-
-        // Try to make icons appear vertically centered
-        img {
-            vertical-align: middle;
-            margin-bottom: (@baseLineHeight - @fbIconsHeight) / 2;
+            .fr-orbeon-version { color: white; }
         }
     }
 
-    // Add colon after labels to make them more distinct. Do we like this?
-    // See also https://github.com/orbeon/orbeon-forms/issues/383
-    .xforms-label:after { content: ": " }
-    // Exceptions to above rule
-    legend.xforms-label:after,
-    .fb-grid-th .xforms-label:after,
-    .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
-}
+    /* ***** Dialogs **************************************************************************************************** */
 
-// Metadata editor dialog
-.fb-dialog-form-settings {
-    width: 600px;
+    // All dialogs
+    .xforms-dialog {
 
-    img { float: left; margin: 1em 2em 0 1em; }
-    .xforms-label { display: block; }
-    .xforms-hint { margin-bottom: 1em; }
-    .fb-dialog-form-settings-fields {
-        float: left;
-        width: 475px;
-        input, textarea {
-            width: 100%;
-            box-sizing: border-box;
+        .xforms-label {
+            margin-top: 5px;
+
+            // Try to make icons appear vertically centered
+            img {
+                vertical-align: middle;
+                margin-bottom: (@baseLineHeight - @fbIconsHeight) / 2;
+            }
+        }
+
+        // Add colon after labels to make them more distinct. Do we like this?
+        // See also https://github.com/orbeon/orbeon-forms/issues/383
+        .xforms-label:after { content: ": " }
+        // Exceptions to above rule
+        legend.xforms-label:after,
+        .fb-grid-th .xforms-label:after,
+        .xbl-fr-alert-dialog-message .xforms-label:after { content: none }
+    }
+
+    // Metadata editor dialog
+    .fb-dialog-form-settings {
+        width: 600px;
+
+        img { float: left; margin: 1em 2em 0 1em; }
+        .xforms-label { display: block; }
+        .xforms-hint { margin-bottom: 1em; }
+        .fb-dialog-form-settings-fields {
+            float: left;
+            width: 475px;
+            input, textarea {
+                width: 100%;
+                box-sizing: border-box;
+            }
+        }
+
+        .fb-dialog-form-settings-stats {
+            th { text-align: left }
+            td { text-align: right; padding-left: .5em }
+            &> .xforms-label { border-bottom: 1px solid #DDE }
         }
     }
 
-    .fb-dialog-form-settings-stats {
-        th { text-align: left }
-        td { text-align: right; padding-left: .5em }
-        &> .xforms-label { border-bottom: 1px solid #DDE }
+    // Itemset editor dialog
+    // Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
+    .fb-dialog-itemsets {
+        width: 400px;
+
+        .xbl-fr-grid {
+            height: 30em;
+            overflow-y: auto;
+            padding: 0;
+            table { background-color: white; }
+        }
+
+        .fr-grid-2-columns .xforms-input input { width: 13em }
+        .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
+        .xbl-fr-link-select1 .xforms-label { display: none }
+        .xforms-invalid .xforms-input-input { border-color: #DF731B }     // show errors also for fields that aren't visited
     }
-}
 
-// Itemset editor dialog
-// Using a class instead of an id since the id is simply 'dialog' as it is declared in a component
-.fb-dialog-itemsets {
-    width: 400px;
-
-    .xbl-fr-grid {
-        height: 30em;
-        overflow-y: auto;
-        padding: 0;
-        table { background-color: white; }
-    }
-
-    .fr-grid-2-columns .xforms-input input { width: 13em }
-    .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
-    .xbl-fr-link-select1 .xforms-label { display: none }
-    .xforms-invalid .xforms-input-input { border-color: #DF731B }     // show errors also for fields that aren't visited
-}
-
-// Submission editor dialog
-#fb-service-dialog {
-    width: 550px;
-    .fb-service-dialog-error {
-        border: 2px solid red; padding: .25em;
-        select {
-            border: none;
+    // Submission editor dialog
+    #fb-service-dialog {
+        width: 550px;
+        .fb-service-dialog-error {
+            border: 2px solid red; padding: .25em;
+            select {
+                border: none;
+            }
+        }
+        .fb-service-dialog-success {
+            border: 2px solid green;
+            padding: .25em;
+        }
+        .fb-submission-response {
+            display: block;
+            height: 200px;
+            overflow-y: auto;
+            textarea {
+                height: 10em;
+            }
         }
     }
-    .fb-service-dialog-success {
-        border: 2px solid green;
-        padding: .25em;
+
+    // Bindings editor dialog
+    #fb-action-dialog {
+        width: 550px;
+        .xforms-select1 { width: auto }
+        .fr-repeat-table {
+            .fb-parameters {
+                .xforms-label { display: block }
+                .xforms-hint { display: block }
+                .xforms-disabled { display: none }
+            }
+            th { white-space: nowrap }
+        }
     }
-    .fb-submission-response {
-        display: block;
-        height: 200px;
-        overflow-y: auto;
+
+    #fb-database-service-dialog {
+        width: 550px;
         textarea {
             height: 10em;
+            font-family: monospace;
         }
     }
-}
 
-// Bindings editor dialog
-#fb-action-dialog {
-    width: 550px;
-    .xforms-select1 { width: auto }
-    .fr-repeat-table {
-        .fb-parameters {
-            .xforms-label { display: block }
-            .xforms-hint { display: block }
-            .xforms-disabled { display: none }
+
+    // Help dialog
+    #fb-edit-help-dialog {
+        width: 400px;
+        textarea {
+            width: 98%;
+            height: 12em;
         }
-        th { white-space: nowrap }
     }
-}
 
-#fb-database-service-dialog {
-    width: 550px;
-    textarea {
-        height: 10em;
-        font-family: monospace;
+    // Other dialogs
+    #fb-section-details-dialog, #fb-add-language-dialog {
+        width: 400px;
     }
-}
 
-
-// Help dialog
-#fb-edit-help-dialog {
-    width: 400px;
-    textarea {
-        width: 98%;
-        height: 12em;
+    .fb-dialog-control-details {
+        width: 400px;
     }
-}
 
-// Other dialogs
-#fb-section-details-dialog, #fb-add-language-dialog {
-    width: 400px;
-}
+    .fb-dialog-validation-details {
+        width: 800px;
+        .xforms-label { margin-top: 5px; }
+    }
 
-.fb-dialog-control-details {
-    width: 400px;
-}
+    #fb-schema-upload-dialog {
+        width: 400px;
 
-.fb-dialog-validation-details {
-    width: 800px;
-    .xforms-label { margin-top: 5px; }
-}
+        .xforms-hint { width: 100% }
+        .xforms-select1 { height: 10em; width: 100% }
+        .fb-dialog-h2 { font-size: larger; display: block; padding-top: .3em; padding-bottom: .3em }
+        .fb-dialog-section { display: block; margin-left: 1em }
+    }
 
-#fb-schema-upload-dialog {
-    width: 400px;
+    #fb-source-editor-dialog, .fb-custom-xml-dialog {
+        width: 900px;
+        .CodeMirror { font-size: 12px; }            // Pick slightly smaller font size, default being 13px
+        .CodeMirror-scroll { height: auto }
+        .xforms-alert-active { display: block }
+    }
 
-    .xforms-hint { width: 100% }
-    .xforms-select1 { height: 10em; width: 100% }
-    .fb-dialog-h2 { font-size: larger; display: block; padding-top: .3em; padding-bottom: .3em }
-    .fb-dialog-section { display: block; margin-left: 1em }
-}
+    // Publish dialog
+    #fb-publish-dialog {
+        width: 400px;
 
-#fb-source-editor-dialog, .fb-custom-xml-dialog {
-    width: 900px;
-    .CodeMirror { font-size: 12px; }            // Pick slightly smaller font size, default being 13px
-    .CodeMirror-scroll { height: auto }
-    .xforms-alert-active { display: block }
-}
+        .fb-publish-message {
+            background-color: white;
+            border: 1px solid #DDDDDD;
+            display: block;
+            padding: .5em;
+        }
+    }
 
-// Publish dialog
-#fb-publish-dialog {
-    width: 400px;
+    .xxforms-set-height {                           // Dialogs for which we want the main area to take remaining height
+        .xxforms-dialog-body {
+            position: relative;                     // So the source editor and buttons can be absolutely positioned relative to the dialog body
+            overflow: inherit;                      // Override the overflow: auto in xforms.css to avoid a second scrollbar on the body on Firefox
+            @buttonsAreaHeight: 60px;
+            .fb-dialog-remaining-height {           // Contains the CodeMirror editor
+                position: absolute;                 // Take all the vertical space, leaving just 60px at the bottom for the buttons
+                top: 0; left: 0; right: 0;
+                bottom: @buttonsAreaHeight;
+                overflow: scroll;                   // So users can scroll through the source
+            }
+            .fr-dialog-buttons {
+                height: 60px;                       // Fixed height
+                position: absolute;                 // Absolutely positioned
+                bottom: 0; left: 0; right: 0;       // At the bottom of the dialog body
+                line-height: @buttonsAreaHeight;
+                padding: 0 20px 0 0; margin: 0;     // Overrides default for .fr-dialog-buttons
+                .box-sizing(border-box);            // So top margin gets include in height
+            }
+        }
+    }
 
-    .fb-publish-message {
-        background-color: white;
-        border: 1px solid #DDDDDD;
+    // Test dialog
+    .fb-test-dialog {
+        width: 1000px;                              // Space to fit the 940px layout (couldn't find a reasonable variable to use here)
+        .xxforms-dialog-body {
+            .fb-dialog-remaining-height {
+                overflow: hidden !important;        // Override scroll above, to avoid 1px scroll (not why this is necessary, or how else to avoid this)
+            }
+            .fb-test-iframe {
+                height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
+                .box-sizing(border-box);            // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
+                border: none;                       // By default, iframes have a particularly ugly border
+            }
+        }
+    }
+
+    /* ***** In-Place Editing ******************************************************************************************* */
+
+    // Label and hint editors
+    .fr-grid .xforms-label input, .fr-grid .xforms-hint input  {
+        height: @baseLineHeight;
+        padding: 0;
+        .box-sizing(border-box);
+        .border-radius(0);
+    }
+
+    h2 .fr-section-label {
+        height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
+    }
+
+    /* ***** Grid ******************************************************************************************************* */
+
+    .fb {
+
+        .xbl-fr-section .fr-section-content {
+            padding: 10px;          // don't need as much padding as usual because grids have extra padding for their icons
+        }
+
+        .xbl-fr-grid {
+            padding: @fbGridIconsGutter 0 0 @fbGridIconsGutter; // reserve space for icons
+        }
+    }
+
+    .fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td
+
+    .fr-view {
+        display: block;                                                                                                     // So we can get its width in `position.coffee`
+        table.fr-grid.fr-norepeat {                                                                                         // For non-repeat grid (`table` to override collapse in FR.less)
+            border-collapse: collapse;
+            &:hover .fb-grid-td { border: 1px solid @lightBlue }
+        }
+        .fb-grid-tr { height: 60px }                                                                                        // Enough space to hold row icons so hovering doesn't cause the row to expand
+    }
+
+    .fb-grid-td { border: 1px solid transparent }
+    .fr-grid.fr-norepeat:hover .fb-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
+
+    .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
+        display: block; width: @fbIconsHeight;
+        height: 60px;
+        text-align: center }
+
+    // Delete, expand, shrink shown to the left of the cell
+    .fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
+    .fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
+    .fr-grid .fb-grid-td .fb-grid-cell-icons img { display: inline }
+    // Control details and validation shown to the top right of the cell
+    .fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
+    .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
+    // Optional link to itemset editor shown to the bottom of the cell
+    // Position to the left (2.5em) matched left margin of the fr-grid-content
+    .fb-edit-items { text-decoration: none; display: block; clear: both; position: absolute; left: 2.5em; bottom: .5em }
+    // Simply styling for file select to just show "x"
+    #fr-form-group .fb-static-upload {
+        background-color: none;
+        position: absolute; // show upload UI at the bottom of the cell and remove file upload indicator
+        left: 2.5em;
+        bottom: .5em;
+        .xforms-upload-info, .xforms-upload-size, .xforms-upload-remove { padding: 0 }
+    }
+
+    .fr-grid .fb-grid-td .fb-grid-control-icons img { display: inline }
+    .fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
+    .fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
+    .fr-grid .fr-grid-content .xforms-trigger .btn input,                               // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
+    .fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input
+        { margin: 0 }
+    .fb-mock-link { color: @darkBlue; text-decoration: underline }                      // Simulate  styling of a link
+    .btn .xforms-label { margin: 0 }                                                    // Override margin set in form-runner-base.css for regular labels
+    .fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     // When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder
+    .fb-mock-link:hover { background-color: @yellow }                                   // Simulated link get yellow background on mouse over to suggest it can be edited
+
+    .fb-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
+                                                                                        // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
+
+    .fb-selected {                                                                      // Selected cell in grids
+        box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
+        border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
+    }
+
+    // Grid
+    .fr-view .fr-grid {
+
+        .fr-grid-content .xforms-hint:hover,           // .fr-grid-content for label/hint in body
+        .fb-grid-th .xforms-label:hover,               // .fb-grid-th for label/hint in thead of a repeat
+        .fb-grid-th .xforms-hint:hover,
+        .btn span:hover
+            { background-color: @yellow }
+
+        // Even if the label or hint is empty, we still want space for 1 line to be reserved
+        .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                                      // In regular grid content
+        .fb-grid-th .xforms-label, .fb-grid-th .xforms-hint                                                                 // In grid header, for the repeat single line
+            { min-height: 20px }                                                                                            // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+
+        .fr-grid-content {
+            // Space for the icons to the left and right of the control
+            padding-left: 2.5em;
+            padding-right: 2.5em;
+
+            // Space for trigger showing the itemset editor and file upload
+            &.fb-itemset, &.fb-upload {
+                padding-bottom: 2.5em;
+            }
+            // Inputs for editing the label and hint to take the whole width of the grid content
+            .xforms-label input, .xforms-hint input { width: 100% }
+        }
+    }
+
+    #fr-view {                                                                                                              // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
+        .fr-grid .xforms-hint.xforms-disabled {                                                                             // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less
+            display: block;
+            position: static;                                                                                               // Overrides position: absolute; top: -10000px; left: -10000px in xforms.css
+        }
+    }
+
+    .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
+    .fb-selected .fb-use-toolbar-message { display: block }
+    td:hover .fb-click-message { display: block }
+    td.fb-selected:hover .fb-click-message { display: none }
+
+    .fb-component-icon { display: block }
+
+    // Read-only components
+    .fb-section-component .fb-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
+    .xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
+    .xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
+
+    // Placeholder frame for buttons in test mode
+    .fr-buttons-placeholder {
+
+        width: 100%;
         display: block;
-        padding: .5em;
-    }
-}
+        text-align: center;
 
-.xxforms-set-height {                           // Dialogs for which we want the main area to take remaining height
-    .xxforms-dialog-body {
-        position: relative;                     // So the source editor and buttons can be absolutely positioned relative to the dialog body
-        overflow: inherit;                      // Override the overflow: auto in xforms.css to avoid a second scrollbar on the body on Firefox
-        @buttonsAreaHeight: 60px;
-        .fb-dialog-remaining-height {           // Contains the CodeMirror editor
-            position: absolute;                 // Take all the vertical space, leaving just 60px at the bottom for the buttons
-            top: 0; left: 0; right: 0;
-            bottom: @buttonsAreaHeight;
-            overflow: scroll;                   // So users can scroll through the source
-        }
-        .fr-dialog-buttons {
-            height: 60px;                       // Fixed height
-            position: absolute;                 // Absolutely positioned
-            bottom: 0; left: 0; right: 0;       // At the bottom of the dialog body
-            line-height: @buttonsAreaHeight;
-            padding: 0 20px 0 0; margin: 0;     // Overrides default for .fr-dialog-buttons
-            .box-sizing(border-box);            // So top margin gets include in height
+        .xforms-output { color: gray }
+        div { margin: .5em }
+    }
+
+    /* ***** Message **************************************************************************************************** */
+
+    // Size message so that it fits within bottom navbar, see #486
+    .fr-messages, .fb-xpath-errors {
+        display: inline-block;
+        .alert {
+            display: inline;
+            margin: 0;
+            padding-top: 5px;
+            padding-bottom: 5px;
         }
     }
-}
 
-// Test dialog
-.fb-test-dialog {
-    width: 1000px;                              // Space to fit the 940px layout (couldn't find a reasonable variable to use here)
-    .xxforms-dialog-body {
-        .fb-dialog-remaining-height {
-            overflow: hidden !important;        // Override scroll above, to avoid 1px scroll (not why this is necessary, or how else to avoid this)
+    /* ***** Layout ***************************************************************************************************** */
+
+    #fr-view { margin-left: 0 }
+
+    .fb-bottom {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        .box-sizing(border-box);
+        height: @fbBottomHeight;
+        line-height: @fbBottomHeight;
+        vertical-align: middle;
+        text-align: right;                                              // Message and buttons to show on the right
+        padding: 0 @fbGutter;
+
+        .fr-status-icons { display: none }                              // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
+        .fr-buttons {
+            margin: 0;
         }
-        .fb-test-iframe {
-            height: 100%; width: 100%;          // Use all the space available in container (.fb-dialog-remaining-height)
-            .box-sizing(border-box);            // So the size of this box doesn't get larger than its container, which would add scrollbars to the container
-            border: none;                       // By default, iframes have a particularly ugly border
-        }
-    }
-}
-
-/* ***** In-Place Editing ******************************************************************************************* */
-
-// Label and hint editors
-.fr-grid .xforms-label input, .fr-grid .xforms-hint input  {
-    height: @baseLineHeight;
-    padding: 0;
-    .box-sizing(border-box);
-    .border-radius(0);
-}
-
-h2 .fr-section-label {
-    height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
-}
-
-/* ***** Grid ******************************************************************************************************* */
-
-.fb {
-
-    .xbl-fr-section .fr-section-content {
-        padding: 10px;          // don't need as much padding as usual because grids have extra padding for their icons
     }
 
-    .xbl-fr-grid {
-        padding: @fbGridIconsGutter 0 0 @fbGridIconsGutter; // reserve space for icons
+    .fr-container { top: 10px }                                         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+
+    // Both navbars
+    .navbar .navbar-inner {
+        box-shadow: none;
     }
-}
 
-.fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td
-
-.fr-view {
-    display: block;                                                                                                     // So we can get its width in `position.coffee`
-    table.fr-grid.fr-norepeat {                                                                                         // For non-repeat grid (`table` to override collapse in FR.less)
-        border-collapse: collapse;
-        &:hover .fb-grid-td { border: 1px solid @lightBlue }
-    }
-    .fb-grid-tr { height: 60px }                                                                                        // Enough space to hold row icons so hovering doesn't cause the row to expand
-}
-
-.fb-grid-td { border: 1px solid transparent }
-.fr-grid.fr-norepeat:hover .fb-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
-
-.fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
-    display: block; width: @fbIconsHeight;
-    height: 60px;
-    text-align: center }
-
-// Delete, expand, shrink shown to the left of the cell
-.fb-grid-cell-icons { position: absolute; left: .5em; top: .5em}
-.fb-grid-cell-icons img { margin-bottom: 0; padding: 0 }
-.fr-grid .fb-grid-td .fb-grid-cell-icons img { display: inline }
-// Control details and validation shown to the top right of the cell
-.fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
-.fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
-// Optional link to itemset editor shown to the bottom of the cell
-// Position to the left (2.5em) matched left margin of the fr-grid-content
-.fb-edit-items { text-decoration: none; display: block; clear: both; position: absolute; left: 2.5em; bottom: .5em }
-// Simply styling for file select to just show "x"
-#fr-form-group .fb-static-upload {
-    background-color: none;
-    position: absolute; // show upload UI at the bottom of the cell and remove file upload indicator
-    left: 2.5em;
-    bottom: .5em;
-    .xforms-upload-info, .xforms-upload-size, .xforms-upload-remove { padding: 0 }
-}
-
-.fr-grid .fb-grid-td .fb-grid-control-icons img { display: inline }
-.fb-label-hint-placeholder,                                                         // Grey color for placeholder "Click here to edit…" so users can distinguish it from an actual value
-.fb-label-hint-placeholder .btn { color: #bbb }                                     // To take precedence over color set for button's labels in xforms.css
-.fr-grid .fr-grid-content .xforms-trigger .btn input,                               // Override margin set in form-runner-base.css for buttons in noscript (rendered as input)
-.fr-grid .fr-grid-content .xforms-trigger .fb-mock-link input
-    { margin: 0 }
-.fb-mock-link { color: @darkBlue; text-decoration: underline }                      // Simulate  styling of a link
-.btn .xforms-label { margin: 0 }                                                    // Override margin set in form-runner-base.css for regular labels
-.fb-label-hint-placeholder .fb-mock-link { color: #bbb; text-decoration: none }     // When placeholder shown, don't underline and use grey color, to make it clear this is a placeholder
-.fb-mock-link:hover { background-color: @yellow }                                   // Simulated link get yellow background on mouse over to suggest it can be edited
-
-.fb-grid-td .fb-hover { position: relative }                                        // So elements shown on hover can be absolutely positioned relative to the cell
-                                                                                    // Necessary as Firefox doesn't support position: relative on table cells (http://goo.gl/Atzi2)
-
-.fb-selected {                                                                      // Selected cell in grids
-    box-shadow: 0 0 10px @darkBlue;                                                 // Highlight current cell with "halo"
-    border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
-}
-
-// Grid
-.fr-view .fr-grid {
-
-    .fr-grid-content .xforms-hint:hover,           // .fr-grid-content for label/hint in body
-    .fb-grid-th .xforms-label:hover,               // .fb-grid-th for label/hint in thead of a repeat
-    .fb-grid-th .xforms-hint:hover,
-    .btn span:hover
-        { background-color: @yellow }
-
-    // Even if the label or hint is empty, we still want space for 1 line to be reserved
-    .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                                      // In regular grid content
-    .fb-grid-th .xforms-label, .fb-grid-th .xforms-hint                                                                 // In grid header, for the repeat single line
-        { min-height: 20px }                                                                                            // Use min-height instead of height so text wraps if it doesn't fit on 1 line
-
-    .fr-grid-content {
-        // Space for the icons to the left and right of the control
-        padding-left: 2.5em;
-        padding-right: 2.5em;
-
-        // Space for trigger showing the itemset editor and file upload
-        &.fb-itemset, &.fb-upload {
-            padding-bottom: 2.5em;
-        }
-        // Inputs for editing the label and hint to take the whole width of the grid content
-        .xforms-label input, .xforms-hint input { width: 100% }
-    }
-}
-
-#fr-view {                                                                                                              // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
-    .fr-grid .xforms-hint.xforms-disabled {                                                                             // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less
-        display: block;
-        position: static;                                                                                               // Overrides position: absolute; top: -10000px; left: -10000px in xforms.css
-    }
-}
-
-.fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
-.fb-selected .fb-use-toolbar-message { display: block }
-td:hover .fb-click-message { display: block }
-td.fb-selected:hover .fb-click-message { display: none }
-
-.fb-component-icon { display: block }
-
-// Read-only components
-.fb-section-component .fb-grid-td { background-image: none; background-color: #F8F8F8; border: solid 1px #F8F8F8 }
-.xforms-readonly .xforms-input-input { background-image: none; background-color: #CCCCCC }
-.xforms-readonly textarea { background-image: none; background-color: #CCCCCC }
-
-// Placeholder frame for buttons in test mode
-.fr-buttons-placeholder {
-
-    width: 100%;
-    display: block;
-    text-align: center;
-
-    .xforms-output { color: gray }
-    div { margin: .5em }
-}
-
-/* ***** Message **************************************************************************************************** */
-
-// Size message so that it fits within bottom navbar, see #486
-.fr-messages, .fb-xpath-errors {
-    display: inline-block;
-    .alert {
-        display: inline;
-        margin: 0;
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-}
-
-/* ***** Layout ***************************************************************************************************** */
-
-#fr-view { margin-left: 0 }
-
-.fb-bottom {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    .box-sizing(border-box);
-    height: @fbBottomHeight;
-    line-height: @fbBottomHeight;
-    vertical-align: middle;
-    text-align: right;                                              // Message and buttons to show on the right
-    padding: 0 @fbGutter;
-
-    .fr-status-icons { display: none }                              // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
-    .fr-buttons {
-        margin: 0;
-    }
-}
-
-.fr-container { top: 10px }                                         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
-
-// Both navbars
-.navbar .navbar-inner {
-    box-shadow: none;
-}
-
-// Top Form Builder navbar only
-.fb-navbar {
-    margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
-    .border-radius(0);                                                  // override Boostrap rounded corners
-    .container {
-        width: auto;
-        margin-left: 15px;
-        margin-right: 15px;
-        img, .brand { vertical-align: middle }                          // Logo and title vertically centered
-        img { padding: 0 10px }                                         // Space to the left/right of the logo
-        .brand {                                                        // For the title, reuse some of the styling defined in Bootstrap for .brand
-            float: none;                                                // Override Bootstrap float, which doesn't allow us to vertically align logo and title
-            margin: 0; padding: 0; display: inline;                     // Overdide h1 styles
-        }
-        .nav {                                                          // Contains links to user guide and screencast, and language selection
-            position: absolute; left: auto; right: 0; top: 0;           // Position to the top right
-            li {
-                line-height: @navbarHeight;                             // So it is vertically centered, specified again as this is is absolutely positioned
-                a { padding-top: 0; padding-bottom: 0 }                 // Undo Bootstrap's additional padding, which breaks vertical centering
-                .fr-language-choice {
-                    margin-left: 15px;                                  // Space betteen links and language FB's selection
-                    font-size: inherit;                                 // Override FR smaller size for language selector
+    // Top Form Builder navbar only
+    .fb-navbar {
+        margin-bottom: 0;                                                   // override 18px in bootstrap.css as the content below the navbar (.fr-top) already as its own padding
+        .border-radius(0);                                                  // override Boostrap rounded corners
+        .container {
+            width: auto;
+            margin-left: 15px;
+            margin-right: 15px;
+            img, .brand { vertical-align: middle }                          // Logo and title vertically centered
+            img { padding: 0 10px }                                         // Space to the left/right of the logo
+            .brand {                                                        // For the title, reuse some of the styling defined in Bootstrap for .brand
+                float: none;                                                // Override Bootstrap float, which doesn't allow us to vertically align logo and title
+                margin: 0; padding: 0; display: inline;                     // Overdide h1 styles
+            }
+            .nav {                                                          // Contains links to user guide and screencast, and language selection
+                position: absolute; left: auto; right: 0; top: 0;           // Position to the top right
+                li {
+                    line-height: @navbarHeight;                             // So it is vertically centered, specified again as this is is absolutely positioned
+                    a { padding-top: 0; padding-bottom: 0 }                 // Undo Bootstrap's additional padding, which breaks vertical centering
+                    .fr-language-choice {
+                        margin-left: 15px;                                  // Space betteen links and language FB's selection
+                        font-size: inherit;                                 // Override FR smaller size for language selector
+                    }
                 }
             }
         }
     }
-}
 
-// Form navbar only
-.fb-main .navbar {
-    margin-top: 0;                                                      // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
-    .navbar-inner { .border-radius(6px 6px 0 0) }                       // Add radius to the top of the navbar, so it doesn't show over the radius of the surrounding .fb-main-inner
-    .fb-form-settings-trigger { padding-left: 20px }
-    .icon-white { .opacity(70) }                                        // Make icons grayer, so they don't stand out too much in the inverted navbar
+    // Form navbar only
+    .fb-main .navbar {
+        margin-top: 0;                                                      // Overrides 10px in form-runner-bootstrap-override, as this navbar is not at the top of the page
+        .navbar-inner { .border-radius(6px 6px 0 0) }                       // Add radius to the top of the navbar, so it doesn't show over the radius of the surrounding .fb-main-inner
+        .fb-form-settings-trigger { padding-left: 20px }
+        .icon-white { .opacity(70) }                                        // Make icons grayer, so they don't stand out too much in the inverted navbar
+    }
 }
 
 /* ***** Other media ************************************************************************************************ */

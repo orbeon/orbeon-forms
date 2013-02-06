@@ -12,95 +12,108 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 /* ***** Strong rules to hide disabled/non-relevant elements ******************************************************** */
-#xforms-form {
+.orbeon {
   /**
-     * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
-     * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
-     * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
-     * doesn't require us to update disabled attributes on controls during the life of the page.
+     * XForms switch/case
+     * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
      */
 
+  /* ***** Label, hint, help, alert *********************************************************************************** */
+
+  /* ***** Controls *********************************************************************************** */
+
+  /* ***** Indicators and messages ************************************************************************************ */
+
+  /* ***** Tree ******************************************************************************************************* */
+
+  /* Fix for Firefox issue when clicking on the first "-" in span mode
+       http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
+
 }
-#xforms-form .xforms-repeat-template,
-#xforms-form .xforms-template,
-#xforms-form .xforms-repeat-delimiter,
-#xforms-form .xforms-repeat-begin-end,
-#xforms-form .xforms-group-begin-end,
-#xforms-form .xforms-disabled-subsequent,
-#xforms-form .xforms-case-begin-end,
-#xforms-form .xforms-case-deselected-subsequent,
-#xforms-form .xforms-alert-inactive,
-#xforms-form .xforms-hidden {
+.orbeon #xforms-form {
+  /**
+         * Use visibility: hidden for disabled and deselected form controls, so they can't get the focus. If we don't do this,
+         * since what is disabled or deselected is initially rendered off-screen, users would be able to reach disabled or
+         * deselected controls by tabbing. This is a CSS alternative to using the disabled attribute on the controls, which
+         * doesn't require us to update disabled attributes on controls during the life of the page.
+         */
+
+}
+.orbeon #xforms-form .xforms-repeat-template,
+.orbeon #xforms-form .xforms-template,
+.orbeon #xforms-form .xforms-repeat-delimiter,
+.orbeon #xforms-form .xforms-repeat-begin-end,
+.orbeon #xforms-form .xforms-group-begin-end,
+.orbeon #xforms-form .xforms-disabled-subsequent,
+.orbeon #xforms-form .xforms-case-begin-end,
+.orbeon #xforms-form .xforms-case-deselected-subsequent,
+.orbeon #xforms-form .xforms-alert-inactive,
+.orbeon #xforms-form .xforms-hidden {
   display: none;
 }
-#xforms-form .xforms-disabled,
-#xforms-form .xforms-case-deselected,
-#xforms-form .xforms-case-deselected .xforms-case-selected {
+.orbeon #xforms-form .xforms-disabled,
+.orbeon #xforms-form .xforms-case-deselected,
+.orbeon #xforms-form .xforms-case-deselected .xforms-case-selected {
   top: -10000px;
   left: -10000px;
   position: absolute;
 }
-#xforms-form col.xforms-disabled,
-#xforms-form th.xforms-disabled,
-#xforms-form td.xforms-disabled,
-#xforms-form tr.xforms-disabled,
-#xforms-form thead.xforms-disabled,
-#xforms-form tbody.xforms-disabled,
-#xforms-form tfoot.xforms-disabled {
+.orbeon #xforms-form col.xforms-disabled,
+.orbeon #xforms-form th.xforms-disabled,
+.orbeon #xforms-form td.xforms-disabled,
+.orbeon #xforms-form tr.xforms-disabled,
+.orbeon #xforms-form thead.xforms-disabled,
+.orbeon #xforms-form tbody.xforms-disabled,
+.orbeon #xforms-form tfoot.xforms-disabled {
   display: none;
 }
-#xforms-form br.xforms-disabled,
-#xforms-form br.xforms-case-deselected,
-#xforms-form .xforms-case-deselected br.xforms-case-selected {
+.orbeon #xforms-form br.xforms-disabled,
+.orbeon #xforms-form br.xforms-case-deselected,
+.orbeon #xforms-form .xforms-case-deselected br.xforms-case-selected {
   display: none;
 }
-#xforms-form .xforms-disabled a,
-#xforms-form a.xforms-disabled,
-#xforms-form .xforms-case-deselected a,
-#xforms-form a.xforms-case-deselected {
+.orbeon #xforms-form .xforms-disabled a,
+.orbeon #xforms-form a.xforms-disabled,
+.orbeon #xforms-form .xforms-case-deselected a,
+.orbeon #xforms-form a.xforms-case-deselected {
   /* Prevent links from being able to get the focus. See bug:
-           [ #315198 ] Non-relevant links and minimal triggers can get the focus
-           http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
+               [ #315198 ] Non-relevant links and minimal triggers can get the focus
+               http://forge.ow2.org/tracker/index.php?func=detail&aid=315198&group_id=168&atid=350207 */
 
   display: none;
 }
-#xforms-form .xforms-disabled input,
-#xforms-form .xforms-disabled select,
-#xforms-form .xforms-disabled button {
+.orbeon #xforms-form .xforms-disabled input,
+.orbeon #xforms-form .xforms-disabled select,
+.orbeon #xforms-form .xforms-disabled button {
   visibility: hidden;
 }
-#xforms-form .xforms-case-deselected input,
-#xforms-form .xforms-case-deselected select,
-#xforms-form .xforms-case-deselected button {
+.orbeon #xforms-form .xforms-case-deselected input,
+.orbeon #xforms-form .xforms-case-deselected select,
+.orbeon #xforms-form .xforms-case-deselected button {
   visibility: hidden;
 }
-#xforms-form tr.xforms-disabled,
-#xforms-form .xforms-disabled tr,
-#xforms-form th.xforms-disabled,
-#xforms-form .xforms-disabled th,
-#xforms-form td.xforms-disabled,
-#xforms-form .xforms-disabled td {
+.orbeon #xforms-form tr.xforms-disabled,
+.orbeon #xforms-form .xforms-disabled tr,
+.orbeon #xforms-form th.xforms-disabled,
+.orbeon #xforms-form .xforms-disabled th,
+.orbeon #xforms-form td.xforms-disabled,
+.orbeon #xforms-form .xforms-disabled td {
   border-style: none ! important;
 }
-#xforms-repeat-tree,
-#xforms-repeat-indexes {
+.orbeon #xforms-repeat-tree,
+.orbeon #xforms-repeat-indexes {
   display: none;
 }
-/**
- * XForms switch/case
- * http://wiki.orbeon.com/forms/doc/contributor-guide/xforms-switch-case
- */
-.xforms-case-selected {
+.orbeon .xforms-case-selected {
   position: static;
 }
-/* ***** Label, hint, help, alert *********************************************************************************** */
-.xforms-hint {
+.orbeon .xforms-hint {
   display: none;
 }
-.xforms-help {
+.orbeon .xforms-help {
   display: none;
 }
-.xforms-help-image {
+.orbeon .xforms-help-image {
   display: -moz-inline-box;
   display: inline-block;
   margin-left: 0;
@@ -113,8 +126,8 @@
   background-repeat: no-repeat;
   background-position: left bottom;
 }
-.xforms-alert-inactive,
-.xforms-alert-active {
+.orbeon .xforms-alert-inactive,
+.orbeon .xforms-alert-active {
   display: -moz-inline-box;
   display: inline-block;
   white-space: nowrap;
@@ -126,137 +139,136 @@
   margin-left: .25em;
   vertical-align: middle;
 }
-.xforms-alert-active {
+.orbeon .xforms-alert-active {
   background-image: url(../../ops/images/xforms/exclamation.png);
   background-repeat: no-repeat;
   background-position: left center;
 }
-/* ***** Controls *********************************************************************************** */
-.xforms-static {
+.orbeon .xforms-static {
   border: none;
 }
-.xforms-output {
+.orbeon .xforms-output {
   display: inline;
 }
-.xforms-trigger-appearance-minimal img,
-.xforms-submit-appearance-minimal img {
+.orbeon .xforms-trigger-appearance-minimal img,
+.orbeon .xforms-submit-appearance-minimal img {
   border: 0;
 }
-.xforms-trigger-appearance-xxforms-minimal button,
-.xforms-submit-appearance-xxforms-minimal button {
+.orbeon .xforms-trigger-appearance-xxforms-minimal button,
+.orbeon .xforms-submit-appearance-xxforms-minimal button {
   border: none;
   background: transparent;
   cursor: hand;
   *width: auto;
   *overflow: visible;
 }
-button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner,
-.xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner {
+.orbeon button.xforms-trigger-appearance-xxforms-minimal::-moz-focus-inner,
+.orbeon .xforms-trigger-appearance-xxforms-minimal button::-moz-focus-inner {
   border: 0;
   padding: 0;
 }
-.xforms-input input.xforms-type-date {
+.orbeon .xforms-input input.xforms-type-date {
   width: 8em;
   padding-right: 16px;
   background-image: url(../../ops/images/xforms/calendar.png);
   background-position: right center;
   background-repeat: no-repeat;
 }
-.xforms-ios .xforms-input input.xforms-type-date {
+.orbeon .xforms-ios .xforms-input input.xforms-type-date {
   width: initial;
   padding-right: initial;
   background-image: initial;
   background-position: initial;
   background-repeat: initial;
 }
-.xforms-type-date img {
+.orbeon .xforms-type-date img {
   vertical-align: middle;
   padding-left: .2em;
 }
-.xforms-readonly img.xforms-type-date {
+.orbeon .xforms-readonly img.xforms-type-date {
   display: none;
 }
-.xforms-input input.xforms-type-time {
+.orbeon .xforms-input input.xforms-type-time {
   width: 8em;
   padding-right: 16px;
   background-image: url(../../ops/images/xforms/clock.png);
   background-position: right center;
   background-repeat: no-repeat;
 }
-.xforms-ios .xforms-input input.xforms-type-time {
+.orbeon .xforms-ios .xforms-input input.xforms-type-time {
   width: initial;
   padding-right: initial;
   background-image: initial;
   background-position: initial;
   background-repeat: initial;
 }
-.xforms-type-dateTime input.xforms-type-date {
+.orbeon .xforms-type-dateTime input.xforms-type-date {
   margin-right: 1em;
 }
-.xforms-input input {
+.orbeon .xforms-input input {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.xforms-placeholder input {
+.orbeon .xforms-placeholder input {
   color: #bbb;
 }
-.xforms-form .xforms-textarea textarea {
+.orbeon .xforms-form .xforms-textarea textarea {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
   font-family: Arial, Helvetica, Geneva, sans-serif;
   -webkit-overflow-scrolling: touch;
 }
-.xforms-secret input {
+.orbeon .xforms-secret input {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
-.xforms-textarea-appearance-xxforms-autosize textarea {
+.orbeon .xforms-textarea-appearance-xxforms-autosize textarea {
   width: 100%;
   overflow: hidden;
 }
-.xforms-mediatype-text-html textarea {
+.orbeon .xforms-mediatype-text-html textarea {
   width: 550px;
   height: 300px;
 }
-.xforms-select1-appearance-full label {
+.orbeon .xforms-select1-appearance-full label {
   vertical-align: middle;
   margin-right: 0.5em;
 }
-fieldset.xforms-select1-appearance-full {
+.orbeon fieldset.xforms-select1-appearance-full {
   margin: 0;
   border: none;
 }
-.xforms-select-appearance-full input {
+.orbeon .xforms-select-appearance-full input {
   vertical-align: middle;
 }
-.xforms-select-appearance-full label {
+.orbeon .xforms-select-appearance-full label {
   vertical-align: middle;
   margin-right: 0.5em;
 }
-fieldset.xforms-select-appearance-full {
+.orbeon fieldset.xforms-select-appearance-full {
   margin: 0;
   border: none;
 }
-.xforms-dialog .bd {
+.orbeon .xforms-dialog .bd {
   overflow: auto;
 }
-.xforms-group-appearance-xxforms-fieldset {
+.orbeon .xforms-group-appearance-xxforms-fieldset {
   padding-left: 1em;
   padding-right: 1em;
   padding-top: 0;
   padding-bottom: 0;
 }
-.xforms-range-background {
+.orbeon .xforms-range-background {
   position: relative;
   background: url(../../ops/images/xforms/slider-horizontal-background.png) no-repeat;
   height: 26px;
   width: 218px;
   z-index: 5;
 }
-.xforms-range-thumb {
+.orbeon .xforms-range-thumb {
   position: absolute;
   left: 0;
   top: 8px;
@@ -265,69 +277,69 @@ fieldset.xforms-select-appearance-full {
   height: 20px;
   background: url(../../ops/images/xforms/slider-horizontal-thumb.png) no-repeat;
 }
-.xforms-upload-state-empty .xforms-upload-info {
+.orbeon .xforms-upload-state-empty .xforms-upload-info {
   display: none;
 }
-.xforms-upload-state-empty .xforms-upload-progress {
+.orbeon .xforms-upload-state-empty .xforms-upload-progress {
   display: none;
 }
-.xforms-upload-state-progress .xforms-upload-select {
+.orbeon .xforms-upload-state-progress .xforms-upload-select {
   display: none;
 }
-.xforms-upload-state-progress .xforms-upload-info {
+.orbeon .xforms-upload-state-progress .xforms-upload-info {
   display: none;
 }
-.xforms-upload-state-file .xforms-upload-select {
+.orbeon .xforms-upload-state-file .xforms-upload-select {
   display: none;
 }
-.xforms-upload-state-file .xforms-upload-progress {
+.orbeon .xforms-upload-state-file .xforms-upload-progress {
   display: none;
 }
-.xforms-upload-mediatype {
+.orbeon .xforms-upload-mediatype {
   display: none;
 }
-.xforms-upload-size {
+.orbeon .xforms-upload-size {
   padding-left: .5em;
 }
-.xforms-upload-remove {
+.orbeon .xforms-upload-remove {
   vertical-align: -20%;
   padding-left: .5em;
   cursor: pointer;
 }
-.xforms-upload-progress .yui-pb,
-.xforms-upload-progress .xforms-upload-cancel {
+.orbeon .xforms-upload-progress .yui-pb,
+.orbeon .xforms-upload-progress .xforms-upload-cancel {
   vertical-align: middle;
 }
-.xforms-upload-progress .xforms-upload-cancel {
+.orbeon .xforms-upload-progress .xforms-upload-cancel {
   padding-left: 0.5em;
 }
-.xforms-upload-progress .yui-pb {
+.orbeon .xforms-upload-progress .yui-pb {
   display: inline-block;
   *display: inline;
   *zoom: 1;
 }
-.xforms-readonly .xforms-upload-remove {
+.orbeon .xforms-readonly .xforms-upload-remove {
   display: none;
 }
-.xforms-trigger button img,
-.xforms-trigger button span {
+.orbeon .xforms-trigger button img,
+.orbeon .xforms-trigger button span {
   vertical-align: middle;
 }
-.xforms-submit button img,
-.xforms-submit button span {
+.orbeon .xforms-submit button img,
+.orbeon .xforms-submit button span {
   vertical-align: middle;
 }
-.xforms-trigger-readonly a {
+.orbeon .xforms-trigger-readonly a {
   color: gray;
   cursor: default;
 }
-#orbeon-calendar-div .yui-calendar .calheader {
+.orbeon #orbeon-calendar-div .yui-calendar .calheader {
   padding-top: .3em;
 }
-#orbeon-calendar-div .yui-calendar .calnavleft {
+.orbeon #orbeon-calendar-div .yui-calendar .calnavleft {
   top: 7px;
 }
-#orbeon-calendar-div .yui-calendar .calyearleft {
+.orbeon #orbeon-calendar-div .yui-calendar .calyearleft {
   overflow: hidden;
   position: absolute;
   text-indent: -10000em;
@@ -341,10 +353,10 @@ fieldset.xforms-select-appearance-full {
   top: -7px;
   width: 25px;
 }
-#orbeon-calendar-div .yui-calendar .calnavright {
+.orbeon #orbeon-calendar-div .yui-calendar .calnavright {
   top: 7px;
 }
-#orbeon-calendar-div .yui-calendar .calyearright {
+.orbeon #orbeon-calendar-div .yui-calendar .calyearright {
   overflow: hidden;
   position: absolute;
   text-indent: -10000em;
@@ -358,32 +370,31 @@ fieldset.xforms-select-appearance-full {
   top: -7px;
   width: 25px;
 }
-.yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
+.orbeon .yui-skin-sam .xforms-select1-appearance-xxforms-menu .yuimenubaritemlabel {
   border: 0;
   padding-top: 2px;
   padding-bottom: 2px;
 }
-.yui-tt-shadow {
+.orbeon .yui-tt-shadow {
   display: none;
 }
-/* ***** Indicators and messages ************************************************************************************ */
-.xforms-loading-loading {
+.orbeon .xforms-loading-loading {
   background-color: #c44;
   color: #fff;
   padding: 2px;
   position: absolute;
   right: 2em;
 }
-.xforms-loading-none {
+.orbeon .xforms-loading-none {
   display: block;
   height: 0;
 }
-div.xforms-modal-progress {
+.orbeon div.xforms-modal-progress {
   width: 40px;
   height: 40px;
   background-image: url(../../ops/images/xforms/processing.gif);
 }
-.xforms-error-panel .bd {
+.orbeon .xforms-error-panel .bd {
   background-image: url(../../ops/images/xforms/warning_64.png);
   background-position: 20px 20px;
   background-repeat: no-repeat;
@@ -391,39 +402,39 @@ div.xforms-modal-progress {
   overflow: auto;
   background-color: white;
 }
-.xforms-error-panel {
+.orbeon .xforms-error-panel {
   width: 500px;
 }
-.xforms-error-panel .hd {
+.orbeon .xforms-error-panel .hd {
   background-color: #FF6600;
 }
-.xforms-error-panel .xforms-error-panel-details-hidden,
-.xforms-error-panel .xforms-error-panel-details-shown {
+.orbeon .xforms-error-panel .xforms-error-panel-details-hidden,
+.orbeon .xforms-error-panel .xforms-error-panel-details-shown {
   vertical-align: middle;
 }
-.xforms-error-panel .xforms-error-panel-show-details,
-.xforms-error-panel .xforms-error-panel-hide-details,
-.xforms-error-panel .xforms-error-panel-close,
-.xforms-error-panel .xforms-error-panel-reload {
+.orbeon .xforms-error-panel .xforms-error-panel-show-details,
+.orbeon .xforms-error-panel .xforms-error-panel-hide-details,
+.orbeon .xforms-error-panel .xforms-error-panel-close,
+.orbeon .xforms-error-panel .xforms-error-panel-reload {
   cursor: pointer;
 }
-.xforms-noscript .xforms-error-panel {
+.orbeon .xforms-noscript .xforms-error-panel {
   margin: auto;
 }
-.xforms-help-panel {
+.orbeon .xforms-help-panel {
   width: 300px;
 }
-.xforms-help-panel .xforms-help-panel-close {
+.orbeon .xforms-help-panel .xforms-help-panel-close {
   text-align: right;
 }
-.xforms-noscript-panel {
+.orbeon .xforms-noscript-panel {
   display: block;
   border: 4px solid #FF6600;
   width: auto;
   margin: 1em;
   padding: .5em;
 }
-.xforms-debug {
+.orbeon .xforms-debug {
   background-color: #fc9;
   position: absolute;
   -moz-opacity: 0.5;
@@ -432,61 +443,58 @@ div.xforms-modal-progress {
   border: 1px solid red;
   font-size: 11px;
 }
-.xforms-message {
+.orbeon .xforms-message {
   list-style: disc;
   display: list-item;
   margin-left: 2em;
 }
-#wait .bd {
+.orbeon #wait .bd {
   background-color: #ffffff;
 }
-/* ***** Tree ******************************************************************************************************* */
-/* Fix for Firefox issue when clicking on the first "-" in span mode
-   http://forge.ow2.org/tracker/index.php?func=detail&aid=314833&group_id=168&atid=350207 */
-.xforms-select1-appearance-xxforms-tree,
-.xforms-select-appearance-xxforms-tree {
+.orbeon .xforms-select1-appearance-xxforms-tree,
+.orbeon .xforms-select-appearance-xxforms-tree {
   display: block;
 }
-.xforms-form .ygtvcontent .xforms-tree-label-selected,
-.xforms-form .ygtvcontent .xforms-tree-label-selected:hover {
+.orbeon .xforms-form .ygtvcontent .xforms-tree-label-selected,
+.orbeon .xforms-form .ygtvcontent .xforms-tree-label-selected:hover {
   background-color: #ffff66;
 }
-.ygtvfocus .ygtvlabel,
-.ygtvfocus .ygtvlabel:hover {
+.orbeon .ygtvfocus .ygtvlabel,
+.orbeon .ygtvfocus .ygtvlabel:hover {
   background-color: transparent;
 }
-a.ygtvlabel {
+.orbeon a.ygtvlabel {
   cursor: pointer;
 }
-.ygtvfocus {
+.orbeon .ygtvfocus {
   background-color: transparent;
 }
-.xforms-select-appearance-xxforms-tree table,
-xforms-select1-appearance-xxforms-tree table {
+.orbeon .xforms-select-appearance-xxforms-tree table,
+.orbeon xforms-select1-appearance-xxforms-tree table {
   margin: 0;
 }
-#xforms-form .xforms-width-2em input.xforms-input-input,
-#xforms-form .xforms-width-2em select {
+.orbeon #xforms-form .xforms-width-2em input.xforms-input-input,
+.orbeon #xforms-form .xforms-width-2em select {
   width: 2em;
 }
-#xforms-form .xforms-width-3em input.xforms-input-input,
-#xforms-form .xforms-width-3em select {
+.orbeon #xforms-form .xforms-width-3em input.xforms-input-input,
+.orbeon #xforms-form .xforms-width-3em select {
   width: 3em;
 }
-#xforms-form .xforms-width-5em input.xforms-input-input,
-#xforms-form .xforms-width-5em select {
+.orbeon #xforms-form .xforms-width-5em input.xforms-input-input,
+.orbeon #xforms-form .xforms-width-5em select {
   width: 5em;
 }
-#xforms-form .xforms-width-7em input.xforms-input-input,
-#xforms-form .xforms-width-7em select {
+.orbeon #xforms-form .xforms-width-7em input.xforms-input-input,
+.orbeon #xforms-form .xforms-width-7em select {
   width: 7em;
 }
-#xforms-form .xforms-width-10em input.xforms-input-input,
-#xforms-form .xforms-width-10em select {
+.orbeon #xforms-form .xforms-width-10em input.xforms-input-input,
+.orbeon #xforms-form .xforms-width-10em select {
   width: 10em;
 }
-#xforms-form .xforms-width-15em input.xforms-input-input,
-#xforms-form .xforms-width-15em select {
+.orbeon #xforms-form .xforms-width-15em input.xforms-input-input,
+.orbeon #xforms-form .xforms-width-15em select {
   width: 15em;
 }
 @media print {

@@ -11,52 +11,56 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.fr-summary-search,
-.fr-summary-table-div,
-.fr-summary-search-count {
+.orbeon {
+  /* With IE 6/7, legend and overflow don't behave */
+
+}
+.orbeon .fr-summary-search,
+.orbeon .fr-summary-table-div,
+.orbeon .fr-summary-search-count {
   display: block;
   margin: 10px 0;
 }
-.fr-summary-search .fr-search-free {
+.orbeon .fr-summary-search .fr-search-free {
   display: inline-block;
 }
-.fr-summary-search .fr-search-free input {
+.orbeon .fr-summary-search .fr-search-free input {
   width: 25em;
 }
-.fr-summary-search .fr-search-options {
+.orbeon .fr-summary-search .fr-search-options {
   display: block;
 }
-.fr-summary-search .fr-search-options .fr-summary-search-item {
+.orbeon .fr-summary-search .fr-search-options .fr-summary-search-item {
   display: inline-block;
   margin-bottom: 10px;
 }
-.fr-summary-search .fr-search-options .fr-summary-search-item input,
-.fr-summary-search .fr-search-options .fr-summary-search-item select {
+.orbeon .fr-summary-search .fr-search-options .fr-summary-search-item input,
+.orbeon .fr-summary-search .fr-search-options .fr-summary-search-item select {
   width: 12em;
 }
-.fr-summary-search .fr-search-buttons {
+.orbeon .fr-summary-search .fr-search-buttons {
   display: inline-block;
 }
-.fr-summary-table-div {
+.orbeon .fr-summary-table-div {
   overflow: auto;
   background: white;
 }
-.fr-summary-table-div table {
+.orbeon .fr-summary-table-div table {
   margin-bottom: 0;
   max-width: none;
 }
-.fr-summary-table-div tbody a {
+.orbeon .fr-summary-table-div tbody a {
   text-decoration: none;
   color: black;
   outline: 0;
 }
-.fr-summary-table-div tbody span {
+.orbeon .fr-summary-table-div tbody span {
   color: black;
 }
-.fr-summary-table-div td {
+.orbeon .fr-summary-table-div td {
   white-space: nowrap;
 }
-.fr-summary-table-div td a {
+.orbeon .fr-summary-table-div td a {
   width: 100%;
   display: -moz-inline-box;
   display: inline-block;
@@ -64,43 +68,42 @@
   *display: inline;
   vertical-align: middle;
 }
-.fr-summary-table-div th {
+.orbeon .fr-summary-table-div th {
   white-space: nowrap;
 }
-.fr-summary-table-div .fr-summary-repeat-selection-checkbox .xforms-select input {
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox .xforms-select input {
   float: none;
 }
-.fr-summary-table-div .fr-summary-repeat-selection-checkbox label {
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox label {
   margin: 0;
   padding: 0;
   text-indent: 0;
 }
-.fr-summary-table-div .fr-summary-repeat-selection-checkbox label input {
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox label input {
   margin: 0;
 }
-.fr-summary-table-div .fr-summary-repeat-column-number {
+.orbeon .fr-summary-table-div .fr-summary-repeat-column-number {
   text-align: right;
   width: 3em;
 }
-/* With IE 6/7, legend and overflow don't behave */
-.xforms-noscript .fr-summary-table-div td legend {
+.orbeon .xforms-noscript .fr-summary-table-div td legend {
   display: none;
 }
-.xforms-noscript .fr-summary-table-div td .datatable-cell-content {
+.orbeon .xforms-noscript .fr-summary-table-div td .datatable-cell-content {
   overflow: visible;
 }
-.pagination {
+.orbeon .pagination {
   margin-top: 0;
   margin-bottom: 0;
   float: left;
 }
-.fr-buttons {
+.orbeon .fr-buttons {
   display: block;
   float: right;
   margin-top: 7px;
   margin-bottom: 0;
 }
-.xforms-readonly input {
+.orbeon .xforms-readonly input {
   background-color: white;
   background-image: none;
   border: 0 solid #ffffff;

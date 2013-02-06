@@ -2,6 +2,7 @@
 
 /* Grey out text */
 .yui-skin-sam .xbl-fr-tabview .yui-nav .disabled a { color: #A3A3A3 }
+
 /* Don't highlight background */
 .yui-skin-sam .xbl-fr-tabview .yui-nav .disabled a:hover {
     background:url("../../../ops/yui/assets/skins/sam/sprite.png") repeat-x scroll 0 0 #D8D8D8;
@@ -9,3 +10,6 @@
 
 /* Make content of non-visible tab really hidden, to avoid peek-a-boo issues on IE */
 .xbl-fr-tabview .yui-hidden { display: none }
+
+/* Override Bootstrap */
+.xbl-fr-tabview ul.yui-nav { margin: 0 }

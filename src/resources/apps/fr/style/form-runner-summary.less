@@ -13,101 +13,103 @@
  */
 @spacing: 10px; // same as .fr-border
 
-.fr-summary-search, .fr-summary-table-div, .fr-summary-search-count {
-    display: block;
-    margin: @spacing 0;   // use margin so we have margin collapsing
-}
-
-.fr-summary-search {
-
-    .fr-search-free {
-        display: inline-block;
-
-        input {
-            width: 25em;
-        }
+.orbeon {
+    .fr-summary-search, .fr-summary-table-div, .fr-summary-search-count {
+        display: block;
+        margin: @spacing 0;   // use margin so we have margin collapsing
     }
 
-    .fr-search-options {
-        display: block; // so that search buttons will always be underneath
+    .fr-summary-search {
 
-        .fr-summary-search-item {
+        .fr-search-free {
             display: inline-block;
-            margin-bottom: @spacing;
 
-            input, select {
-                width: 12em;
+            input {
+                width: 25em;
             }
         }
+
+        .fr-search-options {
+            display: block; // so that search buttons will always be underneath
+
+            .fr-summary-search-item {
+                display: inline-block;
+                margin-bottom: @spacing;
+
+                input, select {
+                    width: 12em;
+                }
+            }
+        }
+
+        .fr-search-buttons {
+            display: inline-block;  // will be next to free search, but under search items
+        }
     }
 
-    .fr-search-buttons {
-        display: inline-block;  // will be next to free search, but under search items
+    .fr-summary-table-div {
+
+        overflow: auto;
+        background: white;
+
+        table {
+            margin-bottom: 0;
+            max-width: none;                                        // Because table can scrolls beyond size of container
+        }
+
+        tbody {
+            a { text-decoration: none; color: black; outline: 0 }   // Links in table must appear as normal text
+            span { color: black;  }                                 // When there is no link (delete-only), override YUI CSS that shows current row text in white
+        }
+
+        td {
+            white-space: nowrap;                                    // Mainly to prevent dates from wrapping
+            a {                                                     // Link to take as much space as possible in the cell
+                width: 100%;
+                display: -moz-inline-box;
+                display: inline-block;
+                *zoom: 1;
+                *display: inline;
+                vertical-align: middle;
+            }
+        }
+
+        th {
+            white-space: nowrap;
+        }
+
+        .fr-summary-repeat-selection-checkbox {
+            .xforms-select input { float: none }                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
+            label {
+                margin: 0;
+                padding: 0;
+                text-indent: 0;
+                input { margin: 0}
+            }
+        }
+
+        .fr-summary-repeat-column-number { text-align: right; width: 3em }
+
     }
-}
 
-.fr-summary-table-div {
+    /* With IE 6/7, legend and overflow don't behave */
+    .xforms-noscript .fr-summary-table-div td  {
+        legend { display: none }
+        .datatable-cell-content { overflow: visible }
+    }
 
-    overflow: auto;
-    background: white;
-
-    table {
+    .pagination {
+        margin-top: 0;
         margin-bottom: 0;
-        max-width: none;                                        // Because table can scrolls beyond size of container
+        float: left;
     }
 
-    tbody {
-        a { text-decoration: none; color: black; outline: 0 }   // Links in table must appear as normal text
-        span { color: black;  }                                 // When there is no link (delete-only), override YUI CSS that shows current row text in white
+    .fr-buttons {
+        display: block;
+        float: right;
+        margin-top: 7px;
+        margin-bottom: 0;
     }
 
-    td {
-        white-space: nowrap;                                    // Mainly to prevent dates from wrapping
-        a {                                                     // Link to take as much space as possible in the cell
-            width: 100%;
-            display: -moz-inline-box;
-            display: inline-block;
-            *zoom: 1;
-            *display: inline;
-            vertical-align: middle;
-        }
-    }
-
-    th {
-        white-space: nowrap;
-    }
-
-    .fr-summary-repeat-selection-checkbox {
-        .xforms-select input { float: none }                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
-        label {
-            margin: 0;
-            padding: 0;
-            text-indent: 0;
-            input { margin: 0}
-        }
-    }
-
-    .fr-summary-repeat-column-number { text-align: right; width: 3em }
-
+    .xforms-readonly input { background-color: white; background-image: none; border: 0 solid white }
 }
-
-/* With IE 6/7, legend and overflow don't behave */
-.xforms-noscript .fr-summary-table-div td  {
-    legend { display: none }
-    .datatable-cell-content { overflow: visible }
-}
-
-.pagination {
-    margin-top: 0;
-    margin-bottom: 0;
-    float: left;
-}
-
-.fr-buttons {
-    display: block;
-    float: right;
-    margin-top: 7px;
-    margin-bottom: 0;
-}
-
-.xforms-readonly input { background-color: white; background-image: none; border: 0 solid white }

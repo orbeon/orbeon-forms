@@ -75,6 +75,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 final boolean isHTMLMediaType = "text/html".equals(attributes.getValue("mediatype"));
 
                 // Use <pre> in text/plain so that spaces are kept by the serializer
+                // NOTE: Another option would be to transform the text to output &nbsp; and <br/> instead.
                 final String containerName = isHTMLMediaType ? "span" : "pre";
                 final String containerQName = XMLUtils.buildQName(xhtmlPrefix, containerName);
 

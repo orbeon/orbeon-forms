@@ -47,7 +47,7 @@
         </metadata>
         <xbl:resources>
             <xbl:style>
-                .xbl-fr-date-picker .fr-component-group img { vertical-align: bottom }
+                .xbl-fr-date-picker .fr-component-group img { vertical-align: middle; margin-top: -4px; margin-left: 4px }
                 .xbl-fr-date-picker .xforms-readonly .xforms-input { display: none }
             </xbl:style>
         </xbl:resources>

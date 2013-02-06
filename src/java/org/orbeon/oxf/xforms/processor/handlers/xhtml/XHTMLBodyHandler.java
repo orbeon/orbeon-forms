@@ -102,7 +102,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getFormId(containingDocument),
                 // Regular classes
-                "class", "xforms-form" + (handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden") + " xforms-layout-span",
+                "class", "xforms-form" + (handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden"),
                 // Submission parameters
                 "action", xformsSubmissionPath, "method", "POST",
                 // In noscript mode, don't add event handler

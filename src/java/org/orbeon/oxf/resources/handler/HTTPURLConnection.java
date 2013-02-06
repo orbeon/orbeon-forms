@@ -89,7 +89,7 @@ public class HTTPURLConnection extends URLConnection {
         final HttpConnectionParamBean paramBean = new HttpConnectionParamBean(basicHttpParams);
         final PropertySet propertySet = Properties.instance().getPropertySet();
         paramBean.setStaleCheckingEnabled(propertySet.getBoolean(STALE_CHECKING_ENABLED_PROPERTY, true));
-        paramBean.setSocketBufferSize(propertySet.getInteger(SO_TIMEOUT_PROPERTY, 0));
+        paramBean.setSoTimeout(propertySet.getInteger(SO_TIMEOUT_PROPERTY, 0));
 
         // Create SSL context, based on a custom key store if specified
         final SSLContext sslcontext;

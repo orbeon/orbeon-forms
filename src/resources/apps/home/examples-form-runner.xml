@@ -30,20 +30,19 @@
         This sample form is based on a real-life California DMV form. It shows data capture and validation, repeating sections,
         and generating great-looking PDF from templates.
     </example>
-    <example title="W-9 Form" href="/fr/orbeon/w9/edit/4a83b4cf2b905fbe105d7e57ddc5597b5e78c0a3" img="/home/images/form-w9-small.jpg" size="8"
+    <example title="W-9 Form" href="/fr/orbeon/w9/edit/4a83b4cf2b905fbe105d7e57ddc5597b5e78c0a3" img="/home/images/form-w9-small.jpg" size="4"
              source="http://www.flickr.com/photos/68751915@N05/6355404323/">
-        This sample form is also based on a real-life US form, "US Request for Taxpayer Identification Number and
-        Certification". It uses the wizard view, shows and hides controls depending on conditions, and fills-out a PDF
+        This sample form is also based on a real-life US form. It uses the wizard view, shows and hides controls depending on conditions, and fills-out a PDF
         from a template.
     </example>
-    <example title="Controls Form" href="/fr/orbeon/controls/new" img="/home/images/form-controls-small.jpg" size="8"
+    <example title="Controls Form" href="/fr/orbeon/controls/new" img="/home/images/form-controls-small.jpg" size="4"
              source="http://www.flickr.com/photos/andreajoseph/2249951011/">
-        This sample forms showcases, in one single form, all the form controls available out of the box in
+        This sample form showcases all the form controls available out of the box in
         Form Builder. It also uses the wizard view to present a form as a series of separate pages.
     </example>
     <example title="Contact Form" href="/fr/orbeon/contact/summary" img="/home/images/form-contact-small.jpg" size="4"
              source="http://www.flickr.com/photos/kt/32660952/">
-        This simple form can be entirely created in about 10
+        This sample form can be entirely created in about 10
         minutes as shown in the <xh:a href="http://www.orbeon.com/forms/screencast/form-builder">Form Builder screencast</xh:a>.
     </example>
     <banner>

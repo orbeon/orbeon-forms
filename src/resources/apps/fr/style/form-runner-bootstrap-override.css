@@ -184,6 +184,21 @@ body.orbeon {
   line-height: inherit;
   font-size: 14.3px;
 }
+.orbeon form.xforms-form .fr-grid .xforms-textarea.xforms-static pre,
+.orbeon form.xforms-form .fr-grid .xforms-mediatype-text-html.xforms-static {
+  color: #333333;
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 20px;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+}
 .orbeon form.xforms-form .nav > li > span > a {
   display: block;
 }

@@ -42,7 +42,9 @@
 
     <xsl:template match="xh:body">
         <xsl:copy>
-            <xh:div class="container{if (@class) then concat(' ', @class) else ''}">
+            <xsl:apply-templates select="@* except @class"/>
+            <xsl:attribute name="class" select="string-join(('orbeon', @class), ' ')"/>
+            <xh:div class="container">
                 <xh:div class="navbar navbar-inverse">
                     <xh:div class="navbar-inner">
                         <xh:div class="container">
@@ -53,7 +55,7 @@
                         </xh:div>
                     </xh:div>
                 </xh:div>
-                <xsl:apply-templates select="(@* except @class)|node()"/>
+                <xsl:apply-templates select="node()"/>
             </xh:div>
         </xsl:copy>
     </xsl:template>

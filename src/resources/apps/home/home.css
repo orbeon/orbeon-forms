@@ -25,26 +25,26 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-body {
+body.orbeon {
   background-color: #f3f3f3 !important;
 }
-body .thumbnails li {
+.orbeon ul.thumbnails li {
   margin: 0 0 18px 18px;
   background-color: white;
   font-family: "ff-meta-serif-web-pro", Georgia, Cambria, "Times New Roman", Times, serif;
   padding: 0;
 }
-body .thumbnails li.span4,
-body .thumbnails li.span8 {
+.orbeon ul.thumbnails li.span4,
+.orbeon ul.thumbnails li.span8 {
   height: 412px;
 }
-body .thumbnails li a {
+.orbeon ul.thumbnails li a {
   text-decoration: none;
 }
-body .thumbnails li a img {
+.orbeon ul.thumbnails li a img {
   height: 230px;
 }
-body .thumbnails li a h2 {
+.orbeon ul.thumbnails li a h2 {
   font-size: 20px;
   line-height: 25px;
   font-weight: 700;
@@ -52,17 +52,17 @@ body .thumbnails li a h2 {
   margin: 0;
   padding-top: 24px;
 }
-body .thumbnails li h2,
-body .thumbnails li p {
+.orbeon ul.thumbnails li h2,
+.orbeon ul.thumbnails li p {
   padding-left: 30px;
   padding-right: 30px;
 }
-body .thumbnails li p {
+.orbeon ul.thumbnails li p {
   padding-top: 6px;
   font-size: 15px;
   line-height: 21px;
   color: #666;
 }
-body .thumbnails li.span12 {
+.orbeon ul.thumbnails li.span12 {
   padding: 4px 0 0 0;
 }

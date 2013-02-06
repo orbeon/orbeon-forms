@@ -27,7 +27,7 @@
                                             else '[Untitled]'" as="xs:string"/>
 
     <xsl:template match="/">
-        <xh:div class="orbeon-portlet-div">
+        <xh:div class="orbeon orbeon-portlet-div">
             <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
             <xsl:variable name="classes-to-copy" select="p:classes(/xh:html/xh:body)[matches(., '^xforms-disable-[^-]+-as-tooltip$')]"/>
             <xsl:if test="exists($classes-to-copy)">

@@ -48,19 +48,26 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-body,
-label,
-button,
-.btn {
+body.orbeon {
+  margin: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  line-height: 20px;
+  color: #333333;
+  background-color: #ffffff;
+}
+.orbeon label,
+.orbeon button,
+.orbeon .btn {
   font-size: 13px;
 }
-a {
+.orbeon a {
   text-decoration: underline;
 }
-.navbar-inverse {
+.orbeon .navbar-inverse {
   margin: 10px 0;
 }
-.navbar-inverse .navbar-inner {
+.orbeon .navbar-inverse .navbar-inner {
   background-color: #414141;
   background-image: -moz-linear-gradient(top, #555555, #222222);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#555555), to(#222222));
@@ -71,17 +78,17 @@ a {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff555555', endColorstr='#ff222222', GradientType=0);
   border: none;
 }
-.navbar-inverse .navbar-inner .container {
+.orbeon .navbar-inverse .navbar-inner .container {
   line-height: 40px;
 }
-.navbar-inverse .navbar-inner .container img,
-.navbar-inverse .navbar-inner .container h1 {
+.orbeon .navbar-inverse .navbar-inner .container img,
+.orbeon .navbar-inverse .navbar-inner .container h1 {
   vertical-align: middle;
 }
-.navbar-inverse .navbar-inner .container img {
+.orbeon .navbar-inverse .navbar-inner .container img {
   max-height: 40px;
 }
-.navbar-inverse .navbar-inner .container h1 {
+.orbeon .navbar-inverse .navbar-inner .container h1 {
   margin: 0 0 0 15px;
   padding: 0;
   font-size: 16px;
@@ -91,27 +98,27 @@ a {
   text-decoration: none;
   display: inline;
 }
-form.xforms-form {
+.orbeon form.xforms-form {
   float: none;
   margin: 0;
 }
-form.xforms-form select,
-form.xforms-form textarea,
-form.xforms-form input[type="text"],
-form.xforms-form input[type="password"],
-form.xforms-form input[type="datetime"],
-form.xforms-form input[type="datetime-local"],
-form.xforms-form input[type="date"],
-form.xforms-form input[type="month"],
-form.xforms-form input[type="time"],
-form.xforms-form input[type="week"],
-form.xforms-form input[type="number"],
-form.xforms-form input[type="email"],
-form.xforms-form input[type="url"],
-form.xforms-form input[type="search"],
-form.xforms-form input[type="tel"],
-form.xforms-form input[type="color"],
-form.xforms-form .uneditable-input {
+.orbeon form.xforms-form select,
+.orbeon form.xforms-form textarea,
+.orbeon form.xforms-form input[type="text"],
+.orbeon form.xforms-form input[type="password"],
+.orbeon form.xforms-form input[type="datetime"],
+.orbeon form.xforms-form input[type="datetime-local"],
+.orbeon form.xforms-form input[type="date"],
+.orbeon form.xforms-form input[type="month"],
+.orbeon form.xforms-form input[type="time"],
+.orbeon form.xforms-form input[type="week"],
+.orbeon form.xforms-form input[type="number"],
+.orbeon form.xforms-form input[type="email"],
+.orbeon form.xforms-form input[type="url"],
+.orbeon form.xforms-form input[type="search"],
+.orbeon form.xforms-form input[type="tel"],
+.orbeon form.xforms-form input[type="color"],
+.orbeon form.xforms-form .uneditable-input {
   font-size: 13px;
   margin-bottom: 0;
   color: black;
@@ -122,87 +129,87 @@ form.xforms-form .uneditable-input {
   *height: 24px;
   *line-height: 24px;
 }
-form.xforms-form input[type="file"] {
+.orbeon form.xforms-form input[type="file"] {
   line-height: normal;
 }
-form.xforms-form textarea {
+.orbeon form.xforms-form textarea {
   height: 68px;
 }
-form.xforms-form label.radio,
-form.xforms-form label.checkbox {
+.orbeon form.xforms-form label.radio,
+.orbeon form.xforms-form label.checkbox {
   margin-bottom: 5px;
 }
-form.xforms-form label.radio input[type="radio"],
-form.xforms-form label.checkbox input[type="radio"],
-form.xforms-form label.radio input[type="checkbox"],
-form.xforms-form label.checkbox input[type="checkbox"] {
+.orbeon form.xforms-form label.radio input[type="radio"],
+.orbeon form.xforms-form label.checkbox input[type="radio"],
+.orbeon form.xforms-form label.radio input[type="checkbox"],
+.orbeon form.xforms-form label.checkbox input[type="checkbox"] {
   margin-top: 3px;
   *margin-top: 0;
   margin-top: 0px\9;
 }
-form.xforms-form select[multiple],
-form.xforms-form .xforms-select1-appearance-compact select,
-form.xforms-form .xforms-select-appearance-compact select {
+.orbeon form.xforms-form select[multiple],
+.orbeon form.xforms-form .xforms-select1-appearance-compact select,
+.orbeon form.xforms-form .xforms-select-appearance-compact select {
   height: 78px;
 }
-form.xforms-form .pagination ul > li > .xforms-trigger {
+.orbeon form.xforms-form .pagination ul > li > .xforms-trigger {
   cursor: pointer;
 }
-form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
+.orbeon form.xforms-form .pagination ul > li > .xforms-trigger.xforms-readonly {
   cursor: auto;
 }
-form.xforms-form .pagination ul > li a {
+.orbeon form.xforms-form .pagination ul > li a {
   text-decoration: none;
 }
-form.xforms-form .input-append .add-on,
-form.xforms-form .input-prepend .add-on {
+.orbeon form.xforms-form .input-append .add-on,
+.orbeon form.xforms-form .input-prepend .add-on {
   height: 18px;
   *margin-top: 1px;
   *height: 20px;
 }
-form.xforms-form .fr-grid tr th label {
+.orbeon form.xforms-form .fr-grid tr th label {
   margin: 0;
 }
-form.xforms-form .table {
+.orbeon form.xforms-form .table {
   margin: 0;
 }
-form.xforms-form table th {
+.orbeon form.xforms-form table th {
   font-weight: normal;
 }
-form.xforms-form fieldset {
+.orbeon form.xforms-form fieldset {
   padding-left: 0;
   padding-right: 0;
 }
-form.xforms-form fieldset > legend {
+.orbeon form.xforms-form fieldset > legend {
   line-height: inherit;
   font-size: 14.3px;
 }
-form.xforms-form .nav > li > span > a {
+.orbeon form.xforms-form .nav > li > span > a {
   display: block;
 }
-form.xforms-form .nav > li > span > a:hover {
+.orbeon form.xforms-form .nav > li > span > a:hover {
   text-decoration: none;
   background-color: #eeeeee;
 }
-form.xforms-form .nav-list > li > span > a,
-form.xforms-form .nav-list .nav-header {
+.orbeon form.xforms-form .nav-list > li > span > a,
+.orbeon form.xforms-form .nav-list .nav-header {
   margin-left: -15px;
   margin-right: -15px;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
-form.xforms-form .nav-list > li > span > a {
+.orbeon form.xforms-form .nav-list > li > span > a {
   padding: 3px 15px;
 }
-form.xforms-form .nav-list > .active > span > a,
-form.xforms-form .nav-list > .active > span > a:hover {
+.orbeon form.xforms-form .nav-list > .active > span > a,
+.orbeon form.xforms-form .nav-list > .active > span > a:hover {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
   background-color: #0088cc;
 }
-form.xforms-form .nav > .disabled > span > a {
+.orbeon form.xforms-form .nav > .disabled > span > a {
   color: #999999;
 }
-form.xforms-form .nav > .disabled > span > a:hover {
+.orbeon form.xforms-form .nav > .disabled > span > a:hover {
   text-decoration: none;
   background-color: transparent;
   cursor: default;

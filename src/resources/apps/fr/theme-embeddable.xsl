@@ -22,12 +22,10 @@
     xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
     <xsl:template match="/">
-        <xh:div class="orbeon-portlet-div">
+        <xh:div>
             <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
             <xsl:variable name="classes-to-copy" select="tokenize(/xh:html/xh:body/@class, '\s+')[matches(., '^xforms-disable-[^-]+-as-tooltip$')]"/>
-            <xsl:if test="exists($classes-to-copy)">
-                <xsl:attribute name="class" select="$classes-to-copy"/>
-            </xsl:if>
+            <xsl:attribute name="class" select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
             <!-- Handle head elements except scripts -->
             <xsl:for-each select="/xh:html/xh:head/(xh:meta | xh:link | xh:style)">
                 <xsl:element name="xh:{local-name()}" namespace="{namespace-uri()}">

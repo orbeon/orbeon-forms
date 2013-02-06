@@ -61,82 +61,99 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-.fr-status-icons {
+.orbeon {
+  /* ***** Utilities ************************************************************************************************** */
+
+  /* ***** Portlet reset *********************************************************************************************** */
+
+  /* ***** XForms Controls ******************************************************************************************** */
+
+  /* ***** General Layout ********************************************************************************************* */
+
+  /* ***** Repeats **************************************************************************************************** */
+
+  /* ***** Dialogs **************************************************************************************************** */
+
+  /* ***** Sections *************************************************************************************************** */
+
+  /* ***** Grids ****************************************************************************************************** */
+
+  /* ***** View, PDF, email ******************************************************************************************* */
+
+}
+.orbeon .fr-status-icons {
   display: inline;
 }
-.fr-status-icons img {
+.orbeon .fr-status-icons img {
   margin-left: 3px;
 }
-.fr-body {
+.orbeon .fr-body {
   display: block;
 }
-.fr-body h2 {
+.orbeon .fr-body h2 {
   margin-top: 0;
 }
-/* ***** Utilities ************************************************************************************************** */
-.fr-clear {
+.orbeon .fr-clear {
   clear: both;
 }
-.fr-clear-container {
+.orbeon .fr-clear-container {
   *zoom: 1;
 }
-.fr-clear-container:before,
-.fr-clear-container:after {
+.orbeon .fr-clear-container:before,
+.orbeon .fr-clear-container:after {
   display: table;
   content: "";
   line-height: 0;
 }
-.fr-clear-container:after {
+.orbeon .fr-clear-container:after {
   clear: both;
 }
-/* ***** Portlet reset *********************************************************************************************** */
-.orbeon-portlet-body {
+.orbeon .orbeon-portlet-body {
   font: 13px/1.231 arial, helvetica, clean, sans-serif;
   *font-size: small;
   *font: x-small;
 }
-/* ***** XForms Controls ******************************************************************************************** */
-.xforms-noscript .xforms-help-image {
+.orbeon .xforms-noscript .xforms-help-image {
   display: block;
   margin: 0 0 0 .5em;
 }
-.xforms-noscript .fr-section-title .fr-section-label button.btn-link {
+.orbeon .xforms-noscript .fr-section-title .fr-section-label button.btn-link {
   color: #555555;
   font-size: inherit;
   *font-size: 20px;
 }
-.xforms-noscript .fr-section-title .fr-section-label .xforms-help-image {
+.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help-image {
   display: inline;
 }
-.xforms-noscript .fr-section-title .fr-section-label .xforms-help {
+.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help {
   display: inline;
 }
-.xforms-noscript .fr-section-title .fr-section-label .xforms-help-anchor {
+.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help-anchor {
   display: none;
 }
-.xforms-noscript .xforms-help-panel {
+.orbeon .xforms-noscript .xforms-help-panel {
   display: block;
   width: auto;
   padding: 0 1em;
 }
-.xforms-noscript .xforms-help-panel .xforms-help-group {
+.orbeon .xforms-noscript .xforms-help-panel .xforms-help-group {
   margin: 0 0 0.5em;
 }
-.xforms-noscript .xforms-help-panel .xforms-label {
+.orbeon .xforms-noscript .xforms-help-panel .xforms-label {
   display: inline;
 }
-.xforms-noscript .xforms-help-panel .xforms-help-image {
+.orbeon .xforms-noscript .xforms-help-panel .xforms-help-image {
   display: none;
 }
-.xforms-noscript .fr-help-back {
+.orbeon .xforms-noscript .fr-help-back {
   margin-left: 0.5em;
 }
-.xforms-noscript .fr-mode-view .xforms-help-image,
-.xforms-noscript .fr-mode-pdf .xforms-help-image,
-.xforms-noscript .fr-mode-email .xforms-help-image {
+.orbeon .xforms-noscript .fr-mode-view .xforms-help-image,
+.orbeon .xforms-noscript .fr-mode-pdf .xforms-help-image,
+.orbeon .xforms-noscript .fr-mode-email .xforms-help-image {
   display: none;
 }
-.xforms-alert-active {
+.orbeon .xforms-alert-active {
   display: none;
   margin-top: .2em;
   margin-left: 0;
@@ -148,33 +165,33 @@
   background-image: none;
   white-space: normal;
 }
-.xforms-alert-active-visited {
+.orbeon .xforms-alert-active-visited {
   display: block;
   clear: both;
 }
-.xforms-alert-inactive {
+.orbeon .xforms-alert-inactive {
   display: none;
 }
-.xforms-hint {
+.orbeon .xforms-hint {
   display: block;
   margin-top: .2em;
   margin-left: 0;
   width: 100%;
 }
-.xforms-trigger button,
-.xforms-trigger input {
+.orbeon .xforms-trigger button,
+.orbeon .xforms-trigger input {
   white-space: nowrap;
 }
-button.btn-link {
+.orbeon button.btn-link {
   text-decoration: underline;
   font-size: inherit;
   padding: 0 0 2px 0;
 }
-.xforms-type-boolean input {
+.orbeon .xforms-type-boolean input {
   background: none;
   border: none;
 }
-.xforms-upload-info {
+.orbeon .xforms-upload-info {
   display: block;
   width: 100%;
   padding: 2px 2px 2px 18px;
@@ -183,53 +200,53 @@ button.btn-link {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-.xforms-upload-mediatype,
-.xforms-upload-size {
+.orbeon .xforms-upload-info .xforms-upload-mediatype,
+.orbeon .xforms-upload-info .xforms-upload-size {
   padding-left: 1em;
 }
-.xforms-upload-remove {
-  vertical-align: top;
+.orbeon .xforms-upload-info .xforms-upload-remove {
+  vertical-align: middle;
+  margin-top: -4px;
 }
-.xforms-help-panel-message {
+.orbeon .xforms-help-panel-message {
   padding: .5em 0;
   margin-bottom: .5em;
   border-bottom: 2px solid #ddddee;
 }
-/* ***** General Layout ********************************************************************************************* */
-.fr-language-choice,
-.fr-noscript-choice,
-.fr-goto-content {
+.orbeon .fr-language-choice,
+.orbeon .fr-noscript-choice,
+.orbeon .fr-goto-content {
   margin-right: 1em;
 }
-.fr-language-choice .xforms-label,
-.fr-noscript-choice .xforms-label,
-.fr-goto-content .xforms-label {
+.orbeon .fr-language-choice .xforms-label,
+.orbeon .fr-noscript-choice .xforms-label,
+.orbeon .fr-goto-content .xforms-label {
   display: inline;
   margin-right: .5em;
 }
-.fr-status-icons img {
+.orbeon .fr-status-icons img {
   margin-right: 0.5em;
 }
-.fr-noscript-icon {
+.orbeon .fr-noscript-icon {
   display: none;
 }
-.xforms-noscript .fr-noscript-icon {
+.orbeon .xforms-noscript .fr-noscript-icon {
   display: inline;
 }
-.fr-message-success {
+.orbeon .fr-message-success {
   display: block;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
 }
-.fr-unsaved-data {
+.orbeon .fr-unsaved-data {
   color: #ff0000;
 }
-.xbl-fr-error-summary .fr-error-summary-body {
+.orbeon .xbl-fr-error-summary .fr-error-summary-body {
   padding: 0 10px;
 }
-.xbl-fr-error-summary .fr-error-title {
+.orbeon .xbl-fr-error-summary .fr-error-title {
   margin: 0;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -237,120 +254,117 @@ button.btn-link {
   width: 100%;
   *width: 97.5%;
 }
-.xbl-fr-error-summary .fr-error-list {
+.orbeon .xbl-fr-error-summary .fr-error-list {
   padding-top: 10px;
   margin-top: 0;
 }
-.fr-explanation {
+.orbeon .fr-explanation {
   padding: 10px;
 }
-.fr-bottom-bar {
+.orbeon .fr-bottom-bar {
   text-align: right;
 }
-.fr-buttons {
+.orbeon .fr-buttons {
   display: inline;
   margin-bottom: 1em;
   /* Space between the image and the text in a button, only for the buttons bar
-       (not other buttons in the form which might contain just an image) */
+           (not other buttons in the form which might contain just an image) */
 
 }
-.fr-buttons .fr-buttons-message div {
+.orbeon .fr-buttons .fr-buttons-message div {
   display: inline;
 }
-.fr-buttons .xforms-trigger button img {
+.orbeon .fr-buttons .xforms-trigger button img {
   margin-right: 10px;
 }
-.fr-buttons .xforms-trigger button,
-.fr-buttons .xforms-trigger input {
+.orbeon .fr-buttons .xforms-trigger button,
+.orbeon .fr-buttons .xforms-trigger input {
   width: 9.5em;
   *width: 9em;
 }
-.fr-buttons #fr-collapse-all-button .xforms-trigger button,
-.fr-buttons #fr-expand-all-button .xforms-trigger button,
-.fr-buttons #fr-refresh-button .xforms-trigger button {
+.orbeon .fr-buttons #fr-collapse-all-button .xforms-trigger button,
+.orbeon .fr-buttons #fr-expand-all-button .xforms-trigger button,
+.orbeon .fr-buttons #fr-refresh-button .xforms-trigger button {
   min-width: 2em;
   width: 2em;
   padding: 0;
 }
-.fr-buttons #fr-collapse-all-button.xforms-trigger button,
-.fr-buttons #fr-expand-all-button.xforms-trigger button,
-.fr-buttons #fr-refresh-button.xforms-trigger button {
+.orbeon .fr-buttons #fr-collapse-all-button.xforms-trigger button,
+.orbeon .fr-buttons #fr-expand-all-button.xforms-trigger button,
+.orbeon .fr-buttons #fr-refresh-button.xforms-trigger button {
   min-width: 2em;
   width: 2em;
   padding: 3px;
 }
-.fr-buttons #fr-collapse-all-button img,
-.fr-buttons #fr-expand-all-button img,
-.fr-buttons #fr-refresh-button img {
+.orbeon .fr-buttons #fr-collapse-all-button img,
+.orbeon .fr-buttons #fr-expand-all-button img,
+.orbeon .fr-buttons #fr-refresh-button img {
   margin-right: 0;
 }
-/* ***** Repeats **************************************************************************************************** */
-.fr-repeat-table.fr-repeat-single-row td .xforms-label {
+.orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-label {
   display: none;
 }
-.fr-repeat-table.fr-repeat-single-row td .xforms-help-image {
+.orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-help-image {
   display: none;
 }
-.fr-repeat-table.fr-repeat-single-row td .xforms-help {
+.orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-help {
   display: none;
 }
-.fr-repeat-table.fr-repeat-single-row td .xforms-hint {
+.orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-hint {
   display: none;
 }
-.fr-repeat-table tr th .xforms-label {
+.orbeon .fr-repeat-table tr th .xforms-label {
   display: block;
 }
-.fr-repeat-table tr th .xforms-help-image {
+.orbeon .fr-repeat-table tr th .xforms-help-image {
   margin-top: 2px;
 }
-.fr-repeat-table .fr-repeat-column-trigger {
+.orbeon .fr-repeat-table .fr-repeat-column-trigger {
   width: 25px;
   text-align: center;
   vertical-align: middle;
 }
-.fr-repeat-table .fr-repeat-column-trigger i {
+.orbeon .fr-repeat-table .fr-repeat-column-trigger i {
   margin: 0;
   display: block;
 }
-.fr-repeat-table .fr-repeat-column-trigger span i {
+.orbeon .fr-repeat-table .fr-repeat-column-trigger span i {
   *margin-left: 0px;
 }
-.fr-repeat-table .fr-repeat-column-trigger button {
+.orbeon .fr-repeat-table .fr-repeat-column-trigger button {
   display: block;
   margin: auto;
 }
-.fr-repeat-table i.disabled {
+.orbeon .fr-repeat-table i.disabled {
   opacity: 0.4;
   filter: alpha(opacity=40);
 }
-/* ***** Dialogs **************************************************************************************************** */
-.xforms-dialog {
+.orbeon .xforms-dialog {
   width: 400px;
 }
-.xforms-dialog .bd p {
+.orbeon .xforms-dialog .bd p {
   margin: 0.5em 0 0.5em 0;
 }
-.xforms-dialog .fr-dialog-icon {
+.orbeon .xforms-dialog .fr-dialog-icon {
   float: left;
   margin-right: 2em;
   margin-left: 1em;
   padding-bottom: 1em;
 }
-.xforms-dialog .fr-dialog-buttons {
+.orbeon .xforms-dialog .fr-dialog-buttons {
   text-align: right;
   padding: 10px 5px 0 5px;
   margin-top: 5px;
   border-top: 2px solid #ddddee;
   clear: both;
 }
-#fr-submission-result-dialog {
+.orbeon #fr-submission-result-dialog {
   width: 800px;
 }
-/* ***** Sections *************************************************************************************************** */
-.xbl-fr-section {
+.orbeon .xbl-fr-section {
   display: block;
 }
-.xbl-fr-section .fr-section-title .xforms-help-image {
+.orbeon .xbl-fr-section .fr-section-title .xforms-help-image {
   float: left;
   margin-top: 11px;
   margin-right: 5px;
@@ -364,46 +378,45 @@ button.btn-link {
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-.xbl-fr-section p {
+.orbeon .xbl-fr-section p {
   margin-top: 1em;
 }
-.xbl-fr-section .fr-section-open-close img {
+.orbeon .xbl-fr-section .fr-section-open-close img {
   margin-right: 0;
 }
-.xbl-fr-section .fr-section-open-close {
+.orbeon .xbl-fr-section .fr-section-open-close {
   padding: 0 7px 0 7px;
 }
-.xbl-fr-section .fr-section-content {
+.orbeon .xbl-fr-section .fr-section-content {
   display: block;
   padding-left: 16px;
   padding-right: 16px;
   padding-top: 10px;
   padding-bottom: 10px;
 }
-.fr-captcha {
+.orbeon .fr-captcha {
   display: block;
   margin-left: 22px;
   margin-top: 1.5em;
   margin-bottom: 1em;
 }
-/* ***** Grids ****************************************************************************************************** */
-.fr-grid {
+.orbeon .fr-grid {
   table-layout: fixed;
   width: 100%;
   margin-bottom: 10px;
 }
-.fr-grid thead tr th {
+.orbeon .fr-grid thead tr th {
   text-align: left;
 }
-.fr-grid tbody tr td {
+.orbeon .fr-grid tbody tr td {
   vertical-align: top;
   width: auto;
   /*overflow: hidden*/
   /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
-                                                                   absolute positioning of the cell editors, this crops overlays, in particular the date picker */
+                                                                       absolute positioning of the cell editors, this crops overlays, in particular the date picker */
 
 }
-.fr-grid .xforms-help-image {
+.orbeon .fr-grid .xforms-help-image {
   float: left;
   margin-top: 3px;
   margin-right: 3px;
@@ -417,185 +430,184 @@ button.btn-link {
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-.fr-grid .xforms-label {
+.orbeon .fr-grid .xforms-label {
   margin-top: 2px;
   margin-bottom: 4px;
   overflow: hidden;
   zoom: 1;
 }
-.fr-grid select,
-.fr-grid textarea,
-.fr-grid input[type="text"],
-.fr-grid input[type="password"],
-.fr-grid input[type="datetime"],
-.fr-grid input[type="datetime-local"],
-.fr-grid input[type="date"],
-.fr-grid input[type="month"],
-.fr-grid input[type="time"],
-.fr-grid input[type="week"],
-.fr-grid input[type="number"],
-.fr-grid input[type="email"],
-.fr-grid input[type="url"],
-.fr-grid input[type="search"],
-.fr-grid input[type="tel"],
-.fr-grid input[type="color"],
-.fr-grid .uneditable-input {
+.orbeon .fr-grid select,
+.orbeon .fr-grid textarea,
+.orbeon .fr-grid input[type="text"],
+.orbeon .fr-grid input[type="password"],
+.orbeon .fr-grid input[type="datetime"],
+.orbeon .fr-grid input[type="datetime-local"],
+.orbeon .fr-grid input[type="date"],
+.orbeon .fr-grid input[type="month"],
+.orbeon .fr-grid input[type="time"],
+.orbeon .fr-grid input[type="week"],
+.orbeon .fr-grid input[type="number"],
+.orbeon .fr-grid input[type="email"],
+.orbeon .fr-grid input[type="url"],
+.orbeon .fr-grid input[type="search"],
+.orbeon .fr-grid input[type="tel"],
+.orbeon .fr-grid input[type="color"],
+.orbeon .fr-grid .uneditable-input {
   width: 100%;
   *padding: 2px;
   *width: 98%;
 }
-.fr-grid .xforms-textarea textarea {
+.orbeon .fr-grid .xforms-textarea textarea {
   width: 100%;
 }
-.fr-grid input[type="file"] {
+.orbeon .fr-grid input[type="file"] {
   width: auto;
   *width: 98%;
 }
-.fr-grid .xbl-fr-autocomplete .xforms-input input {
+.orbeon .fr-grid .xbl-fr-autocomplete .xforms-input input {
   width: 140px;
 }
-.fr-grid .xbl-fr-inplace-input {
+.orbeon .fr-grid .xbl-fr-inplace-input {
   width: 100%;
 }
-.fr-grid .xbl-fr-inplace-input input {
+.orbeon .fr-grid .xbl-fr-inplace-input input {
   width: 100%;
   *width: 98%;
 }
-.fr-grid .xforms-mediatype-text-html textarea {
+.orbeon .fr-grid .xforms-mediatype-text-html textarea {
   height: 10.1em;
 }
-.fr-grid .xforms-input input.xforms-type-date,
-.fr-grid .xforms-input input.xforms-type-time {
+.orbeon .fr-grid .xforms-input input.xforms-type-date,
+.orbeon .fr-grid .xforms-input input.xforms-type-time {
   width: 7.5em;
 }
-.fr-grid .xforms-type-boolean input {
+.orbeon .fr-grid .xforms-type-boolean input {
   width: auto;
 }
-.fr-grid .xforms-mediatype-image {
+.orbeon .fr-grid .xforms-mediatype-image {
   width: 100%;
   overflow: auto;
   display: block;
 }
-.fr-grid .xforms-mediatype-image {
+.orbeon .fr-grid .xforms-mediatype-image {
   *padding-bottom: 17px;
   *overflow-y: hidden;
 }
-.fr-grid .xforms-mediatype-image img {
+.orbeon .fr-grid .xforms-mediatype-image img {
   display: block;
 }
-.fr-grid .fr-grid-content .xforms-trigger button,
-.fr-grid .fr-grid-content .xforms-trigger input {
+.orbeon .fr-grid .fr-grid-content .xforms-trigger button,
+.orbeon .fr-grid .fr-grid-content .xforms-trigger input {
   margin-top: 1.72em;
 }
-.fr-grid .fr-grid-content .xforms-trigger button,
-.fr-grid .fr-grid-content .yui-button .xforms-trigger input {
+.orbeon .fr-grid .fr-grid-content .xforms-trigger button,
+.orbeon .fr-grid .fr-grid-content .yui-button .xforms-trigger input {
   margin-top: 0;
 }
-.fr-grid .fr-grid-content {
+.orbeon .fr-grid .fr-grid-content {
   padding: 4px;
   *padding-right: 6px;
   *zoom: 1;
 }
-.fr-repeat-table .fr-grid-content {
+.orbeon .fr-repeat-table .fr-grid-content {
   padding-top: 0;
   padding-bottom: 0;
 }
-#fr-view {
+.orbeon #fr-view {
   margin-bottom: 10px;
   /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-       http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
+           http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
 
 }
-#fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
+.orbeon #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
   *width: 13em;
 }
-#fr-view .fr-grid td .fr-grid-content img.xforms-input-input {
+.orbeon #fr-view .fr-grid td .fr-grid-content img.xforms-input-input {
   *width: auto;
 }
-#fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-date,
-#fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-time {
+.orbeon #fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-date,
+.orbeon #fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-time {
   *width: 6.3em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-2em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-2em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em select {
   width: 2em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-3em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-3em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-3em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-3em select {
   width: 3em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-4em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-4em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4em select {
   width: 4em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-5em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-5em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-5em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-5em select {
   width: 5em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-7em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-7em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-7em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-7em select {
   width: 7em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-10em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-10em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-10em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-10em select {
   width: 10em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-12em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-12em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-12em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-12em select {
   width: 12em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-15em input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-15em select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-15em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-15em select {
   width: 15em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-100pc input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-100pc select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-100pc input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-100pc select {
   width: 100%;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
   width: 2.2em;
 }
-#fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
-#fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
   width: 3.3em;
 }
-/* ***** View, PDF, email ******************************************************************************************* */
-.xforms-textarea pre {
+.orbeon .xforms-textarea pre {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   white-space: -moz-pre-wrap;
   white-space: pre-wrap;
   *white-space: normal;
   word-break: normal;
 }
-.fr-mode-view .xforms-hint,
-.fr-mode-view .fr-mode-pdf .xforms-hint,
-.fr-mode-view .fr-mode-email .xforms-hint {
+.orbeon .fr-mode-view .xforms-hint,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-hint,
+.orbeon .fr-mode-view .fr-mode-email .xforms-hint {
   display: none;
 }
-.fr-mode-view .xforms-alert,
-.fr-mode-view .fr-mode-pdf .xforms-alert,
-.fr-mode-view .fr-mode-email .xforms-alert {
+.orbeon .fr-mode-view .xforms-alert,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-alert,
+.orbeon .fr-mode-view .fr-mode-email .xforms-alert {
   display: none;
 }
-.fr-mode-view .fr-section-title img,
-.fr-mode-view .fr-mode-pdf .fr-section-title img,
-.fr-mode-view .fr-mode-email .fr-section-title img {
+.orbeon .fr-mode-view .fr-section-title img,
+.orbeon .fr-mode-view .fr-mode-pdf .fr-section-title img,
+.orbeon .fr-mode-view .fr-mode-email .fr-section-title img {
   display: none;
 }
-.fr-mode-view .xforms-help-image,
-.fr-mode-view .fr-mode-pdf .xforms-help-image,
-.fr-mode-view .fr-mode-email .xforms-help-image {
+.orbeon .fr-mode-view .xforms-help-image,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-help-image,
+.orbeon .fr-mode-view .fr-mode-email .xforms-help-image {
   display: none;
 }
-.fr-mode-view .fr-grid-content .xforms-control,
-.fr-mode-view .fr-grid-content .fr-component-group {
+.orbeon .fr-mode-view .fr-grid-content .xforms-control,
+.orbeon .fr-mode-view .fr-grid-content .fr-component-group {
   margin-top: 0;
 }
-.fr-mode-view .fr-repeat-multiple-rows {
+.orbeon .fr-mode-view .fr-repeat-multiple-rows {
   border-top: none;
 }
-.fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row {
+.orbeon .fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row {
   display: none;
 }
 @media print {
@@ -608,67 +620,67 @@ button.btn-link {
   noscript {
     display: none;
   }
-  form.xforms-form .fr-status-icons,
-  form.xforms-form .xforms-loading-loading,
-  form.xforms-form .xforms-upload-remove,
-  form.xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
-  form.xforms-form .xforms-help-image,
-  form.xforms-form .fr-section-title .xforms-help-image,
-  form.xforms-form .xforms-hint,
-  form.xforms-form .fr-buttons {
+  .orbeon .xforms-form .fr-status-icons,
+  .orbeon .xforms-form .xforms-loading-loading,
+  .orbeon .xforms-form .xforms-upload-remove,
+  .orbeon .xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
+  .orbeon .xforms-form .xforms-help-image,
+  .orbeon .xforms-form .fr-section-title .xforms-help-image,
+  .orbeon .xforms-form .xforms-hint,
+  .orbeon .xforms-form .fr-buttons {
     display: none;
   }
-  form.xforms-form .xforms-upload-info {
+  .orbeon .xforms-form .xforms-upload-info {
     background: transparent none repeat scroll 0 0;
     padding-left: 2px;
   }
-  form.xforms-form select[multiple],
-  form.xforms-form .xforms-select1-appearance-compact select,
-  form.xforms-form .xforms-select-appearance-compact select {
+  .orbeon .xforms-form select[multiple],
+  .orbeon .xforms-form .xforms-select1-appearance-compact select,
+  .orbeon .xforms-form .xforms-select-appearance-compact select {
     height: auto;
   }
-  form.xforms-form .clearfix:before,
-  form.xforms-form .clearfix:after,
-  form.xforms-form .row:before,
-  form.xforms-form .row:after,
-  form.xforms-form .row-fluid:before,
-  form.xforms-form .row-fluid:after,
-  form.xforms-form .container:before,
-  form.xforms-form .container:after,
-  form.xforms-form .container-fluid:before,
-  form.xforms-form .container-fluid:after,
-  form.xforms-form .dl-horizontal:before,
-  form.xforms-form .dl-horizontal:after,
-  form.xforms-form .controls-row:before,
-  form.xforms-form .controls-row:after,
-  form.xforms-form .form-actions:before,
-  form.xforms-form .form-actions:after,
-  form.xforms-form .form-horizontal .control-group:before,
-  form.xforms-form .form-horizontal .control-group:after,
-  form.xforms-form .nav-tabs:before,
-  form.xforms-form .nav-pills:before,
-  form.xforms-form .nav-tabs:after,
-  form.xforms-form .nav-pills:after,
-  form.xforms-form .tabbable:before,
-  form.xforms-form .tabbable:after,
-  form.xforms-form .navbar-inner:before,
-  form.xforms-form .navbar-inner:after,
-  form.xforms-form .navbar-form:before,
-  form.xforms-form .navbar-form:after,
-  form.xforms-form .pager:before,
-  form.xforms-form .pager:after,
-  form.xforms-form .modal-footer:before,
-  form.xforms-form .modal-footer:after,
-  form.xforms-form .thumbnails:before,
-  form.xforms-form .thumbnails:after,
-  form.xforms-form .navbar-inner:before,
-  form.xforms-form .navbar-inner:after {
+  .orbeon .xforms-form .clearfix:before,
+  .orbeon .xforms-form .clearfix:after,
+  .orbeon .xforms-form .row:before,
+  .orbeon .xforms-form .row:after,
+  .orbeon .xforms-form .row-fluid:before,
+  .orbeon .xforms-form .row-fluid:after,
+  .orbeon .xforms-form .container:before,
+  .orbeon .xforms-form .container:after,
+  .orbeon .xforms-form .container-fluid:before,
+  .orbeon .xforms-form .container-fluid:after,
+  .orbeon .xforms-form .dl-horizontal:before,
+  .orbeon .xforms-form .dl-horizontal:after,
+  .orbeon .xforms-form .controls-row:before,
+  .orbeon .xforms-form .controls-row:after,
+  .orbeon .xforms-form .form-actions:before,
+  .orbeon .xforms-form .form-actions:after,
+  .orbeon .xforms-form .form-horizontal .control-group:before,
+  .orbeon .xforms-form .form-horizontal .control-group:after,
+  .orbeon .xforms-form .nav-tabs:before,
+  .orbeon .xforms-form .nav-pills:before,
+  .orbeon .xforms-form .nav-tabs:after,
+  .orbeon .xforms-form .nav-pills:after,
+  .orbeon .xforms-form .tabbable:before,
+  .orbeon .xforms-form .tabbable:after,
+  .orbeon .xforms-form .navbar-inner:before,
+  .orbeon .xforms-form .navbar-inner:after,
+  .orbeon .xforms-form .navbar-form:before,
+  .orbeon .xforms-form .navbar-form:after,
+  .orbeon .xforms-form .pager:before,
+  .orbeon .xforms-form .pager:after,
+  .orbeon .xforms-form .modal-footer:before,
+  .orbeon .xforms-form .modal-footer:after,
+  .orbeon .xforms-form .thumbnails:before,
+  .orbeon .xforms-form .thumbnails:after,
+  .orbeon .xforms-form .navbar-inner:before,
+  .orbeon .xforms-form .navbar-inner:after {
     display: block;
   }
-  form.xforms-form .input-append,
-  form.xforms-form .input-prepend,
-  form.xforms-form .btn-group,
-  form.xforms-form .btn-toolbar {
+  .orbeon .xforms-form .input-append,
+  .orbeon .xforms-form .input-prepend,
+  .orbeon .xforms-form .btn-group,
+  .orbeon .xforms-form .btn-toolbar {
     font-size: .5px;
   }
 }

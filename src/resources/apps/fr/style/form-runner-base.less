@@ -16,492 +16,500 @@
 
 @import "form-runner-common";
 
-.fr-status-icons {
-    display: inline;
-    img { margin-left: 3px; }
-}
+.orbeon {
 
-.fr-body {
-    display: block;
-    h2 { margin-top: 0; }
-}
-
-/* ***** Utilities ************************************************************************************************** */
-.fr-clear { clear: both }
-
-.fr-clear-container {
-    .clearfix()
-}
-
-/* ***** Portlet reset *********************************************************************************************** */
-
-// rom YUI font.css, but applied to portlet body only
-.orbeon-portlet-body {
-    font: 13px/1.231 arial,helvetica,clean,sans-serif;
-	// for IE6/7
-	*font-size: small;
-	// for IE Quirks Mode
-	*font: x-small;
-}
-
-/* ***** XForms Controls ******************************************************************************************** */
-
-.xforms-noscript {
-    // NOTE: In noscript mode, help appears last in a control for accessibility reasons
-    .xforms-help-image {
-        display: block;
-        margin: 0 0 0 .5em;
-    }
-
-    .fr-section-title .fr-section-label {
-
-        button.btn-link {
-            color: @frHeaderColor;
-            font-size: inherit;
-            *font-size: @baseLineHeight; // actual font size for IE7
-        }
-
-        .xforms-help-image {
-            display: inline;
-        }
-
-        .xforms-help { display: inline }
-        .xforms-help-anchor { display: none }
-    }
-
-    // Noscript help section
-    .xforms-help-panel {
-        display: block;
-        width: auto;
-        padding: 0 1em;
-
-        .xforms-help-group { margin: 0 0 .5em }
-        .xforms-label { display: inline }
-        .xforms-help-image { display: none }
-    }
-
-    .fr-help-back { margin-left: .5em }
-
-    .fr-mode-view .xforms-help-image, .fr-mode-pdf .xforms-help-image, .fr-mode-email .xforms-help-image { display: none }
-}
-
-// Display alerts under each control
-.xforms-alert-active {
-    display: none;
-    margin-top: .2em;
-    margin-left: 0;// used to have margin here but with new colors no margin seems better
-    height: auto;
-    width: auto;// width: 100%;
-    padding: 1px;
-    font-size: inherit;// override xforms.css
-    text-indent: 0;// override xforms.css
-    background-image: none;// override xforms.css
-    white-space: normal;// override xforms.css to allow for multiline alert messages
-}
-
-.xforms-alert-active-visited {
-    display: block;
-    clear: both;
-}
-
-.xforms-alert-inactive {
-    display: none;// Otherwise inactive alerts take vertical space because of defaults in xforms.css
-}
-
-// Display hints under each control
-.xforms-hint {
-    display: block;
-    margin-top: .2em;
-    margin-left: 0;// used to have margin here but with new colors no margin seems better
-    width: 100%;
-}
-
-// Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
-.xforms-trigger button, .xforms-trigger input { white-space: nowrap }
-
-// Updates to Bootstrap btn-link
-button.btn-link {
-    text-decoration: underline;
-    font-size: inherit;
-    padding: 0 0 2px 0;
-}
-
-// But for boolean inputs, no background and border (for IE)
-.xforms-type-boolean input { background: none; border: none }
-
-// Upload control information
-.xforms-upload-info {
-    display: block;
-    width: 100%;
-    padding: 2px 2px 2px 18px;
-    background: url( images/silk/attach.png ) no-repeat left center;
-    .box-sizing(border-box);
-}
-
-.xforms-upload-mediatype, .xforms-upload-size { padding-left: 1em }
-.xforms-upload-remove { vertical-align: top }
-
-.xforms-help-panel-message {
-    padding: .5em 0;
-    margin-bottom: .5em;
-    border-bottom: 2px solid @frBorderColor;
-}
-
-/* ***** General Layout ********************************************************************************************* */
-
-// Language and mode selectors
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content {
-    margin-right: 1em;
-
-    .xforms-label {
+    .fr-status-icons {
         display: inline;
-        margin-right: .5em;
-    }
-}
-
-// Status icons
-.fr-status-icons img { margin-right: .5em }
-
-// Enable noscript icon when in noscript mode
-.fr-noscript-icon { display: none }
-.xforms-noscript .fr-noscript-icon { display: inline }
-
-// Messages
-.fr-message-success {
-    display: block;
-    .box-sizing(border-box);
-    width: 100%;
-}
-.fr-unsaved-data { color: red }
-
-// Error summary
-.xbl-fr-error-summary {
-    .fr-error-summary-body { padding: 0 10px }
-    .fr-error-title { margin: 0; .box-sizing(border-box); width: 100%; *width: 97.5% }
-    .fr-error-list { padding-top: 10px; margin-top: 0  }
-}
-
-// Explanation message if present
-.fr-explanation { padding: 10px }
-
-// Button bar
-
-.fr-bottom-bar { text-align: right }
-
-.fr-buttons {
-    display: inline;
-    margin-bottom: 1em;
-
-    .fr-buttons-message div { display: inline }
-
-    /* Space between the image and the text in a button, only for the buttons bar
-       (not other buttons in the form which might contain just an image) */
-    .xforms-trigger button img { margin-right: 10px }
-
-    .xforms-trigger button, .xforms-trigger input {
-        width: 9.5em; *width: 9em
+        img { margin-left: 3px; }
     }
 
-    // Special sizing for expand/collapse/refresh buttons
-    #fr-collapse-all-button .xforms-trigger button, #fr-expand-all-button .xforms-trigger button, #fr-refresh-button .xforms-trigger button {
-        min-width: 2em;
-        width: 2em;
-        padding: 0;
+    .fr-body {
+        display: block;
+        h2 { margin-top: 0; }
     }
 
-    // Special sizing for new expand/collapse/refresh buttons
-    #fr-collapse-all-button.xforms-trigger button, #fr-expand-all-button.xforms-trigger button, #fr-refresh-button.xforms-trigger button {
-        min-width: 2em;
-        width: 2em;
-        padding: 3px;
+    /* ***** Utilities ************************************************************************************************** */
+    .fr-clear { clear: both }
+
+    .fr-clear-container {
+        .clearfix()
     }
 
-    #fr-collapse-all-button img, #fr-expand-all-button img, #fr-refresh-button img {
-        margin-right: 0
+    /* ***** Portlet reset *********************************************************************************************** */
+
+    // rom YUI font.css, but applied to portlet body only
+    .orbeon-portlet-body {
+        font: 13px/1.231 arial,helvetica,clean,sans-serif;
+        // for IE6/7
+        *font-size: small;
+        // for IE Quirks Mode
+        *font: x-small;
     }
-}
 
-/* ***** Repeats **************************************************************************************************** */
+    /* ***** XForms Controls ******************************************************************************************** */
 
-// Repeats: shows as table (1 line per iteration; labels used as header of table)
-.fr-repeat-table {
+    .xforms-noscript {
+        // NOTE: In noscript mode, help appears last in a control for accessibility reasons
+        .xforms-help-image {
+            display: block;
+            margin: 0 0 0 .5em;
+        }
 
-    // Don't show label, help, hint for controls inside a repeat-table which repeats over a single row only (they are shown in the column header)
-    &.fr-repeat-single-row {
-        td {
-            .xforms-label { display: none }
+        .fr-section-title .fr-section-label {
+
+            button.btn-link {
+                color: @frHeaderColor;
+                font-size: inherit;
+                *font-size: @baseLineHeight; // actual font size for IE7
+            }
+
+            .xforms-help-image {
+                display: inline;
+            }
+
+            .xforms-help { display: inline }
+            .xforms-help-anchor { display: none }
+        }
+
+        // Noscript help section
+        .xforms-help-panel {
+            display: block;
+            width: auto;
+            padding: 0 1em;
+
+            .xforms-help-group { margin: 0 0 .5em }
+            .xforms-label { display: inline }
             .xforms-help-image { display: none }
-            .xforms-help { display: none }
-            .xforms-hint { display: none }
+        }
+
+        .fr-help-back { margin-left: .5em }
+
+        .fr-mode-view .xforms-help-image, .fr-mode-pdf .xforms-help-image, .fr-mode-email .xforms-help-image { display: none }
+    }
+
+    // Display alerts under each control
+    .xforms-alert-active {
+        display: none;
+        margin-top: .2em;
+        margin-left: 0;// used to have margin here but with new colors no margin seems better
+        height: auto;
+        width: auto;// width: 100%;
+        padding: 1px;
+        font-size: inherit;// override xforms.css
+        text-indent: 0;// override xforms.css
+        background-image: none;// override xforms.css
+        white-space: normal;// override xforms.css to allow for multiline alert messages
+    }
+
+    .xforms-alert-active-visited {
+        display: block;
+        clear: both;
+    }
+
+    .xforms-alert-inactive {
+        display: none;// Otherwise inactive alerts take vertical space because of defaults in xforms.css
+    }
+
+    // Display hints under each control
+    .xforms-hint {
+        display: block;
+        margin-top: .2em;
+        margin-left: 0;// used to have margin here but with new colors no margin seems better
+        width: 100%;
+    }
+
+    // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
+    .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
+
+    // Updates to Bootstrap btn-link
+    button.btn-link {
+        text-decoration: underline;
+        font-size: inherit;
+        padding: 0 0 2px 0;
+    }
+
+    // But for boolean inputs, no background and border (for IE)
+    .xforms-type-boolean input { background: none; border: none }
+
+    // Upload control information
+    .xforms-upload-info {
+        display: block;
+        width: 100%;
+        padding: 2px 2px 2px 18px;
+        background: url( images/silk/attach.png ) no-repeat left center;
+        .box-sizing(border-box);
+        .xforms-upload-mediatype, .xforms-upload-size {
+            padding-left: 1em
+        }
+        .xforms-upload-remove {
+            // Visually center
+            vertical-align: middle;
+            margin-top: -4px;
         }
     }
 
-    // But if there is a nested table, show those in the label in the column header of that table
-    tr th {
-        .xforms-label { display: block }         // Label in repeat table header is block so yellow background in FB takes the whole width
-        .xforms-help-image { margin-top: 2px }
+    .xforms-help-panel-message {
+        padding: .5em 0;
+        margin-bottom: .5em;
+        border-bottom: 2px solid @frBorderColor;
     }
 
-    .fr-repeat-column-trigger {
-        width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
-        text-align: center;
-        vertical-align: middle;
+    /* ***** General Layout ********************************************************************************************* */
 
-        i { margin: 0; display: block }                     // For the Bootstrap icon
-        span i { *margin-left: 0px }                        // IE buttons depress; is there a way to remove their 1px 3px padding?
-        button { display: block; margin: auto }
+    // Language and mode selectors
+    .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+        margin-right: 1em;
+
+        .xforms-label {
+            display: inline;
+            margin-right: .5em;
+        }
     }
 
-    i.disabled {
-        .opacity(40)
+    // Status icons
+    .fr-status-icons img { margin-right: .5em }
+
+    // Enable noscript icon when in noscript mode
+    .fr-noscript-icon { display: none }
+    .xforms-noscript .fr-noscript-icon { display: inline }
+
+    // Messages
+    .fr-message-success {
+        display: block;
+        .box-sizing(border-box);
+        width: 100%;
     }
-}
+    .fr-unsaved-data { color: red }
 
-/* ***** Dialogs **************************************************************************************************** */
-
-// Dialogs
-.xforms-dialog {
-    width: 400px;               // default width
-
-    .bd p {
-        margin: .5em 0 .5em 0
+    // Error summary
+    .xbl-fr-error-summary {
+        .fr-error-summary-body { padding: 0 10px }
+        .fr-error-title { margin: 0; .box-sizing(border-box); width: 100%; *width: 97.5% }
+        .fr-error-list { padding-top: 10px; margin-top: 0  }
     }
 
-    .fr-dialog-icon {
-        float: left;
-        margin-right: 2em;
-        margin-left: 1em;
-        padding-bottom: 1em
+    // Explanation message if present
+    .fr-explanation { padding: 10px }
+
+    // Button bar
+
+    .fr-bottom-bar { text-align: right }
+
+    .fr-buttons {
+        display: inline;
+        margin-bottom: 1em;
+
+        .fr-buttons-message div { display: inline }
+
+        /* Space between the image and the text in a button, only for the buttons bar
+           (not other buttons in the form which might contain just an image) */
+        .xforms-trigger button img { margin-right: 10px }
+
+        .xforms-trigger button, .xforms-trigger input {
+            width: 9.5em; *width: 9em
+        }
+
+        // Special sizing for expand/collapse/refresh buttons
+        #fr-collapse-all-button .xforms-trigger button, #fr-expand-all-button .xforms-trigger button, #fr-refresh-button .xforms-trigger button {
+            min-width: 2em;
+            width: 2em;
+            padding: 0;
+        }
+
+        // Special sizing for new expand/collapse/refresh buttons
+        #fr-collapse-all-button.xforms-trigger button, #fr-expand-all-button.xforms-trigger button, #fr-refresh-button.xforms-trigger button {
+            min-width: 2em;
+            width: 2em;
+            padding: 3px;
+        }
+
+        #fr-collapse-all-button img, #fr-expand-all-button img, #fr-refresh-button img {
+            margin-right: 0
+        }
     }
 
-    .fr-dialog-buttons {
-        text-align: right;
-        padding: 10px 5px 0 5px;     // dialog bd already has padding so no padding-bottom
-        margin-top: 5px;             // so that content above doesn't touch us
-        border-top: 2px solid @frBorderColor;
-        clear: both
+    /* ***** Repeats **************************************************************************************************** */
+
+    // Repeats: shows as table (1 line per iteration; labels used as header of table)
+    .fr-repeat-table {
+
+        // Don't show label, help, hint for controls inside a repeat-table which repeats over a single row only (they are shown in the column header)
+        &.fr-repeat-single-row {
+            td {
+                .xforms-label { display: none }
+                .xforms-help-image { display: none }
+                .xforms-help { display: none }
+                .xforms-hint { display: none }
+            }
+        }
+
+        // But if there is a nested table, show those in the label in the column header of that table
+        tr th {
+            .xforms-label { display: block }         // Label in repeat table header is block so yellow background in FB takes the whole width
+            .xforms-help-image { margin-top: 2px }
+        }
+
+        .fr-repeat-column-trigger {
+            width: @frGridPlusMinusIconWidth + 5px*2 + 1px;     // 5px padding from tables.less (no variable), 1px for the border
+            text-align: center;
+            vertical-align: middle;
+
+            i { margin: 0; display: block }                     // For the Bootstrap icon
+            span i { *margin-left: 0px }                        // IE buttons depress; is there a way to remove their 1px 3px padding?
+            button { display: block; margin: auto }
+        }
+
+        i.disabled {
+            .opacity(40)
+        }
     }
-}
 
-#fr-submission-result-dialog { width: 800px }
+    /* ***** Dialogs **************************************************************************************************** */
 
-/* ***** Sections *************************************************************************************************** */
+    // Dialogs
+    .xforms-dialog {
+        width: 400px;               // default width
 
-.xbl-fr-section {
-    display: block;
+        .bd p {
+            margin: .5em 0 .5em 0
+        }
 
-    .fr-section-title {
+        .fr-dialog-icon {
+            float: left;
+            margin-right: 2em;
+            margin-left: 1em;
+            padding-bottom: 1em
+        }
+
+        .fr-dialog-buttons {
+            text-align: right;
+            padding: 10px 5px 0 5px;     // dialog bd already has padding so no padding-bottom
+            margin-top: 5px;             // so that content above doesn't touch us
+            border-top: 2px solid @frBorderColor;
+            clear: both
+        }
+    }
+
+    #fr-submission-result-dialog { width: 800px }
+
+    /* ***** Sections *************************************************************************************************** */
+
+    .xbl-fr-section {
+        display: block;
+
+        .fr-section-title {
+            .xforms-help-image {
+                float: left;                       // Help on the same line as section title in display: block
+                margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
+                margin-right: 5px;                 // Space between help icon and section title
+
+                .help-icon();
+            }
+        }
+
+        p { margin-top: 1em }
+        .fr-section-open-close img { margin-right: 0 }
+        .fr-section-open-close {
+            // Padding is designed to make the <a> box around the section open/close images a square
+            padding: 0 7px 0 7px;
+        }
+
+        .fr-section-content {
+            display: block;
+            padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding; // To be aligned with the start of the text of the titles
+            padding-right: @frSectionTitleLeftPadding - @frGridCellPadding; // To have the same margin on both side, especially visible with tables
+            padding-top: 10px;                                              // At the top/bottom of a section, less space
+            padding-bottom: 10px;
+        }
+    }
+
+
+    .fr-captcha {
+        display: block;                             // By default captcha is inline
+        margin-left: 22px;                          // Margin left to be aligned with fr-section-content
+        margin-top: 1.5em; margin-bottom: 1em;      // Spacing before and after
+    }
+
+    /* ***** Grids ****************************************************************************************************** */
+
+    .fr-grid {
+
+        table-layout: fixed;
+        width: 100%;
+        margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
+
+        thead tr th { text-align: left }
+        tbody tr td {
+            vertical-align: top;
+            width: auto;
+            /*overflow: hidden*/                                    /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
+                                                                       absolute positioning of the cell editors, this crops overlays, in particular the date picker */
+        }
+
         .xforms-help-image {
-            float: left;                       // Help on the same line as section title in display: block
-            margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
-            margin-right: 5px;                 // Space between help icon and section title
+            float: left;
+            margin-top: (@baseLineHeight - 14)/2;      // Vertically center help image on first line
+            margin-right: 3px;
 
             .help-icon();
         }
-    }
 
-    p { margin-top: 1em }
-    .fr-section-open-close img { margin-right: 0 }
-    .fr-section-open-close {
-        // Padding is designed to make the <a> box around the section open/close images a square
-        padding: 0 7px 0 7px;
-    }
+        .xforms-label {
+            margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
+            margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
+                                                        // than above the control to make the CSS more generally applicable to XBL components)
+            overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
+            zoom: 1;                                    // For the overflow: hidden to have an effect on IE6
+        }
 
-    .fr-section-content {
-        display: block;
-        padding-left:  @frSectionTitleLeftPadding - @frGridCellPadding; // To be aligned with the start of the text of the titles
-        padding-right: @frSectionTitleLeftPadding - @frGridCellPadding; // To have the same margin on both side, especially visible with tables
-        padding-top: 10px;                                              // At the top/bottom of a section, less space
-        padding-bottom: 10px;
-    }
-}
-
-
-.fr-captcha {
-    display: block;                             // By default captcha is inline
-    margin-left: 22px;                          // Margin left to be aligned with fr-section-content
-    margin-top: 1.5em; margin-bottom: 1em;      // Spacing before and after
-}
-
-/* ***** Grids ****************************************************************************************************** */
-
-.fr-grid {
-
-    table-layout: fixed;
-    width: 100%;
-    margin-bottom: 10px;            // So we have some space between us and the next grid or nested section
-
-    thead tr th { text-align: left }
-    tbody tr td {
-        vertical-align: top;
-        width: auto;
-        /*overflow: hidden*/                                    /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
-                                                                   absolute positioning of the cell editors, this crops overlays, in particular the date picker */
-    }
-
-    .xforms-help-image {
-        float: left;
-        margin-top: (@baseLineHeight - 14)/2;      // Vertically center help image on first line
-        margin-right: 3px;
-
-        .help-icon();
-    }
-
-    .xforms-label {
-        margin-top: 2px;                            // Nicer to have a bit of space at the top to separate controls a bit more, esp. when outside grid cells
-        margin-bottom: 4px;                         // Insert some space between the label / help and the control (we add spacing below the label rather
-                                                    // than above the control to make the CSS more generally applicable to XBL components)
-        overflow: hidden;                           // So the block area doesn't extend below the floated help, when there is one. Also see http://bit.ly/ruAKSU
-        zoom: 1;                                    // For the overflow: hidden to have an effect on IE6
-    }
-
-    // Controls
-    select,
-    textarea,
-    input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="url"],
-    input[type="search"],
-    input[type="tel"],
-    input[type="color"],
-    .uneditable-input {
-        width: 100%;
-        *padding: 2px;              // IE7: due to missing box-sizing support
-        *width: 98%;
-    }
-
-    .xforms-textarea textarea {
-        width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
-    }
-
-    input[type="file"] {
-        width: auto;
-        *width: 98%;                // IE7: due to missing box-sizing support
-    }
-
-    // Override previous rule for autocomplete input, which can't be sized with width: 100%
-    .xbl-fr-autocomplete .xforms-input input { width: 140px }
-
-    // Better to be wide as well
-    .xbl-fr-inplace-input {
-        width: 100%;
-        input {
+        // Controls
+        select,
+        textarea,
+        input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
+        input[type="password"],
+        input[type="datetime"],
+        input[type="datetime-local"],
+        input[type="date"],
+        input[type="month"],
+        input[type="time"],
+        input[type="week"],
+        input[type="number"],
+        input[type="email"],
+        input[type="url"],
+        input[type="search"],
+        input[type="tel"],
+        input[type="color"],
+        .uneditable-input {
             width: 100%;
+            *padding: 2px;              // IE7: due to missing box-sizing support
             *width: 98%;
         }
-    }
 
-    // Make HTML editor shorter by default
-    .xforms-mediatype-text-html textarea { height: 10.1em } // NOTE: with Firefox, 10em makes bottom line disappear
+        .xforms-textarea textarea {
+            width: 100%;                // It's a reasonable default for textareas to be as wide as allowed
+        }
 
-    // Set this again as default is 100% above
-    // NOTE: This doesn't work well with IE 6/7
-    .xforms-input input {
-        &.xforms-type-date, &.xforms-type-time {
-            width: 7.5em;
+        input[type="file"] {
+            width: auto;
+            *width: 98%;                // IE7: due to missing box-sizing support
+        }
+
+        // Override previous rule for autocomplete input, which can't be sized with width: 100%
+        .xbl-fr-autocomplete .xforms-input input { width: 140px }
+
+        // Better to be wide as well
+        .xbl-fr-inplace-input {
+            width: 100%;
+            input {
+                width: 100%;
+                *width: 98%;
+            }
+        }
+
+        // Make HTML editor shorter by default
+        .xforms-mediatype-text-html textarea { height: 10.1em } // NOTE: with Firefox, 10em makes bottom line disappear
+
+        // Set this again as default is 100% above
+        // NOTE: This doesn't work well with IE 6/7
+        .xforms-input input {
+            &.xforms-type-date, &.xforms-type-time {
+                width: 7.5em;
+            }
+        }
+
+        // But for boolean inputs, don't size (for IE)
+        .xforms-type-boolean input {
+            width: auto;
+        }
+
+        // Image output
+        .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
+        .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }// IE HACK
+        .xforms-mediatype-image img { display: block }
+
+        //  Buttons
+        .fr-grid-content {
+            .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
+            .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
+        }
+
+        // Cell content
+        .fr-grid-content {
+            padding: @frGridCellPadding;                // Add some space around control
+            *padding-right: 6px;                        // IE7: help move back controls within .fr-grid-content
+            *zoom: 1;                                   // IE7: fix handling of padding
         }
     }
 
-    // But for boolean inputs, don't size (for IE)
-    .xforms-type-boolean input {
-        width: auto;
+    .fr-repeat-table {
+        .fr-grid-content {
+            // No top/bottom padding in repeated grid cells
+            padding-top: 0;
+            padding-bottom: 0;
+        }
     }
 
-    // Image output
-    .xforms-mediatype-image { width: 100%; overflow: auto; display: block }
-    .xforms-mediatype-image { *padding-bottom: 17px; *overflow-y: hidden }// IE HACK
-    .xforms-mediatype-image img { display: block }
+    #fr-view {
 
-    //  Buttons
-    .fr-grid-content {
-        .xforms-trigger button, .xforms-trigger input { margin-top: 1.72em } // hand-tuned so it appears at about the same pos as input fields
-        .xforms-trigger button, .yui-button .xforms-trigger input { margin-top: 0 } // except YUI buttons don't appear right with top margin!
+        margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
+
+        /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
+           http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
+         .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
+            { *width: 13em }
+
+        .fr-grid td .fr-grid-content {
+
+            img.xforms-input-input { *width: auto } // Undo effect of previous rule for image in minimal date picker
+
+            .xforms-input input.xforms-type-date,
+            .xforms-input input.xforms-type-time
+                { *width: 6.3em }
+
+            // Custom control widths
+            .fr-width-2em     input.xforms-input-input, .fr-width-2em select      { width: 2em }
+            .fr-width-3em     input.xforms-input-input, .fr-width-3em select      { width: 3em }
+            .fr-width-4em     input.xforms-input-input, .fr-width-4em select      { width: 4em }
+            .fr-width-5em     input.xforms-input-input, .fr-width-5em select      { width: 5em }
+            .fr-width-7em     input.xforms-input-input, .fr-width-7em select      { width: 7em }
+            .fr-width-10em    input.xforms-input-input, .fr-width-10em select     { width: 10em }
+            .fr-width-12em    input.xforms-input-input, .fr-width-12em select     { width: 12em }
+            .fr-width-15em    input.xforms-input-input, .fr-width-15em select     { width: 15em }
+            .fr-width-100pc   input.xforms-input-input, .fr-width-100pc select    { width: 100% }
+
+            .fr-width-2digits input.xforms-input-input, .fr-width-2digits select  { width: 2.2em }
+            .fr-width-4digits input.xforms-input-input, .fr-width-4digits select  { width: 3.3em }
+        }
     }
 
-    // Cell content
-    .fr-grid-content {
-        padding: @frGridCellPadding;                // Add some space around control
-        *padding-right: 6px;                        // IE7: help move back controls within .fr-grid-content
-        *zoom: 1;                                   // IE7: fix handling of padding
+    /* ***** View, PDF, email ******************************************************************************************* */
+
+    // Textarea in output mode can contain line breaks so try to keep them
+    .xforms-textarea pre {
+        font-family: @sansFontFamily;   // use regular font, not monospaced font
+        white-space: -moz-pre-wrap;
+        white-space: pre-wrap;
+        *white-space: normal;
+        word-break: normal;             // Boostrap overrides word-break
     }
-}
 
-.fr-repeat-table {
-    .fr-grid-content {
-        // No top/bottom padding in repeated grid cells
-        padding-top: 0;
-        padding-bottom: 0;
-    }
-}
+    .fr-mode-view {
+        .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
+        .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }
 
-#fr-view {
+        .fr-section-title img,
+          .fr-mode-pdf .fr-section-title img,
+          .fr-mode-email .fr-section-title img { display: none }
+        .xforms-help-image,
+          .fr-mode-pdf .xforms-help-image,
+          .fr-mode-email .xforms-help-image { display: none }
 
-    margin-bottom: 10px;    // otherwise buttons at the bottom touch the viewport
-    
-    /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
-       http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
-     .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input
-        { *width: 13em }
-
-    .fr-grid td .fr-grid-content {
-
-        img.xforms-input-input { *width: auto } // Undo effect of previous rule for image in minimal date picker
-
-        .xforms-input input.xforms-type-date,
-        .xforms-input input.xforms-type-time
-            { *width: 6.3em }
-
-        // Custom control widths
-        .fr-width-2em     input.xforms-input-input, .fr-width-2em select      { width: 2em }
-        .fr-width-3em     input.xforms-input-input, .fr-width-3em select      { width: 3em }
-        .fr-width-4em     input.xforms-input-input, .fr-width-4em select      { width: 4em }
-        .fr-width-5em     input.xforms-input-input, .fr-width-5em select      { width: 5em }
-        .fr-width-7em     input.xforms-input-input, .fr-width-7em select      { width: 7em }
-        .fr-width-10em    input.xforms-input-input, .fr-width-10em select     { width: 10em }
-        .fr-width-12em    input.xforms-input-input, .fr-width-12em select     { width: 12em }
-        .fr-width-15em    input.xforms-input-input, .fr-width-15em select     { width: 15em }
-        .fr-width-100pc   input.xforms-input-input, .fr-width-100pc select    { width: 100% }
-    
-        .fr-width-2digits input.xforms-input-input, .fr-width-2digits select  { width: 2.2em }
-        .fr-width-4digits input.xforms-input-input, .fr-width-4digits select  { width: 3.3em }
-    }
-}
-
-/* ***** View, PDF, email ******************************************************************************************* */
-
-// Textarea in output mode can contain line breaks so try to keep them
-.xforms-textarea pre {
-    font-family: @sansFontFamily;   // use regular font, not monospaced font
-    white-space: -moz-pre-wrap;
-    white-space: pre-wrap;
-    *white-space: normal;
-    word-break: normal;             // Boostrap overrides word-break
-}
-
-.fr-mode-view {
-    .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
-    .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }
-
-    .fr-section-title img,
-      .fr-mode-pdf .fr-section-title img,
-      .fr-mode-email .fr-section-title img { display: none }
-    .xforms-help-image,
-      .fr-mode-pdf .xforms-help-image,
-      .fr-mode-email .xforms-help-image { display: none }
-
-    // For those controls that still have a display: block in view mode, make sure there is no top margin
-    .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
-    .fr-repeat-multiple-rows {
-        .fr-dt-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
-        border-top: none;                           // Avoid double border at the top
+        // For those controls that still have a display: block in view mode, make sure there is no top margin
+        .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
+        .fr-repeat-multiple-rows {
+            .fr-dt-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
+            border-top: none;                           // Avoid double border at the top
+        }
     }
 }
 
@@ -516,7 +524,7 @@ button.btn-link {
     // This must not show in the PDF
     noscript { display: none }
 
-    form.xforms-form {
+    .orbeon .xforms-form {
         .fr-status-icons,                                              // no status icons
         .xforms-loading-loading,                                       // no loading icon
         .xforms-upload-remove,                                         // upload remove button

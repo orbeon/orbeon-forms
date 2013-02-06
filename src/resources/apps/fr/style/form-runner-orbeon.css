@@ -75,13 +75,19 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
-html,
-body {
+body.orbeon {
   background-color: #f3f3f3;
 }
-/* ***** Headings (titles and sections) ***************************************************************************** */
-.xforms-form h2,
-.xforms-form h3 {
+.orbeon {
+  /* ***** Headings (titles and sections) ***************************************************************************** */
+
+  /* ***** Controls**************************************************************************************************** */
+
+  /* ***** Other ****************************************************************************************************** */
+
+}
+.orbeon h2,
+.orbeon h3 {
   background-color: #f8f8f8;
   background-image: -moz-linear-gradient(top, #ffffff, #eeeeee);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#eeeeee));
@@ -92,28 +98,27 @@ body {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#ffeeeeee', GradientType=0);
   margin: 0;
 }
-.xforms-form h2,
-.xforms-form h3,
-.xforms-form h4,
-.xforms-form h5,
-.xforms-form h6 {
+.orbeon h2,
+.orbeon h3,
+.orbeon h4,
+.orbeon h5,
+.orbeon h6 {
   text-align: left;
   font-weight: normal;
   clear: left;
   padding: 0;
   color: #555555;
 }
-.xforms-form h2 {
+.orbeon h2 {
   font-size: 18px;
   line-height: 36px;
 }
-.xforms-form h3,
-.xforms-form h4 {
+.orbeon h3,
+.orbeon h4 {
   font-size: 110%;
   line-height: 135%;
 }
-/* ***** Controls**************************************************************************************************** */
-.fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
+.orbeon .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
@@ -124,7 +129,7 @@ body {
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
   padding: 4px 6px;
 }
-.fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items:focus {
+.orbeon .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items:focus {
   border-color: rgba(82, 168, 236, 0.8);
   outline: 0;
   outline: thin dotted  \9;
@@ -132,30 +137,29 @@ body {
   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
 }
-.xforms-noscript button.btn-link {
+.orbeon .xforms-noscript button.btn-link {
   text-shadow: none;
   margin-top: 0;
 }
-.xforms-noscript button.btn-link button {
+.orbeon .xforms-noscript button.btn-link button {
   height: auto;
 }
-.xforms-noscript .xforms-help-panel .xforms-help-group {
+.orbeon .xforms-noscript .xforms-help-panel .xforms-help-group {
   list-style-type: square;
 }
-/* ***** Other ****************************************************************************************************** */
-.fr-orbeon-version {
+.orbeon .fr-orbeon-version {
   text-align: center;
   font-size: smaller;
   padding: 10px;
   color: #6E6E6E;
 }
-.fr-explanation .xforms-output {
+.orbeon .fr-explanation .xforms-output {
   display: block;
   font-style: italic;
   padding: 1em;
   background-color: #f8f8f8;
 }
-.xforms-alert-active {
+.orbeon .xforms-alert-active {
   font-weight: bold;
   font-size: smaller;
   color: #b94a48;
@@ -163,7 +167,7 @@ body {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-.xforms-hint {
+.orbeon .xforms-hint {
   display: block;
   clear: both;
   font-size: smaller;
@@ -172,63 +176,63 @@ body {
   width: 100%;
   color: #6E6E6E;
 }
-.fr-language-choice,
-.fr-noscript-choice,
-.fr-goto-content {
+.orbeon .fr-language-choice,
+.orbeon .fr-noscript-choice,
+.orbeon .fr-goto-content {
   color: #555555;
   font-size: 85%;
   text-align: right;
 }
-.fr-language-choice a,
-.fr-noscript-choice a,
-.fr-goto-content a,
-.fr-language-choice button.btn-link,
-.fr-noscript-choice button.btn-link,
-.fr-goto-content button.btn-link {
+.orbeon .fr-language-choice a,
+.orbeon .fr-noscript-choice a,
+.orbeon .fr-goto-content a,
+.orbeon .fr-language-choice button.btn-link,
+.orbeon .fr-noscript-choice button.btn-link,
+.orbeon .fr-goto-content button.btn-link {
   color: #777777;
 }
-.fr-language-choice,
-.fr-noscript-choice {
+.orbeon .fr-language-choice,
+.orbeon .fr-noscript-choice {
   float: right;
 }
-.fr-goto-content {
+.orbeon .fr-goto-content {
   float: left;
 }
-.navbar-inverse .fr-language-choice,
-.navbar-inverse .fr-noscript-choice,
-.navbar-inverse .fr-goto-content {
+.orbeon .navbar-inverse .fr-language-choice,
+.orbeon .navbar-inverse .fr-noscript-choice,
+.orbeon .navbar-inverse .fr-goto-content {
   color: #bbbbbb;
 }
-.navbar-inverse .fr-language-choice a,
-.navbar-inverse .fr-noscript-choice a,
-.navbar-inverse .fr-goto-content a,
-.navbar-inverse .fr-language-choice button.btn-link,
-.navbar-inverse .fr-noscript-choice button.btn-link,
-.navbar-inverse .fr-goto-content button.btn-link {
+.orbeon .navbar-inverse .fr-language-choice a,
+.orbeon .navbar-inverse .fr-noscript-choice a,
+.orbeon .navbar-inverse .fr-goto-content a,
+.orbeon .navbar-inverse .fr-language-choice button.btn-link,
+.orbeon .navbar-inverse .fr-noscript-choice button.btn-link,
+.orbeon .navbar-inverse .fr-goto-content button.btn-link {
   color: #999999;
 }
-.fr-mode-new .xforms-required .xforms-label,
-.fr-mode-edit .xforms-required .xforms-label,
-.fr-mode-test .xforms-required .xforms-label,
-.xforms-dialog .xforms-required .xforms-label,
-.fr-mode-new .fb-required-true .xforms-label,
-.fr-mode-edit .fb-required-true .xforms-label {
+.orbeon .fr-mode-new .xforms-required .xforms-label,
+.orbeon .fr-mode-edit .xforms-required .xforms-label,
+.orbeon .fr-mode-test .xforms-required .xforms-label,
+.orbeon .xforms-dialog .xforms-required .xforms-label,
+.orbeon .fr-mode-new .fb-required-true .xforms-label,
+.orbeon .fr-mode-edit .fb-required-true .xforms-label {
   background-image: url(asterisk.png);
   background-position: 0 2px;
   background-repeat: no-repeat;
   padding-left: 12px;
 }
-.xforms-invalid-visited .xforms-input-input,
-textarea.xforms-invalid-visited {
+.orbeon .xforms-invalid-visited .xforms-input-input,
+.orbeon textarea.xforms-invalid-visited {
   border-color: #b94a48;
 }
-.xforms-upload-info {
+.orbeon .xforms-upload-info {
   background-color: transparent;
 }
-.fr-toc a {
+.orbeon .fr-toc a {
   text-decoration: none;
 }
-.fr-view .xbl-fr-error-summary .fr-error-title {
+.orbeon .fr-view .xbl-fr-error-summary .fr-error-title {
   padding: 5px;
   background-color: #b94a48;
   color: white;
@@ -239,14 +243,14 @@ textarea.xforms-invalid-visited {
   -moz-border-radius-topright: 4px;
   border-top-right-radius: 4px;
 }
-.fr-view .xbl-fr-error-summary .fr-error-label,
-.fr-view .xbl-fr-error-summary .fr-error-row {
+.orbeon .fr-view .xbl-fr-error-summary .fr-error-label,
+.orbeon .fr-view .xbl-fr-error-summary .fr-error-row {
   font-weight: bold;
 }
-.fr-view .xbl-fr-error-summary .fr-error-alert {
+.orbeon .fr-view .xbl-fr-error-summary .fr-error-alert {
   color: #b94a48;
 }
-.fr-view .xbl-fr-error-summary .fr-error-summary-body {
+.orbeon .fr-view .xbl-fr-error-summary .fr-error-summary-body {
   padding: 0;
   margin-bottom: 10px;
   background-color: #f5f5f5;
@@ -258,51 +262,51 @@ textarea.xforms-invalid-visited {
   -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
 }
-.xbl-fr-section {
+.orbeon .xbl-fr-section {
   background-color: white;
 }
-.xbl-fr-section .fr-section-title .fr-section-label {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label {
   display: block;
   padding-left: 20px;
   height: 100%;
   overflow: hidden;
   font-size: 18px;
 }
-.xbl-fr-section .fr-section-title .fr-section-label a {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label a {
   text-decoration: none;
   color: #555555;
   display: block;
   min-height: 36px;
 }
-.xbl-fr-section .fr-section-title .fr-section-label label {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label label {
   font-size: 18px;
   line-height: 36px;
   margin-bottom: 0;
 }
-.xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
-.xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
   background-repeat: no-repeat;
   background-position: 5px 15px;
   cursor: pointer;
 }
-.xbl-fr-section .fr-section-title .fr-section-label.fr-section-open {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open {
   background-image: url(arrow-down.png);
 }
-.xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+.orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
   background-image: url(arrow-right.png);
 }
-.xforms-static,
-.fr-static {
+.orbeon .xforms-static,
+.orbeon .fr-static {
   min-height: 1em;
 }
-.fr-mode-view .fr-grid-content {
+.orbeon .fr-mode-view .fr-grid-content {
   margin-bottom: 1em;
 }
-.fr-mode-view .fr-repeat .fr-grid-content {
+.orbeon .fr-mode-view .fr-repeat .fr-grid-content {
   background-color: transparent;
   margin-bottom: 0;
 }
-.table th {
+.orbeon .table th {
   text-align: center;
 }
 /* ***** Print and PDF ********************************************************************************************** */
@@ -311,73 +315,73 @@ textarea.xforms-invalid-visited {
     font-family: "Arial Unicode MS";
   }
   html,
-  html body {
+  html body.orbeon {
     background-color: white;
     background-image: none;
   }
-  html body {
+  html body.orbeon {
     padding-top: 0;
   }
-  form.xforms-form a,
-  form.xforms-form button.btn-link {
+  .orbeon .xforms-form a,
+  .orbeon .xforms-form button.btn-link {
     color: black;
     text-decoration: none;
   }
-  form.xforms-form .xforms-required label {
+  .orbeon .xforms-form .xforms-required label {
     background-image: none;
     padding-left: 0;
   }
-  form.xforms-form .container {
+  .orbeon .xforms-form .container {
     width: 100%;
   }
-  form.xforms-form .fr-body {
+  .orbeon .xforms-form .fr-body {
     border: none;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
   }
-  form.xforms-form h2 {
+  .orbeon .xforms-form h2 {
     border-bottom: 1px solid #e3e3e3;
     color: black;
   }
-  form.xforms-form .xbl-fr-section .fr-section-title {
+  .orbeon .xforms-form .xbl-fr-section .fr-section-title {
     background: none;
   }
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label {
+  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label {
     padding-left: 0;
   }
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
+  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
     background-image: none;
   }
-  form.xforms-form .xbl-fr-section .fr-section-title .fr-section-label a {
+  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label a {
     color: black;
   }
-  form.xforms-form .navbar,
-  form.xforms-form .navbar.navbar-inverse {
+  .orbeon .xforms-form .navbar,
+  .orbeon .xforms-form .navbar.navbar-inverse {
     position: static;
   }
-  form.xforms-form .navbar .navbar-inner,
-  form.xforms-form .navbar.navbar-inverse .navbar-inner {
+  .orbeon .xforms-form .navbar .navbar-inner,
+  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner {
     background-color: white;
     border-bottom: 1px solid #e3e3e3;
     padding-left: 0;
   }
-  form.xforms-form .navbar .navbar-inner .container h1,
-  form.xforms-form .navbar.navbar-inverse .navbar-inner .container h1 {
+  .orbeon .xforms-form .navbar .navbar-inner .container h1,
+  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner .container h1 {
     font-size: 24px;
     color: black;
   }
-  form.xforms-form .navbar .navbar-inner .fr-language-choice,
-  form.xforms-form .navbar.navbar-inverse .navbar-inner .fr-language-choice {
+  .orbeon .xforms-form .navbar .navbar-inner .fr-language-choice,
+  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner .fr-language-choice {
     display: none;
   }
-  form.xforms-form .navbar .navbar-inner .brand,
-  form.xforms-form .navbar.navbar-inverse .navbar-inner .brand {
+  .orbeon .xforms-form .navbar .navbar-inner .brand,
+  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner .brand {
     color: #555555;
     font-size: 25px;
   }
-  form.xforms-form .fr-form-description {
+  .orbeon .xforms-form .fr-form-description {
     display: none;
   }
 }

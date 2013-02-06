@@ -16,11 +16,11 @@
 @import "bootstrap-src/less/mixins";
 @import "form-runner-common";
 
-html, body { background-color: @frBackground }
+body.orbeon { background-color: @frBackground }
 
-/* ***** Headings (titles and sections) ***************************************************************************** */
+.orbeon {
 
-.xforms-form {
+    /* ***** Headings (titles and sections) ***************************************************************************** */
     h2, h3 {
         #gradient > .vertical(#fff, #eee);
         margin: 0;
@@ -43,208 +43,208 @@ html, body { background-color: @frBackground }
         font-size: 110%;
         line-height: 135%;
     }
-}
 
-/* ***** Controls**************************************************************************************************** */
+    /* ***** Controls**************************************************************************************************** */
 
-// Copied over Bootstrap styles as we can't reuse them simply as mixins
-// Ideally this would be in box-select.less
-.fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
-    .border-radius(@inputBorderRadius);
-    background-color: @inputBackground;
-    border: 1px solid @inputBorder;
-    .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
-    padding: 4px 6px;
-    &:focus {
-        border-color: rgba(82, 168, 236, .8);
-        outline: 0;
-        outline: thin dotted  \9; // IE6-9
-        .box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6));
-    }
-}
-
-.xforms-noscript {
-    button.btn-link {
-        text-shadow: none;
-        margin-top: 0;
-        button { height: auto; }
+    // Copied over Bootstrap styles as we can't reuse them simply as mixins
+    // Ideally this would be in box-select.less
+    .fr-view .xbl-fr-box-select .xforms-select-appearance-full .xforms-items {
+        .border-radius(@inputBorderRadius);
+        background-color: @inputBackground;
+        border: 1px solid @inputBorder;
+        .box-shadow(inset 0 1px 1px rgba(0,0,0,.075));
+        padding: 4px 6px;
+        &:focus {
+            border-color: rgba(82, 168, 236, .8);
+            outline: 0;
+            outline: thin dotted  \9; // IE6-9
+            .box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(82,168,236,.6));
+        }
     }
 
-    .xforms-help-panel .xforms-help-group { list-style-type: square }
-}
+    .xforms-noscript {
+        button.btn-link {
+            text-shadow: none;
+            margin-top: 0;
+            button { height: auto; }
+        }
 
-/* ***** Other ****************************************************************************************************** */
+        .xforms-help-panel .xforms-help-group { list-style-type: square }
+    }
 
-.fr-orbeon-version {
-    text-align: center;
-    font-size: smaller;
-    padding: 10px;
-    color: #6E6E6E;
-}
+    /* ***** Other ****************************************************************************************************** */
 
-.fr-explanation .xforms-output {
-    display: block;
-    font-style: italic;
-    padding: 1em;
-    background-color: #f8f8f8
-}
+    .fr-orbeon-version {
+        text-align: center;
+        font-size: smaller;
+        padding: 10px;
+        color: #6E6E6E;
+    }
 
-.xforms-alert-active {
-    font-weight: bold;
-    font-size: smaller;
-    color: @error;
-    .border-radius(3px);
-}
+    .fr-explanation .xforms-output {
+        display: block;
+        font-style: italic;
+        padding: 1em;
+        background-color: #f8f8f8
+    }
 
-.xforms-hint {
-    display: block;
-    clear: both;
-    font-size: smaller;
-    margin-top: .2em;
-    margin-left: 0;// used to have margin here but with new colors no margin seems better
-    width: 100%;
-    color: #6E6E6E;
-}
+    .xforms-alert-active {
+        font-weight: bold;
+        font-size: smaller;
+        color: @error;
+        .border-radius(3px);
+    }
 
-// Navbar
-.fr-language-choice, .fr-noscript-choice, .fr-goto-content {
-    color: @navbarLinkColorActive;
-    font-size: 85%;
-    text-align: right;
-    a, button.btn-link { color: @navbarLinkColor }
-}
+    .xforms-hint {
+        display: block;
+        clear: both;
+        font-size: smaller;
+        margin-top: .2em;
+        margin-left: 0;// used to have margin here but with new colors no margin seems better
+        width: 100%;
+        color: #6E6E6E;
+    }
 
-.fr-language-choice, .fr-noscript-choice {
-    float: right;
-}
-
-.fr-goto-content {
-    float: left;
-}
-
-.navbar-inverse {
+    // Navbar
     .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
-        color: @frNavBarTextColor;
-        a, button.btn-link { color: @navbarInverseLinkColor }
-    }
-}
-
-// Add a star before the label of required fields, but only in new/edit modes
-// NOTE: This only works in span layout (the default in FR since 2011-07-28)
-// NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
-.fr-mode-new .xforms-required .xforms-label,
-.fr-mode-edit .xforms-required .xforms-label,
-.fr-mode-test .xforms-required .xforms-label,
-.xforms-dialog .xforms-required .xforms-label,
-.fr-mode-new .fb-required-true .xforms-label,
-.fr-mode-edit .fb-required-true .xforms-label {
-    background-image: url(asterisk.png);
-    background-position: 0 2px;             // Lower the star, so it doesn't sit "too high" relative to the text of the label
-    background-repeat: no-repeat;
-    padding-left: 12px;
-}
-
-// Colored border for invalid fields
-// NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label
-.xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: @error }
-
-// Upload control information
-.xforms-upload-info { background-color: transparent }
-
-// Table of contents
-.fr-toc a { text-decoration: none }
-
-// Error summary
-.fr-view .xbl-fr-error-summary {
-    .fr-error-title {
-        padding: 5px;
-        background-color: @error;
-        color: white;
-        .border-top-left-radius(4px);
-        .border-top-right-radius(4px);
+        color: @navbarLinkColorActive;
+        font-size: 85%;
+        text-align: right;
+        a, button.btn-link { color: @navbarLinkColor }
     }
 
-    .fr-error-label, .fr-error-row { font-weight: bold }
-    .fr-error-alert { color: @error } // override default of XBL component
-
-    // Mix-in a border into the error summary body
-    .fr-error-summary-body {
-        .fr-border;
+    .fr-language-choice, .fr-noscript-choice {
+        float: right;
     }
-}
 
-// Section
-.xbl-fr-section {
+    .fr-goto-content {
+        float: left;
+    }
 
-    background-color: white;
+    .navbar-inverse {
+        .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+            color: @frNavBarTextColor;
+            a, button.btn-link { color: @navbarInverseLinkColor }
+        }
+    }
 
-    .fr-section-title {
+    // Add a star before the label of required fields, but only in new/edit modes
+    // NOTE: This only works in span layout (the default in FR since 2011-07-28)
+    // NOTE: Also cover Form Builder classes here instead of form-builder.css, so we don't miss changes done here
+    .fr-mode-new .xforms-required .xforms-label,
+    .fr-mode-edit .xforms-required .xforms-label,
+    .fr-mode-test .xforms-required .xforms-label,
+    .xforms-dialog .xforms-required .xforms-label,
+    .fr-mode-new .fb-required-true .xforms-label,
+    .fr-mode-edit .fb-required-true .xforms-label {
+        background-image: url(asterisk.png);
+        background-position: 0 2px;             // Lower the star, so it doesn't sit "too high" relative to the text of the label
+        background-repeat: no-repeat;
+        padding-left: 12px;
+    }
 
-        .fr-section-label {
-            display: block;                                 // So the line expands all the way to the right
-            padding-left: @frSectionTitleLeftPadding;
-            // NOTE: Was meant to make title take space even when empty, but this doesn't seem to work. However,
-            // removing this breaks multi-line titles. Need a better solution probably.
-            height: 100%;
-            overflow: hidden;           // Avoid wrapping under help image for long title
-            font-size: @frSectionTitleHeight;
+    // Colored border for invalid fields
+    // NOTE: We don't use this style for required fields, as we are now using an asterisk next to the label
+    .xforms-invalid-visited .xforms-input-input, textarea.xforms-invalid-visited { border-color: @error }
 
-            // Case of collapsable section
-            a {
-                text-decoration: none;
-                color: @frHeaderColor;      // Don't use the default styling for anchors
-                                            // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
-                display: block;             // - So it extends all the way to the right
-                min-height: @frSectionTitleLineHeight;
-            }
+    // Upload control information
+    .xforms-upload-info { background-color: transparent }
 
-            // Override default label styles
-            label {
+    // Table of contents
+    .fr-toc a { text-decoration: none }
+
+    // Error summary
+    .fr-view .xbl-fr-error-summary {
+        .fr-error-title {
+            padding: 5px;
+            background-color: @error;
+            color: white;
+            .border-top-left-radius(4px);
+            .border-top-right-radius(4px);
+        }
+
+        .fr-error-label, .fr-error-row { font-weight: bold }
+        .fr-error-alert { color: @error } // override default of XBL component
+
+        // Mix-in a border into the error summary body
+        .fr-error-summary-body {
+            .fr-border;
+        }
+    }
+
+    // Section
+    .xbl-fr-section {
+
+        background-color: white;
+
+        .fr-section-title {
+
+            .fr-section-label {
+                display: block;                                 // So the line expands all the way to the right
+                padding-left: @frSectionTitleLeftPadding;
+                // NOTE: Was meant to make title take space even when empty, but this doesn't seem to work. However,
+                // removing this breaks multi-line titles. Need a better solution probably.
+                height: 100%;
+                overflow: hidden;           // Avoid wrapping under help image for long title
                 font-size: @frSectionTitleHeight;
-                line-height: @frSectionTitleLineHeight;
-                margin-bottom: 0;
-            }
 
-            &.fr-section-open, &.fr-section-closed {
-                background-repeat: no-repeat;
-                background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
-                                                                                                         // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
-                                                                                                         // to be aligned on the first line, not the middle of the section area
-                cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
-            }
-            &.fr-section-open {
-                background-image: url(arrow-down.png);
-            }
-            &.fr-section-closed {
-                background-image: url(arrow-right.png);
+                // Case of collapsable section
+                a {
+                    text-decoration: none;
+                    color: @frHeaderColor;      // Don't use the default styling for anchors
+                                                // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
+                    display: block;             // - So it extends all the way to the right
+                    min-height: @frSectionTitleLineHeight;
+                }
+
+                // Override default label styles
+                label {
+                    font-size: @frSectionTitleHeight;
+                    line-height: @frSectionTitleLineHeight;
+                    margin-bottom: 0;
+                }
+
+                &.fr-section-open, &.fr-section-closed {
+                    background-repeat: no-repeat;
+                    background-position: 5px (@frSectionTitleLineHeight + 1 - @frSectionTitleIconWidth) / 2; // To vertically align on the middle of the first line of the section title
+                                                                                                             // We use an offset in pixels, instead of 50%, for multi-line titles, for which we want the open/close
+                                                                                                             // to be aligned on the first line, not the middle of the section area
+                    cursor: pointer;            // So the "hand" cursor shows wherever the mouse is on the line, not just on the text of the title
+                }
+                &.fr-section-open {
+                    background-image: url(arrow-down.png);
+                }
+                &.fr-section-closed {
+                    background-image: url(arrow-right.png);
+                }
             }
         }
     }
-}
 
-// Add background to static read-only fields and special output fields
-.xforms-static, .fr-static { min-height: 1em }
-.fr-mode-view {
-    .fr-grid-content { margin-bottom: 1em }
-    .fr-repeat .fr-grid-content {
-        background-color: transparent;
-        margin-bottom: 0;
+    // Add background to static read-only fields and special output fields
+    .xforms-static, .fr-static { min-height: 1em }
+    .fr-mode-view {
+        .fr-grid-content { margin-bottom: 1em }
+        .fr-repeat .fr-grid-content {
+            background-color: transparent;
+            margin-bottom: 0;
+        }
     }
-}
 
-.table th { text-align: center }
+    .table th { text-align: center }
+}
 
 /* ***** Print and PDF ********************************************************************************************** */
 
 // This is also used for PDF generation
 @media print {
     html {
-        &, body { background-color: white; background-image: none }
+        &, body.orbeon { background-color: white; background-image: none }
         font-family: "Arial Unicode MS";
-        body { padding-top: 0 } // no need for padding because navbar is position: static
+        body.orbeon { padding-top: 0 } // no need for padding because navbar is position: static
     }
 
-    form.xforms-form {
+    .orbeon .xforms-form {
 
         a, button.btn-link { color: black; text-decoration: none }
         .xforms-required label { background-image: none; padding-left: 0 }

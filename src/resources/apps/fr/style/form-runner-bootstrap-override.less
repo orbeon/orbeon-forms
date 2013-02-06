@@ -17,170 +17,181 @@
 @controlsBottomMargin: 5px;                 // 5px is the Bootstrap default
 @multipleSelectHeight: (@baseLineHeight + @controlsBottomMargin) * 3 - @controlsBottomMargin + 8px; // 3 lines including margins
 
-body, label, button, .btn  {
-    font-size: @frFontSize;         // Use our own preferred font size
+body.orbeon {
+  margin: 0;
+  font-family: @baseFontFamily;
+  font-size: @frFontSize;         // Use our own preferred font size
+  line-height: @baseLineHeight;
+  color: @textColor;
+  background-color: @bodyBackground;
 }
 
-a {
-    text-decoration: underline;     // Don't remove the underline for anchors; this is an important web convention
-}
+.orbeon {
+    label, button, .btn  {
+        font-size: @frFontSize;         // Use our own preferred font size
+    }
 
-.navbar-inverse {
-    .navbar-inner {
-        #gradient > .vertical(@gray, @grayDarker);
-        border: none;
-        .container {
-            line-height: @navbarHeight;             // Get the content of the navbar to be verticaly aligned
-            img, h1 { vertical-align: middle }      // See: http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Center-content-vertically-inside-a-box
-            img { max-height: @navbarHeight }       // So the navbar height isn't increased if users select a larger logo image
-            h1 {
-                margin: 0 0 0 15px;                 // Space between image and title
-                padding: 0;
-                font-size: 16px;
-                font-weight: normal;
-                color: @frNavBarTextColor;
-                text-shadow: none;
-                text-decoration: none;
-                display: inline;
+    a {
+        text-decoration: underline;     // Don't remove the underline for anchors; this is an important web convention
+    }
+
+    .navbar-inverse {
+        .navbar-inner {
+            #gradient > .vertical(@gray, @grayDarker);
+            border: none;
+            .container {
+                line-height: @navbarHeight;             // Get the content of the navbar to be verticaly aligned
+                img, h1 { vertical-align: middle }      // See: http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Center-content-vertically-inside-a-box
+                img { max-height: @navbarHeight }       // So the navbar height isn't increased if users select a larger logo image
+                h1 {
+                    margin: 0 0 0 15px;                 // Space between image and title
+                    padding: 0;
+                    font-size: 16px;
+                    font-weight: normal;
+                    color: @frNavBarTextColor;
+                    text-shadow: none;
+                    text-decoration: none;
+                    display: inline;
+                }
             }
         }
-    }
-    margin: 10px 0;                 // Space before and after the navbar
-}
-
-form.xforms-form {
-
-    // Override Bootstrap styling for element with a class name ending with 'span' (.xforms-layout-span)
-    float: none;
-    margin: 0;
-
-    select,
-    textarea,
-    input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
-    input[type="password"],
-    input[type="datetime"],
-    input[type="datetime-local"],
-    input[type="date"],
-    input[type="month"],
-    input[type="time"],
-    input[type="week"],
-    input[type="number"],
-    input[type="email"],
-    input[type="url"],
-    input[type="search"],
-    input[type="tel"],
-    input[type="color"],
-    .uneditable-input {
-        font-size: @frFontSize;         // Use our own preferred font size
-        margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
-        color: black;                   // Make text inside the fields stand out, as this is the most important information
-        .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap
-        height: @controlsHeight;
-
-        // IE7: due to missing box-sizing support
-        *height: @controlsHeight - 2 * 2px;
-        *line-height: @controlsHeight - 2 * 2px;
+        margin: 10px 0;                 // Space before and after the navbar
     }
 
-    input[type="file"] {
-        line-height: normal;            // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
-    }
+    form.xforms-form {
 
-    // Don't set height for textarea
-    textarea {
-        height: @textareaHeight;
-    }
+        // Override Bootstrap styling for element with a class name ending with 'span' (.xforms-layout-span)
+        float: none;
+        margin: 0;
 
-    label.radio, label.checkbox {
-        margin-bottom: @controlsBottomMargin;
-        input[type="radio"],
-        input[type="checkbox"] {
-            margin-top: 3px;    // override Bootstrap
-            *margin-top: 0;     // IE7
-            margin-top: 0px\9;  // IE8-9
+        select,
+        textarea,
+        input[type="text"],             // Like Boostrap, use all the specific types to exclude checkbox/radio
+        input[type="password"],
+        input[type="datetime"],
+        input[type="datetime-local"],
+        input[type="date"],
+        input[type="month"],
+        input[type="time"],
+        input[type="week"],
+        input[type="number"],
+        input[type="email"],
+        input[type="url"],
+        input[type="search"],
+        input[type="tel"],
+        input[type="color"],
+        .uneditable-input {
+            font-size: @frFontSize;         // Use our own preferred font size
+            margin-bottom: 0;               // Override default 9px bottom margin added by Bootstrap
+            color: black;                   // Make text inside the fields stand out, as this is the most important information
+            .box-sizing(border-box);        // So width: 100% works with the padding added by Bootstrap
+            height: @controlsHeight;
+
+            // IE7: due to missing box-sizing support
+            *height: @controlsHeight - 2 * 2px;
+            *line-height: @controlsHeight - 2 * 2px;
         }
-    }
 
-    select[multiple],
-    .xforms-select1-appearance-compact select,
-    .xforms-select-appearance-compact select {
-        height: @multipleSelectHeight;
-    }
-
-    // Adapt pagination to use of xf:trigger
-    .pagination ul > li {
-        &> .xforms-trigger { cursor: pointer }
-        &> .xforms-trigger.xforms-readonly { cursor: auto; }
-        a { text-decoration: none; }
-    }
-
-    .input-append .add-on, .input-prepend .add-on {
-        height: @baseLineHeight - 2px;
-        // IE7: align with input field
-        *margin-top: 1px;
-        *height: @baseLineHeight;
-    }
-
-    .fr-grid tr th label {
-        margin: 0;                          //  No margin on label inside table headers as they are not next to a control
-    }
-
-    .table {
-        margin: 0;                          // Bootstrap adds a bottom margin of 20px
-    }
-
-    table th {
-        font-weight: normal;                // Set to bold in Bootstrap
-    }
-
-    // Used in Form Builder in particular and we probably never want the humongous legends anywhere
-    fieldset {
-        padding-left: 0;
-        padding-right: 0;
-
-        &> legend {
-            line-height: inherit;
-            font-size: @frFontSize * 1.1;
+        input[type="file"] {
+            line-height: normal;            // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
         }
-    }
 
-    // NAV LIST
-    // --------
+        // Don't set height for textarea
+        textarea {
+            height: @textareaHeight;
+        }
 
-    // Copy Boostrap rules but add span between li and a
-    // Make links block level
-    .nav > li > span > a {
-      display: block;
-    }
-    .nav > li > span > a:hover {
-      text-decoration: none;
-      background-color: @grayLighter;
-    }
+        label.radio, label.checkbox {
+            margin-bottom: @controlsBottomMargin;
+            input[type="radio"],
+            input[type="checkbox"] {
+                margin-top: 3px;    // override Bootstrap
+                *margin-top: 0;     // IE7
+                margin-top: 0px\9;  // IE8-9
+            }
+        }
 
-    .nav-list > li > span > a,
-    .nav-list .nav-header {
-      margin-left:  -15px;
-      margin-right: -15px;
-      text-shadow: 0 1px 0 rgba(255,255,255,.5);
-    }
-    .nav-list > li > span > a {
-      padding: 3px 15px;
-    }
-    .nav-list > .active > span > a,
-    .nav-list > .active > span > a:hover {
-      color: @white;
-      text-shadow: 0 -1px 0 rgba(0,0,0,.2);
-      background-color: @linkColor;
-    }
+        select[multiple],
+        .xforms-select1-appearance-compact select,
+        .xforms-select-appearance-compact select {
+            height: @multipleSelectHeight;
+        }
 
-    // Gray out text
-    .nav > .disabled > span > a {
-      color: @grayLight;
-    }
-    // Nuke hover effects
-    .nav > .disabled > span > a:hover {
-      text-decoration: none;
-      background-color: transparent;
-      cursor: default;
+        // Adapt pagination to use of xf:trigger
+        .pagination ul > li {
+            &> .xforms-trigger { cursor: pointer }
+            &> .xforms-trigger.xforms-readonly { cursor: auto; }
+            a { text-decoration: none; }
+        }
+
+        .input-append .add-on, .input-prepend .add-on {
+            height: @baseLineHeight - 2px;
+            // IE7: align with input field
+            *margin-top: 1px;
+            *height: @baseLineHeight;
+        }
+
+        .fr-grid tr th label {
+            margin: 0;                          //  No margin on label inside table headers as they are not next to a control
+        }
+
+        .table {
+            margin: 0;                          // Bootstrap adds a bottom margin of 20px
+        }
+
+        table th {
+            font-weight: normal;                // Set to bold in Bootstrap
+        }
+
+        // Used in Form Builder in particular and we probably never want the humongous legends anywhere
+        fieldset {
+            padding-left: 0;
+            padding-right: 0;
+
+            &> legend {
+                line-height: inherit;
+                font-size: @frFontSize * 1.1;
+            }
+        }
+
+        // NAV LIST
+        // --------
+
+        // Copy Boostrap rules but add span between li and a
+        // Make links block level
+        .nav > li > span > a {
+          display: block;
+        }
+        .nav > li > span > a:hover {
+          text-decoration: none;
+          background-color: @grayLighter;
+        }
+
+        .nav-list > li > span > a,
+        .nav-list .nav-header {
+          margin-left:  -15px;
+          margin-right: -15px;
+          text-shadow: 0 1px 0 rgba(255,255,255,.5);
+        }
+        .nav-list > li > span > a {
+          padding: 3px 15px;
+        }
+        .nav-list > .active > span > a,
+        .nav-list > .active > span > a:hover {
+          color: @white;
+          text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+          background-color: @linkColor;
+        }
+
+        // Gray out text
+        .nav > .disabled > span > a {
+          color: @grayLight;
+        }
+        // Nuke hover effects
+        .nav > .disabled > span > a:hover {
+          text-decoration: none;
+          background-color: transparent;
+          cursor: default;
+        }
     }
 }

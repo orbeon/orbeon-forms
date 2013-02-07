@@ -60,7 +60,7 @@
                         <xh:h1>
                             <xsl:value-of select="$title"/>
                         </xh:h1>
-                        <xh:ul class="nav">
+                        <xh:ul class="nav pull-right">
                             <xh:li>
                                 <xh:a xmlns:f="http://orbeon.org/oxf/xml/formatting" href="/" f:portlet-mode="view">Home</xh:a>
                             </xh:li>

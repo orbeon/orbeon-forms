@@ -71,17 +71,15 @@ public class UtilsTest extends TestCase {
 
     private ResourceManager setupResourceManager() {
         // Setup resource manager
-        Map props = new HashMap();
-        Properties properties = System.getProperties();
+        final Map<String, Object> props = new HashMap<String, Object>();
+        final Properties properties = System.getProperties();
         for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
             if (name.startsWith("oxf.resources."))
                 props.put(name, properties.getProperty(name));
         }
         ResourceManagerWrapper.init(props);
-        ResourceManager resourceManager = ResourceManagerWrapper.instance();
-
-        return resourceManager;
+        return ResourceManagerWrapper.instance();
     }
 
     public void testLocationDocumentSourceResult() {

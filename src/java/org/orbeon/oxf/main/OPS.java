@@ -87,7 +87,7 @@ public class OPS {
 
         // 2. Initialize resource manager
         // Resources are first searched in a file hierarchy, then from the classloader
-        final Map<String, String> props = new LinkedHashMap<String, String>();
+        final Map<String, Object> props = new LinkedHashMap<String, Object>();
         props.put("oxf.resources.factory", "org.orbeon.oxf.resources.PriorityResourceManagerFactory");
         if (resourceManagerSandbox != null) {
             // Use a sandbox

@@ -32,60 +32,36 @@ final public class ResourceManagerWrapper {
     /**
      *  Initialize the factory
      */
-    synchronized public static void init(Map props) {
+    synchronized public static void init(Map<String, Object> props) {
 
         // Create resource factory according to properties
-        final String factoryImp = (String) props.get(FACTORY_PROPERTY);
-        if (factoryImp == null) {
+        final String factoryImpl = (String) props.get(FACTORY_PROPERTY);
+        if (factoryImpl == null) {
             throw new OXFException("Declaration of resource factory missing: no value declared for property '" 
                     + FACTORY_PROPERTY + "'");
         }
         try {
-            final Class c = Class.forName(factoryImp);
-            final Constructor constructor = c.getConstructor(Map.class);
-            factory = (ResourceManagerFactoryFunctor) constructor.newInstance(props);
-            instance = null;
+            final Class<ResourceManagerFactoryFunctor> factoryClass = (Class<ResourceManagerFactoryFunctor>) Class.forName(factoryImpl);
+            final Constructor<ResourceManagerFactoryFunctor> constructor = factoryClass.getConstructor(Map.class);
+            factory = constructor.newInstance(props);
         } catch (ClassNotFoundException e) {
-            throw new OXFException("class " + factoryImp + "not found", e);
+            throw new OXFException("Class " + factoryImpl + "not found", e);
         } catch (Exception e) {
-            throw new OXFException("Can't instanciate factory " + factoryImp, e);
+            throw new OXFException("Can't instantiate factory " + factoryImpl, e);
         }
     }
-
 
     /**
      * Returns an instance of ResourceManager
      */
     synchronized public static ResourceManager instance() {
-        if (instance == null) {
-            instance = (factory == null) ? makeInstance() : factory.makeInstance();
-        }
+
+        if (factory == null)
+            throw new IllegalStateException("ResourceManagerWrapper not initialized");
+
+        if (instance == null)
+            instance = factory.makeInstance();
+
         return instance;
-    }
-
-    /**
-     * Sets a new factory. Nulls the current instance so a new one will be created
-     */
-    synchronized public static void setFactory(ResourceManagerFactoryFunctor factory) {
-        ResourceManagerWrapper.factory = factory;
-        instance = null;
-    }
-
-    /**
-     * Sets the current Singleton instance.
-     * You can set this to null to force a new instance to be created the
-     * next time instance() is called.
-     * @param instance The Singleton instance to use.
-     */
-    synchronized public static void setInstance(ResourceManager instance) {
-        ResourceManagerWrapper.instance = instance;
-    }
-
-
-    /**
-     * Calls the factory to create a ResourceManager instance
-     */
-    private static ResourceManager makeInstance() {
-        return factory.makeInstance();
     }
 }

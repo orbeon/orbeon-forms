@@ -55,7 +55,7 @@ public abstract class ResourceManagerTestBase {
             LoggerFactory.initBasicLogger();
 
             // Setup resource manager
-            final Map props = new HashMap();
+            final Map<String, Object> props = new HashMap<String, Object>();
             final java.util.Properties properties = System.getProperties();
             for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
                 final String name = (String) e.nextElement();

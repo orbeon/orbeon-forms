@@ -322,66 +322,66 @@ body.orbeon {
   html body.orbeon {
     padding-top: 0;
   }
-  .orbeon .xforms-form a,
-  .orbeon .xforms-form button.btn-link {
+  .orbeon a,
+  .orbeon button.btn-link {
     color: black;
     text-decoration: none;
   }
-  .orbeon .xforms-form .xforms-required label {
+  .orbeon .xforms-required label {
     background-image: none;
     padding-left: 0;
   }
-  .orbeon .xforms-form .container {
+  .orbeon .container {
     width: 100%;
   }
-  .orbeon .xforms-form .fr-body {
+  .orbeon .fr-body {
     border: none;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
     -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
   }
-  .orbeon .xforms-form h2 {
+  .orbeon h2 {
     border-bottom: 1px solid #e3e3e3;
     color: black;
   }
-  .orbeon .xforms-form .xbl-fr-section .fr-section-title {
+  .orbeon .xbl-fr-section .fr-section-title {
     background: none;
   }
-  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label {
+  .orbeon .xbl-fr-section .fr-section-title .fr-section-label {
     padding-left: 0;
   }
-  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
-  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
+  .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-open,
+  .orbeon .xbl-fr-section .fr-section-title .fr-section-label.fr-section-closed {
     background-image: none;
   }
-  .orbeon .xforms-form .xbl-fr-section .fr-section-title .fr-section-label a {
+  .orbeon .xbl-fr-section .fr-section-title .fr-section-label a {
     color: black;
   }
-  .orbeon .xforms-form .navbar,
-  .orbeon .xforms-form .navbar.navbar-inverse {
+  .orbeon .navbar,
+  .orbeon .navbar.navbar-inverse {
     position: static;
   }
-  .orbeon .xforms-form .navbar .navbar-inner,
-  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner {
+  .orbeon .navbar .navbar-inner,
+  .orbeon .navbar.navbar-inverse .navbar-inner {
     background-color: white;
     border-bottom: 1px solid #e3e3e3;
     padding-left: 0;
   }
-  .orbeon .xforms-form .navbar .navbar-inner .container h1,
-  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner .container h1 {
+  .orbeon .navbar .navbar-inner .container h1,
+  .orbeon .navbar.navbar-inverse .navbar-inner .container h1 {
     font-size: 24px;
     color: black;
   }
-  .orbeon .xforms-form .navbar .navbar-inner .fr-language-choice,
-  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner .fr-language-choice {
+  .orbeon .navbar .navbar-inner .fr-language-choice,
+  .orbeon .navbar.navbar-inverse .navbar-inner .fr-language-choice {
     display: none;
   }
-  .orbeon .xforms-form .navbar .navbar-inner .brand,
-  .orbeon .xforms-form .navbar.navbar-inverse .navbar-inner .brand {
+  .orbeon .navbar .navbar-inner .brand,
+  .orbeon .navbar.navbar-inverse .navbar-inner .brand {
     color: #555555;
     font-size: 25px;
   }
-  .orbeon .xforms-form .fr-form-description {
+  .orbeon .fr-form-description {
     display: none;
   }
 }

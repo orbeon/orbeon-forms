@@ -222,7 +222,7 @@
         color: #bbb;
     }
 
-    .xforms-form .xforms-textarea textarea {
+    .xforms-textarea textarea {
         -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: border-box;
         font-family: Arial,Helvetica,Geneva,sans-serif;
         -webkit-overflow-scrolling: touch; // Only supported by iOS 5, but should be good too if it becomes supported in the future by browsers on OS X
@@ -294,8 +294,19 @@
         .xforms-upload-progress { display: none; }
     }
     .xforms-upload-mediatype { display: none }
-    .xforms-upload-size { padding-left: .5em; }
-    .xforms-upload-remove { vertical-align: -20%; padding-left: .5em; cursor: pointer; }
+    .xforms-upload-size {
+        padding-left: 8px;
+        white-space: nowrap;
+        &:before { content: "(" }
+        &:after { content: ")" }
+    }
+    .xforms-upload-remove {
+        // Visually center
+        vertical-align: middle;
+        margin-top: -4px;
+        padding-left: 8px;
+        cursor: pointer;
+    }
     .xforms-upload-progress {
         .yui-pb, .xforms-upload-cancel { vertical-align: middle }
         .xforms-upload-cancel { padding-left: .5em }
@@ -449,7 +460,7 @@
     .xforms-select1-appearance-xxforms-tree, .xforms-select-appearance-xxforms-tree { display: block }
 
     // Yellow highlight for selected item
-    .xforms-form .ygtvcontent {
+    .ygtvcontent {
         .xforms-tree-label-selected,
         .xforms-tree-label-selected:hover { background-color: #ff6 }
     }
@@ -476,5 +487,5 @@
 }
 
 @media print {
-    .xforms-form .xforms-loading-loading { display: none }
+    .orbeon .xforms-loading-loading { display: none }
 }

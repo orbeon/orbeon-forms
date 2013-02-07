@@ -213,7 +213,7 @@
 .orbeon .xforms-placeholder input {
   color: #bbb;
 }
-.orbeon .xforms-form .xforms-textarea textarea {
+.orbeon .xforms-textarea textarea {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -299,11 +299,19 @@
   display: none;
 }
 .orbeon .xforms-upload-size {
-  padding-left: .5em;
+  padding-left: 8px;
+  white-space: nowrap;
+}
+.orbeon .xforms-upload-size:before {
+  content: "(";
+}
+.orbeon .xforms-upload-size:after {
+  content: ")";
 }
 .orbeon .xforms-upload-remove {
-  vertical-align: -20%;
-  padding-left: .5em;
+  vertical-align: middle;
+  margin-top: -4px;
+  padding-left: 8px;
   cursor: pointer;
 }
 .orbeon .xforms-upload-progress .yui-pb,
@@ -455,8 +463,8 @@
 .orbeon .xforms-select-appearance-xxforms-tree {
   display: block;
 }
-.orbeon .xforms-form .ygtvcontent .xforms-tree-label-selected,
-.orbeon .xforms-form .ygtvcontent .xforms-tree-label-selected:hover {
+.orbeon .ygtvcontent .xforms-tree-label-selected,
+.orbeon .ygtvcontent .xforms-tree-label-selected:hover {
   background-color: #ffff66;
 }
 .orbeon .ygtvfocus .ygtvlabel,
@@ -498,7 +506,7 @@
   width: 15em;
 }
 @media print {
-  .xforms-form .xforms-loading-loading {
+  .orbeon .xforms-loading-loading {
     display: none;
   }
 }

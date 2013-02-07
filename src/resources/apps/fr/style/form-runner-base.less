@@ -138,14 +138,6 @@
         padding: 2px 2px 2px 18px;
         background: url( images/silk/attach.png ) no-repeat left center;
         .box-sizing(border-box);
-        .xforms-upload-mediatype, .xforms-upload-size {
-            padding-left: 1em
-        }
-        .xforms-upload-remove {
-            // Visually center
-            vertical-align: middle;
-            margin-top: -4px;
-        }
     }
 
     .xforms-help-panel-message {
@@ -524,7 +516,7 @@
     // This must not show in the PDF
     noscript { display: none }
 
-    .orbeon .xforms-form {
+    .orbeon #xforms-form { // make rules strong
         .fr-status-icons,                                              // no status icons
         .xforms-loading-loading,                                       // no loading icon
         .xforms-upload-remove,                                         // upload remove button

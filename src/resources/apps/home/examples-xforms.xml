@@ -43,7 +43,7 @@
         Sandbox to run your own standalone file by either uploading it, or providing the URL of its source.
     </example>
     <example title="XPath Sandbox" href="/sandbox-transformations/xpath/" img="/home/images/xpath-sandbox-small.jpg" size="4"
-             source="http://www.flickr.com/photos/vinothchandar/6820565620/">
+             source="http://www.flickr.com/photos/vinothchandar/6820565620/" portlet-exclude="true">
         Allows you to quickly test XPath expressions, and see as you type what they evaluate to.
     </example>
     <example title="XForms Translate" href="/xforms-translate/" img="/home/images/xforms-translate-small.jpg" size="4"

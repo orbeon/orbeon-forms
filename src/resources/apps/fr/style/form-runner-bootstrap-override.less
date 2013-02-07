@@ -91,6 +91,12 @@ body.orbeon {
 
     input[type="file"] {
         line-height: normal;            // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
+
+        // Reset these as Liferay adds its own stuff and we don't look good
+        border: none;
+        background-image: none;
+        background-color: inherit;
+        padding: 0;
     }
 
     // Don't set height for textarea

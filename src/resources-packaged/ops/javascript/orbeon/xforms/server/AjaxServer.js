@@ -1513,6 +1513,9 @@
                                     var documentElement = document.getElementById(controlId);
                                     if (documentElement != null) {
                                         // Found container
+                                        // Detaching children to avoid nodes becoming disconnected
+                                        // http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-In-IE-nodes-become-disconnected-when-removed-from-the-DOM-with-an-innerHTML
+                                        $(documentElement).children().detach();
                                         documentElement.innerHTML = innerHTML;
                                         ORBEON.xforms.FullUpdate.onFullUpdateDone(controlId);
                                     } else {

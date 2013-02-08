@@ -178,6 +178,9 @@
   margin-left: 0;
   width: 100%;
 }
+.orbeon.xforms-enable-hint-as-tooltip .xforms-hint {
+  display: none;
+}
 .orbeon .xforms-trigger button,
 .orbeon .xforms-trigger input {
   white-space: nowrap;

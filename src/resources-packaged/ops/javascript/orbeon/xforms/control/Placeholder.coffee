@@ -33,11 +33,11 @@ showPlaceholder = (control) ->
     input = (control.getElementsByTagName "input")[0]
     if YD.hasClass control, "xforms-placeholder"
         # Already showing the placeholder, update it
-        input.value = input.placeholder
+        input.value = $(input).attr('placeholder')
     else if input.value == ""
         # Field is empty, then we can show the placeholder
         YD.addClass control, "xforms-placeholder"
-        input.value = input.placeholder
+        input.value = $(input).attr('placeholder')
 
 # Remove placeholder
 hidePlaceholder = (control) ->
@@ -88,7 +88,7 @@ do ->
             if not labelHint?
                 # Update placeholder attribute and show it
                 input = (event.control.getElementsByTagName "input")[0]
-                input.placeholder = event.message
+                $(input).attr('placeholder', event.message)
                 showPlaceholder event.control if not browserSupportsPlaceholder
 
 # When getting the value of a placeholder input, if the placeholder is shown, the current value is empty string

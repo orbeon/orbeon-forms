@@ -149,7 +149,7 @@
                                         </xsl:for-each>
                                         <!-- Condition for free text search -->
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
-                                             and contains(data.xml, <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>) > 0
+                                             and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
                                         </xsl:if>
                                     order by created desc
                                 </xsl:variable>

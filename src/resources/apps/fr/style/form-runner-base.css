@@ -562,11 +562,11 @@
 }
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
-  width: 2.2em;
+  width: 29px;
 }
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
 .orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
-  width: 3.3em;
+  width: 43px;
 }
 .orbeon .xforms-textarea pre {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;

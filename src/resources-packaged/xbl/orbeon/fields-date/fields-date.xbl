@@ -54,8 +54,8 @@
                 .xbl-fr-fields-date .fr-component-group img { vertical-align: middle }
 
                 <!-- For use outside of Form Runner -->
-                .fr-width-2digits input.xforms-input-input { width: 2.2em }
-                .fr-width-4digits input.xforms-input-input { width: 3.3em }
+                .fr-width-2digits input.xforms-input-input { width: 29px }
+                .fr-width-4digits input.xforms-input-input { width: 43px }
             </xbl:style>
         </xbl:resources>
         <xbl:implementation>

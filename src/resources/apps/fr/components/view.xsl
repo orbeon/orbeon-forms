@@ -105,7 +105,8 @@
                     </xsl:element>
                 </xsl:otherwise>
             </xsl:choose>
-            <fr:captcha/>
+            <!-- Insert captcha here if needed -->
+            <xsl:call-template name="fr-captcha"/>
             <!--<fr:xforms-inspector/>-->
         </xf:group>
     </xsl:template>

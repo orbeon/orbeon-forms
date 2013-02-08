@@ -21,7 +21,6 @@ ORBEON.util.FiniteStateMachine =
             _.each transition.events, (eventName) ->
                 events[eventName] (event) ->
                     if transition.elements?                                                                             # State if per-element
-                        elementsFromEvent = elements[transition.elements]
                         elts = elements[transition.elements] event                                                      # Get elements from event (e.g. editable inside cell for mouseover)
                         if transition.from?                                                                             # Filter elements that are in the 'from' state
                             elts = _.filter elts, (e) -> elementStateMatches transition.from, $ e

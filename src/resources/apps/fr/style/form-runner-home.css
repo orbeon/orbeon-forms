@@ -11,10 +11,6 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.fr-view .fr-body {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
 .fr-view table th {
   white-space: nowrap;
 }

@@ -1,32 +1,32 @@
-.xbl-fr-simple-captcha div {
-    background-color: #930900;                              /* Dark color, inspired from reCAPTCHA */
-    display: inline-block;                                  /* So the background only covers the needed area, horizontally */
-    *display: inline; zoom: 1;
-    padding: 5px;                                           /* Dark color border */
-    border-radius: 4px;
+.xbl-fr-simple-captcha {
+  text-align: left;
+  padding: 5px;
+  display: inline-block;
+  *display: inline;
+  zoom: 1;
+  border-radius: 4px;
 }
 .xbl-fr-simple-captcha img {
-    display: block;
-    border-radius: 4px;
+  display: block;
+  border-radius: 4px;
 }
 .xbl-fr-simple-captcha .xforms-input {
-    display: block;                                         /* Input shows below image */
-    background: #FFDC73 url('arrow.png') no-repeat 5px 0;
-    margin-top: 5px;
-    padding: 5px;
-    border-radius: 4px;
+  display: block;
+  width: 200px;
+  background: #ffdc73 url('arrow.png') no-repeat 5px 0;
+  margin-top: 5px;
+  padding: 5px;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 .xbl-fr-simple-captcha .xforms-input label {
-    font-size: 8pt;
-    padding-bottom: 5px;
-    font-style: normal;                                     /* Override possible italic in FR */
+  font-style: normal;
 }
-
 .xbl-fr-simple-captcha .xforms-input input {
-    border: 1px solid #CCA940;
+  width: 172px;
 }
 .xbl-fr-simple-captcha .xforms-input label,
 .xbl-fr-simple-captcha .xforms-input input {
-    display: block;
-    margin-left: 17px;
+  display: block;
+  margin-left: 17px;
 }

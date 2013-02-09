@@ -403,12 +403,18 @@
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
   text-align: right;
 }
-.orbeon .fr-captcha .xbl-fr-recaptcha {
+.orbeon .fr-captcha .xbl-fr-recaptcha,
+.orbeon .fr-captcha .xbl-fr-simple-captcha {
   display: inline-block;
 }
-.orbeon .fr-captcha .xbl-fr-recaptcha .xforms-label,
-.orbeon .fr-captcha .xbl-fr-recaptcha .xforms-alert {
+.orbeon .fr-captcha .xbl-fr-recaptcha > .xforms-label,
+.orbeon .fr-captcha .xbl-fr-simple-captcha > .xforms-label,
+.orbeon .fr-captcha .xbl-fr-recaptcha > .xforms-alert,
+.orbeon .fr-captcha .xbl-fr-simple-captcha > .xforms-alert {
   display: none;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha {
+  display: inline-block;
 }
 .orbeon .fr-captcha .xbl-fr-recaptcha #recaptcha_response_field {
   font-size: 13px;

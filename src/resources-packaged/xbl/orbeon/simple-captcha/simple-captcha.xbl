@@ -24,10 +24,9 @@
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-         xmlns:xf="http://www.w3.org/1999/XSL/Transform"
          xmlns:SimpleCaptcha="java:org.orbeon.xbl.SimpleCaptcha">
 
-    <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha">
+    <xbl:binding id="fr-simple-captcha" element="fr|simple-captcha" xxbl:mode="focus binding lhha">
         <xbl:resources>
              <xbl:style src="/xbl/orbeon/simple-captcha/simple-captcha.css"/>
         </xbl:resources>
@@ -57,7 +56,7 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:group id="component-inner-group">
+            <xf:group id="component-inner-group" appearance="xxf:internal">
                 <xf:var name="resource" value="instance('resources')/resource[@xml:lang = 'en']"/>
                 <xf:action ev:event="xforms-enabled">
                     <xf:var name="captcha" value="SimpleCaptcha:createCaptcha()"/>

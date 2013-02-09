@@ -1,0 +1,34 @@
+.xbl-fr-simple-captcha {
+
+    text-align: left;
+    padding: 5px;
+    display: inline-block;                                  // So the background only covers the needed area, horizontally
+    *display: inline; zoom: 1;
+    border-radius: 4px;
+
+    img {
+        display: block;
+        border-radius: 4px;
+    }
+    .xforms-input {
+        display: block;                                         // Input shows below image
+        width: 200px;
+        background: #ffdc73 url('arrow.png') no-repeat 5px 0;
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .xforms-input label {
+        font-style: normal;                                     // Override possible italic in FR
+    }
+    
+    .xforms-input input {
+        width: 172px;
+    }
+    .xforms-input label,
+    .xforms-input input {
+        display: block;
+        margin-left: 17px;
+    }
+}

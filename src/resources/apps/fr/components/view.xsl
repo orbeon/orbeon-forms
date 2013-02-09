@@ -237,7 +237,10 @@
                         </fr:recaptcha>
                     </xsl:if>
                     <xsl:if test="$captcha = 'SimpleCaptcha'">
-                        <fr:simple-captcha id="captcha"/>
+                        <fr:simple-captcha id="captcha" ref="$captcha">
+                            <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
+                            <xf:alert ref="$fr-resources/detail/labels/captcha-help"/>
+                        </fr:simple-captcha>
                     </xsl:if>
                 </xf:group>
             </xf:group>

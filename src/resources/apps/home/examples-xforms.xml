@@ -24,7 +24,7 @@
     </example>
     <example title="XForms Bookcast" href="/xforms-bookcast/" img="/home/images/xforms-bookcast-small.jpg" portlet-exclude="true" size="4"
              source="http://www.flickr.com/photos/osiatynska/3287986172/">
-        The <xh:i>Bookcast</xh:i> is part of the Orbeon <xh:a
+        The <xh:i>Bookcast</xh:i> app is part of the Orbeon <xh:a
         href="http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial">XForms tutorial</xh:a>.
         It shows simple XRX-style database access, repeats, and more.
     </example>
@@ -34,24 +34,23 @@
     </example>
     <example title="Flickr Resize" href="/xforms-flickr-resize/" img="/home/images/xforms-flickr-resize-small.jpg" size="4"
              source="http://www.flickr.com/photos/seanmolin/5638588326/">
-        Uses an XForms submission to do a search on Flickr through their REST API, and uses a slider to dynamically
+        Use an XForms submission to do a search on Flickr through their REST API, and uses a slider to dynamically
         change the size of the images.
     </example>
     <example title="XForms Sandbox" href="/xforms-sandbox/" img="/home/images/xforms-sandbox-small.jpg" size="4"
              source="http://www.flickr.com/photos/foreverphoto/2467694199/">
-        Allows you to run standalone XForms examples. A number of such examples come built-in, and you use the XForms
-        Sandbox to run your own standalone file by either uploading it, or providing the URL of its source.
+        Play with built-in XForms samples, or test your own samples by uploading or linking to them.
     </example>
     <example title="XPath Sandbox" href="/sandbox-transformations/xpath/" img="/home/images/xpath-sandbox-small.jpg" size="4"
              source="http://www.flickr.com/photos/vinothchandar/6820565620/" portlet-exclude="true">
-        Allows you to quickly test XPath expressions, and see as you type what they evaluate to.
+        Test XPath expressions and see instantly, as you type, what they evaluate to.
     </example>
     <example title="XForms Translate" href="/xforms-translate/" img="/home/images/xforms-translate-small.jpg" size="4"
              source="http://www.flickr.com/photos/horiavarlan/4290551550/">
-        Provides as-you-type translation, using Google Translate through screen scraping.
+        Try as-you-type translation by screen scraping Google Translate.
     </example>
     <example title="XForms Wizard" href="/xforms-wizard-switch/" img="/home/images/xforms-wizard-switch-small.jpg" size="4"
              source="http://www.flickr.com/photos/mcgraths/3248483447/">
-        Shows how to create a multi-step form (aka wizard) using the XForms switch construct.
+        A simple multi-step wizard using the XForms switch construct.
     </example>
 </examples>

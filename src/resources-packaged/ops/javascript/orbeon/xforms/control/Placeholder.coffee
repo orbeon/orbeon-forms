@@ -58,7 +58,12 @@ do ->
                     continue if not controls[labelHint]?
                     placeholders = controls[labelHint]["minimal"]
                     continue if not placeholders?
-                    showPlaceholder (YD.get id) for id in placeholders
+                    for id in placeholders
+                        control = YD.get id
+                        input = $(control).find('input')
+                        # Don't show the placeholder if the focus is already on this input
+                        if not input.is(document.activeElement)
+                            showPlaceholder control
 
 # Call showPlaceholder/hidePlaceholder when users focus in and out of input
 do ->

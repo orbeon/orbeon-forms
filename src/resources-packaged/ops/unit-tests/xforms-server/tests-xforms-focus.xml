@@ -25,6 +25,7 @@
        xmlns:exf="http://www.exforms.org/exf/1-0"
        xmlns:ev="http://www.w3.org/2001/xml-events"
        xmlns:xbl="http://www.w3.org/ns/xbl"
+       xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
        xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <test description="xf:setfocus on xf:group with non-relevant child control" name="oxf:pipeline">
@@ -1177,6 +1178,88 @@
                         <xxf:control id="my-input·2">Marie</xxf:control>
                     </xxf:control-values>
                     <xxf:focus control-id="my-input·2"/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="#824: Setfocus on XBL with mode='focus' focuses on nested control" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <value/>
+                        </xf:instance>
+
+                        <xf:action ev:event="xforms-ready">
+                            <xf:setfocus control="my-gaga"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                            <xf:setfocus control="my-toto"/>
+                            <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
+                        </xf:action>
+
+                    </xf:model>
+                    <xf:model id="events-model">
+                        <!-- TEST: Events to gather -->
+                        <xf:instance id="events-instance">
+                            <events/>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga" xxbl:mode="focus">
+                            <xbl:template>
+                                <xf:model id="model"><xf:instance id="instance"><instance/></xf:instance></xf:model>
+                                <xf:input id="gaga-1" ref="."/>
+                            </xbl:template>
+                        </xbl:binding>
+                        <xbl:binding id="fr-toto" element="fr|toto" xxbl:mode="">
+                            <xbl:template>
+                                <xf:model id="model"><xf:instance id="instance"><instance/></xf:instance></xf:model>
+                                <xf:input id="toto-1" ref="."/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+
+                    <!-- Record focus events -->
+                    <xf:insert ev:event="DOMFocusIn DOMFocusOut" xxf:phantom="true" model="events-model" context="." ref="*"
+                        origin="xxf:element('event',
+                                (xxf:attribute('type', event('xxf:type')),
+                                 xxf:attribute('target', event('xxf:absolute-targetid'))))"/>
+
+                    <fr:gaga id="my-gaga"/>
+                    <fr:toto id="my-toto"/>
+
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="events-instance" model-id="events-model">
+                                <events>
+                                    <event type="DOMFocusIn" target="|my-gaga|"/>
+                                    <separator/>
+                                    <event type="DOMFocusOut" target="|my-gaga|"/>
+                                    <event type="DOMFocusIn" target="|my-toto|"/>
+                                    <event type="DOMFocusIn" target="|my-toto$xf-9|"/>
+                                    <event type="DOMFocusIn" target="|my-toto$toto-1|"/>
+                                    <separator/>
+                                </events>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-gaga" visited="true"/>
+                    </xxf:control-values>
+                    <xxf:focus control-id="my-toto$toto-1"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

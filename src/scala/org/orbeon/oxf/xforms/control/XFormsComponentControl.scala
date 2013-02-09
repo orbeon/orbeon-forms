@@ -240,4 +240,11 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Consider LHHA hasn't externally changed for custom-lhha mode
     override def compareLHHA(other: XFormsControl) =
         ! handleLHHA || super.compareLHHA(other)
+
+    // If component is directly focusable, attempt focus, otherwise delegate to container behavior
+    override def setFocus(inputOnly: Boolean) =
+        if (isFocusable)
+            Focus.focusWithEvents(this)
+        else
+            super.setFocus(inputOnly)
 }

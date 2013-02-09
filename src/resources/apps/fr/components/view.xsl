@@ -48,6 +48,9 @@
         <fr:row>
             <fr:body/>
         </fr:row>
+        <fr:row>
+            <fr:captcha/>
+        </fr:row>
 
         <!-- Error summary (if at bottom) -->
         <!-- If we configuration tells us the bottom error summary should not be shown, still include it but hide it with 'display: none'.
@@ -105,8 +108,6 @@
                     </xsl:element>
                 </xsl:otherwise>
             </xsl:choose>
-            <!-- Insert captcha here if needed -->
-            <xsl:call-template name="fr-captcha"/>
             <!--<fr:xforms-inspector/>-->
         </xf:group>
     </xsl:template>
@@ -215,40 +216,32 @@
 
     <xsl:template match="fr:captcha" name="fr-captcha">
         <!-- Captcha -->
-        <xf:group appearance="xxf:internal"  model="fr-persistence-model">
-            <xf:var name="captcha" model="fr-persistence-model" value="instance('fr-persistence-instance')/captcha"/>
-            <xf:var name="mode" value="xxf:instance('fr-parameters-instance')/mode"/>
-            <xsl:if test="$has-captcha">
-                <xf:group ref=".[$mode = ('new', 'edit') and not(property('xxf:noscript')) and $captcha = 'false']" class="fr-captcha">
+        <xsl:if test="$has-captcha">
+            <xf:group model="fr-persistence-model" appearance="xxf:internal">
+                <xf:var name="captcha" value="instance('fr-persistence-instance')/captcha"/>
+                <xf:var name="mode"    value="xxf:instance('fr-parameters-instance')/mode"/>
+                <xf:group id="fr-captcha-group" ref=".[$mode = ('new', 'edit') and not(property('xxf:noscript')) and $captcha = 'false']" class="fr-captcha">
+                    <!-- Success: remember the captcha passed, which also influences validity -->
+                    <xf:action ev:event="fr-verify-done">
+                        <xf:setvalue ref="$captcha">true</xf:setvalue>
+                        <xf:revalidate model="fr-persistence-model"/>
+                        <xf:refresh/>
+                    </xf:action>
+                    <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
+                    <xf:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
                     <!-- Captcha component: either reCAPTCHA or SimpleCaptcha -->
-                    <xf:group appearance="xxf:internal">
-                        <!-- Success: remember the captcha passed, which also influences validity -->
-                        <xf:action ev:event="fr-verify-done">
-                            <xf:setvalue ref="$captcha">true</xf:setvalue>
-                            <xf:revalidate model="fr-persistence-model"/>
-                            <xf:refresh/>
-                        </xf:action>
-                        <!-- Failure: load another challenge (supported by reCAPTCHA; SimpleCaptcha won't do anything) -->
-                        <xf:dispatch ev:event="fr-verify-error" if="event('fr-error-code') != 'empty'" targetid="captcha" name="fr-reload"/>
-                        <xsl:if test="$captcha = 'reCAPTCHA'">
-                            <fr:recaptcha id="captcha" theme="clean"/>
-                        </xsl:if>
-                        <xsl:if test="$captcha = 'SimpleCaptcha'">
-                            <fr:simple-captcha id="captcha"/>
-                        </xsl:if>
-                    </xf:group>
-                    <!-- Non-visible output bound to captcha node to influence form validity -->
-                    <xh:span style="display: none">
-                        <xf:output ref="$captcha">
-                            <!-- Focus from error summary proxies to captcha -->
-                            <xf:setfocus ev:event="xforms-focus" control="captcha"/>
+                    <xsl:if test="$captcha = 'reCAPTCHA'">
+                        <fr:recaptcha id="captcha" theme="clean" ref="$captcha">
                             <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
                             <xf:alert ref="$fr-resources/detail/labels/captcha-help"/>
-                        </xf:output>
-                    </xh:span>
+                        </fr:recaptcha>
+                    </xsl:if>
+                    <xsl:if test="$captcha = 'SimpleCaptcha'">
+                        <fr:simple-captcha id="captcha"/>
+                    </xsl:if>
                 </xf:group>
-            </xsl:if>
-        </xf:group>
+            </xf:group>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="fr:noscript-help" name="fr-noscript-help">
@@ -468,13 +461,13 @@
     <xsl:template match="fr:error-summary" name="fr-error-summary">
         <xsl:param name="position" select="@position" as="xs:string"/>
 
-        <!-- Handle "control visited" events on #fr-form-group -->
         <!-- NOTE: We used to only handle events coming from controls bound to "fr-form-instance" instance, but this
              doesn't work with "section templates". We now use the observer mechanism of fr:error-summary -->
+
+        <!-- For form builder we disable the error summary and say that the form is always valid -->
         <xsl:if test="not($is-form-builder)">
             <fr:row>
-                <!-- For form builder we disable the error summary and say that the form is always valid -->
-                <fr:error-summary id="error-summary-control-{$position}" observer="fr-form-group" model="fr-error-summary-model"
+                <fr:error-summary id="error-summary-control-{$position}" observer="fr-form-group fr-captcha-group" model="fr-error-summary-model"
                     errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
                     <fr:label>
                         <xf:output value="$fr-resources/errors/summary-title"/>

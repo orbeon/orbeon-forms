@@ -13,14 +13,12 @@
  */
 
 (function() {
-    var OD = ORBEON.util.Dom;
-    var YD = YAHOO.util.Dom;
     var Document = ORBEON.xforms.Document;
     var Event = YAHOO.util.Event;
 
-    YAHOO.namespace("xbl.fr");
+    YAHOO.namespace('xbl.fr');
     YAHOO.xbl.fr.Recaptcha = function() {};
-    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Recaptcha, "xbl-fr-recaptcha");
+    ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.Recaptcha, 'xbl-fr-recaptcha');
     YAHOO.xbl.fr.Recaptcha.prototype = {
 
         challengeId: null,
@@ -32,19 +30,18 @@
          * Constructor
          */
         init: function() {
-            var recaptchaDiv = YD.getElementsByClassName("xbl-fr-recaptcha-div", null, this.container)[0];
-            this.challengeId = YD.getElementsByClassName("xbl-fr-recaptcha-challenge", null, this.container)[0].id;
-            this.responseId = YD.getElementsByClassName("xbl-fr-recaptcha-response", null, this.container)[0].id;
-            this.verifyButton = YD.getElementsByClassName("xbl-fr-recaptcha-verify", null, this.container)[0];
+            var recaptchaDiv = $(this.container).find('.xbl-fr-recaptcha-div').get(0);
+            this.challengeId = $(this.container).find('.xbl-fr-recaptcha-challenge').get(0).id;
+            this.responseId  = $(this.container).find('.xbl-fr-recaptcha-response').get(0).id;
 
             // Public key comes from property
-            var publicKeyElement = YD.getElementsByClassName("xbl-fr-recaptcha-public-key", null, this.container)[0];
-            var publicKey = Document.getValue(publicKeyElement.id);
+            var publicKeyElement = $(this.container).find('.xbl-fr-recaptcha-public-key').get(0);
+            var publicKey        = Document.getValue(publicKeyElement.id);
             // Other configurations
-            var themeElement = YD.getElementsByClassName("xbl-fr-recaptcha-theme", null, this.container)[0];
-            var theme = Document.getValue(themeElement.id);
-            var langElement = YD.getElementsByClassName("xbl-fr-recaptcha-lang", null, this.container)[0];
-            var lang = Document.getValue(langElement.id);
+            var themeElement     = $(this.container).find('.xbl-fr-recaptcha-theme').get(0);
+            var theme            = Document.getValue(themeElement.id);
+            var langElement      = $(this.container).find('.xbl-fr-recaptcha-lang').get(0);
+            var lang             = Document.getValue(langElement.id);
 
             Recaptcha.create(publicKey, recaptchaDiv.id, {
                theme: theme,
@@ -58,20 +55,25 @@
          * so they are ready to be checked.
          */
         recaptchaInitialized: function() {
-            var recaptchaInput = YD.get(this.container.id + "_response_field");
-            Event.addListener(recaptchaInput, "change", _.bind(function() {
+            Event.addListener(this.recaptchaInput(), 'change', _.bind(function() {
                 Document.setValue(this.challengeId, Recaptcha.get_challenge());
                 Document.setValue(this.responseId, Recaptcha.get_response());
             }, this));
         },
 
         reload: function() {
-            Document.setValue(this.responseId, "");
+            Document.setValue(this.responseId, '');
             Recaptcha.reload();
         },
 
         focus: function() {
-            YD.get(this.container.id + "_response_field").focus();
+            this.recaptchaInput().focus();
+        },
+
+        // Return the recaptcha input created by Recaptcha.create(). We used to search by id but it's unclear whether
+        // the id is always 'recaptcha_response_field'.
+        recaptchaInput: function() {
+            return $(this.container).find('.xbl-fr-recaptcha-div input[type=text]').get(0);
         }
     };
 })();

@@ -2758,17 +2758,19 @@ ORBEON.xforms.Events = {
             }
 
             // Send focus events
-            var events = new Array();
+            var events = [];
+            var sendFocus =
+                    // The idea here is that we only register focus changes when focus moves between XForms controls. If focus
+                    // goes out to nothing, we don't handle it at this point but wait until focus comes back to a control.
+                    targetControlElement != null && currentFocusControlElement != targetControlElement
+                    // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
+                    // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
+                    // prevents detection of value changes in focus() above.
+                    && ! YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")
+                    // Don't send focus for XBL component that are not focusable
+                    && ! $(targetControlElement).is('.xbl-component:not(.xbl-focusable)');
 
-            // The idea here is that we only register focus changes when focus moves between XForms controls. If focus
-            // goes out to nothing, we don't handle it at this point but wait until focus comes back to a control.
-
-            // We don't run this for dialogs, as there is not much sense doing this AND this causes issues with
-            // FCKEditor embedded within dialogs with IE. In that case, the editor gets a blur, then the dialog, which
-            // prevents detection of value changes in focus() above.
-
-            if (targetControlElement != null && currentFocusControlElement != targetControlElement
-                    && !YAHOO.util.Dom.hasClass(targetControlElement, "xforms-dialog")) {
+            if (sendFocus) {
 
                 // Handle special value changes upon losing focus
 

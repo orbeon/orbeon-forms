@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.mongdb
+package org.orbeon.oxf.fr.mongodb
 
 import com.mongodb.casbah.Imports._
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}

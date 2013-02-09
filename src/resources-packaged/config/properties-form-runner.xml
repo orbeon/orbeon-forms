@@ -29,6 +29,9 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                               value="/fr/service/mysql"/>
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
 
+    <!-- Properties to enable experimental MongoDB persistence -->
+    <!--<property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mongo"/>-->
+    <property as="xs:anyURI"  name="oxf.fr.persistence.mongo.uri"                               value="/fr/service/mongo"/>
 
     <property as="xs:anyURI"  name="oxf.fr.appserver.uri"                                       value=""/>
     <property as="xs:string"  name="oxf.fr.default-language.*.*"                                value="en"/>

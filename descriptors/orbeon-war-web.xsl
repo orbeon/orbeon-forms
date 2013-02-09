@@ -298,6 +298,17 @@
                 </init-param>
             </servlet>
 
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'Experimental MongoDB Form Runner persistence implementation'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="content">
+                    <servlet>
+                        <servlet-name>form-runner-mongodb-servlet</servlet-name>
+                        <servlet-class>org.orbeon.oxf.fr.mongodb.MongoDBPersistence</servlet-class>
+                    </servlet>
+                </xsl:with-param>
+            </xsl:call-template>
+
             <servlet>
                 <servlet-name>display-chart-servlet</servlet-name>
                 <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
@@ -380,6 +391,17 @@
                 <servlet-name>exist-rest-servlet</servlet-name>
                 <url-pattern>/exist/rest/*</url-pattern>
             </servlet-mapping>
+
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'Experimental MongoDB Form Runner persistence implementation'"/>
+                <xsl:with-param name="commented" select="$target != 'devel'"/>
+                <xsl:with-param name="content">
+                    <servlet-mapping>
+                        <servlet-name>form-runner-mongodb-servlet</servlet-name>
+                        <url-pattern>/fr/service/mongo/*</url-pattern>
+                    </servlet-mapping>
+                </xsl:with-param>
+            </xsl:call-template>
 
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'eXist XMLRPC support'"/>

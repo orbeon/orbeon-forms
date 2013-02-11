@@ -165,7 +165,9 @@
                             name="top-level-section-case-id"
                             select="concat((ancestor-or-self::fr:section/@id)[1], '-case')"/>
                         <!-- NOTE: Only make active top-level sections -->
-                        <xh:li class="{{if (xxf:case('switch') = '{concat(@id, '-case')}') then 'active' else (),
+                        <xf:var name="active"
+                                value="xxf:case('switch') = '{concat(@id, '-case')}'"/>
+                        <xh:li class="{{if ($active) then 'active' else (),
                                         if (xxf:visited('{$top-level-section-case-id}') and not(xxf:valid(context(), true(), true()))) then 'invalid' else ()}}">
 
                             <!--visited: <xf:output value="xxf:visited('{$top-level-section-case-id}')"/>-->
@@ -186,7 +188,7 @@
                             </xf:trigger>
 
                             <xsl:if test="exists(.//fr:section)">
-                                <xh:ul class="nav nav-list">
+                                <xh:ul class="nav nav-list{{if ($active) then '' else ' xforms-hidden'}}">
                                     <xsl:apply-templates mode="toc-sections"/>
                                 </xh:ul>
                             </xsl:if>

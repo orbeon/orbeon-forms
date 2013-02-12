@@ -100,14 +100,14 @@
                     <!-- Process the LHHA of each details control -->
                     <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
                     <xf:action iterate="$local/fb:control-details/*/(xf:label, xf:hint, xf:help, xf:alert)">
-                        <xf:var name="lhhr" value="."/>
+                        <xf:var name="lhha" value="."/>
                         <!-- If it has a lang attribute, only keep if matches the current language -->
-                        <xf:delete if="exists($lhhr/@lang) and $lhhr/@lang != $current-language" ref="$lhhr"/>
+                        <xf:delete if="exists($lhha/@lang) and $lhha/@lang != $current-language" ref="$lhha"/>
                         <!-- If it has a ref="$resources/...", evaluate it -->
-                        <xf:action if="starts-with($lhhr/@ref, '$resources/')">
-                            <xf:var name="resource-path" value="substring-after($lhhr/@ref, '$resources/')"/>
-                            <xf:setvalue ref="$lhhr" value="$resources/saxon:evaluate($resource-path)"/>
-                            <xf:delete ref="$lhhr/@ref"/>
+                        <xf:action if="starts-with($lhha/@ref, '$resources/')">
+                            <xf:var name="resource-path" value="substring-after($lhha/@ref, '$resources/')"/>
+                            <xf:setvalue ref="$lhha" value="$resources/saxon:evaluate($resource-path)"/>
+                            <xf:delete ref="$lhha/@ref"/>
                         </xf:action>
                     </xf:action>
 

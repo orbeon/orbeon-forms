@@ -66,7 +66,7 @@
                         <xf:bind ref="." calculate="normalize-space(.)" readonly="false()"/>                                    <!-- Additional spaces are most likely there by error -->
                         <xf:bind ref="." constraint=". != ''"/>                                                                 <!-- Empty values are not allowed -->
                         <xf:bind ref="." constraint="for $ln in local-name() return
-                            not((../../item/*[local-name() = $ln] except .) = .)"/>                                                 <!-- No duplicate label or value are allowed -->
+                            not((../../item/*[local-name() = $ln] except .) = .)"/>                                             <!-- No duplicate label or value are allowed -->
                     </xf:bind>
                     <xf:bind ref="value">
                         <xf:bind ref="." constraint="/instance/control-type = 'select1' or not(contains(., ' '))"/>             <!-- No spaces in values are allowed for xf:select -->
@@ -85,6 +85,10 @@
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <xf:insert context="$local/items" origin="controlOps:getControlItems(fbf:controlId($local/control-name))"/>     <!-- Get items in the current language -->
                     <xf:insert if="empty($local/items/item)" context="$local/items" origin="$local/template/item"/>                 <!-- Insert new blank item if there were no items -->
+                    <xf:action iterate="$local/items/item">                                                                         <!-- Fixup if missing label and value elements -->
+                        <xf:insert context="." if="empty(label)" ref="*[1]"      position="before" origin="$local/template/item/label"/>
+                        <xf:insert context="." if="empty(value)" ref="*[last()]" position="after"  origin="$local/template/item/value"/>
+                    </xf:action>
                     <xf:setfocus control="fb-itemset-label-input"/>                                                                 <!-- Set focus on input rather than button -->
                 </xf:action>
 
@@ -92,7 +96,7 @@
                 <xf:action ev:event="DOMActivate" ev:observer="save-trigger" type="xpath">                                          <!-- Save on click on save -->
                     controlOps:setControlItems(fbf:controlId($local/control-name), $local/items)
                 </xf:action>
-                <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>    <!-- Become non-relevant on dialog close -->
+                <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>        <!-- Become non-relevant on dialog close -->
 
                 <xf:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input">                      <!-- Add line when users press enter -->
                     <xf:var name="index" value="index('fb-itemset-repeat-repeat')"/>
@@ -100,7 +104,8 @@
                     <xf:setfocus control="fb-itemset-label-input"/>
                 </xf:action>
 
-                <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">             <!-- Actual dialog -->
+                <!-- Actual dialog -->
+                <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">
                     <xf:label ref="$resources/dialog-itemsets/label"/>
                     <xh:div class="fb-dialog-body fb-hide-alert">
                         <xf:group ref="$local/items">

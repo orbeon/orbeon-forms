@@ -113,8 +113,8 @@ public class XFormsActionInterpreter {
         try {
 
             // Condition
-            final String ifConditionAttribute = actionTrait.ifConditionJava();
-            final String whileIterationAttribute = actionTrait.whileConditionJava();
+            final String ifConditionAttribute      = actionTrait.ifConditionJava();
+            final String whileIterationAttribute   = actionTrait.whileConditionJava();
             final String iterateIterationAttribute = actionTrait.iterateJava();
 
             // Push @iterate (if present) within the @model and @context context

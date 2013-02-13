@@ -94,6 +94,14 @@
                     <xsl:attribute name="xxf:{local-name()}" select="."/>
                 </xsl:template>
 
+                <!-- Restore xxf:custom-mips -->
+                <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']/@xxf:custom-mips">
+                    <xsl:variable name="tokens" select="tokenize(., '\s+')[. != 'fb:required']"/>
+                    <xsl:if test="exists($tokens)">
+                        <xsl:attribute name="xxf:custom-mips" select="string-join($tokens, ' ')"/>
+                    </xsl:if>
+                </xsl:template>
+
                 <!-- Remove model actions -->
                 <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']/*[p:has-class('fb-annotation')]"/>
 

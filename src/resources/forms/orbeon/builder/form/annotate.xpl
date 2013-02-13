@@ -130,13 +130,22 @@
 
                 <!-- Convert MIP names -->
                 <xsl:template match="xf:bind/@relevant | xf:bind/@readonly | xf:bind/@required | xf:bind/@constraint | xf:bind/@calculate | xf:bind/@xxf:default">
+                    <!-- Below we only allow fb:required to be interpreted as a custom MIP -->
                     <xsl:attribute name="fb:{local-name()}" select="."/>
                 </xsl:template>
 
                 <!-- Add model actions -->
                 <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']">
                     <xsl:copy>
-                        <xsl:apply-templates select="@* | node()"/>
+                        <!-- Namespace for fb:required -->
+                        <xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>
+                        <xsl:apply-templates select="@* except @xxf:custom-mips"/>
+                        <!-- Only let fb:required act as a custom MIP. All other non-standard bind attributes, including
+                             @fb:relevant, are ignored. We don't need the result of these rewritten MIPs at design time,
+                             and this helps with performance in case there is a large number of binds. -->
+                        <xsl:attribute name="xxf:custom-mips" select="string-join((@xxf:custom-mips, 'fb:required'), ' ')"/>
+
+                        <xsl:apply-templates select="node()"/>
 
                         <!-- Upon model creation, recalculation and revalidation, notify Form Builder -->
                         <xsl:for-each select="('xforms-model-construct', 'xforms-recalculate', 'xforms-revalidate', 'xxforms-xpath-error')">

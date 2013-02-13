@@ -201,7 +201,7 @@ trait ModelEventHandlers {
     def jEventHandlers = _eventHandlers.asJava
 }
 
-class BindTree(model: Model, bindElements: Seq[Element]) {
+class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ Boolean) {
 
     bindTree ⇒
 
@@ -299,9 +299,9 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
         // Represent an individual MIP on an <xf:bind> element
         class MIP(val name: String) {
-            val isCalculateComputedMIP = CalculateMIPNames.contains(name)
-            val isValidateMIP = ValidateMIPNames.contains(name)
-            val isCustomMIP = !isCalculateComputedMIP && !isValidateMIP
+            val isCalculateComputedMIP = CalculateMIPNames(name)
+            val isValidateMIP          = ValidateMIPNames(name)
+            val isCustomMIP            = ! isCalculateComputedMIP && ! isValidateMIP
         }
 
         // Represent an XPath MIP
@@ -313,7 +313,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
             def analyzeXPath() {
 
                 def booleanOrStringExpression =
-                    if (BooleanXPathMIPNames.contains(name)) "boolean(" + expression + ")" else "string((" + expression + ")[1])"
+                    if (BooleanXPathMIPNames(name)) "boolean(" + expression + ")" else "string((" + expression + ")[1])"
 
                 // Analyze and remember if figured out
                 Bind.this.analyzeXPath(getChildrenContext, bindsVariablesSeq, booleanOrStringExpression) match {
@@ -353,19 +353,9 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
         // Custom MIPs
         val customMIPNameToXPathMIP = Predef.Map((
             for {
-                attribute ← Dom4j.attributes(element) // check all the element's attributes
-
-                attributeQName = attribute.getQName
-                attributePrefix = attributeQName.getNamespacePrefix
-                attributeURI = attributeQName.getNamespaceURI
-
-                // Any QName-but-not-NCName which is not in the xforms or xxforms namespace or an XML attribute
-                // NOTE: Also allow for xxf:events-mode extension MIP
-                if attributePrefix.nonEmpty && !attributePrefix.startsWith("xml") &&
-                        attributeURI != XFORMS_NAMESPACE_URI &&
-                        (attributeURI != XXFORMS_NAMESPACE_URI || attributeQName == XXFORMS_EVENT_MODE_QNAME)
-
-                customMIPName = buildCustomMIPName(attribute.getQualifiedName)
+                attribute       ← Dom4j.attributes(element) // check all the element's attributes
+                if isCustomMIP(attribute.getQName)
+                customMIPName   = buildCustomMIPName(attribute.getQualifiedName)
             } yield
                 customMIPName → new XPathMIP(customMIPName, attribute.getValue)): _*)
 
@@ -376,7 +366,7 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
         // Create children binds
         private var _children: Seq[Bind] = Dom4j.elements(element, XFORMS_BIND_QNAME) map (new Bind(_, Bind.this, None))// NOTE: preceding not handled for now
-        def children = _children
+        def children  = _children
         def jChildren = _children.asJava
 
         def addBind(bindElement: Element, precedingId: Option[String]): Unit =
@@ -397,12 +387,12 @@ class BindTree(model: Model, bindElements: Seq[Element]) {
 
         // For Java callers (can return null)
         def getDefaultValue = getMIPExpressionOrNull(Default.name)
-        def getCalculate = getMIPExpressionOrNull(Calculate.name)
-        def getRelevant = getMIPExpressionOrNull(Relevant.name)
-        def getReadonly = getMIPExpressionOrNull(Readonly.name)
-        def getRequired = getMIPExpressionOrNull(Required.name)
-        def getConstraint = getMIPExpressionOrNull(Constraint.name)
-        def getType = typeMIP map (_.datatype) orNull
+        def getCalculate    = getMIPExpressionOrNull(Calculate.name)
+        def getRelevant     = getMIPExpressionOrNull(Relevant.name)
+        def getReadonly     = getMIPExpressionOrNull(Readonly.name)
+        def getRequired     = getMIPExpressionOrNull(Required.name)
+        def getConstraint   = getMIPExpressionOrNull(Constraint.name)
+        def getType         = typeMIP map (_.datatype) orNull
         def getCustom(mipName: String) = getMIPExpressionOrNull(mipName)
 
         def getMIPExpressionOrNull(mipName: String) = allMIPNameToXPathMIP.get(mipName) match {
@@ -551,9 +541,32 @@ trait ModelBinds {
 
     selfModel: Model ⇒
 
-    private var bindTree = new BindTree(selfModel, Dom4j.elements(selfModel.element, XFORMS_BIND_QNAME))
+    private class LazyBindTree(bindElements: Seq[Element]) extends (() ⇒ BindTree) {
 
-    def annotateSubTree(rawElement: Element) = {
+        import ElementAnalysis.attQNameSet
+
+        private val canBeCustomMIP: QName ⇒ Boolean = qName ⇒
+            qName.getNamespacePrefix.nonEmpty &&
+            ! qName.getNamespacePrefix.startsWith("xml") &&
+            (StandardCustomMIPsQNames(qName) || ! NeverCustomMIPsURIs(qName.getNamespaceURI))
+
+        private def isCustomMIP: QName ⇒ Boolean = Option(selfModel.element.attribute(XXFORMS_CUSTOM_MIPS_QNAME)) match {
+            case Some(_) ⇒
+                // If the attribute is present, allow all specified QNames if valid, plus standard MIP QNames
+                attQNameSet(selfModel.element, XXFORMS_CUSTOM_MIPS_QNAME, namespaceMapping) ++ StandardCustomMIPsQNames filter canBeCustomMIP
+            case None    ⇒
+                // Attribute not present: backward-compatible behavior
+                canBeCustomMIP
+        }
+
+        private lazy val result = new BindTree(selfModel, bindElements, isCustomMIP)
+
+        def apply() = result
+    }
+
+    private var bindTree = new LazyBindTree(Dom4j.elements(selfModel.element, XFORMS_BIND_QNAME))
+
+    private def annotateSubTree(rawElement: Element) = {
         val (annotatedTree, _) =
             part.xblBindings.annotateSubtree(
                 None,
@@ -573,39 +586,39 @@ trait ModelBinds {
 
         assert(! selfModel.part.isTopLevel)
 
-        bindTree.destroy()
-        bindTree = new BindTree(selfModel, Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
+        bindTree().destroy()
+        bindTree = new LazyBindTree(Dom4j.elements(rawModelElement, XFORMS_BIND_QNAME) map (annotateSubTree(_).getRootElement))
     }
 
-    def bindsById = bindTree.bindsById
-    def jBindsByName = bindTree.bindsByName.asJava
+    def bindsById = bindTree().bindsById
+    def jBindsByName = bindTree().bindsByName.asJava
 
-    def hasDefaultValueBind = bindTree.hasDefaultValueBind
-    def hasCalculateBind = bindTree.hasCalculateBind
-    def hasTypeBind = bindTree.hasTypeBind
-    def hasRequiredBind = bindTree.hasRequiredBind
-    def hasConstraintBind = bindTree.hasConstraintBind
+    def hasDefaultValueBind = bindTree().hasDefaultValueBind
+    def hasCalculateBind = bindTree().hasCalculateBind
+    def hasTypeBind = bindTree().hasTypeBind
+    def hasRequiredBind = bindTree().hasRequiredBind
+    def hasConstraintBind = bindTree().hasConstraintBind
 
-    def hasCalculateComputedCustomBind = bindTree.hasCalculateComputedCustomBind
-    def hasValidateBind = bindTree.hasValidateBind
+    def hasCalculateComputedCustomBind = bindTree().hasCalculateComputedCustomBind
+    def hasValidateBind = bindTree().hasValidateBind
 
-    def bindInstances = bindTree.bindInstances
-    def computedBindExpressionsInstances = bindTree.computedBindExpressionsInstances
-    def validationBindInstances = bindTree.validationBindInstances
+    def bindInstances = bindTree().bindInstances
+    def computedBindExpressionsInstances = bindTree().computedBindExpressionsInstances
+    def validationBindInstances = bindTree().validationBindInstances
 
     // TODO: use and produce variables introduced with xf:bind/@name
 
-    def topLevelBinds = bindTree.topLevelBinds
+    def topLevelBinds = bindTree().topLevelBinds
     def topLevelBindsJava = topLevelBinds.asJava
 
-    def hasBinds = bindTree.hasBinds
-    def containsBind(bindId: String) = bindTree.bindIds.contains(bindId)
+    def hasBinds = bindTree().hasBinds
+    def containsBind(bindId: String) = bindTree().bindIds(bindId)
 
-    def figuredAllBindRefAnalysis = bindTree.figuredAllBindRefAnalysis
+    def figuredAllBindRefAnalysis = bindTree().figuredAllBindRefAnalysis
 
-    def analyzeBindsXPath() = bindTree.analyzeBindsXPath()
-    def bindsToXML(helper: ContentHandlerHelper) = bindTree.bindsToXML(helper)
-    def freeBindsTransientState() = bindTree.freeBindsTransientState()
+    def analyzeBindsXPath() = bindTree().analyzeBindsXPath()
+    def bindsToXML(helper: ContentHandlerHelper) = bindTree().bindsToXML(helper)
+    def freeBindsTransientState() = bindTree().freeBindsTransientState()
 }
 
 object Model {
@@ -632,19 +645,22 @@ object Model {
 
     case class Custom(override val name: String) extends MIP with XPathMIP
 
-    val AllMIPs                 = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type)
-    val AllMIPsByName           = AllMIPs map (mip ⇒ mip.name → mip) toMap
-    val AllMIPNames             = AllMIPs map (_.name)
-    val MIPNameToAttributeQName = AllMIPs map (m ⇒ m.name → m.qName) toMap
+    val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type)
+    val AllMIPsByName            = AllMIPs map (mip ⇒ mip.name → mip) toMap
+    val AllMIPNames              = AllMIPs map (_.name)
+    val MIPNameToAttributeQName  = AllMIPs map (m ⇒ m.name → m.qName) toMap
 
-    val QNameToXPathComputedMIP = AllMIPs collect { case m: XPathMIP with ComputedMIP ⇒ m.qName → m } toMap
-    val QNameToXPathValidateMIP = AllMIPs collect { case m: XPathMIP with ValidateMIP ⇒ m.qName → m } toMap
-    val QNameToXPathMIP         = QNameToXPathComputedMIP ++ QNameToXPathValidateMIP
+    val QNameToXPathComputedMIP  = AllMIPs collect { case m: XPathMIP with ComputedMIP ⇒ m.qName → m } toMap
+    val QNameToXPathValidateMIP  = AllMIPs collect { case m: XPathMIP with ValidateMIP ⇒ m.qName → m } toMap
+    val QNameToXPathMIP          = QNameToXPathComputedMIP ++ QNameToXPathValidateMIP
 
-    val CalculateMIPNames       = AllMIPs collect { case m: ComputedMIP ⇒ m.name }
-    val ValidateMIPNames        = AllMIPs collect { case m: ValidateMIP ⇒ m.name }
-    val BooleanXPathMIPNames    = AllMIPs collect { case m: XPathMIP with BooleanMIP ⇒ m.name }
-    val StringXPathMIPNames     = AllMIPs collect { case m: XPathMIP with StringMIP ⇒ m.name }
+    val CalculateMIPNames        = AllMIPs collect { case m: ComputedMIP ⇒ m.name }
+    val ValidateMIPNames         = AllMIPs collect { case m: ValidateMIP ⇒ m.name }
+    val BooleanXPathMIPNames     = AllMIPs collect { case m: XPathMIP with BooleanMIP ⇒ m.name }
+    val StringXPathMIPNames      = AllMIPs collect { case m: XPathMIP with StringMIP ⇒ m.name }
+
+    val StandardCustomMIPsQNames = Set(XXFORMS_EVENT_MODE_QNAME)
+    val NeverCustomMIPsURIs      = Set(XFORMS_NAMESPACE_URI, XXFORMS_NAMESPACE_URI)
 
     def buildCustomMIPName(qualifiedName: String) = qualifiedName.replace(':', '-')
 

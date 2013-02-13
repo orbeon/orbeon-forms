@@ -169,13 +169,13 @@
 
             <!-- Calculations for page navigation -->
             <xf:bind ref="instance('fr-paging-instance')">
-                <xf:bind ref="total" calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
+                <xf:bind ref="total"        calculate="(instance('fr-summary-instance')/@total, 0)[1]"/>
                 <xf:bind ref="search-total" calculate="(instance('fr-summary-instance')/@search-total, 0)[1]"/>
-                <xf:bind ref="page-size" calculate="instance('fr-search-instance')/page-size"/>
-                <xf:bind ref="page-number" calculate="instance('fr-search-instance')/page-number"/>
-                <xf:bind ref="page-count" calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
-                <xf:bind ref="from" calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
-                <xf:bind ref="to" calculate="min((../page-number * ../page-size, ../search-total))"/>
+                <xf:bind ref="page-size"    calculate="instance('fr-search-instance')/page-size"/>
+                <xf:bind ref="page-number"  calculate="instance('fr-search-instance')/page-number"/>
+                <xf:bind ref="page-count"   calculate="(../search-total + ../page-size - 1) idiv ../page-size"/>
+                <xf:bind ref="from"         calculate="if (../search-total = 0) then 0 else (../page-number - 1) * ../page-size + 1"/>
+                <xf:bind ref="to"           calculate="min((../page-number * ../page-size, ../search-total))"/>
                 <xf:bind ref="prev-trigger" readonly="../search-total = 0 or xs:integer(../page-number) le 1"/>
                 <xf:bind ref="next-trigger" readonly="../search-total = 0 or xs:integer(../search-total) le xs:integer(../to)"/>
             </xf:bind>

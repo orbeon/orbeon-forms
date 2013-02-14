@@ -1794,9 +1794,9 @@ ORBEON.xforms.Controls = {
         if (byId != null)
             return byId;
 
-        // Search under the control element
-        var lhhaElements = YAHOO.util.Dom.getElementsByClassName("xforms-" + lhhaType, null, control);
-        return (lhhaElements.length > 0) ? lhhaElements[0] : null;
+        // Search just under the control element, excluding elements with an id, as they might be for another control
+        var lhhaElements = $(control).children('.xforms-' + lhhaType + ':not([id])');
+        return (lhhaElements.length > 0) ? lhhaElements.get(0) : null;
     },
 
     /**

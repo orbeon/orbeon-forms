@@ -553,7 +553,7 @@
             ORBEON.xforms.Globals.requestDocument = "";
             var formID = ORBEON.xforms.Globals.requestForm.id;
             var title = ORBEON.util.Dom.getStringValue(ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "title", null)[0]);
-            var body = ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0]
+            var body = ORBEON.util.Dom.getElementsByName(o.responseXML.documentElement, "body", null)[0];
             var detailsFromBody = body != null ? ORBEON.util.Dom.getStringValue(body) : null;
             AjaxServer.showError(title, detailsFromBody, formID);
         } else {

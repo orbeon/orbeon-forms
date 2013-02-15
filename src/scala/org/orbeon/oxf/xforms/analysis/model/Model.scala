@@ -24,10 +24,13 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import java.lang.String
 import collection.immutable.List
 import collection.mutable.{LinkedHashSet, LinkedHashMap}
-import org.orbeon.oxf.xml.{Dom4j, ContentHandlerHelper}
+import org.orbeon.oxf.xml.{ShareableXPathStaticContext, Dom4j, ContentHandlerHelper}
 import Model._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
+import org.orbeon.oxf.common.ValidationException
 
 /**
  * Static analysis of an XForms model <xf:model> element.
@@ -283,7 +286,7 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
 
     // In-scope variable on binds include variables implicitly declared with bind/@name
     // Used by XPath analysis
-    private lazy val bindsVariablesSeq = model.variablesMap ++ (bindsByName map { case (k, v) ⇒ k → new BindAsVariable(v) })
+    private lazy val allBindVariables = model.variablesMap ++ (bindsByName map { case (k, v) ⇒ k → new BindAsVariable(v) })
 
     class BindAsVariable(bind: Bind) extends VariableTrait {
         def name = bind.name
@@ -305,18 +308,37 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
         }
 
         // Represent an XPath MIP
-        class XPathMIP(name: String, val expression: String) extends MIP(name) {
+        class XPathMIP(name: String, expression: String) extends MIP(name) {
+
+            // Compile the expression right away
+            val compiledExpression = {
+                val booleanOrStringExpression =
+                    if (BooleanXPathMIPNames(name)) "boolean(" + expression + ")" else "string((" + expression + ")[1])"
+
+                OrbeonXPath.compileExpression(booleanOrStringExpression, Bind.this.namespaceMapping, Bind.this.locationData, XFormsFunctionLibrary, avt = false)
+            }
 
             // Default to negative, analyzeXPath() can change that
             var analysis: XPathAnalysis = NegativeAnalysis(expression)
 
             def analyzeXPath() {
 
-                def booleanOrStringExpression =
-                    if (BooleanXPathMIPNames(name)) "boolean(" + expression + ")" else "string((" + expression + ")[1])"
+                val allBindVariablesInScope = allBindVariables
+
+                // Saxon: "In the case of free-standing XPath expressions it will be the StaticContext object"
+                val staticContext  = compiledExpression.expression.getInternalExpression.getContainer.asInstanceOf[ShareableXPathStaticContext]
+                if (staticContext ne null) {
+                    // NOTE: The StaticContext can be null if the expression is a constant such as BooleanValue
+                    val usedVariables = staticContext.referencedVariables
+
+                    // Check whether all variables used by the expression are actually in scope, throw otherwise
+                    usedVariables find (name ⇒ ! allBindVariablesInScope.contains(name.getLocalName)) foreach { name ⇒
+                        throw new ValidationException("Undeclared variable in XPath expression: $" + name.getClarkName, Bind.this.locationData)
+                    }
+                }
 
                 // Analyze and remember if figured out
-                Bind.this.analyzeXPath(getChildrenContext, bindsVariablesSeq, booleanOrStringExpression) match {
+                Bind.this.analyzeXPath(getChildrenContext, allBindVariablesInScope, compiledExpression) match {
                     case valueAnalysis if valueAnalysis.figuredOutDependencies ⇒ this.analysis = valueAnalysis
                     case _ ⇒ // NOP
                 }
@@ -386,19 +408,16 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
         def getMIP(mipName: String) = if (mipName == TYPE) typeMIP else allMIPNameToXPathMIP.get(mipName)
 
         // For Java callers (can return null)
-        def getDefaultValue = getMIPExpressionOrNull(Default.name)
-        def getCalculate    = getMIPExpressionOrNull(Calculate.name)
-        def getRelevant     = getMIPExpressionOrNull(Relevant.name)
-        def getReadonly     = getMIPExpressionOrNull(Readonly.name)
-        def getRequired     = getMIPExpressionOrNull(Required.name)
-        def getConstraint   = getMIPExpressionOrNull(Constraint.name)
+        def getDefaultValue = getMIPOrNull(Default.name)
+        def getCalculate    = getMIPOrNull(Calculate.name)
+        def getRelevant     = getMIPOrNull(Relevant.name)
+        def getReadonly     = getMIPOrNull(Readonly.name)
+        def getRequired     = getMIPOrNull(Required.name)
+        def getConstraint   = getMIPOrNull(Constraint.name)
         def getType         = typeMIP map (_.datatype) orNull
-        def getCustom(mipName: String) = getMIPExpressionOrNull(mipName)
+        def getCustom(mipName: String) = getMIPOrNull(mipName)
 
-        def getMIPExpressionOrNull(mipName: String) = allMIPNameToXPathMIP.get(mipName) match {
-            case Some(mip) ⇒ mip.expression
-            case None ⇒ null
-        }
+        def getMIPOrNull(mipName: String) = allMIPNameToXPathMIP.get(mipName).orNull
 
         def hasCalculateComputedMIPs = mipNameToXPathMIP exists (_._2 isCalculateComputedMIP)
         def hasValidateMIPs = typeMIP.isDefined || (mipNameToXPathMIP exists (_._2 isValidateMIP))
@@ -494,7 +513,7 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
 
                 // MIP analysis
                 for (mip ← allMIPNameToXPathMIP.values) {
-                    helper.startElement("mip", Array("name", mip.name, "expression", mip.expression))
+                    helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
                     mip.analysis.toXML(helper)
                     helper.endElement()
                 }

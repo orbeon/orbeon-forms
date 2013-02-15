@@ -18,8 +18,7 @@ import org.dom4j.Element
 import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.PooledXPathExpression
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{XPath, PooledXPathExpression, XPathCache}
 import org.orbeon.oxf.xforms.XFormsContextStack
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
@@ -128,7 +127,7 @@ abstract class XFormsFunction extends SystemFunction {
 
         // Create expression
         val pooledXPathExpression =
-            XPathCache.createPoolableXPathExpression(null, staticContext, xpathString, variableDeclarations.asJava, isAVT)
+            XPathCache.createPoolableXPathExpression(staticContext, xpathString, isAVT, null, variableDeclarations.asJava)
 
         // Set context items and position for use at runtime
         pooledXPathExpression.setContextItem(initialXPathContext.getContextItem, initialXPathContext.getContextPosition)
@@ -183,7 +182,7 @@ object XFormsFunction {
 
     // NOTE: This is always constructed in XFormsContextStack
     // Constructor for XBLContainer and XFormsActionInterpreter
-    class Context(val container: XBLContainer, val contextStack: XFormsContextStack) extends XPathCache.FunctionContext {
+    class Context(val container: XBLContainer, val contextStack: XFormsContextStack) extends XPath.FunctionContext {
 
         // Constructor for XFormsModel
         def this(containingModel: XFormsModel, contextStack: XFormsContextStack) =

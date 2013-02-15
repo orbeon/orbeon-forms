@@ -551,14 +551,24 @@
                                         <instance show="false">
                                             <date>2011-11-03</date>
                                             <select/>
+                                            <!-- Instance values so that XPath engine doesn't optimize literals (we want dynamic errors) -->
+                                            <error>error1</error>
+                                            <error>error2</error>
+                                            <error>error3</error>
+                                            <error>error4</error>
+                                            <error>error5</error>
+                                            <error>error6</error>
+                                            <error>error7</error>
+                                            <error>error8</error>
+                                            <error>error9</error>
                                         </instance>
                                     </xf:instance>
                                     <xf:bind ref=".[@show = 'true']">
-                                        <xf:bind ref="date[xs:date('error2') = xs:date('2011-11-04')]"/>            <!-- XPath error on ref -->
-                                        <xf:bind ref="date" calculate="xs:date('error3')"/>                         <!-- XPath error on calculate value -->
-                                        <xf:bind ref="date" required="xs:date('error4') = current-date()"/>         <!-- XPath error on boolean MIP -->
+                                        <xf:bind ref="date[xs:date(../error[2]) = xs:date('2011-11-04')]"/>             <!-- XPath error on ref -->
+                                        <xf:bind ref="date" calculate="xs:date(../error[3])"/>                          <!-- XPath error on calculate value -->
+                                        <xf:bind ref="date" required="xs:date(../error[4]) = current-date()"/>          <!-- XPath error on boolean MIP -->
                                     </xf:bind>
-                                    <xf:var ref=".[@show = 'true']" name="var1" value="xs:date('error5')"/>  <!-- XPath error on variable value -->
+                                    <xf:var ref=".[@show = 'true']" name="var1" value="xs:date(error[5])"/>             <!-- XPath error on variable value -->
                                 </xf:model>
                             </xh:head>
                             <xh:body>
@@ -566,10 +576,10 @@
                                     <xf:label>Try</xf:label>
                                     <!-- 1. Run actions causing errors -->
                                     <!-- NOTE: Invalid model ids are now caught statically -->
-                                    <xf:setvalue ev:event="DOMActivate" ref="date[xs:date('error1')]"/>             <!-- XPath error on ref -->
-                                    <xf:action ev:event="DOMActivate" bind="non-existing-bind"/>                    <!-- non-existing bind -->
-                                    <xf:dispatch ev:event="DOMActivate"/>                                           <!-- missing mandatory attribute -->
-                                    <xf:setvalue ev:event="DOMActivate" ref="."/>                                   <!-- setvalue on complex content -->
+                                    <xf:setvalue ev:event="DOMActivate" ref="date[xs:date(../error[1])]"/>              <!-- XPath error on ref -->
+                                    <xf:action ev:event="DOMActivate" bind="non-existing-bind"/>                        <!-- non-existing bind -->
+                                    <xf:dispatch ev:event="DOMActivate"/>                                               <!-- missing mandatory attribute -->
+                                    <xf:setvalue ev:event="DOMActivate" ref="."/>                                       <!-- setvalue on complex content -->
 
                                     <!-- 2. Show binds and controls to cause other errors -->
                                     <xf:action ev:event="DOMActivate">
@@ -579,12 +589,12 @@
                                 </xf:trigger>
 
                                 <xf:group ref=".[@show = 'true']">
-                                    <xf:var name="var2" value="xs:date('error6')"/>                          <!-- XPath error on variable value -->
-                                    <xf:input ref=".[xs:date('error7') = current-date()]"/>                         <!-- XPath error on control binding -->
-                                    <xf:output value="xs:date('error8')"/>                                          <!-- XPath error on control value -->
+                                    <xf:var name="var2" value="xs:date(error[6])"/>                                     <!-- XPath error on variable value -->
+                                    <xf:input ref=".[xs:date(error[7]) = current-date()]"/>                             <!-- XPath error on control binding -->
+                                    <xf:output value="xs:date(error[8])"/>                                              <!-- XPath error on control value -->
                                     <xf:select ref="select">
                                         <xf:itemset ref=".[1]">
-                                            <xf:label value="xs:date('error9')"/>                                   <!-- XPath error on itemset label -->
+                                            <xf:label value="xs:date(../error[9])"/>                                    <!-- XPath error on itemset label -->
                                             <xf:value/>
                                         </xf:itemset>
                                     </xf:select>

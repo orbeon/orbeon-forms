@@ -24,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
+import org.orbeon.oxf.util.XPath;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
@@ -784,15 +785,15 @@ public class XFormsUtils {
      * @param namespaceMapping  in-scope namespaces
      * @return                  true iif the given string contains well-formed XPath 2.0
      */
-    public static boolean isXPath2Expression(Configuration configuration, String xpathString, NamespaceMapping namespaceMapping) {
+    public static boolean isXPath2Expression(Configuration configuration, String xpathString, NamespaceMapping namespaceMapping, LocationData locationData) {
         // Empty string is never well-formed XPath
         if (xpathString.trim().length() == 0)
             return false;
 
         try {
-            XPathCache.checkXPathExpression(configuration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary());
+            XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary(), false);
         } catch (Exception e) {
-            // Ideally we would like the parser to not throw as this is time-consuming, but not sure ho.w to achieve that
+            // Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
             return false;
         }
 

@@ -29,7 +29,8 @@ class ItemsetDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         this setupDocument
             <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
                      xmlns:xf="http://www.w3.org/2002/xforms"
-                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
                 <xh:head>
                     <xf:model id="model" xxf:xpath-analysis="true" xxf:encrypt-item-values="false">

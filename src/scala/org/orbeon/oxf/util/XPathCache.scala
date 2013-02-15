@@ -13,60 +13,32 @@
  */
 package org.orbeon.oxf.util
 
+import collection.JavaConverters._
 import java.util.{List ⇒ JList, Map ⇒ JMap}
 import org.apache.commons.pool.{BasePoolableObjectFactory, ObjectPool}
 import org.orbeon.oxf.cache.InternalCacheKey
 import org.orbeon.oxf.cache.ObjectCache
-import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xml.NamespaceMapping
-import org.orbeon.oxf.xml.XPathCacheStaticContext
-import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.`type`.Type
-import org.orbeon.saxon.expr.Expression
-import org.orbeon.saxon.expr.ExpressionTool
-import org.orbeon.saxon.expr.ExpressionVisitor
 import org.orbeon.saxon.functions.FunctionLibrary
 import org.orbeon.saxon.functions.FunctionLibraryList
-import org.orbeon.saxon.instruct.SlotManager
-import org.orbeon.saxon.om.Item
-import org.orbeon.saxon.om.NamePool
-import org.orbeon.saxon.om.ValueRepresentation
-import org.orbeon.saxon.style.AttributeValueTemplate
-import org.orbeon.saxon.sxpath.IndependentContext
-import org.orbeon.saxon.sxpath.XPathEvaluator
-import org.orbeon.saxon.sxpath.XPathExpression
-import org.orbeon.saxon.sxpath.XPathVariable
-import org.orbeon.saxon.value.SequenceExtent
-import collection.JavaConverters._
+import org.orbeon.saxon.om.{Item, ValueRepresentation}
+import org.orbeon.saxon.sxpath._
 import org.orbeon.saxon.trans.XPathException
+import org.orbeon.saxon.value.SequenceExtent
 
 /**
  * XPath expressions cache.
  */
 object XPathCache {
 
-    private val Configuration = new Configuration {
-        
-        setNamePool(new NamePool)
-        
-        override def setAllowExternalFunctions(allowExternalFunctions: Boolean): Unit =
-            throw new IllegalStateException("Global XPath configuration is read-only")
+    import XPath._
 
-        override def setConfigurationProperty(name: String, value: AnyRef): Unit =
-            throw new IllegalStateException("Global XPath configuration is read-only")
-    }
-    
     private val XPathCacheName = "cache.xpath"
     private val XPathCacheDefaultSize = 200
     
     private val Logger = LoggerFactory.createLogger(getClass)
-
-    // Marker for XPath function context
-    trait FunctionContext
-
-    type Reporter = (String, Long) ⇒ Unit
     
     case class XPathContext(
         namespaceMapping: NamespaceMapping,
@@ -76,8 +48,8 @@ object XPathCache {
         baseURI: String,
         locationData: LocationData)
     
-    
-    def getGlobalConfiguration = Configuration
+    // FIXME: Directly use GlobalConfiguration
+    def getGlobalConfiguration = GlobalConfiguration
 
     def isDynamicXPathError(t: Throwable) = t match {
         case e: XPathException if ! e.isStaticError ⇒ true
@@ -372,30 +344,6 @@ object XPathCache {
             variableToValueMap, functionLibrary, baseURI,
             false, locationData)
 
-    /**
-     * Just attempt to compile an XPath expression. An exception is thrown if the expression is not statically correct.
-     * Any variable used by the expression is assumed to be in scope. The expression is not added to the cache.
-     *
-     * @param xpathString       XPath string
-     * @param namespaceMapping  namespace mapping
-     * @param functionLibrary   function library
-     * @throws Exception        if the expression is not correct
-     */
-    def checkXPathExpression(
-            configuration: Configuration,
-            xpathString: String,
-            namespaceMapping: NamespaceMapping,
-            functionLibrary: FunctionLibrary): Unit =
-        new XPathCachePoolableObjectFactory(configurationOrDefault(configuration), xpathString, namespaceMapping, null, functionLibrary, null, false, true, null).makeObject
-
-    // 1  external usage for XPath analysis
-    def createExpression(
-            configuration: Configuration,
-            xpathString: String,
-            namespaceMapping: NamespaceMapping,
-            functionLibrary: FunctionLibrary): Expression =
-        (new XPathCachePoolableObjectFactory(configuration, xpathString, namespaceMapping, null, functionLibrary, null, false, true, null)).makeObject.getExpression
-
     private def getXPathExpression(
             configuration: Configuration,
             contextItems: JList[Item],
@@ -481,47 +429,19 @@ object XPathCache {
         // TODO: pool should have at least one hard reference
         val factory = new XPathCachePoolableObjectFactory(
             configurationOrDefault(xpathConfiguration), xpathString, namespaceMapping, variableNames,
-            functionLibrary, baseURI, isAvt, false, locationData)
+            functionLibrary, baseURI, isAvt, locationData)
         val pool = new SoftReferenceObjectPool(factory)
         factory.pool = pool
         pool
     }
 
     def createPoolableXPathExpression(
-        pool: ObjectPool[PooledXPathExpression], independentContext: IndependentContext, xpathString: String,
-        variables: JMap[String, XPathVariable], isAvt: Boolean): PooledXPathExpression = {
-        // Create and compile the expression
-        val expression =
-            if (isAvt) {
-                val tempExpression: Expression = AttributeValueTemplate.make(xpathString, -1, independentContext)
-                prepareExpression(independentContext, tempExpression)
-            }
-            else {
-                val evaluator = new XPathEvaluator
-                evaluator.setStaticContext(independentContext)
-                evaluator.createExpression(xpathString)
-            }
-        new PooledXPathExpression(expression, pool, variables)
-    }
-
-    // Ideally: add this to Saxon XPathEvaluator
-    private def prepareExpression(independentContext: IndependentContext, expression: Expression): XPathExpression = {
-        // Based on XPathEvaluator.createExpression()
-        expression.setContainer(independentContext)
-        val visitor = ExpressionVisitor.make(independentContext)
-        visitor.setExecutable(independentContext.getExecutable)
-        var newExpression = visitor.typeCheck(expression, Type.ITEM_TYPE)
-        newExpression = visitor.optimize(newExpression, Type.ITEM_TYPE)
-        val map = independentContext.getStackFrameMap
-        val numberOfExternalVariables = map.getNumberOfVariables
-        ExpressionTool.allocateSlots(expression, numberOfExternalVariables, map)
-
-        // Set an evaluator as later it might be requested
-        val evaluator = new XPathEvaluator
-        evaluator.setStaticContext(independentContext)
-
-        new CustomXPathExpression(evaluator, newExpression, map, numberOfExternalVariables)
-    }
+            independentContext: IndependentContext,
+            xpathString: String,
+            isAvt: Boolean,
+            pool: ObjectPool[PooledXPathExpression],
+            variables: JMap[String, XPathVariable]): PooledXPathExpression =
+        new PooledXPathExpression(compileExpressionWithStaticContext(independentContext, xpathString, isAvt), pool, variables)
 
     // Not sure if/when configuration can be null, but it shouldn't be
     private def configurationOrDefault(configuration: Configuration) =
@@ -535,7 +455,6 @@ object XPathCache {
             functionLibrary: FunctionLibrary,
             baseURI: String,
             isAvt: Boolean,
-            allowAllVariables: Boolean,
             locationData: LocationData)
         extends BasePoolableObjectFactory[PooledXPathExpression] {
 
@@ -549,7 +468,8 @@ object XPathCache {
                 Logger.debug("makeObject(" + xpathString + ")")
             
             // Create context
-            val independentContext = new XPathCacheStaticContext(xpathConfiguration, allowAllVariables)
+            val independentContext = new IndependentContext(xpathConfiguration)
+            independentContext.getConfiguration.setURIResolver(XPath.URIResolver)
             
             // Set the base URI if specified
             if (baseURI ne null)
@@ -575,30 +495,10 @@ object XPathCache {
             if (functionLibrary ne null)
                 independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
             
-            createPoolableXPathExpression(pool, independentContext, xpathString, variables.toMap.asJava, isAvt)
+            createPoolableXPathExpression(independentContext, xpathString, isAvt, pool, variables.toMap.asJava)
         }
 
         override def destroyObject(o: PooledXPathExpression): Unit = o.destroy()
-    }
-
-    private class CustomXPathExpression(evaluator: XPathEvaluator, exp: Expression, map: SlotManager, numberOfExternalVariables: Int)
-            extends XPathExpression(evaluator, exp) {
-
-        //        private SlotManager slotManager;
-
-        setStackFrameMap(map, numberOfExternalVariables)
-        //            this.slotManager = map;
-
-        // Ideally: put this here instead of modifying Saxon, but then we need our own XPathEvaluator as well to return CustomXPathExpression
-//        public XPathDynamicContext createDynamicContext(XPathContextMajor context, Item contextItem) {
-//            // Set context item
-//            final UnfailingIterator contextIterator = SingletonIterator.makeIterator(contextItem);
-//            contextIterator.next();
-//            context.setCurrentIterator(contextIterator);
-//
-//            context.openStackFrame(slotManager);
-//            return new XPathDynamicContext(context, slotManager);
-//        }
     }
 
     private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData, reporter: Reporter)(body: ⇒ T): T =
@@ -615,15 +515,4 @@ object XPathCache {
                 body
         } catch { case e: Exception ⇒ throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData) }
         finally xpathExpression.returnToPool()
-
-    private def handleXPathException(e: Exception, xpathString: String, description: String, locationData: LocationData) = {
-        val validationException = ValidationException.wrapException(e, new ExtendedLocationData(locationData, description, "expression", xpathString))
-
-        // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
-        // so we need to explicitly add them.
-        if (locationData.isInstanceOf[ExtendedLocationData])
-            validationException.addLocationData(locationData)
-
-        validationException
-    }
 }

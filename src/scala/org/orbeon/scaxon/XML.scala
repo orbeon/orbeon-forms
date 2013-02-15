@@ -18,6 +18,7 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.value.StringValue
 import xml.Elem
 import org.orbeon.oxf.util.XPathCache._
+import org.orbeon.oxf.util.XPath._
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsInstance

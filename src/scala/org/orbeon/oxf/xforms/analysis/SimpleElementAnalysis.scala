@@ -14,11 +14,11 @@
 package org.orbeon.oxf.xforms.analysis
 
 import collection.mutable.LinkedHashMap
-import controls.RepeatControl
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.{XFormsUtils, XFormsConstants}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.util.XPath.CompiledExpression
 
 /**
  * Representation of a common XForms element supporting optional context, binding and value.
@@ -128,12 +128,19 @@ class SimpleElementAnalysis(
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
         analyzeXPath(contextAnalysis, inScopeVariables, xpathString)
 
+    // For callers without a CompiledExpression
     protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String): XPathAnalysis = {
 
         val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
 
         PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId),
             contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element)
+    }
+
+    // For callers with a CompiledExpression
+    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], expression: CompiledExpression): XPathAnalysis = {
+        val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
+        PathMapXPathAnalysis(part, expression, contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, element)
     }
 
     class SimplePathMapContext {

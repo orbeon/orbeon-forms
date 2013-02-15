@@ -122,7 +122,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="constraint" expression="true()">
+                            <mip name="constraint" expression="boolean(true())">
                                 <analysis expression="boolean(true())" analyzed="true"/>
                             </mip>
                         </bind>
@@ -143,7 +143,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="required" expression="true()">
+                            <mip name="required" expression="boolean(true())">
                                 <analysis expression="boolean(true())" analyzed="true"/>
                             </mip>
                         </bind>
@@ -164,7 +164,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="relevant" expression="false()">
+                            <mip name="relevant" expression="boolean(false())">
                                 <analysis expression="boolean(false())" analyzed="true"/>
                             </mip>
                         </bind>
@@ -185,7 +185,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="calculate" expression="42">
+                            <mip name="calculate" expression="string((42)[1])">
                                 <analysis expression="string((42)[1])" analyzed="true"/>
                             </mip>
                         </bind>
@@ -206,7 +206,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="readonly" expression="true()">
+                            <mip name="readonly" expression="boolean(true())">
                                 <analysis expression="boolean(true())" analyzed="true"/>
                             </mip>
                         </bind>
@@ -227,7 +227,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="default" expression="42">
+                            <mip name="default" expression="string((42)[1])">
                                 <analysis expression="string((42)[1])" analyzed="true"/>
                             </mip>
                         </bind>
@@ -336,7 +336,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="constraint" expression="../b = 'x'">
+                                <mip name="constraint" expression="boolean(../b = 'x')">
                                     <analysis expression="boolean(../b = 'x')" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i1')/b</path>
@@ -367,7 +367,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="readonly" expression="instance('i2')/a">
+                                <mip name="readonly" expression="boolean(instance('i2')/a)">
                                     <analysis expression="boolean(instance('i2')/a)" analyzed="true">
                                         <dependent-models>
                                             <model>model</model>
@@ -395,7 +395,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="required" expression=". = 'y'">
+                                <mip name="required" expression="boolean(. = 'y')">
                                     <analysis expression="boolean(. = 'y')" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i1')/c</path>
@@ -445,7 +445,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="calculate" expression="concat(../b, ../c)">
+                                <mip name="calculate" expression="string((concat(../b, ../c))[1])">
                                     <analysis expression="string((concat(../b, ../c))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i2')/b</path>
@@ -477,7 +477,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="default" expression="concat(../a, ../c)">
+                                <mip name="default" expression="string((concat(../a, ../c))[1])">
                                     <analysis expression="string((concat(../a, ../c))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('i2')/a</path>
@@ -2620,10 +2620,10 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="required" expression="true()">
+                                <mip name="required" expression="boolean(true())">
                                     <analysis expression="boolean(true())" analyzed="true"/>
                                 </mip>
-                                <mip name="constraint" expression="normalize-space()">
+                                <mip name="constraint" expression="boolean(normalize-space())">
                                     <analysis expression="boolean(normalize-space())" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/name</path>
@@ -2667,7 +2667,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="constraint" expression=". &gt; 0">
+                                <mip name="constraint" expression="boolean(. &gt; 0)">
                                     <analysis expression="boolean(. &gt; 0)" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
@@ -2711,7 +2711,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="constraint" expression=". &gt; 0">
+                                <mip name="constraint" expression="boolean(. &gt; 0)">
                                     <analysis expression="boolean(. &gt; 0)" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/price</path>
@@ -2755,7 +2755,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="relevant" expression="for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0">
+                                <mip name="relevant" expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)">
                                     <analysis expression="boolean(for $u in ../units return string($u) castable as xs:decimal and $u &gt; 0)" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
@@ -2768,7 +2768,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </mip>
-                                <mip name="calculate" expression="if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-'">
+                                <mip name="calculate" expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])">
                                     <analysis expression="string((if (string(../units) castable as xs:integer and string(../price) castable as xs:decimal) then ../units * ../price else '-')[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/units</path>
@@ -2831,7 +2831,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="calculate" expression="sum(for $t in ../../items/item/total[string(.) castable as xs:decimal] return $t)">
+                                <mip name="calculate" expression="string((sum(for $t in ../../items/item/total[string(.) castable as xs:decimal] return $t))[1])">
                                     <analysis expression="string((sum(for $t in ../../items/item/total[string(.) castable as xs:decimal] return $t))[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/items/item/total</path>
@@ -2875,7 +2875,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="calculate" expression="../subtotal * ../../info/tax">
+                                <mip name="calculate" expression="string((../subtotal * ../../info/tax)[1])">
                                     <analysis expression="string((../subtotal * ../../info/tax)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/totals/subtotal</path>
@@ -2920,7 +2920,7 @@
                                         </dependent-instances>
                                     </analysis>
                                 </value>
-                                <mip name="calculate" expression="for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9">
+                                <mip name="calculate" expression="string((for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9)[1])">
                                     <analysis expression="string((for $t in ../subtotal + ../tax return if ($t &gt; 4000) then $t else $t * 0.9)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('po')/totals/subtotal</path>
@@ -4431,7 +4431,7 @@
                                     </returnable-instances>
                                 </analysis>
                             </binding>
-                            <mip name="relevant" expression="$foo = 42">
+                            <mip name="relevant" expression="boolean($foo = 42)">
                                 <analysis expression="boolean($foo = 42)" analyzed="true">
                                     <value-dependent>
                                         <path>instance('instance')/a</path>
@@ -5919,7 +5919,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="readonly" expression="$root + $destination mod 2 = 0">
+                                <mip name="readonly" expression="boolean($root + $destination mod 2 = 0)">
                                     <analysis expression="boolean($root + $destination mod 2 = 0)" analyzed="true">
                                         <value-dependent>
                                             <path>instance('instance')</path>
@@ -5951,7 +5951,7 @@
                                         </returnable-instances>
                                     </analysis>
                                 </binding>
-                                <mip name="calculate" expression="$source">
+                                <mip name="calculate" expression="string(($source)[1])">
                                     <analysis expression="string(($source)[1])" analyzed="true">
                                         <value-dependent>
                                             <path>instance('instance')/@source</path>

@@ -17,7 +17,7 @@ import org.orbeon.saxon.expr._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.XPath
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import java.util.{Map ⇒ JMap}
@@ -32,6 +32,7 @@ import org.orbeon.saxon.Configuration
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.xforms._
 import xbl.Scope
+import org.orbeon.oxf.util.XPath.CompiledExpression
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -119,9 +120,23 @@ object PathMapXPathAnalysis {
               pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
               locationData: LocationData, element: Element): XPathAnalysis = {
 
+        val compiledExpression = XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt = false)
+        apply(partAnalysis, compiledExpression, baseAnalysis, inScopeVariables, pathMapContext, scope, defaultInstancePrefixedId, element)
+    }
+
+    /**
+     * Create a new XPathAnalysis based on an initial XPath expression.
+     */
+    def apply(partAnalysis: PartAnalysis, compiledExpression: CompiledExpression,
+              baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
+              pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
+              element: Element): XPathAnalysis = {
+
+        val xpathString = compiledExpression.string
+
         try {
             // Create expression
-            val expression = XPathCache.createExpression(XPathCache.getGlobalConfiguration, xpathString, namespaceMapping, XFormsContainingDocument.getFunctionLibrary)
+            val expression = compiledExpression.expression.getInternalExpression
 
             val stringPathmap = new PathMap(new StringLiteral(""))
 
@@ -272,7 +287,7 @@ object PathMapXPathAnalysis {
 
         } catch {
             case e: Exception ⇒
-                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "analysing XPath expression",
+                throw ValidationException.wrapException(e, new ExtendedLocationData(compiledExpression.locationData, "analysing XPath expression",
                         element, "expression", xpathString))
         }
     }
@@ -487,7 +502,7 @@ object PathMapXPathAnalysis {
         // Special case of empty path
         if (path.isEmpty) return path
 
-        val pool = XPathCache.getGlobalConfiguration.getNamePool
+        val pool = XPath.GlobalConfiguration.getNamePool
 
         {
             for (token ← path split '/') yield {
@@ -519,7 +534,7 @@ object PathMapXPathAnalysis {
         // Special case of empty path
         if (path.isEmpty) return path
 
-        val pool = XPathCache.getGlobalConfiguration.getNamePool
+        val pool = XPath.GlobalConfiguration.getNamePool
 
         {
             for (token ← path split '/') yield {

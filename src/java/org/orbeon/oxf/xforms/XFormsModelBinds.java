@@ -483,7 +483,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getRequired());
             } catch (Exception e) {
                 handleMIPXPathException(e, bind, bind.staticBind.getRequired(), "evaluating XForms required bind");
-                return null;
+                return ! Model.DEFAULT_REQUIRED(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
             return null;
@@ -509,7 +509,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getReadonly());
             } catch (Exception e) {
                 handleMIPXPathException(e, bind, bind.staticBind.getReadonly(), "evaluating XForms readonly bind");
-                return null;
+                return ! Model.DEFAULT_READONLY(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
             return null;
@@ -531,7 +531,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getRelevant());
             } catch (Exception e) {
                 handleMIPXPathException(e, bind, bind.staticBind.getRelevant(), "evaluating XForms relevant bind");
-                return null;
+                return ! Model.DEFAULT_RELEVANT(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
             return null;
@@ -852,7 +852,7 @@ public class XFormsModelBinds {
                 return evaluateBooleanExpression(bind.nodeset, position, bind.staticBind.getConstraint());
             } catch (Exception e) {
                 handleMIPXPathException(e, bind, bind.staticBind.getConstraint(), "evaluating XForms constraint bind");
-                return null;
+                return ! Model.DEFAULT_VALID(); // https://github.com/orbeon/orbeon-forms/issues/835
             }
         } else {
             return null;

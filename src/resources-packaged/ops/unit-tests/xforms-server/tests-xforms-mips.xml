@@ -1650,4 +1650,52 @@
         </output>
     </test>
 
+    <test description="#835: Failing constraint should default to false()" name="oxf:pipeline">
+        <!-- See https://github.com/orbeon/orbeon-forms/issues/835 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="form-model" xxf:expose-xpath-types="true">
+                        <xf:instance id="values">
+                            <values xmlns="">
+                                <value>foo</value>
+                                <constraint/>
+                                <relevant/>
+                                <required/>
+                                <readonly/>
+                            </values>
+                        </xf:instance>
+                        <xf:bind ref="value"      type="xs:decimal" name="value"/>
+                        <xf:bind ref="constraint" constraint="$value = 42"/>
+                        <xf:bind ref="relevant"   relevant="$value = 42"/>
+                        <xf:bind ref="required"   required="$value = 42"/>
+                        <xf:bind ref="readonly"   readonly="$value = 42"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output
+                        id="my-output"
+                        value="string-join(for $v in (xxf:valid(constraint),
+                                                      xxf:relevant(relevant),
+                                                      xxf:required(required),
+                                                      xxf:readonly(readonly))
+                                           return string($v), ' ')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="my-output">false false true true</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

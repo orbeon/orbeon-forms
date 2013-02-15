@@ -326,7 +326,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         }
     }
 
-    override def writeMIPs(write: (String, String) => Unit) {
+    override def writeMIPs(write: (String, String) ⇒ Unit) {
         super.writeMIPs(write)
 
         write("valid",            isValid.toString)

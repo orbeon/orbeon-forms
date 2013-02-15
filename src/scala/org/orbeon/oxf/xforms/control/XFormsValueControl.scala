@@ -219,7 +219,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
             helper.text(getExternalValue())
         }
 
-    override def writeMIPs(write: (String, String) => Unit) {
+    override def writeMIPs(write: (String, String) ⇒ Unit) {
         super.writeMIPs(write)
 
         if (isRequired)

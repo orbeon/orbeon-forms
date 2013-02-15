@@ -131,8 +131,8 @@ body {
 .orbeon .fb-edit-section-label {
   position: absolute;
   z-index: 2;
-  font-size: 20px;
   box-sizing: border-box;
+  font-size: 18px;
 }
 .orbeon .fr-section-title.hover {
   background-color: #f1f1f1;

@@ -30,20 +30,12 @@
 
         <xbl:handlers>
             <xbl:handler event="fr-expand" phase="target">
-                <xf:setvalue ref="instance('open')">true</xf:setvalue>
+                <xf:toggle case="case-open"/>
             </xbl:handler>
             <xbl:handler event="fr-collapse" phase="target">
-                <xf:setvalue ref="instance('open')">false</xf:setvalue>
+                <xf:toggle case="case-closed"/>
             </xbl:handler>
         </xbl:handlers>
-
-        <xbl:implementation>
-            <xf:model id="model">
-                <xf:instance id="open">
-                    <open/>
-                </xf:instance>
-            </xf:model>
-        </xbl:implementation>
 
         <xbl:template xxbl:transform="oxf:xslt">
             <xsl:transform version="2.0">
@@ -76,14 +68,6 @@
                                 <!-- Q: Is this the best way to get access to Form Runner resources? -->
                                 <xf:var name="fr-resources"><xxf:sequence value="$fr-resources" xxbl:scope="outer"/></xf:var>
 
-                                <!-- Whether the section is open, initialized from XSLT variable -->
-                                <xf:var name="open" value="instance('open') = 'true'">
-                                    <!-- TODO: get rid of the toggle once we have a data-bound switch -->
-                                    <xf:toggle ev:event="xforms-value-changed" case="case-{{if (. = 'true') then 'open' else 'closed'}}"/>
-                                </xf:var>
-
-                                <xf:setvalue ev:event="xforms-enabled" ev:target="#observer" ref="instance('open')" value="'{$open}'"/>
-
                                 <!-- Section title area: open/close button, title, help -->
                                 <xsl:element name="{if ($ancestor-sections = 0) then 'xh:h2' else 'xh:h3'}">
                                     <xsl:attribute name="class" select="'fr-section-title'"/>
@@ -91,19 +75,10 @@
                                     <!-- Open/close button -->
                                     <xf:var name="fb-vars" value="xxf:instance('fb-variables')"/>
                                     <xf:group appearance="xxf:internal">
+                                        <xf:var name="open" value="xxf:case('switch') = 'case-open'"/>
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
-                                            <xf:action ev:event="DOMActivate">
-                                                <xf:var name="expand" value="xxf:case('switch') = 'case-closed'" as="xs:boolean"/>
-                                                <xf:action if="$expand">
-                                                    <!-- Expand -->
-                                                    <xf:setvalue ref="instance('open')">true</xf:setvalue>
-                                                </xf:action>
-                                                <xf:action if="not($expand)">
-                                                    <!-- Collapse -->
-                                                    <xf:setvalue ref="instance('open')">false</xf:setvalue>
-                                                </xf:action>
-                                            </xf:action>
+                                            <xf:toggle ev:event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>
                                         </xsl:if>
 
                                         <!-- Actual section title -->
@@ -128,12 +103,12 @@
 
                                 </xsl:element>
 
-                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div">
+                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="true">
                                     <!-- Closed section -->
                                     <xf:case id="case-closed" selected="{not($open)}"/>
                                     <!-- Open section -->
                                     <xf:case id="case-open" selected="{$open}">
-                                        <xsl:if test="$animate">
+                                        <xsl:if test="false() and $animate">
                                             <xsl:attribute name="class">xxforms-animate</xsl:attribute>
                                         </xsl:if>
                                         <xf:group class="fr-section-content" xxbl:scope="outer" xxf:element="div">

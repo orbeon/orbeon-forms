@@ -25,6 +25,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.Submission;
+import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.events.*;
@@ -394,7 +395,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     public void restoreInstances() {
 
         // Find serialized instances from context
-        final List<InstanceState> instanceStates = containingDocument.getRestoringDynamicState().instancesJava();
+        final List<InstanceState> instanceStates = Controls.restoringInstancesJava();
 
         // Get instances from dynamic state first
         if (instanceStates != null) {

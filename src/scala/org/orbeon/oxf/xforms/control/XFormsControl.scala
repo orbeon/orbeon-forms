@@ -37,6 +37,7 @@ import org.orbeon.saxon.om.Item
 import org.orbeon.oxf.xforms.analysis.controls.{RepeatControl, SingleNodeTrait, AppearanceTrait}
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
+import Controls._
 
 /**
  * Represents an XForms control.
@@ -73,7 +74,7 @@ class XFormsControl(
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
 
-    final def stateToRestore     = Option(containingDocument.getRestoringDynamicState) flatMap (_.controls.get(effectiveId))
+    final def stateToRestore     = restoringControl(effectiveId)
     final def stateToRestoreJava = stateToRestore.orNull
 
     // Whether the control has been visited

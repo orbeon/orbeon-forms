@@ -20,12 +20,12 @@ import XFormsOperations._
 import XFormsProtocols._
 
 import org.orbeon.oxf.util.URLRewriterUtils.PathMatcher
-import collection.mutable.Buffer
 import org.orbeon.oxf.xforms._
-import control.{Controls, XFormsControl}
+import control.Controls.ControlsIterator
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, SAXStore}
 import org.dom4j.Element
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsControl}
 
 // Immutable representation of the dynamic state
 case class DynamicState(
@@ -69,10 +69,6 @@ case class DynamicState(
     def decodeLastAjaxResponseJava   = decodeLastAjaxResponse.orNull
     def decodeInstancesJava          = decodeInstances.asJava
     def decodeControlsJava           = decodeControls.asJava
-
-    case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState]) {
-        def instancesJava = instances.asJava
-    }
 
     def decodeInstancesControls = InstancesControls(decodeInstances, decodeControls map (c ⇒ (c.effectiveId, c)) toMap)
     
@@ -214,31 +210,41 @@ case class InstanceState(
             instance.valid)
 }
 
+case class InstancesControls(instances: List[InstanceState], controls: Map[String, ControlState]) {
+    def instancesJava = instances.asJava
+}
+
 object DynamicState {
 
     // Create a DynamicState from a document
-    def apply(document: XFormsContainingDocument): DynamicState = {
+    def apply(document: XFormsContainingDocument): DynamicState =
+        apply(document, Option(document.getControls.getCurrentControlTree.getRoot))
+
+    // Create a DynamicState from a control
+    def apply(document: XFormsContainingDocument, startOpt: Option[XFormsControl]): DynamicState = {
+
+        val startContainer = startOpt match {
+            case Some(componentControl: XFormsComponentControl) ⇒ componentControl.nestedContainer
+            case Some(other)                                    ⇒ other.container
+            case None                                           ⇒ document
+        }
 
         // Serialize relevant controls that have data
         // NOTE: As of 2012-02-02, only repeat, switch and dialogs controls serialize state. The state of all the other
         // controls is rebuilt from model data. This way we minimize the size of serialized controls. In the future,
         // more information might be serialized.
-        def controlsToSerialize(document: XFormsContainingDocument): Seq[ControlState] = {
-            val result = Buffer[ControlState]()
+        // TODO: What about about visited state? right now only for controls which have other data to serialize.
+        def controlsToSerialize = {
+            val iterator =
+                for {
+                    start ← startOpt.toList
+                    control ← ControlsIterator(start, includeSelf = false)
+                    if control.isRelevant
+                    controlState ← control.controlState
+                } yield
+                    controlState
 
-            // Gather relevant control
-            Controls.visitAllControls(document, new Controls.XFormsControlVisitorAdapter {
-                override def startVisitControl(control: XFormsControl) = {
-                    if (control.isRelevant) { // don't serialize anything for non-relevant controls
-                        Option(control.serializeLocal.asScala) filter (_.nonEmpty) foreach {
-                            nameValues ⇒ result += ControlState(control.getEffectiveId, control.visited, nameValues.toMap)
-                        }
-                    }
-                    true
-                }
-            })
-
-            result
+            iterator.toList
         }
 
         // Create the dynamic state object. A snapshot of the state is taken, whereby mutable parts of the state, such
@@ -268,8 +274,8 @@ object DynamicState {
             toByteSeq(document.getPendingUploads.asScala.toSet),
             Option(document.getTemplate) map (_.asByteSeq), // template returns its own serialization
             toByteSeq(Option(document.getLastAjaxResponse)),
-            toByteSeq(document.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
-            toByteSeq(controlsToSerialize(document).toList)
+            toByteSeq(startContainer.allModels flatMap (_.getInstances.asScala) filter (_.mustSerialize) map (new InstanceState(_)) toList),
+            toByteSeq(controlsToSerialize)
         )
     }
 

@@ -1,4 +1,4 @@
-/**
+    /**
  * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -19,7 +19,8 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms._
 import analysis.PartAnalysisImpl
-import control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.{XFormsComponentControl, XFormsSingleNodeContainerControl, XFormsControl}
+import org.orbeon.oxf.xforms.control.Controls._
 import event.XFormsEvents._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xml._
@@ -29,11 +30,12 @@ import org.dom4j._
 import org.orbeon.scaxon.XML._
 import collection.mutable.Buffer
 import XXFormsDynamicControl._
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEvent}
+import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener}
 import org.orbeon.oxf.xforms.event.events.{XXFormsValueChanged, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import InstanceMirror._
+import org.orbeon.oxf.xforms.state.InstancesControls
 
 /**
  * xxf:dynamic control
@@ -123,6 +125,13 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         val outerInstance = containingDocument.getInstanceForNode(node)
         if (outerInstance eq null)
             throw new IllegalArgumentException
+
+        // Gather relevant switch state before removing children
+        val relevantSwitchState = gatherRelevantSwitchState(this)
+        // LATER: Could also restore everything including models, but need to think about implications. It's
+        // conservative to attempt to restore only switch state, but restoring models should not take place for every
+        // full update.
+        //val dynamicState = DynamicState(this)
 
         // Remove children controls if any
         val tree = containingDocument.getControls.getCurrentControlTree
@@ -223,9 +232,18 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         // Remember all that we created
         _nested = Some(new Nested(childContainer, partAnalysis, template, outerListener))
 
-        // Create new control subtree
-        tree.createAndInitializeDynamicSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
+        // Create new control subtree, attempting to restore switch state
+        // LATER: See above comments
+        // withDynamicStateToRestore(dynamicState.decodeInstancesControls) {
+        withDynamicStateToRestore(InstancesControls(Nil, relevantSwitchState)) {
+            tree.createAndInitializeDynamicSubTree(childContainer, this, partAnalysis.getTopLevelControls.head)
+        }
     }
+
+    // We want to remember the state of switches
+    private def gatherRelevantSwitchState(start: XFormsControl) =
+        ControlsIterator(start, includeSelf = false) collect
+            { case switch: XFormsSwitchControl if switch.isRelevant ⇒ switch.getEffectiveId → switch.controlState.get } toMap
 
     // If more than one change touches a given id, processed it once using the last element
     private def groupChanges(changes: Seq[(String, Element)]) =
@@ -241,29 +259,34 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
             control match {
                 case componentControl: XFormsComponentControl ⇒
+                    // Update and restore switch state
+                    // LATER: See above comments
+                    // withDynamicStateToRestore(DynamicState(componentControl).decodeInstancesControls) {
+                    withDynamicStateToRestore(InstancesControls(Nil, gatherRelevantSwitchState(componentControl))) {
 
-                    // Remove concrete models and controls
-                    // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
-                    // Also: check whether dispatchDestructionEventsForRemovedContainer dispatches to already non-relevant controls
-                    //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
-                    componentControl.destroyNestedContainer()
+                        // Remove concrete models and controls
+                        // PERF: dispatching destruction events takes a lot of time, what can we do besides not dispatching them?
+                        // Also: check whether dispatchDestructionEventsForRemovedContainer dispatches to already non-relevant controls
+                        //tree.dispatchDestructionEventsForRemovedContainer(componentControl, false)
+                        componentControl.destroyNestedContainer()
 
-                    // Remove dynamic controls
-                    tree.deindexSubtree(componentControl, false)
-                    componentControl.clearChildren()
+                        // Remove dynamic controls
+                        tree.deindexSubtree(componentControl, false)
+                        componentControl.clearChildren()
 
-                    // Update the shadow tree
-                    val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, element)
+                        // Update the shadow tree
+                        val staticComponent = _nested.get.partAnalysis.updateShadowTree(prefixedId, element)
 
-                    // Create the new models and new concrete subtree rooted at xbl:template
-                    componentControl.recreateNestedContainer()
+                        // Create the new models and new concrete subtree rooted at xbl:template
+                        componentControl.recreateNestedContainer()
 
-                    val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
-                    templateTree foreach
-                        (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _))
+                        val templateTree = staticComponent.children find (_.element.getQName == XBL_TEMPLATE_QNAME)
+                        templateTree foreach
+                            (tree.createAndInitializeDynamicSubTree(componentControl.nestedContainer, componentControl, _))
 
-                    // Tell client
-                    containingDocument.addControlStructuralChange(componentControl.prefixedId)
+                        // Tell client
+                        containingDocument.addControlStructuralChange(componentControl.prefixedId)
+                    }
                 case _ ⇒
             }
         }

@@ -209,26 +209,21 @@ object XHTMLHeadHandler {
 
         // control name → appearance or mediatype → ids
         val javaScriptControlsAppearancesMap = HashMap[String, HashMap[String, Buffer[String]]]()
-        
-        Controls.visitAllControls(containingDocument, new Controls.XFormsControlVisitorAdapter {
-            override def startVisitControl(control: XFormsControl): Boolean = {
-                
-                // Don't run JavaScript initialization if the control is static readonly (could change in the
-                // future if some static readonly controls require JS initialization)
-                if (! control.isStaticReadonly)
-                    Option(control.getJavaScriptInitialization) foreach { init ⇒
 
-                        val appearanceToId = javaScriptControlsAppearancesMap.getOrElseUpdate(init._1, HashMap[String, Buffer[String]]())
-                        val ids = appearanceToId.getOrElseUpdate(init._2, Buffer[String]())
+        val rootControl = containingDocument.getControls.getCurrentControlTree.getRoot
 
-                        ids += XFormsUtils.namespaceId(containingDocument, init._3)
-                    }
-                
-                true
-            }
-        })
+        // NOTE: Don't run JavaScript initialization if the control is static readonly (could change in the
+        // future if some static readonly controls require JS initialization)
+        for {
+            control ← Controls.ControlsIterator(rootControl, includeSelf = false)
+            if ! control.isStaticReadonly
+            (localName, appearanceOrMediatype, effectiveId) ← Option(control.getJavaScriptInitialization)
+            appearanceToId = javaScriptControlsAppearancesMap.getOrElseUpdate(localName, HashMap[String, Buffer[String]]())
+            ids = appearanceToId.getOrElseUpdate(appearanceOrMediatype, Buffer[String]())
+        }
+            ids += XFormsUtils.namespaceId(containingDocument, effectiveId)
 
-        // Get rid of this series of conversions as soon as possible!
+        // FIXME: Get rid of this series of conversions as soon as possible!
         javaScriptControlsAppearancesMap mapValues (_ mapValues (_.asJava) asJava) asJava
     }
 }

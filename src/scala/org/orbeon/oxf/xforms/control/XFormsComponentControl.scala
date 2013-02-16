@@ -101,7 +101,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     override def onCreate() {
         super.onCreate()
-        if (containingDocument.isRestoringDynamicState)
+        if (Controls.isRestoringDynamicState)
             nestedContainer.restoreModelsState()
         else
             initializeModels()

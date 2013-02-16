@@ -53,7 +53,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         super.onCreate()
         // Evaluate itemsets only if restoring dynamic state
         // NOTE: This doesn't sound like it is the right place to do this, does it?
-        if (containingDocument.isRestoringDynamicState)
+        if (Controls.isRestoringDynamicState)
             getItemset
     }
 

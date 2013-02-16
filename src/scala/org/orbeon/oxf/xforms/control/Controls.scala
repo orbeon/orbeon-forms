@@ -21,6 +21,8 @@ import xbl.XBLContainer
 import org.orbeon.oxf.xforms.BindingContext
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
+import org.orbeon.oxf.xforms.state.InstancesControls
+import org.orbeon.oxf.util.DynamicVariable
 
 object Controls {
 
@@ -229,7 +231,7 @@ object Controls {
             control.preceding map (_.bindingContextForFollowing) getOrElse control.parent.bindingContextForChild
 
         val updater = new BindingUpdater(control.containingDocument, startBindingContext)
-        visitControls(control, updater, includeCurrent = true, recurse = true)
+        visitControls(control, updater, includeCurrent = true)
         xpathDependencies.bindingUpdateDone()
         updater
     }
@@ -386,8 +388,66 @@ object Controls {
     def visitAllControls(tree: ControlTree, listener: XFormsControlVisitorListener): Unit =
         visitSiblings(listener, tree.getChildren.asScala)
 
+    // Iterator over the given control and its descendants
+    case class ControlsIterator(private val start: XFormsControl, private val includeSelf: Boolean) extends Iterator[XFormsControl] {
+
+        private val children = start match {
+            case containerControl: XFormsContainerControl ⇒ containerControl.children.iterator
+            case control                                  ⇒ Iterator.empty
+        }
+
+        private var descendants: Iterator[XFormsControl] = Iterator.empty
+
+        private def findNext(): XFormsControl =
+            if (descendants.hasNext)
+                // Descendants of current child
+                descendants.next()
+            else if (children.hasNext) {
+                // Move to next child
+                val next = children.next()
+                if (next.isInstanceOf[XFormsContainerControl])
+                    descendants = new ControlsIterator(next, false)
+                next
+            } else
+                null
+
+        private var current =
+            if (includeSelf)
+                start
+            else
+                findNext()
+
+        def next() = {
+            val result = current
+            current = findNext()
+            result
+        }
+
+        def hasNext = current ne null
+    }
+
+    // Evaluate the body with InstancesControls in scope
+    def withDynamicStateToRestore[T](instancesControls: InstancesControls, topLevel: Boolean = false)(body: ⇒ T) =
+        instancesControlsToRestore.withValue((instancesControls, topLevel))(body)
+
+    // Evaluate the body with InstancesControls in scope (Java callers)
+    def withDynamicStateToRestoreJava(instancesControls: InstancesControls, runnable: Runnable) =
+        withDynamicStateToRestore(instancesControls, topLevel = true)(runnable.run())
+
+    // Get state to restore
+    private def restoringDynamicState         = instancesControlsToRestore.value
+    def restoringControl(effectiveId: String) = restoringDynamicState flatMap (_._1.controls.get(effectiveId))
+    def restoringInstancesJava                = restoringDynamicState map (_._1.instancesJava) orNull
+
+    // Whether we are restoring state
+    def isRestoringDynamicState = restoringDynamicState exists (_._2)
+
+    // ThreadLocal for dynamic state restoration
+    private val instancesControlsToRestore = new DynamicVariable[(InstancesControls, Boolean)]
+
     // Visit all the descendant controls of the given container control
-    def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean, recurse: Boolean): Unit =
+    // FIXME: Use ControlsIterator instead and then remove this when done
+    def visitControls(control: XFormsControl, listener: XFormsControlVisitorListener, includeCurrent: Boolean): Unit =
         control match {
             case containerControl: XFormsContainerControl ⇒
                 // Container itself
@@ -396,8 +456,7 @@ object Controls {
                         return
 
                 // Children
-                if (recurse)
-                    visitSiblings(listener, containerControl.children)
+                visitSiblings(listener, containerControl.children)
 
                 // Container itself
                 if (includeCurrent)

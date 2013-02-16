@@ -16,6 +16,8 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.common.OXFException
 import java.util.{Collections ⇒ JCollections}
 import ControlLocalSupport._
+import org.orbeon.oxf.xforms.state.ControlState
+import collection.JavaConverters._
 
 trait ControlLocalSupport {
 
@@ -29,6 +31,14 @@ trait ControlLocalSupport {
      * serialization is needed, or a map of name/value pairs otherwise.
      */
     def serializeLocal = JCollections.emptyMap[String, String]
+
+    final def controlState = {
+        val serialized = serializeLocal
+        if (serialized.isEmpty)
+            None
+        else
+            Some(ControlState(effectiveId, visited, serialized.asScala.toMap))
+    }
 
     final def updateLocalCopy(copy: XFormsControl) {
         if (this.currentLocal != null) {

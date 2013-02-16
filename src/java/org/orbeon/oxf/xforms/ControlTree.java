@@ -60,7 +60,7 @@ public class ControlTree implements ExternalCopyable {
         final Collection<XFormsControl> allControls = controlIndex.getEffectiveIdsToControls().values();
 
         // Dispatch initialization events for all controls created in index
-        if (!containingDocument.isRestoringDynamicState()) {
+        if (! Controls.isRestoringDynamicState()) {
             // Copy list because it can be modified concurrently as events are being dispatched and handled
             final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
             dispatchRefreshEvents(controlsEffectiveIds);
@@ -124,7 +124,7 @@ public class ControlTree implements ExternalCopyable {
                 if (control instanceof XFormsContainerControl)
                     controlsEffectiveIds.add(control.getEffectiveId());
             }
-        }, includeCurrent, true);
+        }, includeCurrent);
 
         // Dispatch events
         for (final String effectiveId : controlsEffectiveIds) {
@@ -195,7 +195,7 @@ public class ControlTree implements ExternalCopyable {
                 effectiveIdsToControls.put(control.getEffectiveId(), control);
                 return true;
             }
-        }, includeCurrent, true);
+        }, includeCurrent);
 
         // Dispatch initialization events, passing the ids only
         dispatchRefreshEvents(effectiveIdsToControls.keySet());
@@ -223,7 +223,7 @@ public class ControlTree implements ExternalCopyable {
                 controlIndex.indexControl(control);
                 return true;
             }
-        }, includeCurrent, true);
+        }, includeCurrent);
     }
 
     /**
@@ -239,7 +239,7 @@ public class ControlTree implements ExternalCopyable {
                 controlIndex.deindexControl(control);
                 return true;
             }
-        }, includeCurrent, true);
+        }, includeCurrent);
     }
 
     public boolean isBindingsDirty() {

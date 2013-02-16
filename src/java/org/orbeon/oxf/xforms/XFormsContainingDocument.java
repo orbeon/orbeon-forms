@@ -29,6 +29,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analytics.RequestStats;
 import org.orbeon.oxf.xforms.analytics.RequestStatsImpl;
+import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl;
@@ -335,9 +336,6 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         indentedLogger.endHandleOperation();
     }
 
-    // ThreadLocal for dynamic state restoration
-    private static ThreadLocal<DynamicState.InstancesControls> threadLocal = new ThreadLocal<DynamicState.InstancesControls>();
-
     private void restoreDynamicState(final DynamicState dynamicState) {
 
         this.uuid = dynamicState.uuid();
@@ -370,38 +368,26 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         // Scope the containing document for the XForms API
         XFormsAPI.withContainingDocumentJava(this, new Runnable() {
             public void run() {
+                Controls.withDynamicStateToRestoreJava(dynamicState.decodeInstancesControls(), new Runnable() {
+                    public void run() {
+                        // Restore models state
+                        // Create XForms controls and models
+                        createControlsAndModels();
 
-                threadLocal.set(dynamicState.decodeInstancesControls());
-                try {
-                    // Restore models state
-                    // Create XForms controls and models
-                    createControlsAndModels();
+                        // Restore top-level models state, including instances
+                        restoreModelsState();
 
-                    // Restore top-level models state, including instances
-                    restoreModelsState();
+                        // Restore controls state
+                        // Store serialized control state for retrieval later
+                        xformsControls.createControlTree();
 
-                    // Restore controls state
-                    // Store serialized control state for retrieval later
-                    xformsControls.restoreControls();
-
-                    // Once the control tree is rebuilt, restore focus if needed
-                    if (dynamicState.decodeFocusedControlJava() != null)
-                        xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().getControl(dynamicState.decodeFocusedControlJava()));
-                } finally {
-                    // Indicate that instance restoration process is over
-                    threadLocal.remove();
-                }
+                        // Once the control tree is rebuilt, restore focus if needed
+                        if (dynamicState.decodeFocusedControlJava() != null)
+                            xformsControls.setFocusedControl(xformsControls.getCurrentControlTree().getControl(dynamicState.decodeFocusedControlJava()));
+                    }
+                });
             }
         });
-    }
-
-    // Whether the containing document is in a phase of restoring the dynamic state.
-    public boolean isRestoringDynamicState() {
-        return threadLocal.get() != null;
-    }
-
-    public DynamicState.InstancesControls getRestoringDynamicState() {
-        return threadLocal.get();
     }
 
     @Override
@@ -1094,7 +1080,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         rebuildRecalculateRevalidateIfNeeded();
 
         // Initialize controls
-        xformsControls.initialize();
+        xformsControls.createControlTree();
     }
 
     public Stack<XFormsEvent> eventStack = new Stack<XFormsEvent>();

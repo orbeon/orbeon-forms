@@ -63,7 +63,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
                 val local = getCurrentLocal.asInstanceOf[XFormsRepeatControlLocal]
                 local.index = state.keyValues("index").toInt
                 true
-            case None ⇒ false
+            case None ⇒
+                false
         }
 
     // The repeat's sequence binding

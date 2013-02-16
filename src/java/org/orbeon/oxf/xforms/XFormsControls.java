@@ -115,27 +115,12 @@ public class XFormsControls implements XFormsObjectResolver {
     }
 
     /**
-     * Initialize the controls. This is called upon initial creation of the engine.
-     *
+     * Create the controls, whether upon initial creation of restoration of the controls.
      */
-    public void initialize() {
+    public void createControlTree() {
 
         assert !initialized;
 
-        createControlTree();
-    }
-    /**
-     * Restore the controls. This is called when the document is restored.
-     *
-     */
-    public void restoreControls() {
-
-        assert !initialized;
-
-        createControlTree();
-    }
-
-    private void createControlTree() {
         if (containingDocument.getStaticState().topLevelPart().hasControls()) {
 
             // Create new controls tree
@@ -441,7 +426,7 @@ public class XFormsControls implements XFormsObjectResolver {
                 }
                 return true;
             }
-        }, true, true);
+        }, true);
 
         return eventsToDispatch;
     }

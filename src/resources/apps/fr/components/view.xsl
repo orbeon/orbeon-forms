@@ -233,13 +233,13 @@
                     <xsl:if test="$captcha = 'reCAPTCHA'">
                         <fr:recaptcha id="captcha" theme="clean" ref="$captcha">
                             <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                            <xf:alert ref="$fr-resources/detail/labels/captcha-help"/>
+                            <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
                         </fr:recaptcha>
                     </xsl:if>
                     <xsl:if test="$captcha = 'SimpleCaptcha'">
                         <fr:simple-captcha id="captcha" ref="$captcha">
                             <xf:label ref="$fr-resources/detail/labels/captcha-label"/>
-                            <xf:alert ref="$fr-resources/detail/labels/captcha-help"/>
+                            <xf:alert ref="$fr-resources/detail/labels/captcha-alert"/>
                         </fr:simple-captcha>
                     </xsl:if>
                 </xf:group>

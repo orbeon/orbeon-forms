@@ -47,7 +47,6 @@ class XFormsStaticStateImpl(
 
     val getIndentedLogger = Loggers.getIndentedLogger("analysis")
     val locationData = staticStateDocument.locationData
-    val documentWrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
     // Create top-level part once vals are all initialized
     val topLevelPart = new PartAnalysisImpl(this, None, startScope, metadata, staticStateDocument)

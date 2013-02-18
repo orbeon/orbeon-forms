@@ -660,7 +660,6 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         Mockito when instance.getListeners(Matchers.any[String]) thenReturn Seq()
 
         val staticState = mock[XFormsStaticState]
-        Mockito when staticState.documentWrapper thenReturn doc
 
         val document = mock[XFormsContainingDocument]
         Mockito when document.getStaticState thenReturn staticState

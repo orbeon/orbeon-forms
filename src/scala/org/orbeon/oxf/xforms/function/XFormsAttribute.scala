@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om.Item
+import org.orbeon.oxf.util.XPath
 
 /**
  * xxf:attribute()
@@ -29,6 +30,6 @@ class XFormsAttribute extends XFormsFunction {
 
         // Create and wrap the attribute
         val attribute = Dom4jUtils.createAttribute(qName, value)
-        getContainingDocument(xpathContext).getStaticState.documentWrapper.wrap(attribute)
+        XPath.DocumentWrapper.wrap(attribute)
     }
 }

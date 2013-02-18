@@ -15,12 +15,13 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.oxf.util.XPath
 
 class XXFormsControlElement extends XFormsFunction with FunctionSupport {
 
     override def evaluateItem(xpathContext: XPathContext) = {
         implicit val ctx = xpathContext
         relevantControl(0) map
-            (control ⇒ context.containingDocument.getStaticState.documentWrapper.wrap(control.element)) orNull
+            (control ⇒ XPath.DocumentWrapper.wrap(control.element)) orNull
     }
 }

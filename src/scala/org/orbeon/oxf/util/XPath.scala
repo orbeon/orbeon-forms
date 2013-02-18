@@ -21,7 +21,7 @@ import org.orbeon.saxon.expr.{XPathContextMajor, ExpressionTool, ExpressionVisit
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.saxon.value.{Value, AtomicValue}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.saxon.Configuration
@@ -29,6 +29,7 @@ import javax.xml.transform.{TransformerException, Source, URIResolver}
 import org.orbeon.oxf.resources.URLFactory
 import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
+import org.orbeon.saxon.dom4j.DocumentWrapper
 
 object XPath {
 
@@ -58,6 +59,10 @@ object XPath {
         override def setConfigurationProperty(name: String, value: AnyRef): Unit =
             throw new IllegalStateException("Global XPath configuration is read-only")
     }
+
+    // Global document wrapper
+    // NOTE: Not ideal to require this. See also XML.
+    val DocumentWrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
     // Create and compile an expression
     def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean): CompiledExpression = {

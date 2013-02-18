@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindNode
+import org.orbeon.oxf.util.XPath
 
 object DataModel {
 
@@ -131,7 +132,7 @@ object DataModel {
         else {
             // Create and wrap the dangling element
             val newElement = Dom4jUtils.createElement("orbeon-dangling-element")
-            val newElementInfo = containingDocument.getStaticState.documentWrapper.wrap(newElement)
+            val newElementInfo = XPath.DocumentWrapper.wrap(newElement)
             // Then attach a readonly bind node to it. This is as if there was a <bind readonly="true" for the node>
             val bindNode = new BindNode(bindId, newElementInfo, null)
             bindNode.setReadonly(true)

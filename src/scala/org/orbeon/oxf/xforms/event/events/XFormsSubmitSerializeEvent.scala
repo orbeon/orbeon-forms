@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om._
+import org.orbeon.oxf.util.XPath
 
 class XFormsSubmitSerializeEvent(target: XFormsEventTarget, properties: PropertyGetter)
         extends XFormsEvent(XFORMS_SUBMIT_SERIALIZE, target, properties, bubbles = true, cancelable = false) {
@@ -46,7 +47,7 @@ private object XFormsSubmitSerializeEvent {
         val document = Dom4jUtils.createDocument
         val submissionBodyElement = Dom4jUtils.createElement("submission-body")
         document.setRootElement(submissionBodyElement)
-        containingDocument.getStaticState.documentWrapper.wrap(submissionBodyElement)
+        XPath.DocumentWrapper.wrap(submissionBodyElement)
     }
 
     val Getters = Map[String, XFormsSubmitSerializeEvent ⇒ Option[Any]] (

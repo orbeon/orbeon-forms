@@ -306,10 +306,11 @@ object XML {
         def \@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
         def \@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
 
-        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
-        def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
-        def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
+        // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
+//        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+//        def \\@(attName: QName): Seq[NodeInfo] = \\@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+//        def \\@(attName: (String, String)): Seq[NodeInfo] = \\@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
+//        def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         def root = nodeInfo.getDocumentRoot
         def rootElement = root \ * head
@@ -368,10 +369,11 @@ object XML {
         def \@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \@ attName)
         def \@(test: Test): Seq[NodeInfo] = seq flatMap (_ \@ test)
 
-        def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
-        def \\@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
-        def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
-        def \\@(test: Test): Seq[NodeInfo] = seq flatMap (_ \\@ test)
+        // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
+//        def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
+//        def \\@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
+//        def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
+//        def \\@(test: Test): Seq[NodeInfo] = seq flatMap (_ \\@ test)
 
         def att(attName: String) = \@(attName)
         def child(test: Test) = \(test)

@@ -74,10 +74,15 @@
                     </fr:body>
                 </xsl:template>
 
-                <!-- Remove @edit-ref and @xxf:update, fb:view → fr:view -->
+                <!-- Remove @edit-ref and @xxf:update, handle section @open, fb:view → fr:view -->
                 <xsl:template match="xh:body//fb:view | xh:body//fr:section | xh:body//fr:grid">
                     <xsl:element name="fr:{local-name()}">
-                        <xsl:apply-templates select="@* except (@edit-ref, @xxf:update) | node()"/>
+                        <!-- Restore @open if needed -->
+                        <xsl:if test="self::fr:section and @fb:open">
+                            <xsl:attribute name="open" select="@fb:open"/>
+                        </xsl:if>
+                        <!-- Process everything else -->
+                        <xsl:apply-templates select="@* except (@edit-ref, @xxf:update, @open, @fb:open) | node()"/>
                     </xsl:element>
                 </xsl:template>
 

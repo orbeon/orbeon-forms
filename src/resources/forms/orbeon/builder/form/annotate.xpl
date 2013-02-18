@@ -39,6 +39,9 @@
                 <xsl:variable name="is-custom-instance"
                               select="$model/xf:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
 
+                <!-- Whether we have "many" controls -->
+                <xsl:variable name="many-controls" select="count(/*/xh:body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
+
                 <!-- Custom instance: add dataModel namespace binding to top-level bind -->
                 <xsl:template match="xf:bind[@id = 'fr-form-binds']">
                     <xsl:copy>
@@ -116,6 +119,12 @@
                     <xsl:copy>
                         <xsl:attribute name="edit-ref"/>
                         <xsl:attribute name="xxf:update" select="'full'"/>
+                        <!-- Save current value of @open as @fb:open -->
+                        <xsl:if test="@open"><xsl:attribute name="fb:open" select="@open"/></xsl:if>
+                        <!-- If "many" controls close all sections but the first -->
+                        <xsl:if test="$many-controls and preceding::fr:section">
+                            <xsl:attribute name="open" select="'false'"/>
+                        </xsl:if>
                         <xsl:apply-templates select="@* | node()"/>
                     </xsl:copy>
                 </xsl:template>

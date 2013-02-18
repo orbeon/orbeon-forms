@@ -406,7 +406,7 @@
                             <!-- NOTE: This needs to be after the xxf:dynamic as the shared upload control use xxf:binding() to get the binding of the current node,
                                        which only works if the control exists -->
                             <xh:div class="fb-cell-editor">
-                                <xf:var name="td"            value="instance('fb-form-instance')/xh:body//*:td[@id = $selected-cell]"/>
+                                <xf:var name="td"            value="id($selected-cell, instance('fb-form-instance'))"/>
                                 <xf:var name="grid"          value="$td/ancestor::*:grid[1]"/>
                                 <xf:var name="control"       value="$td/*[1]"/><!-- may be empty! -->
                                 <xf:var name="control-id"    value="$control/@id"/>

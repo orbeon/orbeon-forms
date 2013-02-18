@@ -45,6 +45,7 @@
                 <xsl:template match="/*">
 
                     <!-- Section configuration -->
+                    <xsl:variable name="editable" select="exists(@edit-ref)"/>
                     <xsl:variable name="mode" select="@mode"/>
                     <xsl:variable name="ancestor-sections" select="count(ancestor::fr:section)"/><!-- TODO -->
                     <xsl:variable name="collapse" select="not(@collapse = 'false')"/>
@@ -54,13 +55,15 @@
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
-                        <xf:var name="id" xbl:attr="xbl:text=id"/>
-                        <xf:var name="fb-section" value="xxf:instance('fb-form-instance')/xh:body//fr:section[@id = $id]"/>
-                        <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ()"/>
+                        <xsl:if test="$editable">
+                            <!-- Variables for design time -->
+                            <xf:var name="fb-section" value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
+                            <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ()"/>
+                        </xsl:if>
 
                         <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->
                         <xf:group
-                            class="{{string-join((@class, $fb-can-do-classes), ' ')}}"
+                            class="{@class}{if ($editable) then ' {$fb-can-do-classes}' else ''}"
                             xxf:element="div">
 
                             <xf:group xxbl:scope="inner" appearance="xxf:internal">

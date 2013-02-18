@@ -614,4 +614,64 @@
         </output>
     </test>
 
+    <test description="#837: Support xxforms-replace event" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/837 -->
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <e1/>
+                        </xf:instance>
+
+                        <xf:submission
+                            id="replace-instance"
+                            ref="instance()"
+                            action="echo:"
+                            method="post"
+                            replace="instance"/>
+
+                        <xf:submission
+                            id="replace-ref"
+                            ref="instance()"
+                            action="echo:"
+                            method="post"
+                            replace="instance"
+                            targetref="instance()"/>
+
+                        <xf:action ev:event="xforms-model-construct-done">
+                            <xf:insert ref="instance()" origin="xf:element('e2')"/>
+                            <xf:send submission="replace-instance"/>
+                            <xf:insert ref="instance()" origin="xf:element('e3')"/>
+                            <xf:send submission="replace-ref"/>
+                        </xf:action>
+
+                        <xf:message ev:event="xxforms-replace" value="string-join((name(event('former-node')), name(event('current-node'))), '-')"/>
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <e3/>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">e1-e2</xxf:message>
+                    <xxf:message level="modal">e2-e2</xxf:message>
+                    <xxf:message level="modal">e2-e3</xxf:message>
+                    <xxf:message level="modal">e3-e3</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

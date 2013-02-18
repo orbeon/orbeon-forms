@@ -85,6 +85,7 @@ object XFormsEventFactory {
         XXFORMS_UPLOAD_DONE         → (new XXFormsUploadDoneEvent(_, _)),
         XXFORMS_VALUE_CHANGED       → (new XXFormsValueChangedEvent(_, _)),
         XFORMS_DELETE               → (new XFormsDeleteEvent(_, _)),
+        XXFORMS_REPLACE             → (new XXFormsReplaceEvent(_, _)),
         XXFORMS_VALUE               → (new XXFormsValueEvent(_, _))
     )
 

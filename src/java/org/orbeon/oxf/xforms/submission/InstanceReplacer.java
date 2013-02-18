@@ -174,16 +174,13 @@ public class InstanceReplacer extends BaseReplacer {
                 // Insert before the target node, so that the position of the inserted node
                 // wrt its parent does not change after the target node is removed
                 // This will also mark a structural change
+                // FIXME: Replace logic should use doReplace and xxforms-replace event
                 XFormsInsertAction.doInsert(containingDocument, detailsLogger, "before",
                         destinationCollection, destinationNodeInfo.getParent(),
                         Collections.singletonList(newDocumentRootElement), 1, false, true);
 
-                if (!destinationNodeInfo.getParent().isSameNodeInfo(destinationNodeInfo.getDocumentRoot())) {
-                    // The node to replace is NOT a root element
-
-                    // Perform the deletion of the selected node
-                    XFormsDeleteAction.doDelete(containingDocument, detailsLogger, destinationCollection, 1, true);
-                }
+                // Perform the deletion of the selected node
+                XFormsDeleteAction.doDelete(containingDocument, detailsLogger, destinationCollection, 1, true);
 
                 // Update model instance
                 // NOTE: The inserted node NodeWrapper.index might be out of date at this point because:

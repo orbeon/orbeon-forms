@@ -95,6 +95,7 @@ public class XFormsEvents {
 
     public static final String XFORMS_INSERT = "xforms-insert";
     public static final String XFORMS_DELETE = "xforms-delete";
+    public static final String XXFORMS_REPLACE = "xxforms-replace";
 
     public static final String XFORMS_FOCUS = "xforms-focus";
 

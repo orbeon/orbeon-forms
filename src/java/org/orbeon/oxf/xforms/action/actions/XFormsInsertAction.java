@@ -21,6 +21,7 @@ import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.events.XFormsInsertEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsReplaceEvent;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -301,7 +302,7 @@ public class XFormsInsertAction extends XFormsAction {
             modifiedInstance = (containingDocument != null) ? containingDocument.getInstanceForNode(insertContextNodeInfo) : null;
             insertLocationNodeInfo = insertContextNodeInfo;
             final Node insertLocationNode = XFormsUtils.getNodeFromNodeInfo(insertContextNodeInfo, CANNOT_INSERT_READONLY_MESSAGE);
-            insertedNodes = doInsert(insertLocationNode, clonedNodes);
+            insertedNodes = doInsert(insertLocationNode, clonedNodes, modifiedInstance, doDispatch);
             beforeAfterInto = "into";
 
             // Normalize text nodes if needed to respect XPath 1.0 constraint
@@ -326,7 +327,7 @@ public class XFormsInsertAction extends XFormsAction {
                 // location is the target location. If there is more than one cloned node to insert, only the
                 // first node that does not cause a conflict is considered."
 
-                insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes);
+                insertedNodes = doInsert(insertLocationNode.getDocument(), clonedNodes, modifiedInstance, doDispatch);
                 beforeAfterInto = positionAttribute; // TODO: ideally normalize to "into document node"?
 
                 // NOTE: Don't need to normalize text nodes in this case, as no new text node is inserted
@@ -343,7 +344,7 @@ public class XFormsInsertAction extends XFormsAction {
                     // insertion strategy.
 
                     // TODO: Don't think we should even do this now in XForms 1.1
-                    insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes);
+                    insertedNodes = doInsert(insertLocationNode.getParent(), clonedNodes, modifiedInstance, doDispatch);
 
                 } else {
                     // Other node types
@@ -437,7 +438,7 @@ public class XFormsInsertAction extends XFormsAction {
         return insertedNodeInfos;
     }
 
-    private static List<Node> doInsert(Node insertionNode, List<Node> clonedNodes) {
+    private static List<Node> doInsert(Node insertionNode, List<Node> clonedNodes, XFormsInstance modifiedInstance, boolean doDispatch) {
         final List<Node> insertedNodes = new ArrayList<Node>(clonedNodes.size());
         if (insertionNode instanceof Element) {
             // Insert inside an element
@@ -482,7 +483,22 @@ public class XFormsInsertAction extends XFormsAction {
             for (Node clonedNode: clonedNodes) {
                 // Only an element can be inserted at the root of an instance
                 if (clonedNode instanceof Element) {
+
+                    final Element formerRootElement = insertContextDocument.getRootElement();
                     insertContextDocument.setRootElement((Element) clonedNode);
+
+                    // Dispatch xxforms-replace event if required and possible
+                    // NOTE: For now, still dispatch xforms-insert for backward compatibility.
+                    if (doDispatch && modifiedInstance != null) {
+                        final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.documentInfo();
+
+                        Dispatch.dispatchEvent(
+                            new XXFormsReplaceEvent(
+                                modifiedInstance,
+                                documentWrapper.wrap(formerRootElement),
+                                documentWrapper.wrap(insertContextDocument.getRootElement())));
+                    }
+
                     insertedNodes.add(clonedNode);
                     return insertedNodes;
                 }

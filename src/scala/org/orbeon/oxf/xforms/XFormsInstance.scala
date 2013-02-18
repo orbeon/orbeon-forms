@@ -20,7 +20,7 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
 import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
-import events.{XXFormsInstanceInvalidate, XXFormsActionErrorEvent, XFormsDeleteEvent, XFormsInsertEvent}
+import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
@@ -28,10 +28,13 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import javax.xml.transform.stream.StreamResult
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
-import state.InstanceState
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
 import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, Item}
 import org.orbeon.oxf.util._
+import scala.Left
+import scala.Some
+import scala.Right
+import org.orbeon.oxf.xforms.state.InstanceState
 
 // Caching information associated with an instance loaded with xxf:cache="true"
 case class InstanceCaching(
@@ -281,6 +284,9 @@ class XFormsInstance(
     // Replace the instance with the given document
     // This includes marking the structural change as well as dispatching events
     def replace(newDocumentInfo: DocumentInfo, dispatch: Boolean = true, instanceCaching: Option[InstanceCaching] = instanceCaching, isReadonly: Boolean = readonly): Unit = {
+
+        val formerRoot = instanceRoot
+
         // Update the instance (this also marks it as modified)
         update(
             instanceCaching,
@@ -290,24 +296,30 @@ class XFormsInstance(
         // Call this directly, since we are not using insert/delete here
         model.markStructuralChange(this)
 
-        val newDocumentRootElement = instanceRoot
+        val currentRoot = instanceRoot
 
-        // Dispatch xforms-delete event
-        // NOTE: Do NOT dispatch so we are compatible with the regular root element replacement
-        // (see below). In the future, we might want to dispatch this, especially if
-        // XFormsInsertAction dispatches xforms-delete when removing the root element
-        //Dispatch.dispatchEvent(new XFormsDeleteEvent(this, Seq(destinationNodeInfo).asJava, 1));
+        if (dispatch) {
+            // Dispatch xxforms-replace event
+            // NOTE: For now, still dispatch xforms-insert for backward compatibility.
+            Dispatch.dispatchEvent(
+                new XXFormsReplaceEvent(
+                    this,
+                    formerRoot,
+                    currentRoot)
+            )
 
-        // Dispatch xforms-insert event
-        // NOTE: use the root node as insert location as it seems to make more sense than pointing to the earlier root element
-        if (dispatch)
+            // Dispatch xforms-insert event
+            // NOTE: use the root node as insert location as it seems to make more sense than pointing to the former
+            // root element.
             Dispatch.dispatchEvent(
                 new XFormsInsertEvent(
                     this,
-                    Seq[Item](newDocumentRootElement).asJava,
-                    null,
-                    newDocumentRootElement.getDocumentRoot, "after")
+                    Seq[Item](currentRoot).asJava,
+                    null, // CHECK
+                    currentRoot.getDocumentRoot,
+                    "into") // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
             )
+        }
     }
 }
 

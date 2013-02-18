@@ -236,6 +236,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_DEFERRED_QNAME = new QName("deferred", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_INDEX_QNAME = new QName("index", XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_UUID_QNAME = new QName("uuid", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_STATIC_STATE_QNAME = new QName("static-state", XXFORMS_NAMESPACE);

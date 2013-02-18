@@ -39,6 +39,10 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 // Logic to mirror mutations between an outer and an inner instance
 object InstanceMirror {
 
+    // LATER: Handle xxforms-replace for instance root replacement. Right now, we rely on xforms-insert only and this
+    // specially takes care of instance root replacement. However in order to ensure that indexes are properly
+    // maintained in the case of two linked instances, xxforms-replace will be needed. For now this doesn't happen
+    // with Form Builder.
     private val MutationEvents = Seq(XXFORMS_VALUE_CHANGED, XFORMS_INSERT, XFORMS_DELETE)
 
     // (sourceInstance, sourceNode, into) ⇒ Option[(destinationInstance, destinationNode)]
@@ -163,7 +167,7 @@ object InstanceMirror {
         (innerInstance, innerNode, into) ⇒
 
             // Find instance in original doc
-            evalOne(outerDoc, "//xf:instance[@id = $sourceId]",
+            evalOne(outerDoc, "//xf:instance[@id = $sourceId]", // could write:(id($sourceId)[self::xf:instance], //xf:instance[@id = $sourceId])[1]
                     variables = Map("sourceId" → StringValue.makeStringValue(innerInstance.getId))) match {
                 case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
 
@@ -255,11 +259,11 @@ object InstanceMirror {
                                         def containsRootElement(items: Seq[Item]) =
                                             items collect { case node: NodeInfo ⇒ node } exists (node ⇒ node == node.rootElement)
 
-                                        if (containsRootElement(insert.insertedItems)) {
+                                        if (containsRootElement(insert.insertedNodes)) {
                                             // If the inserted items contain the root element it means the root element was replaced, so
                                             // remove it first
 
-                                            assert(insert.insertedItems.size == 1)
+                                            assert(insert.insertedNodes.size == 1)
 
                                             val parent = matchingInsertNode.parentOption.get
                                             doDelete(containingDocument, logger, Seq(matchingInsertNode).asJava, - 1, doDispatch = true)

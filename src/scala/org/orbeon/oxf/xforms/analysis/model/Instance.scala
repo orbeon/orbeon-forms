@@ -37,14 +37,21 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
         extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) {
 
     import Instance._
+    import ElementAnalysis._
 
     val readonly = element.attributeValue(XXFORMS_READONLY_ATTRIBUTE_QNAME) == "true"
     val cache = Version.instance.isPEFeatureEnabled(element.attributeValue(XXFORMS_CACHE_QNAME) == "true", "cached XForms instance")
     val timeToLive = Instance.timeToLiveOrDefault(element)
     val handleXInclude = false
 
-    val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
     def exposeXPathTypes = part.isExposeXPathTypes // NOTE: per part
+
+    val (indexIds, indexClasses) = {
+        val tokens = attSet(element, XXFORMS_INDEX_QNAME)
+        (tokens("id"), tokens("class"))
+    }
+
+    val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
 
     def isLaxValidation    = (validation eq null) || validation == "lax"
     def isStrictValidation = validation == "strict"

@@ -1,4 +1,4 @@
-    /**
+/**
  * Copyright (C) 2011 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
@@ -195,7 +195,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             }
 
             def changeListener(record: Seq[NodeInfo] ⇒ Boolean): EventListener = {
-                case insert: XFormsInsertEvent ⇒ record(insert.insertedItems collect { case n: NodeInfo ⇒ n })
+                case insert: XFormsInsertEvent ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
                 case delete: XFormsDeleteEvent ⇒ record(delete.deletedNodes)
                 case valueChanged: XXFormsValueChangedEvent ⇒ record(Seq(valueChanged.node))
                 case _ ⇒ false

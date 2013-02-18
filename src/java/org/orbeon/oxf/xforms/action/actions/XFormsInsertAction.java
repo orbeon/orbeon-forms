@@ -174,7 +174,7 @@ public class XFormsInsertAction extends XFormsAction {
                 (NodeInfo) insertContextItem, originObjects, insertionIndex, true, true);
     }
 
-    public static List<Item> doInsert(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
+    public static List<NodeInfo> doInsert(XFormsContainingDocument containingDocument, IndentedLogger indentedLogger, String positionAttribute,
                                 List collectionToBeUpdated, NodeInfo insertContextNodeInfo, List<Item> originItems, int insertionIndex, boolean doClone, boolean doDispatch) {
 
         final boolean isEmptyNodesetBinding = collectionToBeUpdated == null || collectionToBeUpdated.size() == 0;
@@ -417,11 +417,11 @@ public class XFormsInsertAction extends XFormsAction {
         }
 
         // Gather list of modified nodes
-        final List<Item> insertedNodeInfos;
+        final List<NodeInfo> insertedNodeInfos;
         if (didInsertNodes && modifiedInstance != null) {
             // Can be null if document into which delete is performed is not in an instance, e.g. in a variable
             final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.documentInfo();
-            insertedNodeInfos = new ArrayList<Item>(insertedNodes.size());
+            insertedNodeInfos = new ArrayList<NodeInfo>(insertedNodes.size());
             for (Object insertedNode : insertedNodes)
                 insertedNodeInfos.add(documentWrapper.wrap(insertedNode));
         } else {

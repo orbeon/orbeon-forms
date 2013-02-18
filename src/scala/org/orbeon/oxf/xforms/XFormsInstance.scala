@@ -29,11 +29,8 @@ import javax.xml.transform.stream.StreamResult
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
-import org.orbeon.saxon.om.{VirtualNode, DocumentInfo, Item}
+import org.orbeon.saxon.om.{NodeInfo, VirtualNode, DocumentInfo}
 import org.orbeon.oxf.util._
-import scala.Left
-import scala.Some
-import scala.Right
 import org.orbeon.oxf.xforms.state.InstanceState
 
 // Caching information associated with an instance loaded with xxf:cache="true"
@@ -93,10 +90,13 @@ class XFormsInstance(
         private var _modified: Boolean,                         // whether the instance was modified
         var valid: Boolean)                                     // whether the instance was valid as of the last revalidation
     extends ListenersTrait
+    with XFormsInstanceIndex
     with XFormsEventObserver
     with Logging {
 
     require(! (_readonly && _documentInfo.isInstanceOf[VirtualNode]))
+
+    requireNewIndex()
 
     def containingDocument = parent.containingDocument
 
@@ -105,6 +105,7 @@ class XFormsInstance(
     def documentInfo = _documentInfo
     def readonly = _readonly
     def modified = _modified
+
 
     // Mark the instance as modified
     // This is used so we can optimize serialization: if an instance is inline and not modified, we don't need to
@@ -116,6 +117,8 @@ class XFormsInstance(
         _instanceCaching = instanceCaching
         _documentInfo = documentInfo
         _readonly = readonly
+
+        requireNewIndex()
 
         markModified()
     }
@@ -172,24 +175,37 @@ class XFormsInstance(
                 // inserted.
     
                 // Find affected repeats
-                val insertedNodes = insertEvent.insertedItems
+                val insertedNodes = insertEvent.insertedNodes
     
                 //didInsertNodes = insertedNodes.size() != 0
                 
                 // Find affected repeats and update their node-sets and indexes
                 val controls = container.getContainingDocument.getControls
                 updateRepeatNodesets(controls, insertedNodes)
+
+                // Update index
+                // If this was a root element replacement, rely on XXFormsReplaceEvent instead
+                if (! insertEvent.isRootElementReplacement)
+                    updateIndexForInsert(insertedNodes)
             case deleteEvent: XFormsDeleteEvent ⇒
                 // New nodes were just deleted
                 if (deleteEvent.deletedNodes.nonEmpty) {
                     // Find affected repeats and update them
                     val controls = container.getContainingDocument.getControls
                     updateRepeatNodesets(controls, null)
+                    updateIndexForDelete(deleteEvent.deletedNodes)
                 }
+            case replaceEvent: XXFormsReplaceEvent ⇒
+                // A node was replaced
+                // As of 2013-02-18, this only happens for a root element replacement
+                updateIndexForDelete(Seq(replaceEvent.formerNode))
+                updateIndexForInsert(Seq(replaceEvent.currentNode))
+            case valueChangeEvent: XXFormsValueChangedEvent ⇒
+                updateIndexForValueChange(valueChangeEvent)
             case _ ⇒
         }
 
-    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: Seq[Item]) {
+    private def updateRepeatNodesets(controls: XFormsControls, insertedNodes: Seq[NodeInfo]) {
         val repeatControlsMap = controls.getCurrentControlTree.getRepeatControls.asScala
         if (repeatControlsMap.nonEmpty) {
             val instanceScope = container.getPartAnalysis.scopeForPrefixedId(getPrefixedId)
@@ -314,13 +330,111 @@ class XFormsInstance(
             Dispatch.dispatchEvent(
                 new XFormsInsertEvent(
                     this,
-                    Seq[Item](currentRoot).asJava,
+                    Seq[NodeInfo](currentRoot).asJava,
                     null, // CHECK
                     currentRoot.getDocumentRoot,
                     "into") // "into" makes more sense than "after" or "before"! We used to have "after", not sure why.
             )
         }
     }
+}
+
+// For instances which declare xxf:index="id", keep up-to-date an index of ids to elements. The index is set on
+// DocumentWrapper, so that the XPath id() function works out of the box.
+//
+// Implementation notes:
+//
+// - set an IdGetter on DocumentWrapper when a new Dom4j DocumentWrapper is set on the instance
+// - index all elements with an attribute whose local name is "id"
+// - initial index is created the first time an id is required
+// - upon subsequent document updates (insert, delete, setvalue), the index is incrementally updated
+// - keep reference to all elements which have a given id so that we support insert/delete in any order
+// - sort the elements in case there is more than one possible result; this is not very efficient so it's better to
+//   make sure that every id is unique
+//
+// Possible improvements:
+//
+// - should just index "id" and "xml:id"
+// - handle schema xs:ID type as well
+trait XFormsInstanceIndex {
+
+    self: XFormsInstance ⇒
+
+    import org.orbeon.scaxon.XML._
+    import collection.{mutable ⇒ m}
+
+    private var idIndex: m.Map[String, List[Element]] = _
+
+    def requireNewIndex() = {
+        idIndex = null
+        if (instance.indexIds && self.documentInfo.isInstanceOf[DocumentWrapper]) {
+            val wrapper = self.documentInfo.asInstanceOf[DocumentWrapper]
+            wrapper.setIdGetter(new DocumentWrapper.IdGetter {
+
+                object ElementOrdering extends Ordering[Element] {
+                    def compare(x: Element, y: Element) =
+                        wrapper.wrap(x).compareOrder(wrapper.wrap(y))
+                }
+
+                def apply(id: String) = {
+                    // Lazily create index the first time if needed
+                    if (idIndex eq null) {
+                        idIndex = m.Map()
+                        combineMappings(mappingsInSubtree(self.documentInfo))
+                    }
+
+                    // Query index
+                    idIndex.get(id) match {
+                        case Some(list) if list.size > 1 ⇒ list.min(ElementOrdering) // get first in document order
+                        case Some(list)                  ⇒ list.head                 // empty list not allowed in the map
+                        case None                        ⇒ null
+                    }
+                }
+            })
+        }
+    }
+
+    def updateIndexForInsert(nodes: Seq[NodeInfo]) =
+        if (idIndex ne null)
+            for (node ← nodes)
+                combineMappings(mappingsInSubtree(node))
+
+    def updateIndexForDelete(nodes: Seq[NodeInfo]) =
+        if (idIndex ne null)
+            for (node ← nodes; (id, element) ← mappingsInSubtree(node))
+                removeId(id, element)
+
+    def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent) =
+        if ((idIndex ne null) && valueChangeEvent.node.getLocalPart == "id") {
+
+            val parentElement = unwrapElement(valueChangeEvent.node.getParent)
+
+            removeId(valueChangeEvent.oldValue, parentElement)
+            addId(valueChangeEvent.newValue, parentElement)
+        }
+
+    private def idsInSubtree(start: NodeInfo) = start descendantOrSelf * att "id"
+    private def mappingsInSubtree(start: NodeInfo) = idsInSubtree(start) map (id ⇒ id.getStringValue → unwrapElement(id.getParent))
+
+    private def removeId(id: String, parentElement: Element) = {
+        idIndex.get(id) match {
+            case Some(list) if list.size > 1 ⇒ idIndex(id) = list filter (_ ne parentElement)
+            case Some(list)                  ⇒ idIndex -= id // don't leave an empty list in the map
+            case None                        ⇒ // NOP
+        }
+    }
+
+    private def addId(id: String, element: Element) =
+        idIndex(id) = element :: (
+            idIndex.get(id) match {
+                case Some(list) ⇒ list
+                case None       ⇒ Nil
+            }
+        )
+
+    private def combineMappings(mappings: Seq[(String, Element)]) =
+        for ((id, element) ← mappings)
+            addId(id, element)
 }
 
 object XFormsInstance extends Logging {

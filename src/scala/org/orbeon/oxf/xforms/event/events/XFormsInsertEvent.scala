@@ -24,15 +24,15 @@ import collection.JavaConverters._
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XFORMS_INSERT, target, properties, bubbles = true, cancelable = false) {
 
-    def this(target: XFormsEventTarget, insertedItems: JList[Item], originItems: JList[Item], insertLocationNode: NodeInfo, position: String) =
+    def this(target: XFormsEventTarget, insertedNodes: JList[NodeInfo], originItems: JList[Item], insertLocationNode: NodeInfo, position: String) =
         this(target, Map(
-            "inserted-nodes"       → Option(insertedItems.asScala),  // "The instance data nodes inserted."
+            "inserted-nodes"       → Option(insertedNodes.asScala),  // "The instance data nodes inserted."
             "origin-nodes"         → Option(originItems.asScala),    // "The instance data nodes referenced by the insert action's origin attribute if present, or the empty nodeset if not present."
             "insert-location-node" → Option(insertLocationNode),     // "The insert location node as defined by the insert action."
             "position"             → Option(position)                // "before | after | into" relative to the insert location node ("into" is an Orbeon extension)
         ))
 
-    def insertedItems      = property[Seq[Item]]("inserted-nodes").get
+    def insertedNodes      = property[Seq[NodeInfo]]("inserted-nodes").get
     def originItems        = property[Seq[Item]]("origin-nodes").get
     def insertLocationNode = property[NodeInfo]("insert-location-node").get
     def position           = property[String]("position").get

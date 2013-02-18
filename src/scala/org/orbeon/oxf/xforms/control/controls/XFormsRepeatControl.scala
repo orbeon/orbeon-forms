@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.event.events.XXFormsIndexChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsNodesetChangedEvent
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.saxon.om.Item
+import org.orbeon.saxon.om.{NodeInfo, Item}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.Logging
 
@@ -250,7 +250,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             contextStack.getCurrentBindingContext.copy(nodeset = items.asScala filter isRelevantItem asJava)
     }
 
-    def updateSequenceForInsertDelete(insertedNodeInfos: Seq[Item]): Unit = {
+    def updateSequenceForInsertDelete(insertedNodeInfos: Seq[NodeInfo]): Unit = {
 
         // NOTE: This can be called even if we are not relevant!
 
@@ -312,7 +312,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
      * @param insertedItems         items just inserted by xf:insert if any, or null
      * @return                      new iterations if any, or an empty list
      */
-    def updateIterations(oldRepeatItems: Seq[Item], insertedItems: Seq[Item], isInsertDelete: Boolean):
+    def updateIterations(oldRepeatItems: Seq[Item], insertedItems: Seq[NodeInfo], isInsertDelete: Boolean):
             (Seq[XFormsRepeatIterationControl], Option[XFormsRepeatControl]) = {
 
         // NOTE: The following assumes the nodesets have changed

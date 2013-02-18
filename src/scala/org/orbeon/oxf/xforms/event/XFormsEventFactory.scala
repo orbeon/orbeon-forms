@@ -83,7 +83,7 @@ object XFormsEventFactory {
         XXFORMS_NODESET_CHANGED     → (new XXFormsNodesetChangedEvent(_, _)),
         XXFORMS_SETINDEX            → (new XXFormsSetindexEvent(_, _)),
         XXFORMS_UPLOAD_DONE         → (new XXFormsUploadDoneEvent(_, _)),
-        XXFORMS_VALUE_CHANGED       → (new XXFormsValueChanged(_, _)),
+        XXFORMS_VALUE_CHANGED       → (new XXFormsValueChangedEvent(_, _)),
         XFORMS_DELETE               → (new XFormsDeleteEvent(_, _)),
         XXFORMS_VALUE               → (new XXFormsValueEvent(_, _))
     )

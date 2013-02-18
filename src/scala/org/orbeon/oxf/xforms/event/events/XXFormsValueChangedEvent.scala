@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 import org.orbeon.saxon.om._
 
-class XXFormsValueChanged(target: XFormsEventTarget, properties: PropertyGetter)
+class XXFormsValueChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XXFORMS_VALUE_CHANGED, target, properties, bubbles = true, cancelable = true) {
 
     def this(target: XFormsEventTarget, node: NodeInfo, oldValue: String, newValue: String) = {
@@ -33,14 +33,16 @@ class XXFormsValueChanged(target: XFormsEventTarget, properties: PropertyGetter)
 
     private var oldValueOpt: Option[String] = None
     private var newValueOpt: Option[String] = None
+
+    def oldValue = oldValueOpt.get
     def newValue = newValueOpt.get
 
-    override def lazyProperties = getters(this, XXFormsValueChanged.Getters)
+    override def lazyProperties = getters(this, XXFormsValueChangedEvent.Getters)
 }
 
-private object XXFormsValueChanged {
+private object XXFormsValueChangedEvent {
 
-    val Getters = Map[String, XXFormsValueChanged ⇒ Option[Any]](
+    val Getters = Map[String, XXFormsValueChangedEvent ⇒ Option[Any]](
         "node"      → (_.nodeOpt),
         "old-value" → (_.oldValueOpt),
         "new-value" → (_.newValueOpt)

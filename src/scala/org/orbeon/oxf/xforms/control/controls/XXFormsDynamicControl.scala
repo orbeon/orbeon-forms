@@ -31,7 +31,7 @@ import org.orbeon.scaxon.XML._
 import collection.mutable.Buffer
 import XXFormsDynamicControl._
 import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener}
-import org.orbeon.oxf.xforms.event.events.{XXFormsValueChanged, XFormsDeleteEvent, XFormsInsertEvent}
+import org.orbeon.oxf.xforms.event.events.{XXFormsValueChangedEvent, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import InstanceMirror._
@@ -197,7 +197,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
             def changeListener(record: Seq[NodeInfo] ⇒ Boolean): EventListener = {
                 case insert: XFormsInsertEvent ⇒ record(insert.insertedItems collect { case n: NodeInfo ⇒ n })
                 case delete: XFormsDeleteEvent ⇒ record(delete.deletedNodes)
-                case valueChanged: XXFormsValueChanged ⇒ record(Seq(valueChanged.node))
+                case valueChanged: XXFormsValueChangedEvent ⇒ record(Seq(valueChanged.node))
                 case _ ⇒ false
             }
 

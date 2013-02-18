@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.model
 
 import org.orbeon.oxf.xforms._
-import event.events.{XXFormsBindingErrorEvent, XXFormsValueChanged}
+import event.events.{XXFormsBindingErrorEvent, XXFormsValueChangedEvent}
 import event.{Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.saxon.value.AtomicValue
@@ -194,7 +194,7 @@ object DataModel {
                 modifiedInstance.model.markValueChange(nodeInfo, isCalculate)
 
                 // Dispatch extension event to instance
-                Dispatch.dispatchEvent(new XXFormsValueChanged(modifiedInstance, nodeInfo, oldValue, newValue))
+                Dispatch.dispatchEvent(new XXFormsValueChangedEvent(modifiedInstance, nodeInfo, oldValue, newValue))
             case None ⇒
                 // Value modified is not in an instance
                 // Q: Is the code below the right thing to do?

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms._
 import action.actions.XFormsDeleteAction.doDelete
 import action.actions.XFormsInsertAction.doInsert
 import collection.JavaConverters._
-import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChanged}
+import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import event.XFormsEvents._
 import model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
@@ -228,7 +228,7 @@ object InstanceMirror {
             }
 
             event match {
-                case valueChanged: XXFormsValueChanged ⇒
+                case valueChanged: XXFormsValueChangedEvent ⇒
                     findMatchingNode(valueChanged.targetObject.asInstanceOf[XFormsInstance], valueChanged.node, true) match {
                         case Some((matchingInstance, matchingNode)) ⇒
                             if (! isInLoop(matchingInstance, event))

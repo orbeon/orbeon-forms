@@ -106,6 +106,12 @@ $ ->
             { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'mock' ],                                                                                 to: 'initial',                  actions: [ 'removeMock' ]                                   }
             { events: [ 'mouseExistsGridTd' ],      elements: 'elementsInContainer',  from: [ 'placeholder' ],                                                                          to: 'initial',                  actions: [ 'hidePlaceholder', 'removeMock'  ]               }
             { events: [ 'click' ],                  elements: 'elementClosest',       from: [ 'placeholder', 'mock' ],                                                                  to: 'wait-xhr-to-edit',         actions: [ 'storeSeqNo' ]                                   }
+            # This transition is for the case where in one server response we get two controls added. In the case
+            # we want to make sure we end the edit on the first control, before we add the second one. If we don't
+            # when moving the editor for the second control, the blur event from the first editor runs and gives us
+            # a DOM Exception 8 on Chrome. See bugs #247 and #839, as well as
+            # http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Chrome-s-DOM-Exception-8
+            { events: [ 'controlAdded' ],           elements: 'elementsAll',          from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
             { events: [ 'controlAdded' ],           elements: 'labelsInContainer',    from: [ 'initial' ],                                                                              to: 'edit',                     actions: [ 'removeFor', 'createMock', 'startEdit' ]         }
             { events: [ 'ajaxResponse' ],           elements: 'elementsAll',          from: [ 'wait-xhr-to-edit' ],                 conditions: [ 'isNextSeqNo' ],                      to: 'edit',                     actions: [ 'startEdit' ]                                    }
             { events: [ 'enterKey', 'lostFocus' ],  elements: 'elementClosest',       from: [ 'edit' ],                                                                                 to: 'edit-done',                actions: [ 'endEdit', 'removeMock', 'fireEditDone' ]        }
@@ -171,15 +177,19 @@ $ ->
             removeMock: editableDo 'removeMock'
             storeSeqNo: (element) -> f$.data 'seqNo', (currentSeqNo element), element
             startEdit: (element) ->
-                Builder.beforeAddingEditorCallbacks.fire element
-                f$.removeClass 'fb-label-hint-placeholder', element
-                f$.removeClass 'xforms-disabled', element                                                               # Remove disabled which we have on hint when their value is empty
-                input = editableEditInput element
-                f$.append input, f$.empty editablePlaceholderContainer element
-                f$.show input
-                htmlInput = f$.find 'input', input
-                saveButton = $ '#fr-save-button button'                                                                 # HACK: Focus on something else (we know we have a Save button in Form Builder)
-                (setFocus saveButton).then -> setFocus htmlInput
+                beingMoved = f$.data 'beingMoved', element
+                if not beingMoved
+                    f$.data 'beingMoved', true, element
+                    Builder.beforeAddingEditorCallbacks.fire element
+                    f$.removeClass 'fb-label-hint-placeholder', element
+                    f$.removeClass 'xforms-disabled', element                                                           # Remove disabled which we have on hint when their value is empty
+                    input = editableEditInput element
+                    f$.append input, f$.empty editablePlaceholderContainer element
+                    f$.show input
+                    htmlInput = f$.find 'input', input
+                    saveButton = $ '#fr-save-button button'                                                             # HACK: Focus on something else (we know we have a Save button in Form Builder)
+                    (setFocus saveButton).then -> setFocus htmlInput
+                    f$.data 'beingMoved', false, element
             endEdit: (element) ->
                 input = editableEditInput element
                 f$.append input, $ '.fb-cell-editor'                                                                    # Move editor out of grid, so it doesn't get removed by HTML replacements

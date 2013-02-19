@@ -429,9 +429,6 @@ body {
 .orbeon #fb-source-editor-dialog .CodeMirror,
 .orbeon .fb-custom-xml-dialog .CodeMirror {
   font-size: 12px;
-}
-.orbeon #fb-source-editor-dialog .CodeMirror-scroll,
-.orbeon .fb-custom-xml-dialog .CodeMirror-scroll {
   height: auto;
 }
 .orbeon #fb-source-editor-dialog .xforms-alert-active,

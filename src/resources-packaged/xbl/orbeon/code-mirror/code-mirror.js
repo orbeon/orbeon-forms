@@ -30,11 +30,11 @@
                 lineNumbers: true,
                 indentUnit: 4,
                 value: Document.getValue(this.textarea),
-                readOnly: YD.hasClass(this.container, "xforms-readonly") ? 'nocursor' : false,
-                onChange: _.bind(this.codeMirrorChange, this),
-                onFocus: _.bind(this.codeMirrorFocus, this),
-                onBlur: _.bind(this.codeMirrorBlur, this)
+                readOnly: YD.hasClass(this.container, "xforms-readonly") ? 'nocursor' : false
             });
+            this.editor.on('change', _.bind(this.codeMirrorChange, this));
+            this.editor.on('focus' , _.bind(this.codeMirrorFocus , this));
+            this.editor.on('blur'  , _.bind(this.codeMirrorBlur  , this));
         },
 
         codeMirrorFocus: function() { this.hasFocus = true; },

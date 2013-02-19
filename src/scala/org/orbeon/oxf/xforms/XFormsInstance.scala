@@ -367,6 +367,12 @@ trait XFormsInstanceIndex {
 
     private var idIndex: m.Map[String, List[Element]] = _
 
+    // Iterator over all ids
+    def idsIterator = {
+        createIndexIfNeeded()
+        if (idIndex ne null) idIndex.keysIterator else Iterator.empty
+    }
+
     def requireNewIndex() = {
         idIndex = null
         if (instance.indexIds && self.documentInfo.isInstanceOf[DocumentWrapper]) {
@@ -380,10 +386,7 @@ trait XFormsInstanceIndex {
 
                 def apply(id: String) = {
                     // Lazily create index the first time if needed
-                    if (idIndex eq null) {
-                        idIndex = m.Map()
-                        combineMappings(mappingsInSubtree(self.documentInfo))
-                    }
+                    createIndexIfNeeded()
 
                     // Query index
                     idIndex.get(id) match {
@@ -395,6 +398,12 @@ trait XFormsInstanceIndex {
             })
         }
     }
+
+    private def createIndexIfNeeded() =
+        if (idIndex eq null) {
+            idIndex = m.Map()
+            combineMappings(mappingsInSubtree(self.documentInfo))
+        }
 
     def updateIndexForInsert(nodes: Seq[NodeInfo]) =
         if (idIndex ne null)

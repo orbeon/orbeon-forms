@@ -45,8 +45,7 @@ object ContainerOps {
     def containerById(containerId: String): NodeInfo = {
         // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
         val staticId = XFormsUtils.getStaticIdFromId(containerId)
-        val formInstance = asNodeInfo(model("fr-form-model").get.getInstance("fb-form-instance"))
-        formInstance \ "*:body" \\ * filter IsContainer filter (_ \@ "id" === staticId) head
+        byId(fbFormInstance, staticId) filter IsContainer head
     }
 
     def controlsInContainer(containerId: String): Int = (containerById(containerId) \\ "*:td" \ *).length
@@ -56,9 +55,7 @@ object ContainerOps {
 
     // Find ancestor sections and grids (including non-repeated grids) from leaf to root
     def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
-        if (includeSelf) descendant ancestorOrSelf *
-        else descendant ancestor * filter
-                IsContainer
+        (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
 
     // Find ancestor section and grid names from root to leaf
     def findContainerNames(descendant: NodeInfo): Seq[String] =
@@ -130,7 +127,7 @@ object ContainerOps {
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =
         element parent * child * filter
                 (name(_) == siblingName) filterNot
-                (_ isSameNodeInfo element)
+                (_ == element)
 
     // Move a container based on a move function (typically up or down)
     def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo) {
@@ -174,7 +171,7 @@ object ContainerOps {
                                     (moveOp(holder, _))
                     }
 
-                val movedContainer = findControlById(doc, container \@ "id").get // must get new reference
+                val movedContainer = byId(doc, container \@ "id").get // must get new reference
 
                 (firstControl(movedContainer preceding *), firstControl(movedContainer following *)) match {
                     case (Some(preceding), _) ⇒ tryToMoveHolders(getControlName(preceding), moveElementAfter)

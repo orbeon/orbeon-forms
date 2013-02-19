@@ -451,6 +451,30 @@ object XML {
 
     implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
 
+    implicit def asSequenceIterator(i: Iterator[Item]) = new SequenceIterator {
+
+        private var currentItem: Item = _
+        private var _position = 0
+
+        def next() = {
+            if (i.hasNext) {
+                currentItem = i.next()
+                _position += 1
+            } else {
+                currentItem = null
+                _position = -1
+            }
+
+            currentItem
+        }
+
+        def current = currentItem
+        def position = _position
+        def close() = ()
+        def getAnother = null
+        def getProperties = 0
+    }
+
     implicit def asScalaIterator(i: SequenceIterator): Iterator[Item] = new Iterator[Item] {
 
         private var current = i.next()

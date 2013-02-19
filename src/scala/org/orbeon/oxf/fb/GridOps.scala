@@ -321,10 +321,8 @@ object GridOps {
         asNodeInfo(model("fr-form-model").get.getVariable("selected-cell"))
 
     // Find the currently selected grid td if any
-    def findSelectedTd(inDoc: NodeInfo) = {
-        val tdId = selectedCellVar.stringValue
-        findFRBodyElement(inDoc) \\ "*:grid" \\ "*:td" filter (_ \@ "id" === tdId) headOption
-    }
+    def findSelectedTd(inDoc: NodeInfo) =
+        byId(inDoc, selectedCellVar.stringValue)
 
     // Make the given grid td selected
     def selectTd(newTd: NodeInfo): Unit =

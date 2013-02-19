@@ -57,6 +57,13 @@ object FormBuilderFunctions extends Logging {
     // Find the form document being edited
     def getFormDoc = asNodeInfo(model("fr-form-model").get.getVariable("model")).getDocumentRoot
 
+    // Find an element by id
+    def byId(inDoc: NodeInfo, id: String) = Option(inDoc.getDocumentRoot.selectID(id))
+
+    // Return fb-form-instance
+    def fbFormInstance =
+        model("fr-form-model").get.getInstance("fb-form-instance")
+
     // Find the top-level form model of the form being edited
     def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + "$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
@@ -76,8 +83,8 @@ object FormBuilderFunctions extends Logging {
         instanceElement(inDoc, id).toSeq \ * headOption
 
     // Get the root element of instances
-    def formInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-instance").get
-    def metadataInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-metadata").get
+    def formInstanceRoot(inDoc: NodeInfo)      = inlineInstanceRootElement(inDoc, "fr-form-instance").get
+    def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata").get
     def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
     def formResourcesRoot = asNodeInfo(model("fr-form-model").get.getVariable("resources"))
@@ -97,10 +104,18 @@ object FormBuilderFunctions extends Logging {
         def findAllIds = {
             val root = inDoc.getDocumentRoot
 
-            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (localname(_) + suffix) else Seq()
-            val elementIds = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix))
+            // Use id index when possible, otherwise use plain XPath
+            val fbInstance = fbFormInstance
 
-            instanceIds ++ elementIds
+            def elementIdsFromIndex = fbInstance.idsIterator filter (_.endsWith(suffix))
+            def elementIdsFromXPath = root \\ * \@ "id" map (_.stringValue) filter (_.endsWith(suffix)) iterator
+
+            def canUseIndex = fbInstance.documentInfo == root
+
+            val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
+            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (localname(_) + suffix) else Seq()
+
+            elementIds ++ instanceIds
         }
 
         val allIds = collection.mutable.Set() ++ findAllIds

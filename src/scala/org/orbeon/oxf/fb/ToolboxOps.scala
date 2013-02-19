@@ -375,7 +375,7 @@ object ToolboxOps {
                     val requestedName = getControlName(control)
 
                     // Check if id is already in use
-                    if (findControlById(td, controlId(requestedName)).isDefined) {
+                    if (byId(td, controlId(requestedName)).isDefined) {
                         // If so create new id
                         val newName = controlName(nextId(td, "control"))
 

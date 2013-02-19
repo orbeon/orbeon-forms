@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.XFormsUtils.effectiveIdToAbsoluteId
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import scala.collection.mutable
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.saxon.value.StringValue
 
 /*
  * Form Builder: operations on controls.
@@ -65,7 +66,7 @@ object ControlOps {
     // Find a control by name (less efficient than searching by id)
     def findControlByName(inDoc: NodeInfo, controlName: String) =
         Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
-            (suffix ⇒ findControlById(inDoc, controlName + '-' + suffix)) headOption
+            (suffix ⇒ byId(inDoc, controlName + '-' + suffix)) headOption
 
     // Find a control id by name
     def findControlIdByName(inDoc: NodeInfo, controlName: String) =
@@ -97,10 +98,6 @@ object ControlOps {
             (id ⇒ Option(controlName(id.stringValue)))
 
     def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
-
-    // Find a control (including grids and sections) element by id
-    def findControlById(inDoc: NodeInfo, id: String) =
-        findFRBodyElement(inDoc) \\ * filter (hasIdValue(_, id)) headOption
 
     // Return a bind ref or nodeset attribute value if present
     def bindRefOrNodeset(bind: NodeInfo): Option[String] =
@@ -440,12 +437,10 @@ object ControlOps {
 
     // Get all control names by inspecting all elements with an id that converts to a valid name
     def getAllControlNames(inDoc: NodeInfo) =
-        findFRBodyElement(inDoc) \\ * flatMap
-            (e ⇒ attValueOption(e \@ "id")) flatMap
-                (id ⇒ Option(controlName(id)))
+        fbFormInstance.idsIterator filter isIdForControl map controlName
 
     // For XForms callers
-    def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = getAllControlNames(inDoc)
+    def getAllControlNamesXPath(inDoc: NodeInfo): SequenceIterator = getAllControlNames(inDoc) map StringValue.makeStringValue
 
     // Return all the controls in the view
     def getAllControlsWithIds(inDoc: NodeInfo) =
@@ -617,7 +612,7 @@ object ControlOps {
     // - the only repeats are containers
     // - all containers must have stable ids
     def buildControlEffectiveId(inDoc: NodeInfo, staticId: String) =
-        findControlById(inDoc, staticId) map { control ⇒
+        byId(inDoc, staticId) map { control ⇒
             // Ancestors from root to leaf except the top-level
             val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse.tail
 

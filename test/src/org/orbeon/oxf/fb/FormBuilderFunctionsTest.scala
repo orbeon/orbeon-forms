@@ -13,37 +13,26 @@
  */
 package org.orbeon.oxf.fb
 
-import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
-import org.orbeon.oxf.test.DocumentTestBase
+import org.mockito.Mockito
+import org.orbeon.oxf.fb.ContainerOps._
+import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.fb.GridOps._
 import org.orbeon.oxf.fb.SectionOps._
 import org.orbeon.oxf.fb.ToolboxOps._
-import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fb.ContainerOps._
-import org.scalatest.mock.MockitoSugar
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
-import org.orbeon.oxf.util.{IndentedLogger, XPathCache}
-import org.orbeon.oxf.xforms.processor.XFormsServer
-import org.mockito.{Matchers, Mockito}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import collection.JavaConverters._
-import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
-import org.orbeon.saxon.value.BooleanValue
-import org.mockito.stubbing.Answer
-import org.mockito.invocation.InvocationOnMock
-import org.orbeon.saxon.om._
-import org.orbeon.scaxon.XML.evalOne
-import org.orbeon.oxf.processor.ProcessorUtils
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms._
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis
-import org.orbeon.oxf.xforms.event.XFormsEvent.Phase
-import org.orbeon.oxf.xforms.event.EventHandler
-import org.orbeon.oxf.xforms.analytics.{RequestStatsImpl, NOPRequestStats}
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
+import org.orbeon.saxon.om._
+import org.orbeon.scaxon.XML._
+import org.scalatest.junit.AssertionsForJUnit
+import org.scalatest.mock.MockitoSugar
 
 class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -51,20 +40,67 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     val CustomXMLDoc       = "oxf:/org/orbeon/oxf/fb/template-with-custom-xml.xhtml"
     val SectionsGridsDoc   = "oxf:/org/orbeon/oxf/fb/template-with-sections-grids.xhtml"
     val SectionsRepeatsDoc = "oxf:/org/orbeon/oxf/fb/template-with-sections-repeats.xhtml"
+    val RowspansDoc        = "oxf:/org/orbeon/oxf/fb/template-with-rowspans.xhtml"
 
-    def getNewDoc(url: String = TemplateDoc): DocumentWrapper = {
+    // Create a form which simulates the main Form Builder model
+    def formBuilderDoc(url: String, isCustomInstance: Boolean) =
+        elemToDom4j(
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:ev="http://www.w3.org/2001/xml-events"
+                     xmlns:xbl="http://www.w3.org/ns/xbl">
+                <xh:head>
+                    <xf:model id="fr-form-model">
+                        <xf:instance id="fb-form-instance" src={url} xxf:index="id"/>
 
-        def createDoc(documentURL: String) = ProcessorUtils.createDocumentFromURL(documentURL, null)
+                        <!-- TODO: don't duplicate logic with what's in FormBuilderFunctions -->
+                        <xf:var name="model"             value="xh:head/xf:model[@id = 'fr-form-model']"/>
+                        <xf:var name="metadata-instance" value="$model/xf:instance[@id = 'fr-form-metadata']/*"/>
+                        <xf:var name="resources"         value="$model/xf:instance[@id = 'fr-form-resources']/*"/>
 
-        // Get and annotate the template
-        implicit val functionLibrary = XFormsContainingDocument.getFunctionLibrary
-        evalOne(
-            new DocumentWrapper(createDoc(url), null, XPathCache.getGlobalConfiguration),
-            """xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                ('data', 'bindings'),
-                                (., .),
-                                'data')""").asInstanceOf[DocumentWrapper]
-    }
+                        <xf:instance id="fb-variables">
+                            <variables>
+                                <selected-cell/>
+                            </variables>
+                        </xf:instance>
+
+                        <xf:var name="variables"     value="instance('fb-variables')"/>
+                        <xf:var name="selected-cell" value="$variables/selected-cell"/>
+
+                        <xf:instance id="fb-components-instance">
+                            <components/>
+                        </xf:instance>
+
+                        <xf:var name="component-bindings" value="instance('fb-components-instance')//xbl:binding"/>
+
+                        <xf:var name="is-custom-instance" value={if (isCustomInstance) "true()" else "false()"}/>
+
+                        <xf:action ev:event="xforms-model-construct-done">
+                            <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
+                            <xf:var name="temp" value="xxf:create-document()"/>
+                            <xf:insert context="$temp"
+                                       origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                                                ('data', 'bindings'),
+                                                                (instance(), instance('fb-components-instance')),
+                                                                'data')"/>
+
+                            <xf:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+                                gridOps:initializeGrids($temp)
+                            </xf:action>
+
+                            <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->
+
+                            <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>
+                        </xf:action>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                </xh:body>
+            </xh:html>)
+
+    def formBuilderContainingDocument(url: String, isCustomInstance: Boolean = false) =
+        setupDocument(formBuilderDoc(url, isCustomInstance))
 
     private val control1 = "control-1"
     private val control2 = "control-2"
@@ -72,32 +108,30 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     private val section1 = "section-1"
     private val section2 = "section-2"
 
-    @Test def modelInstanceBodyElements(): Unit = {
-        val doc = getNewDoc()
+    @Test def modelInstanceBodyElements(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
+            assert(findModelElement(doc).getDisplayName === "xf:model")
+            assert(hasIdValue(findModelElement(doc), "fr-form-model"))
 
-        assert(findModelElement(doc).getDisplayName === "xf:model")
-        assert(hasIdValue(findModelElement(doc), "fr-form-model"))
+            assert(name(formInstanceRoot(doc) parent * head) === "xf:instance")
 
-        assert(name(formInstanceRoot(doc) parent * head) === "xf:instance")
+            assert(qname(findFRBodyElement(doc)) === (XF → "group"))
+        }
 
-        assert(qname(findFRBodyElement(doc)) === (XF → "group"))
-    }
+    @Test def nameAndId(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
 
-    @Test def nameAndId(): Unit = {
+            // Basic functions
+            assert(controlName(controlId(control1)) === control1)
+            assert(controlName(bindId(control1)) === control1)
 
-        val doc = getNewDoc()
-
-        // Basic functions
-        assert(controlName(controlId(control1)) === control1)
-        assert(controlName(bindId(control1)) === control1)
-
-        // Find control element
-        assert(qname(findControlByName(doc, control1).get) === (XF → "input"))
-        assert(hasIdValue(findControlByName(doc, control1).get, controlId(control1)))
-    }
+            // Find control element
+            assert(qname(findControlByName(doc, control1).get) === (XF → "input"))
+            assert(hasIdValue(findControlByName(doc, control1).get, controlId(control1)))
+        }
 
     @Test def controlElements(): Unit =
-        withActionAndDoc(getNewDoc()) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
 
             // Find bind element
             assert(qname(findBindByName(doc, control1).get) === (XF → "bind"))
@@ -111,15 +145,14 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             // controlResourceHolders
         }
 
-    @Test def sectionName(): Unit = {
-        val doc = getNewDoc()
-
-        assert(findSectionName(doc, control1).get === section1)
-        assert(getControlNameOption(doc \\ "*:section" head).get === section1)
-    }
+    @Test def sectionName(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
+            assert(findSectionName(doc, control1).get === section1)
+            assert(getControlNameOption(doc \\ "*:section" head).get === section1)
+        }
 
     @Test def newBinds(): Unit =
-        withActionAndDoc(getNewDoc()) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
             ensureBinds(doc, Seq(section1, control2))
 
             assert(qname(findBindByName(doc, control2).get) === (XF → "bind"))
@@ -131,40 +164,35 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             assert(hasIdValue(findBindByName(doc, control3).get, bindId(control3)))
         }
 
-    @Test def findNextId(): Unit = {
-        val doc = getNewDoc()
+    @Test def findNextId(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
+            assert(nextId(doc, "control") === "control-3-control")
+            assert(nextId(doc, "section") === "section-3-section")
 
-        assert(nextId(doc, "control") === "control-3-control")
-        assert(nextId(doc, "section") === "section-3-section")
+            // TODO: test more collisions
+        }
 
-        // TODO: test more collisions
-    }
+    @Test def containers(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
+            val firstTd = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head
 
-    @Test def containers(): Unit = {
+            val containers = findAncestorContainers(firstTd)
 
-        val doc = getNewDoc()
+            assert(localname(containers(0)) === "grid")
+            assert(localname(containers(1)) === "section")
 
-        val firstTd = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head
-
-        val containers = findAncestorContainers(firstTd)
-
-        assert(localname(containers(0)) === "grid")
-        assert(localname(containers(1)) === "section")
-
-        assert(findContainerNames(firstTd) === Seq("section-1"))
-
-    }
+            assert(findContainerNames(firstTd) === Seq("section-1"))
+        }
 
     // Select the first grid td (assume there is one)
-    def selectFirstTd(doc: NodeInfo): Unit = {
+    def selectFirstTd(doc: NodeInfo): Unit =
         selectTd(findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head)
-    }
 
     @Test def insertControl(): Unit = insertControl(isCustomInstance = false)
     @Test def insertControlCustomXML(): Unit = insertControl(isCustomInstance = true)
 
     private def insertControl(isCustomInstance: Boolean): Unit =
-        withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc, isCustomInstance)) { doc ⇒
 
             val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
 
@@ -198,11 +226,11 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             assert(formResourcesRoot \ "resource" \ newControlName nonEmpty)
         }
 
-    @Test def insertRepeat(): Unit = insertRepeat(false)
-    @Test def insertRepeatCustomXML(): Unit = insertRepeat(true)
+    @Test def insertRepeat(): Unit = insertRepeat(isCustomInstance = false)
+    @Test def insertRepeatCustomXML(): Unit = insertRepeat(isCustomInstance = true)
 
     private def insertRepeat(isCustomInstance: Boolean): Unit =
-        withActionAndDoc(getNewDoc(), isCustomInstance) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc, isCustomInstance)) { doc ⇒
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
@@ -276,77 +304,55 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             }
         }
 
-    // Return a grid with some rowspans. The tree returned is mutable.
-    // Include model and instance, because the code that looks for next ids relies on their presence.
-    def gridWithRowspan: NodeInfo = {
-        val doc = elemToDocumentInfo(
-            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml">
-                <xh:head>
-                    <xf:model id="fr-form-model" xmlns:xf="http://www.w3.org/2002/xforms">
-                        <xf:instance id="fr-form-instance"><form/></xf:instance>
-                    </xf:model>
-                </xh:head>
-                <xh:body>
-                    <fr:body xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                        <fr:grid>
-                            <xh:tr><xh:td id="11"/><xh:td id="12" rowspan="2"/><xh:td id="13"/></xh:tr>
-                            <xh:tr><xh:td id="21" rowspan="2"/><xh:td id="23"/></xh:tr>
-                            <xh:tr><xh:td id="32"/><xh:td id="33"/></xh:tr>
-                        </fr:grid>
-                    </fr:body>
-                </xh:body>
-            </xh:html>, false)
-
-        doc \\ "grid" head
-    }
-
     def compareExpectedCells(grid: NodeInfo, expected: Seq[Seq[Cell]]): Unit = {
         val trs = grid \ "tr"
         for ((expected, index) ← expected.zipWithIndex)
             yield assert(getRowCells(trs(index)) === expected)
     }
 
-    @Test def rowspanGetRowCells(): Unit = {
+    @Test def rowspanGetRowCells(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(RowspansDoc)) { doc ⇒
 
-        val grid = gridWithRowspan
+            val grid = doc \\ "grid" head
 
-        def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
+            def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
 
-        val expected = Seq(
-            Seq(Cell(td("11"), 1, false), Cell(td("12"), 2, false), Cell(td("13"), 1, false)),
-            Seq(Cell(td("21"), 2, false), Cell(td("12"), 1, true),  Cell(td("23"), 1, false)),
-            Seq(Cell(td("21"), 1, true),  Cell(td("32"), 1, false), Cell(td("33"), 1, false))
-        )
+            val expected = Seq(
+                Seq(Cell(td("11"), 1, false), Cell(td("12"), 2, false), Cell(td("13"), 1, false)),
+                Seq(Cell(td("21"), 2, false), Cell(td("12"), 1, true),  Cell(td("23"), 1, false)),
+                Seq(Cell(td("21"), 1, true),  Cell(td("32"), 1, false), Cell(td("33"), 1, false))
+            )
 
-        compareExpectedCells(grid, expected)
-    }
+            compareExpectedCells(grid, expected)
+        }
 
     def rewrap(node: NodeInfo) = node match {
         case nodeWrapper: NodeWrapper ⇒ node.root.asInstanceOf[DocumentWrapper].wrap(nodeWrapper.getUnderlyingNode)
         case _ ⇒ node
     }
 
-    @Test def rowspanInsertRowBelow(): Unit = {
+    @Test def rowspanInsertRowBelow(): Unit =
+        withActionAndDoc(formBuilderContainingDocument(RowspansDoc)) { doc ⇒
 
-        val grid = gridWithRowspan
+            val grid = doc \\ "grid" head
 
-        // Insert one row below each existing row
-        for (tr ← grid \ "tr" toList)
-            insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
+            // Insert one row below each existing row
+            for (tr ← grid \ "tr" toList)
+                insertRowBelow(rewrap(tr)) // rewrap after mutation (it's dangerous to play with NodeInfo and mutation!)
 
-        def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
+            def td(id: String) = grid \\ * filter (hasIdValue(_, id)) head
 
-        val expected = Seq(
-            Seq(Cell(td("11"),        1, false), Cell(td("12"),        3, false), Cell(td("13"),        1, false)),
-            Seq(Cell(td("tmp-1-tmp"), 1, false), Cell(td("12"),        2, true),  Cell(td("tmp-2-tmp"), 1, false)),
-            Seq(Cell(td("21"),        3, false), Cell(td("12"),        1, true),  Cell(td("23"),        1, false)),
-            Seq(Cell(td("21"),        2, true),  Cell(td("tmp-3-tmp"), 1, false), Cell(td("tmp-4-tmp"), 1, false)),
-            Seq(Cell(td("21"),        1, true),  Cell(td("32"),        1, false), Cell(td("33"),        1, false)),
-            Seq(Cell(td("tmp-5-tmp"), 1, false), Cell(td("tmp-6-tmp"), 1, false), Cell(td("tmp-7-tmp"), 1, false))
-        )
+            val expected = Seq(
+                Seq(Cell(td("11"),        1, false), Cell(td("12"),        3, false), Cell(td("13"),        1, false)),
+                Seq(Cell(td("tmp-2-tmp"), 1, false), Cell(td("12"),        2, true),  Cell(td("tmp-3-tmp"), 1, false)),
+                Seq(Cell(td("21"),        3, false), Cell(td("12"),        1, true),  Cell(td("23"),        1, false)),
+                Seq(Cell(td("21"),        2, true),  Cell(td("tmp-4-tmp"), 1, false), Cell(td("tmp-5-tmp"), 1, false)),
+                Seq(Cell(td("21"),        1, true),  Cell(td("32"),        1, false), Cell(td("33"),        1, false)),
+                Seq(Cell(td("tmp-6-tmp"), 1, false), Cell(td("tmp-7-tmp"), 1, false), Cell(td("tmp-8-tmp"), 1, false))
+            )
 
-        compareExpectedCells(grid, expected)
-    }
+            compareExpectedCells(grid, expected)
+        }
 
     def sectionWithGridAndControls: NodeInfo =
         <fr:section xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -382,7 +388,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         val grids = section \\ "*:grid"
 
         val expected = Seq(Some("control-11"), Some("grid-2"), Some("control-31"))
-        val actual = grids map (precedingControlNameInSectionForGrid(_, true))
+        val actual = grids map (precedingControlNameInSectionForGrid(_, includeSelf = true))
 
         assert(actual === expected)
     }
@@ -391,7 +397,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
 
         // For before/after td ids: create a doc, call the delete function, and assert the resulting selected td
         def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
-            withActionAndDoc(getNewDoc(SectionsGridsDoc)) { doc ⇒
+            withActionAndDoc(formBuilderContainingDocument(SectionsGridsDoc)) { doc ⇒
 
                 def getTd(id: String) = doc \\ "*:td" find (hasIdValue(_, id)) head
 
@@ -470,7 +476,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def lastGridInSectionAndCanInsert(): Unit =
-        withActionAndDoc(getNewDoc(TemplateDoc)) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(TemplateDoc)) { doc ⇒
 
             // Initially can insert all
             assert(canInsertSection(doc) === true)
@@ -490,7 +496,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         }
 
     @Test def customXMLBindRef(): Unit =
-        withActionAndDoc(getNewDoc(CustomXMLDoc), isCustomInstance = true) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(CustomXMLDoc, isCustomInstance = true)) { doc ⇒
 
             def rawBindRef(inDoc: NodeInfo, name: String) =
                 findBindByName(inDoc, name) flatMap
@@ -554,7 +560,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
     }
 
     @Test def controlEffectiveId(): Unit =
-        withActionAndDoc(getNewDoc(SectionsRepeatsDoc)) { doc ⇒
+        withActionAndDoc(formBuilderContainingDocument(SectionsRepeatsDoc)) { doc ⇒
 
             val expected = Map(
                 "|fb$section-1-section$tmp-11-tmp$control-1-control|"                      → "control-1-control",
@@ -600,81 +606,19 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
         dataHolder
     }
 
-    private def withActionAndDoc(doc: DocumentWrapper, isCustomInstance: Boolean = false)(body: DocumentWrapper ⇒ Any) {
-        val actionInterpreter = mockActionInterpreter(doc, isCustomInstance)
+    private def withActionAndDoc[T](doc: XFormsContainingDocument)(body: DocumentWrapper ⇒ T) {
+        val actionInterpreter = mockActionInterpreter(doc)
         withScalaAction(actionInterpreter) {
-            withContainingDocument(actionInterpreter.containingDocument) {
-                initializeGrids(doc)
-                body(doc)
+            withContainingDocument(doc) {
+                body(doc.models find (_.getId == "fr-form-model") flatMap (m ⇒ Option(m.getInstance("fb-form-instance"))) map (_.documentInfo.asInstanceOf[DocumentWrapper]) orNull)
             }
         }
     }
 
-    private def mockActionInterpreter(doc: DocumentWrapper, isCustomInstance: Boolean) = {
-
-        // This mocks just what's needed so that the tests won't choke
-
-        // Main model
-        val model = mock[XFormsModel]
-        Mockito when model.getId thenReturn "fr-form-model"
-        Mockito when model.getEffectiveId thenReturn "fr-form-model"
-
-        // Mock useful model variables
-        val variables = Map(
-            "model"              → Option(findModelElement(doc)),
-            "component-bindings" → None,
-            "selected-cell"      → Some(elementInfo("selected-cell")),
-            "resources"          → inlineInstanceRootElement(doc, "fr-form-resources"),
-            "metadata-instance"  → inlineInstanceRootElement(doc, "fr-form-metadata"),
-            "is-custom-instance" → Some(BooleanValue.get(isCustomInstance))
-        )
-
-        Mockito when model.getVariable(Matchers.anyString) thenAnswer new Answer[SequenceIterator] {
-            // Use answer because each invocation returns a fresh result
-            def answer(invocation: InvocationOnMock) = {
-                val name = invocation.getArguments.apply(0).asInstanceOf[String]
-
-                variables.get(name) map {
-                    case Some(item) ⇒ SingletonIterator.makeIterator(item)
-                    case None ⇒ EmptyIterator.getInstance
-                } getOrElse
-                    EmptyIterator.getInstance
-            }
-        }
-
-        // Everything else
-        val elementAnalysis = mock[ElementAnalysis]
-        Mockito when elementAnalysis.handlersForEvent(Matchers.any[String]) thenReturn ((true, Map.empty[Phase, Map[String, List[EventHandler]]]))
-
-        val part = mock[PartAnalysis]
-        Mockito when part.getEventHandlers(Matchers.any[String]) thenReturn Seq()
-        Mockito when part.getControlAnalysis(Matchers.any[String]) thenReturn elementAnalysis // this so that Dispatch works
-
-        val xblContainer = mock[XBLContainer]
-        Mockito when xblContainer.getPartAnalysis thenReturn part
-
-        val instance = mock[XFormsInstance]
-        Mockito when instance.model thenReturn model
-        Mockito when instance.container thenReturn xblContainer
-        Mockito when instance.documentInfo thenReturn doc
-        Mockito when instance.getListeners(Matchers.any[String]) thenReturn Seq()
-
-        val staticState = mock[XFormsStaticState]
-
-        val document = mock[XFormsContainingDocument]
-        Mockito when document.getStaticState thenReturn staticState
-        Mockito when document.getInstanceForNode(Matchers.any[NodeInfo]) thenReturn instance
-        Mockito when document.models thenReturn Seq(model)
-        Mockito when document.getModelsJava thenReturn Seq(model).asJava
-        Mockito when document.getIndentedLogger(Matchers.any[String]) thenReturn new IndentedLogger(XFormsServer.logger, "any")
-        Mockito when document.getIndentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "document")
-        Mockito when document.getRequestStats thenReturn RequestStatsImpl.apply()
-
-        Mockito when instance.containingDocument thenReturn document
-
+    private def mockActionInterpreter(doc: XFormsContainingDocument) = {
         val actionInterpreter = mock[XFormsActionInterpreter]
-        Mockito when actionInterpreter.containingDocument thenReturn document
-        Mockito when actionInterpreter.container thenReturn xblContainer
+        Mockito when actionInterpreter.containingDocument thenReturn doc
+        Mockito when actionInterpreter.container thenReturn doc
         Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
 
         actionInterpreter

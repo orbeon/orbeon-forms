@@ -169,7 +169,7 @@ object XFormsAPI {
     // nodes.
     def ensureAttribute(element: NodeInfo, attName: QName, value: String): Unit =
         element \@ attName match {
-            case Seq() ⇒ insert(into = element, origin = attributeInfo(attName, value))
+            case Seq()        ⇒ insert(into = element, origin = attributeInfo(attName, value))
             case Seq(att, _*) ⇒ setvalue(att, value)
         }
 

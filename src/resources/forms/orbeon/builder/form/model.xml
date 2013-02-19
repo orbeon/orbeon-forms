@@ -64,10 +64,10 @@
         <!-- First store into a temporary document so that multiple inserts won't cause repeat processing until we are done -->
         <xf:var name="temp" value="xxf:create-document()"/>
         <xf:insert context="$temp"
-                       origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
-                                                ('data', 'bindings'),
-                                                (event('data'), instance('fb-components-instance')),
-                                                'data')"/>
+                   origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/annotate.xpl',
+                                            ('data', 'bindings'),
+                                            (event('data'), instance('fb-components-instance')),
+                                            'data')"/>
 
         <xf:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
             gridOps:initializeGrids($temp)

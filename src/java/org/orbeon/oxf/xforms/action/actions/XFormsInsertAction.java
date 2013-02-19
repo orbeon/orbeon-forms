@@ -450,18 +450,33 @@ public class XFormsInsertAction extends XFormsAction {
                 if (clonedNode != null) {// NOTE: we allow passing some null nodes so we check on null
                     if (clonedNode instanceof Attribute) {
                         // Add attribute to element
-                        final Attribute clonedAttribute = (Attribute) clonedNode;
-                        final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
-                        if (existingAttribute != null)
-                            insertContextElement.remove(existingAttribute);
-                        //                    // TODO: If we try to insert several attributes with the same name, we may get an OutOfBounds exception below. Must check and ajust.
-                        //                    insertContextElement.attributes().add(attributeIndex++, clonedNode);
 
                         // NOTE: In XML, attributes are unordered. dom4j handles them as a list so has order, but the
                         // XForms spec shouldn't rely on attribute order. We could try to keep the order, but it is harder
                         // as we have to deal with removing duplicate attributes and find a reasonable insertion strategy.
+                        final Attribute clonedAttribute = (Attribute) clonedNode;
+                        final Attribute existingAttribute = insertContextElement.attribute(clonedAttribute.getQName());
+
+                        if (existingAttribute != null)
+                            insertContextElement.remove(existingAttribute);
 
                         insertContextElement.add(clonedAttribute);
+
+                        if (existingAttribute != null) {
+
+                            // Dispatch xxforms-replace event if required and possible
+                            // NOTE: For now, still dispatch xforms-insert for backward compatibility.
+                            if (doDispatch && modifiedInstance != null) {
+                                final DocumentWrapper documentWrapper = (DocumentWrapper) modifiedInstance.documentInfo();
+
+                                Dispatch.dispatchEvent(
+                                    new XXFormsReplaceEvent(
+                                        modifiedInstance,
+                                        documentWrapper.wrap(existingAttribute),
+                                        documentWrapper.wrap(clonedAttribute)));
+                            }
+                        }
+
                         insertedNodes.add(clonedAttribute);
 
                     } else if (!(clonedNode instanceof Document)) {

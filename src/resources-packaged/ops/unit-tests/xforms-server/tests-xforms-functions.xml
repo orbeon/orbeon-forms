@@ -2144,12 +2144,23 @@
                             </document>
                         </xf:instance>
                         <xf:action ev:event="xforms-ready">
+                            <!-- Initial state -->
                             <xf:message value="string-join(for $id in distinct-values(//@id) return id($id)/@p, '-')"/>
+                            <!-- Update @id attribute value -->
                             <xf:setvalue ref="e[1]/@id" value="'id4'"/>
                             <xf:message value="string-join(for $id in distinct-values(//@id) return id($id)/@p, '-')"/>
+                            <!-- Remove tree -->
                             <xf:delete ref="e[2]"/>
                             <xf:message value="string-join(for $id in distinct-values(//@id) return id($id)/@p, '-')"/>
+                            <!-- Insert tree -->
                             <xf:insert ref="*" origin="xf:element('e', (xf:attribute('id', 'id5'), xf:attribute('p', '5')))"/>
+                            <xf:message value="string-join(for $id in distinct-values(//@id) return id($id)/@p, '-')"/>
+                            <!-- Replace existing @id attribute -->
+                            <xf:insert context="//e[@p = '5']" origin="xf:attribute('id', 'id6')"/>
+                            <xf:message value="string-join(for $id in (distinct-values(//@id), 'id5') return id($id)/@p, '-')"/>
+                            <!-- Insert new @id attribute -->
+                            <xf:insert ref="*" origin="xf:element('e', xf:attribute('p', '7'))"/>
+                            <xf:insert context="//e[@p = '7']" origin="xf:attribute('id', 'id7')"/>
                             <xf:message value="string-join(for $id in distinct-values(//@id) return id($id)/@p, '-')"/>
                         </xf:action>
                     </xf:model>
@@ -2170,7 +2181,8 @@
                                             <e id="id3" p="3"/>
                                         </e>
                                     </e>
-                                    <e id="id5" p="5"/>
+                                    <e p="5" id="id6"/>
+                                    <e p="7" id="id7"/>
                                 </document>
                             </instance>
                         </instances>
@@ -2182,6 +2194,8 @@
                     <xxf:message level="modal">1-2-3-4</xxf:message>
                     <xxf:message level="modal">1-2-3</xxf:message>
                     <xxf:message level="modal">1-2-3-5</xxf:message>
+                    <xxf:message level="modal">1-2-3-5</xxf:message>
+                    <xxf:message level="modal">1-2-3-5-7</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -197,9 +197,10 @@ class XFormsInstance(
                 }
             case replaceEvent: XXFormsReplaceEvent ⇒
                 // A node was replaced
-                // As of 2013-02-18, this only happens for a root element replacement
-                updateIndexForDelete(Seq(replaceEvent.formerNode))
-                updateIndexForInsert(Seq(replaceEvent.currentNode))
+                // As of 2013-02-18, this happens for:
+                // - a root element replacement
+                // - an id attribute replacement
+                updateIndexForReplace(replaceEvent.formerNode, replaceEvent.currentNode)
             case valueChangeEvent: XXFormsValueChangedEvent ⇒
                 updateIndexForValueChange(valueChangeEvent)
             case _ ⇒
@@ -362,6 +363,7 @@ trait XFormsInstanceIndex {
 
     import org.orbeon.scaxon.XML._
     import collection.{mutable ⇒ m}
+    import org.w3c.dom.Node.{ATTRIBUTE_NODE, ELEMENT_NODE}
 
     private var idIndex: m.Map[String, List[Element]] = _
 
@@ -404,6 +406,17 @@ trait XFormsInstanceIndex {
             for (node ← nodes; (id, element) ← mappingsInSubtree(node))
                 removeId(id, element)
 
+    def updateIndexForReplace(formerNode: NodeInfo, currentNode: NodeInfo) =
+        if (idIndex ne null) {
+            if (currentNode.getNodeKind == ATTRIBUTE_NODE && currentNode.getLocalPart == "id")
+                // Don't use updateIndexForDelete, because formerNode.getParent will fail
+                removeId(formerNode.stringValue, unwrapElement(currentNode.getParent))
+            else if (currentNode.getNodeKind == ELEMENT_NODE)
+                updateIndexForDelete(Seq(formerNode))
+
+            updateIndexForInsert(Seq(currentNode))
+        }
+
     def updateIndexForValueChange(valueChangeEvent: XXFormsValueChangedEvent) =
         if ((idIndex ne null) && valueChangeEvent.node.getLocalPart == "id") {
 
@@ -413,7 +426,12 @@ trait XFormsInstanceIndex {
             addId(valueChangeEvent.newValue, parentElement)
         }
 
-    private def idsInSubtree(start: NodeInfo) = start descendantOrSelf * att "id"
+    private def idsInSubtree(start: NodeInfo) =
+        if (start.getNodeKind == ATTRIBUTE_NODE)
+            start self "id"
+        else
+            start descendantOrSelf * att "id"
+
     private def mappingsInSubtree(start: NodeInfo) = idsInSubtree(start) map (id ⇒ id.getStringValue → unwrapElement(id.getParent))
 
     private def removeId(id: String, parentElement: Element) = {

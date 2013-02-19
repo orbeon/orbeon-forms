@@ -560,6 +560,8 @@ trait ModelBinds {
 
     selfModel: Model ⇒
 
+    // FIXME: Unhappy with the complexity of this: we want the tree to be lazily evaluated yet be re-assignable. The
+    // laziness is desired because of initialization order issues with the superclass. There has to be a simpler way!
     private class LazyBindTree(bindElements: Seq[Element]) extends (() ⇒ BindTree) {
 
         import ElementAnalysis.attQNameSet

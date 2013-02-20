@@ -146,7 +146,7 @@
 
                             </xf:group>
                         </xh:div>
-                        <!-- In case the view contains elements others than -->
+                        <!-- In case the view contains elements other than sections (like dialogs) -->
                         <xsl:apply-templates select="* except fr:section"/>
                     </xh:div>
                 </xsl:template>

@@ -177,19 +177,15 @@ $ ->
             removeMock: editableDo 'removeMock'
             storeSeqNo: (element) -> f$.data 'seqNo', (currentSeqNo element), element
             startEdit: (element) ->
-                beingMoved = f$.data 'beingMoved', element
-                if not beingMoved
-                    f$.data 'beingMoved', true, element
-                    Builder.beforeAddingEditorCallbacks.fire element
-                    f$.removeClass 'fb-label-hint-placeholder', element
-                    f$.removeClass 'xforms-disabled', element                                                           # Remove disabled which we have on hint when their value is empty
-                    input = editableEditInput element
-                    f$.append input, f$.empty editablePlaceholderContainer element
-                    f$.show input
-                    htmlInput = f$.find 'input', input
-                    saveButton = $ '#fr-save-button button'                                                             # HACK: Focus on something else (we know we have a Save button in Form Builder)
-                    (setFocus saveButton).then -> setFocus htmlInput
-                    f$.data 'beingMoved', false, element
+                Builder.beforeAddingEditorCallbacks.fire element
+                f$.removeClass 'fb-label-hint-placeholder', element
+                f$.removeClass 'xforms-disabled', element                                                               # Remove disabled which we have on hint when their value is empty
+                input = editableEditInput element
+                f$.append input, f$.empty editablePlaceholderContainer element
+                f$.show input
+                htmlInput = f$.find 'input', input
+                saveButton = $ '#fr-save-button button'                                                                 # HACK: Focus on something else (we know we have a Save button in Form Builder)
+                (setFocus saveButton).then -> setFocus htmlInput
             endEdit: (element) ->
                 input = editableEditInput element
                 f$.append input, $ '.fb-cell-editor'                                                                    # Move editor out of grid, so it doesn't get removed by HTML replacements

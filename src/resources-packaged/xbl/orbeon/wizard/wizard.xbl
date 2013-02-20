@@ -46,9 +46,9 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:template match="/*">
-                    <xh:div class="fr-clear-container">
+                    <xh:div class="fr-clear-container" xxbl:scope="outer">
                         <xh:div class="fr-wizard-body">
-                            <xf:switch id="switch" xxbl:scope="outer">
+                            <xf:switch id="switch">
                                 <!-- Wrap each top-level fr:section within each own case -->
                                 <xsl:for-each select="fr:section">
                                     <xf:case id="{@id}-case">
@@ -66,7 +66,7 @@
                             </xf:switch>
                         </xh:div>
                         <xh:div class="fr-wizard-toc">
-                            <xf:group xxbl:scope="outer">
+                            <xf:group>
                                 <xh:ul class="nav nav-list">
                                     <xsl:apply-templates mode="toc-sections"/>
                                 </xh:ul>
@@ -146,7 +146,8 @@
 
                             </xf:group>
                         </xh:div>
-                        <!--<xh:div class="fr-clear"/>-->
+                        <!-- In case the view contains elements others than -->
+                        <xsl:apply-templates select="* except fr:section"/>
                     </xh:div>
                 </xsl:template>
 
@@ -159,7 +160,7 @@
                 <!-- TOC: handle section -->
                 <xsl:template match="fr:section" mode="toc-sections">
                     <!-- Propagate binding so that entry for section disappears if the section is non-relevant -->
-                    <xf:group xxbl:scope="outer">
+                    <xf:group>
                         <xsl:copy-of select="@model | @context | @bind | @ref"/>
                         <xsl:variable
                             name="top-level-section-case-id"

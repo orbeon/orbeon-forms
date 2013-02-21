@@ -152,15 +152,15 @@ object ScalaUtils {
     // We assume that there are no spaces in the input query
     def decodeSimpleQuery(queryOption: Option[String]): Seq[(String, String)] =
         for {
-            query ← queryOption.toList
-            nameValue ← query.split('&').toList
+            query          ← queryOption.toList
+            nameValue      ← query.split('&').toList
             if nameValue.nonEmpty
             nameValueArray = nameValue.split('=')
             if nameValueArray.size >= 1
-            encodedName = nameValueArray(0)
+            encodedName    = nameValueArray(0)
             if encodedName.nonEmpty
-            decodedName = decodeURL(encodedName, "utf-8")
-            decodedValue = decodeURL(nameValueArray.lift(1) getOrElse "", "utf-8")
+            decodedName    = decodeURL(encodedName, "utf-8")
+            decodedValue   = decodeURL(nameValueArray.lift(1) getOrElse "", "utf-8")
         } yield
             decodedName → decodedValue
 

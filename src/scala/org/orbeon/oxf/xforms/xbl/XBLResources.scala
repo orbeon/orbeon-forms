@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import org.orbeon.oxf.properties.{PropertySet, Properties}
+import org.orbeon.oxf.properties.{JPropertySet, Properties}
 import collection.JavaConverters._
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.dom4j.{QName, Element}
@@ -122,11 +122,11 @@ object XBLResources {
     // The returned resources are in a consistent order of binding QNames then order within the bindings
     def baselineResources =
         XFormsProperties.getResourcesBaseline match {
-            case baselineProperty: PropertySet.Property ⇒
+            case baselineProperty: JPropertySet.Property ⇒
 
                 val qNames =
                     stringToSet(baselineProperty.value.toString) map
-                    (Dom4jUtils.extractTextValueQName(baselineProperty.namespaces, _, true)) toList
+                    (Dom4jUtils.extractTextValueQName(baselineProperty.namespaces.asJava, _, true)) toList
 
                 def getBinding(qName: QName) = {
 

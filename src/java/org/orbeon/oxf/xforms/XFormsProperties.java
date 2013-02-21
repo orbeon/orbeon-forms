@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.properties.JPropertySet;
 import org.orbeon.oxf.properties.Properties;
-import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.Connection;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -421,7 +421,7 @@ public class XFormsProperties {
                 (ENCODE_VERSION_PROPERTY, ENCODE_VERSION_PROPERTY_DEFAULT);
     }
 
-    public static PropertySet.Property getResourcesBaseline() {
+    public static JPropertySet.Property getResourcesBaseline() {
         return Properties.instance().getPropertySet().getProperty(BASELINE_PROPERTY);
     }
     public static boolean isAsyncPortletLoad() {

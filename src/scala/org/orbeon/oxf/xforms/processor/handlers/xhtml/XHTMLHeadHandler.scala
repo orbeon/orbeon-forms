@@ -44,7 +44,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             resource: Option[String],
             cssClass: Option[String],
             content: Option[String]
-        ) {
+        ): Unit = {
 
         val (elementName, attributes) = getElementDetails(resource, cssClass)
 
@@ -56,7 +56,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
         helper.endElement()
     }
 
-    override def outputCSSResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl) {
+    override def outputCSSResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl): Unit = {
 
         // Function to output either a <link> or <style> element
         def outputCSSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
@@ -78,7 +78,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             minimal)
     }
 
-    override def outputJavaScriptResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl) {
+    override def outputJavaScriptResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl): Unit = {
 
         // Function to output either a <script> element
         def outputJSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
@@ -97,7 +97,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             minimal)
     }
 
-    override def outputConfigurationProperties(helper: ContentHandlerHelper, xhtmlPrefix: String, versionedResources: Boolean) {
+    override def outputConfigurationProperties(helper: ContentHandlerHelper, xhtmlPrefix: String, versionedResources: Boolean): Unit = {
 
         // Gather all static properties that need to be sent to the client
         val staticProperties = containingDocument.getStaticState.getNonDefaultProperties filter

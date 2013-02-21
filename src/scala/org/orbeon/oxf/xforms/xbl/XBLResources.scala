@@ -27,10 +27,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 // Handle XBL scripts and CSS resources
 object XBLResources {
 
-    // XXX FIXME reload based on changes of properties
-    // XXX FIXME what needs to be stored directly into static state?
-
-    val XBLMappingPropertyPrefix = "oxf.xforms.xbl.mapping."
+    private val XBLMappingPropertyPrefix = "oxf.xforms.xbl.mapping."
 
     sealed trait HeadElement
     case class ReferenceElement(src: String) extends HeadElement
@@ -66,22 +63,33 @@ object XBLResources {
     // All elements ordered in a consistent way: first by QName, then in the order in which they appear in the binding,
     // removing duplicates.
     def orderedHeadElements(bindings: Iterable[AbstractBinding], getHeadElements: AbstractBinding ⇒ Seq[HeadElement]): Iterable[HeadElement] = {
-
         import org.orbeon.oxf.xml.Dom4j.QNameOrdering
-
-        val result = mutable.LinkedHashSet[HeadElement]()
-        bindings.toList sortBy (_.qNameMatch) flatMap getHeadElements foreach (result += _)
-        result
+        (bindings.toList sortBy (_.qNameMatch)).flatMap(getHeadElements)(breakOut): mutable.LinkedHashSet[HeadElement] // breakOut to LinkedHashSet
     }
 
-    private lazy val automaticMappings = {
+    // E.g. http://orbeon.org/oxf/xml/form-runner → orbeon
+    private def automaticMappings: Map[String, String] = {
         val propertySet = Properties.instance.getPropertySet
-        for {
-            propertyName ← propertySet.getPropertiesStartsWith(XBLMappingPropertyPrefix).asScala
-            prefix = propertyName.substring(XBLMappingPropertyPrefix.length)
-        } yield
-            (propertySet.getString(propertyName), prefix)
-    } toMap
+
+        val mappingProperties = propertySet.propertiesStartsWith(XBLMappingPropertyPrefix)
+
+        def evaluate(property: JPropertySet.Property) = (
+            for {
+                propertyName ← mappingProperties
+                uri = propertySet.getString(propertyName)
+                prefix = propertyName.substring(XBLMappingPropertyPrefix.length)
+            } yield
+                uri → prefix
+        ) toMap
+
+        // Associate result with the property so it won't be computed until properties are reloaded
+        mappingProperties.headOption match {
+            case Some(firstPropertyName) ⇒
+                propertySet.getProperty(firstPropertyName).associatedValue(evaluate)
+            case None ⇒
+                Map()
+        }
+    }
 
     // E.g. fr:tabview → oxf:/xbl/orbeon/tabview/tabview.xbl
     def getAutomaticXBLMappingPath(uri: String, localname: String) =
@@ -124,43 +132,49 @@ object XBLResources {
         XFormsProperties.getResourcesBaseline match {
             case baselineProperty: JPropertySet.Property ⇒
 
-                val qNames =
-                    stringToSet(baselineProperty.value.toString) map
-                    (Dom4jUtils.extractTextValueQName(baselineProperty.namespaces.asJava, _, true)) toList
+                def evaluate(property: JPropertySet.Property) = {
+                    val qNames =
+                        stringToSet(property.value.toString) map
+                        (Dom4jUtils.extractTextValueQName(property.namespaces.asJava, _, true)) toList
 
-                def getBinding(qName: QName) = {
+                    def getBinding(qName: QName) = {
 
-                    def getPath(qName: QName) =
-                        getAutomaticXBLMappingPath(qName.getNamespaceURI, qName.getName)
+                        def getPath(qName: QName) =
+                            getAutomaticXBLMappingPath(qName.getNamespaceURI, qName.getName)
 
-                    def fromCache(qName: QName) =
-                        getPath(qName) flatMap (BindingCache.get(_, qName, 0))
+                        def fromCache(qName: QName) =
+                            getPath(qName) flatMap (BindingCache.get(_, qName, 0))
 
-                    def fromFileThenCache(qName: QName) =
-                        getPath(qName) flatMap { path ⇒
-                            // Load XBL document
-                            val (xblElement, lastModified) = XBLBindings.readXBLResource(path)
-                            val bindingsInResource = XBLBindings.extractXBLBindings(Some(path), xblElement, lastModified)
+                        def fromFileThenCache(qName: QName) =
+                            getPath(qName) flatMap { path ⇒
+                                // Load XBL document
+                                val (xblElement, lastModified) = XBLBindings.readXBLResource(path)
+                                val bindingsInResource = XBLBindings.extractXBLBindings(Some(path), xblElement, lastModified)
 
-                            // Cache all bindings found so we don't have to re-read them later
-                            // NOTE: Typically there is only one binding in each XBL file
-                            bindingsInResource foreach (b ⇒ BindingCache.put(path, lastModified, b))
+                                // Cache all bindings found so we don't have to re-read them later
+                                // NOTE: Typically there is only one binding in each XBL file
+                                bindingsInResource foreach (b ⇒ BindingCache.put(path, lastModified, b))
 
-                            // Find if there is a binding with the given name
-                            bindingsInResource find (_.qNameMatch == qName)
-                        }
+                                // Find if there is a binding with the given name
+                                bindingsInResource find (_.qNameMatch == qName)
+                            }
 
-                    fromCache(qName) orElse fromFileThenCache(qName)
+                        fromCache(qName) orElse fromFileThenCache(qName)
+                    }
+
+                    // All the baseline bindings
+                    val bindings = qNames flatMap getBinding
+
+                    val scripts: LinkedHashSet[String] = orderedHeadElements(bindings, _.scripts).collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
+                    val styles:  LinkedHashSet[String] = orderedHeadElements(bindings, _.styles) .collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
+
+                    // Return tuple with two sets
+                    (scripts, styles)
                 }
 
-                // All the baseline bindings
-                val bindings = qNames flatMap getBinding
+                // Associate result with the property so it won't be computed until properties are reloaded
+                baselineProperty.associatedValue(evaluate)
 
-                val scripts: LinkedHashSet[String] = orderedHeadElements(bindings, _.scripts).collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
-                val styles:  LinkedHashSet[String] = orderedHeadElements(bindings, _.styles).collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
-
-                // Return tuple with two sets
-                (scripts, styles)
             case _ ⇒ (collection.Set.empty[String], collection.Set.empty[String])
         }
 }

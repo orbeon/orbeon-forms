@@ -84,7 +84,8 @@ class PropertySet {
         tuples.toMap.asJava
     }
 
-    def getPropertiesStartsWith(name: String): JList[String] = {
+    // Return all the properties starting with the given name
+    def propertiesStartsWith(name: String): Seq[String] = {
         
         val result = mutable.Buffer[String]()
         
@@ -120,8 +121,11 @@ class PropertySet {
         
         processNode(wildcardProperties, "", StringUtils.split(name, "."), 0)
         
-        result.toList.asJava
+        result.toList
     }
+
+    // For Java callers
+    def getPropertiesStartsWith(name: String): JList[String] = propertiesStartsWith(name).asJava
 
     /**
      * Get a property.
@@ -244,11 +248,19 @@ class PropertySet {
 // Different name to help with Java callers
 object JPropertySet {
 
-    case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String])
+    case class Property(typ: QName, value: AnyRef, namespaces: Map[String, String]) {
+
+        private var _associatedValue: Option[Any] = None
+
+        def associatedValue[U](evaluate: Property ⇒ U): U = {
+            if (_associatedValue.isEmpty)
+                _associatedValue = Option(evaluate(this))
+            _associatedValue.get.asInstanceOf[U]
+        }
+    }
 
     class PropertyNode {
         var property: Property = null
         var children: mutable.Map[String, PropertyNode] = null // token → property node
     }
-
 }

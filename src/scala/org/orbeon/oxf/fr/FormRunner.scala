@@ -157,7 +157,7 @@ object FormRunner {
         // Build headers map
         val headers = (
             for {
-                propertyName ← properties.getPropertiesStartsWith(propertyPrefix).asScala
+                propertyName ← properties.propertiesStartsWith(propertyPrefix)
                 lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
                 if lowerSuffix != "uri"
                 headerName = "Orbeon-" + capitalizeHeader(lowerSuffix)

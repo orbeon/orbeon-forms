@@ -145,7 +145,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         val propertySet = Properties.instance.getPropertySet
         val providers = {
             // All the oxf.fr.persistence.provider.*.*.form properties, removing the data-only mappings
-            val properties = propertySet getPropertiesStartsWith "oxf.fr.persistence.provider" filterNot (_ endsWith ".data")
+            val properties = propertySet propertiesStartsWith "oxf.fr.persistence.provider" filterNot (_ endsWith ".data")
             // Value of the property is the name of a provider, e.g. oracle-finance, oracle-hr
             properties map (propertySet getString _) distinct
         }

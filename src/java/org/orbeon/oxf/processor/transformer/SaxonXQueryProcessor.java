@@ -35,7 +35,6 @@ import org.orbeon.saxon.query.XQueryExpression;
 import javax.xml.transform.URIResolver;
 import javax.xml.transform.sax.SAXResult;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -126,15 +125,6 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                                     xqueryBody = Dom4jUtils.domToString(xqueryDocument);
                                     xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
                                     xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
-
-                                    // Add namespaces declarations
-                                    // TODO: 2007-7-05 MK says that this shouldn't be necessary. In fact, I don't know why we do this.
-                                    final Map namespaces = Dom4jUtils.getNamespaceContext(xqueryDocument.getRootElement());
-                                    for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
-                                        String prefix = (String) i.next();
-                                        String uri = (String) namespaces.get(prefix);
-                                        staticContext.declarePassiveNamespace(prefix, uri, false);
-                                    }
                                 }
 
                                 // 2007-07-05 MK says: "fetching of query modules is done by the ModuleURIResolver in the

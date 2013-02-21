@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.analysis
 import controls.ComponentControl
 import scala.collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings}
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.dom4j.{Element, QName}
 import collection.mutable.HashMap
@@ -92,20 +92,16 @@ trait PartXBLAnalysis extends TransientState {
     def isComponent(binding: QName) = xblBindings.isComponent(binding)
     def getBinding(prefixedId: String) = xblBindings.getBinding(prefixedId)
     def getBindingId(prefixedId: String) = xblBindings.getBindingId(prefixedId)
-    def getBindingQNames = xblBindings.abstractBindings.keys toSeq
+    def jBindingQNames = xblBindings.abstractBindings.keys toSeq
     def getAbstractBinding(binding: QName) = xblBindings.abstractBindings.get(binding)
 
-    def getComponentBindings = xblBindings.abstractBindings
+    def abstractBindings: Iterable[AbstractBinding] = xblBindings.abstractBindings.values
 
     // Search scope in ancestor or self parts
     def searchResolutionScopeByPrefixedId(prefixedId: String) =
         ancestorOrSelfIterator map (_.scopeForPrefixedId(prefixedId)) find (_ ne null) get
 
     def getGlobals = xblBindings.allGlobals
-
-    def getXBLStyles = xblBindings.allStyles
-    def getXBLScripts = xblBindings.allScripts
-    def baselineResources = xblBindings.baselineResources
 
     // For the given bound node prefixed id, remove the current shadow tree and create a new one
     // NOTE: Can be used only in a sub-part, as this mutates the tree

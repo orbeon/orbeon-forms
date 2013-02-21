@@ -14,25 +14,26 @@
 
 package org.orbeon.oxf.xforms.processor
 
+import org.orbeon.oxf.util.ScalaUtils._
+import collection.mutable.{Buffer, LinkedHashSet}
+import net.sf.ehcache.{Element ⇒ EhElement }
+import org.apache.commons.lang3.StringUtils
+import org.dom4j.QName
+import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.processor._
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xml._
 import org.xml.sax.Attributes
-import net.sf.ehcache.{Element ⇒ EhElement }
 import org.xml.sax.helpers.AttributesImpl
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.processor._
-import collection.mutable.{Buffer, LinkedHashSet}
-import org.orbeon.oxf.xforms._
-import org.dom4j.QName
-import org.apache.commons.lang3.StringUtils
-import ResourcesAggregator._
-import org.orbeon.oxf.externalcontext.URLRewriter
-import ScalaUtils._
 
 /**
  * Aggregate CSS and JS resources under <head>.
  */
 class ResourcesAggregator extends ProcessorImpl {
+
+    import ResourcesAggregator._
 
     addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
     addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
@@ -272,10 +273,19 @@ class ResourcesAggregator extends ProcessorImpl {
     }
 }
 
-object ResourcesAggregator {
+object ResourcesAggregator extends Logging {
+
     // Output combined resources
-    def aggregate[T](resources: scala.collection.Set[String], outputElement: String ⇒ T, namespaceOpt: Option[String], isCacheCombinedResources: Boolean, isCSS: Boolean): Option[T] =
-        if (resources.nonEmpty) {
+    def aggregate[T](
+            resources: scala.collection.Set[String],
+            outputElement: String ⇒ T,
+            namespaceOpt: Option[String],
+            isCacheCombinedResources: Boolean,
+            isCSS: Boolean): Option[T] =
+        resources.nonEmpty option {
+
+            implicit val logger = Loggers.getIndentedLogger("resources")
+
             // If there is at least one non-platform path, we also hash the app version number
             val hasAppResource = ! (resources forall URLRewriterUtils.isPlatformPath)
             val appVersion = URLRewriterUtils.getApplicationResourceVersion
@@ -296,6 +306,16 @@ object ResourcesAggregator {
                 (URLRewriterUtils.isResourcesVersioned list URLRewriterUtils.getOrbeonVersionForClient) :::
                 "orbeon-" + resourcesHash + extension + namespace :: Nil mkString "/"
 
+            debug("aggregating resources", Seq(
+                "isCSS"                    → isCSS.toString,
+                "isCacheCombinedResources" → isCacheCombinedResources.toString,
+                "hasAppResource"           → hasAppResource.toString,
+                "appVersion"               → appVersion,
+                "resourcesHash"            → resourcesHash,
+                "namespaceOpt"             → namespaceOpt.orNull,
+                "resources"                → (resources mkString " | ")
+            ))
+
             val result = outputElement(path)
 
             // Store on disk if requested to make the resource available to external software, like Apache
@@ -308,7 +328,6 @@ object ResourcesAggregator {
                 XFormsResourceRewriter.cacheResources(resourcesConfig, path, namespaceOpt, combinedLastModified, isCSS, isMinimal = false)
             }
 
-            Some(result)
-        } else
-            None
+            result
+        }
 }

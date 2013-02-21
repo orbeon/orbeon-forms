@@ -13,23 +13,21 @@
  */
 
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
-    
-import org.orbeon.oxf.xforms._
-import control.{Controls, XFormsControl}
-import org.orbeon.oxf.xforms.XFormsProperties._
-import event.XFormsEvents
-import org.orbeon.oxf.xforms.processor.XFormsFeatures
-import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.xml.XMLConstants
-import org.xml.sax.helpers.AttributesImpl
 
-import scala.collection.JavaConversions._
-import scala.collection.JavaConverters._
+import collection.mutable.{Buffer, HashMap}
 import java.util.{List ⇒ JList, Map ⇒ JMap}
-import org.dom4j.Element
-import collection.mutable.{Buffer, HashMap, LinkedHashSet}
-import state.XFormsStateManager
 import org.orbeon.oxf.util.URLRewriterUtils._
+import org.orbeon.oxf.xforms.XFormsProperties._
+import org.orbeon.oxf.xforms._
+import org.orbeon.oxf.xforms.processor.XFormsFeatures
+import org.orbeon.oxf.xforms.xbl.XBLResources
+import org.orbeon.oxf.xml.{ContentHandlerHelper, XMLConstants}
+import org.xml.sax.helpers.AttributesImpl
+import scala.collection.JavaConverters._
+import state.XFormsStateManager
+import org.orbeon.oxf.xforms.event.XFormsEvents
+import org.orbeon.oxf.xforms.control.Controls
+
 
 /**
  * Handler for <xh:head>. Outputs CSS and JS.
@@ -58,32 +56,6 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
         helper.endElement()
     }
 
-    // Output baseline, remaining, and inline resources
-    private def outputResources(
-            outputElement: (Option[String], Option[String], Option[String]) ⇒ Unit,
-            getBuiltin: StaticStateGlobalOps ⇒ JList[XFormsFeatures.ResourceConfig],
-            getXBL: ⇒ Seq[Element],
-            xblBaseline: collection.Set[String],
-            minimal: Boolean) {
-
-        // For now, actual builtin resources always include the baseline builtin resources
-        val builtinBaseline = LinkedHashSet(getBuiltin(null) map (_.getResourcePath(minimal)): _*)
-        val allBaseline = builtinBaseline ++ xblBaseline
-
-        // Output baseline resources with a CSS class
-        allBaseline foreach (s ⇒ outputElement(Some(s), Some("xforms-baseline"), None))
-
-        val builtinUsed = LinkedHashSet(getBuiltin(containingDocument.getStaticOps) map (_.getResourcePath(minimal)): _*)
-        val xblUsed = LinkedHashSet(XHTMLHeadHandler.xblResourcesToSeq(getXBL): _*)
-
-        // Output remaining resources if any, with no CSS class
-        builtinUsed ++ xblUsed -- allBaseline foreach (s ⇒ outputElement(Some(s), None, None))
-
-        // Output inline XBL resources
-        getXBL filter (_.attributeValue(XFormsConstants.SRC_QNAME) eq null) foreach
-            { e ⇒ outputElement(None, None, Some(e.getText)) }
-    }
-
     override def outputCSSResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl) {
 
         // Function to output either a <link> or <style> element
@@ -93,10 +65,17 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
                 case None ⇒ ("style", Array("type", "text/css", "media", "all", "class", cssClass.orNull))
             })(_, _, _)
 
+        def getCSSResources(useDoc: Boolean) = {
+            val ops = if (useDoc) containingDocument.getStaticOps else null
+            XFormsFeatures.getCSSResources(ops).asScala
+        }
+
         // Output all CSS
-        outputResources(outputCSSElement, XFormsFeatures.getCSSResources,
+        XBLResources.outputResources(outputCSSElement,
+            getCSSResources,
             containingDocument.getStaticOps.getXBLStyles,
-            containingDocument.getStaticOps.baselineResources._2, minimal)
+            XBLResources.baselineResources._2,
+            minimal)
     }
 
     override def outputJavaScriptResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl) {
@@ -105,10 +84,17 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
         def outputJSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
             (resource, cssClass) ⇒ ("script", Array("type", "text/javascript", "src", resource.orNull, "class", cssClass.orNull)))(_, _, _)
 
+        def getJavaScriptResources(useDoc: Boolean) = {
+            val ops = if (useDoc) containingDocument.getStaticOps else null
+            XFormsFeatures.getJavaScriptResources(ops).asScala
+        }
+
         // Output all JS
-        outputResources(outputJSElement, XFormsFeatures.getJavaScriptResources,
+        XBLResources.outputResources(outputJSElement,
+            getJavaScriptResources,
             containingDocument.getStaticOps.getXBLScripts,
-            containingDocument.getStaticOps.baselineResources._1, minimal)
+            XBLResources.baselineResources._1,
+            minimal)
     }
 
     override def outputConfigurationProperties(helper: ContentHandlerHelper, xhtmlPrefix: String, versionedResources: Boolean) {
@@ -134,7 +120,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             // Help events are dynamic because they depend on whether the xforms-help event is used
             // TODO: Need better way to enable/disable xforms-help event support, probably better static analysis of event handlers
             def help = dynamicProperty(
-                containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, false),
+                containingDocument.getStaticOps.hasHandlerForEvent(XFormsEvents.XFORMS_HELP, includeAllEvents = false),
                 HELP_HANDLER_PROPERTY,
                 true)
 
@@ -193,10 +179,6 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
 }
 
 object XHTMLHeadHandler {
-
-    // All XBL resources use the @src attribute
-    def xblResourcesToSeq(elements: Iterable[Element]) =
-        elements flatMap (e ⇒ Option(e.attributeValue(XFormsConstants.SRC_QNAME))) toSeq
 
     def outputScripts(helper: ContentHandlerHelper, scripts: Iterable[(String, String)]) =
         for ((clientName, body) ← scripts) {

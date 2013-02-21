@@ -24,8 +24,8 @@ object BindingCache {
 
     private def cacheKey(path: String, name: QName) = path  + '#' + name.getQualifiedName
 
-    def put(path: String, name: QName, lastModified: Long, abstractBinding: AbstractBinding) = synchronized {
-        val key = cacheKey(path, name)
+    def put(path: String, lastModified: Long, abstractBinding: AbstractBinding) = synchronized {
+        val key = cacheKey(path, abstractBinding.qNameMatch)
         cache.put(new EhElement(key, abstractBinding, lastModified))
     }
 

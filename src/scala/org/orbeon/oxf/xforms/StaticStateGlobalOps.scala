@@ -14,10 +14,9 @@
 package org.orbeon.oxf.xforms
 
 import analysis.controls.RepeatControl
-import collection.mutable.LinkedHashSet
 import collection.JavaConverters._
 import org.dom4j.QName
-import org.orbeon.oxf.xforms.xbl.Scope
+import org.orbeon.oxf.xforms.xbl.{XBLResources, AbstractBinding, Scope}
 
 // Global operations on parts including top-level part and descendant parts
 class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
@@ -77,7 +76,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def isComponent(binding: QName) = existsInParts(_.isComponent(binding))
     def getBinding(prefixedId: String) = findInPartsOpt(_.getBinding(prefixedId))
     def getBindingId(prefixedId: String) = findInParts(_.getBindingId(prefixedId)) orNull
-    def getBindingQNames = collectInParts(_.getBindingQNames)
+
+    def jBindingQNames = collectInParts(_.jBindingQNames) // called from XHTMLBodyHandler, could do w/ abstractBindings only once XHTMLBodyHandler is in Scala
 
     def repeats = collectInPartsReverse(_.repeats)
     def getRepeatHierarchyString(ns: String) = parts map (_.getRepeatHierarchyString(ns)) mkString "," // just concat the repeat strings from all parts
@@ -91,22 +91,10 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
     def scripts = collectInParts(_.scripts) toMap
     def uniqueClientScripts = collectInParts(_.uniqueClientScripts)
-    def getXBLStyles = collectInParts(_.getXBLStyles)
-    def getXBLScripts = collectInParts(_.getXBLScripts)
+    def abstractBindings: Iterable[AbstractBinding] = collectInParts(_.abstractBindings)
 
-    def baselineResources = {
-        // Do this imperative-style so we can conserve the order of items in sets
-        val allScripts = LinkedHashSet[String]()
-        val allStyles = LinkedHashSet[String]()
-
-        parts map (_.baselineResources) foreach {
-            case (scripts, styles) ⇒
-                allScripts ++= scripts
-                allStyles ++= styles
-        }
-
-        (allScripts, allStyles)
-    }
+    def getXBLStyles  = XBLResources.orderedHeadElements(abstractBindings, _.styles)
+    def getXBLScripts = XBLResources.orderedHeadElements(abstractBindings, _.scripts)
 
     /**
      * Get prefixed ids of all of the start control's repeat ancestors, stopping at endPrefixedId if not null. If

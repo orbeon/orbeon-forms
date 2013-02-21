@@ -17,10 +17,10 @@ import analysis.controls._
 import analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.analysis.model.{Model, Instance}
 import event.EventHandler
-import org.dom4j.{Element, QName}
+import org.dom4j.QName
 import java.util.{List ⇒ JList, Collection ⇒ JCollection}
 import org.orbeon.oxf.xml.SAXStore
-import xbl.{Scope, XBLBindings, ConcreteBinding}
+import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings, ConcreteBinding}
 import org.apache.commons.lang3.StringUtils
 import collection.JavaConverters._
 
@@ -50,8 +50,9 @@ trait PartGlobalOps {
     def isComponent(binding: QName): Boolean
     def getBinding(prefixedId: String): Option[ConcreteBinding]
     def getBindingId(prefixedId: String): String
-    def getBindingQNames: Seq[QName]
+    def jBindingQNames: Seq[QName]
     def getGlobals: collection.Map[QName, XBLBindings#Global]
+    def abstractBindings: Iterable[AbstractBinding]
 
     // Return the scope associated with the given prefixed id (the scope is directly associated with the prefix of the id)
     def containingScope(prefixedId: String): Scope
@@ -68,9 +69,6 @@ trait PartGlobalOps {
     // Client-side resources
     def scripts: Map[String, Script]
     def uniqueClientScripts: Seq[(String, String)]
-    def getXBLStyles: Seq[Element]
-    def getXBLScripts: Seq[Element]
-    def baselineResources: (collection.Set[String], collection.Set[String])
 
     // Functions derived from getControlAnalysis
     def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))

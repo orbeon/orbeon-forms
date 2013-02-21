@@ -1950,11 +1950,11 @@
                 <xh:link href="/ops/yui/calendar/assets/skins/sam/calendar.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/xforms.css" class="xforms-baseline"/>
                 <xh:link href="/config/theme/error.css" class="xforms-baseline"/>
+                <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css" class="xforms-baseline"/>
+                <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/button/assets/skins/sam/button.css" class="xforms-baseline"/>
                 <xh:link href="/ops/yui/tabview/assets/skins/sam/tabview.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/tabview/tabview.css" class="xforms-baseline"/>
-                <xh:link href="/ops/yui/autocomplete/assets/skins/sam/autocomplete.css" class="xforms-baseline"/>
-                <xh:link href="/xbl/orbeon/autocomplete/autocomplete.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/currency/currency.css"/>
                 <xh:script src="/ops/jquery/jquery-1.8.2.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo-min.js" class="xforms-baseline"/>
@@ -1992,14 +1992,14 @@
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Tree-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/action/Message-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/javascript/orbeon/xforms/control/Placeholder-min.js" class="xforms-baseline"/>
+                <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
+                <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/button/button-min.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/button/button.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/element/element.js" class="xforms-baseline"/>
                 <xh:script src="/xbl/orbeon/tabview/tabview.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/tabview/tabview-min.js" class="xforms-baseline"/>
-                <xh:script src="/xbl/orbeon/autocomplete/autocomplete.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/datasource/datasource.js" class="xforms-baseline"/>
-                <xh:script src="/ops/yui/autocomplete/autocomplete.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/slider/slider-min.js"/>
                 <xh:script src="/xbl/orbeon/number/number.js"/>
                 <xh:script src="/xbl/orbeon/currency/currency.js"/>

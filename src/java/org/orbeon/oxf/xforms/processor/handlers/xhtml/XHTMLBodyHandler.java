@@ -356,7 +356,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         controller.registerHandler(XFormsLHHAHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "alert", ANY_MATCHER);
 
         // Add handlers for custom components
-        final Seq<QName> componentBindings = containingDocument.getStaticOps().getBindingQNames();
+        final Seq<QName> componentBindings = containingDocument.getStaticOps().jBindingQNames();
         for (final scala.collection.Iterator<QName> i = componentBindings.iterator(); i.hasNext();) {
             final QName currentQName = i.next();
             controller.registerHandler(XXFormsComponentHandler.class.getName(), currentQName.getNamespaceURI(), currentQName.getName(), ANY_MATCHER);

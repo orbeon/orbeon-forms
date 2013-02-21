@@ -110,4 +110,15 @@ object Dom4j {
 
     // Return an element's attributes
     def attributes(e: Element): Seq[Attribute] = Dom4jUtils.attributes(e).asScala
+
+    // Ordering on QName, comparing first by namespace URI then by local name
+    implicit object QNameOrdering extends Ordering[QName] {
+        def compare(x: QName, y: QName) = {
+            val nsOrder = x.getNamespaceURI compareTo y.getNamespaceURI
+            if (nsOrder != 0)
+                nsOrder
+            else
+                x.getName compareTo y.getName
+        }
+    }
 }

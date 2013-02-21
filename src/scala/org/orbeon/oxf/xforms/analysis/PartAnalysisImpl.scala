@@ -241,9 +241,6 @@ class PartAnalysisImpl(
                 analyzeControlsXPath()
             }
 
-            // Set baseline resources before freeing transient state
-            xblBindings.baselineResources
-
             debugResults(Seq("controls" → controlAnalysisMap.size.toString))
         }
 

@@ -13,20 +13,18 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import collection.immutable.TreeMap
 import collection.JavaConverters._
-import org.orbeon.oxf.xforms.XFormsUtils
-import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import collection.immutable.Stream._
+import collection.immutable.TreeMap
+import collection.mutable.{HashSet, HashMap, LinkedHashMap, LinkedHashSet}
 import java.util.{Map ⇒ JMap}
-
-import org.orbeon.oxf.resources.{ResourceNotFoundException, ResourceManagerWrapper}
-import org.orbeon.oxf.properties.Properties
-import org.orbeon.oxf.xforms.xbl.XBLBindings
-import org.orbeon.oxf.xforms.state.AnnotatedTemplate
-import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping, SAXStore}
 import org.dom4j.io.DocumentSource
+import org.orbeon.oxf.resources.{ResourceNotFoundException, ResourceManagerWrapper}
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
+import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.state.AnnotatedTemplate
+import org.orbeon.oxf.xforms.xbl.XBLResources
+import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping, SAXStore}
 
 /**
  * Container for element metadata gathered during document annotation/extraction:
@@ -78,15 +76,6 @@ trait Bindings {
     private val xblBindings = new HashMap[String, collection.mutable.Set[String]]
     private var lastModified = -1L
 
-    private lazy val automaticMappings = {
-        val propertySet = Properties.instance.getPropertySet
-        for {
-            propertyName ← propertySet.getPropertiesStartsWith(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX).asScala
-            prefix = propertyName.substring(XBLBindings.XBL_MAPPING_PROPERTY_PREFIX.length)
-        } yield
-            (propertySet.getString(propertyName), prefix)
-    } toMap
-
     val bindingIncludes = new LinkedHashSet[String]
 
     def isXBLBindingCheckAutomaticBindings(uri: String, localname: String): Boolean = {
@@ -96,7 +85,7 @@ trait Bindings {
             return true
 
         // If not, check if it exists as automatic binding
-        getAutomaticXBLMappingPath(uri, localname) match {
+        XBLResources.getAutomaticXBLMappingPath(uri, localname) match {
             case Some(path) ⇒
                 storeXBLBinding(uri, localname)
                 bindingIncludes.add(path)
@@ -133,13 +122,6 @@ trait Bindings {
         } catch {
             // If a resource cannot be found, consider that something has changed
             case e: ResourceNotFoundException ⇒ false
-        }
-
-    // E.g. fr:tabview → oxf:/xbl/orbeon/tabview/tabview.xbl
-    def getAutomaticXBLMappingPath(uri: String, localname: String) =
-        automaticMappings.get(uri) flatMap { prefix ⇒
-            val path = "/xbl/" + prefix + '/' + localname + '/' + localname + ".xbl"
-            if (ResourceManagerWrapper.instance.exists(path)) Some(path) else None
         }
 }
 

@@ -20,8 +20,9 @@ import analysis.ElementAnalysis.attSet
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_FOCUS
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xml.{Dom4j, NamespaceMapping}
+import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
@@ -29,8 +30,8 @@ case class AbstractBinding(
     bindingElement: Element,
     lastModified: Long,
     bindingId: Option[String],
-    scripts: Seq[Element],
-    styles: Seq[Element],
+    scripts: Seq[HeadElement],
+    styles: Seq[HeadElement],
     handlers: Seq[Element],
     implementations: Seq[Element],
     global: Option[Document]
@@ -94,8 +95,9 @@ case class AbstractBinding(
 }
 
 object AbstractBinding {
+
     // Construct an AbstractBinding
-    def apply(bindingElement: Element, lastModified: Long, scripts: Seq[Element], namespaceMapping: NamespaceMapping) = {
+    def apply(bindingElement: Element, lastModified: Long, scripts: Seq[HeadElement]) = {
 
         assert(bindingElement ne null)
 
@@ -106,7 +108,7 @@ object AbstractBinding {
                 resourcesElement ← Dom4j.elements(bindingElement, XBL_RESOURCES_QNAME)
                 styleElement ← Dom4j.elements(resourcesElement, XBL_STYLE_QNAME)
             } yield
-                styleElement
+                HeadElement(styleElement)
 
         val handlers =
             for {
@@ -125,34 +127,35 @@ object AbstractBinding {
         val global = Option(bindingElement.element(XXBL_GLOBAL_QNAME)) map
             (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
 
-        new AbstractBinding(qNameMatch(bindingElement, namespaceMapping), bindingElement, lastModified, bindingId, scripts, styles, handlers, implementations, global)
+        new AbstractBinding(qNameMatch(bindingElement), bindingElement, lastModified, bindingId, scripts, styles, handlers, implementations, global)
     }
 
+    // From a binding element, extract the @element CSS-style selectors and return a QName
+    // So: fr|section → fr:section
     def elementQualifiedName(bindingElement: Element) =
         bindingElement.attributeValue(ELEMENT_QNAME).replace('|', ':')
-
-    private def qNameMatch(bindingElement: Element, namespaceMapping: NamespaceMapping) =
-        Dom4jUtils.extractTextValueQName(namespaceMapping.mapping, elementQualifiedName(bindingElement), true)
 
     // Find a cached abstract binding or create and cache a new one
     def findOrCreate(
             path: Option[String],
             bindingElement: Element,
             lastModified: Long,
-            scripts: Seq[Element],
-            namespaceMapping: NamespaceMapping): AbstractBinding = {
+            scripts: Seq[HeadElement]): AbstractBinding = {
 
-        val qName = qNameMatch(bindingElement, namespaceMapping)
+        val qName = qNameMatch(bindingElement)
 
         path flatMap (BindingCache.get(_, qName, lastModified)) match {
             case Some(cachedBinding) ⇒
                 // Found in cache
                 cachedBinding
             case None ⇒
-                val newBinding = AbstractBinding(bindingElement, lastModified, scripts, namespaceMapping)
+                val newBinding = AbstractBinding(bindingElement, lastModified, scripts)
                 // Cache binding
-                path foreach (BindingCache.put(_, qName, lastModified, newBinding))
+                path foreach (BindingCache.put(_, lastModified, newBinding))
                 newBinding
         }
     }
+
+    private def qNameMatch(bindingElement: Element) =
+        Dom4jUtils.extractTextValueQName(bindingElement, elementQualifiedName(bindingElement), true)
 }

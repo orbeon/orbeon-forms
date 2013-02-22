@@ -429,7 +429,7 @@ body {
 .orbeon #fb-source-editor-dialog .CodeMirror,
 .orbeon .fb-custom-xml-dialog .CodeMirror {
   font-size: 12px;
-  height: auto;
+  height: 100%;
 }
 .orbeon #fb-source-editor-dialog .xforms-alert-active,
 .orbeon .fb-custom-xml-dialog .xforms-alert-active {
@@ -454,7 +454,13 @@ body {
   left: 0;
   right: 0;
   bottom: 60px;
-  overflow: scroll;
+}
+.orbeon .xxforms-set-height .xxforms-dialog-body .fb-dialog-remaining-height .xbl-fr-code-mirror {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 .orbeon .xxforms-set-height .xxforms-dialog-body .fr-dialog-buttons {
   height: 60px;

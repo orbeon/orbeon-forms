@@ -327,7 +327,7 @@ body {
 
     #fb-source-editor-dialog, .fb-custom-xml-dialog {
         width: 900px;
-        .CodeMirror { font-size: 12px; height: auto  }            // Pick slightly smaller font size, default being 13px
+        .CodeMirror { font-size: 12px; height: 100% }            // Pick slightly smaller font size, default being 13px
         .xforms-alert-active { display: block }
     }
 
@@ -352,7 +352,11 @@ body {
                 position: absolute;                 // Take all the vertical space, leaving just 60px at the bottom for the buttons
                 top: 0; left: 0; right: 0;
                 bottom: @buttonsAreaHeight;
-                overflow: scroll;                   // So users can scroll through the source
+                .xbl-fr-code-mirror {
+                    position: absolute;
+                    top: 0; bottom: 0;              // top: 0 can be overridded in dialogs where there is something above the main box
+                    left: 0; right: 0;
+                }
             }
             .fr-dialog-buttons {
                 height: 60px;                       // Fixed height

@@ -12,10 +12,12 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-.fb-custom-xml-dialog {
-    width: 70em;                                                    // Reasonable dialog width to edit content
-    &.xxforms-set-height .xxforms-dialog-body
-        .fb-dialog-remaining-height { top: 100px }                  // Leave space at the top for radio buttons TODO: can we improve this to avoid a fixed height?
-    .xforms-select1 { margin:  0.5em 0 1em 0; display: block }      // Spacing around the radio buttons
-    .xforms-select1 span { margin-bottom: .5em }                    // Spacing between the radio buttons
+.orbeon {
+    .fb-custom-xml-dialog {
+        width: 70em;                                                    // Reasonable dialog width to edit content
+        &.xxforms-set-height .xxforms-dialog-body
+            .fb-dialog-remaining-height { top: 100px }                  // Leave space at the top for radio buttons TODO: can we improve this to avoid a fixed height?
+        .xforms-select1 { margin:  0.5em 0 1em 0; display: block }      // Spacing around the radio buttons
+        .xforms-select1 span { margin-bottom: .5em }                    // Spacing between the radio buttons
+    }
 }

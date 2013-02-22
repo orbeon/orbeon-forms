@@ -11,16 +11,16 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.fb-custom-xml-dialog {
+.orbeon .fb-custom-xml-dialog {
   width: 70em;
 }
-.fb-custom-xml-dialog.xxforms-set-height .xxforms-dialog-body .fb-dialog-remaining-height {
+.orbeon .fb-custom-xml-dialog.xxforms-set-height .xxforms-dialog-body .fb-dialog-remaining-height {
   top: 100px;
 }
-.fb-custom-xml-dialog .xforms-select1 {
+.orbeon .fb-custom-xml-dialog .xforms-select1 {
   margin: 0.5em 0 1em 0;
   display: block;
 }
-.fb-custom-xml-dialog .xforms-select1 span {
+.orbeon .fb-custom-xml-dialog .xforms-select1 span {
   margin-bottom: 0.5em;
 }

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.control.{VisitableTrait, XFormsContainerControl, XFormsControl}
+//import org.orbeon.oxf.xforms.control.Controls.ControlsIterator
 
 class XXFormsSetvisitedAction extends XFormsAction {
 
@@ -29,10 +30,12 @@ class XXFormsSetvisitedAction extends XFormsAction {
 
         // Resolve and update control
         resolveControl("control")(context) foreach (applyToVisitable(_, _.visited = visited, recurse))
+
+        //resolveControl("control")(context).iterator flatMap (ControlsIterator(_, includeSelf = true)) foreach (_.visited = visited)
     }
 
     private def applyToVisitable(control: XFormsControl, visit: VisitableTrait ⇒ Any, recurse: Boolean): Unit =
-        if (control.isRelevant)
+        if (control.isRelevant && ! control.isStaticReadonly)
             control match {
                 case containerControl: XFormsContainerControl ⇒
                     visit(containerControl)

@@ -43,7 +43,7 @@
     <example title="Contact Form" href="/fr/orbeon/contact/summary" img="/home/images/form-contact-small.jpg" size="4"
              source="http://www.flickr.com/photos/kt/32660952/">
         This sample form can be entirely created in about 10
-        minutes as shown in the <xh:a href="http://www.orbeon.com/forms/screencast/form-builder">Form Builder screencast</xh:a>.
+        minutes as shown in the <xh:a href="http://www.orbeon.com/">Form Builder screencast</xh:a>.
     </example>
     <banner>
         Form Builder is a powerful tool to create forms, but if you are a developer and you are

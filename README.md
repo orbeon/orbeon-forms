@@ -3,8 +3,6 @@ Orbeon Forms - Open source web forms done the right way
 
 Last updated for Orbeon Forms 4.0 RC1 February 2013
 
-NOTE: This is a milestone build, not a final release.
-
 [![Build Status](https://secure.travis-ci.org/orbeon/orbeon-forms.png)](http://travis-ci.org/orbeon/orbeon-forms)
 
 What is Orbeon Forms?

@@ -25,8 +25,7 @@ class SeleniumTest extends AssertionsForJUnit {
         checkOutputs(Seq("triggered" → "false", "p1" → "", "p2" → ""))
         $("#send-event button").click()
         waitForAjaxResponse()
-        checkOutputs(Seq("triggered" → "true", "p1" → "", "p2" → ""))
-        //checkOutputs(Seq("triggered" → "true", "p1" → "v1", "p2" → "v2"))
+        checkOutputs(Seq("triggered" → "true", "p1" → "v1", "p2" → "v2"))
     }
 
     @Before

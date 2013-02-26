@@ -276,9 +276,6 @@
     <target name="prepare" depends="init">
         <mkdir dir="${build.classes.dir}"/>
         <mkdir dir="${build.lib.dir}"/>
-        <condition property="is.debug">
-            <equals arg1="${debug.enabled}" arg2="true"/>
-        </condition>
     </target>
 
     <target name="jarjar" depends="prepare">
@@ -690,21 +687,7 @@
 
     </target>
 
-    <target name="debug-enabled" if="is.debug">
-        <property name="debug.arg1" value="-Xdebug"/>
-        <property name="debug.arg2" value="-Xnoagent"/>
-        <property name="debug.arg3" value="-Djava.compiler=NONE"/>
-        <property name="debug.arg4" value="-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5001"/>
-    </target>
-
-    <target name="debug-disabled" unless="is.debug">
-        <property name="debug.arg1" value=""/>
-        <property name="debug.arg2" value=""/>
-        <property name="debug.arg3" value=""/>
-        <property name="debug.arg4" value=""/>
-    </target>
-
-    <target name="test" depends="jars, test-classes, debug-enabled, debug-disabled, test-classpath">
+    <target name="test" depends="jars, test-classes, test-classpath">
     	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successfully
     	     				it would leave behind .class files in java.io.tmpdir.  This
     	     				meant that on subsequent runs of the test it wouldn't try to

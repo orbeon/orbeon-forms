@@ -759,9 +759,6 @@
                 <path refid="test.class.path"/>
                 <pathelement location="${build.test-classes.dir}"/>
                 <pathelement location="${resources-private.jar.file}"/>
-                <!-- SHOULD ADD THIS WHEN skip.compilation:  <pathelement location="${war.classes}"/>-->
-                <!-- FWIW tomcat 5 doesn't include this jar. -->
-                <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
             </classpath>
         </junit>
     </target>

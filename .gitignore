@@ -1,4 +1,5 @@
 build
+build-local.properties
 doc
 src/resources-private
 tmp

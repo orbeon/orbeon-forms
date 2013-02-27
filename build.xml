@@ -13,8 +13,7 @@
 -->
 <project name="orbeon" default="orbeon-war" basedir="." xmlns:xdb="http://exist-db.org/ant">
 
-    <!--<echoproperties/>-->
-
+    <property file="build-local.properties"/>
     <property name="project.name" value="orbeon"/>
 
     <!-- set global build.root to be dir containing this file. -->
@@ -29,6 +28,9 @@
     <property name="src.dir" location="src"/>
 
     <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20130217.jar"/>
+
+    <property name="catalina.home" value=""/>
+
 
     <!-- Scala tasks -->
     <!-- http://www.scala-lang.org/node/98 -->
@@ -958,6 +960,23 @@
                 <include name="orbeon/**"/>
             </fileset>
         </xdb:store>
+    </target>
+
+    <target name="tomcat-start">
+        <java jar="${catalina.home}/bin/bootstrap.jar" fork="true">
+            <jvmarg value="-Dcatalina.home=${catalina.home}"/>
+            <jvmarg value="-Dcatalina.base=test/catalina_base"/>
+            <jvmarg line="-server -verbosegc -Xms256m -Xmx1024m -XX:MaxPermSize=192m -Djava.awt.headless=true -XX:+PerfDisableSharedMem"/>
+            <jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=61155"/>
+        </java>
+        <delete dir="test/catalina_base/work"/>
+    </target>
+
+    <target name="tomcat-stop">
+        <java jar="${catalina.home}/bin/bootstrap.jar" fork="true">
+            <jvmarg value="-Dcatalina.home=${catalina.home}"/>
+            <arg line="stop"/>
+        </java>
     </target>
 
 </project>

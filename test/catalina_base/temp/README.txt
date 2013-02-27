@@ -1,0 +1,1 @@
+Directory intentionally left empty. So Tomcat doesn't complain about not having a temp directory.

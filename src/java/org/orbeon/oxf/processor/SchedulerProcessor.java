@@ -117,8 +117,9 @@ public class SchedulerProcessor extends ProcessorImpl {
                 }
             });
 
-            TaskScheduler scheduler = TaskScheduler.getInstance();
             ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+            TaskScheduler scheduler = TaskScheduler.getInstance(externalContext.getWebAppContext());
+
             //assert externalContext != null;
 
             for (Iterator i = configs.iterator(); i.hasNext();) {

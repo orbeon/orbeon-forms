@@ -54,7 +54,6 @@ trait ServletPortlet {
         Logger.info(logPrefix + " destroyed.")
 
          // Clean-up
-        _processorService.destroy()
         _processorService = null
         _webAppContext = null
     }

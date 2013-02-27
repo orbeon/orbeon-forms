@@ -105,16 +105,6 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
 
         writer.print(sb.toString)
     }
-
-    def destroy(): Unit =
-        try {
-            TaskScheduler.getInstance.cancelAll(false)
-            TaskScheduler.shutdown()
-        } catch {
-            case error: NoClassDefFoundError ⇒
-                // Ignore error: this can happen if using JDK 1.3 (scheduling classed not available)
-                // and also happens from time to time on Tomcat 4.1.18 with JDK 1.4.2 (not sure why).
-        }
 }
 
 object ProcessorService {

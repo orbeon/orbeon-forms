@@ -17,6 +17,8 @@ package org.orbeon.oxf.util.task;
 
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.webapp.WebAppContext;
+import org.orbeon.oxf.webapp.WebAppListener;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -227,31 +229,25 @@ public class TaskScheduler {
     }
 
 
-    // static variables
-    private static Boolean semaphore = new Boolean(true);
-    private static TaskScheduler globalTaskScheduler = null;
-
-
     /**
      * Get a singleton TaskScheduler. This can be used if the application wants
      * to share one task scheduler across the whole JVM.
      */
-    public static TaskScheduler getInstance() {
-        synchronized (semaphore) {
-            if (globalTaskScheduler == null)
-                globalTaskScheduler = new TaskScheduler();
-
-            return globalTaskScheduler;
-        }
-    }
-
-
-    /**
-     * Shutdown the scheduler
-     */
-    public static void shutdown() {
-        synchronized (semaphore) {
-            globalTaskScheduler.schedulerThread.cancel();
+    public static TaskScheduler getInstance(WebAppContext webAppContext) {
+        synchronized (webAppContext) {
+            final TaskScheduler existingTaskScheduler = (TaskScheduler) webAppContext.getAttributesMap().get("task-scheduler");
+            if (existingTaskScheduler != null) {
+                return existingTaskScheduler;
+            } else {
+                final TaskScheduler newTaskScheduler = new TaskScheduler();
+                webAppContext.getAttributesMap().put("task-scheduler", newTaskScheduler);
+                webAppContext.addListener(new WebAppListener() {
+                    public void webAppDestroyed() {
+                        newTaskScheduler.cancelAll(false);
+                    }
+                });
+                return newTaskScheduler;
+            }
         }
     }
 

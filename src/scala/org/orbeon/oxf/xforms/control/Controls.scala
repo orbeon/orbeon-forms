@@ -406,7 +406,7 @@ object Controls {
                 // Move to next child
                 val next = children.next()
                 if (next.isInstanceOf[XFormsContainerControl])
-                    descendants = new ControlsIterator(next, false)
+                    descendants = ControlsIterator(next, includeSelf = false)
                 next
             } else
                 null

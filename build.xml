@@ -913,12 +913,10 @@
 
     <target name="orbeon-dist" depends="orbeon-dist-checksum"/>
 
-    <target name="teamcity-release-worker" depends="clean, test, orbeon-dist"/>
-    <target name="teamcity-release">
-        <antcall target="teamcity-release-worker">
-            <param name="skip.selenium" value="true"/>
-        </antcall>
+    <target name="skip-selenium">
+        <property name="skip.selenium" value="true"/>
     </target>
+    <target name="teamcity-release" depends="skip-selenium, clean, test, orbeon-dist"/>
 
     <target name="teamcity-rsync" depends="teamcity-release">
 

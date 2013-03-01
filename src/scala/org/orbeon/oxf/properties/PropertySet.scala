@@ -30,6 +30,8 @@ import scala.collection.mutable
  *
  * A property name can be exact, e.g. foo.bar.gaga, or it can contain wildcards, like ".*.bar.gaga", "foo.*.gaga", or
  * "foo.bar.*", or "*.bar.*", etc.
+ *
+ * TODO: Make this effectively immutable and remove `setProperty`.
  */
 class PropertySet {
     

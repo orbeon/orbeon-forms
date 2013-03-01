@@ -31,7 +31,6 @@
 
     <property name="catalina.home" value=""/>
 
-
     <!-- Scala tasks -->
     <!-- http://www.scala-lang.org/node/98 -->
     <taskdef resource="scala/tools/ant/antlib.xml">
@@ -59,11 +58,11 @@
         </classpath>
     </taskdef>
 
-     <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
-         <classpath>
+    <taskdef name="jarjar" classname="com.tonicsystems.jarjar.JarJarTask">
+        <classpath>
             <pathelement location="lib/jarjar-1.3.jar"/>
         </classpath>
-     </taskdef>
+    </taskdef>
 
     <!-- ant-contrib, for tasks like <if> -->
     <taskdef resource="net/sf/antcontrib/antcontrib.properties">
@@ -246,7 +245,6 @@
         <property name="build.temp.dir" value="${build.dir}/temp"/>
         <property name="build.doc.dir" value="${build.dir}/doc"/>
 
-        <property name="test.tmp.dir" location="${build.temp.dir}/test"/>
         <property name="test.exist-db.dir" location="${src.dir}/resources-packaged/ops/unit-tests/exist-data"/>
 
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
@@ -682,63 +680,123 @@
 
     </target>
 
-    <target name="test" depends="jars, test-classes, test-classpath">
-    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successfully
-    	     				it would leave behind .class files in java.io.tmpdir.  This
-    	     				meant that on subsequent runs of the test it wouldn't try to
-    	     				compile anything.
+    <target name="test" depends="orbeon-war, test-classes, test-classpath">
 
-    	     				So now we delete,create,and specify a specific dir as the temp
-    	     				dir so that compiles always occur.
-    	 -->
-    	<delete dir="${test.tmp.dir}"/>
-    	<mkdir dir="${test.tmp.dir}"/>
+        <property name="tomcat-version" value="6.0.36"/>
+        <parallel>
 
-	    <delete dir="${test.exist-db.dir}"/>
-    	<mkdir dir="${test.exist-db.dir}"/>
+            <!-- Run Tomcat -->
+            <sequential>
+                <if>
+                    <not><isset property="skip.selenium"/></not>
+                    <then>
+                        <!-- Uncompress -->
+                        <if>
+                            <not><available file="build/apache-tomcat-${tomcat-version}"/></not>
+                            <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
+                        </if>
+                        <!-- Run -->
+                        <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true">
+                            <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
+                            <jvmarg value="-Dcatalina.base=test/catalina_base"/>
+                            <jvmarg line="-server -verbosegc -Xms256m -Xmx1024m -XX:MaxPermSize=192m -Djava.awt.headless=true -XX:+PerfDisableSharedMem"/>
+                            <jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=61155"/>
+                        </java>
+                        <delete dir="test/catalina_base/work"/>
+                    </then>
+                </if>
+            </sequential>
 
-        <junit fork="true" haltonerror="yes" haltonfailure="yes">
-            <!-- Enable assertions -->
-            <jvmarg value="-ea"/>
+            <sequential>
 
-            <batchtest>
-                <fileset dir="${build.test-classes.dir}">
-                    <include name="org/orbeon/oxf/**/*Test.class"/>
-                    <include name="org/orbeon/oxf/**/Test*.class"/>
-                    <exclude name="org/orbeon/oxf/test/SeleniumTest.class"/>
-                </fileset>
-            </batchtest>
+                <if>
+                    <not><isset property="skip.selenium"/></not>
+                    <then>
+                        <!-- Wait for Tomcat to start -->
+                        <waitfor maxwait="1" maxwaitunit="minute" checkevery="200">
+                            <http url="http://localhost:8080/orbeon/home/"/>
+                        </waitfor>
 
-            <formatter type="plain" usefile="false"/>
+                        <!-- Pick version of ChromiumDriver for OS X or Linux -->
+                        <if>
+                            <not><available file="build/bin/chromedriver"/></not>
+                            <then>
+                                <property name="chromiumdriver-version" value="26.0.1383.0"/>
+                                <mkdir  dir="build/bin"/>
+                                <if>
+                                    <os family="mac"/>
+                                    <then><unzip src="lib/test/chromedriver_mac_${chromiumdriver-version}.zip" dest="build/bin"/></then>
+                                    <else><unzip src="lib/test/chromedriver_linux32_${chromiumdriver-version}.zip" dest="build/bin"/></else>
+                                </if>
+                                <chmod file="build/bin/chromedriver" perm="a+x"/>
+                            </then>
+                        </if>
+                    </then>
+                </if>
 
-            <!-- Configure resource manager -->
-            <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-            <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
-            <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
-            <!-- resources -->
-            <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
-            <!-- For resources associated with Java test files -->
-            <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="${test-src.dir}"/>
-            <!-- Classpath -->
-            <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
+                <delete dir="build/temp/test"/>
+               	<mkdir  dir="build/temp/test"/>
+           	    <delete dir="${test.exist-db.dir}"/>
+               	<mkdir  dir="${test.exist-db.dir}"/>
 
-            <!-- Other properties -->
-            <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
-            <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
-        	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}"/>
+                <!-- Run tests -->
+                <junit fork="true" haltonerror="yes" haltonfailure="yes" printsummary="true">
+                    <!-- Enable assertions -->
+                    <jvmarg value="-ea"/>
 
-            <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitely -->
-        	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
+                    <batchtest>
+                        <fileset dir="${build.test-classes.dir}">
+                            <include name="org/orbeon/oxf/**/*Test.class"/>
+                            <include name="org/orbeon/oxf/**/Test*.class"/>
+                            <exclude name="org/orbeon/oxf/test/SeleniumTest.class" if="skip.selenium"/>
+                        </fileset>
+                    </batchtest>
 
-            <classpath>
-                <path refid="test.class.path"/>
-                <pathelement location="${build.test-classes.dir}"/>
-                <pathelement location="${resources-private.jar.file}"/>
-            </classpath>
-        </junit>
+                    <formatter type="plain" usefile="false"/>
+
+                    <!-- Configure resource manager -->
+                    <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
+                    <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
+                    <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+                    <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
+                    <!-- resources -->
+                    <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+                    <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
+                    <!-- For resources associated with Java test files -->
+                    <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+                    <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="${test-src.dir}"/>
+                    <!-- Classpath -->
+                    <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
+                    <!-- Other properties -->
+                    <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
+                    <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
+                	<sysproperty key="java.io.tmpdir" value="build/temp/test"/>
+                	<sysproperty key="webdriver.chrome.driver" value="build/bin/chromedriver"/>
+
+                    <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitly -->
+                	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
+
+                    <classpath>
+                        <path refid="test.class.path"/>
+                        <pathelement location="${build.test-classes.dir}"/>
+                        <pathelement location="${resources-private.jar.file}"/>
+                    </classpath>
+                </junit>
+
+                <!-- Stop Tomcat -->
+                <if>
+                    <not><isset property="skip.selenium"/></not>
+                    <then>
+                        <!-- Stop Tomcat -->
+                        <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true">
+                            <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
+                            <arg line="stop"/>
+                        </java>
+                    </then>
+                </if>
+            </sequential>
+        </parallel>
+
     </target>
 
     <target name="orbeon-dist-war" depends="jars, exist-import-sample-data-to-build" description="Creates Orbeon Forms WAR">
@@ -855,7 +913,12 @@
 
     <target name="orbeon-dist" depends="orbeon-dist-checksum"/>
 
-    <target name="teamcity-release" depends="clean, test, orbeon-dist"/>
+    <target name="teamcity-release-worker" depends="clean, test, orbeon-dist"/>
+    <target name="teamcity-release">
+        <antcall target="teamcity-release-worker">
+            <param name="skip.selenium" value="true"/>
+        </antcall>
+    </target>
 
     <target name="teamcity-rsync" depends="teamcity-release">
 
@@ -953,23 +1016,6 @@
                 <include name="orbeon/**"/>
             </fileset>
         </xdb:store>
-    </target>
-
-    <target name="tomcat-start">
-        <java jar="${catalina.home}/bin/bootstrap.jar" fork="true">
-            <jvmarg value="-Dcatalina.home=${catalina.home}"/>
-            <jvmarg value="-Dcatalina.base=test/catalina_base"/>
-            <jvmarg line="-server -verbosegc -Xms256m -Xmx1024m -XX:MaxPermSize=192m -Djava.awt.headless=true -XX:+PerfDisableSharedMem"/>
-            <jvmarg line="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=61155"/>
-        </java>
-        <delete dir="test/catalina_base/work"/>
-    </target>
-
-    <target name="tomcat-stop">
-        <java jar="${catalina.home}/bin/bootstrap.jar" fork="true">
-            <jvmarg value="-Dcatalina.home=${catalina.home}"/>
-            <arg line="stop"/>
-        </java>
     </target>
 
 </project>

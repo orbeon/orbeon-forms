@@ -65,6 +65,13 @@
         </classpath>
      </taskdef>
 
+    <!-- ant-contrib, for tasks like <if> -->
+    <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+        <classpath>
+            <pathelement location="lib/ant-contrib-1.0b3.jar"/>
+        </classpath>
+    </taskdef>
+
     <fileset id="war.libs" dir="lib">
 
         <include name="orbeon-errorified-20120619.jar"/>
@@ -220,24 +227,10 @@
         <!-- User-friendly message -->
         <echo message="Building Orbeon Forms ${release.number}"/>
 
-        <!-- dump version string with dots in into a file, then read that file convert -->
-        <!-- the dots to underscores while reading.   i.e. convert 2.5.4-3234 to      -->
-        <!-- 2_5_4_3234                                                                -->
-        <tempfile property="ops-temp-version-file"/>
-        <echo message="${project.name}-version=${release.number}" file="${ops-temp-version-file}"/>
-
-        <loadproperties srcFile="${ops-temp-version-file}">
-            <filterchain>
-                <tokenfilter>
-                    <!-- Cannot seem to be able to tell ant to replace "-" here! -->
-                    <replacestring from="." to="_"/>
-                </tokenfilter>
-            </filterchain>
-        </loadproperties>
-        <delete file="${ops-temp-version-file}"/>
-
         <!-- Provide custom version number to TeamCity -->
-        <echo message="##teamcity[buildNumber '${orbeon-version}']"/>
+        <!-- http://confluence.jetbrains.com/display/TCD4/Build+Script+Interaction+with+TeamCity#BuildScriptInteractionwithTeamCity-ReportingBuildNumber-->
+        <propertyregex property="teamcity.release.number" input="${release.number}" regexp="\." replace="_"/>
+        <echo message="##teamcity[buildNumber '${teamcity.release.number}']"/>
 
         <property name="java-src.dir" value="${src.dir}/java"/>
         <property name="scala-src.dir" value="${src.dir}/scala"/>

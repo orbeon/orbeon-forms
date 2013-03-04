@@ -111,8 +111,11 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 else
                     // Special case of empty parts
                     ""
-            case _ ⇒
+            case "string" | null ⇒
+                // Apply replacement filter for string type only
                 containingDocument.getStaticState.inputFilter(unformatTransform(externalValue))
+            case _ ⇒
+                unformatTransform(externalValue)
         }
     }
 

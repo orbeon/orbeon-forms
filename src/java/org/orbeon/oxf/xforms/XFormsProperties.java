@@ -263,19 +263,6 @@ public class XFormsProperties {
     }
 
     // Global properties
-    private static final String STORE_APPLICATION_SIZE_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.size";
-    private static final int STORE_APPLICATION_SIZE_DEFAULT = 20 * 1024 * 1024;
-
-    private static final String STORE_APPLICATION_USERNAME_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.username";
-    private static final String STORE_APPLICATION_PASSWORD_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.password";
-    private static final String STORE_APPLICATION_URI_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.uri";
-    private static final String STORE_APPLICATION_COLLECTION_PROPERTY = XFORMS_PROPERTY_PREFIX + "store.application.collection";
-
-    private static final String STORE_APPLICATION_USERNAME_DEFAULT = "guest";
-    private static final String STORE_APPLICATION_PASSWORD_DEFAULT = "";
-    private static final String STORE_APPLICATION_URI_DEFAULT = "xmldb:exist:///";
-    private static final String STORE_APPLICATION_COLLECTION_DEFAULT = "/db/orbeon/xforms/cache/";
-
     private static final String GZIP_STATE_PROPERTY = XFORMS_PROPERTY_PREFIX + "gzip-state"; // global but could possibly be per document
     private static final boolean GZIP_STATE_DEFAULT = true;
 
@@ -351,34 +338,9 @@ public class XFormsProperties {
                 (CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT);
     }
 
-    public static int getApplicationStateStoreSize() {
-        return Properties.instance().getPropertySet().getInteger
-                (STORE_APPLICATION_SIZE_PROPERTY, STORE_APPLICATION_SIZE_DEFAULT);
-    }
-
     public static boolean isGZIPState() {
         return Properties.instance().getPropertySet().getBoolean
                 (GZIP_STATE_PROPERTY, GZIP_STATE_DEFAULT);
-    }
-
-    public static String getStoreUsername() {
-        return Properties.instance().getPropertySet().getString
-                (STORE_APPLICATION_USERNAME_PROPERTY, STORE_APPLICATION_USERNAME_DEFAULT);
-    }
-
-    public static String getStorePassword() {
-        return Properties.instance().getPropertySet().getString
-                (STORE_APPLICATION_PASSWORD_PROPERTY, STORE_APPLICATION_PASSWORD_DEFAULT);
-    }
-
-    public static String getStoreURI() {
-        return Properties.instance().getPropertySet().getStringOrURIAsString
-                (STORE_APPLICATION_URI_PROPERTY, STORE_APPLICATION_URI_DEFAULT);
-    }
-
-    public static String getStoreCollection() {
-        return Properties.instance().getPropertySet().getString
-                (STORE_APPLICATION_COLLECTION_PROPERTY, STORE_APPLICATION_COLLECTION_DEFAULT);
     }
 
     public static boolean isHostLanguageAVTs() {

@@ -44,6 +44,6 @@ class XXFormsExtractDocument extends XFormsFunction {
                 case _ ⇒ return null
             }
 
-        Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false)
+        Instance.extractDocument(rootElement, stringOptionToSet(excludeResultPrefixes), readonly, exposeXPathTypes = false, removeInstanceData = true)
     }
 }

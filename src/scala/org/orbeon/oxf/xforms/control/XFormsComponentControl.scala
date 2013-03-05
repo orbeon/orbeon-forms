@@ -53,7 +53,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Create nested container upon creation
     createNestedContainer()
 
-    def createNestedContainer(): Unit = {
+    private def createNestedContainer(): Unit = {
 
         assert(_nestedContainer.isEmpty)
 
@@ -176,7 +176,8 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
                     unwrapElement(referenceNode.get),
                     excludeResultPrefixes = Set(),
                     readonly              = false,
-                    exposeXPathTypes      = mirrorInstance.exposeXPathTypes)
+                    exposeXPathTypes      = mirrorInstance.exposeXPathTypes,
+                    removeInstanceData    = true)
 
             // Update initial instance without dispatching events
             mirrorInstance.replace(doc, dispatch = false)

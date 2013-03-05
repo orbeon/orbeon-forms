@@ -75,7 +75,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
 
     // Create inline instance document if any
     // NOTE: Result can't be shared. In the future we could share the extracted document and copy as needed.
-    def inlineContent = root map (extractDocument(_, excludeResultPrefixes, readonly, exposeXPathTypes))
+    def inlineContent = root map (extractDocument(_, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false))
 
     // Don't allow more than one child element
     if (Dom4j.elements(element).size > 1)
@@ -121,7 +121,7 @@ object Instance {
     //
     // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
     // @exposeXPathTypes if true, use a TypedDocumentWrapper
-    def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean): DocumentInfo = {
+    def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean, removeInstanceData: Boolean): DocumentInfo = {
 
         // Extract a document and adjust namespaces if requested
         // NOTE: Should implement exactly as per XSLT 2.0
@@ -139,11 +139,10 @@ object Instance {
                     Dom4jUtils.createDocumentCopyParentNamespaces(element)
             }
 
-        val document = extractDocument
         if (readonly)
-            TransformerUtils.dom4jToTinyTree(XPathCache.getGlobalConfiguration, document, false)
+            TransformerUtils.dom4jToTinyTree(XPathCache.getGlobalConfiguration, extractDocument, false)
         else
-            wrapDocument(document, exposeXPathTypes)
+            wrapDocument(if (removeInstanceData) InstanceData.remove(extractDocument) else extractDocument, exposeXPathTypes)
     }
 
     def wrapDocument(document: Document, exposeXPathTypes: Boolean) =

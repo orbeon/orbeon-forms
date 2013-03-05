@@ -446,14 +446,15 @@ public class InstanceData {// rename to DataNodeProperties once done
             return null;
     }
 
-    public static void remove(Node node) {
+    public static <A extends Node> A remove(A node) {
 
         // We can't store data on the Document object. Use root element instead.
+        Node adjustedNode = node;
         if (node instanceof Document)
-            node = ((Document) node).getRootElement();
+            adjustedNode = ((Document) node).getRootElement();
 
-        if (node instanceof Element) {
-            final Element element = (Element) node;
+        if (adjustedNode instanceof Element) {
+            final Element element = (Element) adjustedNode;
 
             // Handle current element
             element.setData(null);
@@ -469,11 +470,13 @@ public class InstanceData {// rename to DataNodeProperties once done
                 remove(childElement);
             }
 
-        } else if (node instanceof Attribute) {
-            ((Attribute) node).setData(null);
+        } else if (adjustedNode instanceof Attribute) {
+            ((Attribute) adjustedNode).setData(null);
         } else {
             // TODO: other node types once we update to handling text nodes correctly. But it looks like Text does not support data.
         }
+
+        return node;
     }
 
     private static InstanceData createNewInstanceData(NodeInfo nodeInfo) {

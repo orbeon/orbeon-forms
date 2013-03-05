@@ -431,8 +431,23 @@ public class XFormsInsertAction extends XFormsAction {
         // "4. If the insert is successful, the event xforms-insert is dispatched."
         // XFormsInstance handles index and repeat items updates 
         if (doDispatch && modifiedInstance != null) {
+
+            // Adjust insert location node and before/after/into in case the root element was replaced
+            final NodeInfo adjustedInsertLocationNodeInfo;
+            final String adjustedBeforeAfterInto;
+
+            final NodeInfo parent = insertedNodeInfos.get(0).getParent(); // we know there is at least one because modifiedInstance != null
+            if (parent != null && parent.equals(parent.getDocumentRoot())) {
+                // Node was inserted under document node
+                adjustedInsertLocationNodeInfo = parent.getDocumentRoot();
+                adjustedBeforeAfterInto = "into";
+            } else {
+                adjustedInsertLocationNodeInfo = insertLocationNodeInfo;
+                adjustedBeforeAfterInto = beforeAfterInto;
+            }
+
             Dispatch.dispatchEvent(
-                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, insertLocationNodeInfo, beforeAfterInto));
+                    new XFormsInsertEvent(modifiedInstance, insertedNodeInfos, originItems, adjustedInsertLocationNodeInfo, adjustedBeforeAfterInto));
         }
 
         return insertedNodeInfos;

@@ -726,12 +726,11 @@
                         <if>
                             <not><available file="build/bin/chromedriver"/></not>
                             <then>
-                                <property name="chromiumdriver-version" value="26.0.1383.0"/>
                                 <mkdir  dir="build/bin"/>
                                 <if>
                                     <os family="mac"/>
-                                    <then><unzip src="lib/test/chromedriver_mac_${chromiumdriver-version}.zip" dest="build/bin"/></then>
-                                    <else><unzip src="lib/test/chromedriver_linux32_${chromiumdriver-version}.zip" dest="build/bin"/></else>
+                                    <then><unzip src="lib/test/chromedriver_mac_26.0.1383.0.zip" dest="build/bin"/></then>
+                                    <else><unzip src="lib/test/chromedriver_linux32_23.0.1240.0.zip" dest="build/bin"/></else>
                                 </if>
                                 <chmod file="build/bin/chromedriver" perm="a+x"/>
                             </then>

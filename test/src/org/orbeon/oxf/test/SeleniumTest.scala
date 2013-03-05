@@ -12,12 +12,11 @@ import org.openqa.selenium.remote.RemoteWebDriver
 import org.junit.Assert.assertEquals
 import org.openqa.selenium.{JavascriptExecutor, By, WebDriver}
 import java.io.File
+import org.openqa.selenium.firefox.FirefoxDriver
 
 class SeleniumTest extends AssertionsForJUnit {
 
     import SeleniumTest._
-    private var driver: WebDriver = _
-    private var js: JavascriptExecutor = _
 
     @Test
     def testEventProperties() {
@@ -30,8 +29,6 @@ class SeleniumTest extends AssertionsForJUnit {
 
     @Before
     def createDriver() {
-        driver = new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome())
-        js = driver.asInstanceOf[JavascriptExecutor]
     }
 
     @After
@@ -48,7 +45,7 @@ class SeleniumTest extends AssertionsForJUnit {
     }
 
     private def waitForAjaxResponse() {
-        while (js.executeScript("""return ORBEON.xforms.Globals.requestInProgress
+        while (driver.executeScript("""return ORBEON.xforms.Globals.requestInProgress
                                        || ORBEON.xforms.Globals.eventQueue.length > 0""").asInstanceOf[Boolean])
             Thread.sleep(100)
     }
@@ -57,16 +54,20 @@ class SeleniumTest extends AssertionsForJUnit {
 object SeleniumTest {
 
     private var service: ChromeDriverService = _
+    private var driver: RemoteWebDriver = _
 
     @BeforeClass
     def createAndStartService() {
-        service = ChromeDriverService.createDefaultService()
-        service.start()
+        driver = new FirefoxDriver()
+//        val service = ChromeDriverService.createDefaultService()
+//        service.start()
+//        driver = new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome())
     }
 
     @AfterClass
     def createAndStopService() {
-        service.stop()
+        driver.quit()
+        //service.stop()
     }
 }
 

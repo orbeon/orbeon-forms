@@ -20,7 +20,8 @@ import XFormsEvent._
 import org.orbeon.saxon.om.NodeInfo
 
 class XXFormsReplaceEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_REPLACE, target, properties, bubbles = true, cancelable = false) {
+    extends XFormsEvent(XXFORMS_REPLACE, target, properties, bubbles = true, cancelable = false)
+    with InstanceEvent {
 
     def this(target: XFormsEventTarget, formerNode: NodeInfo, currentNode: NodeInfo) = {
         this(target, Map("former-node" → Option(formerNode), "current-node" → Option(currentNode)))

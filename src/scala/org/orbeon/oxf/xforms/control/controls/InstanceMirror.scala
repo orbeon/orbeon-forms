@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms._
 import action.actions.XFormsDeleteAction.doDelete
 import action.actions.XFormsInsertAction.doInsert
 import collection.JavaConverters._
-import event.events.{XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
+import org.orbeon.oxf.xforms.event.events.{XXFormsReplaceEvent, XFormsDeleteEvent, XFormsInsertEvent, XXFormsValueChangedEvent}
 import event.XFormsEvents._
 import model.DataModel
 import org.orbeon.oxf.util.ScalaUtils._
@@ -31,7 +31,7 @@ import java.lang.IllegalStateException
 import org.dom4j._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, XFormsEvent, ListenersTrait}
+import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, Dispatch, XFormsEvent, ListenersTrait}
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -43,7 +43,7 @@ object InstanceMirror {
     // specially takes care of instance root replacement. However in order to ensure that indexes are properly
     // maintained in the case of two linked instances, xxforms-replace will be needed. For now this doesn't happen
     // with Form Builder.
-    private val MutationEvents = Seq(XXFORMS_VALUE_CHANGED, XFORMS_INSERT, XFORMS_DELETE)
+    private val MutationEvents = Seq(XXFORMS_VALUE_CHANGED, XFORMS_INSERT, XFORMS_DELETE, XXFORMS_REPLACE)
 
     // (sourceInstance, sourceNode, into) ⇒ Option[(destinationInstance, destinationNode)]
     type NodeMatcher = (XFormsInstance, NodeInfo, Boolean) ⇒ Option[(XFormsInstance, NodeInfo)]
@@ -170,17 +170,24 @@ object InstanceMirror {
             evalOne(outerDoc, "//xf:instance[@id = $sourceId]", // could write:(id($sourceId)[self::xf:instance], //xf:instance[@id = $sourceId])[1]
                     variables = Map("sourceId" → StringValue.makeStringValue(innerInstance.getId))) match {
                 case instanceWrapper: VirtualNode if instanceWrapper.getUnderlyingNode.isInstanceOf[Element] ⇒
+                    // Outer xf:instance found
+                    innerNode match {
+                        case document: DocumentInfo ⇒
+                            // Root element replaced
+                            Some(outerInstance, instanceWrapper) ensuring (into)
+                        case _ ⇒
+                            // All other cases
+                            // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
+                            // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
+                            // mappings.
+                            val path       = dropStartingSlash(Navigator.getPath(innerNode))
+                            val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
 
-                    // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
-                    // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
-                    // mappings.
-                    val path       = dropStartingSlash(Navigator.getPath(innerNode))
-                    val namespaces = partAnalysis.getNamespaceMapping(partAnalysis.startScope.fullPrefix, instanceWrapper.getUnderlyingNode.asInstanceOf[Element])
-
-                    // Find destination node in inline instance in original doc
-                    evalOne(instanceWrapper, path, namespaces) match {
-                        case newNode: VirtualNode ⇒ Some(outerInstance, newNode)
-                        case _ ⇒ throw new IllegalStateException
+                            // Find destination node in inline instance in original doc
+                            evalOne(instanceWrapper, path, namespaces) match {
+                                case newNode: VirtualNode ⇒ Some(outerInstance, newNode)
+                                case _ ⇒ throw new IllegalStateException
+                            }
                     }
                 case _ ⇒ throw new IllegalStateException
             }
@@ -197,19 +204,20 @@ object InstanceMirror {
             // have another name. So we create a relative path starting at /a, which can be applied to the outer element.
             val relativePath  = Navigator.getPath(innerNode) split '/' drop 2 mkString "/"
 
-            // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
-            // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
-            // mappings.
-            val namespaces = outerInstance.instance.namespaceMapping
-
             if (relativePath.isEmpty)
                 // The root element
                 Some(outerInstance, outerNode)
-            else
+            else {
+                // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of
+                // xf:instance. This is not general enough. It stems from the use of getPath, which loses namespace
+                // mappings.
+                val namespaces = outerInstance.instance.namespaceMapping
+
                 // Apply path to find node in outer instance
                 Option(evalOne(outerNode, relativePath, namespaces)) collect {
                     case newNode: NodeInfo ⇒ outerInstance → newNode
                 }
+            }
     }
 
     // Listener that mirrors changes from one document to the other
@@ -233,7 +241,7 @@ object InstanceMirror {
 
             event match {
                 case valueChanged: XXFormsValueChangedEvent ⇒
-                    findMatchingNode(valueChanged.targetObject.asInstanceOf[XFormsInstance], valueChanged.node, true) match {
+                    findMatchingNode(valueChanged.targetInstance, valueChanged.node, true) match {
                         case Some((matchingInstance, matchingNode)) ⇒
                             if (! isInLoop(matchingInstance, event))
                                 DataModel.setValueIfChanged(
@@ -246,40 +254,34 @@ object InstanceMirror {
                         case _ ⇒
                             false
                     }
-                case insert: XFormsInsertEvent ⇒
-                    findMatchingNode(insert.targetObject.asInstanceOf[XFormsInstance], insert.insertLocationNode, insert.position == "into") match {
-                        case Some((matchingInstance, matchingInsertNode)) ⇒
-                            if (! isInLoop(matchingInstance, event))
-                                insert.position match {
-                                    case "into" ⇒
-                                        doInsert(containingDocument, logger, "after", null,
-                                            matchingInsertNode, insert.originItems.asJava, -1, doClone = true, doDispatch = true)
-                                    case position @ ("before" | "after") ⇒
+                case insert: XFormsInsertEvent if ! insert.isRootElementReplacement ⇒
+                    // Insert except root element replacement
+                    findMatchingNode(insert.targetInstance, insert.insertLocationNode, insert.position == "into") match {
+                        case Some((matchingInstance, matchingInsertLocation)) ⇒
+                            if (! isInLoop(matchingInstance, event)) {
 
-                                        def containsRootElement(items: Seq[Item]) =
-                                            items collect { case node: NodeInfo ⇒ node } exists (node ⇒ node == node.rootElement)
+                                val (collection, context) =
+                                    if (insert.position == "into")
+                                        (null, matchingInsertLocation)
+                                    else
+                                        (Seq(matchingInsertLocation).asJava, null)
 
-                                        if (containsRootElement(insert.insertedNodes)) {
-                                            // If the inserted items contain the root element it means the root element was replaced, so
-                                            // remove it first
-
-                                            assert(insert.insertedNodes.size == 1)
-
-                                            val parent = matchingInsertNode.parentOption.get
-                                            doDelete(containingDocument, logger, Seq(matchingInsertNode).asJava, - 1, doDispatch = true)
-                                            doInsert(containingDocument, logger, position, null,
-                                                parent, insert.originItems.asJava, 1, doClone = true, doDispatch = true)
-                                        } else {
-                                            // Not replacing the root element
-                                            doInsert(containingDocument, logger, position, Seq(matchingInsertNode).asJava,
-                                                null, insert.originItems.asJava, 1, doClone = true, doDispatch = true)
-                                        }
-                                    case _ ⇒ throw new IllegalStateException
-                                }
+                                doInsert(
+                                    containingDocument,
+                                    logger,
+                                    insert.position,
+                                    collection,
+                                    context,
+                                    insert.originItems.asJava,
+                                    1,
+                                    doClone = true,
+                                    doDispatch = true)
+                            }
                             true
                         case _ ⇒
                             false
                     }
+                case insert: XFormsInsertEvent if insert.isRootElementReplacement ⇒ true // handled by xxforms-replace
                 case delete: XFormsDeleteEvent ⇒
                     delete.deleteInfos map { deleteInfo ⇒ // more than one node might have been removed
 
@@ -293,7 +295,7 @@ object InstanceMirror {
                             // If parent is available, find matching node and call body
                             Option(deleteInfo.parent) match {
                                 case Some(removedParentNodeInfo) ⇒
-                                    findMatchingNode(delete.targetObject.asInstanceOf[XFormsInstance], removedParentNodeInfo, true) match {
+                                    findMatchingNode(delete.targetInstance, removedParentNodeInfo, true) match {
                                         case Some((matchingInstance, matchingParentNode)) ⇒
 
                                             val docWrapper    = matchingParentNode.getDocumentRoot.asInstanceOf[DocumentWrapper]
@@ -336,7 +338,7 @@ object InstanceMirror {
                                         // Don't perform the deletion of the root element because we don't support
                                         // this in the data model (although maybe we should). However, consider this
                                         // a supported change. If the root element is replaced, the subsequent
-                                        // insert event will take care of the replacement.
+                                        // xxforms-replace event will take care of the replacement.
                                         (None, true)
 
                                     case newParentElement: Element ⇒
@@ -360,7 +362,27 @@ object InstanceMirror {
                                 false // we don't know how to propagate the change
                         }
                     } exists identity // "at least one item is true"
-                case _ ⇒ throw new IllegalStateException
+                case replace: XXFormsReplaceEvent if replace.currentNode.getNodeKind == ELEMENT_NODE ⇒
+                    // Element replacement
+                    findMatchingNode(replace.targetInstance, replace.currentNode.getParent, true) match {
+                        case Some((matchingInstance, matchingParent)) ⇒
+                            if (! isInLoop(matchingInstance, event)) {
+                                val deleted  = doDelete(containingDocument, logger, matchingParent child * asJava, - 1, doDispatch = false)
+                                val inserted = doInsert(containingDocument, logger, "into", null,
+                                    matchingParent, Seq[Item](replace.currentNode).asJava, 1, doClone = true, doDispatch = false)
+
+                                Dispatch.dispatchEvent(
+                                    new XXFormsReplaceEvent(
+                                        matchingInstance,
+                                        deleted.get(0).nodeInfo,
+                                        inserted.get(0)))
+                            }
+                            true
+                        case _ ⇒
+                            false
+                    }
+                case replace: XXFormsReplaceEvent ⇒ true // handled by xforms-insert
+                case _ ⇒ throw new IllegalStateException // no other events supported
             }
     }
 }

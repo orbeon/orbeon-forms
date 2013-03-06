@@ -59,10 +59,6 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                         <xf:delete   ev:event="update9"  ref="//xf:instance/instance/@*"/>
                         <xf:insert   ev:event="update10" context="/*/xh:body"               origin="xf:element('xh:div')"/>
                         <xf:setvalue ev:event="update11" ref="/*/xh:body/xh:div">Hello!</xf:setvalue>
-
-                        <xf:delete   ev:event="update12" ref="//xf:instance/instance"/>
-                        <xf:insert   ev:event="update13" context="//xf:instance"            origin="xf:element('root')"/>
-
                     </xf:model>
                 </xh:head>
                 <xh:body/>
@@ -104,9 +100,6 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             ("""<instance/>""" , 0),
             ("""<instance/>""" , 1),
             ("""<instance/>""" , 2)
-            // NOTE: Removing root element doesn't work right now, maybe because doDelete() doesn't support it
-//            ("""""" , 2),
-//            ("""<root/>""" , 2)
         )
 
         expected.zipWithIndex foreach {

@@ -22,7 +22,8 @@ import org.orbeon.saxon.om._
 import collection.JavaConverters._
 
 class XFormsInsertEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XFORMS_INSERT, target, properties, bubbles = true, cancelable = false) {
+    extends XFormsEvent(XFORMS_INSERT, target, properties, bubbles = true, cancelable = false)
+    with InstanceEvent {
 
     def this(target: XFormsEventTarget, insertedNodes: JList[NodeInfo], originItems: JList[Item], insertLocationNode: NodeInfo, position: String) =
         this(target, Map(

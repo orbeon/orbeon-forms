@@ -19,7 +19,8 @@ import org.orbeon.oxf.xforms.event.{XFormsEventTarget, XFormsEvent}
 import org.orbeon.saxon.om._
 
 class XXFormsValueChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_VALUE_CHANGED, target, properties, bubbles = true, cancelable = true) {
+    extends XFormsEvent(XXFORMS_VALUE_CHANGED, target, properties, bubbles = true, cancelable = true)
+    with InstanceEvent {
 
     def this(target: XFormsEventTarget, node: NodeInfo, oldValue: String, newValue: String) = {
         this(target, EmptyGetter)

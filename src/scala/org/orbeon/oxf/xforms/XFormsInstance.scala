@@ -325,7 +325,7 @@ class XFormsInstance(
                     currentRoot)
             )
 
-            // Dispatch xforms-insert event
+            // Dispatch xforms-insert event for backward compatibility
             // NOTE: use the root node as insert location as it seems to make more sense than pointing to the former
             // root element.
             Dispatch.dispatchEvent(
@@ -445,7 +445,9 @@ trait XFormsInstanceIndex {
 
     private def removeId(id: String, parentElement: Element) = {
         idIndex.get(id) match {
-            case Some(list) if list.size > 1 ⇒ idIndex(id) = list filter (_ ne parentElement)
+            case Some(list) if list.size > 1 ⇒
+                idIndex(id) = list filter (_ ne parentElement)
+                assert(idIndex(id).nonEmpty)
             case Some(list)                  ⇒ idIndex -= id // don't leave an empty list in the map
             case None                        ⇒ // NOP
         }
@@ -454,7 +456,12 @@ trait XFormsInstanceIndex {
     private def addId(id: String, element: Element) =
         idIndex(id) = element :: (
             idIndex.get(id) match {
-                case Some(list) ⇒ list
+                case Some(list) ⇒
+                    // We should enable the assert below, but first we need to make sure we skip xforms-insert
+                    // processing for an attribute replacement, because xxforms-replace has already handled the updated
+                    // attribute. For now, filter so we don't get duplicates.
+                    //assert(! (list exists (_ eq element)))
+                    list filter (_ ne element)
                 case None       ⇒ Nil
             }
         )

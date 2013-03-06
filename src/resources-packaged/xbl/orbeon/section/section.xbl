@@ -51,7 +51,7 @@
                     <xsl:variable name="collapse" select="not(@collapse = 'false')"/>
                     <xsl:variable name="animate" select="not(@animate = 'false')"/>
 
-                    <xsl:variable name="open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
+                    <xsl:variable name="initially-open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">
@@ -78,7 +78,10 @@
                                     <!-- Open/close button -->
                                     <xf:var name="fb-vars" value="xxf:instance('fb-variables')"/>
                                     <xf:group appearance="xxf:internal">
-                                        <xf:var name="open" value="xxf:case('switch') = 'case-open'"/>
+                                        <!-- A bit tricky: the switch is further below, and xxf:case('switch') can
+                                             return () if the switch is not yet initialized. In that case, it means we
+                                             are just becoming relevant, so use the value of $initially-open. -->
+                                        <xf:var name="open" value="(for $switch in xxf:case('switch') return $switch = 'case-open', {if ($initially-open) then 'true()' else 'false()'})[1]"/>
                                         <xsl:if test="$collapse">
                                             <!-- Handle DOMActivate event to open/close the switches -->
                                             <xf:toggle ev:event="DOMActivate" case="case-{{if ($open) then 'closed' else 'open'}}"/>
@@ -108,9 +111,9 @@
 
                                 <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="true">
                                     <!-- Closed section -->
-                                    <xf:case id="case-closed" selected="{not($open)}"/>
+                                    <xf:case id="case-closed" selected="{not($initially-open)}"/>
                                     <!-- Open section -->
-                                    <xf:case id="case-open" selected="{$open}">
+                                    <xf:case id="case-open" selected="{$initially-open}">
                                         <xsl:if test="not($editable) and $animate">
                                             <xsl:attribute name="class">xxforms-animate</xsl:attribute>
                                         </xsl:if>

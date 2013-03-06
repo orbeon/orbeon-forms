@@ -235,12 +235,9 @@
         <propertyregex property="teamcity.release.number" input="${release.number}" regexp="\." replace="_"/>
         <echo message="##teamcity[buildNumber '${teamcity.release.number}']"/>
 
-        <property name="java-src.dir" value="${src.dir}/java"/>
-        <property name="scala-src.dir" value="${src.dir}/scala"/>
         <property name="examples-cli-src.dir" value="${src.dir}/examples-cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="resources-packaged.dir" value="${src.dir}/resources-packaged"/>
-        <property name="test-src.dir" location="test/src"/>
 
         <property name="build.classes.dir" value="${build.dir}/classes"/>
         <property name="build.test-classes.dir" value="${build.dir}/test-classes"/>
@@ -328,7 +325,7 @@
     <!-- Perform string replacement in Version.scala to set version and edition  -->
     <target name="set-version" depends="init">
         <mkdir dir="${build.dir}/src"/>
-        <copy todir="${build.dir}/src" file="${scala-src.dir}/org/orbeon/oxf/common/Version.scala" overwrite="true" encoding="UTF-8">
+        <copy todir="${build.dir}/src" file="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true" encoding="UTF-8">
             <filterset>
                 <filter token="RELEASE" value="${release.number}"/>
                 <filter token="EDITION" value="${edition}"/>
@@ -341,7 +338,7 @@
     <target name="intellij-before-make" depends="set-version">
         <mkdir dir="test/src/config"/>
         <copy file="src/resources-private/config/license.xml" todir="test/src/config" failonerror="false"/>
-        <copy file="build/src/Version.scala" tofile="src/scala/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
+        <copy file="build/src/Version.scala" tofile="src/main/scala/org/orbeon/oxf/common/Version.scala" overwrite="true"/>
     </target>
 
     <!-- Compile source -->
@@ -352,8 +349,8 @@
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
                 addparams="-Xfatal-warnings" deprecation="yes">
             <src path="${build.dir}/src"/> <!-- Location of the copy of Version.scala with the release/edition set -->
-            <src path="${java-src.dir}"/>
-            <src path="${scala-src.dir}"/>
+            <src path="src/main/java"/>
+            <src path="src/main/scala"/>
             <!-- Scala code bundled with XBL components -->
             <!-- NOTE: Ideally we'd like to use a pattern instead of multiple lines, but src doesn't support patterns, and scalac doesn't support fileset child elements, only include/exclude -->
             <src path="src/resources-packaged/xbl/orbeon/simple-captcha/src/scala"/>
@@ -365,7 +362,7 @@
                 debug="${build.debug}" optimize="off" target="1.5" source="1.5"
                 fork="true" memoryInitialSize="128m" memoryMaximumSize="400m" encoding="utf-8">
             <src path="${build.dir}/src"/>
-            <src path="${java-src.dir}"/>
+            <src path="src/main/java"/>
             <exclude name="org/orbeon/oxf/common/Version.java"/>
             <exclude name="org/orbeon/oxf/xforms/analysis/PathMapUIDependencies.java"/>
         </javac>
@@ -380,10 +377,11 @@
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
                 addparams="-Xfatal-warnings"
                 deprecation="yes">
-            <src path="${test-src.dir}"/>
+            <src path="src/test/java"/>
+            <src path="src/test/scala"/>
         </scalac>
 
-        <javac srcdir="${test-src.dir}" destdir="${build.test-classes.dir}"
+        <javac srcdir="src/test/java" destdir="${build.test-classes.dir}"
                 classpathref="test.class.path" debug="on" optimize="off" target="1.5" source="1.5"
                 includes="**/*.java" encoding="utf-8">
         </javac>
@@ -392,14 +390,14 @@
     <!-- JARs -->
     <target name="jars" depends="classes, orbeon-minify-js">
         <jar destfile="${jar.file}" compress="false">
-            <fileset dir="${java-src.dir}">
+            <fileset dir="src/main/java">
                 <include name="**/*.xml"/>
                 <include name="**/*.rng"/>
                 <include name="**/*.css"/>
                 <include name="**/*.xsd"/>
                 <include name="**/*.properties"/>
             </fileset>
-            <fileset dir="${scala-src.dir}">
+            <fileset dir="src/main/scala">
                 <include name="**/*.js"/>
             </fileset>
             <fileset dir="${build.classes.dir}">
@@ -636,7 +634,7 @@
             <classpath>
                 <pathelement location="build/classes"/>
                 <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->
-                <pathelement location="src/scala"/>
+                <pathelement location="src/main/scala"/>
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1_2_15.jar"/>
@@ -753,7 +751,7 @@
                     <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
                     <!-- For resources associated with Java test files -->
                     <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="${test-src.dir}"/>
+                    <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="src/test/java"/>
                     <!-- Classpath -->
                     <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
                     <!-- Other properties -->

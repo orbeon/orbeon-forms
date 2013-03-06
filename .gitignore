@@ -1,5 +1,5 @@
-build
+build/
+tmp/
+target/
 build-local.properties
-doc
-src/resources-private
-tmp
+src/resources-private/

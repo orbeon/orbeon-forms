@@ -86,7 +86,7 @@
 
         <include name="commons-beanutils-1_5.jar"/>
         <include name="commons-cli-1_0.jar"/>
-        <include name="commons-codec-1.4.jar"/>
+        <include name="commons-codec-1.6.jar"/>
         <include name="commons-collections-3.2.1.jar"/>
         <include name="commons-digester-1_5.jar"/>
         <include name="commons-discovery-0.4.jar"/>
@@ -97,11 +97,10 @@
         <include name="commons-pool-1.6.jar"/>
         <include name="commons-validator-1_0_2.jar"/>
         <include name="joda-time-2.1.jar"/> <!--We don't include joda-convert-1.2.jar; it is only a compile-time dependency for Scala -->
-        <include name="httpclient-4.1.jar"/>
+        <include name="httpclient-4.2.3.jar"/>
         <!--<include name="httpclient-cache-4.1.jar"/>-->
-        <include name="httpcore-4.1.jar"/>
-        <include name="httpcore-nio-4.1.jar"/>
-        <include name="httpmime-4.1.jar"/>
+        <include name="httpcore-4.2.2.jar"/>
+        <include name="httpmime-4.2.3.jar"/>
 
         <include name="apache-mime4j-0.6.jar"/>
         <include name="jcifs-1.3.14.jar"/>

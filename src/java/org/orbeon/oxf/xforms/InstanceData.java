@@ -313,7 +313,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         }
 
         // No type was assigned by schema or MIP, try xsi:type
-        if (nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+        if (nodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE) {
             // Check for xsi:type attribute
             // NOTE: Saxon 9 has new code to resolve such QNames
             final String typeQName = nodeInfo.getAttributeValue(StandardNames.XSI_TYPE);

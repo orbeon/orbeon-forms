@@ -793,7 +793,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "Empty single-node binding on xf:submission for submission id: " + id, "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.NO_DATA(), null));
 
-            if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)) {
+            if (!(refNodeInfo instanceof DocumentInfo || refNodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE)) {
                 throw new XFormsSubmissionException(XFormsModelSubmission.this, "xf:submission: single-node binding must refer to a document node or an element.", "getting submission single-node binding",
                         new XFormsSubmitErrorEvent(XFormsModelSubmission.this, XFormsSubmitErrorEvent.NO_DATA(), null));
             }
@@ -1162,7 +1162,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         }
 
         // TODO: Also detect readonly node/ancestor situation
-        if (destinationObject instanceof NodeInfo && ((NodeInfo) destinationObject).getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE)
+        if (destinationObject instanceof NodeInfo && ((NodeInfo) destinationObject).getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE)
             return (NodeInfo) destinationObject;
         else
             return null;
@@ -1262,7 +1262,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // TODO: handle includenamespaceprefixes
         } else {
             // Submitting read-only instance backed by TinyTree (no MIPs to check)
-            if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE) {
+            if (currentNodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE) {
                 documentToSubmit = TransformerUtils.tinyTreeToDom4j2(currentNodeInfo);
             } else {
                 documentToSubmit = TransformerUtils.tinyTreeToDom4j2(currentNodeInfo.getRoot());

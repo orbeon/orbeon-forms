@@ -410,7 +410,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                     final Item currentItem = (Item) stack.get(i);
                                     if (currentItem instanceof NodeInfo) {
                                         final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
-                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE
+                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE
                                                 && currentNodeInfo.getLocalPart().equals(localname)
                                                 && currentNodeInfo.getURI().equals(uri)) {
                                             // Very probable match...
@@ -430,7 +430,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                         final Item currentItem = (Item) stack.get(i);
                                         if (currentItem instanceof NodeInfo) {
                                             final NodeInfo currentNodeInfo = (NodeInfo) currentItem;
-    //                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.TEXT_NODE) {
+    //                                        if (currentNodeInfo.getNodeKind() == org.w3c.dom.Node.TEXT_NODE) {
                                                 // Possible match
                                                 return new LocationData(currentNodeInfo.getSystemId(), currentNodeInfo.getLineNumber(), -1);
     //                                        }

@@ -233,7 +233,7 @@ public class XBLTransformer {
                     if (nodeInfos.size() > 0) {
                         for (Object nodeInfo: nodeInfos) {
                             final NodeInfo currentNodeInfo = (NodeInfo) nodeInfo;
-                            if (currentNodeInfo.getNodeKind() == org.w3c.dom.Document.ATTRIBUTE_NODE) {
+                            if (currentNodeInfo.getNodeKind() == org.w3c.dom.Node.ATTRIBUTE_NODE) {
                                 // This is an attribute
                                 final Attribute currentAttribute = (Attribute) ((VirtualNode) currentNodeInfo).getUnderlyingNode();
                                 setAttribute(resultingNodes, currentAttribute.getQName(), currentAttribute.getValue(), currentAttribute.getParent());

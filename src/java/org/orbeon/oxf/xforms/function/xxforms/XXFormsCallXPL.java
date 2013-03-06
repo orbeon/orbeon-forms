@@ -112,7 +112,7 @@ public class XXFormsCallXPL extends XFormsFunction {
                     for (final String inputName: inputNames) {
                         final NodeInfo inputNodeInfo = (NodeInfo) inputNodesIterator.next();
 
-                        if (!(inputNodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE || inputNodeInfo.getNodeKind() == org.w3c.dom.Document.DOCUMENT_NODE))
+                        if (!(inputNodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE || inputNodeInfo.getNodeKind() == org.w3c.dom.Node.DOCUMENT_NODE))
                             throw new OXFException("Input node must be a document or element for input name: " + inputName);
 
                         // TODO: We should be able to just pass inputNodeInfo to addInput() and avoid the conversions, but that doesn't work!

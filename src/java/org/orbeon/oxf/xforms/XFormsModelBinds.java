@@ -1099,7 +1099,7 @@ public class XFormsModelBinds {
             this.bindStaticId = bindStaticId;
             if (item instanceof NodeInfo) {
                 nodeInfo = (NodeInfo) item;
-                hasChildrenElements = nodeInfo.getNodeKind() == org.w3c.dom.Document.ELEMENT_NODE && XML.hasChildElement(nodeInfo);
+                hasChildrenElements = nodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE && XML.hasChildElement(nodeInfo);
 
                 // Add us to the node
                 InstanceData.addBindNode(nodeInfo, this);

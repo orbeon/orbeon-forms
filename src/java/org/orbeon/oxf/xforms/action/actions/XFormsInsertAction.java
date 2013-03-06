@@ -436,7 +436,7 @@ public class XFormsInsertAction extends XFormsAction {
             final NodeInfo adjustedInsertLocationNodeInfo;
             final String adjustedBeforeAfterInto;
 
-            final NodeInfo parent = insertedNodeInfos.get(0).getParent();
+            final NodeInfo parent = insertedNodeInfos.get(0).getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE ? insertedNodeInfos.get(0).getParent() : null;
             if (parent != null && parent.equals(parent.getDocumentRoot())) {
                 // Node was inserted under document node
                 adjustedInsertLocationNodeInfo = parent.getDocumentRoot();

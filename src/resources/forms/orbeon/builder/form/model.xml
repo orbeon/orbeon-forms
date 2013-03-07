@@ -76,6 +76,20 @@
         <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->
 
         <xf:insert ref="instance('fb-form-instance')" origin="$temp"/>
+
+        <!-- RRR so that all binds are up to date for the rest of the initialization -->
+        <xf:rebuild/>
+        <xf:recalculate/>
+        <xf:revalidate/>
+
+    </xf:action>
+
+    <!-- If needed, update current language after data got annotated. Do this in separate action so that model variables are up to date. -->
+    <xf:action ev:event="fr-annotate-data">
+        <xf:setvalue
+            if="not($fb-lang = $resources/resource/@xml:lang)"
+            ref="$fb-lang"
+            value="$resources/resource[1]/@xml:lang"/>
     </xf:action>
 
     <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->
@@ -123,23 +137,17 @@
             value="$form-resources/template/untitled-section"/>
 
         <!-- Annotate data -->
+        <!-- NOTE: RRR done by fr-annotate-data -->
         <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
             <xf:property name="data" value="$template"/>
         </xf:dispatch>
 
-        <!-- RRR so that all binds are up to date for the rest of the initialization -->
-        <xf:rebuild/>
-        <xf:recalculate/>
-        <xf:revalidate/>
     </xf:action>
 
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
     <xf:action ev:event="fr-data-ready">
 
-        <!-- Set current language: use language based on first resources available in loaded form -->
-        <xf:setvalue
-            ref="$fb-lang"
-            value="$resources/resource[1]/@xml:lang"/>
+        <!-- NOTE: $fb-lang has already been set by fr-annotate-data above -->
 
         <!-- Check permissions if there are roles -->
         <xf:var name="has-roles" value="not(xxf:instance('fr-permissions')/@has-roles = 'false')"/>

@@ -165,8 +165,10 @@ object XBLResources {
                     // All the baseline bindings
                     val bindings = qNames flatMap getBinding
 
-                    val scripts: LinkedHashSet[String] = orderedHeadElements(bindings, _.scripts).collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
-                    val styles:  LinkedHashSet[String] = orderedHeadElements(bindings, _.styles) .collect({ case e: ReferenceElement ⇒ e.src })(breakOut)
+                    def matchReferenceElements: PartialFunction[HeadElement, String] = { case e: ReferenceElement ⇒ e.src }
+
+                    val scripts: LinkedHashSet[String] = orderedHeadElements(bindings, _.scripts).collect(matchReferenceElements)(breakOut)
+                    val styles:  LinkedHashSet[String] = orderedHeadElements(bindings, _.styles) .collect(matchReferenceElements)(breakOut)
 
                     // Return tuple with two sets
                     (scripts, styles)

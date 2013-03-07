@@ -32,14 +32,9 @@ object Controls {
         val bindingContext = containingDocument.getContextStack.resetBindingContext()
         val rootControl = containingDocument.getStaticState.topLevelPart.getTopLevelControls.head
 
-        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq())
+        buildTree(controlIndex, containingDocument, bindingContext, None, rootControl, Seq()) map
+            logTreeIfNeeded("after building full tree")
     }
-
-    def logXML(control: Option[XFormsControl], message: String): Unit =
-        if (XFormsProperties.getDebugLogging.contains("control-tree"))
-            control foreach { control ⇒
-                control.containingDocument.getControls.getIndentedLogger.logDebug(message, control.toXMLString)
-            }
 
     // Create a new repeat iteration for insertion into the current tree of controls
     def createRepeatIterationTree(
@@ -62,14 +57,18 @@ object Controls {
         // This has to be the case at this point, otherwise it's a bug in our code
         assert(repeatControl.staticControl.iteration.isDefined)
 
-        buildTree(
-            controlIndex,
-            container,
-            bindingContext,
-            Some(repeatControl),
-            repeatControl.staticControl.iteration.get,
-            idSuffix
-        ).get.asInstanceOf[XFormsRepeatIterationControl] // we "know" this, right?
+        val controlOpt =
+            buildTree(
+                controlIndex,
+                container,
+                bindingContext,
+                Some(repeatControl),
+                repeatControl.staticControl.iteration.get,
+                idSuffix
+            ) map
+                logTreeIfNeeded("after building repeat iteration tree")
+
+            controlOpt.get.asInstanceOf[XFormsRepeatIterationControl] // we "know" this, right?
     }
 
     // Create a new subtree of controls (used by xxf:dynamic)
@@ -89,7 +88,8 @@ object Controls {
             Some(containerControl),
             rootAnalysis,
             idSuffix
-        )
+        ) map
+            logTreeIfNeeded("after building subtree")
     }
 
     // Build a component subtree
@@ -233,6 +233,9 @@ object Controls {
         val updater = new BindingUpdater(control.containingDocument, startBindingContext)
         visitControls(control, updater, includeCurrent = true)
         xpathDependencies.bindingUpdateDone()
+
+        Option(control) foreach logTreeIfNeeded("after subtree update")
+
         updater
     }
 
@@ -240,6 +243,9 @@ object Controls {
     def updateBindings(containingDocument: XFormsContainingDocument) = {
         val updater = new BindingUpdater(containingDocument, containingDocument.getContextStack.resetBindingContext())
         visitAllControls(containingDocument, updater)
+
+        Option(containingDocument.getControls.getCurrentControlTree.getRoot) foreach logTreeIfNeeded("after full tree update")
+
         updater
     }
 
@@ -484,4 +490,12 @@ object Controls {
                 listener.endVisitControl(currentControl)
             }
         }
+
+    // Log a subtree of controls as XML
+    private def logTreeIfNeeded(message: String) = {
+        control: XFormsControl ⇒
+            if (XFormsProperties.getDebugLogging.contains("control-tree"))
+                control.containingDocument.getControls.getIndentedLogger.logDebug(message, control.toXMLString)
+            control
+    }
 }

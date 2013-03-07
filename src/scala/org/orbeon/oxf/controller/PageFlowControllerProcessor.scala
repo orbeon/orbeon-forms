@@ -218,7 +218,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         val topLevelElements = Dom4j.elements(configRoot)
 
          // Prepend a synthetic page for submissions if configured
-        val syntheticPages =
+        val syntheticRoutes: Seq[RouteElement] =
             (controllerProperty(SubmissionPathProperty), controllerProperty(SubmissionModelProperty)) match {
                 case (Some(submissionPath), submissionModel @ Some(_)) ⇒
                     Seq(PageOrServiceElement(None, submissionPath, Pattern.compile(submissionPath), None, submissionModel, None, configRoot, SubmissionPublicMethods, isPage = true))
@@ -226,14 +226,14 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                     Seq()
             }
 
-        val routeElements: Seq[RouteElement] =
-            syntheticPages ++ (
-                for (e ← topLevelElements filter (e ⇒ Set("files", "page", "service")(e.getName)))
+        val explicitRoutes: Seq[RouteElement] =
+            for (e ← topLevelElements filter (e ⇒ Set("files", "page", "service")(e.getName)))
                 yield e.getName match {
                     case "files"            ⇒ FileElement(e, defaultMatcher, defaultVersioned)
                     case "page" | "service" ⇒ PageOrServiceElement(e, defaultMatcher, defaultPagePublicMethods, defaultServicePublicMethods)
                 }
-            )
+
+        val routeElements = syntheticRoutes ++ explicitRoutes
 
         val pagesElementsWithIds = routeElements collect { case page: PageOrServiceElement if page.id.isDefined ⇒ page }
         val pathIdToPath              = pagesElementsWithIds map (p ⇒ p.id.get → p.path) toMap

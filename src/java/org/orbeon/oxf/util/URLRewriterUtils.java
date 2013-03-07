@@ -385,7 +385,7 @@ public class URLRewriterUtils {
     }
 
     public static String getServiceBaseURI() {
-        return Properties.instance().getPropertySet().getStringOrURIAsString(REWRITING_SERVICE_BASE_URI_PROPERTY, REWRITING_SERVICE_BASE_URI_DEFAULT);
+        return Properties.instance().getPropertySet().getStringOrURIAsString(REWRITING_SERVICE_BASE_URI_PROPERTY, REWRITING_SERVICE_BASE_URI_DEFAULT, false);
     }
 
     public static String getApplicationResourceVersion() {

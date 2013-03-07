@@ -94,7 +94,7 @@ public class HTTPURLConnection extends URLConnection {
         // Create SSL context, based on a custom key store if specified
         final SSLContext sslcontext;
         try {
-            final String keyStoreURI = propertySet.getStringOrURIAsString(SSL_KEYSTORE_URI);
+            final String keyStoreURI = propertySet.getStringOrURIAsString(SSL_KEYSTORE_URI, false);
             final String keyStorePassword = propertySet.getString(SSL_KEYSTORE_PASSWORD);
             if (keyStoreURI != null) {
                 sslcontext = SSLContext.getInstance("TLS");

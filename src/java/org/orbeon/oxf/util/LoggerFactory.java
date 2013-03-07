@@ -27,7 +27,6 @@ import org.orbeon.oxf.properties.Properties;
 public class LoggerFactory {
 
     public static final String LOG4J_DOM_CONFIG_PROPERTY = "oxf.log4j-config";
-    public static final String LOG4J_DOM_CONFIG_PROPERTY_OLD = "oxf.servlet.log4j";
     
     static
     {
@@ -71,9 +70,7 @@ public class LoggerFactory {
     public static void initLogger() {
         try {
             // Accept both xs:string and xs:anyURI types
-            String log4jConfigURL = Properties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY);
-            if (log4jConfigURL == null)
-                log4jConfigURL = Properties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY_OLD);
+            String log4jConfigURL = Properties.instance().getPropertySet().getStringOrURIAsString(LOG4J_DOM_CONFIG_PROPERTY, false);
 
             if (log4jConfigURL != null) {
                 final Processor urlGenerator = PipelineUtils.createURLGenerator(log4jConfigURL, true);

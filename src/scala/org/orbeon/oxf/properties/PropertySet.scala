@@ -190,16 +190,16 @@ class PropertySet {
     def getObject(name: String, defaultValue: AnyRef): AnyRef =
         Option(getObject(name)) getOrElse defaultValue
 
-    def getStringOrURIAsString(name: String): String =
+    def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
         getObject(name) match {
-            case p: String ⇒ StringUtils.trimToNull(getString(name))
-            case p: URI    ⇒ StringUtils.trimToNull(getURI(name).toString)
+            case p: String ⇒ if (allowEmpty) StringUtils.trimToEmpty(p) else StringUtils.trimToNull(p)
+            case p: URI    ⇒ if (allowEmpty) StringUtils.trimToEmpty(p.toString) else StringUtils.trimToNull(p.toString)
             case null      ⇒ null
             case _         ⇒ throw new OXFException("Invalid attribute type requested for property '" + name + "': expected " + XMLConstants.XS_STRING_QNAME.getQualifiedName + " or " + XMLConstants.XS_ANYURI_QNAME.getQualifiedName)
         }
 
-    def getStringOrURIAsString(name: String, defaultValue: String): String =
-        Option(getStringOrURIAsString(name)) getOrElse defaultValue
+    def getStringOrURIAsString(name: String, defaultValue: String, allowEmpty: Boolean): String =
+        Option(getStringOrURIAsString(name, allowEmpty)) getOrElse defaultValue
 
     def getString(name: String): String =
         StringUtils.trimToNull(getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String])

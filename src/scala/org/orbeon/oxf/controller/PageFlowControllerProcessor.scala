@@ -193,16 +193,19 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
         // Gather properties
         implicit val properties = getPropertySet
 
-        def controllerProperty(name: String, default: Option[String] = None) =
-            att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull))
+        def controllerProperty(name: String, default: Option[String] = None, allowEmpty: Boolean = false) =
+            att(configRoot, name) orElse Option(properties.getStringOrURIAsString(name, default.orNull, allowEmpty))
 
         def controllerPropertyQName(name: String, default: Option[QName] = None) =
             Option(extractAttributeValueQName(configRoot, name)) orElse Option(properties.getQName(name, default.orNull))
 
         val defaultMatcher              = controllerPropertyQName(MatcherProperty, Some(DefaultMatcher)).get
         val defaultInstancePassing      = controllerProperty(InstancePassingProperty, Some(DefaultInstancePassing)).get
-        val defaultPagePublicMethods    = stringOptionToSet(controllerProperty(PagePublicMethodsProperty, Some(PagePublicMethods mkString " ")))
-        val defaultServicePublicMethods = stringOptionToSet(controllerProperty(ServicePublicMethodsProperty, Some(ServicePublicMethods mkString " ")))
+
+        // For these, make sure setting the property to a blank value doesn't cause the default to be used
+        // See: https://github.com/orbeon/orbeon-forms/issues/865
+        val defaultPagePublicMethods    = stringOptionToSet(controllerProperty(PagePublicMethodsProperty, Some(PagePublicMethods mkString " "), allowEmpty = true))
+        val defaultServicePublicMethods = stringOptionToSet(controllerProperty(ServicePublicMethodsProperty, Some(ServicePublicMethods mkString " "), allowEmpty = true))
 
         // NOTE: We use a global property, not an oxf:page-flow scoped one
         val defaultVersioned =

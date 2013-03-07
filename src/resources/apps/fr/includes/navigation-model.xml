@@ -121,7 +121,9 @@
     </xf:action>
 
     <!-- React to failed submission -->
-    <xf:action ev:event="xforms-submit-error">
+    <!-- NOTE: Don't react to fr-pdf-submission because in that case we don't want to mutate the document. See also:
+         https://github.com/orbeon/orbeon-forms/issues/858 -->
+    <xf:action ev:event="xforms-submit-error" if="event('target') != 'fr-pdf-submission'">
         <xf:dispatch name="fr-persistence-error" targetid="fr-persistence-model">
             <xf:property name="submission-id" value="event('xxf:targetid')"/>
             <xf:property name="response-body" value="event('response-body')"/>

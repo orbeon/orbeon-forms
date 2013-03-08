@@ -24,9 +24,8 @@ object StringReplacer extends Logging {
     // If there was an error processing the configuration, log and return
     def apply(json: String)(implicit logger: IndentedLogger): String ⇒ String = {
         val mapping =
-            try (
-                Some(json.asJson)
-                collect {
+            try
+                json.asJson match {
                     case JsObject(fields) ⇒
                         fields collect {
                             case (k, v: JsString) ⇒ k → v.value
@@ -34,8 +33,7 @@ object StringReplacer extends Logging {
                         }
                     case other ⇒ throw new RuntimeException
                 }
-                getOrElse Map()
-            ) catch {
+            catch {
                 case e: Exception ⇒
                     warn("configuration must be a JSON map of String → String", Seq("JSON" → json))
                     Map()

@@ -32,6 +32,9 @@ trait XFormsOutputHandler extends XFormsControlLifecyleHandler {
         containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-output-output")
         containerAttributes
     }
+
+    // Don't use @for as we ae not pointing to an HTML control
+    override def getForEffectiveId(effectiveId: String) = null
 }
 
 // Default xf:output handler

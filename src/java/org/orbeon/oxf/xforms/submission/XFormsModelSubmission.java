@@ -502,6 +502,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         if (submitDoneOrErrorRunnable != null) {
             // We do this outside the above catch block so that if a problem occurs during dispatching xforms-submit-done
             // or xforms-submit-error we don't dispatch xforms-submit-error (which would be illegal).
+            // This will also close the connection result if needed.
             submitDoneOrErrorRunnable.run();
         }
     }
@@ -556,9 +557,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             } finally {
                 if (indentedLogger.isDebugEnabled())
                     indentedLogger.endHandleOperation();
-
-                // Clean-up result
-                submissionResult.close();
             }
         } catch (final Throwable throwable) {
             // Any exception will cause an error event to be dispatched
@@ -566,7 +564,19 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
                 public void run() { sendSubmitError(throwable, submissionResult); }
             };
         }
-        return submitDoneOrErrorRunnable;
+
+        // Create wrapping runnable to make sure the submission result is closed
+        final Runnable finalSubmitDoneOrErrorRunnable = submitDoneOrErrorRunnable;
+        return new Runnable() {
+            public void run() {
+                try {
+                    finalSubmitDoneOrErrorRunnable.run();
+                } finally {
+                    // Close only after the submission result has run
+                    submissionResult.close();
+                }
+            }
+        };
     }
 
     /**

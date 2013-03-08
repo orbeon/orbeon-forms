@@ -18,7 +18,7 @@ import org.xml.sax.Attributes
 
 object HandlerHelper {
 
-    def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes )(body: ⇒ T)(implicit receiver: DeferredXMLReceiver): T = {
+    def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes)(body: ⇒ T)(implicit receiver: DeferredXMLReceiver): T = {
         val qName = XMLUtils.buildQName(prefix, localName)
         receiver.startElement(uri, localName, qName, atts)
         val result = body
@@ -26,7 +26,7 @@ object HandlerHelper {
         result
     }
 
-    def element(prefix: String, uri: String, localName: String, atts: Attributes )(implicit receiver: DeferredXMLReceiver) =
+    def element(prefix: String, uri: String, localName: String, atts: Attributes)(implicit receiver: DeferredXMLReceiver) =
         withElement(prefix, uri, localName, atts) {}
 
     def withFormattingPrefix[T](body: String ⇒ T)(implicit context: HandlerContext): T = {

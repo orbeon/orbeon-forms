@@ -126,19 +126,17 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandler {
         if (!handlerContext.isNoScript()) {
             currentOutputInterceptor.flushCharacters(true, true);
 
-            // Restore output
-            controller.setOutput(currentSavedOutput);
-
             final boolean isMustGenerateBeginEndDelimiters = !handlerContext.isFullUpdateTopLevelControl(effectiveId);
             if (isMustGenerateBeginEndDelimiters) {
-                final String namespacedId = XFormsUtils.namespaceId(containingDocument, effectiveId);
-                if (! currentOutputInterceptor.isGotElements()) {
-                    // Output start delimiter using xhtml:span
-                    currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-begin-" + namespacedId);
-                }
+                // Make sure first delimiter was output
+                currentOutputInterceptor.generateFirstDelimitersIfNeeded();
+
                 // Output end delimiter
-                currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + namespacedId);
+                currentOutputInterceptor.outputDelimiter(currentSavedOutput, "xforms-case-begin-end", "xforms-case-end-" + XFormsUtils.namespaceId(containingDocument, effectiveId));
             }
+
+            // Restore output
+            controller.setOutput(currentSavedOutput);
         } else if (!isVisible) {
             // Case not visible, restore output
             controller.setOutput(currentSavedOutput);

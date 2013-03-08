@@ -54,10 +54,6 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
         delimiterLocalName    = XMLUtils.localNameFromQName(spanQName);
     }
 
-    public boolean isGotElements() {
-        return gotElements;
-    }
-
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         level++;
@@ -124,7 +120,7 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
         super.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName);
     }
 
-    private void generateFirstDelimitersIfNeeded() throws SAXException {
+    public void generateFirstDelimitersIfNeeded() throws SAXException {
         if (mustGenerateFirstDelimiters) {
             // Generate first delimiter
             beginDelimiterListener.generateFirstDelimiter(this);

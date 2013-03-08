@@ -59,9 +59,10 @@
 
                 <!-- All elements which mark the start of a repeat/switch/group -->
                 <xsl:variable
-                        name="start-repeat-group"
-                        select="//xh:*[p:classes() = 'xforms-repeat-begin-end' and starts-with(@id, 'repeat-begin-')
-                                       or p:classes() = 'xforms-group-begin-end'  and starts-with(@id, 'group-begin-')]"/>
+                    name="start-repeat-group"
+                    select="//xh:*[p:classes() = 'xforms-repeat-begin-end' and starts-with(@id, 'repeat-begin-')
+                                or p:classes() = 'xforms-group-begin-end'  and starts-with(@id, 'group-begin-')
+                                or p:classes() = 'xforms-case-begin-end'   and starts-with(@id, 'xforms-case-begin-')]"/>
 
                 <!-- All elements which are contained within repeat/switch/group delimiters (excluding begin/end markers)-->
                 <xsl:variable
@@ -79,7 +80,7 @@
                 <!-- Keep repeat templates, controls, LHHA, and elements with MIP classes like repeat/group elements in tables
                      Also keep content of elements with class xxforms-test-preserve-content and content of repeats. -->
                 <xsl:template match="xh:*[p:classes() = ('xforms-repeat-template', 'xforms-control', 'xforms-label',
-                                        'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-group-begin-end',
+                                        'xforms-hint', 'xforms-help', 'xforms-alert', 'xforms-help-image', 'xforms-group', 'xforms-switch', 'xforms-group-begin-end',
                                         'xforms-invalid', 'xforms-required', 'xforms-readonly', 'xxforms-test-preserve-content',
                                         'xforms-repeat-begin-end', 'xforms-repeat-delimiter', 'xforms-repeat-selected-item-1', 'xforms-repeat-selected-item-2',
                                         'xforms-repeat-selected-item-3', 'xforms-repeat-selected-item-4') or generate-id(.) = $repeat-group-content]">

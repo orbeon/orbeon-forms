@@ -720,20 +720,6 @@
                         <waitfor maxwait="1" maxwaitunit="minute" checkevery="200">
                             <http url="http://localhost:8080/orbeon/home/"/>
                         </waitfor>
-
-                        <!-- Pick version of ChromiumDriver for OS X or Linux -->
-                        <if>
-                            <not><available file="build/bin/chromedriver"/></not>
-                            <then>
-                                <mkdir  dir="build/bin"/>
-                                <if>
-                                    <os family="mac"/>
-                                    <then><unzip src="lib/test/chromedriver_mac_26.0.1383.0.zip" dest="build/bin"/></then>
-                                    <else><unzip src="lib/test/chromedriver_linux32_23.0.1240.0.zip" dest="build/bin"/></else>
-                                </if>
-                                <chmod file="build/bin/chromedriver" perm="a+x"/>
-                            </then>
-                        </if>
                     </then>
                 </if>
 

@@ -53,21 +53,16 @@ class SeleniumTest extends AssertionsForJUnit {
 
 object SeleniumTest {
 
-    private var service: ChromeDriverService = _
     private var driver: RemoteWebDriver = _
 
     @BeforeClass
     def createAndStartService() {
-//        driver = new FirefoxDriver()
-        service = ChromeDriverService.createDefaultService()
-        service.start()
-        driver = new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome())
+        driver = new FirefoxDriver()
     }
 
     @AfterClass
     def createAndStopService() {
-//        driver.quit()
-        service.stop()
+        driver.quit()
     }
 }
 

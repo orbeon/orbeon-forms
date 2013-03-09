@@ -58,16 +58,16 @@ object SeleniumTest {
 
     @BeforeClass
     def createAndStartService() {
-        driver = new FirefoxDriver()
-//        val service = ChromeDriverService.createDefaultService()
-//        service.start()
-//        driver = new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome())
+//        driver = new FirefoxDriver()
+        service = ChromeDriverService.createDefaultService()
+        service.start()
+        driver = new RemoteWebDriver(service.getUrl, DesiredCapabilities.chrome())
     }
 
     @AfterClass
     def createAndStopService() {
-        driver.quit()
-        //service.stop()
+//        driver.quit()
+        service.stop()
     }
 }
 

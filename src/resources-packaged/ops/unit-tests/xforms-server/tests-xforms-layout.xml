@@ -279,7 +279,7 @@
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-output·1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
-                    <xh:label class="xforms-label" for="my-new-output$$c·1">My label</xh:label>
+                    <xh:label class="xforms-label">My label</xh:label>
                     <xh:span id="my-new-output$$c·1" class="xforms-output-output">Hello!</xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
@@ -290,7 +290,7 @@
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-output" class="xforms-control xforms-output xforms-repeat-template">
-                    <xh:label class="xforms-label" for="my-new-output$$c"/>
+                    <xh:label class="xforms-label"/>
                     <xh:span id="my-new-output$$c" class="xforms-output-output"/>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
@@ -2342,7 +2342,7 @@
         <output name="response">
             <controls>
                 <xh:span id="my-output" class="xforms-control xforms-output">
-                    <xh:label class="xforms-label" for="my-output$$c">
+                    <xh:label class="xforms-label">
                         <xh:span>
                             <xh:span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</xh:span>
                             <xh:span>Pellentesque gravida scelerisque leo, vel

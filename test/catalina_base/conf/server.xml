@@ -24,10 +24,7 @@
                   unpackWARs="true" autoDeploy="false"
                   xmlValidation="false" xmlNamespaceAware="false">
 
-                <Context path="/orbeon" docBase="../../../build/orbeon-war" reloadable="false" override="true" allowLinking="true" crossContext="true">
-                    <Parameter override="false" name="oxf.resources.priority.0" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <Parameter override="false" name="oxf.resources.priority.0.oxf.resources.filesystem.sandbox-directory" value="src/resources-private"/>
-                </Context>
+                <Context path="/orbeon" docBase="../../../build/orbeon-war" reloadable="false" override="true" allowLinking="true" crossContext="true"/>
             </Host>
         </Engine>
     </Service>

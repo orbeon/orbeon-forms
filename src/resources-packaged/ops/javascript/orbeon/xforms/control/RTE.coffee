@@ -84,6 +84,9 @@ class RTE extends Control
         @onRendered () =>
             if (not YD.hasClass(@container, "xforms-incremental") || ORBEON.xforms.Globals.currentFocusControlId != @container.id)
                 @yuiRTE.setEditorHTML(newValue)
+                # Set new server value; if we don't value server value for new controls will be empty as it wasn't
+                # available at the time the control was created
+                ServerValueStore.set(@container.id, @yuiRTE.getEditorHTML())
 
     getValue: () ->
         value = @yuiRTE.getEditorHTML()

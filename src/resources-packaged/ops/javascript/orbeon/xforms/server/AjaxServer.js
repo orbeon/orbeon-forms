@@ -1438,7 +1438,7 @@
                                                         // Other control just have a new value
                                                         ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue);
                                                     }
-                                                    // Store the server value as the client sees it, not as the server sees it. There can be a different in the following cases:
+                                                    // Store the server value as the client sees it, not as the server sees it. There can be a difference in the following cases:
                                                     //
                                                     // 1) For HTML editors, the HTML might change once we put it in the DOM.
                                                     // 2) For select/select1, if the server sends an out-of-range value, the actual value of the field won't be the out

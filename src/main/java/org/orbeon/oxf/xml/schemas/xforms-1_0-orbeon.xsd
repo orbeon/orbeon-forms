@@ -306,6 +306,7 @@
             <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="lang" type="xsd:string" use="optional"/>
             <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>
+            <xsd:attribute name="mediatype" type="xsd:string" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>

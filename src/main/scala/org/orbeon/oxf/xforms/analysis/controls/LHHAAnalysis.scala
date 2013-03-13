@@ -30,8 +30,9 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 
     require(parent.isDefined)
 
-    val forStaticIdOption = Option(element.attributeValue(XFormsConstants.FOR_QNAME))
+    val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
     val isLocal = forStaticIdOption.isEmpty
+    val isHTML  = element.attributeValue(MEDIATYPE_QNAME) == "text/html"
 
     // Find the target control if any
     def targetControl =
@@ -45,7 +46,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
         case Some(lhhaControl) ⇒
             lhhaControl.setExternalLHHA(self)
         case None if ! isLocal ⇒
-            part.getIndentedLogger.logWarning("", "cannot attach exernal LHHA to control",
+            part.getIndentedLogger.logWarning("", "cannot attach external LHHA to control",
                 Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
         case None ⇒
     }
@@ -98,7 +99,7 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
                 Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener {
                     val hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs
                     def startElement(element: Element) {
-                        if (element.getQName == XFormsConstants.XFORMS_OUTPUT_QNAME) {
+                        if (element.getQName == XFORMS_OUTPUT_QNAME) {
                             // Add dependencies
                             val outputAnalysis =
                                 new SimpleElementAnalysis(staticStateContext, element, Some(delegateAnalysis), None, delegateAnalysis.getChildElementScope(element))

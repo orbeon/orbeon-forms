@@ -245,7 +245,8 @@ public class XFormsUtils {
      * @return                      string containing the result of the evaluation, null if evaluation failed
      */
     public static String getChildElementValue(final XBLContainer container, final String sourceEffectiveId,
-                                              final Scope scope, final Element childElement, final boolean acceptHTML, boolean[] containsHTML) {
+                                              final Scope scope, final Element childElement, final boolean acceptHTML,
+                                              final boolean defaultHTML, boolean[] containsHTML) {
 
         // Check that there is a current child element
         if (childElement == null)
@@ -254,7 +255,7 @@ public class XFormsUtils {
         // Child element becomes the new binding
         final XFormsContextStack contextStack = container.getContextStack();
         contextStack.pushBinding(childElement, sourceEffectiveId, scope);
-        final String result = getElementValue(container, contextStack, sourceEffectiveId, childElement, acceptHTML, containsHTML);
+        final String result = getElementValue(container, contextStack, sourceEffectiveId, childElement, acceptHTML, defaultHTML, containsHTML);
         contextStack.popBinding();
         return result;
     }
@@ -275,11 +276,12 @@ public class XFormsUtils {
      */
     public static String getElementValue(final XBLContainer container,
                                          final XFormsContextStack contextStack, final String sourceEffectiveId,
-                                         final Element childElement, final boolean acceptHTML, final boolean[] containsHTML) {
+                                         final Element childElement, final boolean acceptHTML, final boolean defaultHTML,
+                                         final boolean[] containsHTML) {
 
         // No HTML found by default
         if (containsHTML != null)
-            containsHTML[0] = false;
+            containsHTML[0] = defaultHTML;
 
         final BindingContext currentBindingContext = contextStack.getCurrentBindingContext();
 
@@ -366,7 +368,7 @@ public class XFormsUtils {
             // perform a very simple serialization of elements and text to simple (X)HTML, not full-fledged HTML or XML
             // serialization.
             Dom4jUtils.visitSubtree(childElement, new LHHAElementVisitorListener(container, contextStack,
-                    sourceEffectiveId, acceptHTML, containsHTML, sb, childElement));
+                    sourceEffectiveId, acceptHTML, defaultHTML, containsHTML, sb, childElement));
             if (acceptHTML && containsHTML != null && !containsHTML[0]) {
                 // We went through the subtree and did not find any HTML
                 // If the caller supports the information, return a non-escaped string so we can optimize output later
@@ -376,19 +378,6 @@ public class XFormsUtils {
                 return sb.toString();
             }
         }
-    }
-
-    /**
-     * Compare two objects, handling null values as well.
-     *
-     * TODO: This should go, Scala does this natively.
-     *
-     * @param value1    first value or null
-     * @param value2    second value or null
-     * @return          whether the values are identical or both null
-     */
-    public static boolean compareStrings(Object value1, Object value2) {
-        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
     }
 
     public static ValueRepresentation convertJavaObjectToSaxonObject(Object object) {
@@ -818,6 +807,7 @@ public class XFormsUtils {
         private final XFormsContextStack contextStack;
         private final String sourceEffectiveId;
         private final boolean acceptHTML;
+        private final boolean defaultHTML;
         private final boolean[] containsHTML;
         private final StringBuilder sb;
         private final Element childElement;
@@ -830,6 +820,7 @@ public class XFormsUtils {
             this.contextStack = null;
             this.sourceEffectiveId = null;
             this.acceptHTML = acceptHTML;
+            this.defaultHTML = false;
             this.containsHTML = containsHTML;
             this.sb = sb;
             this.childElement = childElement;
@@ -838,12 +829,14 @@ public class XFormsUtils {
 
         // Constructor for "dynamic" case, i.e. when we know the child element can have dynamic content
         public LHHAElementVisitorListener(XBLContainer container, XFormsContextStack contextStack,
-                                          String sourceEffectiveId, boolean acceptHTML, boolean[] containsHTML, StringBuilder sb, Element childElement) {
+                                          String sourceEffectiveId, boolean acceptHTML, boolean defaultHTML, boolean[] containsHTML,
+                                          StringBuilder sb, Element childElement) {
             this.prefix = container.getFullPrefix();
             this.container = container;
             this.contextStack = contextStack;
             this.sourceEffectiveId = sourceEffectiveId;
             this.acceptHTML = acceptHTML;
+            this.defaultHTML = defaultHTML;
             this.containsHTML = containsHTML;
             this.sb = sb;
             this.childElement = childElement;
@@ -876,7 +869,9 @@ public class XFormsUtils {
                     }
                 };
 
-                final boolean isHTMLMediatype = "text/html".equals(element.attributeValue(XFormsConstants.MEDIATYPE_QNAME));
+                final boolean isHTMLMediatype =
+                        ! defaultHTML && "text/html".equals(element.attributeValue(XFormsConstants.MEDIATYPE_QNAME))
+                     || defaultHTML && ! "text/plain".equals(element.attributeValue(XFormsConstants.MEDIATYPE_QNAME));
 
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {

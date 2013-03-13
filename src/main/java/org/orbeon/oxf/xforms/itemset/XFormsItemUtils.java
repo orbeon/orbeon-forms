@@ -254,7 +254,7 @@ public class XFormsItemUtils {
                     throw new ValidationException("xf:item or xf:itemset must contain an xf:value element.", select1Control.getLocationData());
                 final Scope elementScope = select1Control.getChildElementScope(valueElement);
                 final String elementEffectiveId = getElementEffectiveId(valueElement);
-                return XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, valueElement, false, null);
+                return XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, valueElement, false, false, null);
             }
 
             private Label getLabelValue(Element labelElement) {
@@ -264,7 +264,7 @@ public class XFormsItemUtils {
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
                 final boolean supportsHTML = select1Control.isFullAppearance(); // Only support HTML when appearance is "full"
                 final boolean[] containsHTML = new boolean[] { false }; 
-                final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, containsHTML);
+                final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, false, containsHTML);
                 return new Label(StringUtils.defaultString(label), containsHTML[0]);
             }
 

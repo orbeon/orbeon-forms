@@ -52,7 +52,7 @@ object Headers {
 
                     val scope = xblContainer.getPartAnalysis.scopeForPrefixedId(fullPrefix + XFormsUtils.getElementId(element))
                     contextStack.pushBinding(element, sourceEffectiveId, scope)
-                    val result = XFormsUtils.getElementValue(xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, null)
+                    val result = XFormsUtils.getElementValue(xblContainer.getContainingDocument, contextStack, sourceEffectiveId, element, false, false, null)
                     contextStack.popBinding
 
                     result

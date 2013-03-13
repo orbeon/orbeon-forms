@@ -2837,4 +2837,48 @@
         </output>
     </test>
 
+    <test description="#874: Lightweight syntax for HTML LHHA" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/874 -->
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="items">
+                            <value label="This is a &lt;b&gt;bold&lt;/b&gt; value"/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="my-input-1" ref=".">
+                        <xf:label ref="@label"/>
+                    </xf:input>
+                    <xf:input id="my-input-2" ref=".">
+                        <xf:label mediatype="text/html" ref="@label"/>
+                    </xf:input>
+                    <xf:input id="my-input-3" ref=".">
+                        <xf:label mediatype="text/html">"<xf:output value="@label"/>" then "<xf:output mediatype="text/plain" value="@label"/>"</xf:label>
+                    </xf:input>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="my-input-1" class="xforms-control xforms-input">
+                    <xh:label class="xforms-label" for="my-input-1$xforms-input-1">This is a &lt;b&gt;bold&lt;/b&gt; value</xh:label>
+                    <xh:input id="my-input-1$xforms-input-1" type="text" name="my-input-1$xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
+                <xh:span id="my-input-2" class="xforms-control xforms-input">
+                    <xh:label class="xforms-label" for="my-input-2$xforms-input-1">This is a <xh:b>bold</xh:b> value</xh:label>
+                    <xh:input id="my-input-2$xforms-input-1" type="text" name="my-input-2$xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
+                <xh:span id="my-input-3" class="xforms-control xforms-input">
+                    <xh:label class="xforms-label" for="my-input-3$xforms-input-1">"This is a <xh:b>bold</xh:b> value" then "This is a &lt;b&gt;bold&lt;/b&gt; value"</xh:label>
+                    <xh:input id="my-input-3$xforms-input-1" type="text" name="my-input-3$xforms-input-1" value="" class="xforms-input-input"/>
+                </xh:span>
+            </controls>
+
+        </output>
+    </test>
+
 </group>

@@ -232,7 +232,11 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     }
 
     private boolean compareSelectedCase(XFormsSwitchControl otherSwitchControl) {
-        return XFormsUtils.compareStrings(getSelectedCaseEffectiveId(), getOtherSelectedCaseEffectiveId(otherSwitchControl));
+        return compareStrings(getSelectedCaseEffectiveId(), getOtherSelectedCaseEffectiveId(otherSwitchControl));
+    }
+
+    private static boolean compareStrings(Object value1, Object value2) {
+        return (value1 == null && value2 == null) || (value1 != null && value2 != null && value1.equals(value2));
     }
 
     @Override

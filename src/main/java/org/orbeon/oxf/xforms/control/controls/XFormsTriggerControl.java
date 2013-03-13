@@ -28,7 +28,7 @@ public class XFormsTriggerControl extends XFormsSingleNodeFocusableControlBase {
         super(container, parent, element, id);
     }
 
-    private static boolean[] TRIGGER_LHHA_HTML_SUPPORT = { true, true, false, true };
+    private static boolean[] TRIGGER_LHHA_HTML_SUPPORT = { true, true, false, true }; // hint doesn't support HTML
 
     @Override
     public boolean[] lhhaHTMLSupport() {

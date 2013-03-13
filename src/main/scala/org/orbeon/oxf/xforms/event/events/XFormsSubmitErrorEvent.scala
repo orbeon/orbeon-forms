@@ -33,7 +33,7 @@ class XFormsSubmitErrorEvent(target: XFormsEventTarget, properties: PropertyGett
     def this(target: XFormsEventTarget, resourceURI: String, errorType: ErrorType, statusCode: Int) = {
         this(target, Map(
             "error-type" → Some(errorType.name),
-            "resource-uri" → Some(resourceURI ensuring (_ ne null)),
+            "resource-uri" → Option(resourceURI), // xforms-submit-error can be dispatched before the resource URI is resolved
             "response-status-code" → Some(statusCode)))
         _errorType = errorType
     }

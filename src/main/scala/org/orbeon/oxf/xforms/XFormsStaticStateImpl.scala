@@ -30,7 +30,7 @@ import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
 import org.orbeon.oxf.util.{StringReplacer, NumberUtils}
-import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.oxf.util.ScalaUtils.{stringOptionToSet, nonEmptyOrNone}
 
 class XFormsStaticStateImpl(
         val encodedState: String,
@@ -62,8 +62,15 @@ class XFormsStaticStateImpl(
     lazy val isNoscript            = XFormsStaticStateImpl.isNoscript(staticStateDocument.nonDefaultProperties)
     lazy val isHTMLDocument        = staticStateDocument.isHTMLDocument
     lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
-    lazy val inputFilter           = StringReplacer(getProperty[String](P.INPUT_FILTER_PROPERTY))(getIndentedLogger)
-    lazy val textareaFilter        = StringReplacer(getProperty[String](P.TEXTAREA_FILTER_PROPERTY))(getIndentedLogger)
+
+    // Check input/textarea property first, then global property
+    // Q: Does this work if e.g. we have:
+    // - property file: oxf.xforms.filter.input defined and oxf.xforms.filter.* blank
+    // - on model:      oxf.xforms.filter.* defined, oxf.xforms.filter.input blank
+    private def sanitizeProperty(name: String) = nonEmptyOrNone(getProperty[String](name)) getOrElse getProperty[String](P.SANITIZE_PROPERTY)
+
+    lazy val sanitizeInput    = StringReplacer(sanitizeProperty(P.SANITIZE_INPUT_PROPERTY))(getIndentedLogger)
+    lazy val sanitizeTextarea = StringReplacer(sanitizeProperty(P.SANITIZE_TEXTAREA_PROPERTY))(getIndentedLogger)
 
     def isCacheDocument       = staticStateDocument.isCacheDocument
     def isClientStateHandling = staticStateDocument.isClientStateHandling
@@ -209,12 +216,12 @@ object XFormsStaticStateImpl {
 
     def getPropertyJava[T](nonDefaultProperties: JMap[String, AnyRef], propertyName: String) =
         getProperty[T](nonDefaultProperties.asScala, propertyName)
-    
+
+    private def defaultPropertyValue(propertyName: String) =
+        Option(P.getPropertyDefinition(propertyName)) map (_.defaultValue) orNull
+
     def getProperty[T](nonDefaultProperties: collection.Map[String, AnyRef], propertyName: String): T =
-        nonDefaultProperties.getOrElse(propertyName, {
-            val definition = P.getPropertyDefinition(propertyName)
-            Option(definition) map (_.defaultValue) orNull
-        }).asInstanceOf[T]
+        nonDefaultProperties.getOrElse(propertyName, defaultPropertyValue(propertyName)).asInstanceOf[T]
 
     // For Java callers
     def isNoscriptJava(nonDefaultProperties: JMap[String, AnyRef]) =

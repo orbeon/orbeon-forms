@@ -14,30 +14,35 @@
 package org.orbeon.oxf.util
 
 import spray.json._
+import ScalaUtils.nonEmptyOrNone
 
 // Factory for a string replacement function configured by a JSON map.
 //
 // - The configuration is in JSON format and must be a top-level map of String → String.
+// - A blank string is allowed to specify "no mapping".
 // - Filtering applies all the transformations one after the other.
 object StringReplacer extends Logging {
     // Read a filter configuration and return a filter function
     // If there was an error processing the configuration, log and return
     def apply(json: String)(implicit logger: IndentedLogger): String ⇒ String = {
-        val mapping =
-            try
-                json.asJson match {
-                    case JsObject(fields) ⇒
-                        fields collect {
-                            case (k, v: JsString) ⇒ k → v.value
-                            case other ⇒ throw new RuntimeException
-                        }
-                    case other ⇒ throw new RuntimeException
+        val mapping = nonEmptyOrNone(json) match {
+            case Some(nonEmptyJSON) ⇒
+                try
+                    nonEmptyJSON.asJson match {
+                        case JsObject(fields) ⇒
+                            fields collect {
+                                case (k, v: JsString) ⇒ k → v.value
+                                case other ⇒ throw new RuntimeException
+                            }
+                        case other ⇒ throw new RuntimeException
+                    }
+                catch {
+                    case e: Exception ⇒
+                        warn("configuration must be a JSON map of String → String", Seq("JSON" → json))
+                        Map()
                 }
-            catch {
-                case e: Exception ⇒
-                    warn("configuration must be a JSON map of String → String", Seq("JSON" → json))
-                    Map()
-            }
+            case None ⇒ Map()
+        }
 
         // Do the replacement of all mappings one after the other
         (s ⇒ mapping.foldLeft(s){ case (prev, (k, v)) ⇒ prev.replaceAllLiterally(k, v) })

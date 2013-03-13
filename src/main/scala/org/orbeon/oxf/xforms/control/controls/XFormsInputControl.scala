@@ -113,7 +113,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                     ""
             case "string" | null ⇒
                 // Apply replacement filter for string type only
-                containingDocument.getStaticState.inputFilter(unformatTransform(externalValue))
+                containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
             case _ ⇒
                 unformatTransform(externalValue)
         }

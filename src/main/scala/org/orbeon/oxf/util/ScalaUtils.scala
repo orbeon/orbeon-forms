@@ -188,7 +188,7 @@ object ScalaUtils {
         result map { case (k, v) ⇒ k → v.result } toList
     }
 
-    // If the string is null or empty, return none, otherwise return the trimmed value
+    // If the string is null or empty, return None, otherwise return Some(trimmed value)
     def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
 
     // Extensions on Boolean

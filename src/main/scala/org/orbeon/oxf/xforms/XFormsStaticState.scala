@@ -39,8 +39,8 @@ trait XFormsStaticState extends XMLUtils.DebugXML  {
     def isHTMLDocument: Boolean
 
     def isXPathAnalysis: Boolean
-    def inputFilter: String ⇒ String
-    def textareaFilter: String ⇒ String
+    def sanitizeInput: String ⇒ String
+    def sanitizeTextarea: String ⇒ String
 
     def getNonDefaultProperties: Map[String, AnyRef]
     def getProperty[T](propertyName: String): T

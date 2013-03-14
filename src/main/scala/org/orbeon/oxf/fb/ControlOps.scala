@@ -627,4 +627,16 @@ object ControlOps {
 
     def buildControlAbsoluteId(inDoc: NodeInfo, staticId: String) =
         buildControlEffectiveId(inDoc, staticId) map effectiveIdToAbsoluteId
+
+    // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
+    def setControlLHHAMediatype(inDoc: NodeInfo, controlName: String, lhha: String, isHTML: Boolean): Unit =
+        findControlByName(inDoc, controlName).toList child lhha foreach { lhhaElement ⇒
+            val isCurrentlyHTML = (lhhaElement attValue "mediatype") == "text/html"
+            if (isHTML != isCurrentlyHTML) {
+                if (! isHTML)
+                    insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
+                else
+                    delete(lhhaElement \@ "mediatype")
+            }
+        }
 }

@@ -662,7 +662,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
         // If no event obtained, create default event
         if (submitErrorEvent == null) {
-            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, resolvedActionOrResource,
+            submitErrorEvent = new XFormsSubmitErrorEvent(XFormsModelSubmission.this, scala.Option.apply(resolvedActionOrResource),
                 submitErrorEvent.XXFORMS_INTERNAL_ERROR(), 0);
         }
 

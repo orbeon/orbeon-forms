@@ -56,6 +56,9 @@ trait FormRunnerOps extends OrbeonFormsOps {
     def summaryPaging = cssSelector(".fr-paging-numbers:not(.xforms-group-begin-end)").element.text
 }
 
+// The abstract base class has static forwarders to the object. This means that any class deriving from OrbeonClientBase
+// will have the @BeforeClass/@AfterClass annotations. This also means that the web driver is started and stopped once
+// for each class deriving from OrbeonClientBase.
 abstract class OrbeonClientBase
 
 object OrbeonClientBase {

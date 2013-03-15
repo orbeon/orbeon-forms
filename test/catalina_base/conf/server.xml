@@ -24,7 +24,7 @@
                   unpackWARs="true" autoDeploy="false"
                   xmlValidation="false" xmlNamespaceAware="false">
 
-                <Context path="/orbeon" docBase="../../../build/orbeon-war" reloadable="false" override="true" allowLinking="true" crossContext="true"/>
+                <Context path="/orbeon" docBase="../../../build/orbeon-war-tomcat" reloadable="false" override="true" allowLinking="true" crossContext="true"/>
             </Host>
         </Engine>
     </Service>

@@ -23,8 +23,6 @@ class FormRunnerSummaryTest extends OrbeonClientBase with AssertionsForJUnit wit
     @Test def navigateSummary(): Unit = {
         gotoSummary("orbeon", "bookshelf")
 
-        System.err.println("Selenium on Travis troubleshooting:\n" + pageSource)
-
         assert("1 to 10 of 12" === summaryPaging)
         summaryNext()
         assert("11 to 12 of 12" === summaryPaging)

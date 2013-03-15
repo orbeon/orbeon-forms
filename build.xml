@@ -681,7 +681,7 @@
 
     </target>
 
-    <target name="test" depends="orbeon-war, test-classes, test-classpath">
+    <target name="test" depends="orbeon-dist-war, test-classes, test-classpath">
 
         <property name="tomcat-version" value="6.0.36"/>
         <parallel>
@@ -691,11 +691,13 @@
                 <if>
                     <not><isset property="skip.selenium"/></not>
                     <then>
-                        <!-- Uncompress -->
+                        <!-- Uncompress Tomcat -->
                         <if>
                             <not><available file="build/apache-tomcat-${tomcat-version}"/></not>
                             <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
                         </if>
+                        <!-- Uncompress WAR -->
+                        <unzip src="${build.distrib.dir}/${versioned-name}.war" dest="${build.dir}/${project.name}-war-tomcat"/>
                         <!-- Run -->
                         <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true">
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>

@@ -53,7 +53,7 @@ trait FormRunnerOps extends OrbeonFormsOps {
         waitForAjaxResponse()
     }
 
-    def summaryPaging = cssSelector(".fr-paging-numbers:not(.xforms-group-begin-end").element.text
+    def summaryPaging = cssSelector(".fr-paging-numbers:not(.xforms-group-begin-end)").element.text
 }
 
 abstract class OrbeonClientBase

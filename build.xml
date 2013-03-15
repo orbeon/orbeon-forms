@@ -734,7 +734,8 @@
                         <fileset dir="${build.test-classes.dir}">
                             <include name="org/orbeon/oxf/**/*Test.class"/>
                             <include name="org/orbeon/oxf/**/Test*.class"/>
-                            <exclude name="org/orbeon/oxf/test/SeleniumTest.class" if="skip.selenium"/>
+                            <exclude name="org/orbeon/oxf/fr/FormRunnerSummaryTest.class" if="skip.selenium"/>
+                            <exclude name="org/orbeon/oxf/xforms/ClientTest.class" if="skip.selenium"/>
                         </fileset>
                     </batchtest>
 

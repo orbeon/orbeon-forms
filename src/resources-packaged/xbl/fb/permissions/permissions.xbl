@@ -41,7 +41,7 @@
                     <ui valid="true">
                         <apply-trigger/>
                         <has-permissions/>
-                        <readonly-checked>create read-update delete</readonly-checked>
+                        <readonly-checked>create read update delete</readonly-checked>
                         <permissions>
                             <permission>
                                 <operations/>
@@ -55,7 +55,12 @@
                 <xf:bind ref="instance('ui')">
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xf:bind ref="readonly-checked" readonly="true()"/>
-                    <xf:bind ref="permissions/permission/role" constraint="normalize-space()" required="true()"/>
+                    <xf:bind ref="permissions/permission">
+                        <xf:bind ref="role" constraint="normalize-space()" required="true()"/>
+                        <!-- If operations contains 'update', automatically add 'read' -->
+                        <xf:bind ref="operations" readonly="false()" calculate="if (tokenize(., '\s') = 'update')
+                            then string-join(distinct-values((tokenize(., '\s'), 'read')), ' ') else ."/>
+                    </xf:bind>
                 </xf:bind>
                 <xf:instance id="permission-template">
                     <permission>
@@ -92,16 +97,12 @@
                             <xf:var name="role" value="."/>
                             <!-- Permissions for the current role -->
                             <xf:var name="permissions" value="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
-                            <!-- Operations for the current role -->
-                            <xf:var name="operations-raw" value="$permissions/@operations/tokenize(., '\s')"/>
-                            <!-- Replace read and update by read-update -->
-                            <xf:var name="operations-read-update" value="distinct-values(for $o in $operations-raw return if ($o = ('read', 'update')) then 'read-update' else $o)"/>
                             <!-- Insert new permission in UI, and populate it -->
                             <xf:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
                             <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
                             <xf:setvalue if="$role != ''"  ref="$new-permission/role" value="replace($role, '%20', ' ')"/>
-                            <xf:setvalue ref="$new-permission/operations" value="string-join($operations-read-update, ' ')"/>
+                            <xf:setvalue ref="$new-permission/operations" value="string-join($permissions/@operations, ' ')"/>
                         </xf:action>
                     </xf:action>
                 </xf:action>
@@ -112,8 +113,6 @@
                     <xf:delete ref="$metadata/permissions"/>
                     <xf:action if="$ui/has-permissions = 'true'">
                         <xf:insert context="$metadata" ref="*" origin="xxf:element('permissions')"/>
-                        <!-- In UI replace "read-update" by "read update" -->
-                        <xf:setvalue iterate="$ui/permissions/permission/operations" ref="." value="replace(., 'read-update', 'read update')"/>
                         <!-- In UI replace space in role by %20 -->
                         <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
                         <!-- Add "anyone" permission -->
@@ -169,8 +168,8 @@
                             <xf:repeat ref="$ui/permissions/permission">
                                 <xf:var name="is-first" value="position() = 1"/>
                                 <xh:tr>
+                                    <!-- Role name or "anyone" -->
                                     <xh:td class="fb-role">
-                                        <!-- Role name or "anyone" -->
                                         <xf:group ref=".[$is-first]">
                                             <xf:output value="$resources/dialog-permissions/anyone"/>
                                         </xf:group>
@@ -178,8 +177,8 @@
                                             <xf:input ref="role" incremental="true"/>
                                         </xf:group>
                                     </xh:td>
+                                    <!-- Checkboxes for operations -->
                                     <xh:td>
-                                        <!-- Checkboxes for operations -->
                                         <xf:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations" appearance="full">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/create"/>
@@ -188,10 +187,22 @@
                                         </xf:select>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'read-update') then $ui/readonly-checked else operations" appearance="full">
+                                        <!-- If this role has the 'update' permission, make the 'read' checkbox read-only -->
+                                        <xf:select ref="if ((not($is-first) and $anyone-operations = 'read')
+                                                            or (tokenize(operations, '\s') = 'update'))
+                                                        then $ui/readonly-checked else operations"
+                                                   appearance="full">
                                             <xf:item>
-                                                <xf:label ref="$resources/dialog-permissions/read-update"/>
-                                                <xf:value>read-update</xf:value>
+                                                <xf:label ref="$resources/dialog-permissions/read"/>
+                                                <xf:value>read</xf:value>
+                                            </xf:item>
+                                        </xf:select>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'update') then $ui/readonly-checked else operations" appearance="full">
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-permissions/update"/>
+                                                <xf:value>update</xf:value>
                                             </xf:item>
                                         </xf:select>
                                     </xh:td>
@@ -203,8 +214,8 @@
                                             </xf:item>
                                         </xf:select>
                                     </xh:td>
+                                    <!-- Remove -->
                                     <xh:td>
-                                        <!-- Remove -->
                                         <xf:trigger appearance="minimal" ref=".[not($is-first)]">
                                             <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                             <xf:delete ev:event="DOMActivate" ref="."/>
@@ -214,7 +225,7 @@
                                 </xh:tr>
                             </xf:repeat>
                             <xh:tr>
-                                <xh:td colspan="4"/>
+                                <xh:td colspan="5"/>
                                 <xh:td>
                                     <!-- Add -->
                                     <xf:trigger appearance="minimal">

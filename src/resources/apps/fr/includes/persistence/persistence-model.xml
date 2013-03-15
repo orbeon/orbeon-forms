@@ -489,7 +489,7 @@
 
         <!-- Conditions for disabling workflow buttons -->
         <xf:bind ref="workflow-review" readonly="exf:readonly(../submit)"/>
-        <xf:bind ref="workflow-edit" readonly="exf:readonly(../submit)"/>
+        <xf:bind ref="workflow-edit" readonly="exf:readonly(../submit)" relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'update')"/>
         <xf:bind ref="workflow-send" readonly="exf:readonly(../submit)"/>
     </xf:bind>
 

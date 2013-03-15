@@ -807,7 +807,8 @@
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
             <create>Create</create>
-            <read-update>Read and update</read-update>
+            <read>Read</read>
+            <update>Update</update>
             <delete>Delete</delete>
         </dialog-permissions>
         <!-- Messages -->
@@ -1632,7 +1633,8 @@
             <operations>Opérations</operations>
             <anyone>Toute personne</anyone>
             <create>Créer</create>
-            <read-update>Lire et mettre à jour</read-update>
+            <read>Lire</read>
+            <update>Mettre à jour</update>
             <delete>Supprimer</delete>
         </dialog-permissions>
         <!-- Messages -->
@@ -2459,7 +2461,8 @@
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
             <create>Create</create>
-            <read-update>Read and update</read-update>
+            <read>Read</read>
+            <update>Update</update>
             <delete>Delete</delete>
         </dialog-permissions>
         <!-- Messages -->
@@ -3285,7 +3288,8 @@
             <operations>Действия</operations>
             <anyone>Любой пользователь</anyone>
             <create>Заполнять форму</create>
-            <read-update>Просматривать и редактировать</read-update>
+            <read>Просматривать</read>
+            <update>редактировать</update>
             <delete>Удалять</delete>
         </dialog-permissions>
         <!-- Messages -->

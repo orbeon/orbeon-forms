@@ -314,7 +314,7 @@
 
     <target name="test-classpath" depends="classpath">
         <path id="test.class.path">
-            <pathelement location="${jar.file}"/>
+            <pathelement location="${build.classes.dir}"/>
             <pathelement location="${xforms-filter.jar.file}"/>
             <fileset dir="lib">
                 <include name="**/*.jar"/>
@@ -375,10 +375,9 @@
         <scalac destdir="${build.test-classes.dir}"
                 classpathref="test.class.path"
                 fork="true" encoding="utf-8" jvmargs="-Xmx700m"
-                addparams="-Xfatal-warnings"
-                deprecation="yes">
-            <src path="src/test/java"/>
+                addparams="-Xfatal-warnings -feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" deprecation="yes">
             <src path="src/test/scala"/>
+            <src path="src/test/java"/>
         </scalac>
 
         <javac srcdir="src/test/java" destdir="${build.test-classes.dir}"

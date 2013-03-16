@@ -754,8 +754,10 @@
                     <!-- For resources associated with Java test files -->
                     <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
                     <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="src/test/java"/>
+                    <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
+                    <sysproperty key="oxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory" value="src/main/java"/>
                     <!-- Classpath -->
-                    <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
+                    <sysproperty key="oxf.resources.priority.5" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
                     <!-- Other properties -->
                     <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
                     <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>

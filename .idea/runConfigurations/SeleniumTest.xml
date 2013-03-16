@@ -1,0 +1,40 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SeleniumTest" type="JUnit" factoryName="JUnit">
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
+      <pattern>
+        <option name="PATTERN" value="org.orbeon.oxf.test.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <module name="Orbeon Forms" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+    <option name="ALTERNATIVE_JRE_PATH" value="" />
+    <option name="PACKAGE_NAME" value="org.orbeon.oxf.test" />
+    <option name="MAIN_CLASS_NAME" value="org.orbeon.oxf.test.SeleniumTest" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="class" />
+    <option name="VM_PARAMETERS" value="-ea -Doxf.resources.factory=org.orbeon.oxf.resources.PriorityResourceManagerFactory -Doxf.resources.priority.1=org.orbeon.oxf.resources.FilesystemResourceManagerFactory -Doxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory=&quot;$PROJECT_DIR$&quot;/src/resources-packaged -Doxf.resources.priority.2=org.orbeon.oxf.resources.FilesystemResourceManagerFactory -Doxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory=&quot;$PROJECT_DIR$&quot;/src/resources -Doxf.resources.priority.3=org.orbeon.oxf.resources.FilesystemResourceManagerFactory -Doxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory=&quot;$PROJECT_DIR$&quot;/test/src -Doxf.resources.priority.4=org.orbeon.oxf.resources.FilesystemResourceManagerFactory -Doxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory=&quot;$PROJECT_DIR$&quot;/src/java -Doxf.resources.priority.5=org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory -Doxf.resources.common.min-reload-interval=50 -Doxf.test.config=oxf:/ops/unit-tests/tests.xml" />
+    <option name="PARAMETERS" value="" />
+    <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+    <option name="ENV_VARIABLES" />
+    <option name="PASS_PARENT_ENVS" value="true" />
+    <option name="TEST_SEARCH_SCOPE">
+      <value defaultName="singleModule" />
+    </option>
+    <envs />
+    <patterns />
+    <RunnerSettings RunnerId="Cover" />
+    <RunnerSettings RunnerId="Debug">
+      <option name="DEBUG_PORT" value="" />
+      <option name="TRANSPORT" value="0" />
+      <option name="LOCAL" value="true" />
+    </RunnerSettings>
+    <RunnerSettings RunnerId="Run" />
+    <ConfigurationWrapper RunnerId="Cover" />
+    <ConfigurationWrapper RunnerId="Debug" />
+    <ConfigurationWrapper RunnerId="Run" />
+    <method>
+      <option name="Make" enabled="false" />
+    </method>
+  </configuration>
+</component>

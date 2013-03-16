@@ -27,6 +27,26 @@
       <option name="workingDir" value="$FileDir$" />
       <envs />
     </TaskOptions>
+    <TaskOptions isEnabled="true">
+      <option name="arguments" value="--map --compile --output $ProjectFileDir$/build/orbeon-war/WEB-INF/resources/$FileDirRelativeToSourcepath$ $FilePathRelativeToSourcepath$" />
+      <option name="checkSyntaxErrors" value="true" />
+      <option name="description" value="Compiles .coffee files into .js files" />
+      <option name="exitCodeBehavior" value="ERROR" />
+      <option name="fileExtension" value="coffee" />
+      <option name="immediateSync" value="true" />
+      <option name="name" value="CoffeeScript" />
+      <option name="output" value="$ProjectFileDir$/build/orbeon-war/WEB-INF/$FileDirRelativeToSourcepath$/$FileNameWithoutExtension$.js" />
+      <option name="outputFilters">
+        <array />
+      </option>
+      <option name="outputFromStdout" value="false" />
+      <option name="passParentEnvs" value="true" />
+      <option name="program" value="/usr/local/bin/coffee" />
+      <option name="scopeName" value="Project Files" />
+      <option name="trackOnlyRoot" value="true" />
+      <option name="workingDir" value="$SourcepathEntry$" />
+      <envs />
+    </TaskOptions>
   </component>
 </project>
 

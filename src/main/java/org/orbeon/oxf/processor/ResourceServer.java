@@ -131,24 +131,6 @@ public class ResourceServer extends ProcessorImpl {
                                 }
                             }
                         }
-
-                        // When no using combined/minimized resources (i.e. typically in development), compile CoffeeScript on the fly, if we find one
-                        if (! XFormsProperties.isCombinedResources() && ! XFormsProperties.isMinimalResources() && urlPath.endsWith(".js")) {
-                            final String coffeePath = urlPath.substring(0, urlPath.length() - 2) + "coffee";
-                            if (ResourceManagerWrapper.instance().exists(coffeePath)) {
-                                // Open URL for CoffeeScript file
-                                final URL coffeeURL = URLFactory.createURL("oxf:" + coffeePath);
-                                urlConnection = coffeeURL.openConnection();
-                                length = 0; // Unknown length, as it is not just the length of the compiled code
-                                lastModified = NetUtils.getLastModified(urlConnection);
-                                // Read CoffeeScript as a string; CoffeeScript is always UTF-8
-                                Reader coffeeReader = new InputStreamReader(urlConnection.getInputStream(), Charset.forName("UTF-8"));
-                                final String coffeeString = NetUtils.readStreamAsString(coffeeReader);
-                                // TODO: do we need to handle compilation errors?
-                                String javascriptString = CoffeeScriptCompiler.compile(coffeeString, coffeePath, 0);
-                                urlConnectionInputStream = new ByteArrayInputStream(javascriptString.getBytes("UTF-8"));
-                            }
-                        }
                     }
                 }
 

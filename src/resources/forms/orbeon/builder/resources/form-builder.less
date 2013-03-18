@@ -99,6 +99,20 @@ body {
         padding: 0;                                                                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
     }
 
+    .fr-view .fb .fr-section-container .fr-grid .fr-grid-content {          // Tons of classes to take precedence over FR styling
+        .xforms-label {
+            .fb-edit-label-html {
+                float: right;                                               // Checkbox to the right of the input
+                width: auto;                                                // Undos the width: 100%
+                margin: 0 0 0 5px;                                          // Space between input and checkbox
+            }
+            .fb-edit-label {
+                display: block;
+                overflow: hidden;                                           // For the box not to go "under" the checkbox, so the input can be width: 100%
+            }
+        }
+    }
+
     .fb-ie-warning { margin: 1em; padding: .5em; border: 4px solid #D00000; background-color: #FFF0F0 }
 
     .fb-nowrap { white-space: nowrap }

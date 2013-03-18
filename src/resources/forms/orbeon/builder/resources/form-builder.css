@@ -149,6 +149,15 @@ body {
   display: none;
   padding: 0;
 }
+.orbeon .fr-view .fb .fr-section-container .fr-grid .fr-grid-content .xforms-label .fb-edit-label-html {
+  float: right;
+  width: auto;
+  margin: 0 0 0 5px;
+}
+.orbeon .fr-view .fb .fr-section-container .fr-grid .fr-grid-content .xforms-label .fb-edit-label {
+  display: block;
+  overflow: hidden;
+}
 .orbeon .fb-ie-warning {
   margin: 1em;
   padding: .5em;

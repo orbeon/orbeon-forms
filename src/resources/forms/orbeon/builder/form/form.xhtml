@@ -411,7 +411,7 @@
                                 <xf:var name="control"       value="$td/*[1]"/><!-- may be empty! -->
                                 <xf:var name="control-id"    value="$control/@id"/>
                                 <xf:var name="has-control"   value="exists($control-id)"/>
-                                <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
+                                <xf:var name="fb-resources"  value="xxf:get-variable('fr-resources-model', 'fr-form-resources')"/>
 
                                 <xh:span class="fb-grid-cell-icons">
                                     <!-- Expand cell down -->
@@ -472,6 +472,7 @@
 
                                 <!-- Label editor -->
                                 <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/>
+                                <xh:input id="fb-edit-label-html" class="fb-edit-label-html" type="checkbox"/>
                                 <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
                                     <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">
                                         <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>

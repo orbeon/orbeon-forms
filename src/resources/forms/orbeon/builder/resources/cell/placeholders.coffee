@@ -181,7 +181,8 @@ $ ->
                 f$.removeClass 'fb-label-hint-placeholder', element
                 f$.removeClass 'xforms-disabled', element                                                               # Remove disabled which we have on hint when their value is empty
                 input = editableEditInput element
-                f$.append input, f$.empty editablePlaceholderContainer element
+                checkbox = do _.memoize -> $('#fb-edit-label-html')
+                editablePlaceholderContainer(element).empty().append(checkbox).append(input)
                 f$.show input
                 htmlInput = f$.find 'input', input
                 saveButton = $ '#fr-save-button button'                                                                 # HACK: Focus on something else (we know we have a Save button in Form Builder)

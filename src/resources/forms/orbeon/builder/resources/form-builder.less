@@ -40,7 +40,7 @@ body {
         position: absolute;
         top: 40px + @fbGutter;
         right: @fbGutter;
-        left: @fbGutter + @fbToolbarWidth + @fbGutter/2;    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
+        left: @fbGutter + @fbToolbarWidth + @fbGutter/2;                    // Half of the space between toolbox and main is on the toolbox, other half is on the padding, for non-OS X scrollbars
         bottom: @fbBottomHeight + @fbGutter;
         overflow-y: auto;
 
@@ -49,54 +49,54 @@ body {
             .border-radius(6px);
             .box-sizing(border-box);
             margin-bottom: 0;
-            min-height: 100%;               // So the main area uses all the available space, not revealing a large porting of the background
+            min-height: 100%;                                               // So the main area uses all the available space, not revealing a large porting of the background
         }
     }
 
     .fb-bottom {
-        z-index: @zindexFixedNavbar;        // put in front like the navbar
+        z-index: @zindexFixedNavbar;                                        // put in front like the navbar
         background-color: @frBackground;
     }
 
     .fb-section-editor {
-        position: absolute;                                                                                                 // Its left/right set in CoffeeScript relative to the current section
-        display: none;                                                                                                      // Shown in CoffeeScript when mouse over section
-        padding: 0 10px 20px 20px;                                                                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
-        .xforms-trigger { display: block; }                                                                                 // Icons shown vertically
+        position: absolute;                                                 // Its left/right set in CoffeeScript relative to the current section
+        display: none;                                                      // Shown in CoffeeScript when mouse over section
+        padding: 0 10px 20px 20px;                                          // Space between icons and section, and at bottom/top in case the mouse moves a bit out
+        .xforms-trigger { display: block; }                                 // Icons shown vertically
     }
 
-    .fb-grid-repeat-editor {                                                                                                // Section that contains the grid/repeat icons that are moved based on pointer position
+    .fb-grid-repeat-editor {                                                // Section that contains the grid/repeat icons that are moved based on pointer position
         .xforms-trigger {
-            display: none;                                                                                                  // Shown in CoffeeScript based on pointer position
-            position: absolute;                                                                                             // Left/right set in CoffeeScript
+            display: none;                                                  // Shown in CoffeeScript based on pointer position
+            position: absolute;                                             // Left/right set in CoffeeScript
         }
     }
 
-    .fb-section-label-editor-click-interceptor {                                                                            // Shown on top of each section label to avoid click → collapse
-        position: absolute;                                                                                                 // Is left/right set in CoffeeScript relative to the current section label
+    .fb-section-label-editor-click-interceptor {                            // Shown on top of each section label to avoid click → collapse
+        position: absolute;                                                 // Is left/right set in CoffeeScript relative to the current section label
         cursor: pointer;
-        font-size: 20px;                                                                                                    // Matching the title font size
-        line-height: 40px;                                                                                                  // So text is vertically centered
-        color: #BBB;                                                                                                        // Light gray denoting hint
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;                                                        // Matching font defined by Bootstrap for titles
-        z-index: 1;                                                                                                         // Show on top of the page (default is 0)
+        font-size: 20px;                                                    // Matching the title font size
+        line-height: 40px;                                                  // So text is vertically centered
+        color: #BBB;                                                        // Light gray denoting hint
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;        // Matching font defined by Bootstrap for titles
+        z-index: 1;                                                         // Show on top of the page (default is 0)
     }
 
-    .fb-edit-section-label {                                                                                                // Input created dynamically to edit section label
+    .fb-edit-section-label {                                                // Input created dynamically to edit section label
         position: absolute;
-        z-index: 2;                                                                                                         // Display on top of click interceptor
-        box-sizing: border-box;                                                                                             // Makes relative sizing easier
+        z-index: 2;                                                         // Display on top of click interceptor
+        box-sizing: border-box;                                             // Makes relative sizing easier
         font-size: @frSectionTitleHeight;
     }
 
-    .fr-section-title.hover {                                                                                               // .hover added by CS on mouse over click interceptor
+    .fr-section-title.hover {                                               // .hover added by CS on mouse over click interceptor
         #gradient > .vertical(white, #DDD);
     }
 
     .fb-delete-grid-trigger {
-        position: absolute;                                                                                                 // Its left/right set in JS relative to the current grid
-        display: none;                                                                                                      // Shown in JS when mouse over grid
-        padding: 0;                                                                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
+        position: absolute;                                                 // Its left/right set in JS relative to the current grid
+        display: none;                                                      // Shown in JS when mouse over grid
+        padding: 0;                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
     }
 
     .fr-view .fb .fr-section-container .fr-grid .fr-grid-content {          // Tons of classes to take precedence over FR styling

@@ -294,9 +294,7 @@ object XML {
     implicit def pairToTest(s: (String, String)): Test = new NodeQNameTest(s)
 
     // Operations on NodeInfo
-    class NodeInfoOps(nodeInfo: NodeInfo) {
-
-        require(nodeInfo ne null)
+    implicit class NodeInfoOps(val nodeInfo: NodeInfo) extends AnyVal {
 
         def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
         def !==(s: String) = ! ===(s)
@@ -358,9 +356,7 @@ object XML {
     }
 
     // Operations on sequences of NodeInfo
-    class NodeInfoSeqOps(seq: Seq[NodeInfo]) {
-
-        require(seq ne null)
+    implicit class NodeInfoSeqOps(val seq: Seq[NodeInfo]) extends AnyVal {
 
         // Semantic is the same as XPath: at least one value must match
         def ===(s: String) = seq exists (_ === s)
@@ -425,10 +421,6 @@ object XML {
 
         findChild(Some(context), tokens)
     }
-
-    // Scope ops on NodeInfo / Seq[NodeInfo]
-    implicit def nodeInfoToRichNodeInfo(nodeInfo: NodeInfo): NodeInfoOps = new NodeInfoOps(nodeInfo)
-    implicit def nodeInfoSeqToRichNodeInfoSeq(seq: Seq[NodeInfo]): NodeInfoSeqOps = new NodeInfoSeqOps(seq)
 
     // Other implicits
     implicit def itemToItemSeq(item: Item) = Seq(item)

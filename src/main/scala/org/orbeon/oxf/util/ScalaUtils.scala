@@ -127,8 +127,7 @@ object ScalaUtils {
     def appendStartingSlash(s: String) = if (s.size != 0 && s.head == '/') s else '/' + s
 
     // Semi-standard pipe operator
-    class PipeOps[A](a: A) { def |>[B](f: A ⇒ B) = f(a) }
-    implicit def anyToPipeOps[A](a: A) = new PipeOps(a)
+    implicit class PipeOps[A](val a: A) extends AnyVal { def |>[B](f: A ⇒ B) = f(a) }
 
     // Convert a string of tokens to a set
     // NOTE: ("" split """\s+""" toSet).size == 1!
@@ -191,15 +190,15 @@ object ScalaUtils {
     def nonEmptyOrNone(s: String) = Option(s) map trimToEmpty filter isNotBlank
 
     // Extensions on Boolean
-    class BooleanWrapper(b: Boolean) {
+    implicit class BooleanWrapper(val b: Boolean) extends AnyVal {
         def option[A](a: ⇒ A) = if (b) Option(a) else None
         def list[A](a: ⇒ A)   = if (b) List(a) else Nil
         def set[A](a: ⇒ A)    = if (b) Set(a)  else Set.empty[A]
     }
-    implicit def booleanToBooleanWrapper(b: Boolean) = new BooleanWrapper(b)
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
-    def collectByErasedType[T: ClassTag](value: AnyRef) = Option(value) collect { case t: T  ⇒ t }
+    // NOTE: `case t: T` works with `ClassTag` only since Scala 2.10.
+    def collectByErasedType[T: ClassTag](value: AnyRef): Option[T] = Option(value) collect { case t: T ⇒ t }
 
     /*
      * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).

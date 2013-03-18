@@ -82,13 +82,7 @@ abstract class XFormsEvent(
     // - the property is not supported
     // - it is supported but no value is available for it
     final def property[T](name: String): Option[T] =
-        if (allProperties.isDefinedAt(name)) {
-            // NOTE: With Scala 2.10, move to `applyOrElse`
-            allProperties(name) map (_.asInstanceOf[T])
-        } else {
-            warnUnsupportedIfNeeded(name)
-            None
-        }
+        allProperties.applyOrElse(name, { name: String ⇒ warnUnsupportedIfNeeded(name); None }) map (_.asInstanceOf[T])
 
     // Return a property of the given type or the default value
     // WARNING: Remember that type erasure takes place! Property[T[U1]] will work even if the underlying type was T[U2]!
@@ -97,32 +91,20 @@ abstract class XFormsEvent(
     // - the property is not supported
     // - it is supported but no value is available for it
     final def propertyOrDefault[T](name: String, default: T): T =
-        if (allProperties.isDefinedAt(name))
-            // NOTE: With Scala 2.10, move to `applyOrElse`
-            allProperties(name) map (_.asInstanceOf[T]) getOrElse default
-        else
-            default
+        allProperties.applyOrElse(name, (_: String) ⇒ None) map (_.asInstanceOf[T]) getOrElse default
 
     // Get an attribute as an XPath SequenceIterator
     final def getAttribute(name: String): SequenceIterator = {
 
         warnDeprecatedIfNeeded(name)
 
-        // NOTE: With Scala 2.10, move to `applyOrElse`
-        if (allProperties.isDefinedAt(name)) {
+        // "If the event context information does not contain the property indicated by the string argument, then an
+        // empty node-set is returned."
 
-            def propertyAsIterator = allProperties(name) map {
-                case s: Seq[_] ⇒ listIterator(s map anyToItemIfNeeded)
-                case other     ⇒ itemIterator(anyToItemIfNeeded(other))
-            }
-
-            propertyAsIterator getOrElse emptyIterator
-        } else {
-            // "If the event context information does not contain the property indicated by the string argument, then an
-            // empty node-set is returned."
-            warnUnsupportedIfNeeded(name)
-            emptyIterator
-        }
+        allProperties.applyOrElse(name, { name: String ⇒ warnUnsupportedIfNeeded(name); None }) map {
+            case s: Seq[_] ⇒ listIterator(s map anyToItemIfNeeded)
+            case other     ⇒ itemIterator(anyToItemIfNeeded(other))
+        } getOrElse emptyIterator
     }
 
     private def warnDeprecatedIfNeeded(name: String) =
@@ -157,7 +139,7 @@ object XFormsEvent {
     type PropertyGetter = PartialFunction[String, Option[Any]]
     val EmptyGetter: PropertyGetter = Map()
 
-    // With Scala 2.10, implement applyOrElse
+    // Can we benefit from Scala 2.10's applyOrElse here?
     def getters[E <: XFormsEvent](e: E, m: Map[String, E ⇒ Option[Any]]): PropertyGetter = new PropertyGetter {
         def isDefinedAt(name: String) = m.isDefinedAt(name)
         def apply(name: String)       = m(name)(e)

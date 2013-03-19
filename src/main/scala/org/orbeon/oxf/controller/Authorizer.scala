@@ -35,8 +35,6 @@ object Authorizer extends Logging {
     // For now don't remember authorization, because simply remembering in the session is not enough if the authorization
     // depends on the request method, path, or headers.
     private val RememberAuthorization = false
-
-    private val HeadersToFilter = Set("transfer-encoding", "connection", "host", "content-length")
     private val AuthorizedKey = "org.orbeon.oxf.controller.service.authorized"
 
     // Whether the incoming request is authorized either with a token or via the delegate
@@ -101,14 +99,14 @@ object Authorizer extends Logging {
             case Some(baseDelegateURI) ⇒
                 // Forward method and headers but not the body
                 val method  = request.getMethod
-                val headers = request.getHeaderValuesMap.asScala filterNot { case (name, _) ⇒ HeadersToFilter(name) }
+                val headers = filterAndCapitalizeHeaders(request.getHeaderValuesMap.asScala, out = true)
                 val body    = if (Connection.requiresRequestBody(method)) Some(Array[Byte]()) else None
 
                 val newURL  = appendToURI(baseDelegateURI, request.getRequestPath, Option(request.getQueryString)).toString
 
                 debug("Delegating to authorizer", Seq("url" → newURL))
 
-                val connection = Connection(method, URLFactory.createURL(newURL), None, body, headers, loadState = true, logBody = false)
+                val connection = Connection(method, URLFactory.createURL(newURL), None, body, headers.toMap, loadState = true, logBody = false)
 
                 def isAuthorized(result: ConnectionResult) = NetUtils.isSuccessCode(result.statusCode)
 

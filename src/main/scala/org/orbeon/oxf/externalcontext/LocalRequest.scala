@@ -21,7 +21,6 @@ import java.io._
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.servlet.ServletExternalContext
 import org.orbeon.oxf.util._
-import java.util.{Map ⇒ JMap}
 import org.apache.commons.lang3.StringUtils
 
 /**
@@ -75,7 +74,7 @@ class LocalRequest(
     private lazy val queryAndBodyParameters = {
         // Query string
         // SRV.4.1: "Query string data is presented before post body data."
-        def queryParameters = decodeSimpleQuery(Option(getQueryString))
+        def queryParameters = Option(getQueryString) map decodeSimpleQuery getOrElse Seq()
 
         // POST body form parameters
         // NOTE: Remember, the servlet container does not help us decoding the body: the "other side" will just end up here
@@ -84,7 +83,7 @@ class LocalRequest(
             if (method == "POST" && contentType == "application/x-www-form-urlencoded" && messageBody.nonEmpty) {
                 // SRV.4.1.1 When Parameters Are Available
                 val bodyString = new String(messageBody, ServletExternalContext.getDefaultFormCharset)
-                decodeSimpleQuery(Option(bodyString))
+                Option(bodyString) map decodeSimpleQuery getOrElse Seq()
             } else
                 Seq()
 

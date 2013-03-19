@@ -66,15 +66,6 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         }
     }
 
-    private def proxyHeaders(headers: ⇒ Traversable[(String, Seq[String])], setHeader: (String, String) ⇒ Unit, out: Boolean): Unit =
-        for {
-            (name, values) ← headers
-            if !Set("transfer-encoding", "connection", "host")(name.toLowerCase)
-            if !out || name.toLowerCase != "content-length"
-            if values != null && values.nonEmpty
-        } yield
-            setHeader(capitalizeHeader(name), values mkString ",")
-
     // Proxy the request depending on app/form name and whether we are accessing form or data
     private def proxyRequest(request: Request, response: Response, app: String, form: String, formOrData: String, path: String): Unit = {
 
@@ -87,7 +78,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         // Proxy status code
         response.setStatus(connection.getResponseCode)
         // Proxy incoming headers
-        proxyHeaders(connection.getHeaderFields map {case (name, values) ⇒ (name, values.toSeq)}, response.setHeader _, out = false)
+        filterCapitalizeAndCombineHeaders(connection.getHeaderFields, out = false) foreach (response.setHeader _).tupled
         copyStream(connection.getInputStream, response.getOutputStream)
     }
 
@@ -104,7 +95,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         }
 
         def proxyOutgoingHeaders(connection: HTTPURLConnection) =
-            proxyHeaders(request.getHeaderValuesMap map {case (name, values) ⇒ (name, values.toSeq)}, connection.setRequestProperty _, out = true)
+            filterCapitalizeAndCombineHeaders(request.getHeaderValuesMap, out = true) foreach (connection.setRequestProperty _).tupled
 
         if (! Set("GET", "DELETE", "PUT", "POST")(request.getMethod))
             throw new OXFException("Unsupported method: " + request.getMethod)

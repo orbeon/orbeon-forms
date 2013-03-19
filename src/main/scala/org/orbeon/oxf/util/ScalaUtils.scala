@@ -146,11 +146,14 @@ object ScalaUtils {
             (url.substring(0, index), Some(url.substring(index + 1)))
     }
 
+    // Recombine a path and parameters into a resulting URL
+    def recombineQuery(path: String, params: Seq[(String, String)]) =
+        path + (if (params.isEmpty) "" else "?" + encodeSimpleQuery(params))
+
     // Decode a query string into a sequence of pairs
     // We assume that there are no spaces in the input query
-    def decodeSimpleQuery(queryOption: Option[String]): Seq[(String, String)] =
+    def decodeSimpleQuery(query: String): Seq[(String, String)] =
         for {
-            query          ← queryOption.toList
             nameValue      ← query.split('&').toList
             if nameValue.nonEmpty
             nameValueArray = nameValue.split('=')
@@ -164,7 +167,7 @@ object ScalaUtils {
 
     // Get the first query parameter value for the given name
     def getFirstQueryParameter(url: String, name: String) = {
-        val query = decodeSimpleQuery(splitQuery(url)._2)
+        val query = splitQuery(url)._2 map decodeSimpleQuery getOrElse Seq()
 
         query find (_._1 == name) map { case (k, v) ⇒ v }
     }
@@ -199,4 +202,24 @@ object ScalaUtils {
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
     def collectByErasedType[T: ClassTag](value: AnyRef) = Option(value) collect { case t: T  ⇒ t }
+
+    // These headers are connection headers and must never be forwarded (content-length is handled separately below)
+    private val HeadersToFilter = Set("transfer-encoding", "connection", "host")
+
+    // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
+    type ConvertibleToStringSeq[T[_]] = T[String] ⇒ Seq[String]
+
+    // Filter headers that that should never be propagated in our proxies
+    // Also combine headers with the same name into a single header
+    def filterCapitalizeAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, String)] =
+        filterAndCapitalizeHeaders(headers, out) map { case (name, values) ⇒ name → (values mkString ",") }
+
+    def filterAndCapitalizeHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
+        for {
+            (name, values) ← headers
+            if ! HeadersToFilter(name.toLowerCase)
+            if ! out || name.toLowerCase != "content-length"
+            if (values ne null) && values.nonEmpty
+        } yield
+            capitalizeHeader(name) → values
 }

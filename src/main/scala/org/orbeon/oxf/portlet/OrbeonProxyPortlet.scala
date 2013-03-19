@@ -20,6 +20,9 @@ import java.net.{HttpURLConnection, URL}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
+import collection.JavaConverters._
+import com.liferay.portal.util.PortalUtil
+import java.util.{Enumeration ⇒ JEnumeration}
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -39,7 +42,60 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     // For AsyncPortlet
     val isMinimalResources = true
     val isWSRPEncodeResources = true
-    case class AsyncContext(content: Option[Content], session: PortletSession, url: URL, namespace: String)
+    type AsyncContext = RequestDetails
+
+    // Init parameters to configure headers and parameters forwarding
+    private var forwardHeaders = Set.empty[String]
+    private var forwardParams  = Set.empty[String]
+
+    override def init(config: PortletConfig) {
+        super.init(config)
+
+        // Read portlet init parameters
+        forwardHeaders = stringToSet(config.getInitParameter("forward-headers"))
+        forwardParams  = stringToSet(config.getInitParameter("forward-parameters"))
+    }
+
+    // Immutable information about an outgoing request
+    case class RequestDetails(content: Option[Content], session: PortletSession, url: String, namespace: String, headers: Seq[(String, String)], params: Seq[(String, String)])
+
+    // Try to find getHttpServletRequest only the first time this is accessed
+    private lazy val getHttpServletRequest =
+        try Some(PortalUtil.getHttpServletRequest _)
+        catch { case (_: NoClassDefFoundError) | (_: ClassNotFoundException) ⇒ None }
+
+    private def findServletRequest(request: PortletRequest) =
+        getHttpServletRequest flatMap (f ⇒ Option(f(request)))
+
+    object RequestDetails {
+
+        def apply(request: PortletRequest, content: Option[Content], session: PortletSession, url: String, namespace: String): RequestDetails = {
+
+            def headerPairs =
+                for {
+                    servletRequest ← findServletRequest(request).toList
+                    name           ← servletRequest.getHeaderNames.asInstanceOf[JEnumeration[String]].asScala
+                    values         = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].asScala.toList
+                } yield
+                    name → values
+
+            def headersToForward =
+                for {
+                    (name, value) ← filterCapitalizeAndCombineHeaders(headerPairs, out = true)
+                    if forwardHeaders(name)
+                } yield
+                    name → value
+
+            def paramsToForward =
+                for {
+                    pair @ (name, _) ← collectByErasedType[String](request.getAttribute("javax.servlet.forward.query_string")) map decodeSimpleQuery getOrElse Seq()
+                    if forwardParams(name)
+                } yield
+                    pair
+
+            RequestDetails(content, session, url, namespace, headersToForward.toList, paramsToForward)
+        }
+    }
 
     private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
     private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
@@ -49,9 +105,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         withRootException("view render", new PortletException(_)) {
             def renderFunction =
                 if (isAsyncPortletLoad)
-                    startAsyncRender(request, createContext(request, response.getNamespace), callService)
+                    startAsyncRender(request, createRequestDetails(request, response.getNamespace), callService)
                 else
-                    callService(createContext(request, response.getNamespace))
+                    callService(createRequestDetails(request, response.getNamespace))
 
             bufferedRender(request, response, renderFunction)
         }
@@ -66,7 +122,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private def doViewAction(request: ActionRequest, response: ActionResponse): Unit =
         withRootException("view action", new PortletException(_)) {
-            bufferedProcessAction(request, response, callService(createContext(request, response.getNamespace)))
+            bufferedProcessAction(request, response, callService(createRequestDetails(request, response.getNamespace)))
         }
 
     // Portlet resource
@@ -80,27 +136,27 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private def directServeResource(request: ResourceRequest, response: ResourceResponse): Unit = {
         val resourceId = request.getResourceID
-        val url = new URL(buildFormRunnerURL(getPreference(request, FormRunnerURL), resourceId))
+        val url = buildFormRunnerURL(getPreference(request, FormRunnerURL), resourceId)
 
         val namespace = response.getNamespace
-        val connection = connectURL(AsyncContext(contentFromRequest(request, namespace), request.getPortletSession(true), url, namespace))
+        val connection = connectURL(RequestDetails(request, contentFromRequest(request, namespace), request.getPortletSession(true), url, namespace))
 
         useAndClose(connection.getInputStream) { is ⇒
-            propagateHeaders(response, connection)
+            propagateResponseHeaders(connection, response)
             val mediaType = NetUtils.getContentTypeMediaType(connection.getContentType)
             val mustRewrite = XMLUtils.isTextOrJSONContentType(mediaType) || XMLUtils.isXMLMediatype(mediaType)
             readRewriteToPortlet(response, is, mustRewrite, escape = request.getMethod == "POST")
         }
     }
 
-    private def createContext(request: PortletRequest, namespace: String): AsyncContext = {
+    private def createRequestDetails(request: PortletRequest, namespace: String): RequestDetails = {
         // Determine URL based on preferences and request
         val url = {
             val pathParameter = request.getParameter(WSRPURLRewriter.PathParameterName)
 
             if (pathParameter == "/xforms-server-submit")
                 // XForms server submit
-                new URL(buildFormRunnerURL(getPreference(request, FormRunnerURL), pathParameter))
+                buildFormRunnerURL(getPreference(request, FormRunnerURL), pathParameter)
             else {
                 // Form Runner path
                 def filterAction(action: String) =
@@ -117,11 +173,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                     case otherPath ⇒ throw new PortletException("Unsupported path: " + otherPath)
                 }
 
-                new URL(buildFormRunnerURL(getPreference(request, FormRunnerURL), appName, formName, action, documentId, query))
+                buildFormRunnerURL(getPreference(request, FormRunnerURL), appName, formName, action, documentId, query)
             }
         }
 
-        AsyncContext(contentFromRequest(request, namespace), request.getPortletSession(true), url, namespace)
+        RequestDetails(request, contentFromRequest(request, namespace), request.getPortletSession(true), url, namespace)
     }
 
     private def contentFromRequest(request: PortletRequest, namespace: String): Option[Content] = {
@@ -142,15 +198,15 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     }
 
     // Call the Orbeon service at the other end
-    private def callService(context: AsyncContext): ContentOrRedirect = {
-        val connection = connectURL(context)
+    private def callService(requestDetails: RequestDetails): ContentOrRedirect = {
+        val connection = connectURL(requestDetails)
         useAndClose(connection.getInputStream) { is ⇒
-            //propagateHeaders(response, connection)
+            //propagateResponseHeaders(response, connection)
             Content(Right(NetUtils.inputStreamToByteArray(is)), Option(connection.getHeaderField("Content-Type")), None)
         }
     }
 
-    private def connectURL(context: AsyncContext): HttpURLConnection = {
+    private def connectURL(requestDetails: RequestDetails): HttpURLConnection = {
 
         // POST when we get ClientDataRequest for:
         //
@@ -162,17 +218,27 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         // - render requests
         // - resources: typically image, CSS, JavaScript, etc.
 
-        val connection = context.url.openConnection.asInstanceOf[HttpURLConnection]
+        val newURL = {
+            val (path, query) = splitQuery(requestDetails.url)
+
+            val existingParams = query map decodeSimpleQuery getOrElse Seq()
+            val allParams = existingParams ++ requestDetails.params
+
+            recombineQuery(path, allParams)
+        }
+
+        val connection = new URL(newURL).openConnection.asInstanceOf[HttpURLConnection]
 
         connection.setDoInput(true)
 
-        context.content foreach { content ⇒
+        requestDetails.content foreach { content ⇒
             connection.setDoOutput(true)
             connection.setRequestMethod("POST")
             content.contentType foreach (connection.setRequestProperty("Content-Type", _))
         }
 
-        setOutgoingRemoteSessionIdAndHeaders(context.session, connection)
+        propagateRequestHeaders(requestDetails.headers, connection)
+        setRequestRemoteSessionIdAndHeaders(requestDetails.session, connection)
 
         connection.connect()
         try {
@@ -181,14 +247,14 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             // taking place, the portal doesn't provide a body and instead makes the content available via parameters.
             // So we would need to re-encode the POST. As of 2012-05-10, the XForms engine instead uses the
             // multipart/form-data encoding on the main form to help us here.
-            context.content foreach { content ⇒
+            requestDetails.content foreach { content ⇒
                 content.body match {
                     case Left(string) ⇒ connection.getOutputStream.write(string.getBytes("utf-8"))
                     case Right(bytes) ⇒ connection.getOutputStream.write(bytes)
                 }
             }
 
-            handleRemoteSessionId(context.session, connection)
+            handleResponseRemoteSessionId(requestDetails.session, connection)
 
             connection
         } catch{
@@ -215,17 +281,21 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private val REMOTE_SESSION_ID_KEY = "org.orbeon.oxf.xforms.portlet.remote-session-id"
 
-    // Propagate useful headers from Form Runner server to client
-    private def propagateHeaders(response: MimeResponse, connection: HttpURLConnection): Unit =
+    // Propagate useful headers from Form Runner to the client
+    private def propagateResponseHeaders(connection: HttpURLConnection, response: MimeResponse): Unit =
         Seq("Content-Type", "Last-Modified", "Cache-Control") map
             (name ⇒ (name, connection.getHeaderField(name))) foreach {
                 case ("Content-Type", value: String) ⇒ response.setContentType(value)
-                case ("Content-Type", null) ⇒ getPortletContext.log("WARNING: Received null Content-Type for URL: " + connection.getURL.toString)
-                case (name, value: String) ⇒ response.setProperty(name, value)
+                case ("Content-Type", null)          ⇒ getPortletContext.log("WARNING: Received null Content-Type for URL: " + connection.getURL.toString)
+                case (name, value: String)           ⇒ response.setProperty(name, value)
             }
 
+    private def propagateRequestHeaders(headers: Seq[(String, String)], connection: HttpURLConnection): Unit =
+        for ((name, value) ← headers)
+            connection.addRequestProperty(name, value)
+
     // If we know about the remote session id, set it on the connection to Form Runner
-    private def setOutgoingRemoteSessionIdAndHeaders(session: PortletSession, connection: HttpURLConnection): Unit = {
+    private def setRequestRemoteSessionIdAndHeaders(session: PortletSession, connection: HttpURLConnection): Unit = {
         // Tell Orbeon Forms explicitly that we are in fact in a portlet environment. This causes the server to use
         // WSRP URL rewriting for the resulting HTML and CSS.
         connection.addRequestProperty("Orbeon-Client", "portlet")
@@ -237,7 +307,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     }
 
     // If Form Runner sets a remote session id, remember it
-    private def handleRemoteSessionId(session: PortletSession, connection: HttpURLConnection): Unit =
+    private def handleResponseRemoteSessionId(session: PortletSession, connection: HttpURLConnection): Unit =
         // Set session cookie
         connection.getHeaderField("Set-Cookie") match {
             case setCookieHeader: String if setCookieHeader contains "JSESSIONID" ⇒

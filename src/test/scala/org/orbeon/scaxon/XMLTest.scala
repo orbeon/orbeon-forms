@@ -37,7 +37,8 @@ class XMLTest extends AssertionsForJUnit {
         assert((foo \@ ("a1" || "a2") map (_.stringValue) sorted) === Seq("v1", "v2"))
     }
 
-    @Test def implicitStringToQName(): Unit = { // weird with Scala 2.10: calling this stringToQName conflicts with implicit of same name
+
+    @Test def implicitStringToQName(): Unit = { // NOTE: This was called stringToQName and started failing with 2.10 (https://issues.scala-lang.org/browse/SI-4270)
         // stringToQName must not accept a qualified name
         intercept[AssertionError] {
             attributeInfo("foo:bar", "")

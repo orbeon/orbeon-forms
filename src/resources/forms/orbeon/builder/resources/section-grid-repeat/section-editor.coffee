@@ -72,10 +72,13 @@ $ ->
 
         sendNewLabelValue = ->
             newLabelValue = f$.val labelInput
-            OD.setValue (f$.attr 'id', $ '.fb-section-new-label'), newLabelValue
             section = Builder.findInCache sectionsCache, (Builder.adjustedOffset labelInput).top
             f$.text newLabelValue, f$.find '.fr-section-label:first a', section.el
-            OD.dispatchEvent (f$.attr 'id', section.el), 'fb-update-section-label'
+            sectionId = f$.attr 'id', section.el
+            OD.dispatchEvent
+                targetId: sectionId
+                eventName: 'fb-update-section-label'
+                properties: label: newLabelValue
             f$.hide labelInput
 
         showLabelEditor = (clickInterceptor) ->

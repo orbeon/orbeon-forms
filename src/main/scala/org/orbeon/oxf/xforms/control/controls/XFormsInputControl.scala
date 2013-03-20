@@ -35,7 +35,7 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xml.XMLConstants._
 
 /**
- * Represents an xf:input control.
+ * xf:input control
  */
 class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsSingleNodeControl(container, parent, element, id)
@@ -112,7 +112,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                     // Special case of empty parts
                     ""
             case "string" | null ⇒
-                // Apply replacement filter for string type only
+                // Replacement-based input sanitation for string type only
                 containingDocument.getStaticState.sanitizeInput(unformatTransform(externalValue))
             case _ ⇒
                 unformatTransform(externalValue)

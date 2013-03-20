@@ -63,14 +63,7 @@ class XFormsStaticStateImpl(
     lazy val isHTMLDocument        = staticStateDocument.isHTMLDocument
     lazy val isXPathAnalysis       = Version.instance.isPEFeatureEnabled(getProperty[Boolean](P.XPATH_ANALYSIS_PROPERTY), P.XPATH_ANALYSIS_PROPERTY)
 
-    // Check input/textarea property first, then global property
-    // Q: Does this work if e.g. we have:
-    // - property file: oxf.xforms.filter.input defined and oxf.xforms.filter.* blank
-    // - on model:      oxf.xforms.filter.* defined, oxf.xforms.filter.input blank
-    private def sanitizeProperty(name: String) = nonEmptyOrNone(getProperty[String](name)) getOrElse getProperty[String](P.SANITIZE_PROPERTY)
-
-    lazy val sanitizeInput    = StringReplacer(sanitizeProperty(P.SANITIZE_INPUT_PROPERTY))(getIndentedLogger)
-    lazy val sanitizeTextarea = StringReplacer(sanitizeProperty(P.SANITIZE_TEXTAREA_PROPERTY))(getIndentedLogger)
+    lazy val sanitizeInput    = StringReplacer(getProperty[String](P.SANITIZE_PROPERTY))(getIndentedLogger)
 
     def isCacheDocument       = staticStateDocument.isCacheDocument
     def isClientStateHandling = staticStateDocument.isClientStateHandling

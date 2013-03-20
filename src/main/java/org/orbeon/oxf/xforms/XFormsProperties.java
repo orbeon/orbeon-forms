@@ -127,8 +127,6 @@ public class XFormsProperties {
     private static final String DATATABLE_INIT_IN_VIEWPORT = "xbl.fr.datatable.init-in-viewport";
 
     public static final String SANITIZE_PROPERTY = "sanitize";
-    public static final String SANITIZE_INPUT_PROPERTY = "sanitize.input";
-    public static final String SANITIZE_TEXTAREA_PROPERTY = "sanitize.textarea";
 
     public static class PropertyDefinition {
 
@@ -222,8 +220,6 @@ public class XFormsProperties {
             new PropertyDefinition(XPATH_ANALYSIS_PROPERTY, false, false),
             new PropertyDefinition(CACHE_DOCUMENT_PROPERTY, CACHE_DOCUMENT_DEFAULT, false),
             new PropertyDefinition(SANITIZE_PROPERTY, "", false),
-            new PropertyDefinition(SANITIZE_INPUT_PROPERTY, "", false),
-            new PropertyDefinition(SANITIZE_TEXTAREA_PROPERTY, "", false),
 
             // Properties to propagate to the client
             new PropertyDefinition(RETRY_DELAY_INCREMENT, 5000, true),

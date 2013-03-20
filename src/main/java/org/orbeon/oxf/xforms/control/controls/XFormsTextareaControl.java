@@ -72,7 +72,7 @@ public class XFormsTextareaControl extends XFormsValueFocusableControlBase { // 
         }
 
         // String replacement based on configuration
-        externalValue = containingDocument().getStaticState().sanitizeTextarea().apply(externalValue);
+        externalValue = containingDocument().getStaticState().sanitizeInput().apply(externalValue);
 
         return externalValue;
     }

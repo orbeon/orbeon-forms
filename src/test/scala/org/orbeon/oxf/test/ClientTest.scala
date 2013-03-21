@@ -11,22 +11,13 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.test
 
-import org.junit.Test
-import org.orbeon.oxf.test._
-import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.selenium.WebBrowser
+import org.orbeon.oxf.xforms.ClientPropertiesTest
+import org.orbeon.oxf.fr.FormRunnerSummaryTest
 
-trait FormRunnerSummaryTest extends AssertionsForJUnit with FormRunnerOps {
-
-    @Test def navigateSummary(): Unit = {
-        Summary.navigate("orbeon", "bookshelf")
-
-        assert("1 to 10 of 12" === Summary.paging)
-        Summary.nextPage()
-        assert("11 to 12 of 12" === Summary.paging)
-        Summary.firstPage()
-        assert("1 to 10 of 12" === Summary.paging)
-    }
-}
+// List all client tests which we want to run with a single run of the driver
+class ClientTest
+    extends OrbeonClientBase
+    with ClientPropertiesTest
+    with FormRunnerSummaryTest

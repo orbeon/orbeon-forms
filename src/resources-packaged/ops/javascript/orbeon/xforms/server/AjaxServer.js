@@ -1621,75 +1621,7 @@
                                     var yuiDialog = ORBEON.xforms.Globals.dialogs[controlVisibilityChangeId];
                                     if (yuiDialog == null) {
                                         // This is a case
-                                        var caseBeginId = "xforms-case-begin-" + controlVisibilityChangeId;
-                                        var caseBegin = ORBEON.util.Dom.get(caseBeginId);
-                                        var caseBeginParent = caseBegin.parentNode;
-                                        var foundCaseBegin = false;
-                                        for (var childId = 0; caseBeginParent.childNodes.length; childId++) {
-                                            var cursor = caseBeginParent.childNodes[childId];
-                                            if (!foundCaseBegin) {
-                                                if (cursor.id == caseBegin.id) foundCaseBegin = true;
-                                                else continue;
-                                            }
-                                            if (cursor.nodeType == ELEMENT_TYPE) {
-                                                // Change visibility by switching class
-                                                if (cursor.id == "xforms-case-end-" + controlVisibilityChangeId) break;
-                                                var doAnimate = cursor.id != "xforms-case-begin-" + controlVisibilityChangeId && // don't animate case-begin/end
-                                                        YAHOO.util.Dom.hasClass(cursor, "xxforms-animate") // only animate if class present
-                                                        && !(YAHOO.env.ua.ie != 0 && YAHOO.env.ua.ie <= 7); // simply disable animation for IE 6/7 as they behave badly
-                                                if (doAnimate) {
-
-                                                    function hideOverflowDuringAnim(anim) {
-                                                        cursor.style.overflow = "hidden";
-                                                        anim.onComplete.subscribe(_.bind(function(cursor) {
-                                                            cursor.style.overflow = "";
-                                                        }, this, cursor));
-                                                    }
-
-                                                    if (visible) {
-                                                        // Figure out what its natural height is
-                                                        cursor.style.height = "auto";
-                                                        var region = YAHOO.util.Dom.getRegion(cursor);
-                                                        var fullHeight = region.bottom - region.top;
-
-                                                        // Set height back to 0 and animate back to natural height
-                                                        cursor.style.height = 0;
-
-                                                        YAHOO.util.Dom.addClass(cursor, "xforms-case-selected");
-                                                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected");
-                                                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
-
-                                                        var anim = new YAHOO.util.Anim(cursor, { height: {  to: fullHeight } }, .2);
-                                                        hideOverflowDuringAnim(anim);
-                                                        anim.onComplete.subscribe(_.bind(function(cursor) {
-                                                            // Set back the height to auto when the animation is finished
-                                                            // This is also needed because the natural height might have changed during animation
-                                                            cursor.style.height = "auto";
-                                                        }, this, cursor));
-                                                        anim.animate();
-                                                    } else {
-                                                        var anim = new YAHOO.util.Anim(cursor, { height: { to: 0 } }, 0.2);
-                                                        hideOverflowDuringAnim(anim);
-                                                        anim.onComplete.subscribe(_.bind(function(cursor) {
-                                                            // Only close case once the animation terminates
-                                                            YAHOO.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
-                                                            YAHOO.util.Dom.removeClass(cursor, "xforms-case-selected");
-                                                        }, this, cursor));
-                                                        anim.animate();
-                                                    }
-                                                } else {
-                                                    if (visible) {
-                                                        YAHOO.util.Dom.addClass(cursor, "xforms-case-selected");
-                                                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected");
-                                                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-deselected-subsequent");
-                                                        ORBEON.util.Dom.nudgeAfterDelay(cursor);
-                                                    } else {
-                                                        YAHOO.util.Dom.addClass(cursor, "xforms-case-deselected-subsequent");
-                                                        YAHOO.util.Dom.removeClass(cursor, "xforms-case-selected");
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        ORBEON.xforms.Controls.toggleCase(controlVisibilityChangeId, visible);
                                     } else {
                                         // This is a dialog
                                         if (visible) {

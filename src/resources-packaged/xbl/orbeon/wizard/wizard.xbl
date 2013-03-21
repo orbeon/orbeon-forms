@@ -105,7 +105,7 @@
                                 <xh:div class="pagination pagination-centered">
                                     <xh:ul>
                                         <xh:li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
-                                            <xf:trigger ref="$prev-button-ref" appearance="minimal">
+                                            <xf:trigger ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
                                                 <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
                                                      a CSS  bug with IE 7:
                                                      https://github.com/orbeon/orbeon-forms/issues/723
@@ -127,7 +127,7 @@
                                             </xh:span>
                                         </xh:li>
                                         <xh:li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
-                                            <xf:trigger ref="$next-button-ref" appearance="minimal">
+                                            <xf:trigger ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
                                                 <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
                                                      a CSS  bug with IE 7:
                                                      https://github.com/orbeon/orbeon-forms/issues/723

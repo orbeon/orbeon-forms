@@ -12,10 +12,10 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  *  package org.orbeon.oxf.util
  */
+package org.orbeon.oxf.util
 
 import org.junit.Test
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.StringReplacer
 import org.scalatest.junit.AssertionsForJUnit
 
 class StringReplacerTest extends AssertionsForJUnit {

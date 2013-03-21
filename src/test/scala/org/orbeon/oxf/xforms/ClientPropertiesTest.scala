@@ -20,7 +20,7 @@ import org.orbeon.oxf.test.OrbeonClientBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.selenium.WebBrowser
 
-class ClientTest extends OrbeonClientBase with AssertionsForJUnit with WebBrowser with FormRunnerOps {
+trait ClientPropertiesTest extends AssertionsForJUnit with FormRunnerOps {
 
     @Test def testEventProperties(): Unit = {
         loadOrbeonPage("/xforms-sandbox/sample/test-event-properties")

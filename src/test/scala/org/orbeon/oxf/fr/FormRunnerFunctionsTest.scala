@@ -23,7 +23,7 @@ import FormRunner._
 import org.orbeon.oxf.util.NetUtils
 import collection.JavaConverters._
 
-class FormRunnerTest extends DocumentTestBase with AssertionsForJUnit {
+class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
     @Test def persistenceHeaders(): Unit = {
 

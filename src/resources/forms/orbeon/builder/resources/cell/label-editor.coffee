@@ -2,6 +2,7 @@ $ ->
     OD = ORBEON.xforms.Document
 
     currentControl = null
+    isHtmlSpan = -> currentControl.parents('.fr-grid-content').children('.fb-label-is-html')
 
     # Called when users press enter or tab out
     endEdit = ->
@@ -9,14 +10,15 @@ $ ->
         if labelEditor().container.is(':visible')
             # Send value to server
             newLabel = labelEditor().textfield.val()
-            isHtml = labelEditor().checkbox.is(':checked')
+            isChecked = labelEditor().checkbox.is(':checked')
             OD.dispatchEvent
                 targetId: currentControl.attr('id')
                 eventName: 'fb-update-control-label'
-                properties: label: newLabel, isHtml: isHtml.toString()
+                properties: label: newLabel, isHtml: isChecked.toString()
             labelEditor().container.hide()
-            # Update label in the DOM, without waiting for the server to send us the value
+            # Update values in the DOM, without waiting for the server to send us the value
             currentControl.find('.xforms-label').text(newLabel)
+            isHtmlSpan().text(isChecked.toString())
 
     # Heuristic to close the editor based on click and focus events
     clickOrFocus = ({target}) ->
@@ -48,14 +50,13 @@ $ ->
         label = $(target)
         # We don't want the browser to set the focus on the input
         label.removeAttr('for')
+        # Remember which control we're editing
+        currentControl = label.parent('.xforms-control')
         # Position and populate editor
         labelEditor().container.show()
         labelEditor().container.offset(label.offset())
         labelEditor().textfield.outerWidth(label.outerWidth() - labelEditor().checkbox.outerWidth(true))
         labelEditor().textfield.val(label.text()).focus()
-        isHTML = label.parents('.fr-grid-content').children('.fb-label-is-html').text() == 'true'
-        labelEditor().checkbox.prop('checked', isHTML)
-        # Remember which control we're editing
-        currentControl = label.parent('.xforms-control')
+        labelEditor().checkbox.prop('checked', isHtmlSpan().text() == 'true')
 
     $('.fb-main').on('click', '.xforms-label', startEdit)

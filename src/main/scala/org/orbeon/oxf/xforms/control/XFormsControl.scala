@@ -169,6 +169,7 @@ class XFormsControl(
         previousEffectiveIdCommit()
     }
 
+    final def appearances    = XFormsControl.appearances(staticControl)
     final def getAppearances = XFormsControl.jAppearances(staticControl)
     def isStaticReadonly = false
 

@@ -33,6 +33,7 @@
     <orderEntry type="library" name="ScalaTest" level="application" />
     <orderEntry type="library" name="Rhino" level="application" />
     <orderEntry type="library" name="Scala 2.10.1" level="project" />
+    <orderEntry type="library" name="jquery" level="application" />
   </component>
 </module>
 

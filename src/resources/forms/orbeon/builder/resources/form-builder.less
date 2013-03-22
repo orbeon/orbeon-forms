@@ -401,15 +401,21 @@ body {
     /* ***** In-Place Editing ******************************************************************************************* */
 
     // Label and hint editors
-    .fr-grid .xforms-label input, .fr-grid .xforms-hint input  {
+
+    .fb-label-is-html { display: none }
+    .fr-grid .xforms-label input, .fr-grid .xforms-hint input, .fb-label-editor input[type='text'] {
         height: @baseLineHeight;
         padding: 0;
         .box-sizing(border-box);
         .border-radius(0);
     }
 
+    .fb-label-editor input[type='checkbox'] {
+        margin-left: 5px;                           // Use margin as padding doesn't work well on HTML input elements
+    }
+
     h2 .fr-section-label {
-        height: 36px;                                                                                                       // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
+        height: 36px;                               // So the title takes space even when empty; 36px is line-height in bootstrap.css                                                                                                                       // Goes on the label, not the h2, so the collaps background image shows even when empty
     }
 
     /* ***** Grid ******************************************************************************************************* */

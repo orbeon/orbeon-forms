@@ -498,8 +498,12 @@ body {
   box-sizing: border-box;
   border: none;
 }
+.orbeon .fb-label-is-html {
+  display: none;
+}
 .orbeon .fr-grid .xforms-label input,
-.orbeon .fr-grid .xforms-hint input {
+.orbeon .fr-grid .xforms-hint input,
+.orbeon .fb-label-editor input[type='text'] {
   height: 20px;
   padding: 0;
   -webkit-box-sizing: border-box;
@@ -508,6 +512,9 @@ body {
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
+}
+.orbeon .fb-label-editor input[type='checkbox'] {
+  margin-left: 5px;
 }
 .orbeon h2 .fr-section-label {
   height: 36px;

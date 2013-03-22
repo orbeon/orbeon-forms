@@ -51,6 +51,7 @@ $ ->
         # Position and populate editor
         labelEditor().container.show()
         labelEditor().container.offset(label.offset())
+        labelEditor().textfield.outerWidth(label.outerWidth() - labelEditor().checkbox.outerWidth(true))
         labelEditor().textfield.val(label.text()).focus()
         isHTML = label.parents('.fr-grid-content').children('.fb-label-is-html').text() == 'true'
         labelEditor().checkbox.prop('checked', isHTML)

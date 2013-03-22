@@ -636,7 +636,7 @@ object ControlOps {
     def setControlLHHAMediatype(inDoc: NodeInfo, controlName: String, lhha: String, isHTML: Boolean): Unit =
         findControlByName(inDoc, controlName).toList child lhha foreach { lhhaElement ⇒
             if (isHTML != isControlLHHAHTMLMediatype(inDoc, controlName, lhha)) {
-                if (! isHTML)
+                if (isHTML)
                     insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
                 else
                     delete(lhhaElement \@ "mediatype")

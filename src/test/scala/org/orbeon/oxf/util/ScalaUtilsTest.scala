@@ -17,6 +17,7 @@ package org.orbeon.oxf.util
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.ScalaUtils._
+import scala.collection.mutable
 
 class ScalaUtilsTest extends AssertionsForJUnit {
 
@@ -171,5 +172,23 @@ class ScalaUtilsTest extends AssertionsForJUnit {
         assert(lists === (filterAndCapitalizeHeaders(arrays, out = true) map { case (k, v) ⇒ k → v.toList}))
         assert(lists === filterAndCapitalizeHeaders(lists, out = true))
         assert(lists === filterAndCapitalizeHeaders(lists ++ toFilter, out = true))
+    }
+
+    @Test def testSplit(): Unit = {
+
+        val expected = Seq(
+            ""                    → Seq(),
+            "  "                  → Seq(),
+            " GET "               → Seq("GET"),
+            " GET  POST  PUT "    → Seq("GET", "POST", "PUT"),
+            " GET  POST  PUT GET" → Seq("GET", "POST", "PUT", "GET")
+        )
+
+        for ((in, out) ← expected) {
+            assert(out === split[List](in))
+            assert(out === split[Array](in).to[List])
+            assert(out.to[Set] === split[Set](in))
+            assert(out.to[mutable.LinkedHashSet].to[List] === split[mutable.LinkedHashSet](in).toList)
+        }
     }
 }

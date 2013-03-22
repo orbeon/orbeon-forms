@@ -134,7 +134,7 @@ object ScalaUtils {
 
     // Convert a string of tokens to a set
     // NOTE: ("" split """\s+""" toSet).size == 1!
-    def stringToSet(s: String)               = nonEmptyOrNone(s) map (_ split """\s+""" toSet) getOrElse  Set.empty[String]
+    def stringToSet(s: String)               = split[Set](s)
     def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
 
     // Split a URL into a path and query part
@@ -180,7 +180,7 @@ object ScalaUtils {
     // The caller can specify the type of the resulting values, e.g.:
     // - combineValues[AnyRef, Array]
     // - combineValues[String, List]
-    def combineValues[U >: String, T[_]](parameters: Seq[(String, String)])(implicit cbf: CanBuildFrom[T[U], U, T[U]]): Seq[(String, T[U])] = {
+    def combineValues[U >: String, T[_]](parameters: Seq[(String, String)])(implicit cbf: CanBuildFrom[Nothing, U, T[U]]): Seq[(String, T[U])] = {
         val result = mutable.LinkedHashMap[String, mutable.Builder[String, T[U]]]()
 
         for ((name, value) ← parameters)
@@ -207,6 +207,8 @@ object ScalaUtils {
     private val HeadersToFilter = Set("transfer-encoding", "connection", "host")
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
+    // Q: Doesn't Scala already have such a type?
+    // Q: Should the type be parametrized with String?
     type ConvertibleToStringSeq[T[_]] = T[String] ⇒ Seq[String]
 
     // Filter headers that that should never be propagated in our proxies
@@ -222,4 +224,60 @@ object ScalaUtils {
             if (values ne null) && values.nonEmpty
         } yield
             capitalizeHeader(name) → values
+
+    /*
+     * Partial rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).
+     *
+     * This implementation can return any collection type for which there is a builder:
+     *
+     * split[List]("a b")
+     * split[Array]("a b")
+     * split[Set]("a b")
+     * split[LinkedHashSet]("a b")
+     * split("a b")
+     *
+     * Or:
+     *
+     * val result: List[String]          = split("a b")(breakOut)
+     * val result: Array[String]         = split("a b")(breakOut)
+     * val result: Set[String]           = split("a b")(breakOut)
+     * val result: LinkedHashSet[String] = split("a b")(breakOut)
+     */
+    def split[T[_]](str: String, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
+
+        val builder = cbf()
+
+        if (str ne null) {
+            val len = str.length
+            if (len != 0) {
+                var sizePlus1 = 1
+                var i = 0
+                var start = 0
+                var doMatch = false
+
+                while (i < len) {
+                    if (Character.isWhitespace(str.charAt(i))) {
+                        if (doMatch) {
+                            if (sizePlus1 == max)
+                                i = len
+
+                            sizePlus1 += 1
+
+                            builder += str.substring(start, i)
+                            doMatch = false
+                        }
+                        i += 1
+                        start = i
+                    } else {
+                        doMatch = true
+                        i += 1
+                    }
+                }
+
+                if (doMatch)
+                    builder += str.substring(start, i)
+            }
+        }
+        builder.result()
+    }
 }

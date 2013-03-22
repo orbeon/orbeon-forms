@@ -312,8 +312,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 final ElementAnalysis elementAnalysis = getElementAnalysis(attributes, handlerContext);
 
                 // XFormsAnnotatorContentHandler adds this appearance if needed
-                // NOTE: we just check on the attribute value instead of resolving the QName, so that XFormsAnnotatorContentHandler
-                // doesn't have to declare the xxf:* prefix.
+                // See: https://github.com/orbeon/orbeon-forms/issues/418
                 final String appearanceAttributeValue = attributes.getValue(XFormsConstants.APPEARANCE_QNAME.getName());
                 return XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName().equals(appearanceAttributeValue) ? elementAnalysis : null;
             }

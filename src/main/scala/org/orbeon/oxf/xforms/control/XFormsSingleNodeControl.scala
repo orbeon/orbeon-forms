@@ -309,14 +309,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     protected def outputValueElement(ch: ContentHandlerHelper, xformsValueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String) {
 
         // Create element with text value
-        val value =
-            if (xformsValueControl.isRelevant) {
-                // NOTE: Not sure if it is still possible to have a null value when the control is relevant
-                val tempValue = xformsValueControl.getEscapedExternalValue
-                if (tempValue eq null) "" else tempValue
-            } else
-                // Some controls don't have "" as non-relevant value
-                xformsValueControl.getNonRelevantEscapedExternalValue
+        val value = xformsValueControl.getEscapedExternalValue
 
         if (doOutputElement || ! isNewlyVisibleSubtree || value != "") {
             ch.startElement("xxf", XXFORMS_NAMESPACE_URI, elementName, attributesImpl)

@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils
 import AjaxSupport._
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper}
 import ContentHandlerHelper.CDATA
+import org.orbeon.oxf.util.ScalaUtils
 
 trait ControlAjaxSupport {
 
@@ -139,33 +140,32 @@ trait ControlAjaxSupport {
 // NOTE: Use name different from trait so that the Java compiler is happy
 object AjaxSupport {
 
+    private def tokenize(value: String) = ScalaUtils.split[LinkedHashSet](value)
+
+    // Diff two sets of classes
+    def diffClasses(class1: String, class2: String) =
+        if (class1.isEmpty)
+            tokenize(class2) mkString " "
+        else {
+            val classes1 = tokenize(class1)
+            val classes2 = tokenize(class2)
+
+            // Classes to remove and to add
+            val toRemove = classes1 -- classes2 map ('-' + _)
+            val toAdd    = classes2 -- classes1 map ('+' + _)
+
+            toRemove ++ toAdd mkString " "
+        }
+
     // NOTE: Similar to XFormsSingleNodeControl.addAjaxCustomMIPs. Should unify handling of classes.
     def addAjaxClasses(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
         var added = false
-        val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(CLASS_QNAME)))
-        val class2 = Option(control2.getExtensionAttributeValue(CLASS_QNAME))
+        val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(CLASS_QNAME))) getOrElse ""
+        val class2 = Option(control2.getExtensionAttributeValue(CLASS_QNAME)) getOrElse ""
 
         if (newlyVisibleSubtree || class1 != class2) {
-
-            val attributeOption =
-                if (class1.isEmpty)
-                    class2
-                else {
-                    def tokenize(value: Option[String]) = value map (v ⇒ LinkedHashSet(StringUtils.split(v): _*)) getOrElse LinkedHashSet()
-
-                    val classes1 = tokenize(class1)
-                    val classes2 = tokenize(class2)
-
-                    // Classes to remove and to add
-                    val toRemove = classes1 -- classes2 map ("-" + _)
-                    val toAdd    = classes2 -- classes1 map ("+" + _)
-                    
-                    Some(toRemove ++ toAdd mkString " ")
-                }
-
-            attributeOption foreach { attributeValue ⇒
-                added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
-            }
+            val attributeValue = diffClasses(class1, class2)
+            added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
         }
         added
     }

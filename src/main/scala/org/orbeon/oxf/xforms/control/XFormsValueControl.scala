@@ -184,15 +184,22 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     /**
      * Return the external value ready to be inserted into the client after an Ajax response.
      */
-    def getEscapedExternalValue = getExternalValue
+    def getRelevantEscapedExternalValue = getExternalValue
+    def getNonRelevantEscapedExternalValue: String =  ""
+
+    final def getEscapedExternalValue =
+        if (isRelevant)
+            // NOTE: Not sure if it is still possible to have a null value when the control is relevant
+            Option(getRelevantEscapedExternalValue) getOrElse ""
+        else
+            // Some controls don't have "" as non-relevant value
+            getNonRelevantEscapedExternalValue
 
     protected final def setValue(value: String): Unit =
         this._value = value
 
     protected final def setExternalValue(externalValue: String): Unit =
         this.externalValue = externalValue
-
-    def getNonRelevantEscapedExternalValue: String =  ""
 
     override def getBackCopy: AnyRef = {
         // Evaluate lazy values

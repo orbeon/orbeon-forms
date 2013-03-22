@@ -172,7 +172,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 defaultValue
         }
 
-    override def getEscapedExternalValue =
+    override def getRelevantEscapedExternalValue =
         if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatypeAttribute exists (_.startsWith("image/")))) {
             val externalValue = getExternalValue
             if (StringUtils.isNotBlank(externalValue)) {

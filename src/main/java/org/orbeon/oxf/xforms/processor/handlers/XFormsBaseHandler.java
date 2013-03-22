@@ -208,7 +208,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
                         // Determine attribute value
                         // NOTE: This also handles dummy images for the xhtml:img/@src case
-                        final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValue(attributeControl, controlAnalysis);
+                        final String effectiveAttributeValue = XXFormsAttributeControl.getExternalValueHandleSrc(attributeControl, controlAnalysis);
 
                         // Set the value of the attribute
                         attributes = XMLUtils.addOrReplaceAttribute(attributes, attributes.getURI(i),

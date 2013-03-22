@@ -235,8 +235,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-tabview$xf-19" for="my-tabview$nav-1" name="class">selected</xxf:attribute>
-                        <xxf:attribute id="my-tabview$xf-21" for="my-tabview$nav-2" name="class"/>
+                        <xxf:control class="selected" id="my-tabview$nav-1"/>
                         <xxf:control id="my-tabview$fr-tabview-content" class="yui-content"/>
                         <xxf:control id="my-tabview$output1">42</xxf:control>
                         <xxf:control id="my-tabview$output2">42</xxf:control>
@@ -318,17 +317,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-tabview$xf-33" for="my-tabview$nav-1" name="class">selected</xxf:attribute>
-                        <xxf:attribute id="my-tabview$xf-35" for="my-tabview$nav-2" name="class"/>
-                        <xxf:attribute id="my-tabview$xf-37" for="my-tabview$nav-3" name="class"/>
+                        <xxf:control class="selected" id="my-tabview$nav-1"/>
                         <xxf:control id="my-tabview$xf-38">My label 3</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-39" for="my-tabview$nav-4" name="class"/>
                         <xxf:control id="my-tabview$xf-40">My label 4</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-41" for="my-tabview$nav-5" name="class"/>
                         <xxf:control id="my-tabview$xf-42">My label 5</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-43" for="my-tabview$nav-6" name="class"/>
                         <xxf:control id="my-tabview$xf-44">My label 6</xxf:control>
-                        <xxf:attribute id="my-tabview$xf-45" for="my-tabview$nav-7" name="class"/>
                         <xxf:control id="my-tabview$xf-46">My label 7</xxf:control>
                         <xxf:control id="my-tabview$fr-tabview-content" class="yui-content"/>
                     </xxf:control-values>
@@ -571,7 +564,7 @@
                         <xxf:control id="my-currency$xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
                         <xxf:attribute id="my-currency$xf-22" for="my-currency$xf-22" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-currency$xf-28" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
-                        <xxf:attribute id="my-currency$xf-30" for="my-currency$xf-29" name="class">fr-width-10em input-prepend</xxf:attribute>
+                        <xxf:control class="fr-width-10em input-prepend" id="my-currency$xf-29"/>
                         <xxf:control id="my-currency$xf-31" class="add-on"/>
                         <xxf:control id="my-currency$xf-32">$</xxf:control>
                         <xxf:control id="my-currency$xf-33" class="add-on" relevant="false"/>
@@ -582,7 +575,7 @@
                     <xxf:script name="xf_bb240fc3ea943af5cb3019cdb5d43148021201ec" target-id="my-currency$xf-5" observer-id="my-currency$xf-5"/>
                     <xxf:script name="xf_ee48e71b3ea5811ae186431b61fae15a32a302b5" target-id="my-currency" observer-id="my-currency"/>
                 </xxf:action>
-                </xxf:event-response>
+            </xxf:event-response>
         </output>
     </test>
 
@@ -742,15 +735,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-datatable$xf-24" for="my-datatable$xf-23" name="class"/>
-                        <xxf:attribute id="my-datatable$xf-39·1" for="my-datatable$xf-38·1" name="class">yui-dt-first yui-dt-even</xxf:attribute>
-                        <xxf:attribute id="my-datatable$xf-44·1" for="my-datatable$xf-43·1" name="class"/>
+                        <xxf:control class="yui-dt-first yui-dt-even" id="my-datatable$xf-38·1"/>
                         <xxf:control id="my-datatable$my-input·1">1</xxf:control>
-                        <xxf:attribute id="my-datatable$xf-39·2" for="my-datatable$xf-38·2" name="class">yui-dt-odd yui-dt-selected</xxf:attribute>
-                        <xxf:attribute id="my-datatable$xf-44·2" for="my-datatable$xf-43·2" name="class"/>
+                        <xxf:control class="yui-dt-odd yui-dt-selected" id="my-datatable$xf-38·2"/>
                         <xxf:control id="my-datatable$my-input·2">2</xxf:control>
-                        <xxf:attribute id="my-datatable$xf-39·3" for="my-datatable$xf-38·3" name="class">yui-dt-last yui-dt-even</xxf:attribute>
-                        <xxf:attribute id="my-datatable$xf-44·3" for="my-datatable$xf-43·3" name="class"/>
+                        <xxf:control class="yui-dt-last yui-dt-even" id="my-datatable$xf-38·3"/>
                         <xxf:control id="my-datatable$my-input·3">3</xxf:control>
                     </xxf:control-values>
                     <xxf:script name="xf_d23c3ac47cd301b3f95dc8eefa47ad79bba4be9f" target-id="my-datatable$fr-dt-group" observer-id="my-datatable$fr-dt-group"/>

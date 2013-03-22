@@ -27,8 +27,9 @@
       xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
       xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
+      xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
 
-      xxf:external-events="show-fb-test-dialog"
+      xxf:external-events="show-fb-test-dialog fb-update-control-label"
       xxf:noscript-support="false"
       xxf:xpath-analysis="false"
       xxf:expose-xpath-types="true"
@@ -360,8 +361,11 @@
     </xf:instance>
 
     <xf:action ev:observer="fb" ev:event="fb-update-section-label" xxf:phantom="true">
-        <xf:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxf:targetid'))]/label"
-                         value="event('label')"/>
+        <xf:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxf:targetid'))]/label" value="event('label')"/>
+    </xf:action>
+    <xf:action ev:observer="fb" ev:event="fb-update-control-label" xxf:phantom="true">
+        <xf:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxf:targetid'))]/label" value="event('label')"/>
+        <xf:action type="xpath">controlOps:setControlLHHAMediatype(instance('fb-form-instance'), controlOps:controlName(event('xxf:targetid')), 'label', event('isHtml') = 'true')</xf:action>
     </xf:action>
     <xf:var name="variables" value="instance('fb-variables')"/>
     <xf:var name="selected-cell" value="$variables/selected-cell"/>

@@ -43,15 +43,18 @@ $ ->
                 $(document).on('focusin', clickOrFocus)
             editor
 
-    labelClicked = ({target}) ->
-        target = $(target)
+    # Show editor on click on label
+    startEdit = ({target}) ->
+        label = $(target)
         # We don't want the browser to set the focus on the input
-        target.removeAttr('for')
+        label.removeAttr('for')
         # Position and populate editor
         labelEditor().container.show()
-        labelEditor().container.offset(target.offset())
-        labelEditor().textfield.val(target.text()).focus()
+        labelEditor().container.offset(label.offset())
+        labelEditor().textfield.val(label.text()).focus()
+        isHTML = label.parents('.fr-grid-content').children('.fb-label-is-html').text() == 'true'
+        labelEditor().checkbox.prop('checked', isHTML)
         # Remember which control we're editing
-        currentControl = target.parent('.xforms-control')
+        currentControl = label.parent('.xforms-control')
 
-    $('.fb-main').on('click', '.xforms-label', labelClicked)
+    $('.fb-main').on('click', '.xforms-label', startEdit)

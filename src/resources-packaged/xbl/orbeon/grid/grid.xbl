@@ -252,6 +252,10 @@
                                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                                                         <!-- If the label, help, and hint are shown in the table header, don't put them in the cell -->
                                                                         <xsl:for-each select="$control">
+                                                                            <xsl:if test="$is-editable">
+                                                                                <!-- So the client-side code can populate populate the checkbox when editing the label -->
+                                                                                <xh:span class="fb-label-is-html"><xsl:value-of select="xf:label/@mediatype = 'text/html'"/></xh:span>
+                                                                            </xsl:if>
                                                                             <xsl:copy>
                                                                                 <xsl:variable name="lhh" select="xf:label | xf:help | xf:hint"/>
                                                                                 <xsl:variable name="nodes" select="@* | node()"/>

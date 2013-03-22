@@ -28,22 +28,19 @@ $ ->
         endEdit() unless eventOnEditor or eventOnControlLabel
 
     # Returns a <div> which contains the text field and checkbox
-    labelEditor = do ->
-        editor = null
-        ->
-            unless editor?
-                # Create elements and add to the DOM
-                editor = {}
-                editor.textfield = $('<input type="text">')
-                editor.checkbox  = $('<input type="checkbox">')
-                editor.container = $('<div class="fb-label-editor">').append(editor.textfield).append(editor.checkbox)
-                $('.fb-main').append(editor.container)
-                # Register event listeners
-                editor.checkbox.on('click', -> labelEditor().textfield.focus())
-                editor.textfield.on('keypress', (e) -> if e.which == 13 then endEdit())
-                $(document).on('click', clickOrFocus)
-                $(document).on('focusin', clickOrFocus)
-            editor
+    labelEditor = _.memoize ->
+        # Create elements and add to the DOM
+        editor = {}
+        editor.textfield = $('<input type="text">')
+        editor.checkbox  = $('<input type="checkbox">')
+        editor.container = $('<div class="fb-label-editor">').append(editor.textfield).append(editor.checkbox)
+        $('.fb-main').append(editor.container)
+        # Register event listeners
+        editor.checkbox.on('click', -> labelEditor().textfield.focus())
+        editor.textfield.on('keypress', (e) -> if e.which == 13 then endEdit())
+        $(document).on('click', clickOrFocus)
+        $(document).on('focusin', clickOrFocus)
+        editor
 
     # Show editor on click on label
     startEdit = ({target}) ->

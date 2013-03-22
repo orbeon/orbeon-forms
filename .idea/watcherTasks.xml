@@ -25,7 +25,9 @@
       <option name="scopeName" value="Project Files" />
       <option name="trackOnlyRoot" value="false" />
       <option name="workingDir" value="$FileDir$" />
-      <envs />
+      <envs>
+        <env name="PATH" value="/usr/local/bin" />
+      </envs>
     </TaskOptions>
     <TaskOptions isEnabled="true">
       <option name="arguments" value="--compile --output $ProjectFileDir$/build/orbeon-war/WEB-INF/resources/$FileDirRelativeToSourcepath$ $FilePathRelativeToSourcepath$" />

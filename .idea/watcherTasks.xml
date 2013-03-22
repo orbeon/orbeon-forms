@@ -45,7 +45,9 @@
       <option name="scopeName" value="Project Files" />
       <option name="trackOnlyRoot" value="true" />
       <option name="workingDir" value="$SourcepathEntry$" />
-      <envs />
+      <envs>
+        <env name="PATH" value="/usr/local/bin" />
+      </envs>
     </TaskOptions>
   </component>
 </project>

@@ -159,15 +159,14 @@ object AjaxSupport {
 
     // NOTE: Similar to XFormsSingleNodeControl.addAjaxCustomMIPs. Should unify handling of classes.
     def addAjaxClasses(attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean, control1: XFormsControl, control2: XFormsControl): Boolean = {
-        var added = false
         val class1 = Option(control1) flatMap (control ⇒ Option(control.getExtensionAttributeValue(CLASS_QNAME))) getOrElse ""
         val class2 = Option(control2.getExtensionAttributeValue(CLASS_QNAME)) getOrElse ""
 
         if (newlyVisibleSubtree || class1 != class2) {
             val attributeValue = diffClasses(class1, class2)
-            added |= addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
-        }
-        added
+            addOrAppendToAttributeIfNeeded(attributesImpl, "class", attributeValue, newlyVisibleSubtree, attributeValue == "")
+        } else
+            false
     }
 
     def addOrAppendToAttributeIfNeeded(attributesImpl: AttributesImpl, name: String, value: String, isNewRepeatIteration: Boolean, isDefaultValue: Boolean) =

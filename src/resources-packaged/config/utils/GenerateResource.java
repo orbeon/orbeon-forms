@@ -1,12 +1,13 @@
 package config.utils;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.cache.OutputCacheKey;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
-import org.xml.sax.ContentHandler;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 
 public class GenerateResource extends ProcessorImpl {
 
@@ -18,9 +19,9 @@ public class GenerateResource extends ProcessorImpl {
         ProcessorOutput output = new ProcessorOutputImpl(GenerateResource.this, name) {
 
             // Read from URL generator
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
                 ProcessorOutputImpl urlGeneratorOutput = getURLGenerator(pipelineContext);
-                urlGeneratorOutput.read(pipelineContext, contentHandler);
+                urlGeneratorOutput.read(pipelineContext, xmlReceiver);
             }
 
             // Return key from URL generator
@@ -35,7 +36,7 @@ public class GenerateResource extends ProcessorImpl {
                 return urlGeneratorOutput.getValidity(context);
             }
 
-            // If necessary create URL generator and store in state. Then retourn URL generator output
+            // If necessary create URL generator and store in state. Then return URL generator output
             private ProcessorOutputImpl getURLGenerator(PipelineContext context) {
                 State state = (State) getState(context);
                 if (state.urlGenerator == null) {

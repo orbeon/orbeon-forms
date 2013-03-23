@@ -123,7 +123,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
         assert(expectedAsList   === combineValues[String, List](parameters))
         assert(expectedAsVector === combineValues[String, Vector](parameters))
         assert(expectedAsSet    === combineValues[String, Set](parameters))
-        assert(expectedAsList   === (combineValues[AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.toList}))
+        assert(expectedAsList   === (combineValues[AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
     }
 
     @Test def testNonEmptyOrNone(): Unit = {
@@ -169,7 +169,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
 
         val toFilter = Seq("Transfer-Encoding", "Connection", "Host", "Content-Length") map (name ⇒ name → List("NOT!"))
 
-        assert(lists === (filterAndCapitalizeHeaders(arrays, out = true) map { case (k, v) ⇒ k → v.toList}))
+        assert(lists === (filterAndCapitalizeHeaders(arrays, out = true) map { case (k, v) ⇒ k → v.to[List]}))
         assert(lists === filterAndCapitalizeHeaders(lists, out = true))
         assert(lists === filterAndCapitalizeHeaders(lists ++ toFilter, out = true))
     }
@@ -188,7 +188,7 @@ class ScalaUtilsTest extends AssertionsForJUnit {
             assert(out === split[List](in))
             assert(out === split[Array](in).to[List])
             assert(out.to[Set] === split[Set](in))
-            assert(out.to[mutable.LinkedHashSet].to[List] === split[mutable.LinkedHashSet](in).toList)
+            assert(out.to[mutable.LinkedHashSet].to[List] === split[mutable.LinkedHashSet](in).to[List])
         }
     }
 }

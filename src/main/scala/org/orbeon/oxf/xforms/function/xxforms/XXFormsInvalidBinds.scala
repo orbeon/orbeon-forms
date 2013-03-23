@@ -13,17 +13,16 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.apache.axis.utils.StringUtils
+import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.xforms.InstanceData
-import org.orbeon.oxf.xforms.function.XFormsFunction
+import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.value.StringValue
 
 /**
  * xxf:invalid-binds()
  */
-class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunction as addToPathMap returns something different
+class XXFormsInvalidBinds extends XFormsFunction with FunctionSupport {// don't extend XFormsMIPFunction as addToPathMap returns something different
     
     override def iterate(xpathContext: XPathContext): SequenceIterator = {
         
@@ -34,11 +33,7 @@ class XXFormsInvalidBinds extends XFormsFunction {// don't extend XFormsMIPFunct
             case Some(nodeInfo: NodeInfo) ⇒
                 Option(InstanceData.getInvalidBindIds(nodeInfo)) match {
                     case Some(invalidBindIdsString) ⇒
-                        val result =
-                            for (invalidBindId ← StringUtils.split(invalidBindIdsString, ' '))
-                                yield StringValue.makeStringValue(invalidBindId).asInstanceOf[Item]
-
-                        new ArrayIterator(result)
+                        asIterator(ScalaUtils.split[Array](invalidBindIdsString))
                     case None ⇒
                         // No invalid bind ids
                         EmptyIterator.getInstance

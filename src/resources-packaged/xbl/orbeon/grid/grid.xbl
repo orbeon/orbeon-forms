@@ -252,13 +252,19 @@
                                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
                                                                         <!-- If the label, help, and hint are shown in the table header, don't put them in the cell -->
                                                                         <xsl:for-each select="$control">
-                                                                            <xsl:if test="$is-editable">
-                                                                                <!-- So the client-side code can populate populate the checkbox when editing the label -->
-                                                                                <xh:span class="fb-label-is-html"><xsl:value-of select="xf:label/@mediatype = 'text/html'"/></xh:span>
-                                                                            </xsl:if>
                                                                             <xsl:copy>
+                                                                                <!-- So the client-side code can populate populate the checkbox when editing the label -->
+                                                                                <xsl:choose>
+                                                                                    <xsl:when test="$is-editable">
+                                                                                        <xsl:variable name="mediatype-class" select="if (xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
+                                                                                        <xsl:attribute name="class" select="string-join((@class, $mediatype-class), ' ')"/>
+                                                                                    </xsl:when>
+                                                                                    <xsl:otherwise>
+                                                                                        <xsl:copy-of select="@class"/>
+                                                                                    </xsl:otherwise>
+                                                                                </xsl:choose>
                                                                                 <xsl:variable name="lhh" select="xf:label | xf:help | xf:hint"/>
-                                                                                <xsl:variable name="nodes" select="@* | node()"/>
+                                                                                <xsl:variable name="nodes" select="@* except @class| node()"/>
                                                                                 <xsl:copy-of select="if ($lhh-in-header and empty($control/self::xf:trigger)) then ($nodes except $lhh) else $nodes"/>
                                                                             </xsl:copy>
                                                                         </xsl:for-each>

@@ -2,7 +2,8 @@ $ ->
     OD = ORBEON.xforms.Document
 
     currentControl = null
-    isHtmlSpan = -> currentControl.parents('.fr-grid-content').children('.fb-label-is-html')
+    isLabelHtml = -> currentControl.is('.fb-label-is-html')
+    setLabelHtml = (isHtml) -> currentControl.toggleClass('.fb-label-is-html', isHtml)
 
     # Called when users press enter or tab out
     endEdit = ->
@@ -18,7 +19,7 @@ $ ->
             labelEditor().container.hide()
             # Update values in the DOM, without waiting for the server to send us the value
             currentControl.find('.xforms-label').text(newLabel)
-            isHtmlSpan().text(isChecked.toString())
+            setLabelHtml(isChecked)
 
     # Heuristic to close the editor based on click and focus events
     clickOrFocus = ({target}) ->
@@ -54,6 +55,6 @@ $ ->
         labelEditor().container.offset(label.offset())
         labelEditor().textfield.outerWidth(label.outerWidth() - labelEditor().checkbox.outerWidth(true))
         labelEditor().textfield.val(label.text()).focus()
-        labelEditor().checkbox.prop('checked', isHtmlSpan().text() == 'true')
+        labelEditor().checkbox.prop('checked', isLabelHtml())
 
     $('.fb-main').on('click', '.xforms-label', startEdit)

@@ -11,28 +11,26 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms
+package org.orbeon.oxf.client
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.orbeon.oxf.test.FormRunnerOps
-import org.orbeon.oxf.test.OrbeonClientBase
-import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.selenium.WebBrowser
+import org.scalatest.junit.{MustMatchersForJUnit, AssertionsForJUnit}
 
-trait ClientPropertiesTest extends AssertionsForJUnit with FormRunnerOps {
+trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunnerOps {
 
     @Test def testEventProperties(): Unit = {
+
+        def checkOutputs(outputs: Seq[(String, String)]) =
+            outputs.foreach { case (cssClass, expected) ⇒
+                val actual = $("." + cssClass + " span").getText
+                assertEquals(expected, actual)
+            }
+
         loadOrbeonPage("/xforms-sandbox/sample/test-event-properties")
         checkOutputs(Seq("triggered" → "false", "p1" → "", "p2" → ""))
         $("#send-event button").click()
         waitForAjaxResponse()
         checkOutputs(Seq("triggered" → "true", "p1" → "v1", "p2" → "v2"))
     }
-
-    private def checkOutputs(outputs: Seq[(String, String)]) =
-        outputs.foreach { case (cssClass, expected) ⇒
-            val actual = $("." + cssClass + " span").getText
-            assertEquals(expected, actual)
-        }
 }

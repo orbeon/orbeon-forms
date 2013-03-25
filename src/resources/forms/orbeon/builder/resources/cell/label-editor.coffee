@@ -2,6 +2,7 @@ $ ->
     OD = ORBEON.xforms.Document
 
     currentControl = null
+    currentLabel = null
     isLabelHtml = -> currentControl.is('.fb-label-is-html')
     setLabelHtml = (isHtml) -> currentControl.toggleClass('.fb-label-is-html', isHtml)
 
@@ -18,7 +19,7 @@ $ ->
                 properties: label: newLabel, isHtml: isChecked.toString()
             labelEditor().container.hide()
             # Update values in the DOM, without waiting for the server to send us the value
-            currentControl.find('.xforms-label').text(newLabel)
+            currentLabel.text(newLabel)
             setLabelHtml(isChecked)
 
     # Heuristic to close the editor based on click and focus events
@@ -45,16 +46,24 @@ $ ->
 
     # Show editor on click on label
     startEdit = ({target}) ->
-        label = $(target)
-        # We don't want the browser to set the focus on the input
-        label.removeAttr('for')
-        # Remember which control we're editing
-        currentControl = label.parent('.xforms-control')
+        currentLabel = $(target)
+        # Find control for this label
+        th = currentLabel.parents('th')
+        currentControl =
+            if th.is('*')
+                # Case of a repeat
+                trWithControls = th.parents('table').find('tbody tr.fb-grid-tr').first()
+                tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
+                tdWithControl.find('.xforms-control').first()
+            else
+                currentLabel.parent('.xforms-control')
+        # Remove `for` so browser doesn't set the focus to the control on click
+        currentLabel.removeAttr('for')
         # Position and populate editor
         labelEditor().container.show()
-        labelEditor().container.offset(label.offset())
-        labelEditor().textfield.outerWidth(label.outerWidth() - labelEditor().checkbox.outerWidth(true))
-        labelEditor().textfield.val(label.text()).focus()
+        labelEditor().container.offset(currentLabel.offset())
+        labelEditor().textfield.outerWidth(currentLabel.outerWidth() - labelEditor().checkbox.outerWidth(true))
+        labelEditor().textfield.val(currentLabel.text()).focus()
         labelEditor().checkbox.prop('checked', isLabelHtml())
 
     $('.fb-main').on('click', '.xforms-label', startEdit)

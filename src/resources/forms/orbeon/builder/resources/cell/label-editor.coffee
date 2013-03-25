@@ -54,9 +54,9 @@ $ ->
                 # Case of a repeat
                 trWithControls = th.parents('table').find('tbody tr.fb-grid-tr').first()
                 tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
-                tdWithControl.find('.xforms-control').first()
+                tdWithControl.find('.xforms-control, .xbl-component').first()
             else
-                currentLabel.parent('.xforms-control')
+                currentLabel.parent('.xforms-control, .xbl-component')
         # Remove `for` so browser doesn't set the focus to the control on click
         currentLabel.removeAttr('for')
         # Position and populate editor

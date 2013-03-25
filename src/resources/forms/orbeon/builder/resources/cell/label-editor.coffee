@@ -17,6 +17,8 @@ $ ->
                 targetId: currentControl.attr('id')
                 eventName: 'fb-update-control-label'
                 properties: label: newLabel, isHtml: isChecked.toString()
+            # Destroy tooltip, or it doesn't get recreated on startEdit()
+            labelEditor().checkbox.tooltip('destroy')
             labelEditor().container.hide()
             # Update values in the DOM, without waiting for the server to send us the value
             currentLabel.text(newLabel)
@@ -59,6 +61,8 @@ $ ->
                 currentLabel.parent('.xforms-control, .xbl-component')
         # Remove `for` so browser doesn't set the focus to the control on click
         currentLabel.removeAttr('for')
+        # Setup tooltip for editor (don't do this once for all, as the language can change)
+        labelEditor().checkbox.tooltip(title: $('.fb-lhha-checkbox-message').text())
         # Position and populate editor
         labelEditor().container.show()
         labelEditor().container.offset(currentLabel.offset())

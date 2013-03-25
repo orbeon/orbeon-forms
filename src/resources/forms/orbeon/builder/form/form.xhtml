@@ -31,6 +31,7 @@
         <xh:link rel="stylesheet" type="text/css" href="/ops/yui/assets/skins/sam/layout.css"/>
         <xh:link rel="stylesheet" href="/forms/orbeon/builder/resources/form-builder.css" type="text/css"/>
 
+        <xh:script type="text/javascript" src="/fr/style/bootstrap/js/bootstrap.min.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/events.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/action-icons.js"/>
         <xh:script type="text/javascript" src="/forms/orbeon/builder/resources/cell/placeholders.js"/>
@@ -473,6 +474,7 @@
 
                                 <!-- Label editor -->
                                 <xf:output id="fb-placeholder-label" ref="$form-resources/enter-label/label"/>
+                                <xf:output class="fb-lhha-checkbox-message" ref="$form-resources/messages/lhha-checkbox"/>
                                 <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
                                     <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">
                                         <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>

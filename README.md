@@ -220,6 +220,12 @@ This product makes use of the PixelMixer icons at http://pixel-mixer.com/
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
+Credits
+-------
+
+We would like to thank [YourKit, LLC](http://www.yourkit.com/) for kindly supporting open source projects like Orbeon
+Forms with the full-featured [YourKit Java Profiler](http://www.yourkit.com/java/profiler/index.jsp).
+
 ---
 
 Copyright 1999-2013 (C) Orbeon, Inc. All rights reserved.

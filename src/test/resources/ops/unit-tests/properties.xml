@@ -59,6 +59,6 @@
     <property as="xs:integer" name="oxf.fr.persistence.provider2.population"                value="11244369"/>
 
     <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"
-              value="document model submission submission-details control event action analysis server html analysis-xbl-tree server-body submission-body"/>
+              value="document model submission submission-details control event action analysis server html analysis-xbl-tree server-body submission-body form-builder form-builder-grid"/>
 
 </properties>

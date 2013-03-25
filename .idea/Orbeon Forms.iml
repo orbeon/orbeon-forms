@@ -21,6 +21,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/scala" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/resources" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/resources-packaged" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
       <excludeFolder url="file://$MODULE_DIR$/build/classes" />
       <excludeFolder url="file://$MODULE_DIR$/src/resources-packaged/ops/unit-tests/exist-data" />

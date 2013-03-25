@@ -389,14 +389,12 @@
     <!-- JARs -->
     <target name="jars" depends="classes, orbeon-minify-js">
         <jar destfile="${jar.file}" compress="false">
-            <fileset dir="src/main/java">
+            <fileset dir="src/main/resources">
                 <include name="**/*.xml"/>
                 <include name="**/*.rng"/>
                 <include name="**/*.css"/>
                 <include name="**/*.xsd"/>
                 <include name="**/*.properties"/>
-            </fileset>
-            <fileset dir="src/main/scala">
                 <include name="**/*.js"/>
             </fileset>
             <fileset dir="${build.classes.dir}">
@@ -633,7 +631,7 @@
             <classpath>
                 <pathelement location="build/classes"/>
                 <pathelement location="build/orbeon-war/WEB-INF/classes"/><!-- where classes are when compiling from IntelliJ -->
-                <pathelement location="src/main/scala"/>
+                <pathelement location="src/main/resources"/>
                 <pathelement location="lib/rhino-1.7R2.jar"/>
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1_2_15.jar"/>
@@ -744,17 +742,18 @@
 
                     <!-- Configure resource manager -->
                     <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-                    <!-- Put resources-packaged first, as we need to touch files and compile Java files there -->
+                    <!-- 1: test/resources first, as we need to touch files and compile Java files there -->
                     <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
-                    <!-- resources -->
+                    <sysproperty key="oxf.resources.priority.1.oxf.resources.filesystem.sandbox-directory" value="src/test/resources"/>
+                    <!-- 2: resources -->
                     <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
                     <sysproperty key="oxf.resources.priority.2.oxf.resources.filesystem.sandbox-directory" value="${resources.dir}"/>
-                    <!-- For resources associated with Java test files -->
+                    <!-- 3: resources-packaged -->
                     <sysproperty key="oxf.resources.priority.3" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="src/test/java"/>
+                    <sysproperty key="oxf.resources.priority.3.oxf.resources.filesystem.sandbox-directory" value="${resources-packaged.dir}"/>
+                    <!-- 4: main/resources (associated with Java test files) -->
                     <sysproperty key="oxf.resources.priority.4" value="org.orbeon.oxf.resources.FilesystemResourceManagerFactory"/>
-                    <sysproperty key="oxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory" value="src/main/java"/>
+                    <sysproperty key="oxf.resources.priority.4.oxf.resources.filesystem.sandbox-directory" value="src/main/resources"/>
                     <!-- Classpath -->
                     <sysproperty key="oxf.resources.priority.5" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
                     <!-- Other properties -->

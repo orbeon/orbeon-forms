@@ -22,78 +22,48 @@ For more information about Orbeon Forms, please visit:
 - <http://www.orbeon.com/>
 - <http://wiki.orbeon.com/forms/>
 
-Also check the Orbeon Forms Frequently Asked Questions (FAQ):
-
-- <http://wiki.orbeon.com/forms/orbeon-forms-faq>
+Also check the Orbeon Forms [Frequently Asked Questions (FAQ)](http://wiki.orbeon.com/forms/orbeon-forms-faq).
 
 
-Editions
---------
+What's new in the latest release
+--------------------------------
+
+- [complete list of changes](http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40) for the latest release
+- [Orbeon Forms 4.0 announcement](http://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
+- [Orbeon Forms 4.0.1 announcement](http://blog.orbeon.com/2013/03/orbeon-forms-401.html)
+
+
+Downloading and installing
+--------------------------
 
 Orbeon Forms comes in two editions:
 
 - Community Edition (CE)
 - Professional edition (PE)
 
-For more information:
+For more information and downloadable binaries, see the [download](http://www.orbeon.com/download) page.
 
-- <http://www.orbeon.com/forms/compare>
-- <http://www.orbeon.com/support-services/professional>
+The system requirements and installation procedure are detailed on
+[Installing Orbeon Forms](http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing).
 
 
 Community and support
 ---------------------
 
-See: <http://www.orbeon.com/forms/community>
+See the [community](http://www.orbeon.com/community) page. In a nutshell:
 
-In a nutshell:
-
-- Technical questions: ask them on StackOverflow (don't forget the "orbeon"
-  tag):
-
-  <http://stackoverflow.com/>
-
-- Discussions and feedback: please subscribe to the ops-users mailing-list.
-
-- Commercial support and licensing:
-
-  <http://www.orbeon.com/support-services/overview>
-
-  or contact us at:
-
-  <info@orbeon.com>
-
-
-What's new in the latest release
---------------------------------
-
-A complete list of changes can be found online at:
-
-> <http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40>
-
-Changes for the previous release:
-
-> <http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/39>
+- Ask short questions directed to Orbeon on [Twitter](https://twitter.com/intent/tweet?in_reply_to=orbeon&in_reply_to_status_id=261900968369729536&source=webclient&text=%40orbeon+).
+- Asl technical questions on [StackOverflow](http://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
+- Use the mailing-list for discussions and feedback.
+- For commercial support and licensing, see:
+    - <http://www.orbeon.com/services>
+    - <info@orbeon.com>
 
 
 Documentation
 -------------
 
-All new documentation is available on the Orbeon Forms wiki:
-
-> <http://wiki.orbeon.com/forms/>
-
-
-System requirements and installation
-------------------------------------
-
-The system requirements and installation procedure are detailed at:
-
-> <http://wiki.orbeon.com/forms/doc/developer-guide/admin/installing>
-
-In addition, the Orbeon Forms tutorial also tackles installation:
-
-> <http://wiki.orbeon.com/forms/doc/developer-guide/orbeon-forms-xforms-tutorial>
+All documentation is available on the [Orbeon Forms wiki](http://wiki.orbeon.com/forms/).
 
 
 What's happening?
@@ -108,14 +78,9 @@ What's happening?
 Compiling Orbeon Forms
 ----------------------
 
-You usually don't have to compile Orbeon Forms yourself. Now if you want to,
-please visit:
-
-> <http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development>
-
-The source code is on github:
-
-> <https://github.com/orbeon/orbeon-forms/>
+You usually don't have to compile Orbeon Forms yourself. But if you want to, see
+[Java development and IDE settings](http://wiki.orbeon.com/forms/doc/contributor-guide/development-environment/java-development).
+The source code is available on [github](https://github.com/orbeon/orbeon-forms/).
 
 Orbeon Forms is written mainly using the following languages and technologies:
 
@@ -123,16 +88,13 @@ Orbeon Forms is written mainly using the following languages and technologies:
 - Scala
 - JavaScript
 - CoffeeScript
-- XForms, XSLT, and related XML technologies
+- XForms, XSLT, and other XML technologies
 
 
-Known bugs and requests for enhancements
-----------------------------------------
+Known bugs and requests for enhancements (RFEs)
+-----------------------------------------------
 
-For a list of known issues and RFEs, check the issue tracking system:
-
-- New issue tracker on github: <https://github.com/orbeon/orbeon-forms/issues>
-- Legacy issue tracker: <http://goo.gl/iSEyq>
+For a list of known issues and RFEs, check the [issue tracking system](https://github.com/orbeon/orbeon-forms/issues).
 
 
 License

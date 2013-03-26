@@ -21,14 +21,18 @@ $ ->
             labelEditor().checkbox.tooltip('destroy')
             labelEditor().container.hide()
             # Update values in the DOM, without waiting for the server to send us the value
-            currentLabel.text(newLabel)
+            currentLabel.html(newLabel)
             setLabelHtml(isChecked)
 
     # Heuristic to close the editor based on click and focus events
     clickOrFocus = ({target}) ->
         target = $(target)
-        eventOnEditor = labelEditor().textfield.is(target) or labelEditor().checkbox.is(target)
-        eventOnControlLabel = target.is('.xforms-label') && target.parents('.fb-main').is('*')
+        eventOnEditor = labelEditor().textfield.is(target) || labelEditor().checkbox.is(target)
+        eventOnControlLabel =
+            # Click on label or element inside label
+            (target.is('.xforms-label') || target.parents('.xforms-label').is('*')) &&
+            # Only interested in labels in the "editor" portion of FB
+            target.parents('.fb-main').is('*')
         endEdit() unless eventOnEditor or eventOnControlLabel
 
     # Returns a <div> which contains the text field and checkbox
@@ -47,8 +51,8 @@ $ ->
         editor
 
     # Show editor on click on label
-    startEdit = ({target}) ->
-        currentLabel = $(target)
+    startEdit = ({currentTarget}) ->
+        currentLabel = $(currentTarget)
         # Find control for this label
         th = currentLabel.parents('th')
         currentControl =
@@ -56,9 +60,9 @@ $ ->
                 # Case of a repeat
                 trWithControls = th.parents('table').find('tbody tr.fb-grid-tr').first()
                 tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
-                tdWithControl.find('.xforms-control, .xbl-component').first()
+                tdWithControl.find('.xforms-control, .xbl-component')
             else
-                currentLabel.parent('.xforms-control, .xbl-component')
+                currentLabel.parents('.xforms-control, .xbl-component').first()
         # Remove `for` so browser doesn't set the focus to the control on click
         currentLabel.removeAttr('for')
         # Setup tooltip for editor (don't do this once for all, as the language can change)
@@ -67,7 +71,7 @@ $ ->
         labelEditor().container.show()
         labelEditor().container.offset(currentLabel.offset())
         labelEditor().textfield.outerWidth(currentLabel.outerWidth() - labelEditor().checkbox.outerWidth(true))
-        labelEditor().textfield.val(currentLabel.text()).focus()
+        labelEditor().textfield.val(currentLabel.html()).focus()
         labelEditor().checkbox.prop('checked', isLabelHtml())
 
     $('.fb-main').on('click', '.xforms-label', startEdit)

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.script
 
 import org.mozilla.javascript.Context
 import java.io.InputStreamReader
+import org.orbeon.oxf.util.ScalaUtils._
 
 /**
  * CoffeeScript → JavaScript compiler.
@@ -24,10 +25,8 @@ object CoffeeScriptCompiler {
     // Lazy so that if the compiler is never used it is never loaded
     private lazy val compilerScope = {
         val loader = getClass.getClassLoader
-        val inputStream = loader.getResourceAsStream("org/orbeon/oxf/xforms/script/coffee-script.js")
-        try {
-            val reader = new InputStreamReader(inputStream, "utf-8")
-            try {
+        useAndClose(loader.getResourceAsStream("org/orbeon/oxf/xforms/script/coffee-script.js")) { inputStream ⇒
+            useAndClose(new InputStreamReader(inputStream, "utf-8")) { reader ⇒
                 val cx = Context.enter()
                 try {
                     // "A scope is a set of JavaScript object" http://goo.gl/H8g5f
@@ -41,11 +40,7 @@ object CoffeeScriptCompiler {
                 } finally {
                     Context.exit()
                 }
-            } finally {
-                reader.close()
             }
-        } finally {
-            inputStream.close()
         }
     }
 

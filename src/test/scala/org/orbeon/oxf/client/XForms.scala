@@ -19,6 +19,35 @@ import org.scalatest.junit.{MustMatchersForJUnit, AssertionsForJUnit}
 
 trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunnerOps {
 
+    // https://github.com/orbeon/orbeon-forms/issues/889
+    @Test def issue889(): Unit = {
+
+        def clickCheckbox() = clickElementByCSS("#hide-checkbox input")
+
+        loadOrbeonPage("/unit-tests/issue-889")
+
+        def liGroupElements = cssSelector("#group-begin-ul-group ~ li:not(.xforms-group-begin-end)").findAllElements.to[List]
+
+        liGroupElements foreach (_.classes must contain ("xforms-disabled"))
+        cssSelector("#div-group").element.classes must contain ("xforms-disabled")
+        liGroupElements(0).classes must not contain ("class42")
+        liGroupElements(1).classes must contain ("myClass")
+
+        clickCheckbox()
+
+        liGroupElements foreach (_.classes must not contain ("xforms-disabled"))
+        cssSelector("#div-group").element.classes must not contain ("xforms-disabled")
+        liGroupElements(0).classes must contain ("class42")
+        liGroupElements(1).classes must contain ("myClass")
+
+        clickCheckbox()
+        liGroupElements foreach (_.classes must contain ("xforms-disabled-subsequent"))
+        cssSelector("#div-group").element.classes must contain ("xforms-disabled-subsequent")
+        liGroupElements(0).classes must not contain ("class42")
+        liGroupElements(1).classes must contain ("myClass")
+
+    }
+
     @Test def testEventProperties(): Unit = {
 
         def checkOutputs(outputs: Seq[(String, String)]) =

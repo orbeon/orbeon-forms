@@ -1,0 +1,44 @@
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+    <xh:head>
+        <xf:model>
+            <xf:instance>
+                <form>
+                    <hide>true</hide>
+                </form>
+            </xf:instance>
+            <xf:bind ref="hide" type="xs:boolean"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input id="hide-checkbox" ref="hide"><xf:label>Hide:</xf:label></xf:input>
+        <xh:hr/>
+        <xh:ul>
+            <xf:group id="ul-group" ref=".[instance()/hide = 'false']">
+                <xf:var name="abc" value="42"/>
+                <xh:li class="class{42}">
+                    li 1
+                </xh:li>
+                <xh:li class="myClass">
+                    li 2
+                </xh:li>
+            </xf:group>
+        </xh:ul>
+
+        <xh:hr/>
+
+        <xf:group id="div-group" ref=".[instance()/hide = 'false']">
+            <xf:var name="abc" value="42"/>
+            <xh:div class="class{42}">
+                div 1
+            </xh:div>
+            <xh:div class="myClass">
+                div 2
+            </xh:div>
+        </xf:group>
+    </xh:body>
+</xh:html>

@@ -34,23 +34,23 @@
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xh:span>
-            <xf:trigger ref="save-trigger" appearance="xxf:primary">
+            <xf:trigger appearance="xxf:primary">
                 <xf:label ref="$form-resources/apply/label"/>
-                <xf:action ev:event="DOMActivate">
+                <xf:action event="DOMActivate" if="xxf:valid(source)">
                     <!-- Parse the XML, annotate and save it -->
                     <xf:dispatch targetid="fr-form-model" name="fr-annotate-data">
                         <xf:property name="data" value="saxon:parse(instance('fb-source-editor-instance')/source)"/>
                     </xf:dispatch>
+                    <xxf:hide dialog="fb-source-editor-dialog"/>
                 </xf:action>
             </xf:trigger>
             <xf:output value="$form-resources/or/label"/>
             <xf:trigger appearance="minimal">
                 <xf:label ref="$form-resources/cancel/label"/>
+                <xxf:hide ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
             </xf:trigger>
         </xh:span>
     </xh:div>
-    <!-- Hide dialog -->
-    <xxf:hide ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
     <!-- Serialize XML when the dialog opens -->
     <xf:action ev:event="xxforms-dialog-open">
         <xf:setvalue
@@ -69,7 +69,7 @@
         <xf:var name="model" value="xxf:instance('fb-form-instance')/xh:head/xf:model[@id = 'fr-form-model']"/>
 
         <xf:instance id="fb-source-editor-instance">
-            <source-editor valid="true">
+            <source-editor>
                 <source/>
                 <save-trigger/>
             </source-editor>
@@ -77,12 +77,7 @@
 
         <xf:bind ref="instance('fb-source-editor-instance')">
             <xf:bind ref="source" type="xxf:xml" required="true()" constraint="normalize-space() != ''"/>
-            <xf:bind ref="save-trigger" readonly="../@valid = 'false'"/>
         </xf:bind>
-
-        <!-- Enable/disable trigger -->
-        <xf:setvalue ev:event="xxforms-invalid" ev:observer="fb-source-editor-instance" ref="@valid">false</xf:setvalue>
-        <xf:setvalue ev:event="xxforms-valid"   ev:observer="fb-source-editor-instance" ref="@valid">true</xf:setvalue>
 
     </xf:model>
 

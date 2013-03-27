@@ -34,6 +34,7 @@ import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import java.io.{FileInputStream, File}
 import org.orbeon.oxf.xml.XMLUtils
+import scala.util.Try
 
 class PEVersion extends Version {
 
@@ -58,26 +59,20 @@ class PEVersion extends Version {
                 val licenseDocument = {
 
                     def fromResourceManager =
-                        try Option(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
-                        catch { case e: Exception ⇒ None }
+                        Try(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
 
                     def fromHomeDirectory =
-                        try {
+                        Try {
                             val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
 
                             useAndClose(new FileInputStream(new File(path))) { is ⇒
-                                Option(Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN))
+                                Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN)
                             }
-                        } catch {
-                            case e: Exception ⇒ None
                         }
 
-                    val rawLicenceDocument =
-                        fromResourceManager orElse
-                        fromHomeDirectory getOrElse
-                        (throw new ResourceNotFoundException(LicensePath))
+                    def document = fromResourceManager orElse fromHomeDirectory get
 
-                    Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(rawLicenceDocument))
+                    Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(document))
                 }
 
                 // Connect pipeline

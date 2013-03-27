@@ -24,31 +24,48 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
 
         def clickCheckbox() = clickElementByCSS("#hide-checkbox input")
 
-        loadOrbeonPage("/unit-tests/issue-889")
+        def liGroupElements  = cssSelector("#group-begin-ul-group ~ li:not(.xforms-group-begin-end)").findAllElements.to[List]
+        def divGroupElements = cssSelector("#div-group > div").findAllElements.to[List]
 
-        def liGroupElements = cssSelector("#group-begin-ul-group ~ li:not(.xforms-group-begin-end)").findAllElements.to[List]
+        def checkNonRelevantClasses(elements: List[Element]) = {
+            elements(0).classes must not contain ("class42")
+            elements(1).classes must contain ("myClass")
+        }
+
+        def checkRelevantClasses(elements: List[Element]) = {
+            elements(0).classes must contain ("class42")
+            elements(1).classes must contain ("myClass")
+        }
+
+        // Just after loading (checkbox is selected, content is hidden)
+        loadOrbeonPage("/unit-tests/issue-0889")
 
         liGroupElements foreach (_.classes must contain ("xforms-disabled"))
         cssSelector("#div-group").element.classes must contain ("xforms-disabled")
-        liGroupElements(0).classes must not contain ("class42")
-        liGroupElements(1).classes must contain ("myClass")
 
+        checkNonRelevantClasses(liGroupElements)
+        checkNonRelevantClasses(divGroupElements)
+
+        // Show content
         clickCheckbox()
 
         liGroupElements foreach (_.classes must not contain ("xforms-disabled"))
         cssSelector("#div-group").element.classes must not contain ("xforms-disabled")
-        liGroupElements(0).classes must contain ("class42")
-        liGroupElements(1).classes must contain ("myClass")
 
+        checkRelevantClasses(liGroupElements)
+        checkRelevantClasses(divGroupElements)
+
+        // Hide content again
         clickCheckbox()
         liGroupElements foreach (_.classes must contain ("xforms-disabled-subsequent"))
         cssSelector("#div-group").element.classes must contain ("xforms-disabled-subsequent")
-        liGroupElements(0).classes must not contain ("class42")
-        liGroupElements(1).classes must contain ("myClass")
 
+        checkNonRelevantClasses(liGroupElements)
+        checkNonRelevantClasses(divGroupElements)
     }
 
-    @Test def testEventProperties(): Unit = {
+    // https://github.com/orbeon/orbeon-forms/commit/9bfa9ad051c2bafa8c88e8562bb55f46dd9e7666
+    @Test def eventProperties(): Unit = {
 
         def checkOutputs(outputs: Seq[(String, String)]) =
             outputs.foreach { case (cssClass, expected) ⇒
@@ -56,7 +73,7 @@ trait XForms extends AssertionsForJUnit with MustMatchersForJUnit with FormRunne
                 assertEquals(expected, actual)
             }
 
-        loadOrbeonPage("/xforms-sandbox/sample/test-event-properties")
+        loadOrbeonPage("/unit-tests/feature-event-properties")
         checkOutputs(Seq("triggered" → "false", "p1" → "", "p2" → ""))
         $("#send-event button").click()
         waitForAjaxResponse()

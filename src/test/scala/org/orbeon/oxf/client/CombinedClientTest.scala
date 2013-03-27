@@ -18,3 +18,4 @@ class CombinedClientTest
     extends OrbeonClientBase
     with XForms
     with FormRunnerSummary
+    with OrbeonFormsDemoPath

@@ -804,7 +804,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </xh:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="typed-controls-control" bind="typed-controls-bind">
+                <fr:section id="typed-controls-section" bind="typed-controls-bind">
                     <xf:label ref="$form-resources/typed-controls/label"/>
                     <xf:help ref="$form-resources/typed-controls/help"/>
                     <fr:grid>
@@ -1071,7 +1071,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         </xh:tr>
                     </fr:grid>
                 </fr:section>
-                <fr:section id="buttons-control" bind="buttons-bind">
+                <fr:section id="buttons-section" bind="buttons-bind">
                     <xf:label ref="$form-resources/buttons/label"/>
                     <xf:help ref="$form-resources/buttons/help"/>
                     <fr:grid columns="2">

@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.time._
+import org.apache.commons.lang3.StringUtils
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser {
@@ -57,14 +58,29 @@ trait OrbeonFormsOps extends WebBrowser {
             click on xpath(s"//img[@alt = '$alt']").element
         }
 
+    // For a given id, return:
+    //
+    // 1. that id if it exists as is on the client
+    // 2. if not, the first id for which it is a suffix
+    //
+    // NOTE: This doesn't handle repeat iterations yet.
     def clientId(id: String) = {
         val withPrefix = '$' + id
         // NOTE: XPath 1 doesn't have ends-with()
         xpath(s"//*[@id = '$id' or contains(@id, '$withPrefix') and @id = concat(substring-before(@id, '$withPrefix'), '$withPrefix')]").element.attribute("id").get
     }
 
-    def elementByStaticId(staticId: String) = id(clientId(staticId)).element
-    def isCaseSelected(clientId: String) = executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientId')") == true
+    // Remove known prefixes used with separator layout
+    def removeCaseGroupRepeatPrefix(clientId: String) = {
+        val prefixes = Seq("xforms-case-begin-", "group-begin-", "repeat-begin-")
+        prefixes.foldLeft(clientId)(StringUtils.removeStart)
+    }
+
+    def elementByStaticId(staticId: String) =
+        id(clientId(staticId)).element
+
+    def isCaseSelected(clientIdNoCasePrefix: String) =
+        executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
 
     // Functions from xforms.js we must provide access to:
     //
@@ -119,7 +135,7 @@ trait FormRunnerOps extends OrbeonFormsOps {
         def nextPage(wait: Boolean = true) = clickElementByCSS(".fr-wizard-next a", wait)
         def lastPage(wait: Boolean = true) = clickElementByCSS(".fr-wizard-prev a", wait)
         def togglePage(id: String) = ???
-        def pageSelected(id: String) = isCaseSelected(clientId(id + "-section-case"))
+        def pageSelected(id: String) = isCaseSelected(removeCaseGroupRepeatPrefix(clientId(id + "-section-case")))
     }
 }
 

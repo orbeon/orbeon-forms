@@ -133,6 +133,7 @@
     };
 
     AjaxServer.beforeSendingEvent = $.Callbacks();
+    AjaxServer.ajaxResponseReceived = $.Callbacks();
 
     AjaxServer.executeNextRequest = function(bypassRequestQueue) {
         bypassRequestQueue = typeof(bypassRequestQueue) == "boolean" && bypassRequestQueue == true;
@@ -380,12 +381,22 @@
                         requestDocumentString.push('</xxf:uuid>\n');
 
                         // Increment and send sequence number if we have at least one event which is not a request for upload progress or session heartbeat
-                        // NOTE: Still send the element name even if empty as this is what the schema and server-side code expects
+                        var requestWithSequenceNumber = ! _.isUndefined(_.find(eventsToSend, function(event) {
+                            return event.eventName != "xxforms-upload-progress" && event.eventName != "xxforms-session-heartbeat"; }));
+                        // Still send the element name even if empty as this is what the schema and server-side code expects
                         requestDocumentString.push(indent);
                         requestDocumentString.push('<xxf:sequence>');
-                        if (_.detect(eventsToSend, function(event) { return event.eventName != "xxforms-upload-progress" && event.eventName != "xxforms-session-heartbeat"; })) {
+                        if (requestWithSequenceNumber) {
                             var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
                             requestDocumentString.push(currentSequenceNumber);
+                            AjaxServer.ajaxResponseReceived.add(function incrementSequenceNumber() {
+                                // Increment sequence number, now that we know the server processed our request
+                                //      If we were to do this after the request was processed, we might fail to increment the sequence
+                                //      if we were unable to process the response (i.e. JS error). Doing this here, before the
+                                //      response is processed, we incur the risk of incrementing the counter while the response is
+                                //      garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
+                                ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
+                            })
                         }
                         requestDocumentString.push('</xxf:sequence>\n');
 
@@ -626,7 +637,8 @@
         } else {
             var responseXmlIsHTML = responseXML && responseXML.documentElement && responseXML.documentElement.tagName.toLowerCase() == "html";
             var formID = o.argument.formId;
-            if (o.responseText && (!responseXML || responseXmlIsHTML)) {
+            var isResponseToBackgroundUpload = o.responseText && (!responseXML || responseXmlIsHTML);
+            if (isResponseToBackgroundUpload) {
                 // Background uploads
                 //      In this case, the server sends a xxf:event-response embedded in an HTML document:
                 //      <!DOCTYPE HTML><html><body>&lt;xxf:event-response ... </body></html>
@@ -638,14 +650,6 @@
             } else {
                 // Regular Ajax response
 
-                // Increment sequence number, now that we know the server processed our request
-                //      If we were to do this after the request was processed, we might fail to increment the sequence
-                //      if we were unable to process the response (i.e. JS error). Doing this here, before the
-                //      response is processed, we incur the risk of incrementing the counter while the response is
-                //      garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
-                var currentSequenceNumber = ORBEON.xforms.Document.getFromClientState(formID, "sequence");
-                ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
-
                 // On IE, don't rely on the browser's XML parsing, as it doesn't preserve white spaces
                 if (o.responseText && $.browser.msie)
                     responseXML = ORBEON.util.Dom.stringToDom(o.responseText);
@@ -654,6 +658,9 @@
             if (o.responseText != "" && responseXML && responseXML.documentElement && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
 
                 // Everything is fine with the response
+
+                if (! isResponseToBackgroundUpload)
+                    AjaxServer.ajaxResponseReceived.fire();
 
                 // If neither of these two conditions is met, hide the modal progress panel:
                 //      a) The server tells us to do a submission or load, so we don't want to remove it otherwise

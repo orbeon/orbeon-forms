@@ -17,18 +17,19 @@ package org.orbeon.oxf.xforms.processor
 import org.orbeon.oxf.util._
 import ScalaUtils._
 import java.io._
+import java.util.regex.Matcher
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.controller.PageFlowControllerProcessor
+import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.pipeline.api.ExternalContext
+import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
+import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.common.Version
-import org.orbeon.oxf.pipeline.api.ExternalContext
-import org.orbeon.oxf.xforms.XFormsProperties
-import java.util.regex.Matcher
+import scala.util.{Failure, Try}
 
 object XFormsResourceRewriter extends Logging {
     /**
@@ -125,16 +126,29 @@ object XFormsResourceRewriter extends Logging {
 
     private def generateJS(resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
         // Output Orbeon Forms version
-        val outputWriter = new OutputStreamWriter(os, "utf-8")
         if (! XFormsProperties.isEncodeVersion) {
+            val outputWriter = new OutputStreamWriter(os, "utf-8")
             outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
             outputWriter.flush()
         }
 
-        for (resourceConfig ← resources) {
-            useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourceConfig.getResourcePath(isMinimal))) { is ⇒
-                NetUtils.copyStream(is, os)
-            }
+        val rm = ResourceManagerWrapper.instance
+
+        def logFailure[T](path: String): PartialFunction[Throwable, Try[T]] = {
+            case e: Exception ⇒
+                error("could not read resource to aggregate", Seq("resource" → path))
+                new Failure(e)
+        }
+
+        def inputStream(path: String) =
+            Try(rm.getContentAsStream(path)) recoverWith logFailure(path) toOption
+
+        // Use iterators so that we don't open all input streams at once
+        def inputStreamIterator =
+            resources.iterator flatMap (r ⇒ inputStream(r.getResourcePath(isMinimal)).iterator)
+
+        inputStreamIterator foreach { is ⇒
+            useAndClose(is)(NetUtils.copyStream(_, os))
             os.write('\n')
         }
     }
@@ -148,11 +162,10 @@ object XFormsResourceRewriter extends Logging {
         val rm = ResourceManagerWrapper.instance
 
         // NOTE: Actual aggregation will log missing files so we ignore them here
-        def lastModified(r: ResourceConfig) =
-            try rm.lastModified(r.getResourcePath(isMinimal), false)
-            catch { case _: Throwable ⇒ 0L }
+        def lastModified(path: String) =
+            Try(rm.lastModified(path, false)) getOrElse 0L
 
-        if (resources.isEmpty) 0L else resources map lastModified max
+        if (resources.isEmpty) 0L else resources map (_.getResourcePath(isMinimal)) map lastModified max
     }
 
     def cacheResources(resources: Seq[ResourceConfig], resourcePath: String, namespaceOpt: Option[String], combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {

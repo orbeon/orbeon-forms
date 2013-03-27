@@ -54,7 +54,7 @@ See the [community](http://www.orbeon.com/community) page. In a nutshell:
 
 - Ask short questions directed to Orbeon on [Twitter](https://twitter.com/intent/tweet?in_reply_to=orbeon&in_reply_to_status_id=261900968369729536&source=webclient&text=%40orbeon+).
 - Asl technical questions on [StackOverflow](http://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
-- Use the mailing-list for discussions and feedback.
+- Use the [discussion forum](http://discuss.orbeon.com/) for discussions and feedback.
 - For commercial support and licensing, see:
     - <http://www.orbeon.com/services>
     - <info@orbeon.com>

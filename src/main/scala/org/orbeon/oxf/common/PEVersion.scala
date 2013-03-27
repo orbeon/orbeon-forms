@@ -27,11 +27,13 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.resources.ResourceNotFoundException
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.PipelineUtils._
-import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
 import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import java.io.{FileInputStream, File}
+import org.orbeon.oxf.xml.XMLUtils
 
 class PEVersion extends Version {
 
@@ -54,7 +56,27 @@ class PEVersion extends Version {
 
                 // Read license file and remove blank spaces as that's the way it was signed
                 val licenseDocument = {
-                    val rawLicenceDocument = ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath)
+
+                    def fromResourceManager =
+                        try Option(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
+                        catch { case e: Exception ⇒ None }
+
+                    def fromHomeDirectory =
+                        try {
+                            val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
+
+                            useAndClose(new FileInputStream(new File(path))) { is ⇒
+                                Option(Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN))
+                            }
+                        } catch {
+                            case e: Exception ⇒ None
+                        }
+
+                    val rawLicenceDocument =
+                        fromResourceManager orElse
+                        fromHomeDirectory getOrElse
+                        (throw new ResourceNotFoundException(LicensePath))
+
                     Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(rawLicenceDocument))
                 }
 

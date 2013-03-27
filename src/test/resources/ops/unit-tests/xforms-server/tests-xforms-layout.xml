@@ -1520,7 +1520,7 @@
         <output name="response">
             <controls>
                 <xh:span id="s1" class="xforms-switch">
-                    <xh:span id="xforms-case-begin-s1c1" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-s1c1" class="xforms-case-begin-end xforms-case-deselected"/>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="s1c1i1" class="xforms-control xforms-input xforms-case-deselected">
                         <xh:input id="s1c1i1$xforms-input-1" type="text" name="s1c1i1$xforms-input-1" value="" class="xforms-input-input"/>
@@ -1535,7 +1535,7 @@
                     </xh:span>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="xforms-case-end-s1c1" class="xforms-case-begin-end"/>
-                    <xh:span id="xforms-case-begin-s1c2" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-s1c2" class="xforms-case-begin-end xforms-case-selected"/>
                     <xh:span class="xforms-case-selected"/>
                     <xh:span id="s1c2i1" class="xforms-control xforms-input xforms-case-selected">
                         <xh:input id="s1c2i1$xforms-input-1" type="text" name="s1c2i1$xforms-input-1" value="" class="xforms-input-input"/>
@@ -1552,10 +1552,10 @@
                     <xh:span id="xforms-case-end-s1c2" class="xforms-case-begin-end"/>
                 </xh:span>
                 <xh:span id="s2" class="xforms-switch">
-                    <xh:span id="xforms-case-begin-s2c1" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-s2c1" class="xforms-case-begin-end xforms-case-deselected"/>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="s2c1s1" class="xforms-switch xforms-case-deselected">
-                        <xh:span id="xforms-case-begin-s2c1s1c1" class="xforms-case-begin-end"/>
+                        <xh:span id="xforms-case-begin-s2c1s1c1" class="xforms-case-begin-end xforms-case-selected"/>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="s2c1s1c1i1" class="xforms-control xforms-input xforms-case-selected">
                             <xh:input id="s2c1s1c1i1$xforms-input-1" type="text" name="s2c1s1c1i1$xforms-input-1" value="" class="xforms-input-input"/>
@@ -1570,7 +1570,7 @@
                         </xh:span>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="xforms-case-end-s2c1s1c1" class="xforms-case-begin-end"/>
-                        <xh:span id="xforms-case-begin-s2c1s1c2" class="xforms-case-begin-end"/>
+                        <xh:span id="xforms-case-begin-s2c1s1c2" class="xforms-case-begin-end xforms-case-deselected"/>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="s2c1s1c2i1" class="xforms-control xforms-input xforms-case-deselected">
                             <xh:input id="s2c1s1c2i1$xforms-input-1" type="text" name="s2c1s1c2i1$xforms-input-1" value="" class="xforms-input-input"/>
@@ -1588,10 +1588,10 @@
                     </xh:span>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="xforms-case-end-s2c1" class="xforms-case-begin-end"/>
-                    <xh:span id="xforms-case-begin-s2c2" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-s2c2" class="xforms-case-begin-end xforms-case-selected"/>
                     <xh:span class="xforms-case-selected"/>
                     <xh:span id="s2c2s1" class="xforms-switch xforms-case-selected">
-                        <xh:span id="xforms-case-begin-s2c2s1c1" class="xforms-case-begin-end"/>
+                        <xh:span id="xforms-case-begin-s2c2s1c1" class="xforms-case-begin-end xforms-case-deselected"/>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="s2c2s1c1i1" class="xforms-control xforms-input xforms-case-deselected">
                             <xh:input id="s2c2s1c1i1$xforms-input-1" type="text" name="s2c2s1c1i1$xforms-input-1" value="" class="xforms-input-input"/>
@@ -1606,7 +1606,7 @@
                         </xh:span>
                         <xh:span class="xforms-case-deselected"/>
                         <xh:span id="xforms-case-end-s2c2s1c1" class="xforms-case-begin-end"/>
-                        <xh:span id="xforms-case-begin-s2c2s1c2" class="xforms-case-begin-end"/>
+                        <xh:span id="xforms-case-begin-s2c2s1c2" class="xforms-case-begin-end xforms-case-selected"/>
                         <xh:span class="xforms-case-selected"/>
                         <xh:span id="s2c2s1c2i1" class="xforms-control xforms-input xforms-case-selected">
                             <xh:input id="s2c2s1c2i1$xforms-input-1" type="text" name="s2c2s1c2i1$xforms-input-1" value="" class="xforms-input-input"/>
@@ -2774,7 +2774,7 @@
                 <xh:tr id="repeat-end-repeat-around-tr" class="xforms-repeat-begin-end"/>
 
                 <xh:tr id="group-begin-switch-around-tr" class="xforms-group-begin-end"/>
-                <xh:tr id="xforms-case-begin-case-around-tr" class="xforms-case-begin-end"/>
+                <xh:tr id="xforms-case-begin-case-around-tr" class="xforms-case-begin-end xforms-case-selected"/>
                 <xh:tr class="xforms-case-selected">
                     <xh:td>2</xh:td>
                 </xh:tr>
@@ -2821,13 +2821,13 @@
         <output name="response">
             <controls>
                 <xh:span id="switch" class="xforms-switch">
-                    <xh:span id="xforms-case-begin-case-1" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-case-1" class="xforms-case-begin-end xforms-case-selected"/>
                     <xh:span class="xforms-case-selected"/>
                     <xh:span id="xforms-case-end-case-1" class="xforms-case-begin-end"/>
-                    <xh:span id="xforms-case-begin-case-2" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-case-2" class="xforms-case-begin-end xforms-case-deselected"/>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span id="xforms-case-end-case-2" class="xforms-case-begin-end"/>
-                    <xh:span id="xforms-case-begin-case-3" class="xforms-case-begin-end"/>
+                    <xh:span id="xforms-case-begin-case-3" class="xforms-case-begin-end xforms-case-deselected"/>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span class="xforms-case-deselected"/>
                     <xh:span class="xforms-case-deselected"/>

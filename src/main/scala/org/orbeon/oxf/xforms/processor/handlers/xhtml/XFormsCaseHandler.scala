@@ -52,6 +52,8 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
                 caseControl.isVisible
             else
                 false
+
+        val selectedClasses = if (isVisible) "xforms-case-selected" else "xforms-case-deselected"
         
         val controller = handlerContext.getController
         currentSavedOutput = controller.getOutput
@@ -72,7 +74,7 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
                 
                 // Classes on first delimiter
                 private val firstDelimiterClasses = {
-                    val classes = new jl.StringBuilder("xforms-case-begin-end")
+                    val classes = new jl.StringBuilder("xforms-case-begin-end " + selectedClasses)
                     if (elementClasses.nonEmpty) {
                         classes.append(' ')
                         classes.append(elementClasses)
@@ -88,7 +90,7 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
             }, XFormsControl.jAppearances(elementAnalysis.parent.get).contains(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME))
             
             val controlClasses = {
-                val classes = new jl.StringBuilder(if (isVisible) "xforms-case-selected" else "xforms-case-deselected")
+                val classes = new jl.StringBuilder(selectedClasses)
                 if (elementClasses.nonEmpty) {
                     classes.append(' ')
                     classes.append(elementClasses)

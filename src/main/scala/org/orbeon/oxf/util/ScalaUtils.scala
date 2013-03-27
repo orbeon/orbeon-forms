@@ -226,7 +226,7 @@ object ScalaUtils {
             capitalizeHeader(name) → values
 
     /*
-     * Partial rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).
+     * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).
      *
      * This implementation can return any collection type for which there is a builder:
      *

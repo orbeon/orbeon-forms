@@ -26,12 +26,6 @@ YD = YAHOO.util.Dom
 $ ->
     # Low-level operations on editables
     editables =
-        hint:
-            selector: '.xforms-hint'
-            editInputSelector: '#fb-edit-hint'
-            placeholderOutputSelector: '#fb-placeholder-hint'
-            placeholderContainerSelector: '.xforms-hint'
-            initialValueSelector: '.xforms-hint'
         button:
             selector: '.fr-grid-content > .xforms-trigger-appearance-full'
             editInputSelector: '#fb-edit-label'

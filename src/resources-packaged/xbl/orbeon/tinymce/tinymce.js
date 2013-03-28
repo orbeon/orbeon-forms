@@ -35,7 +35,7 @@
             var baseURLa = YAHOO.util.Dom.getElementsByClassName('tinymce-base-url', null, this.container)[0];
             // Remove the magic number and extension at the end of the URL. The magic number was added to allow for
             // URL post-processing for portlets. The extension is added so that the version number is added to the URL.
-            var baseURL = baseURLa.href.substr(0, baseURLa.href.length - '1b713b2e6d7fd45753f4b8a6270b776e.js'.length);
+            var baseURL = baseURLa.href.substr(0, baseURLa.href.length - '/1b713b2e6d7fd45753f4b8a6270b776e.js'.length);
             tinymce.baseURL = baseURL;
 
             // Create TinyMCE editor instance

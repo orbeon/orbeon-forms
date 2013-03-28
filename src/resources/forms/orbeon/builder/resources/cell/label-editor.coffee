@@ -4,7 +4,7 @@ $ ->
     currentControl = null
     currentLabel = null
     isLabelHtml = -> currentControl.is('.fb-label-is-html')
-    setLabelHtml = (isHtml) -> currentControl.toggleClass('.fb-label-is-html', isHtml)
+    setLabelHtml = (isHtml) -> currentControl.toggleClass('fb-label-is-html', isHtml)
     labelValue = (value) ->
         valueAccessor = if isLabelHtml() then currentLabel.html else currentLabel.text
         valueAccessor = _.bind(valueAccessor, currentLabel)

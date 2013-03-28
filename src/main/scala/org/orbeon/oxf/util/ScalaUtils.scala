@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
 import scala.collection.mutable
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
+import scala.util.Try
 
 object ScalaUtils {
 
@@ -280,4 +281,6 @@ object ScalaUtils {
         }
         builder.result()
     }
+
+    implicit def tryToIterator[T](t: Try[T]) = t.toOption.iterator
 }

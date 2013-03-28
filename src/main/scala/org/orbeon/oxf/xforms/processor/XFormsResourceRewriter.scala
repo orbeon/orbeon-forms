@@ -51,10 +51,15 @@ object XFormsResourceRewriter extends Logging {
             os.flush()
         }
 
+    private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Try[T]] = {
+        case e: Exception ⇒
+            error("could not read resource to aggregate", Seq("resource" → path))
+            new Failure(e)
+    }
+
     private def generateCSS(resources: Seq[ResourceConfig], namespaceOpt: Option[String], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
 
         val response = NetUtils.getExternalContext.getResponse
-        val outputWriter = new OutputStreamWriter(os, "utf-8")
 
         val pipelineContext = PipelineContext.get
 
@@ -64,29 +69,53 @@ object XFormsResourceRewriter extends Logging {
             pipelineContext.setAttribute(PageFlowControllerProcessor.PathMatchers, matchAllPathMatcher)
         }
 
-        // Output Orbeon Forms version
+        val rm = ResourceManagerWrapper.instance
+
+        // NOTE: The idea is that:
+        // - we recover and log resource read errors (a file can be missing for example during development)
+        // - we don't recover when writing (writing the resources will be interupted)
+        def tryInputStream(path: String) =
+            Try(rm.getContentAsStream(path)) recoverWith logFailure(path)
+
+        // Use iterators so that we don't open all input streams at once
+        def inputStreamIterator =
+            for {
+                resource ← resources.iterator
+                path     = resource.getResourcePath(isMinimal)
+                is       ← tryInputStream(path)
+            } yield
+                path → is
+
+        def tryReadCSS(path: String, is: InputStream) =
+            Try {
+                val sbw = new StringBuilderWriter
+                copyReader(new InputStreamReader(is, "utf-8"), sbw)
+                sbw.toString
+            } recoverWith
+                logFailure(path)
+
+        val readCSSIterator =
+            for {
+                (path, is)  ← inputStreamIterator
+                originalCSS ← tryReadCSS(path, is)
+            } yield
+                path → originalCSS
+
+        val outputWriter = new OutputStreamWriter(os, "utf-8")
+
+        // Output Orbeon Forms version if allowed
         if (! XFormsProperties.isEncodeVersion)
             outputWriter.write("/* This file was produced by " + Version.VersionString + " */\n")
 
-        for (resource ← resources) {
-            val resourcePath = resource.getResourcePath(isMinimal)
+        // Write and rewrite all resources one after the other
+        readCSSIterator foreach {
+            case (path, originalCSS) ⇒
+                if (! isMinimal)
+                    outputWriter.write("/* Original CSS path: " + path + " */\n")
 
-            // Read CSS into a string
-            val originalCSS = {
-                val sbw = new StringBuilderWriter
-                try useAndClose(ResourceManagerWrapper.instance.getContentAsStream(resourcePath)) { is ⇒
-                    if (! isMinimal)
-                        sbw.write("/* Original CSS path: " + resourcePath + " */\n")
-                    copyReader(new InputStreamReader(is, "utf-8"), sbw)
-                } catch {
-                    case _: Throwable ⇒ warn("could not aggregate CSS file", Seq("path" → resourcePath))
-                }
-                sbw.toString
-            }
-
-            // Rewrite it all
-            outputWriter write rewriteCSS(originalCSS, resourcePath, namespaceOpt, response)(logger)
+                outputWriter.write(rewriteCSS(originalCSS, path, namespaceOpt, response))
         }
+
         outputWriter.flush()
     }
 
@@ -103,21 +132,21 @@ object XFormsResourceRewriter extends Logging {
             case None            ⇒ s
         }
 
-        // Match and rewrite a URL within a block
-        def rewriteBlock(s: String) =
-            MatchURL.replaceAllIn(s, e ⇒ Matcher.quoteReplacement(rewriteURL(e.group(2))))
-
         // Rewrite an individual URL
-        def rewriteURL(url: String) =
-            try {
+        def tryRewriteURL(url: String) =
+            Try {
                 val resolvedURI = NetUtils.resolveURI(url, resourcePath)
                 val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
                 "url(" + rewrittenURI + ")"
-            } catch {
-                case _: Throwable ⇒
+            } recover {
+                case e: Exception ⇒
                     warn("found invalid URI in CSS file", Seq("uri" → url))
                     "url(" + url + ")"
             }
+
+        // Match and rewrite a URL within a block
+        def rewriteBlock(s: String) =
+            MatchURL.replaceAllIn(s, e ⇒ Matcher.quoteReplacement(tryRewriteURL(e.group(2)).get))
 
         // Find approximately pairs of selectors/blocks and rewrite each part
         // Ids are rewritten only if the namespace is not empty
@@ -125,7 +154,7 @@ object XFormsResourceRewriter extends Logging {
     }
 
     private def generateJS(resources: Seq[ResourceConfig], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
-        // Output Orbeon Forms version
+        // Output Orbeon Forms version if allowed
         if (! XFormsProperties.isEncodeVersion) {
             val outputWriter = new OutputStreamWriter(os, "utf-8")
             outputWriter.write("// This file was produced by " + Version.VersionString + "\n")
@@ -134,19 +163,14 @@ object XFormsResourceRewriter extends Logging {
 
         val rm = ResourceManagerWrapper.instance
 
-        def logFailure[T](path: String): PartialFunction[Throwable, Try[T]] = {
-            case e: Exception ⇒
-                error("could not read resource to aggregate", Seq("resource" → path))
-                new Failure(e)
-        }
-
-        def inputStream(path: String) =
-            Try(rm.getContentAsStream(path)) recoverWith logFailure(path) toOption
+        def tryInputStream(path: String) =
+            Try(rm.getContentAsStream(path)) recoverWith logFailure(path)
 
         // Use iterators so that we don't open all input streams at once
         def inputStreamIterator =
-            resources.iterator flatMap (r ⇒ inputStream(r.getResourcePath(isMinimal)).iterator)
+            resources.iterator flatMap (r ⇒ tryInputStream(r.getResourcePath(isMinimal)))
 
+        // Write all resources one after the other
         inputStreamIterator foreach { is ⇒
             useAndClose(is)(NetUtils.copyStream(_, os))
             os.write('\n')
@@ -162,10 +186,10 @@ object XFormsResourceRewriter extends Logging {
         val rm = ResourceManagerWrapper.instance
 
         // NOTE: Actual aggregation will log missing files so we ignore them here
-        def lastModified(path: String) =
-            Try(rm.lastModified(path, false)) getOrElse 0L
+        def lastModified(r: ResourceConfig) =
+            Try(rm.lastModified(r.getResourcePath(isMinimal), false)) getOrElse 0L
 
-        if (resources.isEmpty) 0L else resources map (_.getResourcePath(isMinimal)) map lastModified max
+        if (resources.isEmpty) 0L else resources map lastModified max
     }
 
     def cacheResources(resources: Seq[ResourceConfig], resourcePath: String, namespaceOpt: Option[String], combinedLastModified: Long, isCSS: Boolean, isMinimal: Boolean): File = {

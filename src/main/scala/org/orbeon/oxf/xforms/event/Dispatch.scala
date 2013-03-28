@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 object Dispatch extends Logging {
 
-    def dispatchEvent(event: XFormsEvent) {
+    def dispatchEvent(event: XFormsEvent): Unit = {
 
         val containingDocument = event.containingDocument
         implicit val indentedLogger = containingDocument.getIndentedLogger(XFormsEvents.LOGGING_CATEGORY)
@@ -42,9 +42,18 @@ object Dispatch extends Logging {
             var statHandleEvent = 0
             var statNativeHandlers = 0
 
+            def eventLogging = Seq("name" → event.name, "target" → target.getEffectiveId, "location" → (Option(event.locationData) map (_.toString) orNull))
+
             // Ask the target for the handlers associated with the event name
             val (performDefaultAction, handlers) = {
                 val staticTarget = target.container.getPartAnalysis.getControlAnalysis(target.getPrefixedId)
+
+                // https://github.com/orbeon/orbeon-forms/issues/898
+                if (staticTarget eq null) {
+                    debug("ignoring event dispatch to target without static control", eventLogging)
+                    return
+                }
+
                 staticTarget.handlersForEvent(event.name)
             }
 
@@ -57,7 +66,7 @@ object Dispatch extends Logging {
 
             withEvent {
                 if (handlers.nonEmpty) {
-                    withDebug("dispatching", Seq("name" → event.name, "target" → target.getEffectiveId, "location" → (Option(event.locationData) map (_.toString) orNull))) {
+                    withDebug("dispatching", eventLogging) {
                         // There is at least one handler to run
 
                         // Run all observers for the given phase
@@ -122,11 +131,7 @@ object Dispatch extends Logging {
                     if (! event.cancelable || performDefaultAction)
                         target.performDefaultAction(event)
 
-                    debug("optimized dispatching", Seq(
-                        "name" → event.name,
-                        "target" → target.getEffectiveId,
-                        "location" → (Option(event.locationData) map (_.toString) orNull),
-                        "native handlers called"  → statNativeHandlers.toString))
+                    debug("optimized dispatching", eventLogging ++ Seq("native handlers called" → statNativeHandlers.toString))
                 }
             }
         } catch {

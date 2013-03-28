@@ -623,11 +623,12 @@ body {
   box-shadow: 0 0 10px #004b92;
   border-collapse: separate;
 }
+.orbeon .fr-view .fr-grid .fr-grid-content .xforms-label:hover,
 .orbeon .fr-view .fr-grid .fr-grid-content .xforms-hint:hover,
 .orbeon .fr-view .fr-grid .fb-grid-th .xforms-label:hover,
 .orbeon .fr-view .fr-grid .fb-grid-th .xforms-hint:hover,
 .orbeon .fr-view .fr-grid .btn span:hover {
-  background-color: #ffffd3;
+  background-color: #eeeeee;
 }
 .orbeon .fr-view .fr-grid .fr-grid-content .xforms-label,
 .orbeon .fr-view .fr-grid .fr-grid-content .xforms-hint,

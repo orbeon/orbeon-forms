@@ -5,6 +5,11 @@ $ ->
     currentLabel = null
     isLabelHtml = -> currentControl.is('.fb-label-is-html')
     setLabelHtml = (isHtml) -> currentControl.toggleClass('.fb-label-is-html', isHtml)
+    labelValue = (value) ->
+        valueAccessor = if isLabelHtml() then currentLabel.html else currentLabel.text
+        valueAccessor = _.bind(valueAccessor, currentLabel)
+        # Don't pass value if undefined, as an undefined parameter is not the same to jQuery as no parameter
+        if value? then valueAccessor(value) else valueAccessor()
 
     # Called when users press enter or tab out
     endEdit = ->
@@ -21,8 +26,8 @@ $ ->
             labelEditor().checkbox.tooltip('destroy')
             labelEditor().container.hide()
             # Update values in the DOM, without waiting for the server to send us the value
-            currentLabel.html(newLabel)
             setLabelHtml(isChecked)
+            labelValue(newLabel)
 
     # Heuristic to close the editor based on click and focus events
     clickOrFocus = ({target}) ->
@@ -71,7 +76,7 @@ $ ->
         labelEditor().container.show()
         labelEditor().container.offset(currentLabel.offset())
         labelEditor().textfield.outerWidth(currentLabel.outerWidth() - labelEditor().checkbox.outerWidth(true))
-        labelEditor().textfield.val(currentLabel.html()).focus()
+        labelEditor().textfield.val(labelValue()).focus()
         labelEditor().checkbox.prop('checked', isLabelHtml())
 
     $('.fb-main').on('click', '.xforms-label', startEdit)

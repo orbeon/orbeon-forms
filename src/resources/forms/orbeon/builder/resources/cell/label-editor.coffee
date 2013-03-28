@@ -25,6 +25,7 @@ $ ->
             # Destroy tooltip, or it doesn't get recreated on startEdit()
             labelEditor().checkbox.tooltip('destroy')
             labelEditor().container.hide()
+            currentLabel.css('visibility', '')
             # Update values in the DOM, without waiting for the server to send us the value
             setLabelHtml(isChecked)
             labelValue(newLabel)
@@ -72,7 +73,9 @@ $ ->
         currentLabel.removeAttr('for')
         # Setup tooltip for editor (don't do this once for all, as the language can change)
         labelEditor().checkbox.tooltip(title: $('.fb-lhha-checkbox-message').text())
-        # Position and populate editor
+        # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
+        currentLabel.css('visibility', 'hidden')
+        # Show, position, and populate editor
         labelEditor().container.show()
         labelEditor().container.offset(currentLabel.offset())
         labelEditor().textfield.outerWidth(currentLabel.outerWidth() - labelEditor().checkbox.outerWidth(true))

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.common
 
 import java.text.DateFormat
-import java.util.{Date ⇒ JDate}
 import org.dom4j.Document
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
@@ -106,17 +105,21 @@ class PEVersion extends Version {
                     }
             }
 
-        // Check version
-        if (licenseInfo.isBadVersion)
-            licenseInfo.version foreach { version ⇒
-                licenseError("License version doesn't match. License version is: " + version + ", Orbeon Forms version is: " + VersionNumber)
-            }
+        licenseInfo.formattedSubscriptionEnd match {
+            case Some(end) ⇒
+                // There is a subscription end date so we check that the build date is prior to that
+                // NOTE: Don't check against the current date as we don't want to depend on that for production licenses
+                if (licenseInfo.isBuildAfterSubscriptionEnd)
+                    licenseError(s"Subscription ended on: $end, Orbeon Forms build dates from: ${licenseInfo.formattedBuildDate.get}")
+            case None ⇒
+                // There is no subscription end date so we check against the version
+                if (licenseInfo.isBadVersion)
+                    licenseError(s"License version doesn't match. License version is: ${licenseInfo.version.get}, Orbeon Forms version is: $VersionNumber")
+        }
 
-        // Check expiration
+        // Check expiration against the current date (for non-production licenses)
         if (licenseInfo.isExpired)
-            licenseInfo.formattedExpiration foreach { formatted ⇒
-                licenseError("License has expired on " + formatted)
-            }
+            licenseError(s"License has expired on ${licenseInfo.formattedExpiration.get}")
 
         logger.info("This installation of " + VersionString + " is licensed to: " + licenseInfo.toString)
     }
@@ -153,18 +156,39 @@ private object PEVersion {
         if (ints.size == 2) Some(ints(0), ints(1)) else None
     }
 
-    case class LicenseInfo(licensor: String, licensee: String, organization: String, email: String, issued: String, version: Option[String], expiration: Option[JDate]) {
+    private val MatchTimestamp = """(.*[^\d]|)(\d{4})(\d{2})(\d{2})\d{4}([^\d].*|)""".r
 
-        def isBadVersion = version    exists (isVersionExpired(VersionNumber, _))
-        def isExpired    = expiration exists (new JDate().after(_))
+    def dateFromVersionNumber(currentVersion: String) = (
+        Some(currentVersion)
+        collect { case MatchTimestamp(_, year, month, day, _) ⇒ year + '-' + month + '-' + day }
+        map DateUtils.parseISODateOrDateTime
+    )
 
-        def formattedExpiration = expiration map DateFormat.getDateInstance.format
+    case class LicenseInfo(
+            versionNumber: String,
+            licensor: String,
+            licensee: String,
+            organization: String,
+            email: String,
+            issued: String,
+            version: Option[String],
+            expiration: Option[Long],
+            subscriptionEnd: Option[Long]) {
+
+        def isBadVersion                = version         exists (isVersionExpired(versionNumber, _))
+        def isExpired                   = expiration      exists (System.currentTimeMillis() > _)
+        def isBuildAfterSubscriptionEnd = subscriptionEnd exists (end ⇒ dateFromVersionNumber(versionNumber) exists (_ > end))
+
+        def formattedExpiration      = expiration                           map DateFormat.getDateInstance.format
+        def formattedSubscriptionEnd = subscriptionEnd                      map DateFormat.getDateInstance.format
+        def formattedBuildDate       = dateFromVersionNumber(versionNumber) map DateFormat.getDateInstance.format
 
         override def toString = {
-            val expiresString = formattedExpiration map (" and expires on " + _) getOrElse ""
-            val versionString = version             map (" for version "    + _) getOrElse ""
+            val versionString         = version                  map (" for version " + _) getOrElse ""
+            val subscriptionEndString = formattedSubscriptionEnd map (" with subscription ending on " + _) getOrElse ""
+            val expiresString         = formattedExpiration      map (" and expires on " + _) getOrElse ""
 
-            licensee + " / " + organization + " / " + email + versionString + expiresString
+            licensee + " / " + organization + " / " + email + versionString + subscriptionEndString + expiresString
         }
     }
 
@@ -174,16 +198,17 @@ private object PEVersion {
             import org.orbeon.oxf.xml.XPathUtils.selectStringValueNormalize
             def select(s: String) = selectStringValueNormalize(licenceDocument, "/license/" + s)
 
-            val licensor      = select("licensor")
-            val licensee      = select("licensee")
-            val organization  = select("organization")
-            val email         = select("email")
-            val issued        = select("issued")
+            val licensor           = select("licensor")
+            val licensee           = select("licensee")
+            val organization       = select("organization")
+            val email              = select("email")
+            val issued             = select("issued")
 
-            val versionOpt    = nonEmptyOrNone(select("version"))
-            val expirationOpt = nonEmptyOrNone(select("expiration")) map (s ⇒ new JDate(DateUtils.parseISODateOrDateTime(s)))
+            val versionOpt         = nonEmptyOrNone(select("version"))
+            val expirationOpt      = nonEmptyOrNone(select("expiration"))       map DateUtils.parseISODateOrDateTime
+            val subscriptionEndOpt = nonEmptyOrNone(select("subscription-end")) map DateUtils.parseISODateOrDateTime
 
-            LicenseInfo(licensor, licensee, organization, email, issued, versionOpt, expirationOpt)
+            LicenseInfo(VersionNumber, licensor, licensee, organization, email, issued, versionOpt, expirationOpt, subscriptionEndOpt)
         }
     }
 }

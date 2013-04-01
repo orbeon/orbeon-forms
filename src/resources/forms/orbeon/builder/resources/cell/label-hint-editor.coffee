@@ -1,7 +1,9 @@
 $ ->
+    Builder = ORBEON.Builder
     OD = ORBEON.xforms.Document
 
     LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint'
+    ControlSelector = '.xforms-control, .xbl-component'
 
     # Global state
     currentControl = null
@@ -65,18 +67,7 @@ $ ->
         editor
 
     # Show editor on click on label
-    startEdit = ({currentTarget}) ->
-        currentLabelHint = $(currentTarget)
-        # Find control for this label
-        th = currentLabelHint.parents('th')
-        currentControl =
-            if th.is('*')
-                # Case of a repeat
-                trWithControls = th.parents('table').find('tbody tr.fb-grid-tr').first()
-                tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
-                tdWithControl.find('.xforms-control, .xbl-component')
-            else
-                currentLabelHint.parents('.xforms-control, .xbl-component').first()
+    startEdit = () ->
         # Remove `for` so browser doesn't set the focus to the control on click
         currentLabelHint.removeAttr('for')
         # Setup tooltip for editor (don't do this once for all, as the language can change)
@@ -90,5 +81,28 @@ $ ->
         labelHintEditor().textfield.val(labelHintValue()).focus()
         labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
 
-    $('.fb-main').on('click', LabelHintSelector, startEdit)
+    # Click on label/hint
+    $('.fb-main').on 'click', LabelHintSelector, ({currentTarget}) ->
+        currentLabelHint = $(currentTarget)
+        # Find control for this label
+        th = currentLabelHint.parents('th')
+        currentControl =
+            if th.is('*')
+                # Case of a repeat
+                trWithControls = th.parents('table').find('tbody tr.fb-grid-tr').first()
+                tdWithControl = trWithControls.children(':nth-child(' + (th.index() + 1) + ')')
+                tdWithControl.find(ControlSelector)
+            else
+                currentLabelHint.parents(ControlSelector).first()
+        startEdit()
 
+    # New control added
+    Builder.controlAdded.add (containerId) ->
+        container = $(document.getElementById(containerId))
+        currentControl = container.find(ControlSelector)
+        repeat = container.parents('.fr-repeat').first()
+        currentLabelHint =
+            if   repeat.is('*') \
+            then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
+            else container.find('.xforms-label')
+        startEdit()

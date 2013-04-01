@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
@@ -27,6 +28,7 @@ import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.X509EncodedKeySpec;
 
 public class SignatureVerifierProcessor extends ProcessorImpl {
@@ -59,7 +61,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
 
                     final Document data = readInputAsDOM4J(context, INPUT_DATA);
                     final Node sigDataNode = data.selectSingleNode("/signed-data/data/*");
-                    final String sig = XPathUtils.selectStringValueNormalize(data, "/signed-data/signature");
+                    final String sig = StringUtils.trimToEmpty(XPathUtils.selectStringValue(data, "/signed-data/signature"));
 
                     sigDataNode.detach();
                     final Document sigData = new NonLazyUserDataDocument();
@@ -67,13 +69,22 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
 
                     dsa.update(Dom4jUtils.domToString(sigData).getBytes("utf-8"));
 
-                    if (!dsa.verify(Base64.decode(sig)))
-                        throw new SignatureException("Invalid Signature");
-                    else {
-                        final LocationSAXWriter saw = new LocationSAXWriter();
-                        saw.setContentHandler(xmlReceiver);
-                        saw.write(sigData);
+                    // Verify signature and throw in case of failure
+                    try {
+                        if (! dsa.verify(Base64.decode(sig)))
+                            throw new OXFException("Signature verification failed");
+                    } catch (SignatureException e) {
+                        throw e;
+                    } catch (Exception e) {
+                        // A number of things can fail above, including Base64 decoding
+                        // NOTE: We don't pas the cause so that we can match on SignatureException as root Exception
+                        throw new SignatureException("Signature verification failed");
                     }
+
+                    // Signature verification passed
+                    final LocationSAXWriter saw = new LocationSAXWriter();
+                    saw.setContentHandler(xmlReceiver);
+                    saw.write(sigData);
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }
@@ -81,11 +92,5 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
-    }
-
-    public static class SignatureException extends OXFException {
-        public SignatureException(String message) {
-            super(message);
-        }
     }
 }

@@ -1,7 +1,7 @@
 $ ->
     OD = ORBEON.xforms.Document
 
-    LabelHintSelector = '.xforms-label, .xforms-hint'
+    LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint'
 
     # Global state
     currentControl = null

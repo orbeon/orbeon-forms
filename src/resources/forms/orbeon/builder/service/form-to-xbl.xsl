@@ -261,8 +261,13 @@
                     <xf:instance id="readonly"><readonly/></xf:instance>
 
                     <!-- This is also at the top-level in components.xsl -->
-                    <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode"/>
-                    <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email') or instance('readonly') = 'true'"/>
+                    <xf:var name="fr-params" value="xxf:instance('fr-parameters-instance')"/>
+                    <xf:var name="fr-mode"   value="$fr-params/mode"/>
+                    <xf:bind
+                        ref="instance('fr-form-instance')"
+                        readonly="$fr-mode = ('view', 'pdf', 'email')
+                               or instance('readonly') = 'true'
+                               or ($fr-params/app = 'orbeon' and $fr-params/form = 'builder')"/>
 
                     <!-- Schema: simply copy so that the types are available locally -->
                     <!-- NOTE: Could optimized to check if any of the types are actually used -->

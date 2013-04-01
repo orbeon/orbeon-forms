@@ -20,6 +20,7 @@ import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import FormBuilderFunctions._
 import org.orbeon.oxf.xforms.XFormsUtils
+import scala.Some
 
 object ContainerOps {
 
@@ -223,5 +224,26 @@ object ContainerOps {
     // Currently: must be a section without section template content
     // Later: fr:tab (maybe fr:tabview), wizard
     def canMoveInto(container: NodeInfo) =
-        IsSection(container) && !(container \ * exists IsSectionTemplateContent)
+        IsSection(container) && ! (container \ * exists IsSectionTemplateContent)
+
+    def sectionsWithTemplates(inDoc: NodeInfo) =
+        findFRBodyElement(inDoc) descendant * filter IsSection filter (_ \ * exists IsSectionTemplateContent)
+
+    // See: https://github.com/orbeon/orbeon-forms/issues/633
+    def deleteSectionTemplateContentHolders(inDoc: NodeInfo) = {
+
+        // Find data holders for all section templates
+        val holders =
+            for {
+                section     ← sectionsWithTemplates(inDoc)
+                controlName ← getControlNameOption(section).toList
+                holder      ← findDataHolders(inDoc, controlName)
+            } yield
+                holder
+
+        // Delete all elements underneath those holders
+        holders foreach { holder ⇒
+            delete(holder \ *)
+        }
+    }
 }

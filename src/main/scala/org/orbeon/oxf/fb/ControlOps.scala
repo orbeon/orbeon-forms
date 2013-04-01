@@ -103,7 +103,7 @@ object ControlOps {
     def bindRefOrNodeset(bind: NodeInfo): Option[String] =
         bind \@ ("ref" || "nodeset") map (_.stringValue) headOption
 
-    // Find control holder
+    // Find control holders (there can be more than one with repeats)
     // Don't return anything if isCustomInstance is true
     def findDataHolders(inDoc: NodeInfo, controlName: String): Seq[NodeInfo] =
         if (! isCustomInstance)

@@ -70,8 +70,9 @@
                                             (event('data'), instance('fb-components-instance')),
                                             'data')"/>
 
-        <xf:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-            gridOps:initializeGrids($temp)
+        <xf:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps" xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps">
+            gridOps:initializeGrids($temp),
+            containerOps:deleteSectionTemplateContentHolders($temp)
         </xf:action>
 
         <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->

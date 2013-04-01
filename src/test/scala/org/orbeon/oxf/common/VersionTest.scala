@@ -13,12 +13,19 @@
  */
 package org.orbeon.oxf.common
 
-import org.junit.Test
-import org.orbeon.oxf.test.ResourceManagerTestBase
 import junit.framework.Assert._
-import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.common.PEVersion.LicenseInfo
+import org.dom4j.Document
+import org.junit.Test
+import org.orbeon.oxf.common.PEVersion._
+import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.DateUtils
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.scalatest.junit.AssertionsForJUnit
+import scala.util.Try
+import scala.xml.Elem
+import java.security.SignatureException
+import org.orbeon.oxf.processor.validation.SchemaValidationException
 
 class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
@@ -75,6 +82,9 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     @Test def dateFromVersionNumber(): Unit = {
 
+        // Make sure the current build has a timestamp
+        assert(PEVersion.dateFromVersionNumber(Version.VersionNumber).isDefined)
+
         val TimeStamp = Some(1359356400000L)
 
         val expected = Seq(
@@ -117,5 +127,152 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
             assert(out.expired                   === license.isExpired)
             assert(out.buildAfterSubscriptionEnd === license.isBuildAfterSubscriptionEnd)
         }
+    }
+
+    implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)
+
+    private def tryLicenseInfo(license: Document) = (
+        Try(license)
+        flatMap tryGetSignedData
+        flatMap LicenseInfo.tryApply
+    )
+
+    @Test def invalidSignature(): Unit = {
+
+        // A few licenses with invalid signatures
+        val licenses: Seq[(Document, Class[_])] = Seq(
+            // Document contains the signature of some random value hopefully forever lost
+            elemToDocument(
+                <signed-data>
+                    <data>
+                        <license>
+                            <licensor>Orbeon, Inc.</licensor>
+                                <licensee>Wile E. Coyote</licensee>
+                            <organization>Acme, Corp.</organization>
+                            <email>info@orbeon.com</email>
+                            <issued>2013-04-01</issued>
+                            <expiration/>
+                        </license>
+                    </data>
+                    <signature>MCwCFDp6Ee9MYRjJnBcDA4RS2SjPjJ8PAhQ1zYrSudg9e7ZheQlnPGDSDiFiKQ==</signature>
+                </signed-data>) → classOf[SignatureException],
+            // Document contains empty signature
+            elemToDocument(
+                <signed-data>
+                    <data>
+                        <license>
+                            <licensor>Orbeon, Inc.</licensor>
+                            <licensee>Wile E. Coyote</licensee>
+                            <organization>Acme, Corp.</organization>
+                            <email>info@orbeon.com</email>
+                            <issued>2013-04-01</issued>
+                            <expiration/>
+                        </license>
+                    </data>
+                    <signature/>
+                </signed-data>) → classOf[SignatureException],
+            // Document contains signature not in Base64
+            elemToDocument(
+                <signed-data>
+                    <data>
+                        <license>
+                            <licensor>Orbeon, Inc.</licensor>
+                            <licensee>Wile E. Coyote</licensee>
+                            <organization>Acme, Corp.</organization>
+                            <email>info@orbeon.com</email>
+                            <issued>2013-04-01</issued>
+                            <expiration/>
+                        </license>
+                    </data>
+                    <signature>FUNKY STUFF</signature>
+                </signed-data>) → classOf[SchemaValidationException]
+        )
+
+        licenses foreach { case (license, expectedClass) ⇒
+
+            val thrown = intercept[Exception] {
+                tryLicenseInfo(license) recoverWith recoverRootException get
+            }
+
+            assert(expectedClass === thrown.getClass)
+        }
+    }
+
+    @Test def badVersion(): Unit = {
+
+        // License is for old version
+        val license: Document =
+            <signed-data>
+                <data>
+                    <license>
+                        <licensor>Orbeon, Inc.</licensor>
+                        <licensee>Wile E. Coyote</licensee>
+                        <organization>Acme, Corp.</organization>
+                        <email>info@orbeon.com</email>
+                        <issued>2013-04-01</issued>
+                        <version>3.0</version>
+                        <expiration/>
+                        <subscription-start/>
+                        <subscription-end/>
+                        <license-id/>
+                        <license-description/>
+                    </license>
+                </data>
+                <signature>MCwCFCHbcWqtslECGXPIUuO6jcEfq0GSAhRU/X9TceCC36jTpkh7oHAHU/7vnw==</signature>
+            </signed-data>
+
+        assert(tryLicenseInfo(license).get.isBadVersion)
+    }
+
+    @Test def buildAfterSubscriptionEnd(): Unit = {
+
+        // License has subscription ending way in the past
+        val license: Document =
+            <signed-data>
+                <data>
+                    <license>
+                        <licensor>Orbeon, Inc.</licensor>
+                        <licensee>Wile E. Coyote</licensee>
+                        <organization>Acme, Corp.</organization>
+                        <email>info@orbeon.com</email>
+                        <issued>2013-04-01</issued>
+                        <version/>
+                        <expiration/>
+                        <subscription-start>2000-01-01</subscription-start>
+                        <subscription-end>2001-01-01</subscription-end>
+                        <license-id/>
+                        <license-description/>
+                    </license>
+                </data>
+                <signature>MCwCFANERfNHS+vLMFZGftW9Fa0TDUi3AhRYoUMYU0g/BfIgbmWo8LA4vRgK3Q==</signature>
+            </signed-data>
+
+        assert(tryLicenseInfo(license).get.isBuildAfterSubscriptionEnd)
+    }
+
+    @Test def expired(): Unit = {
+
+        // License is expired
+        val license: Document =
+            <signed-data>
+                <data>
+                    <license>
+                        <licensor>Orbeon, Inc.</licensor>
+                        <licensee>Wile E. Coyote</licensee>
+                        <organization>Acme, Corp.</organization>
+                        <email>info@orbeon.com</email>
+                        <issued>2013-04-01</issued>
+                        <version/>
+                        <expiration>2001-01-01</expiration>
+                        <subscription-start/>
+                        <subscription-end/>
+                        <license-id/>
+                        <license-description/>
+                    </license>
+                </data>
+                <signature>MCwCFEp9uGxNm2b+61mxKpgBnjxDUmE+AhRcV3FrqBjPGbDPM1kId2R0AGC/FQ==</signature>
+            </signed-data>
+
+        assert(tryLicenseInfo(license).get.isExpired)
     }
 }

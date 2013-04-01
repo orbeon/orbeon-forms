@@ -19,7 +19,6 @@ import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
 import org.orbeon.oxf.processor.DOMSerializer
 import org.orbeon.oxf.processor.ProcessorImpl.{INPUT_DATA, OUTPUT_DATA}
 import org.orbeon.oxf.processor.SignatureVerifierProcessor
-import org.orbeon.oxf.processor.SignatureVerifierProcessor.SignatureException
 import org.orbeon.oxf.processor.generator.DOMGenerator
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.resources.ResourceNotFoundException
@@ -33,6 +32,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import java.io.{FileInputStream, File}
 import org.orbeon.oxf.xml.XMLUtils
 import scala.util.Try
+import java.security.SignatureException
 
 class PEVersion extends Version {
 
@@ -50,54 +50,13 @@ class PEVersion extends Version {
         }
 
         val licenseInfo =
-            try {
-                val key = createURLGenerator(OrbeonPublicKeyURL)
-
-                // Read license file and remove blank spaces as that's the way it was signed
-                val licenseDocument = {
-
-                    def fromResourceManager =
-                        Try(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
-
-                    def fromHomeDirectory =
-                        Try {
-                            val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
-
-                            useAndClose(new FileInputStream(new File(path))) { is ⇒
-                                Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN)
-                            }
-                        }
-
-                    def document = fromResourceManager orElse fromHomeDirectory get
-
-                    Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(document))
-                }
-
-                // Connect pipeline
-                val serializer = {
-                    val licence = new DOMGenerator(licenseDocument, "license", DOMGenerator.ZeroValidity, LicenseURL)
-                    val verifierProcessor = new SignatureVerifierProcessor
-                    connect(licence, OUTPUT_DATA, verifierProcessor, INPUT_DATA)
-                    connect(key, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
-                    val result = new DOMSerializer
-                    connect(verifierProcessor, OUTPUT_DATA, result, INPUT_DATA)
-                    result
-                }
-
-                // Execute pipeline to obtain license document
-                val licenceDocument =
-                    withPipelineContext { pipelineContext ⇒
-                        serializer.reset(pipelineContext)
-                        serializer.runGetDocument(pipelineContext)
-                    }
-
-                LicenseInfo(licenceDocument)
-            } catch {
-                case t: Throwable ⇒
+            try tryReadLicense flatMap tryGetSignedData flatMap LicenseInfo.tryApply get
+            catch {
+                case t: Exception ⇒
                     Exceptions.getRootThrowable(t) match {
                         case e: ResourceNotFoundException ⇒
                             licenseError("License file not found")
-                        case e: SignatureException ⇒
+                        case _: SignatureException ⇒
                             licenseError("Invalid license file signature")
                         case e: Exception ⇒
                             licenseError("Error loading license file", Some(e))
@@ -209,5 +168,49 @@ private object PEVersion {
 
             LicenseInfo(VersionNumber, licensor, licensee, organization, email, issued, versionOpt, expirationOpt, subscriptionEndOpt)
         }
+
+        def tryApply(licenceDocument: Document): Try[LicenseInfo] = Try(apply(licenceDocument))
     }
+
+    def tryReadLicense: Try[Document] = {
+
+        def fromResourceManager =
+            Try(ResourceManagerWrapper.instance.getContentAsDOM4J(LicensePath))
+
+        def fromHomeDirectory =
+            Try {
+                val path = dropTrailingSlash(System.getProperty("user.home")) + "/.orbeon/license.xml"
+
+                useAndClose(new FileInputStream(new File(path))) { is ⇒
+                    Dom4jUtils.readDom4j(is, path, XMLUtils.ParserConfiguration.PLAIN)
+                }
+            }
+
+        fromResourceManager orElse fromHomeDirectory
+    }
+
+    def tryGetSignedData(rawDocument: Document): Try[Document] =
+        Try {
+            val key = createURLGenerator(OrbeonPublicKeyURL)
+
+            // Remove blank spaces as that's the way it was signed
+            val inputLicenseDocument = Dom4jUtils.readDom4j(Dom4jUtils.domToCompactString(rawDocument))
+
+            // Connect pipeline
+            val serializer = {
+                val licence = new DOMGenerator(inputLicenseDocument, "license", DOMGenerator.ZeroValidity, LicenseURL)
+                val verifierProcessor = new SignatureVerifierProcessor
+                connect(licence, OUTPUT_DATA, verifierProcessor, INPUT_DATA)
+                connect(key, OUTPUT_DATA, verifierProcessor, SignatureVerifierProcessor.INPUT_PUBLIC_KEY)
+                val result = new DOMSerializer
+                connect(verifierProcessor, OUTPUT_DATA, result, INPUT_DATA)
+                result
+            }
+
+            // Execute pipeline to obtain license document
+            withPipelineContext { pipelineContext ⇒
+                serializer.reset(pipelineContext)
+                serializer.runGetDocument(pipelineContext)
+            }
+        }
 }

@@ -17,7 +17,7 @@ import org.joda.time.DateTimeZone
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.value.{CalendarValue, DateValue, DateTimeValue}
 import org.orbeon.saxon.`type`.ValidationFailure
-import java.util.{Properties, Date, Locale}
+import java.util.{Properties, Locale}
 import javax.xml.transform.Result
 import org.joda.time.format.{DateTimeFormatter, DateTimeFormat, ISODateTimeFormat}
 
@@ -25,7 +25,10 @@ object DateUtils {
 
     // ISO 8601 xs:dateTime formats with timezone, which we should always use when serializing a date
     // From the doc: "DateTimeFormat is thread-safe and immutable, and the formatters it returns are as well."
-    val DateTime = ISODateTimeFormat.dateTime.withZoneUTC
+    val DateTime   = ISODateTimeFormat.dateTime.withZoneUTC
+
+    // Date format without timezone
+    val DateNoZone = ISODateTimeFormat.date
 
     // RFC 1123 format
     // RFC 2616 says: "The first format is preferred as an Internet standard and represents a fixed-length subset of
@@ -48,7 +51,7 @@ object DateUtils {
     // Default timezone offset in minutes
     // This is obtained once at the time the current object initializes
     val DefaultOffsetMinutes = {
-        val currentInstant = (new Date).getTime
+        val currentInstant = System.currentTimeMillis
         DateTimeZone.getDefault.getOffset(currentInstant) / 1000 / 60
     }
 

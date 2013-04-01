@@ -45,6 +45,7 @@ import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.processor.validation.SchemaValidationException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -151,7 +152,7 @@ public class XFormsModelSchemaValidator {
 
         public void error(final Locator[] locators, final String message, final Exception exception) {
             final LocationData locationData = locators.length > 0 ? new LocationData(locators[0]) : null;
-            throw new ValidationException(message, exception, locationData);
+            throw new SchemaValidationException(message, exception, locationData);
         }
 
         public InputSource resolveEntity(final String pid, final String sid) throws SAXException, IOException {
@@ -809,13 +810,13 @@ public class XFormsModelSchemaValidator {
                 try {
                     contentModelExpression = schemaGrammar.getPool().createData(DatatypeFactory.getTypeByName(typeLocalname) );
                 } catch (DatatypeException e) {
-                    throw new ValidationException("Built-in schema type not found: " + typeLocalname, locationData);
+                    throw new SchemaValidationException("Built-in schema type not found: " + typeLocalname, locationData);
                 }
             } else {
                 // Find schema for type namespace
                 final XMLSchemaSchema schema = ((XMLSchemaGrammar) schemaGrammar).getByNamespace(typeNamespaceURI);
                 if (schema == null)
-                    throw new ValidationException("No schema found for namespace: " + typeNamespaceURI, locationData);
+                    throw new SchemaValidationException("No schema found for namespace: " + typeNamespaceURI, locationData);
 
                 // Find simple type in schema
                 final SimpleTypeExp simpleTypeExpression = schema.simpleTypes.get(typeLocalname);
@@ -834,7 +835,7 @@ public class XFormsModelSchemaValidator {
                             contentModelExpression = complexTypeExpression;
                         } else {
                             // XForms mandates simple types or complex types with simple content
-                            throw new ValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
+                            throw new SchemaValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
                         }
                     } else {
                         // Find element declaration in schema
@@ -849,11 +850,11 @@ public class XFormsModelSchemaValidator {
                                 // NOTE: Here again, we do some guesswork from MSV. Is this 100% correct?
                                 contentModelExpression = contentModel;
                             } else {
-                                throw new ValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
+                                throw new SchemaValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
                             }
                         } else {
                             // XForms mandates simple types or complex types with simple content
-                            throw new ValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
+                            throw new SchemaValidationException("Simple type or complex type with simple content required for type: " + typeQName, locationData);
                         }
                     }
                     // TODO: Must also look at schema.attributeDecls?

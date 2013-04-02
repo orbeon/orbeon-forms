@@ -14,6 +14,7 @@ $ ->
     htmlClass = -> 'fb-' + lhha() + '-is-html'
     isLabelHintHtml = -> currentControl.is('.' + htmlClass())
     setLabelHintHtml = (isHtml) -> currentControl.toggleClass(htmlClass(), isHtml)
+    annotateWithLhhaClass = (add) -> labelHintEditor().container.toggleClass('fb-label-editor-for-' + lhha(), add)
 
     labelHintValue = (value) ->
         valueAccessor = if isLabelHintHtml() then currentLabelHint.html else currentLabelHint.text
@@ -35,6 +36,7 @@ $ ->
             # Destroy tooltip, or it doesn't get recreated on startEdit()
             labelHintEditor().checkbox.tooltip('destroy')
             labelHintEditor().container.hide()
+            annotateWithLhhaClass(false)
             currentLabelHint.css('visibility', '')
             # Update values in the DOM, without waiting for the server to send us the value
             setLabelHintHtml(isChecked)
@@ -74,6 +76,8 @@ $ ->
         labelHintEditor().checkbox.tooltip(title: $('.fb-lhha-checkbox-message').text())
         # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
         currentLabelHint.css('visibility', 'hidden')
+        # Add class telling if this is a label or hint editor
+        annotateWithLhhaClass(true)
         # Show, position, and populate editor
         labelHintEditor().container.show()
         labelHintEditor().container.offset(currentLabelHint.offset())

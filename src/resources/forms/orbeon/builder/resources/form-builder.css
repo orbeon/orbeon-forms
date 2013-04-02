@@ -510,6 +510,9 @@ body {
   -moz-border-radius: 0;
   border-radius: 0;
 }
+.orbeon .fb-label-editor-for-hint input {
+  font-size: smaller;
+}
 .orbeon .fb-label-editor input[type='checkbox'] {
   margin-left: 5px;
 }

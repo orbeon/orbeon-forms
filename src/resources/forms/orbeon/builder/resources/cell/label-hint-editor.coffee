@@ -41,6 +41,9 @@ $ ->
             # Update values in the DOM, without waiting for the server to send us the value
             setLabelHintHtml(isChecked)
             labelHintValue(newValue)
+            # Clean state
+            currentControl = null
+            currentLabelHint = null
 
     # Heuristic to close the editor based on click and focus events
     clickOrFocus = ({target}) ->
@@ -87,6 +90,8 @@ $ ->
 
     # Click on label/hint
     $('.fb-main').on 'click', LabelHintSelector, ({currentTarget}) ->
+        # Close current editor, if there is one open
+        endEdit() if ! _.isNull(currentControl)
         currentLabelHint = $(currentTarget)
         # Find control for this label
         th = currentLabelHint.parents('th')

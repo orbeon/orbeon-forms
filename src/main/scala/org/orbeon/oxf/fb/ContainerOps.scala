@@ -20,7 +20,6 @@ import org.orbeon.oxf.fb.ControlOps._
 import org.orbeon.oxf.fb.GridOps._
 import FormBuilderFunctions._
 import org.orbeon.oxf.xforms.XFormsUtils
-import scala.Some
 
 object ContainerOps {
 

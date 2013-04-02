@@ -21,6 +21,8 @@ import org.scalatest.concurrent.Eventually._
 import org.scalatest.selenium.WebBrowser
 import org.scalatest.time._
 import org.apache.commons.lang3.StringUtils
+import org.openqa.selenium.chrome.ChromeDriverService
+import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser {
@@ -146,14 +148,26 @@ abstract class OrbeonClientBase
 
 object OrbeonClientBase {
 
+    private var _service: Option[ChromeDriverService] = _
     private var _driver: WebDriver = _
     def driver = _driver ensuring (_ ne null)
 
     @BeforeClass
-    def createAndStartService() =
-        _driver = new FirefoxDriver()
+    def createAndStartService(): Unit = {
+        System.getProperty("oxf.test.driver") match {
+            case "chromedriver" =>
+                _service = Some(ChromeDriverService.createDefaultService())
+                _service.get.start()
+                _driver = new RemoteWebDriver(_service.get.getUrl, DesiredCapabilities.chrome())
+            case _ =>
+                _service = None
+                _driver = new FirefoxDriver()
+        }
+    }
 
     @AfterClass
-    def createAndStopService() =
+    def createAndStopService(): Unit = {
         _driver.quit()
+        _service foreach (_.stop())
+    }
 }

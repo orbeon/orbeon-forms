@@ -27,6 +27,7 @@
             <xh:head>
                 <xh:title><xsl:value-of select="@title"/></xh:title>
                 <xh:link rel="stylesheet" href="/home/home.css" type="text/css"/>
+                <xh:script type="text/javascript" src="/ops/jquery/jquery-1.8.2.js"/>
             </xh:head>
             <xh:body>
                 <xh:ul class="thumbnails">

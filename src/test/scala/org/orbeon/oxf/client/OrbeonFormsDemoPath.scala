@@ -16,6 +16,8 @@ package org.orbeon.oxf.client
 import org.junit.Test
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.junit.MustMatchersForJUnit
+import org.openqa.selenium.interactions.{Actions, Action}
+import org.openqa.selenium.Keys
 
 trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // with AssertionsForJUnit
 
@@ -24,8 +26,8 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
 
         loadHomePage()
         eventually(pageTitle must be ("Creating forms with Form Builder"))
+        executeScript("window.scrollTo(0, $(document).height())")
         click on partialLinkText("examples coded")
-
         eventually(pageTitle must be ("Creating forms by writing XForms by hand"))
 
         // RFE: test XForms examples

@@ -147,7 +147,7 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
                     <data>
                         <license>
                             <licensor>Orbeon, Inc.</licensor>
-                                <licensee>Wile E. Coyote</licensee>
+                            <licensee>Wile E. Coyote</licensee>
                             <organization>Acme, Corp.</organization>
                             <email>info@orbeon.com</email>
                             <issued>2013-04-01</issued>

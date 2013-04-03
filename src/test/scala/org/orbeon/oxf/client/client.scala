@@ -104,11 +104,13 @@ trait OrbeonFormsOps extends WebBrowser {
     // Extension methods on Element
     implicit class ElementOps(val e: STElement) {
         def classes = e.attribute("class") map stringToSet getOrElse Set()
-        def tabOut(wait: Boolean = true) = e match {
+        def tabOut(wait: Boolean = true) = sendKeys(Keys.TAB)
+        def sendKeys(keys: CharSequence, wait: Boolean = true): STElement = e match {
             case control if classes("xforms-control") ⇒ // && isFocusable
                 withAjaxAction(wait) {
-                    nativeControlUnder(e.attribute("id").get).underlying.sendKeys(Keys.TAB)
+                    nativeControlUnder(e.attribute("id").get).underlying.sendKeys(keys)
                 }
+                e
             case _ ⇒ throw new IllegalArgumentException("Element is not a focusable XForms control")
         }
 
@@ -116,6 +118,10 @@ trait OrbeonFormsOps extends WebBrowser {
         // Chrome:  name(input) = 'input' and local-name(input) = 'input'.
         private def nativeControlUnder(clientId: String) =
             xpath(s"//*[@id = '$clientId']//*[local-name() = 'input' or local-name() = 'textarea' or local-name() = 'select' or local-name() = 'button']").element
+    }
+
+    implicit class TextfieldOps(val textfield: TextField) {
+        def enter(): Unit = textfield.underlying.sendKeys(Keys.ENTER)
     }
 }
 
@@ -139,6 +145,27 @@ trait FormRunnerOps extends OrbeonFormsOps {
         def togglePage(id: String) = ???
         def pageSelected(id: String) = isCaseSelected(removeCaseGroupRepeatPrefix(clientId(id + "-section-case")))
     }
+}
+
+trait FormBuilderOps extends FormRunnerOps {
+
+    object Builder {
+        val SaveButton = cssSelector("#fr-save-button button")
+
+        def newForm(): Unit = {
+            loadOrbeonPage("/fr/orbeon/builder/new")
+            elementByStaticId("fb-application-name-input").sendKeys("a")
+            elementByStaticId("fb-form-name-input").sendKeys("a").sendKeys(Keys.ENTER)
+        }
+
+        def onNewForm[T](block: ⇒ T): Unit = {
+            newForm()
+            block
+            click on SaveButton
+            waitForAjaxResponse()
+        }
+    }
+
 }
 
 // The abstract base class has static forwarders to the object. This means that any class deriving from OrbeonClientBase

@@ -23,6 +23,7 @@ trait LabelHintEditor extends AssertionsForJUnit with FormBuilderOps with Should
     // CSS selectors
     val FirstControl = cssSelector("*[id $= 'control-1-control']")
     val FirstControlLabel = cssSelector(FirstControl.queryString + " .xforms-label")
+    val FirstControlHint = cssSelector(FirstControl.queryString + " .xforms-hint")
     val LabelEditor = cssSelector(".fb-label-editor")
     val LabelEditorInput = cssSelector(LabelEditor.queryString + " input[type = 'text']")
 
@@ -40,10 +41,18 @@ trait LabelHintEditor extends AssertionsForJUnit with FormBuilderOps with Should
                 val textfield = textField(LabelEditorInput)
                 textfield.value = "First name"
                 textfield.enter()
-                def checkLabelValueSet() = FirstControlLabel.element.text should be ("First name")
-                checkLabelValueSet()  // New label should be set right away (even before Ajax response)
+                // New label should be set right away (even before Ajax response)
+                FirstControlLabel.element.text should be ("First name")
+                // After Ajax, the label should still be the same
                 waitForAjaxResponse()
-                checkLabelValueSet()  // New label should still be set after Ajax response
+                FirstControlLabel.element.text should be ("First name")
+            }
+
+            // Bug #915: Label editor: label disappears
+            {
+                click on FirstControlLabel
+                click on FirstControlHint
+                FirstControlLabel.element.text should be ("First name")
             }
         }
     }

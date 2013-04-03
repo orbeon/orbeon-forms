@@ -13,9 +13,12 @@
  */
 package org.orbeon.oxf.client
 
+import org.orbeon.oxf.client.builder.LabelHintEditor
+
 // List all client tests which we want to run with a single run of the driver
 class CombinedClientTest
     extends OrbeonClientBase
     with XForms
     with FormRunnerSummary
     with OrbeonFormsDemoPath
+    with LabelHintEditor

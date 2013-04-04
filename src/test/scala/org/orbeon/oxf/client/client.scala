@@ -14,7 +14,7 @@
 package org.orbeon.oxf.client
 
 import org.junit.{AfterClass, BeforeClass}
-import org.openqa.selenium.firefox.FirefoxDriver
+import org.openqa.selenium.firefox.{FirefoxProfile, FirefoxDriver}
 import org.openqa.selenium.{Keys, WebDriver}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.scalatest.concurrent.Eventually._
@@ -23,6 +23,7 @@ import org.scalatest.time._
 import org.apache.commons.lang3.StringUtils
 import org.openqa.selenium.chrome.ChromeDriverService
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
+import java.io.File
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser {
@@ -150,12 +151,15 @@ trait FormRunnerOps extends OrbeonFormsOps {
 trait FormBuilderOps extends FormRunnerOps {
 
     object Builder {
+        val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
         val SaveButton = cssSelector("#fr-save-button button")
 
         def newForm(): Unit = {
             loadOrbeonPage("/fr/orbeon/builder/new")
             elementByStaticId("fb-application-name-input").sendKeys("a")
-            elementByStaticId("fb-form-name-input").sendKeys("a").sendKeys(Keys.ENTER)
+            elementByStaticId("fb-form-name-input").sendKeys("a")
+            click on NewContinueButton
+            waitForAjaxResponse()
         }
 
         def onNewForm[T](block: ⇒ T): Unit = {
@@ -188,7 +192,15 @@ object OrbeonClientBase {
                 _driver = new RemoteWebDriver(_service.get.getUrl, DesiredCapabilities.chrome())
             case _ =>
                 _service = None
-                _driver = new FirefoxDriver()
+                val profile = new FirefoxProfile()
+                if (System.getProperty("oxf.test.firefox.firebug") == "true") {
+                    profile.addExtension(new File("lib/test/firebug-1.11.2-fx.xpi"))
+                    profile.setPreference("extensions.firebug.currentVersion", "1.11.2")
+                    profile.setPreference("extensions.firebug.addonBarOpened", true)
+                    profile.setPreference("extensions.firebug.allPagesActivation", "on")
+                    profile.setPreference("extensions.firebug.script.enableSites", true)
+                }
+                _driver = new FirefoxDriver(profile)
         }
     }
 

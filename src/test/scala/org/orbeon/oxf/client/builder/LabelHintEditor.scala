@@ -17,6 +17,10 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.client.FormBuilderOps
 import org.junit.Test
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.concurrent.Eventually._
+import scala.Predef._
+import org.scalatest.time.{Seconds, Span}
+import org.openqa.selenium.ElementNotVisibleException
 
 trait LabelHintEditor extends AssertionsForJUnit with FormBuilderOps with ShouldMatchers {
 
@@ -26,32 +30,40 @@ trait LabelHintEditor extends AssertionsForJUnit with FormBuilderOps with Should
     val FirstControlHint = cssSelector(FirstControl.queryString + " .xforms-hint")
     val LabelEditor = cssSelector(".fb-label-editor")
     val LabelEditorInput = cssSelector(LabelEditor.queryString + " input[type = 'text']")
+    val Body = cssSelector(".fb-navbar img")
+
+    // On click on the label, because the label has a `for` pointing to the input, the focus would switch to the input,
+    // which we don't want to happen. So in label-hint-editor.coffee, we remove the `for` after the click. While this
+    // works on the browser, it doesn't work when the click is done through WebDriver, just with Firefox. So here
+    // we remove the `for` before doing the click.
+    private def clickLabel(selector: CssSelectorQuery): Unit = {
+        executeScript("$('" + selector.queryString.replaceAllLiterally("'", "\"") + "').removeAttr('for')")
+        click on selector
+    }
 
     @Test def editLabel(): Unit = {
         Builder.onNewForm {
 
-            // Click on label and check it is displayed
+            // Enter label and check it is set
             {
-                click on FirstControlLabel
-                LabelEditor.element should be ('displayed)
-            }
-
-            // Enter label
-            {
-                val textfield = textField(LabelEditorInput)
+                // Click on label and check it is displayed
+                clickLabel(FirstControlLabel)
+                val textfield = eventually {
+                    val textfield = textField(LabelEditorInput)
+                    textfield should be ('displayed)
+                    textfield
+                }
+                // Enter label
                 textfield.value = "First name"
                 textfield.enter()
-                // New label should be set right away (even before Ajax response)
-                FirstControlLabel.element.text should be ("First name")
-                // After Ajax, the label should still be the same
-                waitForAjaxResponse()
-                FirstControlLabel.element.text should be ("First name")
+                eventually { FirstControlLabel.element.text should be ("First name") }
             }
 
             // Bug #915: Label editor: label disappears
             {
                 click on FirstControlLabel
                 click on FirstControlHint
+                click on Body
                 FirstControlLabel.element.text should be ("First name")
             }
         }

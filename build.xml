@@ -771,6 +771,8 @@
 
                     <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitly -->
                 	<sysproperty key="user.timezone" value="America/Los_Angeles"/>
+                    <!-- Getting a JDK error, per http://stackoverflow.com/a/13575810/5295 -->
+                	<sysproperty key="java.util.Arrays.useLegacyMergeSort" value="true"/>
 
                     <classpath>
                         <path refid="test.class.path"/>

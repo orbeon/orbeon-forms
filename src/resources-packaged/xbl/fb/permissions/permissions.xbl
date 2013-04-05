@@ -148,7 +148,7 @@
                 <xxf:dialog id="dialog" class="fb-permissions-dialog">
                     <xf:label ref="$resources/dialog-permissions/label"/>
                     <!-- Choose mode -->
-                    <xf:select ref="$ui/has-permissions" appearance="full">
+                    <xf:select ref="$ui/has-permissions" appearance="full" class="fb-has-permissions">
                         <xf:item>
                             <xf:label ref="$resources/dialog-permissions/role-based-permissions"/>
                             <xf:value>true</xf:value>
@@ -174,12 +174,13 @@
                                             <xf:output value="$resources/dialog-permissions/anyone"/>
                                         </xf:group>
                                         <xf:group ref=".[not($is-first)]">
-                                            <xf:input ref="role" incremental="true"/>
+                                            <xf:input ref="role" incremental="true" class="fb-role-name"/>
                                         </xf:group>
                                     </xh:td>
                                     <!-- Checkboxes for operations -->
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations" appearance="full">
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations"
+                                                   appearance="full" class="fb-create-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/create"/>
                                                 <xf:value>create</xf:value>
@@ -191,7 +192,7 @@
                                         <xf:select ref="if ((not($is-first) and $anyone-operations = 'read')
                                                             or (tokenize(operations, '\s') = 'update'))
                                                         then $ui/readonly-checked else operations"
-                                                   appearance="full">
+                                                   appearance="full" class="fb-read-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/read"/>
                                                 <xf:value>read</xf:value>
@@ -199,7 +200,8 @@
                                         </xf:select>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'update') then $ui/readonly-checked else operations" appearance="full">
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'update') then $ui/readonly-checked else operations"
+                                                   appearance="full" class="fb-update-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/update"/>
                                                 <xf:value>update</xf:value>
@@ -207,7 +209,8 @@
                                         </xf:select>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations" appearance="full">
+                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations"
+                                                   appearance="full" class="fb-delete-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/delete"/>
                                                 <xf:value>delete</xf:value>
@@ -216,7 +219,7 @@
                                     </xh:td>
                                     <!-- Remove -->
                                     <xh:td>
-                                        <xf:trigger appearance="minimal" ref=".[not($is-first)]">
+                                        <xf:trigger appearance="minimal" ref=".[not($is-first)]" class="fb-remove-permission">
                                             <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                             <xf:delete ev:event="DOMActivate" ref="."/>
                                         </xf:trigger>
@@ -228,7 +231,7 @@
                                 <xh:td colspan="5"/>
                                 <xh:td>
                                     <!-- Add -->
-                                    <xf:trigger appearance="minimal">
+                                    <xf:trigger appearance="minimal" class="fb-add-permission">
                                         <xf:label><xh:i class="icon-plus-sign"/></xf:label>
                                         <xf:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
                                     </xf:trigger>

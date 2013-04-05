@@ -25,12 +25,12 @@ import org.openqa.selenium.ElementNotVisibleException
 trait LabelHintEditor extends AssertionsForJUnit with FormBuilderOps with ShouldMatchers {
 
     // CSS selectors
-    val FirstControl = cssSelector("*[id $= 'control-1-control']")
-    val FirstControlLabel = cssSelector(FirstControl.queryString + " .xforms-label")
-    val FirstControlHint = cssSelector(FirstControl.queryString + " .xforms-hint")
-    val LabelEditor = cssSelector(".fb-label-editor")
-    val LabelEditorInput = cssSelector(LabelEditor.queryString + " input[type = 'text']")
-    val Body = cssSelector(".fb-navbar img")
+    private val FirstControl = cssSelector("*[id $= 'control-1-control']")
+    private val FirstControlLabel = cssSelector(FirstControl.queryString + " .xforms-label")
+    private val FirstControlHint = cssSelector(FirstControl.queryString + " .xforms-hint")
+    private val LabelEditor = cssSelector(".fb-label-editor")
+    private val LabelEditorInput = cssSelector(LabelEditor.queryString + " input[type = 'text']")
+    private val Body = cssSelector(".fb-navbar img")
 
     // On click on the label, because the label has a `for` pointing to the input, the focus would switch to the input,
     // which we don't want to happen. So in label-hint-editor.coffee, we remove the `for` after the click. While this

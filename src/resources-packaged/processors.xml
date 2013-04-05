@@ -785,6 +785,9 @@
     <processor name="fr:xforms-to-schema">
         <class name="org.orbeon.oxf.fr.XFormsToSchema"/>
     </processor>
+    <processor name="fr:resources-patcher">
+        <class name="org.orbeon.oxf.fr.ResourcesPatcher"/>
+    </processor>
 
     <!-- Third-party processors -->
     <processor name="tao:from-pdf-converter" xmlns:tao="http://www.taoconsulting.biz/ops/processors">

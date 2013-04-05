@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
 import org.orbeon.saxon.value.Whitespace
 import collection.mutable.Buffer
+import scala.annotation.tailrec
 
 object Dom4j {
 
@@ -120,5 +121,28 @@ object Dom4j {
             else
                 x.getName compareTo y.getName
         }
+    }
+
+    // Ensure that a path to an element exists by creating missing elements if needed
+    def ensurePath(root: Element, path: Seq[String]): Element = {
+
+        @tailrec def insertIfNeeded(parent: Element, names: Iterator[String]): Element =
+            if (names.hasNext) {
+                val name = names.next()
+                val existing = Dom4j.elements(parent, QName.get(name))
+                val existingOrNew =
+                    if (existing.nonEmpty)
+                        existing(0)
+                    else {
+                        val newElement = Dom4jUtils.createElement(name)
+                        parent.add(newElement)
+                        newElement
+                    }
+
+                insertIfNeeded(existingOrNew, names)
+            } else
+                parent
+
+        insertIfNeeded(root, path.iterator)
     }
 }

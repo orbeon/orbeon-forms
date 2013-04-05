@@ -14,8 +14,11 @@
 package org.orbeon.oxf.client
 
 import org.orbeon.oxf.client.builder.{Permissions, LabelHintEditor}
+import org.junit.runners.MethodSorters
+import org.junit.FixMethodOrder
 
 // List all client tests which we want to run with a single run of the driver
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class CombinedClientTest
     extends OrbeonClientBase
     with XForms

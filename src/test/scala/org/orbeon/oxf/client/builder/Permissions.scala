@@ -15,38 +15,33 @@ package org.orbeon.oxf.client.builder
 
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.client.FormBuilderOps
-import org.scalatest.matchers.ShouldMatchers
 import org.junit.Test
 
-trait Permissions extends AssertionsForJUnit with FormBuilderOps with ShouldMatchers {
+trait Permissions extends AssertionsForJUnit with FormBuilderOps {
 
     private def permissionSelector(selector: String) = cssSelector(".fb-permissions-dialog " + selector)
-    private def role(line: Int) = textField(permissionSelector(".fb-role-name[id $= '" + line + "'] input"))
-    private def checkbox(line: Int, crud: String): Checkbox = checkbox(permissionSelector(".fb-" + crud + "-permission[id $= '" + line + "'] input"))
+    private def role(line: Int) = textField(permissionSelector(".fb-role-name[id $= '" + line + "'] input")) // XXX
+    private def checkbox(line: Int, crud: String): Checkbox = checkbox(permissionSelector(".fb-" + crud + "-permission[id $= '" + line + "'] input")) // XXX
 
-    private val OpenPermissions = cssSelector("#fb-permissions-button button")
-    private val HasPermissions = permissionSelector(".fb-has-permissions input")
-    private val AddPermission = permissionSelector(".fb-add-permission a")
-    private val Apply = permissionSelector("[id $= 'save-trigger']")
+    private val OpenPermissions  = cssSelector("#fb-permissions-button button")
+    private val HasPermissions   = permissionSelector(".fb-has-permissions input")
+    private val AddPermission    = permissionSelector(".fb-add-permission a")
+    private val Apply            = permissionSelector("[id $= 'save-trigger']")
 
     @Test def createClerkAdminPermissions(): Unit = {
         Builder.onNewForm {
 
             // Enable permissions
             click on OpenPermissions
-            waitForAjaxResponse()
-            checkbox(HasPermissions).select()
-            waitForAjaxResponse()
+            checkbox(HasPermissions.displayed).select()
 
             // Clerks can read
-            click on AddPermission
-            waitForAjaxResponse()
+            click on AddPermission.clickable
             role(2).value = "clerk"
             checkbox(2, "read").select()
 
             // Admins can do everything
             click on AddPermission
-            waitForAjaxResponse()
             role(3).value = "admin"
             checkbox(3, "update").select()
             waitForAjaxResponse()
@@ -55,7 +50,6 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps with ShouldMatc
 
             // Everyone can create
             checkbox(1, "create").select()
-            waitForAjaxResponse()
             // Read auto-selected when selecting update
             checkbox(2, "read") should be ('selected)
             checkbox(3, "read") should be ('selected)

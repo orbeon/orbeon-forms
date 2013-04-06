@@ -24,14 +24,16 @@ import org.apache.commons.lang3.StringUtils
 import org.openqa.selenium.chrome.ChromeDriverService
 import org.openqa.selenium.remote.{DesiredCapabilities, RemoteWebDriver}
 import java.io.File
+import java.util.concurrent.TimeUnit
+import org.scalatest.matchers.ShouldMatchers
 
 // Basic client API
-trait OrbeonFormsOps extends WebBrowser {
+trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
 
     type STElement = this.Element
 
     implicit def webDriver: WebDriver = OrbeonClientBase.driver
-    implicit val patienceConfig       = PatienceConfig(timeout = scaled(Span(10, Seconds)), interval = scaled(Span(100, Millis)))
+    implicit val patienceConfig       = PatienceConfig(timeout = scaled(OrbeonClientBase.DefaultTimeout), interval = scaled(Span(100, Millis)))
 
     def loadOrbeonPage(path: String) =
         go to "http://localhost:8080/orbeon/" + dropStartingSlash(path)
@@ -84,6 +86,18 @@ trait OrbeonFormsOps extends WebBrowser {
 
     def isCaseSelected(clientIdNoCasePrefix: String) =
         executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
+
+    // Utility methods to make it easy to check that a selector points to a visible or clickable element, before using it
+    implicit class CssSelectorQueryOps(val css: CssSelectorQuery) {
+        def displayed: CssSelectorQuery = {
+            eventually { css.element should be ('displayed) }
+            css
+        }
+        def clickable: CssSelectorQuery = {
+            eventually { css.displayed.element should be ('enabled) }
+            css
+        }
+    }
 
     // Functions from xforms.js we must provide access to:
     //
@@ -154,7 +168,7 @@ trait FormBuilderOps extends FormRunnerOps {
         val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
         val SaveButton = cssSelector("#fr-save-button button")
 
-        def newForm(): Unit = {
+        private def newForm(): Unit = {
             loadOrbeonPage("/fr/orbeon/builder/new")
             elementByStaticId("fb-application-name-input").sendKeys("a")
             elementByStaticId("fb-form-name-input").sendKeys("a")
@@ -182,6 +196,7 @@ object OrbeonClientBase {
     private var _service: Option[ChromeDriverService] = _
     private var _driver: WebDriver = _
     def driver = _driver ensuring (_ ne null)
+    val DefaultTimeout = Span(10, Seconds)
 
     @BeforeClass
     def createAndStartService(): Unit = {
@@ -202,6 +217,12 @@ object OrbeonClientBase {
                 }
                 _driver = new FirefoxDriver(profile)
         }
+
+        // Set default timeout when searching for an element
+        // (Note that this doesn't solve all our problems: the element could be in the DOM, but not visible yet,
+        // or its value not set properly, or with HTML replacement we might be getting an element that will be replaced
+        // at the next Ajax response.)
+        driver.manage.timeouts.implicitlyWait(DefaultTimeout.totalNanos, TimeUnit.NANOSECONDS)
     }
 
     @AfterClass

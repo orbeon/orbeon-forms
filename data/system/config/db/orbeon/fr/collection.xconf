@@ -6,7 +6,7 @@
         <lucene>
             <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
             <!-- We want to index the content of all form elements -->
-            <text match="//*"/>
+            <text match="/*"/>
         </lucene>
     </index>
 </collection>

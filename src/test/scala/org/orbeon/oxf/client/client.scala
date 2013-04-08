@@ -63,6 +63,16 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
             click on xpath(s"//img[@alt = '$alt']").element
         }
 
+    private def waitEnabled(css: CssSelectorQuery): STElement = eventually {
+        val element = css.element
+        element should be ('displayed)
+        element should be ('enabled)
+        element
+    }
+
+    def patientlyClick(css: CssSelectorQuery): Unit = click on waitEnabled(css)
+    def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = waitEnabled(css).underlying.sendKeys(keys)
+
     // For a given id, return:
     //
     // 1. that id if it exists as is on the client
@@ -86,18 +96,6 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
 
     def isCaseSelected(clientIdNoCasePrefix: String) =
         executeScript(s"return ORBEON.xforms.Controls.isCaseSelected('$clientIdNoCasePrefix')") == true
-
-    // Utility methods to make it easy to check that a selector points to a visible or clickable element, before using it
-    implicit class CssSelectorQueryOps(val css: CssSelectorQuery) {
-        def displayed: CssSelectorQuery = {
-            eventually { css.element should be ('displayed) }
-            css
-        }
-        def clickable: CssSelectorQuery = {
-            eventually { css.displayed.element should be ('enabled) }
-            css
-        }
-    }
 
     // Functions from xforms.js we must provide access to:
     //
@@ -179,7 +177,7 @@ trait FormBuilderOps extends FormRunnerOps {
         def onNewForm[T](block: ⇒ T): Unit = {
             newForm()
             block
-            click on SaveButton
+            patientlyClick(SaveButton)
             waitForAjaxResponse()
         }
     }

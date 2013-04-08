@@ -41,7 +41,8 @@
 
         (: Get all query results, independently from paging :)
         let $search-results :=
-            for $d in if ($query = '') then collection() else ft:query(collection(), $query)
+            for $e in if ($query = '') then collection() else ft:query(collection()/*, $query)
+                let $d := root($e)
                 let $resource-uri := document-uri($d)
                 let $collection-name := string-join(tokenize($resource-uri, '/')[position() lt last()], '/')
                 let $resource-name := tokenize($resource-uri, '/')[last()]

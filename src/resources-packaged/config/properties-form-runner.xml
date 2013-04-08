@@ -174,18 +174,15 @@
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
 
     <!-- Internal processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.require-uploads-recover.*.*"          value='error-message("upload-in-progress") then success'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.require-valid-recover.*.*"            value='visit-all then expand-all then error-message("form-validation-error") then success'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.review-messages-recover.*.*"          value='xf:show("fr-validation-dialog") then suspend'/>
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                      value='save'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"         value='abort'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*"       value='resume'/>
     <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                         value='save("draft")'/>
 
     <!-- Reusable processes -->
-    <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*"                  value='pending-uploads recover require-uploads-recover'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*"                    value='visit-all then captcha then validate("error") recover require-valid-recover'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*"                  value='validate("warning") then validate("info") recover review-messages-recover'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*"                  value='pending-uploads recover (error-message("upload-in-progress") then success)'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.require-valid.*.*"                    value='visit-all then captcha then validate("error") recover (visit-all then expand-all then error-message("form-validation-error") then success)'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.review-messages.*.*"                  value='validate("warning") then validate("info") recover (xf:show("fr-validation-dialog") then suspend)'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validate-all.*.*"                     value='require-valid then review-messages'/>
     <property as="xs:string"  name="oxf.fr.detail.process.orbeon-home.*.*"                      value='navigate("/")'/>
     <property as="xs:string"  name="oxf.fr.detail.process.form-runner-home.*.*"                 value='navigate("/fr")'/>

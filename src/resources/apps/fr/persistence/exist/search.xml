@@ -58,19 +58,18 @@
             <documents total="{$total}" search-total="{count($search-results)}" page-size="{$page-size}"
                        page-number="{$page-number}" query="{$query}">
                 {
-                    subsequence(
-                        for $d in $search-results
-                            let $resource-uri := document-uri($d)
-                            let $collection-name := string-join(tokenize($resource-uri, '/')[position() lt last()], '/')
-                            let $resource-name := tokenize($resource-uri, '/')[last()]
-                            let $resource-id := tokenize($resource-uri, '/')[last() - 1]
-                            let $last-modified := xmldb:last-modified($collection-name, $resource-name)
-                        return
-                            <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}">
-                                <details>
-                                    ]]><details/><![CDATA[
-                                </details>
-                            </document>, (xs:integer($page-number) - 1) * xs:integer($page-size) + 1, xs:integer($page-size))
+                    for $d in subsequence($search-results, (xs:integer($page-number) - 1) * xs:integer($page-size) + 1, xs:integer($page-size))
+                        let $resource-uri := document-uri($d)
+                        let $collection-name := string-join(tokenize($resource-uri, '/')[position() lt last()], '/')
+                        let $resource-name := tokenize($resource-uri, '/')[last()]
+                        let $resource-id := tokenize($resource-uri, '/')[last() - 1]
+                        let $last-modified := xmldb:last-modified($collection-name, $resource-name)
+                    return
+                        <document created="{xmldb:created($collection-name, $resource-name)}" last-modified="{$last-modified}" name="{$resource-id}">
+                            <details>
+                                ]]><details/><![CDATA[
+                            </details>
+                        </document>
                 }
             </documents>
         ]]>

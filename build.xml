@@ -1006,8 +1006,14 @@
 
     <!-- NOTE: You need to comment out the eXist security filter for this to work -->
     <target name="exist-import-sample-data-to-localhost" depends="exist-task">
+        <!-- Store config first -->
+        <xdb:store uri="xmldb:exist://localhost:8080/orbeon/exist/xmlrpc/db" initDb="true" createcollection="true" createsubcollections="true" user="admin" password="">
+            <fileset dir="data">
+                <include name="system/**"/>
+            </fileset>
+        </xdb:store>
         <!-- Store data only -->
-        <xdb:store uri="xmldb:exist://localhost:8080/orbeon/exist/xmlrpc/db" createcollection="true" createsubcollections="true" user="guest" password="guest">
+        <xdb:store uri="xmldb:exist://localhost:8080/orbeon/exist/xmlrpc/db" initDb="true" createcollection="true" createsubcollections="true" user="guest" password="guest">
             <fileset dir="data">
                 <include name="orbeon/**"/>
             </fileset>

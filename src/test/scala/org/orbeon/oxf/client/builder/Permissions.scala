@@ -47,37 +47,38 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
                 patientlyClick(AddPermission)
                 patientlySendKeys(role(3), "admin")
                 patientlyClick(checkbox(3, "update"))
-                eventually { checkbox(3, "read") should be ('selected) } // Read auto-selected when selecting update
+                eventually { assert(checkbox(checkbox(3, "read")).isSelected) }
+                // Read auto-selected when selecting update
                 patientlyClick(checkbox(3, "delete"))
 
                 // Everyone can create
                 patientlyClick(checkbox(1, "create"))
                 // Read auto-selected when selecting update
                 eventually {
-                    checkbox(2, "read") should be ('selected)
-                    checkbox(3, "read") should be ('selected)
+                    assert(checkbox(checkbox(2, "read")).isSelected)
+                    assert(checkbox(checkbox(3, "read")).isSelected)
                 }
 
                 // Save, reopen, and check the permissions are correct
                 patientlyClick(Apply)
                 patientlyClick(OpenPermissions)
                 eventually {
-                    checkbox(HasPermissions) should be ('selected)
+                    assert(  checkbox(HasPermissions).isSelected)
                     // Roles are re-ordered by alphabetic order, see #917
-                    checkbox(1, "create") should     be ('selected)
-                    checkbox(1, "read"  ) should not be ('selected)
-                    checkbox(1, "update") should not be ('selected)
-                    checkbox(1, "delete") should not be ('selected)
-                    textField(role(2)).value should be ("admin")
-                    checkbox(2, "create") should be     ('selected)
-                    checkbox(2, "read"  ) should be     ('selected)
-                    checkbox(2, "update") should be     ('selected)
-                    checkbox(2, "delete") should be     ('selected)
-                    textField(role(3)).value should be ("clerk")
-                    checkbox(3, "create") should be     ('selected)
-                    checkbox(3, "read"  ) should be     ('selected)
-                    checkbox(3, "update") should not be ('selected)
-                    checkbox(3, "delete") should not be ('selected)
+                    assert(  checkbox(checkbox(1, "create")).isSelected)
+                    assert(! checkbox(checkbox(1, "read"  )).isSelected)
+                    assert(! checkbox(checkbox(1, "update")).isSelected)
+                    assert(! checkbox(checkbox(1, "delete")).isSelected)
+                    assert(textField(role(2)).value === "admin")
+                    assert(  checkbox(checkbox(2, "create")).isSelected)
+                    assert(  checkbox(checkbox(2, "read"  )).isSelected)
+                    assert(  checkbox(checkbox(2, "update")).isSelected)
+                    assert(  checkbox(checkbox(2, "delete")).isSelected)
+                    assert(textField(role(3)).value === "clerk")
+                    assert(  checkbox(checkbox(3, "create")).isSelected)
+                    assert(  checkbox(checkbox(3, "read"  )).isSelected)
+                    assert(! checkbox(checkbox(3, "update")).isSelected)
+                    assert(! checkbox(checkbox(3, "delete")).isSelected)
                 }
 
                 // Done, close dialog

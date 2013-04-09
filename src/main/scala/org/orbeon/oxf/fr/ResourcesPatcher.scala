@@ -13,8 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import collection.JavaConverters._
-import org.dom4j.{Document, Element}
+import org.dom4j.{QName, Document}
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{PropertySet, Properties}
@@ -25,7 +24,11 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 
 // Processor to replace or add resources based on properties
-// A property looks like: oxf.fr.resource.*.*.en.detail.labels.save
+//
+// An property looks like: oxf.fr.resource.*.*.en.detail.labels.save
+//
+// NOTE: We used to do this in XSLT, but when it came to implement *adding* missing resources, the level of complexity
+// increased too much and readability would have suffered so we rewrote in Scala.
 class ResourcesPatcher extends SimpleProcessor  {
 
     def generateData(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
@@ -60,38 +63,30 @@ object ResourcesPatcher {
             } yield
                 (lang, path, properties.getString(name))
 
-        def findElements(lang: String, path: String): List[Element] = {
-            val prefix =
-                if (lang == "*")
-                    "resource"
+        // Return all languages or the language specified if it exists
+        // For now we don't support creating new top-level resource elements for new languages.
+        def findConcreteLanguages(langOrWildcard: String) = {
+            val allLanguages =
+                eval(resourcesElement, "resource/@xml:lang/string()").asInstanceOf[Seq[String]]
+
+            val filtered =
+                if (langOrWildcard == "*")
+                    allLanguages
                 else
-                    s"resource[@xml:lang = '$lang']"
+                    allLanguages filter (_ == langOrWildcard)
 
-            // We know the paths only select elements
-            eval(resourcesElement, prefix + (if (path.nonEmpty) "/" + path else "")).asScala.to[List].asInstanceOf[List[NodeInfo]] map unwrapElement
+            filtered.distinct // there *shouldn't* be duplicate languages in the source
         }
 
-        val results =
-            for {
-                (lang, path, value) ← langPathValue
-                elems               = findElements(lang, path)
-            } yield
-                (lang, path, value, elems)
+        def resourceElementsForLang(lang: String) =
+            eval(resourcesElement, s"resource[@xml:lang = '$lang']").asInstanceOf[Seq[NodeInfo]] map unwrapElement
 
-        val (existing, nonExisting) = results partition (_._4.nonEmpty)
-
-        // Update existing elements
-        existing foreach { case (_, _, value, elems) ⇒
-            elems foreach { elem ⇒
-                elem.setText(value)
-            }
+        // Update or create elements and set values
+        for {
+            (langOrWildcard, path, value) ← langPathValue
+            lang                          ← findConcreteLanguages(langOrWildcard)
+            rootForLang                   ← resourceElementsForLang(lang)
         }
-
-        // Create new elements
-        nonExisting foreach { case (lang, path, value, _) ⇒
-            findElements(lang, "") foreach { resourceRoot ⇒
-                Dom4j.ensurePath(resourceRoot, path split "/").setText(value)
-            }
-        }
+            Dom4j.ensurePath(rootForLang, path split "/" map QName.get).setText(value)
     }
 }

@@ -124,22 +124,22 @@ object Dom4j {
     }
 
     // Ensure that a path to an element exists by creating missing elements if needed
-    def ensurePath(root: Element, path: Seq[String]): Element = {
+    def ensurePath(root: Element, path: Seq[QName]): Element = {
 
-        @tailrec def insertIfNeeded(parent: Element, names: Iterator[String]): Element =
-            if (names.hasNext) {
-                val name = names.next()
-                val existing = Dom4j.elements(parent, QName.get(name))
+        @tailrec def insertIfNeeded(parent: Element, qNames: Iterator[QName]): Element =
+            if (qNames.hasNext) {
+                val qName = qNames.next()
+                val existing = Dom4j.elements(parent, qName)
                 val existingOrNew =
                     if (existing.nonEmpty)
                         existing(0)
                     else {
-                        val newElement = Dom4jUtils.createElement(name)
+                        val newElement = Dom4jUtils.createElement(qName)
                         parent.add(newElement)
                         newElement
                     }
 
-                insertIfNeeded(existingOrNew, names)
+                insertIfNeeded(existingOrNew, qNames)
             } else
                 parent
 

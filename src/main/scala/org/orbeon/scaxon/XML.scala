@@ -46,16 +46,18 @@ object XML {
             expr: String,
             namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
             variables: Map[String, ValueRepresentation] = null,
-            reporter: Reporter = null)(implicit library: FunctionLibrary = null) =
+            reporter: Reporter = null)(implicit library: FunctionLibrary = null): Item =
         evaluateSingleKeepItems(Seq(item).asJava, 1, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null, reporter)
 
+    // Evaluate an XPath expression and return a Seq of native Java objects (String, Boolean, etc.), but NodeInfo
+    // wrappers are preserved.
     def eval(item: Item,
             expr: String,
             namespaces: NamespaceMapping = BASIC_NAMESPACE_MAPPING,
             variables: Map[String, ValueRepresentation] = null,
             reporter: Reporter = null)
-            (implicit library: FunctionLibrary = null): JList[AnyRef] =
-        evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null, reporter)
+            (implicit library: FunctionLibrary = null): Seq[AnyRef] =
+        evaluate(item, expr, namespaces, if (variables eq null) null else variables.asJava, library, null, null, null, reporter).asScala
 
     // Runtime conversion to NodeInfo (can fail!)
     def asNodeInfo(item: Item) = item.asInstanceOf[NodeInfo]

@@ -118,7 +118,7 @@ object ControlOps {
 
                 // Evaluate path from instance root element
                 val instanceElements = eval(formInstanceRoot(inDoc), path, namespaces, null, containingDocument.getRequestStats.addXPathStat)
-                instanceElements.asInstanceOf[JList[NodeInfo]].asScala
+                instanceElements.asInstanceOf[Seq[NodeInfo]]
             } getOrElse Seq()
         else
             Seq()

@@ -18,49 +18,53 @@ import org.scalatest.concurrent.Eventually._
 import org.scalatest.junit.MustMatchersForJUnit
 import org.openqa.selenium.interactions.{Actions, Action}
 import org.openqa.selenium.Keys
+import org.scalatest.selenium.WebBrowser.click
 
 trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // with AssertionsForJUnit
 
     // RFE: split into parts so we can start in the middle
     @Test def demoPath(): Unit = {
 
-        loadHomePage()
-        eventually(pageTitle must be ("Creating forms with Form Builder"))
-        // For Chrome, which in some cases (like this one) is unable to click on the anchor if not visible
-        executeScript("window.scrollTo(0, $(document).height())")
-        click on partialLinkText("examples coded")
-        eventually(pageTitle must be ("Creating forms by writing XForms by hand"))
+        for {
+            _ ← loadHomePage()
+            _ ← assert(pageTitle === "Creating forms with Form Builder")
 
-        // RFE: test XForms examples
+            // For Chrome, which in some cases (like this one) is unable to click on the anchor if not visible
+            _ ← executeScript("window.scrollTo(0, $(document).height())")
+            _ ← click on partialLinkText("examples coded")
+            _ ← assert(pageTitle === "Creating forms by writing XForms by hand")
 
-        click on partialLinkText("creating forms")
-        eventually(pageTitle must be ("Creating forms with Form Builder"))
+            // RFE: test XForms examples
+            _ ← click on partialLinkText("creating forms")
+            _ ← eventually(pageTitle must be ("Creating forms with Form Builder"))
 
-        click on linkText("Controls Form")
-        // https://github.com/orbeon/orbeon-forms/issues/887
-        //eventually(assert(pageTitle === "Form Builder Controls"))
+            _ ← click on linkText("Controls Form")
+            // https://github.com/orbeon/orbeon-forms/issues/887
+            //eventually(assert(pageTitle === "Form Builder Controls"))
 
-        eventually(assert(Wizard.pageSelected("text-controls")))
+            _ ← eventually(assert(Wizard.pageSelected("text-controls")))
 
-        val inputControl  = elementByStaticId("input-control")
-        val passwordField = elementByStaticId("secret-control")
+            inputControl ← elementByStaticId("input-control")
+            passwordField ← elementByStaticId("secret-control")
 
-        inputControl.classes  must not contain ("xforms-visited")
-        passwordField.classes must not contain ("xforms-visited")
+            _ ← inputControl.classes  must not contain ("xforms-visited")
+            _ ← passwordField.classes must not contain ("xforms-visited")
 
-        passwordField.classes must contain ("xforms-required")
+            _ ← passwordField.classes must contain ("xforms-required")
 
-        inputControl.tabOut()
-        inputControl.classes must contain ("xforms-visited")
-        passwordField.classes must not contain ("xforms-visited")
+            _ ← inputControl.tabOut()
+            _ ← inputControl.classes must contain ("xforms-visited")
+            _ ← passwordField.classes must not contain ("xforms-visited")
 
-        passwordField.tabOut()
-        passwordField.classes must contain ("xforms-visited")
+            _ ← passwordField.tabOut()
+            _ ← passwordField.classes must contain ("xforms-visited")
 
-        Wizard.nextPage()
-        assert(! Wizard.pageSelected("text-controls"))
-        assert(Wizard.pageSelected("typed-controls"))
+            _ ← Wizard.nextPage()
+            _ ← assert(! Wizard.pageSelected("text-controls"))
+            _ ← assert(Wizard.pageSelected("typed-controls"))
 
-        // RFE: etc.
+            // RFE: etc.
+
+        }()
     }
 }

@@ -19,8 +19,9 @@
 .orbeon {
 
     .fr-status-icons {
-        display: inline;
-        img { margin-left: 3px; }
+        display: block;
+        float: left;
+        i { margin-left: 5px; }
     }
 
     .fr-body {
@@ -163,9 +164,6 @@
         }
     }
 
-    // Status icons
-    .fr-status-icons img { margin-right: .5em }
-
     // Enable noscript icon when in noscript mode
     .fr-noscript-icon { display: none }
     .xforms-noscript .fr-noscript-icon { display: inline }
@@ -176,7 +174,6 @@
         .box-sizing(border-box);
         width: 100%;
     }
-    .fr-unsaved-data { color: red }
 
     // Error summary
     .xbl-fr-error-summary {
@@ -190,11 +187,10 @@
 
     // Button bar
 
-    .fr-bottom-bar { text-align: right }
-
     .fr-buttons {
-        display: inline;
-        margin-bottom: 1em;
+        display: block;
+        float: right;
+        margin-bottom: 110px;
 
         .fr-buttons-message div { display: inline }
 

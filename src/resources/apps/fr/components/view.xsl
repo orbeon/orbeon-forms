@@ -68,7 +68,7 @@
         <fr:row>
             <fr:messages/>
         </fr:row>
-        <fr:row class="fr-bottom-bar">
+        <fr:row>
             <fr:bottom-bar/>
         </fr:row>
         <fr:row>
@@ -504,26 +504,21 @@
                     <!-- Form is invalid -->
 
                     <!-- Display localized errors count -->
-                    <xf:var name="message" as="xs:string" model="fr-error-summary-model"
-                        select="for $c in errors-count return
-                                      if ($c castable as xs:integer and xs:integer($c) > 0)
-                                      then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count))
-                                      else ''"/>
+                    <!--<xf:var name="message" as="xs:string" model="fr-error-summary-model"-->
+                        <!--select="for $c in errors-count return-->
+                                      <!--if ($c castable as xs:integer and xs:integer($c) > 0)-->
+                                      <!--then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count))-->
+                                      <!--else ''"/>-->
 
-                    <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/exclamation.png" alt="{{$fr-resources/errors/some}}" title="{{$fr-resources/errors/some}}"/>-->
-                    <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/warning_16.png" alt="{{$message}}" title="{{$message}}"/>
+                    <xh:span class="badge badge-important"><xf:output value="visible-errors-count"/></xh:span>
                 </xf:group>
                 <xf:group model="fr-error-summary-model" ref=".[valid = 'true']" class="fr-validity-icon">
                     <!-- Form is valid -->
-                    <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/tick.png" alt="{{$fr-resources/errors/none}}" title="{{$fr-resources/errors/none}}"/>-->
-                    <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/tick_16.png" alt="{{$fr-resources/errors/none}}"
-                        title="{{$fr-resources/errors/none}}"/>
+                    <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
                 </xf:group>
                 <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">
                     <!-- Data is dirty -->
-                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt="{{$fr-resources/errors/unsaved}}"
-                        title="{{$fr-resources/errors/unsaved}}"/>
-                    <!--<xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/save_16.png" alt="{{$fr-resources/errors/unsaved}}" title="{{$fr-resources/errors/unsaved}}"/>-->
+                    <xh:i class="icon-hdd" title="{{$fr-resources/errors/unsaved}}"/>
                 </xf:group>
             </xh:span>
         </xsl:if>

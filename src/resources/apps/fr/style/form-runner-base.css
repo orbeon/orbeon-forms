@@ -82,10 +82,11 @@
 
 }
 .orbeon .fr-status-icons {
-  display: inline;
+  display: block;
+  float: left;
 }
-.orbeon .fr-status-icons img {
-  margin-left: 3px;
+.orbeon .fr-status-icons i {
+  margin-left: 5px;
 }
 .orbeon .fr-body {
   display: block;
@@ -219,9 +220,6 @@
   display: inline;
   margin-right: .5em;
 }
-.orbeon .fr-status-icons img {
-  margin-right: 0.5em;
-}
 .orbeon .fr-noscript-icon {
   display: none;
 }
@@ -234,9 +232,6 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%;
-}
-.orbeon .fr-unsaved-data {
-  color: #ff0000;
 }
 .orbeon .xbl-fr-error-summary .fr-error-summary-body {
   padding: 0 10px;
@@ -256,12 +251,10 @@
 .orbeon .fr-explanation {
   padding: 10px;
 }
-.orbeon .fr-bottom-bar {
-  text-align: right;
-}
 .orbeon .fr-buttons {
-  display: inline;
-  margin-bottom: 1em;
+  display: block;
+  float: right;
+  margin-bottom: 110px;
   /* Space between the image and the text in a button, only for the buttons bar
            (not other buttons in the form which might contain just an image) */
 

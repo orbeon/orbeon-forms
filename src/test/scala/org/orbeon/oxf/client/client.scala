@@ -58,15 +58,13 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
             click on cssSelector(css).element
         }
 
-    private def waitEnabled(css: CssSelectorQuery): STElement = eventually {
-        val element = css.element
-        element should be ('displayed)
-        element should be ('enabled)
-        element
-    }
+    def clickImgByAlt(alt: String, wait: Boolean = true) =
+        withAjaxAction(wait) {
+            click on xpath(s"//img[@alt = '$alt']").element
+        }
 
-    def patientlyClick(css: CssSelectorQuery): Unit = click on waitEnabled(css)
-    def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = waitEnabled(css).underlying.sendKeys(keys)
+    def patientlyClick(css: CssSelectorQuery): Unit = eventually { click on css.element }
+    def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = eventually { css.element.underlying.sendKeys(keys) }
 
     // For a given id, return:
     //

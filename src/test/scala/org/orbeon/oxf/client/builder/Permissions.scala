@@ -21,9 +21,9 @@ import org.orbeon.oxf.common.Version
 
 trait Permissions extends AssertionsForJUnit with FormBuilderOps {
 
-    private def permissionSelector(selector: String) = cssSelector(".fb-permissions-dialog " + selector)
-    private def role(line: Int) = permissionSelector(".fb-role-name[id $= '" + line + "'] input")
-    private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(".fb-" + crud + "-permission[id $= '" + line + "'] input")
+    private def permissionSelector(selector: String) = cssSelector(s".fb-permissions-dialog $selector")
+    private def role(line: Int) = permissionSelector(s".fb-role-name[id $$= '$line'] input")
+    private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(s".fb-$crud-permission[id $$= '$line'] input")
 
     private val OpenPermissions  = cssSelector("#fb-permissions-button button")
     private val HasPermissions   = permissionSelector(".fb-has-permissions input")

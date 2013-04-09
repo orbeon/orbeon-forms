@@ -37,7 +37,7 @@ trait LabelHintEditor extends AssertionsForJUnit with FormBuilderOps with Should
     // works on the browser, it doesn't work when the click is done through WebDriver, just with Firefox. So here
     // we remove the `for` before doing the click.
     private def clickLabel(selector: CssSelectorQuery): Unit = {
-        executeScript("$('" + selector.queryString.replaceAllLiterally("'", "\"") + "').removeAttr('for')")
+        executeScript(s"""jQuery("${selector.queryString}").removeAttr('for')""")
         click on selector
     }
 

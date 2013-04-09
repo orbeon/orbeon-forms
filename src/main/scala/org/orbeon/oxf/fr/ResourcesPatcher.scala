@@ -14,17 +14,15 @@
 package org.orbeon.oxf.fr
 
 import collection.JavaConverters._
-import org.dom4j.{Document, QName, Element}
+import org.dom4j.{Document, Element}
 import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{PropertySet, Properties}
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{TransformerUtils, Dom4j}
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import scala.annotation.tailrec
 
 // Processor to replace or add resources based on properties
 // A property looks like: oxf.fr.resource.*.*.en.detail.labels.save
@@ -73,7 +71,6 @@ object ResourcesPatcher {
             eval(resourcesElement, prefix + (if (path.nonEmpty) "/" + path else "")).asScala.to[List].asInstanceOf[List[NodeInfo]] map unwrapElement
         }
 
-
         val results =
             for {
                 (lang, path, value) ← langPathValue
@@ -91,7 +88,7 @@ object ResourcesPatcher {
         }
 
         // Create new elements
-        nonExisting foreach {  case (lang, path, value, _) ⇒
+        nonExisting foreach { case (lang, path, value, _) ⇒
             findElements(lang, "") foreach { resourceRoot ⇒
                 Dom4j.ensurePath(resourceRoot, path split "/").setText(value)
             }

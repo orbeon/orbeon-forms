@@ -55,14 +55,14 @@ object FormBuilderFunctions extends Logging {
     def templateId(gridName: String)   = gridName    + "-template"
 
     // Find the form document being edited
-    def getFormDoc = asNodeInfo(model("fr-form-model").get.getVariable("model")).getDocumentRoot
+    def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
 
     // Find an element by id
     def byId(inDoc: NodeInfo, id: String) = Option(inDoc.getDocumentRoot.selectID(id))
 
     // Return fb-form-instance
     def fbFormInstance =
-        model("fr-form-model").get.getInstance("fb-form-instance")
+        topLevelInstance("fr-form-model", "fb-form-instance").get
 
     // Find the top-level form model of the form being edited
     def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + "$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
@@ -87,7 +87,7 @@ object FormBuilderFunctions extends Logging {
     def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata").get
     def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
-    def formResourcesRoot = asNodeInfo(model("fr-form-model").get.getVariable("resources"))
+    def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
     def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))
 
     // Find the next available id for a given token

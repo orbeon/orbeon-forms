@@ -64,7 +64,7 @@ class Instance extends XFormsFunction {
                         case None             ⇒ model.staticModel.defaultInstance
                     }
 
-                    def findDynamic = dynamicInstance map (instance ⇒ SingletonIterator.makeIterator(instance.instanceRoot))
+                    def findDynamic = dynamicInstance map (instance ⇒ SingletonIterator.makeIterator(instance.rootElement))
                     def findStatic  = staticInstance map (_ ⇒ EmptyIterator.getInstance)
 
                     findDynamic orElse findStatic

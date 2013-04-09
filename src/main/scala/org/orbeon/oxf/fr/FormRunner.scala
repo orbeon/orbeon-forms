@@ -13,21 +13,22 @@
  */
 package org.orbeon.oxf.fr
 
+import java.util.{Map ⇒ JMap, List ⇒ JList}
+import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.common.OXFException
+import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util._
+import org.orbeon.oxf.webapp.HttpStatusCodeException
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import org.orbeon.oxf.xml._
+import org.orbeon.saxon.om.{Item, NodeInfo}
 import org.orbeon.scaxon.XML._
 import scala.collection.JavaConverters._
-import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.saxon.om.{Item, NodeInfo}
-import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
-import java.util.{Map ⇒ JMap, List ⇒ JList}
-import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
-import org.orbeon.oxf.util.{SecureUtils, NetUtils, XPathCache}
-import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 object FormRunner {
 
@@ -44,7 +45,10 @@ object FormRunner {
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
 
-    private def properties = Properties.instance.getPropertySet
+    def properties = Properties.instance.getPropertySet
+
+    def buildPropertyName(name: String)(implicit p: FormRunnerParams) =
+        name :: p.app :: p.form :: Nil mkString "."
 
     type UserRoles = {
         def getRemoteUser(): String
@@ -427,4 +431,29 @@ object FormRunner {
                 case item: Item ⇒ item.getStringValue
                 case other ⇒ other.toString
             }
+
+    // Return specific Form Runner instances
+    def formInstance         = topLevelInstance("fr-form-model",          "fr-form-instance")          get
+    def parametersInstance   = topLevelInstance("fr-parameters-model",    "fr-parameters-instance")    get
+    def errorSummaryInstance = topLevelInstance("fr-error-summary-model", "fr-error-summary-instance") get
+    def persistenceInstance  = topLevelInstance("fr-persistence-model",   "fr-persistence-instance")   get
+
+    def currentFRResources   = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-fr-resources"))
+    def currentFormResources = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-form-resources"))
+
+    // The standard Form Runner parameters
+    case class FormRunnerParams(app: String, form: String, document: Option[String], mode: String)
+
+    object FormRunnerParams {
+        def apply(): FormRunnerParams = {
+            val params = parametersInstance.rootElement
+
+            FormRunnerParams(
+                app      = params \ "app",
+                form     = params \ "form",
+                document = nonEmptyOrNone(params \ "document"),
+                mode     = params \ "mode"
+            )
+        }
+    }
 }

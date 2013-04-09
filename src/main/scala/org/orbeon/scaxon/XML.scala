@@ -296,6 +296,7 @@ object XML {
         require(nodeInfo ne null)
 
         def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
+        def !==(s: String) = ! ===(s)
 
         def \(test: Test) = find(Axis.CHILD, test)
         def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
@@ -360,6 +361,7 @@ object XML {
 
         // Semantic is the same as XPath: at least one value must match
         def ===(s: String) = seq exists (_ === s)
+        def !==(s: String) = ! ===(s)
 
         def \(test: Test): Seq[NodeInfo] = seq flatMap (_ \ test)
         def \\(test: Test): Seq[NodeInfo] = seq flatMap (_ \\ test)
@@ -409,7 +411,7 @@ object XML {
     implicit def itemToItemSeq(item: Item) = Seq(item)
     implicit def nodeInfoToNodeInfoSeq(node: NodeInfo) = if (node ne null) Seq(node) else Seq()// TODO: don't take null
 
-    implicit def instanceToNodeInfo(instance: XFormsInstance) = instance.instanceRoot
+    implicit def instanceToNodeInfo(instance: XFormsInstance) = instance.rootElement
 
     implicit def itemSeqToString(items: Seq[Item]): String = itemSeqToStringOption(items).orNull // TODO: don't return null
     implicit def itemSeqToItemOption(items: Seq[Item]): Option[Item] = items.headOption

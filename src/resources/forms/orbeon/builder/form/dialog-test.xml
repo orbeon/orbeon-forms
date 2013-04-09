@@ -31,7 +31,7 @@
         <xh:span>
             <xf:trigger appearance="xxf:primary">
                 <xf:label>
-                    <xf:output value="$fr-resources/detail/labels/close"/>
+                    <xf:output value="$fr-resources/detail/buttons/close"/>
                 </xf:label>
                 <xxf:hide ev:event="DOMActivate" dialog="fb-test-dialog"/>
             </xf:trigger>

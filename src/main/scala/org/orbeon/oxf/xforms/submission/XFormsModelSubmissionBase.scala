@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,8 +11,8 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event
+package org.orbeon.oxf.xforms.submission
 
-trait EventListener {
-    def handleEvent(event: XFormsEvent)
-}
+import org.orbeon.oxf.xforms.event.ListenersTrait
+
+abstract class XFormsModelSubmissionBase extends ListenersTrait

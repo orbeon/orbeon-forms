@@ -59,13 +59,6 @@
 
     <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
     <!-- Don't use xxf:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
-    <xf:submission id="fr-print-submission"
-        resource="/fr/{$parameters/app}/{$parameters/form}/view/{$parameters/document}?{$common-get-parameters}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
-        method="post" ref="xxf:instance('fr-form-instance')" replace="all" validate="false" relevant="false"
-        xxf:show-progress="false"/>
-
-    <!-- TODO: in some cases, form can be printed without being valid, but general case is probably that form must be valid. Add option? Or two buttons? -->
-    <!-- Don't use xxf:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
     <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
     <xf:submission id="fr-pdf-submission"
         resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}?{$common-get-parameters}"
@@ -89,31 +82,6 @@
     <!-- Open PDF for the current form data (dispatch from XPL) -->
     <xf:action ev:event="fr-open-pdf">
         <xf:send submission="fr-pdf-submission"/>
-    </xf:action>
-
-    <!-- Close the window and attempt to navigate to the configured close page (default to the summary page) -->
-    <xf:action ev:event="fr-close-window">
-
-        <!-- Get close URI -->
-        <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
-        <xf:var name="app" value="$parameters/app" as="xs:string"/>
-        <xf:var name="form" value="$parameters/form" as="xs:string"/>
-        <xf:var name="close-uri" value="xxf:property(string-join(('oxf.fr.detail.close.uri', $app, $form), '.'))" as="xs:anyURI"/>
-        <xf:var name="have-close-uri" value="$close-uri != ''" as="xs:anyURI"/>
-
-        <!-- If we have a close URI, go there -->
-        <xf:action if="$have-close-uri">
-            <xf:load resource="{$close-uri}" xxf:show-progress="false"/>
-        </xf:action>
-
-        <!-- If we don't have a close URI, close window if we can, otherwise go to the summary -->
-        <xf:action if="not($have-close-uri)">
-            <xxf:script>window.close();</xxf:script>
-            <xf:load
-                resource="/fr/{$parameters/app}/{$parameters/form}/summary{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"
-                xxf:show-progress="false"/>
-        </xf:action>
-
     </xf:action>
 
     <xf:action ev:event="xforms-model-construct-done">

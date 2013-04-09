@@ -45,7 +45,7 @@
                         f:url-type="resource"/>
                 
                 <!-- Trigger and its content -->
-                <xf:trigger>
+                <xf:trigger xbl:attr="appearance">
                     <!-- Handle optional binding -->
                     <!-- See also RFE: https://github.com/orbeon/orbeon-forms/issues/72 -->
                     <xsl:if test="exists(/fr:href-button/(@ref, @bind))">

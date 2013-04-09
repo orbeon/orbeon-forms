@@ -565,14 +565,14 @@
                     </xsl:when>
                     <!-- In PDF mode, don't include anything -->
                     <xsl:when test="$mode = ('pdf')"/>
-                    <!-- Use default buttons -->
+                    <!-- Use configured buttons -->
                     <xsl:otherwise>
                         <!-- Message shown next to the buttons -->
                         <xh:span class="fr-buttons-message">
                             <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
                         </xh:span>
                         <!-- List of buttons we include based on property -->
-                        <xsl:variable name="default-buttons" as="node()*">
+                        <xsl:variable name="configured-buttons" as="node()*">
                             <xsl:for-each select="$buttons">
                                 <xsl:variable name="is-primary" select="position() = last()"/>
                                 <xsl:element name="fr:{.}-button">
@@ -583,7 +583,7 @@
                                 <xsl:text> </xsl:text>
                             </xsl:for-each>
                         </xsl:variable>
-                        <xsl:apply-templates select="$default-buttons"/>
+                        <xsl:apply-templates select="$configured-buttons"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xh:span>

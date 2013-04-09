@@ -25,60 +25,48 @@
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
+    <!-- Buttons that translate to fr:send-button -->
+    <xsl:template match="fr:home-button
+                       | fr:summary-button
+                       | fr:close-button
+                       | fr:save-final-button
+                       | fr:save-draft-button
+                       | fr:validate-button
+                       | fr:workflow-review-button
+                       | fr:workflow-edit-button
+                       | fr:email-button
+                       | fr:collapse-all-button
+                       | fr:expand-all-button
+                       | fr:save-button
+                       | fr:submit-button
+                       | fr:workflow-send-button
+                       | fr:*[starts-with(local-name(), 'custom-')]">
+        <xsl:variable name="button-name" select="substring-before(local-name(), '-button')"/>
+        <fr:send-button
+            name="{$button-name}"
+            ref="xxf:instance('fr-triggers-instance')/{if ($button-name = 'workflow-edit') then 'workflow-edit' else 'other'}">
+            <xsl:copy-of select="@appearance"/>
+        </fr:send-button>
+    </xsl:template>
+
     <xsl:template match="fr:refresh-button">
         <!-- Display a "refresh" button only in noscript mode -->
         <xf:group ref=".[property('xxf:noscript')]">
-            <xf:trigger id="fr-refresh-button">
+            <xf:trigger class="fr-refresh-button">
                 <xsl:copy-of select="@appearance"/>
                 <xf:label>
                     <xh:img width="11" height="16" src="/apps/fr/style/images/silk/arrow_refresh.png" alt="{{$fr-resources/summary/labels/refresh}}"/>
                 </xf:label>
-                <xf:action ev:event="DOMActivate">
-                    <!-- NOP -->
-                </xf:action>
+                <!-- NOP -->
             </xf:trigger>
         </xf:group>
     </xsl:template>
 
-    <xsl:template match="fr:close-button">
-        <xf:trigger id="fr-back-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="11" height="16" src="/apps/fr/style/close.gif" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/close"/>
-            </xf:label>
-            <xf:dispatch ev:event="DOMActivate" targetid="fr-navigation-model" name="fr-close-window"/>
-        </xf:trigger>
-        <!-- Trigger shown to go back if the data is dirty -->
-        <!--<xf:trigger ref="instance('fr-persistence-instance')[data-status = 'dirty']">-->
-            <!--<xf:label>-->
-                <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>-->
-                <!--<xf:output value="$fr-resources/detail/labels/discard"/>-->
-            <!--</xf:label>-->
-            <!--<xf:action ev:event="DOMActivate">-->
-                <!--<xf:dispatch targetid="fr-navigation-model" name="fr-close-window"/>-->
-            <!--</xf:action>-->
-        <!--</xf:trigger>-->
-        <!-- Trigger shown to go back if the data is clean -->
-        <!--<xf:trigger ref="instance('fr-persistence-instance')[data-status = 'clean']">-->
-            <!--<xf:label>-->
-                <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/house.png" alt=""/>-->
-                <!--<xf:output value="$fr-resources/detail/labels/return"/>-->
-            <!--</xf:label>-->
-            <!--<xf:action ev:event="DOMActivate">-->
-                <!--<xf:dispatch targetid="fr-navigation-model" name="fr-close-window"/>-->
-            <!--</xf:action>-->
-        <!--</xf:trigger>-->
-    </xsl:template>
-
     <xsl:template match="fr:clear-button">
-        <xf:trigger id="fr-clear-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+        <xf:trigger id="fr-clear-button" class="fr-clear-button" model="fr-persistence-model" ref="xxf:instance('fr-triggers-instance')/other">
             <xsl:copy-of select="@appearance"/>
-            <xf:label><xh:img width="16" height="16" src="/apps/fr/style/clear.gif" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/clear"/>
-            </xf:label>
+            <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/clear"/>
             <xf:action ev:event="DOMActivate">
-                <xf:setvalue ref="xxf:instance('errors-state')/submitted">true</xf:setvalue>
                 <!-- Open confirmation dialog -->
                 <xxf:show if="not(property('xxf:noscript'))" dialog="fr-clear-confirm-dialog"/>
                 <!-- Restore directly -->
@@ -87,22 +75,8 @@
         </xf:trigger>
     </xsl:template>
 
-    <xsl:template match="fr:print-button">
-        <!-- TODO: bind to strict-submit, but maybe fr-print-submission should check validity instead -->
-        <xf:trigger id="fr-print-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/printer.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/print"/>
-            </xf:label>
-            <xf:action ev:event="DOMActivate">
-                <xf:send submission="fr-print-submission"/>
-            </xf:action>
-        </xf:trigger>
-    </xsl:template>
-
     <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
     <xsl:template match="fr:pdf-button">
-        <!-- TODO: bind to strict-submit, but maybe fr-pdf-submission should check validity instead -->
         <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
         <!-- Don't show the PDF template button in CE (also on summary page) -->
         <xsl:if test="not($has-pdf-template and not($is-pe))">
@@ -114,111 +88,18 @@
                 <xsl:if test="$pdf-disable-if-invalid">
                     <xsl:attribute name="ref">instance('fr-triggers-instance')/strict-submit</xsl:attribute>
                 </xsl:if>
-                <xf:label>
-                    <xh:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
-                    <xf:output value="$fr-resources/detail/labels/print-pdf"/>
-                </xf:label>
+                <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/pdf"/>
             </fr:href-button>
         </xsl:if>
     </xsl:template>
 
-    <xsl:template match="fr:save-button">
-        <xf:trigger id="fr-save-button" xxf:modal="true" model="fr-persistence-model" ref="instance('fr-triggers-instance')/save">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_save.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/save-document"/>
-            </xf:label>
-        </xf:trigger>
-    </xsl:template>
-
     <xsl:template match="fr:save-locally-button">
-        <xf:trigger id="fr-save-locally-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
+        <xf:trigger id="fr-save-locally-button" class="fr-save-locally-button" ref="xxf:instance('fr-triggers-instance')/other">
             <xf:label>
                 <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/save-locally"/>
+                <xf:output value="$fr-resources/detail/buttons/save-locally"/>
             </xf:label>
         </xf:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:submit-button">
-        <xf:trigger xxf:modal="true" id="fr-submit-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/submit">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/application_go.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/submit-document"/>
-            </xf:label>
-        </xf:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:workflow-review-button">
-        <xf:trigger xxf:modal="true" id="fr-workflow-review-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-review">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/workflow-review"/>
-            </xf:label>
-        </xf:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:workflow-edit-button">
-        <xf:trigger xxf:modal="true" id="fr-workflow-edit-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-edit">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/left_16.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/workflow-edit"/>
-            </xf:label>
-        </xf:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:workflow-send-button">
-        <xf:trigger xxf:modal="true" id="fr-workflow-send-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/workflow-send">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/right_16.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/workflow-send"/>
-            </xf:label>
-        </xf:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:email-button">
-        <!-- Don't show this button in noscript mode -->
-        <!-- TODO: bind to strict-submit, but maybe fr-email-service-submission should check validity instead -->
-        <xf:trigger xxf:modal="true" id="fr-email-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/strict-submit">
-            <xsl:copy-of select="@appearance"/>
-            <xf:label>
-                <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/email.png" alt=""/>-->
-                <xh:img width="16" height="16" src="/apps/fr/style/images/pixelmixer/letter_16.png" alt=""/>
-                <xf:output value="$fr-resources/detail/labels/email"/>
-            </xf:label>
-            <xf:action ev:event="DOMActivate">
-                <xf:send submission="fr-email-service-submission"/>
-            </xf:action>
-        </xf:trigger>
-    </xsl:template>
-
-    <xsl:template match="fr:collapse-all-button">
-        <xsl:if test="$is-section-collapse">
-            <xf:trigger id="fr-collapse-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
-                <xsl:copy-of select="@appearance"/>
-                <xf:label>
-                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_in.png" alt="{{$fr-resources/detail/labels/collapse-all}}"/>
-                </xf:label>
-                <xf:dispatch ev:event="DOMActivate" name="fr-collapse-all" targetid="fr-sections-model"/>
-            </xf:trigger>
-        </xsl:if>
-    </xsl:template>
-
-    <xsl:template match="fr:expand-all-button">
-        <xsl:if test="$is-section-collapse">
-            <xf:trigger id="fr-expand-all-button" model="fr-persistence-model" ref="instance('fr-triggers-instance')/other">
-                <xsl:copy-of select="@appearance"/>
-                <xf:label>
-                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_out.png" alt="{{$fr-resources/detail/labels/expand-all}}"/>
-                </xf:label>
-                <xf:dispatch ev:event="DOMActivate" name="fr-expand-all" targetid="fr-sections-model"/>
-            </xf:trigger>
-        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>

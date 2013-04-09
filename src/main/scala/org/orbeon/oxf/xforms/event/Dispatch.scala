@@ -21,6 +21,10 @@ import org.orbeon.oxf.xforms.event.XFormsEvent._
 
 object Dispatch extends Logging {
 
+    // Type of an event listener
+    type EventListener = XFormsEvent ⇒ Unit
+
+    // Dispatch an event
     def dispatchEvent(event: XFormsEvent): Unit = {
 
         val containingDocument = event.containingDocument
@@ -60,7 +64,7 @@ object Dispatch extends Logging {
             // Call native listeners on target if any
             def callNativeListeners(target: XFormsEventObserver) =
                 for (listener ← target.getListeners(event.name)) {
-                    listener.handleEvent(event)
+                    listener.apply(event)
                     statNativeHandlers += 1
                 }
 

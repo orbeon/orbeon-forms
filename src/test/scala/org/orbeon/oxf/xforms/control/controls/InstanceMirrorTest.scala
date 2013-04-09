@@ -17,7 +17,6 @@ import XXFormsDynamicControl._
 import org.junit.Test
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener}
 import org.scalatest.junit.AssertionsForJUnit
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
@@ -72,9 +71,9 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
         var nonInstanceChanges = 0
 
         // Attach listeners
-        val outerListener: JEventListener = {
+        val outerListener = {
 
-            val unknownChange: EventListener = _ ⇒ {
+            val unknownChange: MirrorEventListener = _ ⇒ {
                 nonInstanceChanges += 1
                 true
             }
@@ -82,7 +81,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
             val outerMirrorListener =
                 mirrorListener(document, toInnerInstanceNode(outerInstance.documentInfo, document.getStaticState.topLevelPart, document, findOuterInstanceDetailsDynamic))
 
-            composeListeners(Seq(outerMirrorListener, unknownChange))
+            toEventListener(composeListeners(Seq(outerMirrorListener, unknownChange)))
         }
 
         addListener(outerInstance, outerListener)

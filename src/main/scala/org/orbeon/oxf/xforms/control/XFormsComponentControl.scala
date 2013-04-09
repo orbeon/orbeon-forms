@@ -21,7 +21,8 @@ import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.orbeon.oxf.xforms.control.controls.{XXFormsComponentRootControl, InstanceMirror}
 import org.orbeon.oxf.xforms.event.events.{XFormsModelConstructDoneEvent, XFormsModelConstructEvent}
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, Dispatch}
+import org.orbeon.oxf.xforms.event.Dispatch
+import Dispatch.EventListener
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsInstance, BindingContext}
 import org.orbeon.saxon.om.VirtualNode
@@ -48,7 +49,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     private var _nestedContainer: Option[XBLContainer] = None
     def nestedContainer = _nestedContainer.get
 
-    private var _outerListener: Option[(XFormsInstance, JEventListener)] = None
+    private var _outerListener: Option[(XFormsInstance, EventListener)] = None
 
     // Create nested container upon creation
     createNestedContainer()
@@ -116,17 +117,17 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         val outerDocument = referenceNode.getDocumentRoot
         val outerInstance = containingDocument.getInstanceForNode(outerDocument)
 
-        val outerListener: JEventListener = mirrorListener(
+        val outerListener = toEventListener(mirrorListener(
             containingDocument,
             toInnerInstanceNode(
                 outerDocument,
                 nestedContainer.partAnalysis,
                 nestedContainer,
-                findOuterInstanceDetailsXBL(mirrorInstance, referenceNode)))
+                findOuterInstanceDetailsXBL(mirrorInstance, referenceNode))))
 
-        val innerListener: JEventListener = mirrorListener(
+        val innerListener = toEventListener(mirrorListener(
             containingDocument,
-            toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis))
+            toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)))
 
         // Set outer and inner listeners
         InstanceMirror.addListener(outerInstance, outerListener)

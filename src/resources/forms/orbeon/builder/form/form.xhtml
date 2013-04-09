@@ -102,10 +102,7 @@
                 <!-- Test form -->
                 <xf:group model="fr-error-summary-model" ref="instance('fr-error-summary-instance')/trigger" id="fb-test-button-group">
                     <xf:trigger id="fb-test-button">
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/images/pixelmixer/gear_16.png" alt=""/>
-                            <xf:output value="$fr-resources/detail/labels/test"/>
-                        </xf:label>
+                        <xf:label mediatype="text/html" value="$form-resources/test/label"/>
                         <xf:action ev:event="DOMActivate">
                             <xxf:script>
                                 <!-- Reset the displayed page as the iframe might show the result from a previous test -->
@@ -123,10 +120,7 @@
                 <!-- Publish form -->
                 <xf:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
                     <xf:trigger id="fb-publish-button" ref=".">
-                        <xf:label>
-                            <xh:img src="/apps/fr/style/images/pixelmixer/globe_16.png" alt=""/>
-                            <xf:output value="$fr-resources/detail/labels/publish"/>
-                        </xf:label>
+                        <xf:label mediatype="text/html" value="$form-resources/publish/label"/>
                         <xf:action ev:event="DOMActivate">
                             <xxf:show dialog="fb-publish-dialog"/>
                         </xf:action>
@@ -141,7 +135,7 @@
                 <!--<xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">-->
                     <!--<xf:label>-->
                         <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>-->
-                        <!--<xf:output value="$fr-resources/detail/labels/save-as-document"/>-->
+                        <!--<xf:output value="$form-resources/save-as/label"/>-->
                     <!--</xf:label>-->
                     <!--<xf:action ev:event="DOMActivate">-->
                         <!--&lt;!&ndash; Open the dialog in "save-as" mode &ndash;&gt;-->
@@ -176,7 +170,7 @@
 
                             <!-- Form settings -->
                             <xf:trigger appearance="minimal" class="fb-form-settings-trigger pull-right">
-                                <xf:label><xh:i class="icon-tag icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
+                                <xf:label><xh:i class="icon-wrench icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Open the dialog in "edit" mode -->
                                     <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
@@ -367,9 +361,9 @@
                                         <!-- Create new document id -->
                                         <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="secure:randomHexId()"/>
                                         <!-- Actually save -->
-                                        <xf:dispatch name="fr-save-action" targetid="fr-persistence-model">
-                                            <xf:property name="fr:check-data-valid" value="true()"/>
-                                        </xf:dispatch>
+                                        <xf:action type="xpath" xmlns:send="java:org.orbeon.oxf.fr.ProcessButton">
+                                            send:runProcess('validate then save then success-message("save-success") recover error-message("database-error")')
+                                        </xf:action>
                                         <!-- Change URL to have new document id -->
                                         <xxf:script>
                                             <!-- If browser supporting the HTML5 history API (http://goo.gl/Ootqu) -->

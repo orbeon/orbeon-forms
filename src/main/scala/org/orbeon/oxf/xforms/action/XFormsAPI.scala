@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.action
 
-import actions.{XFormsSetindexAction, XFormsDeleteAction, XFormsInsertAction}
+import org.orbeon.oxf.xforms.action.actions._
 import collection.JavaConverters._
 import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
@@ -25,14 +25,20 @@ import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.xforms.model.DataModel
 import org.dom4j.QName
 
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.XFormsContainingDocument
+import org.orbeon.oxf.xforms.{XFormsModel, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.event.{XFormsEventTarget, Dispatch, XFormsEvent}
+import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
+import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
+import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.Some
+import org.orbeon.oxf.xforms.control.controls.{XXFormsDialogControl, XFormsCaseControl}
+import scala.util.Try
 
 object XFormsAPI {
 
     // Dynamically set context
-    val containingDocumentDyn = new DynamicVariable[XFormsContainingDocument]
-    val actionInterpreterDyn = new DynamicVariable[XFormsActionInterpreter]
+    private val containingDocumentDyn = new DynamicVariable[XFormsContainingDocument]
+    private val actionInterpreterDyn  = new DynamicVariable[XFormsActionInterpreter]
 
     // Every block of action must be run within this
     def withScalaAction(interpreter: XFormsActionInterpreter)(body: ⇒ Any) {
@@ -54,7 +60,13 @@ object XFormsAPI {
         }
     }
 
-    // Setvalue
+    // Return the action interpreter
+    def actionInterpreter = { assert(actionInterpreterDyn.value.isDefined); actionInterpreterDyn.value.get }
+
+    // Return the containing document
+    def containingDocument = { assert(containingDocumentDyn.value.isDefined); containingDocumentDyn.value.get }
+
+    // xf:setvalue
     // @return the node whose value was set, if any
     def setvalue(ref: Seq[NodeInfo], value: String) = {
         if (ref nonEmpty) {
@@ -75,7 +87,7 @@ object XFormsAPI {
             None
     }
 
-    // Setindex
+    // xf:setindex
     // @return:
     //
     // - None        if the control is not found
@@ -86,7 +98,7 @@ object XFormsAPI {
             { interpreter ⇒ XFormsSetindexAction.executeSetindexAction(interpreter, interpreter.outerActionElement, repeatStaticId, index) } collect
                 { case newIndex if newIndex >= 0 ⇒ newIndex }
 
-    // Insert
+    // xf:insert
     // @return the inserted nodes
     def insert[T <: Item](origin: Seq[T], into: Seq[NodeInfo] = Seq(), after: Seq[NodeInfo] = Seq(), before: Seq[NodeInfo] = Seq(), doDispatch: Boolean = true): Seq[T] = {
 
@@ -113,7 +125,7 @@ object XFormsAPI {
             Seq()
     }
 
-    // Delete
+    // xf:delete
     def delete(ref: Seq[NodeInfo], doDispatch: Boolean = true): Seq[NodeInfo] = {
 
         val action = actionInterpreterDyn.value
@@ -176,7 +188,7 @@ object XFormsAPI {
     // Return an instance's root element in the current action context
     def instanceRoot(staticId: String, searchAncestors: Boolean = false): Option[NodeInfo] = {
 
-        assert(actionInterpreterDyn.value.isDefined)
+        val ai = actionInterpreter
 
         def ancestorXBLContainers = {
             def recurse(container: XBLContainer): List[XBLContainer] = container :: (container.getParentXBLContainer match {
@@ -184,28 +196,135 @@ object XFormsAPI {
                 case _ ⇒ Nil
             })
 
-            recurse(actionInterpreterDyn.value.get.container)
+            recurse(ai.container)
         }
 
         val containersToSearch =
-            if (searchAncestors) ancestorXBLContainers else List(actionInterpreterDyn.value.get.container)
+            if (searchAncestors) ancestorXBLContainers else List(ai.container)
 
         containersToSearch flatMap
             (_.findInstance(staticId)) find
                 (_ ne null) map
-                    (_.instanceRoot)
+                    (_.rootElement)
     }
 
-    // Return a model
-    // TODO: This searches only top-level models, find a better way
-    def model(modelId: String) =
-        // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
-        containingDocument.models find (_.getId == modelId)
+    // Return an instance within a top-level model
+    def topLevelInstance(modelId: String, instanceId: String) =
+        topLevelModel(modelId) flatMap (m ⇒ Option(m.getInstance(instanceId)))
 
-    // Return the containing document
-    def containingDocument = { assert(containingDocumentDyn.value.isDefined); containingDocumentDyn.value.get }
+    // Return a top-level model by static id
+    // NOTE: This search is not very efficient, but this allows mocking in tests, where getObjectByEffectiveId causes issues
+    // 2013-04-03: Unsure if we still need this for mocking
+    def topLevelModel(modelId: String) =
+        containingDocument.models find (_.getId == modelId)
     
     def context[T](xpath: String)(body: ⇒ T): T = ???
     def context[T](item: Item)(body: ⇒ T): T = ???
     def event[T](attributeName: String): Seq[Item] = ???
-}   
+
+    // The xf:dispatch action
+    def dispatch(
+            name: String,
+            targetId: String,
+            bubbles: Boolean = true,
+            cancelable: Boolean = true,
+            properties: XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
+            delay: Int = 0,
+            showProgress: Boolean = true,
+            progressMessage: String = null): Unit = {
+
+        val target = containingDocument.getObjectByEffectiveId(targetId).asInstanceOf[XFormsEventTarget]
+
+        XFormsDispatchAction.dispatch(
+            name,
+            target,
+            bubbles,
+            cancelable,
+            properties,
+            delay,
+            showProgress,
+            progressMessage
+        )
+    }
+
+    private val SubmitEvents = Seq("xforms-submit-done", "xforms-submit-error")
+
+    // The xf:send action
+    // Send the given submission and applies the body with the resulting event if the submission completed
+    def send[T](submissionId: String, properties: PropertyGetter = EmptyGetter)(body: XFormsEvent ⇒ T): Option[T] = {
+
+        val submission = containingDocument.getObjectByEffectiveId(submissionId).asInstanceOf[XFormsModelSubmission]
+
+        var result: Option[Try[T]] = None
+
+        // Listener runs right away but stores the Try
+        val listener: Dispatch.EventListener = { e ⇒
+            result = Some(Try(body(e)))
+        }
+
+        // Add both listeners
+        SubmitEvents foreach (submission.addListener(_, listener))
+
+        // Dispatch and make sure the listeners are removed
+        try Dispatch.dispatchEvent(new XFormsSubmitEvent(submission, properties))
+        finally SubmitEvents foreach (submission.removeListener(_, listener))
+
+        // - If the dispatch completed successfully and the submission started, it *should* have completed with either
+        //   `xforms-submit-done` or `xforms-submit-error`. In this case, we have called `body(event)` and return
+        //   `Option[T]` or throw an exception if `body(event)` failed.
+        // - But in particular if the xforms-submit event got canceled, we might be in a situation where no
+        //   xforms-submit-done or xforms-submit-error was dispatched. In this case, we return `None`.
+        // - If the dispatch failed for other reasons, it might have thrown an exception, which is propagated.
+
+        result map (_.get)
+    }
+
+    class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
+
+    def sendThrowOnError(submissionId: String, properties: PropertyGetter = EmptyGetter): Option[XFormsSubmitDoneEvent] =
+        XFormsAPI.send(submissionId, properties) {
+            case done:  XFormsSubmitDoneEvent  ⇒ done
+            case error: XFormsSubmitErrorEvent ⇒ throw new SubmitException(error)
+        }
+
+    // xf:toggle
+    def toggle(caseId: String, deferred: Boolean = true): Unit = {
+        val caseControl = containingDocument.getObjectByEffectiveId(caseId).asInstanceOf[XFormsCaseControl]
+        XFormsToggleAction.toggle(caseControl, deferred)
+    }
+
+    // xf:rebuild
+    def rebuild(modelId: String, deferred: Boolean = false): Unit = {
+        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
+        RRRAction.rebuild(model, deferred)
+    }
+
+    // xf:revalidate
+    def revalidate(modelId: String, deferred: Boolean = false): Unit = {
+        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
+        RRRAction.revalidate(model, deferred)
+    }
+
+    // xf:recalculate
+    def recalculate(modelId: String, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
+        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
+        RRRAction.recalculate(model, deferred, applyDefaults)
+    }
+
+    // xf:refresh
+    def refresh(modelId: String): Unit = {
+        val model = containingDocument.getObjectByEffectiveId(modelId).asInstanceOf[XFormsModel]
+        XFormsRefreshAction.refresh(model)
+    }
+
+    // xf:show
+    def show(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit = {
+        val dialogControl = containingDocument.getObjectByEffectiveId(dialogId).asInstanceOf[XXFormsDialogControl]
+        XXFormsShowAction.showDialog(dialogControl, properties = properties)
+    }
+
+    // xf:load
+    def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit = {
+        XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, url, target.orNull, null, false, false)
+    }
+}

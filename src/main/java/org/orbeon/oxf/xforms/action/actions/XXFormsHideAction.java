@@ -43,7 +43,7 @@ public class XXFormsHideAction extends XFormsAction {
             final Object controlObject = actionInterpreter.resolveObject(actionElement, dialogStaticId);
             if (controlObject instanceof XXFormsDialogControl) {
                 final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
-                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(targetDialog, eventProperties(actionInterpreter, actionElement));
+                final XFormsEvent newEvent = new XXFormsDialogCloseEvent(targetDialog, XFormsAction.eventProperties(actionInterpreter, actionElement));
                 Dispatch.dispatchEvent(newEvent);
             } else {
                 final IndentedLogger indentedLogger = actionInterpreter.indentedLogger();

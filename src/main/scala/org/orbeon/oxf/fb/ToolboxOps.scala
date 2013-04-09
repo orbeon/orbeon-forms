@@ -335,7 +335,7 @@ object ToolboxOps {
         val doc = td.getDocumentRoot
 
         val name = getControlName(td \ * head)
-        val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
+        val xvc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("xcv"))
 
         findControlByName(doc, name) foreach { controlElement ⇒
 
@@ -368,7 +368,7 @@ object ToolboxOps {
     def pasteFromClipboard(td: NodeInfo): Unit = {
         ensureEmptyTd(td) foreach { gridTd ⇒
 
-            val xvc = asNodeInfo(model("fr-form-model").get.getVariable("xcv"))
+            val xvc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("xcv"))
 
             (xvc \ "control" \ * headOption) foreach { control ⇒
                 val name = {

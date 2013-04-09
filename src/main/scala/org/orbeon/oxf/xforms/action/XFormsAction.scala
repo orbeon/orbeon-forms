@@ -49,13 +49,61 @@ abstract class XFormsAction extends Logging {
        hasOverriddenContext: Boolean,
        overriddenContext: Item): Unit = ()
 
+    // Resolve a control given the name of an AVT
+    def resolveControl(attName: String, required: Boolean = true)(implicit context: DynamicActionContext): Option[XFormsControl] = {
+
+        val interpreter = context.interpreter
+        val element = context.element
+
+        resolveStringAVT(attName)(context) match {
+            case Some(resolvedAvt) ⇒
+
+                val controlObject = interpreter.resolveObject(element, resolvedAvt)
+
+                Option(controlObject) match {
+                    case Some(control: XFormsControl) ⇒ Some(control)
+                    case _ ⇒
+                        implicit val indentedLogger = interpreter.indentedLogger
+                        debug(
+                            "attribute does not refer to an existing control",
+                            Seq("attribute"      → attName,
+                                "value"          → element.attributeValue("control"),
+                                "resolved value" → resolvedAvt)
+                        )
+                        None
+                }
+
+            case None if required ⇒
+                // This can happen if the attribute is missing or if the AVT cannot be evaluated due to an empty context
+                throw new OXFException("Cannot resolve mandatory '" + attName + "' attribute on " + context.actionName + " action.")
+            case None if ! required ⇒
+                None
+        }
+    }
+
+    // Resolve an optional boolean AVT
+    // Return None if there is no attribute or if the AVT cannot be evaluated
+    def resolveStringAVT(att: String)(implicit context: DynamicActionContext) =
+        Option(context.element.attributeValue(att)) flatMap
+            (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
+
+    // Resolve an optional boolean AVT
+    def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext) =
+        resolveStringAVT(att)(context) map (_ == "true") getOrElse default
+
+    def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
+        if (context.interpreter.isDeferredUpdates(context.element))
+            context.containingDocument.synchronizeAndRefresh()
+}
+
+object XFormsAction {
     /**
      * Obtain context attributes based on nested xxf:context elements.
      *
      * @param actionInterpreter current XFormsActionInterpreter
      * @param actionElement     action element
      */
-    protected def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element): PropertyGetter = {
+    def eventProperties(actionInterpreter: XFormsActionInterpreter, actionElement: Element): PropertyGetter = {
 
         val contextStack = actionInterpreter.actionXPathContext
 
@@ -104,48 +152,4 @@ abstract class XFormsAction extends Logging {
 
         tuples.toMap
     }
-
-    // Resolve a control given the name of an AVT
-    def resolveControl(attName: String)(implicit context: DynamicActionContext): Option[XFormsControl] = {
-
-        val interpreter = context.interpreter
-        val element = context.element
-
-        resolveStringAVT("control")(context) match {
-            case Some(resolvedAvt) ⇒
-
-                val controlObject = interpreter.resolveObject(element, resolvedAvt)
-
-                Option(controlObject) match {
-                    case Some(control: XFormsControl) ⇒ Some(control)
-                    case _ ⇒
-                        implicit val indentedLogger = interpreter.indentedLogger
-                        debug(
-                            "attribute does not refer to an existing control",
-                            Seq("attribute"      → attName,
-                                "value"          → element.attributeValue("control"),
-                                "resolved value" → resolvedAvt)
-                        )
-                        None
-                }
-
-            case None ⇒
-                // This can happen if the attribute is missing or if the AVT cannot be evaluated due to an empty context
-                throw new OXFException("Cannot resolve mandatory '" + attName + "' attribute on " + context.actionName + " action.")
-        }
-    }
-
-    // Resolve an optional boolean AVT
-    // Return None if there is no attribute or if the AVT cannot be evaluated
-    def resolveStringAVT(att: String)(implicit context: DynamicActionContext) =
-        Option(context.element.attributeValue(att)) flatMap
-            (avt ⇒ Option(context.interpreter.resolveAVTProvideValue(context.element, avt)))
-
-    // Resolve an optional boolean AVT
-    def resolveBooleanAVT(att: String, default: Boolean)(implicit context: DynamicActionContext) =
-        resolveStringAVT(att)(context) map (_ == "true") getOrElse default
-
-    def synchronizeAndRefreshIfNeeded(context: DynamicActionContext): Unit =
-        if (context.interpreter.isDeferredUpdates(context.element))
-            context.containingDocument.synchronizeAndRefresh()
 }

@@ -518,6 +518,10 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, XFORMS11_SWITCH_PROPERTY);
     }
 
+    public static boolean isNoscript(XFormsContainingDocument containingDocument) {
+        return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY);
+    }
+
     // == Helpers ======================================================================================================
 
     public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {

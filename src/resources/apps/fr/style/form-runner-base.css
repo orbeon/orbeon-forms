@@ -198,7 +198,7 @@
   display: block;
   width: 100%;
   padding: 2px 2px 2px 18px;
-  background: url(images/silk/attach.png) no-repeat left center;
+  background: url(images/silk/attach.png ) no-repeat left center;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -277,24 +277,19 @@
   width: 9.5em;
   *width: 9em;
 }
-.orbeon .fr-buttons #fr-collapse-all-button .xforms-trigger button,
-.orbeon .fr-buttons #fr-expand-all-button .xforms-trigger button,
-.orbeon .fr-buttons #fr-refresh-button .xforms-trigger button {
+.orbeon .fr-buttons .fr-collapse-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-expand-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-refresh-button.xforms-trigger button {
   min-width: 2em;
   width: 2em;
   padding: 0;
 }
-.orbeon .fr-buttons #fr-collapse-all-button.xforms-trigger button,
-.orbeon .fr-buttons #fr-expand-all-button.xforms-trigger button,
-.orbeon .fr-buttons #fr-refresh-button.xforms-trigger button {
+.orbeon .fr-buttons .fr-collapse-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-expand-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-refresh-button.xforms-trigger button {
   min-width: 2em;
   width: 2em;
   padding: 3px;
-}
-.orbeon .fr-buttons #fr-collapse-all-button img,
-.orbeon .fr-buttons #fr-expand-all-button img,
-.orbeon .fr-buttons #fr-refresh-button img {
-  margin-right: 0;
 }
 .orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-label {
   display: none;
@@ -353,8 +348,8 @@
   border-top: 2px solid #ddddee;
   clear: both;
 }
-.orbeon #fr-submission-result-dialog {
-  width: 800px;
+.orbeon .xforms-dialog.fr-submission-result-dialog {
+  width: 500px;
 }
 .orbeon .xbl-fr-section {
   display: block;

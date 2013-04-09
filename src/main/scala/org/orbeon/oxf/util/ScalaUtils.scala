@@ -23,6 +23,7 @@ import scala.collection.mutable
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.util.{Failure, Try}
+import scala.util.control.ControlThrowable
 
 object ScalaUtils {
 
@@ -285,6 +286,6 @@ object ScalaUtils {
     implicit def tryToIterator[T](t: Try[T]) = t.toOption.iterator
 
     def recoverRootException[T]: PartialFunction[Throwable, Try[T]] = {
-        case e: Exception ⇒ new Failure(Exceptions.getRootThrowable(e))
+        case e: Exception ⇒ Failure(Exceptions.getRootThrowable(e))
     }
 }

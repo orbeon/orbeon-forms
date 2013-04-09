@@ -20,23 +20,24 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        id="fr-submission-result-dialog" level="modal" close="false" draggable="false" class="fr-dialog" model="fr-submission-result-model">
+        id="fr-submission-result-dialog" level="modal" close="false" draggable="true" class="fr-dialog fr-submission-result-dialog" model="fr-submission-result-model">
 
     <xf:label ref="$fr-resources/detail/messages/submit-dialog-title"/>
 
     <xh:div>
-        <xf:var name="content-from-persistence" value="xxf:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
-        <xf:output ref="if ($content-from-persistence) then . else $fr-resources/detail/messages/submit-dialog-message" mediatype="text/html"/>
+        <xf:var
+            name="content-from-persistence"
+            value="xxf:property(string-join(('oxf.fr.detail.submit.content-from-persistence', $app, $form), '.'))"/>
+        <xf:output
+            mediatype="text/html"
+            ref="if ($content-from-persistence) then instance('fr-submission-result-instance') else $fr-resources/detail/messages/submit-dialog-message"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:group>
             <xf:repeat ref="tokenize(xxf:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')">
                 <!-- Clear button -->
                 <xf:trigger ref="instance()[context() = 'clear']">
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/clear.gif" alt=""/>
-                        <xf:output value="$fr-resources/detail/labels/submit-dialog-clear"/>
-                    </xf:label>
+                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-clear"/>
                     <xf:action ev:event="DOMActivate">
                         <!-- Restore instance -->
                         <xf:dispatch name="fr-clear" targetid="fr-persistence-model"/>
@@ -48,10 +49,7 @@
                 </xf:trigger>
                 <!-- Keep button -->
                 <xf:trigger ref="instance()[context() = 'keep']">
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xf:output value="$fr-resources/detail/labels/submit-dialog-keep"/>
-                    </xf:label>
+                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-keep"/>
                     <xf:action ev:event="DOMActivate">
                         <xxf:hide dialog="fr-submission-result-dialog"/>
                         <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
@@ -59,10 +57,7 @@
                 </xf:trigger>
                 <!-- Go button -->
                 <xf:trigger ref="instance()[context() = 'go']">
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xf:output value="$fr-resources/detail/labels/submit-dialog-go"/>
-                    </xf:label>
+                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-go"/>
                     <xf:action ev:event="DOMActivate">
                         <xf:var name="uri-xpath" value="xxf:property(string-join(('oxf.fr.detail.submit.go.uri-xpath', $app, $form), '.'))"/>
                         <xf:load context="xxf:instance('fr-form-instance')" resource="{saxon:evaluate($uri-xpath)}"/>
@@ -70,17 +65,14 @@
                 </xf:trigger>
                 <!-- Close window button -->
                 <xf:trigger ref="instance()[context() = 'close-window']">
-                    <xf:label>
-                        <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                        <xf:output value="$fr-resources/detail/labels/submit-dialog-close-window"/>
-                    </xf:label>
+                    <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-close-window"/>
                     <xxf:script ev:event="DOMActivate">window.close();</xxf:script>
                 </xf:trigger>
             </xf:repeat>
         </xf:group>
     </xh:div>
     <!-- Set value when dialog opens -->
-    <xf:setvalue ev:event="xxforms-dialog-open" ref="." value="event('fr:content')"/>
+    <xf:setvalue ev:event="xxforms-dialog-open" ref="." value="event('fr-content')"/>
     <!-- Clear value when dialog closes -->
     <xf:setvalue ev:event="xxforms-dialog-close" ref="."/>
     <!-- Local model -->

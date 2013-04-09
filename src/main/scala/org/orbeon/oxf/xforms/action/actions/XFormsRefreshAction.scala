@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.XFormsConstants
+import org.orbeon.oxf.xforms.{XFormsModel, XFormsConstants}
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent
@@ -29,10 +29,17 @@ class XFormsRefreshAction extends XFormsAction {
         val interpreter = context.interpreter
         val model       = interpreter.actionXPathContext.getCurrentModel
 
-        val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
-        if (model eq null)
+        if (model ne null) {
+            XFormsRefreshAction.refresh(model)
+        } else {
+            val modelId = context.element.attributeValue(XFormsConstants.MODEL_QNAME)
             throw new ValidationException("Invalid model id: " + modelId, context.element.getData.asInstanceOf[LocationData])
+        }
+    }
+}
 
+object XFormsRefreshAction {
+    def refresh(model: XFormsModel): Unit = {
         // NOTE: We no longer need to force the refresh flag here because the refresh flag is global. If a change in any
         // model occurred, then the flag will be already set and we are safe. Otherwise, it is safe not to do anything.
         Dispatch.dispatchEvent(new XFormsRefreshEvent(model))

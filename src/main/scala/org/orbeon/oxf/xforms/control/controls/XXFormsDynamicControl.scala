@@ -30,7 +30,7 @@ import org.dom4j._
 import org.orbeon.scaxon.XML._
 import collection.mutable.Buffer
 import XXFormsDynamicControl._
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener}
+import org.orbeon.oxf.xforms.event.Dispatch.EventListener
 import org.orbeon.oxf.xforms.event.events.{XXFormsValueChangedEvent, XFormsDeleteEvent, XFormsInsertEvent}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
@@ -57,7 +57,7 @@ import org.orbeon.oxf.xforms.state.InstancesControls
 class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
     extends XFormsSingleNodeContainerControl(container, parent, element, effectiveId) {
 
-    case class Nested(container: XBLContainer, partAnalysis: PartAnalysisImpl, template: SAXStore, outerListener: JEventListener)
+    case class Nested(container: XBLContainer, partAnalysis: PartAnalysisImpl, template: SAXStore, outerListener: EventListener)
 
     private var _nested: Option[Nested] = None
     def nested = _nested
@@ -179,10 +179,10 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         implicit val logger = getIndentedLogger
 
         // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
-        val outerListener: JEventListener = {
+        val outerListener: EventListener = {
 
             // Mark an unknown change, which will require a complete rebuild of the part
-            val unknownChange: EventListener = { case _ ⇒
+            val unknownChange: MirrorEventListener = { case _ ⇒
                 changeCount += 1
                 containingDocument.addControlStructuralChange(prefixedId)
                 true
@@ -194,7 +194,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 newChanges.nonEmpty
             }
 
-            def changeListener(record: Seq[NodeInfo] ⇒ Boolean): EventListener = {
+            def changeListener(record: Seq[NodeInfo] ⇒ Boolean): MirrorEventListener = {
                 case insert: XFormsInsertEvent ⇒ record(insert.insertedNodes collect { case n: NodeInfo ⇒ n })
                 case delete: XFormsDeleteEvent ⇒ record(delete.deletedNodes)
                 case valueChanged: XXFormsValueChangedEvent ⇒ record(Seq(valueChanged.node))
@@ -207,7 +207,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
                 toInnerInstanceNode(docWrapper, partAnalysis, childContainer, findOuterInstanceDetailsDynamic))
 
             // Compose listeners
-            toJEventListener(composeListeners(Seq(
+            toEventListener(composeListeners(Seq(
                 instanceListener,
                 changeListener(recordChanges(findXBLChange(partAnalysis, _), xblChanges)),
                 changeListener(recordChanges(findBindChange, bindChanges)),
@@ -218,9 +218,9 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
         // Add mutation listeners to all top-level inline instances, which upon value change propagate the value
         // change to the related node in the source
-        val innerListener: JEventListener = mirrorListener(
+        val innerListener = toEventListener(mirrorListener(
             containingDocument,
-            toOuterInstanceNodeDynamic(outerInstance, docWrapper, partAnalysis))
+            toOuterInstanceNodeDynamic(outerInstance, docWrapper, partAnalysis)))
 
         partAnalysis.getModelsForScope(partAnalysis.startScope) foreach {
             _.instances.values filter (_.useInlineContent) foreach { instance ⇒
@@ -348,7 +348,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 object XXFormsDynamicControl {
 
     // Compose a Seq of listeners by calling them in order until one has successfully processed the event
-    def composeListeners(listeners: Seq[EventListener]): EventListener =
+    def composeListeners(listeners: Seq[MirrorEventListener]): MirrorEventListener =
         e ⇒ listeners exists (_(e))
 
     // Find whether the given node is a bind element or attribute and return the associated model id → element mapping

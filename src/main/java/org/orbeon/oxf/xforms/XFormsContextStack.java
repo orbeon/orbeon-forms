@@ -150,7 +150,7 @@ public class XFormsContextStack {
 
         if (model != null && model.getDefaultInstance() != null) {
             // Push the default context if there is a model with an instance
-            final Item defaultNode = model.getDefaultInstance().instanceRoot();
+            final Item defaultNode = model.getDefaultInstance().rootElement();
             final List<Item> defaultNodeset = Arrays.asList(defaultNode);
             this.head = new BindingContext(parentBindingContext, model, null, defaultNodeset, 1, null, true, null,
                     model.getDefaultInstance().getLocationData(), false, defaultNode, container.innerScope());
@@ -641,7 +641,7 @@ public class XFormsContextStack {
 
         // If not found, return the document element of the model's default instance
         try {
-            return Collections.singletonList((Item) defaultInstance.instanceRoot());
+            return Collections.singletonList((Item) defaultInstance.rootElement());
         } catch (Exception e) {
             throw new OXFException(e);
         }

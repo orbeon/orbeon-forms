@@ -296,7 +296,7 @@
 
             </xf:action>
 
-            <!-- Mark all controls as un-visited when certain buttons are activated -->
+            <!-- Mark all controls as unvisited -->
             <xf:action ev:event="fr-unvisit-all">
                 <!-- Dispatch to the appropriate error summaries -->
                 <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
@@ -304,6 +304,15 @@
                     <xf:dispatch name="fr-unvisit-all" targetid="error-summary-control-top"/>
                 </xsl:if>
                 <xf:dispatch name="fr-unvisit-all" targetid="error-summary-control-bottom"/>
+            </xf:action>
+            <!-- Mark all controls as visited -->
+            <xf:action ev:event="fr-visit-all">
+                <!-- Dispatch to the appropriate error summaries -->
+                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
+                <xsl:if test="$error-summary-top">
+                    <xf:dispatch name="fr-visit-all" targetid="error-summary-control-top"/>
+                </xsl:if>
+                <xf:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
             </xf:action>
         </xf:model>
         <!-- This model handles document persistence -->

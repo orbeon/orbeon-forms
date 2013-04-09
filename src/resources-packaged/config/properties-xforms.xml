@@ -26,7 +26,7 @@
         * Global:   analysis server html resources state resolver utils
         * Data:     analysis-xbl-tree submission-body model-serialized-instance server-body html-static-state
      -->
-    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"                          value="document model submission control event action analysis server html"/>
+    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"                          value="document model submission control event action analysis server html send"/>
     <!--
         Error logging:
 

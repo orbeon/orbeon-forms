@@ -137,7 +137,7 @@ object ControlOps {
             (lang, holder)
 
     // Current resources
-    def currentResources = asNodeInfo(model("fr-form-model").get.getVariable("current-resources"))
+    def currentResources = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("current-resources"))
 
     // Find the current resource holder for the given name
     def findCurrentResourceHolder(controlName: String) = currentResources \ * filter (name(_) == controlName) headOption
@@ -320,7 +320,7 @@ object ControlOps {
 
         // Maybe add template items to the resource holder
         if (hasEditor(controlElement, "static-itemset")) {
-            val fbResourceInFBLang = asNodeInfo(model("fr-resources-model").get.getVariable("fr-form-resources"))
+            val fbResourceInFBLang = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-form-resources"))
             val templateItems = fbResourceInFBLang \ "template" \ "items" \ "item"
             insert(into = resourceHolder, origin = templateItems)
         }
@@ -513,7 +513,7 @@ object ControlOps {
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
     def binding(controlElement: NodeInfo) = {
-        (asScalaSeq(model("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo filter (b ⇒
+        (asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo filter (b ⇒
             viewTemplate(b) match {
                 case Some(viewTemplate) ⇒ qname(viewTemplate) == qname(controlElement)
                 case _ ⇒ false

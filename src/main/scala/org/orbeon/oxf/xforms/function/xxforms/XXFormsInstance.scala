@@ -39,7 +39,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
                 // Find a concrete instance
                 Option(containingDocument.getObjectByEffectiveId(instanceId)) collect
                     { case i: XFormsInstance ⇒ i } map
-                        (instance ⇒ SingletonIterator.makeIterator(instance.instanceRoot))
+                        (instance ⇒ SingletonIterator.makeIterator(instance.rootElement))
             } else {
                 // Search ancestor-or-self containers as suggested here: http://wiki.orbeon.com/forms/projects/xforms-model-scoping-rules
 
@@ -55,7 +55,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
                 def findDynamic = {
                     val containers = Iterator.iterate(startContainer)(_.getParentXBLContainer) takeWhile (_ ne null)
                     val instances  = containers flatMap (_.findInstance(instanceId))
-                    if (instances.hasNext) Some(SingletonIterator.makeIterator(instances.next().instanceRoot)) else None
+                    if (instances.hasNext) Some(SingletonIterator.makeIterator(instances.next().rootElement)) else None
                 }
 
                 def findStatic = {

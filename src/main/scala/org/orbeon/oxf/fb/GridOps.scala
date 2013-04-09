@@ -318,7 +318,7 @@ object GridOps {
     }
 
     private def selectedCellVar =
-        asNodeInfo(model("fr-form-model").get.getVariable("selected-cell"))
+        asNodeInfo(topLevelModel("fr-form-model").get.getVariable("selected-cell"))
 
     // Find the currently selected grid td if any
     def findSelectedTd(inDoc: NodeInfo) =

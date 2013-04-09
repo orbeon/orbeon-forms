@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xforms._
 import control.Controls.AncestorOrSelfIterator
 import event.events._
-import org.orbeon.oxf.xforms.event.{Dispatch, EventListener, XFormsEvent, XFormsEventObserver}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, XFormsEventObserver}
+import Dispatch.EventListener
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatIterationControl
 import org.orbeon.oxf.xforms.analysis.controls.ViewTrait
 

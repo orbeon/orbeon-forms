@@ -187,8 +187,8 @@ class PropertySet {
     def getObject(name: String): AnyRef =
         getPropertyValue(name, null)
 
-    def getObject(name: String, defaultValue: AnyRef): AnyRef =
-        Option(getObject(name)) getOrElse defaultValue
+    def getObject(name: String, default: AnyRef): AnyRef =
+        Option(getObject(name)) getOrElse default
 
     def getStringOrURIAsString(name: String, allowEmpty: Boolean = false): String =
         getObject(name) match {
@@ -198,8 +198,8 @@ class PropertySet {
             case _         ⇒ throw new OXFException("Invalid attribute type requested for property '" + name + "': expected " + XMLConstants.XS_STRING_QNAME.getQualifiedName + " or " + XMLConstants.XS_ANYURI_QNAME.getQualifiedName)
         }
 
-    def getStringOrURIAsString(name: String, defaultValue: String, allowEmpty: Boolean): String =
-        Option(getStringOrURIAsString(name, allowEmpty)) getOrElse defaultValue
+    def getStringOrURIAsString(name: String, default: String, allowEmpty: Boolean): String =
+        Option(getStringOrURIAsString(name, allowEmpty)) getOrElse default
 
     def getString(name: String): String =
         StringUtils.trimToNull(getPropertyValue(name, XMLConstants.XS_STRING_QNAME).asInstanceOf[String])
@@ -207,20 +207,20 @@ class PropertySet {
     def getNmtokens(name: String): JSet[String] =
         getPropertyValue(name, XMLConstants.XS_NMTOKENS_QNAME).asInstanceOf[JSet[String]]
 
-    def getString(name: String, defaultValue: String): String =
-        Option(getString(name)) getOrElse defaultValue
+    def getString(name: String, default: String): String =
+        Option(getString(name)) getOrElse default
 
     def getInteger(name: String): JInteger =
         getPropertyValue(name, XMLConstants.XS_INTEGER_QNAME).asInstanceOf[JInteger]
 
-    def getInteger(name: String, defaultValue: Int): JInteger =
-        Option(getInteger(name)) getOrElse new JInteger(defaultValue)
+    def getInteger(name: String, default: Int): JInteger =
+        Option(getInteger(name)) getOrElse new JInteger(default)
 
     def getBoolean(name: String): JBoolean =
         getPropertyValue(name, XMLConstants.XS_BOOLEAN_QNAME).asInstanceOf[JBoolean]
 
-    def getBoolean(name: String, defaultValue: Boolean): Boolean =
-        Option(getBoolean(name)) map (_.booleanValue) getOrElse defaultValue
+    def getBoolean(name: String, default: Boolean): Boolean =
+        Option(getBoolean(name)) map (_.booleanValue) getOrElse default
 
     def getDate(name: String): JDate =
         getPropertyValue(name, XMLConstants.XS_DATE_QNAME).asInstanceOf[JDate]
@@ -231,8 +231,8 @@ class PropertySet {
     def getQName(name: String): QName =
         getPropertyValue(name, XMLConstants.XS_QNAME_QNAME).asInstanceOf[QName]
 
-    def getQName(name: String, defaultValue: QName): QName =
-        Option(getQName(name)) getOrElse defaultValue
+    def getQName(name: String, default: QName): QName =
+        Option(getQName(name)) getOrElse default
 
     def getURI(name: String): URI =
         getPropertyValue(name, XMLConstants.XS_ANYURI_QNAME).asInstanceOf[URI]

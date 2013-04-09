@@ -38,7 +38,6 @@ import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
-import scala.collection.immutable.Seq;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -54,7 +53,7 @@ import java.util.concurrent.Callable;
  *
  * TODO: Refactor handling of serialization to separate classes.
  */
-public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObserver {
+public class XFormsModelSubmission extends XFormsModelSubmissionBase implements XFormsEventTarget, XFormsEventObserver {
 
     public static final String LOGGING_CATEGORY = "submission";
 	public final static Logger logger = LoggerFactory.createLogger(XFormsModelSubmission.class);
@@ -1153,7 +1152,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
         if (targetref == null) {
             // There is no explicit @targetref, so the target is implicitly the root element of either the instance
             // pointed to by @ref, or the instance specified by @instance or @xxf:instance.
-            destinationObject = defaultReplaceInstance.instanceRoot();
+            destinationObject = defaultReplaceInstance.rootElement();
         } else {
             // There is an explicit @targetref, which must be evaluated.
 
@@ -1163,7 +1162,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
             // if it is specified."
             final boolean hasInstanceAttribute = xxfReplaceInstanceId != null || replaceInstanceId != null;
             final Item targetRefContextItem = hasInstanceAttribute
-                    ? defaultReplaceInstance.instanceRoot() : submissionElementContextItem;
+                    ? defaultReplaceInstance.rootElement() : submissionElementContextItem;
 
             // Evaluate destination node
             // "This attribute is evaluated only once a successful submission response has been received and if the replace
@@ -1321,17 +1320,5 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventObse
 
     public boolean allowExternalEvent(String eventName) {
         return ALLOWED_EXTERNAL_EVENTS.contains(eventName);
-    }
-
-    public void addListener(String eventName, EventListener listener) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeListener(String eventName, EventListener listener) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Seq<EventListener> getListeners(String eventName) {
-        return scala.collection.immutable.List.empty();
     }
 }

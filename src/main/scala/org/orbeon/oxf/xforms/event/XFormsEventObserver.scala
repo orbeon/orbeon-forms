@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import scala.collection.Seq
+import Dispatch.EventListener
 
 /**
  * Represents an event observer. Implemented by controls, xf:model, xf:instance, xf:submission.

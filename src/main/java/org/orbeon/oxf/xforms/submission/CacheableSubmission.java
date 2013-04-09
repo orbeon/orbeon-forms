@@ -245,7 +245,7 @@ public class CacheableSubmission extends BaseSubmission {
         }
 
         updatedInstance = submission.containingDocument().getInstanceForNode(destinationNodeInfo);
-        if (updatedInstance == null || !updatedInstance.instanceRoot().isSameNodeInfo(destinationNodeInfo)) {
+        if (updatedInstance == null || !updatedInstance.rootElement().isSameNodeInfo(destinationNodeInfo)) {
             // Only support replacing the root element of an instance
             // TODO: in the future, check on resolvedXXFormsReadonly to implement this restriction only when using a readonly instance
             throw new XFormsSubmissionException(submission, "targetref attribute must point to an instance root element when using cached/shared instance replacement.", "processing targetref attribute",

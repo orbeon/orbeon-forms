@@ -80,17 +80,17 @@
                                     <xh:td>
                                         <xf:output value="title"/>
                                     </xh:td>
-                                    <xh:td>
+                                    <xh:td class="fr-summary">
                                         <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
                                             <xh:a href="/fr/{application-name}/{form-name}/summary">
-                                                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/magnifier.png"/>
+                                                <xh:i class="icon-list"/>
                                             </xh:a>
                                         </xf:group>
                                     </xh:td>
-                                    <xh:td>
+                                    <xh:td class="fr-new">
                                         <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
                                             <xh:a href="/fr/{application-name}/{form-name}/new">
-                                                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/add.png"/>
+                                                <xh:i class="icon-plus"/>
                                             </xh:a>
                                         </xf:group>
                                     </xh:td>

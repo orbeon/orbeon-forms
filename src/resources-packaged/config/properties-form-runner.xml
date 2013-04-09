@@ -65,29 +65,17 @@
     <property as="xs:boolean" name="oxf.fr.detail.new.service.enable.*.*"                       value="false"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.uri.*.*"                          value="/fr/service/custom/my-app/new"/>
     <property as="xs:string"  name="oxf.fr.detail.new.service.passing-request-parameters.*.*"   value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="refresh collapse-all expand-all close clear pdf save workflow-review"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.*.*"                                  value="refresh collapse-all expand-all summary clear pdf save workflow-review"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.*.*"                             value="back workflow-edit pdf"/>
     <property as="xs:string"  name="oxf.fr.detail.captcha.*.*"                                  value=""/> <!-- Empty (no captcha), 'reCAPTCHA', or 'SimpleCaptcha'-->
-    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="false"/>
-    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="clear keep go close-window"/>
-    <property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.barcode.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.pdf.disable-if-invalid.*.*"                   value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.email.*.*"                               value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.pdf.*.*"                                 value="false"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.alfresco.*.*"                            value="false"/>
-    <property as="xs:anyURI"  name="oxf.fr.detail.send.success.uri.*.*"                         value="My-Confirmation-Page"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>
-    <property as="xs:boolean" name="oxf.fr.detail.send.success.prune.*.*"                       value="true"/>
-    <property as="xs:anyURI"  name="oxf.fr.detail.send.error.uri.*.*"                           value=""/>
-    <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                        value="get"/>
     <property as="xs:boolean" name="oxf.fr.detail.view.show-explanation.*.*"                    value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-logo.*.*"                                value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-header.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-top.*.*"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                         value="false"/>
-    <property as="xs:anyURI"  name="oxf.fr.detail.close.uri.*.*"                                value=""/>
 
     <!-- PDF template formatting -->
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
@@ -175,7 +163,7 @@
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.register.form"           value="resource"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.register"                      value="refresh workflow-review"/>
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.register"                 value="refresh workflow-edit workflow-send"/>
-    <property as="xs:string"  name="oxf.fr.detail.send.uri.orbeon.register"                     value="/fr/orbeon/license/view/bc3b89cdb12968bb96a8dd6b69fbf85a"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.uri.orbeon.register"             value="/fr/orbeon/license/view/bc3b89cdb12968bb96a8dd6b69fbf85a"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.register"                    value="false"/>
 
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.license.form"            value="resource"/>
@@ -183,13 +171,39 @@
     <property as="xs:string"  name="oxf.fr.detail.buttons.view.orbeon.license"                  value="home"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.orbeon.license"                     value="false"/>
 
-    <!-- The following shows how you can use the "Submit" button instead of the "Save" button -->
-    <!--<property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.bookshelf"                     value="refresh collapse-all expand-all back clear pdf email submit"/>-->
-    <!--<property as="xs:string"  name="oxf.fr.detail.submit.buttons.orbeon.bookshelf"              value="clear"/>-->
-
-    <!-- Save button validates by default -->
-    <property as="xs:boolean" name="oxf.fr.detail.save.validate.*.*"                            value="true"/>
-
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.*.*"                          value=""/>
+
+
+    <!-- Button processes -->
+    <property as="xs:string"  name="oxf.fr.detail.send.process.home.*.*"                        value='home'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.summary.*.*"                     value='summary'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.close.*.*"                       value='navigate("oxf.fr.detail.close") recover summary'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.save-final.*.*"                  value='validate then save then success-message("save-success") recover error-message("database-error")'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.save-draft.*.*"                  value='save then success-message("save-draft-success") recover error-message("database-error")'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.validate.*.*"                    value='validate'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.workflow-review.*.*"             value='validate then review'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.workflow-edit.*.*"               value='edit'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.email.*.*"                       value='validate then email then success-message("email-success) recover email-error-dialog'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.collapse-all.*.*"                value='collapse-all'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.expand-all.*.*"                  value='expand-all'/>
+
+    <!-- Legacy buttons -->
+    <property as="xs:string"  name="oxf.fr.detail.send.process.save.*.*"                        value='maybe-validate then save then success-message("save-success") recover error-message("database-error")'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.submit.*.*"                      value='validate then save then success-message("save-success") then result-dialog recover error-message("database-error")'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.workflow-send.*.*"               value=''/><!-- By  -->
+
+    <!-- Default send parameters -->
+    <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>
+    <property as="xs:boolean" name="oxf.fr.detail.send.success.prune.*.*"                       value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.replace.*.*"                       value="all"/>
+    <property as="xs:boolean" name="oxf.fr.detail.send.error.prune.*.*"                         value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                        value="get"/>
+
+    <property as="xs:anyURI"  name="oxf.fr.detail.close.uri.*.*"                                value=""/>
+
+    <property as="xs:boolean" name="oxf.fr.detail.submit.content-from-persistence.*.*"          value="false"/>
+    <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="clear keep go close-window"/>
+    <!--<property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>-->
 
 </properties>

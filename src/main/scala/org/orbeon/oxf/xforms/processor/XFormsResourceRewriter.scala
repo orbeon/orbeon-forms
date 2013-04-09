@@ -54,7 +54,7 @@ object XFormsResourceRewriter extends Logging {
     private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Try[T]] = {
         case e: Exception ⇒
             error("could not read resource to aggregate", Seq("resource" → path))
-            new Failure(e)
+            Failure(e)
     }
 
     private def generateCSS(resources: Seq[ResourceConfig], namespaceOpt: Option[String], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {

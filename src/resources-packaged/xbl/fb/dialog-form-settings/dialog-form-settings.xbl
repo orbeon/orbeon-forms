@@ -83,7 +83,7 @@
             <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
                 <!-- Dialog title -->
                 <xf:label value="if ($is-new-form) then ()
-                                 else if ($is-save-as) then $fr-resources/detail/labels/save-as-document
+                                 else if ($is-save-as) then $fr-resources/detail/labels/save-as
                                  else $resources/dialog-form-settings/label"/>
                 <xh:div>
                     <!-- IE warning -->
@@ -210,16 +210,19 @@
 
                     <xh:div class="fr-dialog-buttons">
                         <xf:trigger id="fb-metadata-continue-trigger" appearance="xxf:primary">
-                            <xf:label value="$resources/(if ($is-new-form) then continue else apply)/label"/>
+                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then continue else apply)/label"/>
                         </xf:trigger>
                         <xf:output value="$resources/or/label"/>
                         <xf:trigger appearance="minimal">
-                            <xf:label value="if ($is-new-form) then $fr-resources/detail/labels/close else $resources/cancel/label"/>
+                            <xf:label mediatype="text/html" value="$resources/(if ($is-new-form) then close else cancel)/label"/>
                             <!-- Hide this dialog without saving -->
                             <xxf:hide ev:event="DOMActivate" if="not($is-new-form)" dialog="dialog"/>
-                            <!-- Or perform the close action -->
-                            <!-- USE OF ABSOLUTE ID -->
-                            <xf:dispatch ev:event="DOMActivate" if="$is-new-form" targetid="|fr-navigation-model|" name="fr-close-window"/>
+                            <!-- Or go back to the summary -->
+                            <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
+                                 window.close() in the old home/back button. But it's a bit unclear what's best. -->
+                            <xf:action type="xpath" xmlns:send="java:org.orbeon.oxf.fr.ProcessButton">
+                                send:runProcess('summary')
+                            </xf:action>
                         </xf:trigger>
                     </xh:div>
 

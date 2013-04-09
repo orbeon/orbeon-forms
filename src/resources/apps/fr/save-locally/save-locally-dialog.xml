@@ -36,14 +36,14 @@
                             encode-for-uri(concat(instance('fr-save-locally-file-name'), '.html'))}">
                 <xf:label>
                     <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                    <xf:output value="$fr-resources/detail/labels/save-document"/>
+                    <xf:output value="$fr-resources/detail/buttons/save"/>
                 </xf:label>
             </fr:href-button>
 
             <xf:trigger>
                 <xf:label>
                     <xh:img src="/apps/fr/style/close.gif" alt=""/>
-                    <xf:output value="$fr-resources/detail/labels/cancel"/>
+                    <xf:output value="$fr-resources/detail/buttons/cancel"/>
                 </xf:label>
             </xf:trigger>
         </xf:group>
@@ -63,8 +63,6 @@
         </xf:instance>
 
         <xf:action ev:observer="fr-save-locally-button" ev:event="DOMActivate">
-            <xf:setvalue ref="xxf:instance('fr-persistence-instance')/save-attempted">true</xf:setvalue>
-
             <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources" as="element(resource)?"/>
             <xf:insert ref="instance('fr-uuid')" origin="xxf:call-xpl('oxf:/apps/fr/save-locally/save-generate.xpl',
                     ('form-instance', 'parameters', 'fr-current-resources'), (xxf:instance('fr-form-instance'), $parameters, $fr-resources),

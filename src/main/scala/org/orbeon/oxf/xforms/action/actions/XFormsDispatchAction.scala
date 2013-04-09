@@ -16,11 +16,9 @@ package org.orbeon.oxf.xforms.action.actions
 import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.action.XFormsAction
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
-import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.action.{XFormsAPI, XFormsAction, XFormsActionInterpreter}
+import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch, XFormsEventTarget}
 import org.orbeon.oxf.xforms.event.XFormsEventFactory.createEvent
-import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.saxon.om.Item
 import org.apache.commons.lang3.StringUtils.isNotBlank
@@ -31,8 +29,6 @@ import org.apache.commons.lang3.StringUtils.isNotBlank
 class XFormsDispatchAction extends XFormsAction {
     
     override def execute(actionInterpreter: XFormsActionInterpreter, actionElement: Element, actionScope: Scope, hasOverriddenContext: Boolean, overriddenContext: Item) {
-        
-        val containingDocument = actionInterpreter.containingDocument
         
         // Mandatory attribute
         val newEventNameAttributeValue =
@@ -65,33 +61,66 @@ class XFormsDispatchAction extends XFormsAction {
         val resolvedDelay =
             (Option(actionInterpreter.resolveAVT(actionElement, "delay")) filter isNotBlank getOrElse "0").toInt
 
-        if (resolvedDelay <= 0) {
+        // Whether to tell the client to show a progress indicator when sending this event
+        val showProgress =
+            actionInterpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != "false"
+
+        val progressMessage =
+            if (showProgress) actionInterpreter.resolveAVT(actionElement, XXFORMS_PROGRESS_MESSAGE_QNAME) else null
+
+        // Find actual target
+        actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
+            case xformsEventTarget: XFormsEventTarget ⇒
+                // Execute the dispatch proper
+                XFormsDispatchAction.dispatch(
+                    resolvedNewEventName,
+                    xformsEventTarget,
+                    newEventBubbles,
+                    newEventCancelable,
+                    XFormsAction.eventProperties(actionInterpreter, actionElement),
+                    resolvedDelay,
+                    showProgress,
+                    progressMessage
+                )
+            case _ ⇒
+                // "If there is a null search result for the target object and the source object is an XForms action such as
+                // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
+                val indentedLogger = actionInterpreter.indentedLogger
+                if (indentedLogger.isDebugEnabled)
+                    indentedLogger.logWarning("xf:dispatch", "cannot find target, ignoring action", "target id", resolvedNewEventTargetStaticId)
+        }
+    }
+}
+
+object XFormsDispatchAction {
+
+    def dispatch(
+            name: String,
+            target: XFormsEventTarget,
+            bubbles: Boolean = true,
+            cancelable: Boolean = true,
+            properties: XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter,
+            delay: Int = 0,
+            showProgress: Boolean = true,
+            progressMessage: String = null): Unit = {
+
+        if (delay <= 0) {
             // Event is dispatched immediately
 
             // "10.8 The dispatch Element [...] If the delay is not specified or if the given value does not conform
             // to xsd:nonNegativeInteger, then the event is dispatched immediately as the result of the dispatch
             // action."
 
-            // Find actual target
-            actionInterpreter.resolveObject(actionElement, resolvedNewEventTargetStaticId) match {
-                case xformsEventTarget: XFormsEventTarget ⇒
-                    // Create and dispatch the event including custom properties (AKA context information)
-                    val newEvent = createEvent(
-                        resolvedNewEventName,
-                        xformsEventTarget,
-                        eventProperties(actionInterpreter, actionElement),
-                        allowCustomEvents = true,
-                        bubbles = newEventBubbles,
-                        cancelable = newEventCancelable)
+            // Create and dispatch the event including custom properties (AKA context information)
+            val newEvent = createEvent(
+                name,
+                target,
+                properties,
+                allowCustomEvents = true,
+                bubbles,
+                cancelable)
 
-                    Dispatch.dispatchEvent(newEvent)
-                case _ ⇒
-                    // "If there is a null search result for the target object and the source object is an XForms action such as
-                    // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-                    val indentedLogger = actionInterpreter.indentedLogger
-                    if (indentedLogger.isDebugEnabled)
-                        indentedLogger.logWarning("xf:dispatch", "cannot find target, ignoring action", "target id", resolvedNewEventTargetStaticId)
-            }
+            Dispatch.dispatchEvent(newEvent)
         } else {
             // Event is dispatched after a delay
 
@@ -102,19 +131,12 @@ class XFormsDispatchAction extends XFormsAction {
             // contain more than one event with the same name and target IDREF. It is the name and the target run-time
             // element that must be unique."
 
-            // Whether to tell the client to show a progress indicator when sending this event
-            val showProgress =
-                actionInterpreter.resolveAVT(actionElement, XXFORMS_SHOW_PROGRESS_QNAME) != "false"
-
-            val progressMessage =
-                if (showProgress) actionInterpreter.resolveAVT(actionElement, XXFORMS_PROGRESS_MESSAGE_QNAME) else null
-
-            containingDocument.addDelayedEvent(
-                resolvedNewEventName,
-                resolvedNewEventTargetStaticId,
-                newEventBubbles,
-                newEventCancelable,
-                resolvedDelay,
+            XFormsAPI.containingDocument.addDelayedEvent(
+                name,
+                target.getId,
+                bubbles,
+                cancelable,
+                delay,
                 false,
                 showProgress,
                 progressMessage)

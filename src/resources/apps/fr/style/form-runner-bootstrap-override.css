@@ -203,6 +203,9 @@ body.orbeon {
   -moz-border-radius: 4px;
   border-radius: 4px;
 }
+.orbeon .xforms-trigger-appearance-xxforms-primary i {
+  background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings-white.png);
+}
 .orbeon .nav > li > span > a {
   display: block;
 }

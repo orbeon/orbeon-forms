@@ -133,7 +133,11 @@ class XFormsInstance(
     // Return the model that contains this instance
     def model = parent
 
-    def instanceRoot = DataModel.firstChildElement(_documentInfo)
+    // The instance root node
+    def root = _documentInfo
+
+    // The instance root element as with the instance() function
+    def rootElement = DataModel.firstChildElement(_documentInfo)
 
     def getId = instance.staticId
     def getPrefixedId = XFormsUtils.getPrefixedId(getEffectiveId)
@@ -253,7 +257,7 @@ class XFormsInstance(
         debug(message, Seq(
             "model effective id"    → parent.getEffectiveId,
             "instance effective id" → getEffectiveId,
-            "instance"              → TransformerUtils.tinyTreeToString(instanceRoot)
+            "instance"              → TransformerUtils.tinyTreeToString(rootElement)
         ))
     }
 
@@ -302,7 +306,7 @@ class XFormsInstance(
     // This includes marking the structural change as well as dispatching events
     def replace(newDocumentInfo: DocumentInfo, dispatch: Boolean = true, instanceCaching: Option[InstanceCaching] = instanceCaching, isReadonly: Boolean = readonly): Unit = {
 
-        val formerRoot = instanceRoot
+        val formerRoot = rootElement
 
         // Update the instance (this also marks it as modified)
         update(
@@ -313,7 +317,7 @@ class XFormsInstance(
         // Call this directly, since we are not using insert/delete here
         model.markStructuralChange(this)
 
-        val currentRoot = instanceRoot
+        val currentRoot = rootElement
 
         if (dispatch) {
             // Dispatch xxforms-replace event

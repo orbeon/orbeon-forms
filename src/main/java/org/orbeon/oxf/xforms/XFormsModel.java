@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.analysis.model.Submission;
 import org.orbeon.oxf.xforms.control.Controls;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.EventListener;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.model.DataModel;
 import org.orbeon.oxf.xforms.model.XFormsModelAction;
@@ -44,7 +43,6 @@ import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.trans.XPathException;
 import org.orbeon.saxon.value.Value;
 import scala.Option;
-import scala.collection.Seq;
 
 import java.net.URL;
 import java.util.*;
@@ -52,7 +50,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFormsObjectResolver {
+public class XFormsModel extends XFormsModelBase implements XFormsEventObserver, XFormsObjectResolver {
 
     public static final String LOGGING_CATEGORY = "model";
     public static final Logger logger = LoggerFactory.createLogger(XFormsModel.class);
@@ -799,7 +797,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
                     // The reason is that clearing this state can take quite some time
                     final boolean instanceMightBeSchemaValidated = hasSchema && instance.isSchemaValidation();
                     if (instanceMightBeSchemaValidated) {
-                        DataModel.visitElementJava(instance.instanceRoot(), new DataModel.NodeVisitor() {
+                        DataModel.visitElementJava(instance.rootElement(), new DataModel.NodeVisitor() {
                             public void visit(NodeInfo nodeInfo) {
                                 InstanceData.clearSchemaState(nodeInfo);
                             }
@@ -985,17 +983,5 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventObserver, XFor
     // Don't allow any external events
     public boolean allowExternalEvent(String eventName) {
         return false;
-    }
-
-    public void addListener(String eventName, EventListener listener) {
-        throw new UnsupportedOperationException();
-    }
-
-    public void removeListener(String eventName, EventListener listener) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Seq<EventListener> getListeners(String eventName) {
-        return scala.collection.immutable.List.empty();
     }
 }

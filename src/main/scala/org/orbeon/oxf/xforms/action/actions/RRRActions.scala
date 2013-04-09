@@ -20,12 +20,17 @@ import org.orbeon.oxf.xforms.event.{XFormsEvent, Dispatch}
 import org.orbeon.oxf.xforms.event.events.{XFormsRevalidateEvent, XFormsRecalculateEvent, XFormsRebuildEvent}
 import org.dom4j.QName
 
-class XFormsRebuildAction extends RRRAction {
+trait RRRFunctions {
+    def setFlag(model: XFormsModel, applyDefaults: Boolean)
+    def createEvent(model: XFormsModel, applyDefaults: Boolean): XFormsEvent
+}
+
+trait XFormsRebuildFunctions extends RRRFunctions {
     def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.getDeferredActionContext.rebuild = true
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRebuildEvent(model)
 }
 
-class XFormsRecalculateAction extends RRRAction {
+trait XFormsRecalculateFunctions extends RRRFunctions {
     def setFlag(model: XFormsModel, applyDefaults: Boolean) = {
         model.getDeferredActionContext.recalculate = true
         if (applyDefaults)
@@ -34,13 +39,18 @@ class XFormsRecalculateAction extends RRRAction {
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRecalculateEvent(model, applyDefaults)
 }
 
-class XFormsRevalidateAction extends RRRAction {
+trait XFormsRevalidateFunctions extends RRRFunctions {
     def setFlag(model: XFormsModel, applyDefaults: Boolean)     = model.getDeferredActionContext.revalidate = true
     def createEvent(model: XFormsModel, applyDefaults: Boolean) = new XFormsRevalidateEvent(model)
 }
 
+// Concrete action classes
+class XFormsRebuildAction     extends RRRAction with XFormsRebuildFunctions
+class XFormsRecalculateAction extends RRRAction with XFormsRecalculateFunctions
+class XFormsRevalidateAction  extends RRRAction with XFormsRevalidateFunctions
+
 // Common functionality
-trait RRRAction extends XFormsAction {
+trait RRRAction extends XFormsAction with RRRFunctions {
 
     override def execute(context: DynamicActionContext): Unit = {
 
@@ -53,16 +63,33 @@ trait RRRAction extends XFormsAction {
         val deferred      = resolve(XXFORMS_DEFERRED_QNAME)
         val applyDefaults = resolve(XXFORMS_DEFAULTS_QNAME)
 
+        RRRAction.execute(this, model, deferred, applyDefaults)
+    }
+}
+
+object RRRAction{
+
+    private def execute(functions: RRRFunctions, model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false): Unit = {
         // Set the flag in any case
-        setFlag(model, deferred)
+        functions.setFlag(model, deferred)
 
         // Perform the action immediately if needed
         // NOTE: XForms 1.1 and 2.0 say that no event should be dispatched in this case. It's a bit unclear what the
         // purpose of these events is anyway.
         if (! deferred)
-            Dispatch.dispatchEvent(createEvent(model, applyDefaults))
+            Dispatch.dispatchEvent(functions.createEvent(model, applyDefaults))
     }
 
-    def setFlag(model: XFormsModel, applyDefaults: Boolean)
-    def createEvent(model: XFormsModel, applyDefaults: Boolean): XFormsEvent
+    private object ConcreteRebuildFunctions     extends XFormsRebuildFunctions
+    private object ConcreteRecalculateFunctions extends XFormsRecalculateFunctions
+    private object ConcreteRevalidateFunctions  extends XFormsRevalidateFunctions
+
+    def rebuild(model: XFormsModel, deferred: Boolean = false) =
+        execute(ConcreteRebuildFunctions, model, deferred, applyDefaults = false)
+
+    def revalidate(model: XFormsModel, deferred: Boolean = false) =
+        execute(ConcreteRevalidateFunctions, model, deferred, applyDefaults = false)
+
+    def recalculate(model: XFormsModel, deferred: Boolean = false, applyDefaults: Boolean = false) =
+        execute(ConcreteRecalculateFunctions, model, deferred, applyDefaults)
 }

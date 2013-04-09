@@ -40,6 +40,15 @@
             </formats>
         </print>
         <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Review</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Delete</delete>
+                <import>&lt;i class="icon-upload"/&gt; Import</import>
+                <new>&lt;i class="icon-plus"/&gt; New</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Edit</edit><!-- unused as of 2013-04-05 -->
+            </buttons>
             <titles>
                 <summary-title>Summary</summary-title>
                 <row-number>No.</row-number>
@@ -55,7 +64,7 @@
             </titles>
             <search>
                 <search>Search</search>
-                <search-forms>Search forms</search-forms>
+                <search-forms>&lt;i class="icon-search"/&gt; Search forms</search-forms>
                 <show-options>Show search options</show-options>
                 <close-options>Close search options</close-options>
                 <returned-1>Search returned</returned-1>
@@ -70,13 +79,6 @@
                 <delete-confirmation>Are you sure you want to delete one or more forms?</delete-confirmation>
             </messages>
             <labels>
-                <new-form>New</new-form>
-                <import-forms>Import</import-forms>
-                <edit-form>Edit</edit-form>
-                <delete-form>Delete</delete-form>
-                <view-readonly>View HTML</view-readonly>
-                <view-xml>View XML</view-xml>
-                <view-pdf>View PDF</view-pdf>
                 <language-choice>Choose language</language-choice>
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
@@ -98,11 +100,42 @@
             </formats>
         </summary>
         <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Save</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Save</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
+                <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Edit</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <summary>&lt;i class="icon-list"/&gt; Summary</summary>
+                <close>&lt;i class="icon-remove"/&gt; Close</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Clear</clear>
+                <cancel>Cancel</cancel>
+                <save-locally>Save Locally</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Clear and close</submit-dialog-clear>
+                <submit-dialog-keep>Keep values and close</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Close window</submit-dialog-close-window>
+            </buttons>
             <messages>
                 <save-success>Document saved successfully!</save-success>
+                <save-draft-success>Draft saved successfully!</save-draft-success>
+                <email-success>Email sent successfully!</email-success>
                 <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
                 <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
                 <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
+                <process-error>There was an error running the process. Please contact the application administrator.</process-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
                 <error-dialog-title>Unable to complete action</error-dialog-title>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
@@ -112,44 +145,14 @@
                 <buttons-placeholder>Your form's buttons will be placed here</buttons-placeholder>
             </messages>
             <labels>
-                <save-document>Save</save-document>
-                <save-as-document>Save as…</save-as-document>
-                <publish>Publish…</publish>
-                <test>Test</test>
-                <save-locally>Save Locally</save-locally>
-                <save-offline>Save Offline</save-offline>
-                <submit-document>Submit</submit-document>
-                <workflow-review>Review</workflow-review>
-                <workflow-edit>Edit</workflow-edit>
-                <workflow-send>Send</workflow-send>
-                <return>Back to Forms</return>
-                <discard>Forget Changes</discard>
                 <language-choice>Language</language-choice>
                 <errors>Summary of errors</errors>
                 <check-errors-in-form>This form contains errors</check-errors-in-form>
                 <error-details>View error details</error-details>
                 <language-choice>Language</language-choice>
-                <close>Close</close>
-                <home>Home</home>
-                <review>Review</review>
-                <print>Print</print>
-                <print-pdf>PDF</print-pdf>
-                <print-pdf-template>PDF (Template)</print-pdf-template>
-                <clear>Clear</clear>
                 <confirm>Confirm</confirm>
-                <cancel>Cancel</cancel>
-                <offline>Take offline</offline>
-                <online>Take online</online>
                 <alert>Missing or incorrect value</alert>
-                <email>Email</email>
-                <submit-dialog-clear>Clear and close</submit-dialog-clear>
-                <submit-dialog-keep>Keep values and close</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Close window</submit-dialog-close-window>
-                <collapse-all>Collapse all</collapse-all>
-                <expand-all>Expand all</expand-all>
-                <show-content>Show Content</show-content>
-                <hide-content>Hide Content</hide-content>
+
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>The value you entered didn't match the image, please try again</captcha-alert>
             </labels>
@@ -210,6 +213,15 @@
             </formats>
         </print>
         <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Accueil</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Supprimer</delete>
+                <import>Importer</import>
+                <new>Nouveau</new>
+                <edit>Editer</edit>
+            </buttons>
             <titles>
                 <summary-title>Sommaire</summary-title>
                 <row-number>No.</row-number>
@@ -240,13 +252,6 @@
                 <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires ?</delete-confirmation>
             </messages>
             <labels>
-                <new-form>Nouveau</new-form>
-                <import-forms>Importer</import-forms>
-                <edit-form>Editer</edit-form>
-                <delete-form>Supprimer</delete-form>
-                <view-readonly>Vue HTML</view-readonly>
-                <view-xml>Vue XML</view-xml>
-                <view-pdf>Vue PDF</view-pdf>
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
@@ -268,11 +273,42 @@
             </formats>
         </summary>
         <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
+                <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Accueil</home>
+                <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
+                <close>&lt;i class="icon-remove"/&gt; Fermer</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Effacer</clear>
+                <cancel>Annuler</cancel>
+                <save-locally>Enreg. Local</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
+                <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
+            </buttons>
             <messages>
                 <save-success>Document enregistré avec succès!</save-success>
+                <save-draft-success>Document en cours enregistré avec succès!</save-draft-success>
+                <email-success>Email envoyé avec succès!</email-success>
                 <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer la sauvegarde après les avoir corrigées.</form-validation-error>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
-                <database-error>Une erreur s'est produite en contactant la base de données. Veuillez contacter votre l'administrateur de l'application.</database-error>
+                <database-error>Une erreur s'est produite en contactant la base de données. Veuillez contacter votre l'administrateur système.</database-error>
+                <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre l'administrateur système.</process-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
                 <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
@@ -283,44 +319,14 @@
                 <buttons-placeholder>Les boutons de votre formulaire seront placés ici</buttons-placeholder>
             </messages>
             <labels>
-                <save-document>Enregistrer</save-document>
-                <save-as-document>Enregistrer sous…</save-as-document>
-                <publish>Publier…</publish>
-                <test>Tester</test>
-                <save-locally>Enreg. Local</save-locally>
-                <save-offline>Enreg. Hors-ligne</save-offline>
-                <submit-document>Envoyer</submit-document>
-                <workflow-review>Valider</workflow-review>
-                <workflow-send>Envoyer</workflow-send>
-                <workflow-edit>Editer</workflow-edit>
-                <return>Retour</return>
-                <discard>Ignorer Changements</discard>
                 <language-choice>Langue</language-choice>
                 <errors>Résumé des erreurs</errors>
                 <check-errors-in-form>Ce formulaire contient des erreurs</check-errors-in-form>
                 <error-details>Détail des erreurs</error-details>
                 <language-choice>Langue</language-choice>
-                <close>Fermer</close>
-                <home>Accueil</home>
-                <review>Visualiser</review>
-                <print>Imprimer</print>
-                <print-pdf>PDF</print-pdf>
-                <print-pdf-template>PDF (Template)</print-pdf-template>
-                <clear>Effacer</clear>
                 <confirm>Confirmer</confirm>
-                <cancel>Annuler</cancel>
-                <offline>Or-ligne</offline>
-                <online>En-ligne</online>
                 <alert>Valeur manquante ou incorrecte</alert>
-                <email>Email</email>
-                <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
-                <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
-                <collapse-all>Fermer sections</collapse-all>
-                <expand-all>Ouvrir sections</expand-all>
-                <show-content>Montrer contenu</show-content>
-                <hide-content>Cacher contenu</hide-content>
+
                 <captcha-label>Captcha</captcha-label>
                 <captcha-alert>La valeur entrée ne correspond pas à l'image</captcha-alert>
             </labels>
@@ -382,6 +388,15 @@
             </formats>
         </print>
         <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; [Home]</home>
+                <review>&lt;i class="icon-eye-open"/&gt; [Review]</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete><!-- Formulario -->
+                <import>Importar</import>
+                <new>Nuevo</new><!-- Formulario -->
+                <edit>Editar</edit><!-- Formulario -->
+            </buttons>
             <titles>
                 <summary-title>Síntesis</summary-title>
                 <row-number>Número</row-number>
@@ -412,13 +427,6 @@
                 <delete-confirmation>[Are you sure you want to delete one or more forms?]</delete-confirmation>
             </messages>
             <labels>
-                <new-form>Nuevo</new-form><!-- Formulario -->
-                <import-forms>Importar</import-forms>
-                <edit-form>Editar</edit-form><!-- Formulario -->
-                <delete-form>Eliminar</delete-form><!-- Formulario -->
-                <view-readonly>Ver HTML</view-readonly>
-                <view-xml>Ver XML</view-xml>
-                <view-pdf>Ver PDF</view-pdf>
                 <language-choice>Elegir idioma</language-choice>
                 <form-choice>Eligir un Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
@@ -440,11 +448,42 @@
             </formats>
         </summary>
         <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
+                <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; [Review]</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; [Edit]</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; [Send]</workflow-send>
+                <email>&lt;i class="icon-envelope"/&gt; Correo Electrónico</email>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; [Home]</home>
+                <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+                <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Borrar</clear>
+                <cancel>Cancelar</cancel>
+                <save-locally>Guardar en su computador</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Borrar y cerrar</submit-dialog-clear>
+                <submit-dialog-keep>Mantener los datos y cerrar</submit-dialog-keep>
+                <submit-dialog-go>Aceptar</submit-dialog-go>
+                <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
+            </buttons>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
+                <save-draft-success>[Draft saved successfully!]</save-draft-success>
+                <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>Documento no guardado. Por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
                 <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <database-error>Documento no guardado. Por favor, contacte al administrador del sistema.</database-error>
+                <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Su formulario ha sido enviado</submit-dialog-title>
@@ -454,44 +493,18 @@
                 <buttons-placeholder>Botones del formulario será colocado aquí</buttons-placeholder>
             </messages>
             <labels>
-                <save-document>Guardar Documento</save-document>
-                <save-as-document>[Save as…]</save-as-document>
+                <!-- FIXME: This is Form Builder-specific -->
+                <save-as>[Save as…]</save-as>
                 <publish>Publicar...</publish>
-                <test>Probar</test>
-                <save-locally>Guardar en su computador</save-locally>
-                <save-offline>Guardar Sin conexión</save-offline>
-                <submit-document>Enviar</submit-document>
-                <workflow-review>[Review]</workflow-review>
-                <workflow-edit>[Edit]</workflow-edit>
-                <workflow-send>[Send]</workflow-send>
-                <return>Volver al formulario</return>
-                <discard>No guardar los cambios</discard>
+
                 <language-choice>Idioma</language-choice>
                 <errors>Resumen de errores</errors>
                 <check-errors-in-form>Este formulario contiene errores</check-errors-in-form>
                 <error-details>Ver detalles de error</error-details>
                 <language-choice>Idioma</language-choice>
-                <close>Cerrar</close>
-                <home>[Home]</home>
-                <review>[Review]</review>
-                <print>Imprimir</print>
-                <print-pdf>PDF</print-pdf>
-                <print-pdf-template>Modelo PDF</print-pdf-template>
-                <clear>Borrar</clear>
                 <confirm>Confirmar</confirm>
-                <cancel>Cancelar</cancel>
-                <offline>Sin conexión</offline>
-                <online>En línea</online>
                 <alert>Valor no especificado o incorrecto</alert>
-                <email>Correo Electrónico</email>
-                <submit-dialog-clear>Borrar y cerrar</submit-dialog-clear>
-                <submit-dialog-keep>Mantener los datos y cerrar</submit-dialog-keep>
-                <submit-dialog-go>Aceptar</submit-dialog-go>
-                <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
-                <collapse-all>Cerrar Secciones</collapse-all>
-                <expand-all>Abrir Secciones</expand-all>
-                <show-content>[Show Content]</show-content>
-                <hide-content>[Hide Content]</hide-content>
+
                 <captcha-label>[Captcha]</captcha-label>
                 <captcha-alert>[The value you entered didn't match the image, please try again]</captcha-alert>
             </labels>
@@ -551,6 +564,15 @@
             </formats>
         </print>
         <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Hjem</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Slett</delete>
+                <import>Importer</import>
+                <new>Nytt skjema</new>
+                <edit>Rediger</edit>
+            </buttons>
             <titles>
                 <summary-title>Oppsummering</summary-title>
                 <row-number>Nr.</row-number>
@@ -581,13 +603,6 @@
                 <delete-confirmation>Vil du slette markerte skjema?</delete-confirmation>
             </messages>
             <labels>
-                <new-form>Nytt skjema</new-form>
-                <import-forms>Importer</import-forms>
-                <edit-form>Rediger</edit-form>
-                <delete-form>Slett</delete-form>
-                <view-readonly>Vis HTML</view-readonly>
-                <view-xml>Vis XML</view-xml>
-                <view-pdf>Vis PDF</view-pdf>
                 <language-choice>Velg språk</language-choice>
                 <form-choice>Velg et skjema</form-choice>
                 <free-search>Fritekstsøk</free-search>
@@ -609,11 +624,42 @@
             </formats>
         </summary>
         <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Lagre</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
+                <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Vis</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
+                <email>&lt;i class="icon-envelope"/&gt; Epost</email>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Hjem</home>
+                <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+                <close>&lt;i class="icon-remove"/&gt; Lukk</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Tøm innhold</clear>
+                <cancel>Angre</cancel>
+                <save-locally>Lagre lokalt</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
+                <submit-dialog-keep>Behold innhold og lukk</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
+            </buttons>
             <messages>
                 <save-success>Skjemaet er lagret!</save-success>
+                <save-draft-success>[Draft saved successfully!]</save-draft-success>
+                <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
                 <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
+                <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
@@ -623,49 +669,14 @@
                 <buttons-placeholder>Knappene i skjemaet vil bli vist her</buttons-placeholder>
             </messages>
             <labels>
-                <save-document>Lagre</save-document>
-                <save-as-document>[Save as…]</save-as-document>
-                <publish>Publiser...</publish>
-                <test>Test</test>
-                <save-locally>Lagre lokalt</save-locally>
-                <save-offline>Lagre offline</save-offline>
-                <submit-document>Send inn</submit-document>
-                <workflow-review>Vis</workflow-review>
-                <workflow-edit>Rediger</workflow-edit>
-                <workflow-send>Send</workflow-send>
-                <return>Tilbake til skjema</return>
-                <discard>Forkast endringer</discard>
                 <language-choice>Språk</language-choice>
                 <errors>Oppsummering av feil</errors>
                 <check-errors-in-form>Skjemaet inneholder feil</check-errors-in-form>
                 <error-details>Vis feilmeldingsdetaljer</error-details>
                 <language-choice>Språk</language-choice>
-                <close>Lukk</close>
-                <!--<cancel-link>Avbryt</cancel-link>-->
-                <!--<callme-link>Ring meg</callme-link>-->
-                <!--<leave-form>Forlat</leave-form>-->
-                <!--<go-back-to-form>Gå tilbake til skjemaet</go-back-to-form>-->
-                <home>Hjem</home>
-                <review>Vis</review>
-                <print>Skriv ut</print>
-                <print-pdf>PDF</print-pdf>
-                <print-pdf-template>PDF (Template)</print-pdf-template>
-                <clear>Tøm innhold</clear>
                 <confirm>Bekreft</confirm>
-                <cancel>Angre</cancel>
-                <offline>Gå offline</offline>
-                <online>Gå online</online>
                 <alert>Manglende eller ugyldig svar</alert>
-                <email>Epost</email>
-                <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
-                <submit-dialog-keep>Behold innhold og lukk</submit-dialog-keep>
-                <submit-dialog-go>OK</submit-dialog-go>
-                <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
-                <collapse-all>Lukk alle seksjoner</collapse-all>
-                <expand-all>Åpne alle seksjoner</expand-all>
-                <show-content>Vis innhold</show-content>
-                <hide-content>Skjul innhold</hide-content>
-                <!--<select>Velg</select>-->
+
                 <captcha-label>[Captcha]</captcha-label>
                 <captcha-alert>[The value you entered didn't match the image, please try again]</captcha-alert>
             </labels>
@@ -722,6 +733,15 @@
             </formats>
         </print>
         <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; На главную</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Удалить</delete>
+                <import>Импорт</import>
+                <new>Новая</new>
+                <edit>Редактировать</edit>
+            </buttons>
             <titles>
                 <summary-title>Общая информация</summary-title>
                 <row-number>№.</row-number>
@@ -752,13 +772,6 @@
                 <delete-confirmation>Вы уверены, что хотите удалить формы?</delete-confirmation>
             </messages>
             <labels>
-                <new-form>Новая</new-form>
-                <import-forms>Импорт</import-forms>
-                <edit-form>Редактировать</edit-form>
-                <delete-form>Удалить</delete-form>
-                <view-readonly>Просмотр HTML</view-readonly>
-                <view-xml>Просмотр XML</view-xml>
-                <view-pdf>Просмотр PDF</view-pdf>
                 <language-choice>Выберите язык</language-choice>
                 <form-choice>Выберите форму</form-choice>
                 <free-search>Поиск</free-search>
@@ -780,11 +793,42 @@
             </formats>
         </summary>
         <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Сохранить</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
+                <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Править</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Отправить</workflow-send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; На главную</home>
+                <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+                <close>&lt;i class="icon-remove"/&gt; Закрыть</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Очистить</clear>
+                <cancel>Отменить</cancel>
+                <save-locally>Сохр.на диск</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
+                <submit-dialog-keep>Сохранить значения и закрыть</submit-dialog-keep>
+                <submit-dialog-go>Ок</submit-dialog-go>
+                <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
+            </buttons>
             <messages>
                 <save-success>Документ сохранен успешно!</save-success>
+                <save-draft-success>[Draft saved successfully!]</save-draft-success>
+                <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
                 <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
+                <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
@@ -794,44 +838,14 @@
                 <buttons-placeholder>Здесь будут размещены кнопки</buttons-placeholder>
             </messages>
             <labels>
-                <save-document>Сохранить</save-document>
-                <save-as-document>Сохр.копию</save-as-document>
-                <publish>Публиковать</publish>
-                <test>Тестировать</test>
-                <save-locally>Сохр.на диск</save-locally>
-                <save-offline>Сохр.офлайн</save-offline>
-                <submit-document>Отправить</submit-document>
-                <workflow-review>Просмотреть</workflow-review>
-                <workflow-edit>Править</workflow-edit>
-                <workflow-send>Отправить</workflow-send>
-                <return>К списку форм</return>
-                <discard>Отменить изменения</discard>
                 <language-choice>Язык</language-choice>
                 <errors>Ошибки</errors>
                 <check-errors-in-form>В форме есть ошибки</check-errors-in-form>
                 <error-details>Подробности об ошибках</error-details>
                 <language-choice>Язык</language-choice>
-                <close>Закрыть</close>
-                <home>На главную</home>
-                <review>Проверить</review>
-                <print>Печать</print>
-                <print-pdf>PDF</print-pdf>
-                <print-pdf-template>PDF (шаблон)</print-pdf-template>
-                <clear>Очистить</clear>
                 <confirm>Подтвердить</confirm>
-                <cancel>Отменить</cancel>
-                <offline>Офлайн</offline>
-                <online>Онлайн</online>
                 <alert>Значение неверное или отсутствует</alert>
-                <email>Email</email>
-                <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>
-                <submit-dialog-keep>Сохранить значения и закрыть</submit-dialog-keep>
-                <submit-dialog-go>Ок</submit-dialog-go>
-                <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
-                <collapse-all>Свернуть все</collapse-all>
-                <expand-all>Развернуть все</expand-all>
-                <show-content>Показать</show-content>
-                <hide-content>Скрыть</hide-content>
+
                 <captcha-label>Защита от спама</captcha-label>
                 <captcha-alert>Введенное значение не совпадает с картинкой. Попробуйте еще раз.</captcha-alert>
             </labels>

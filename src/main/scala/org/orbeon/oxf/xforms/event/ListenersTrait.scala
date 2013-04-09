@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 import collection.mutable.{Map, HashMap}
+import Dispatch.EventListener
 
 // Support for adding/removing/getting event listeners.
 trait ListenersTrait {

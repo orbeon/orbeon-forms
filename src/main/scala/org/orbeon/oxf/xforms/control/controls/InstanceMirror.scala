@@ -29,7 +29,8 @@ import java.lang.IllegalStateException
 import org.dom4j._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.oxf.xforms.event.{EventListener ⇒ JEventListener, Dispatch, XFormsEvent, ListenersTrait}
+import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent, ListenersTrait}
+import Dispatch.EventListener
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -47,20 +48,20 @@ object InstanceMirror {
     // (sourceInstance, sourceNode, into) ⇒ Option[(destinationInstance, destinationNode)]
     type NodeMatcher = (XFormsInstance, NodeInfo, Boolean) ⇒ Option[(XFormsInstance, NodeInfo)]
 
-    def addListener(observer: ListenersTrait, listener: JEventListener): Unit =
+    def addListener(observer: ListenersTrait, listener: EventListener): Unit =
         for (eventName ← MutationEvents)
             observer.addListener(eventName, listener)
 
-    def removeListener(observer: ListenersTrait, listener: JEventListener): Unit =
+    def removeListener(observer: ListenersTrait, listener: EventListener): Unit =
         for (eventName ← MutationEvents)
             observer.removeListener(eventName, listener)
 
     // Type of an event listener
-    type EventListener = XFormsEvent ⇒ Boolean
+    type MirrorEventListener = XFormsEvent ⇒ Boolean
 
-    // Implicitly convert an EventListener to a Java EventListener
-    implicit def toJEventListener(f: EventListener) = new JEventListener {
-        def handleEvent(event: XFormsEvent) { f(event) }
+    // Implicitly convert a MirrorEventListener to a plain EventListener
+    def toEventListener(f: MirrorEventListener) = new EventListener {
+        def apply(event: XFormsEvent) = f(event)
     }
 
     case class InstanceDetails(id: String, root: VirtualNode, namespaces: NamespaceMapping)
@@ -222,7 +223,7 @@ object InstanceMirror {
     // Listener that mirrors changes from one document to the other
     def mirrorListener(
             containingDocument: XFormsContainingDocument,
-            findMatchingNode: NodeMatcher)(implicit logger: IndentedLogger): EventListener = {
+            findMatchingNode: NodeMatcher)(implicit logger: IndentedLogger): MirrorEventListener = {
 
         event ⇒
 

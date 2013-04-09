@@ -31,7 +31,7 @@ object DataModel {
 
     // Whether the current form has a custom instance
     def isCustomInstance = {
-        val metadataInstance = model("fr-form-model").get.getVariable("is-custom-instance")
+        val metadataInstance = topLevelModel("fr-form-model").get.getVariable("is-custom-instance")
         (metadataInstance ne null) && effectiveBooleanValue(metadataInstance)
     }
     

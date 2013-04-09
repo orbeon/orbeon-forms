@@ -235,6 +235,15 @@
         <delete>
             <label>Delete</label>
         </delete>
+        <test>
+            <label>&lt;i class="icon-cog"/&gt; Test</label>
+        </test>
+        <publish>
+            <label>&lt;i class="icon-globe"/&gt; Publish</label>
+        </publish>
+        <save-as>
+            <label>Save as…</label>
+        </save-as>
         <or>
             <label>or</label>
         </or>
@@ -1067,6 +1076,15 @@
         <delete>
             <label>Supprimer</label>
         </delete>
+        <test>
+            <label>&lt;i class="icon-cog"/&gt; Tester</label>
+        </test>
+        <publish>
+            <label>&lt;i class="icon-globe"/&gt; Publier</label>
+        </publish>
+        <save-as>
+            <label>Enregistrer sous…</label>
+        </save-as>
         <or>
             <label>ou</label>
         </or>
@@ -1896,6 +1914,15 @@
         <delete>
             <label>Slett</label>
         </delete>
+        <test>
+            <label>&lt;i class="icon-cog"/&gt; Test</label>
+        </test>
+        <publish>
+            <label>&lt;i class="icon-globe"/&gt; Publiser…</label>
+        </publish>
+        <save-as>
+            <label>[Save as…]</label>
+        </save-as>
         <or>
             <label>eller</label>
         </or>
@@ -2724,6 +2751,15 @@
         <delete>
             <label>Удалить</label>
         </delete>
+        <test>
+            <label>&lt;i class="icon-cog"/&gt; Тестировать</label>
+        </test>
+        <publish>
+            <label>&lt;i class="icon-globe"/&gt; Публиковать</label>
+        </publish>
+        <save-as>
+            <label>Сохр.копию</label>
+        </save-as>
         <or>
             <label>или</label>
         </or>

@@ -133,7 +133,7 @@ public class InstanceReplacer extends BaseReplacer {
             }
 
             // Whether the destination node is the root element of an instance
-            final boolean isDestinationRootElement = instanceToUpdate.instanceRoot().isSameNodeInfo(destinationNodeInfo);
+            final boolean isDestinationRootElement = instanceToUpdate.rootElement().isSameNodeInfo(destinationNodeInfo);
             if (p2.isReadonly && !isDestinationRootElement) {
                 // Only support replacing the root element of an instance when using a shared instance
                 throw new XFormsSubmissionException(submission, "targetref attribute must point to instance root element when using read-only instance replacement.", "processing targetref attribute",

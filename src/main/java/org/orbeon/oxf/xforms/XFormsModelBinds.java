@@ -129,7 +129,7 @@ public class XFormsModelBinds {
                         dependencies.hasAnyValidationBind(staticModel, instance.getPrefixedId());
 
                 if (instanceMightBeSchemaValidated || instanceMightHaveMips) {
-                    DataModel.visitElementJava(instance.instanceRoot(), new DataModel.NodeVisitor() {
+                    DataModel.visitElementJava(instance.rootElement(), new DataModel.NodeVisitor() {
                         public void visit(NodeInfo nodeInfo) {
                             InstanceData.clearState(nodeInfo);
                         }

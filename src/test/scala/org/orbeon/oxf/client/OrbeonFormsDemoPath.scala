@@ -26,6 +26,7 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
 
         loadHomePage()
         eventually(pageTitle must be ("Creating forms with Form Builder"))
+        // For Chrome, which in some cases (like this one) is unable to click on the anchor if not visible
         executeScript("window.scrollTo(0, $(document).height())")
         click on partialLinkText("examples coded")
         eventually(pageTitle must be ("Creating forms by writing XForms by hand"))

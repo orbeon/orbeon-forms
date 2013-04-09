@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.processor.handlers;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.util.UserAgent;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.control.XFormsComponentControl;
 import org.orbeon.oxf.xforms.control.XFormsControl;
@@ -50,10 +49,6 @@ public class HandlerContext {
     private final String alertElementName;
 
     public final boolean isNoscript;
-
-    // UA information
-    private boolean processedUserAgent;
-    private boolean isRenderingEngineIE6OrEarlier;
 
     // Context information
     private final Stack<PartAnalysis> partAnalysisStack;
@@ -124,18 +119,6 @@ public class HandlerContext {
 
     public String getAlertElementName() {
         return alertElementName;
-    }
-
-    final public boolean isRenderingEngineIE6OrEarlier() {
-        processedUserAgentIfNeeded();
-        return isRenderingEngineIE6OrEarlier;
-    }
-
-    private void processedUserAgentIfNeeded() {
-        if (!processedUserAgent) {
-            isRenderingEngineIE6OrEarlier = UserAgent.isIE6OrEarlier(externalContext.getRequest());
-            processedUserAgent = true;
-        }
     }
 
     final public boolean isNoScript() {

@@ -56,12 +56,4 @@ public class UserAgent {
             return -1;
         }
     }
-
-    /**
-     * Test whether the user agent is IE 6 or earlier.
-     */
-    public static boolean isIE6OrEarlier(ExternalContext.Request request) {
-        final int version = UserAgent.getMSIEVersion(request);
-        return version != -1 && version <= 6;
-    }
 }

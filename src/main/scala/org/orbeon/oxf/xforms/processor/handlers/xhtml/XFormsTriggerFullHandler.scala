@@ -13,21 +13,18 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
-import org.orbeon.oxf.xml.ContentHandlerHelper.CDATA
-import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
-import org.orbeon.oxf.xml.XMLReceiverAdapter
-import org.orbeon.oxf.xml.XMLUtils
-import org.xml.sax.Attributes
-import org.xml.sax.helpers.AttributesImpl
 import XFormsBaseHandlerXHTML._
 import XFormsTriggerFullHandler._
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
+import org.orbeon.oxf.xml.ContentHandlerHelper.CDATA
+import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
+import org.orbeon.oxf.xml.XMLUtils
+import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 import scala.collection.JavaConverters._
-import java.lang.{StringBuilder ⇒ JStringBuilder}
 
 /**
  * Default full appearance (button).
@@ -46,35 +43,20 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
         val xhtmlPrefix = handlerContext.findXHTMLPrefix
 
-        val elementName =
-            if (handlerContext.isNoScript) {
-                // Noscript mode: we need a name to detect activation
-                addAttribute(containerAttributes, "name", effectiveId)
+        if (handlerContext.isNoScript) {
+            // Noscript mode: we need a name to detect activation
+            addAttribute(containerAttributes, "name", effectiveId)
 
-                // Deal with legacy IE stuff
-                val (inputType, elementName) =
-                    if (handlerContext.isRenderingEngineIE6OrEarlier) {
-                        val (inputLabelValue, inputType) =
-                            getIE6LabelValue(triggerControl, xhtmlPrefix, containerAttributes, effectiveId, isHTMLLabel)
+            // We need a value so we can detect an activated button with IE 7
+            // NOTE: IE 6/7 sends the <button> content as value instead of the value attribute!
+            addAttribute(containerAttributes, "value", "activate")
 
-                        addAttribute(containerAttributes, "value", inputLabelValue)
-                        (inputType, "input")
-                    } else {
-                        // We need a value so we can detect an activated button with IE 7
-                        // NOTE: IE 6/7 sends the <button> content as value instead of the value attribute!
-                        addAttribute(containerAttributes, "value", "activate")
-                        ("submit", "button")
-                    }
-
-                // In JS-free mode, all buttons are submit inputs or image inputs
-                addAttribute(containerAttributes, "type", inputType)
-
-                elementName
-            } else {
-                // Script mode: a button without value
-                addAttribute(containerAttributes, "type", "button")
-                "button"
-            }
+            // In JS-free mode, all buttons are submit inputs or image inputs
+            addAttribute(containerAttributes, "type", "submit")
+        } else {
+            // Script mode: a button without value
+            addAttribute(containerAttributes, "type", "button")
+        }
 
         // Disabled attribute when needed
         val disabled = isHTMLDisabled(triggerControl)
@@ -94,6 +76,7 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
 
 
         // xh:button or xh:input
+        val elementName = "button"
         val spanQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
         xmlReceiver.startElement(XHTML_NAMESPACE_URI, elementName, spanQName, appendClasses(containerAttributes, bootstrapClasses))
 
@@ -102,59 +85,6 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
             outputLabelText(xmlReceiver, triggerControl, getTriggerLabel(triggerControl), xhtmlPrefix, isHTMLLabel)
 
         xmlReceiver.endElement(XHTML_NAMESPACE_URI, elementName, spanQName)
-    }
-
-    // IE 6 does not support discriminating between multiple buttons: it sends them all, so we use "input" instead. The
-    // code below tries to output <input type="submit"> or <input type="image"> depending on the content of the label.
-    // This has limitations: we can only handle text or a single image.
-    private def getIE6LabelValue(
-            triggerControl: XFormsTriggerControl,
-            xhtmlPrefix: String,
-            containerAttributes: AttributesImpl,
-            effectiveId: String,
-            isHTMLLabel: Boolean) = {
-
-        val labelValue = getTriggerLabel(triggerControl)
-
-        if (isHTMLLabel) {
-            // Only output character content within input
-            containingDocument.getControls.getIndentedLogger.logWarning(
-                "xf:trigger",
-                "IE 6 does not support <button> elements properly. Only text within HTML content will appear garbled.",
-                "control id", effectiveId)
-
-            // Analyze label value to find a nested image or text
-            val (image, text) = {
-                val sb = new JStringBuilder(labelValue.length)
-                var imageInfo: Option[(Option[String], Option[String], Option[String])] = None
-
-                XFormsUtils.streamHTMLFragment(new XMLReceiverAdapter {
-                    override def startElement(namespaceURI: String, localName: String, qName: String, atts: Attributes): Unit =
-                        // Remember information of first image found
-                        if (imageInfo.isEmpty && localName == "img")
-                            imageInfo = Some((Option(atts.getValue("src")), Option(atts.getValue("alt")), Option(atts.getValue("title"))))
-
-                    override def characters(ch: Array[Char], start: Int, length: Int): Unit =
-                        sb.append(ch, start, length)
-
-                }, labelValue, triggerControl.getLocationData, xhtmlPrefix)
-
-                (imageInfo, sb.toString)
-            }
-
-            image match {
-                case Some((Some(src), altOpt, titleOpt)) if text.trim == "" ⇒
-                    // There is an image and no text, output image
-                    addAttribute(containerAttributes, "src", src)
-                    altOpt   foreach (addAttribute(containerAttributes, "alt",  _))
-                    titleOpt foreach (addAttribute(containerAttributes, "title", _))
-                    ("", "image")
-                case _ ⇒
-                    // Output text
-                    ("submit", text)
-            }
-        } else
-            ("submit", labelValue)
     }
 }
 

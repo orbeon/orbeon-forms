@@ -16,14 +16,10 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.URLRewriterUtils;
-import org.orbeon.oxf.util.UserAgent;
-import org.orbeon.oxf.xforms.XFormsProperties;
-import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -31,10 +27,10 @@ import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,42 +102,13 @@ public class ResourceServer extends ProcessorImpl {
             try {
                 final URL newURL = URLFactory.createURL(urlString);
 
-                URLConnection urlConnection = null;
-                int length = -1;
-                long lastModified = -1;
-                {
-                    final String urlPath = newURL.getPath();
-                    if (newURL.getProtocol().equals("oxf")) {
+                // Open the connection
+                final URLConnection urlConnection = newURL.openConnection();
+                urlConnectionInputStream = urlConnection.getInputStream();
 
-                        // IE 6 hack for PNG images
-                        if (UserAgent.isIE6OrEarlier(externalContext.getRequest())) {
-                            if (urlPath.endsWith(".png")) {
-                                // Case of a PNG image served to IE 6 or earlier: check if there is a .gif instead
-                                urlString = "oxf:" + urlPath.substring(0, urlPath.length() - 3) + "gif";
-                                final URL gifURL = URLFactory.createURL(urlString);
-                                try {
-                                    // Try to get InputStream
-                                    final URLConnection gifURLConnection = gifURL.openConnection();
-                                    urlConnectionInputStream = gifURLConnection.getInputStream();
-                                    // If we get to here, we were successful
-                                    urlConnection = gifURLConnection;
-                                } catch (ResourceNotFoundException e) {
-                                    // GIF doesn't exist
-                                    // NOTE: Exception throwing / catching is expensive so we hope this doesn't happen too often
-                                }
-                            }
-                        }
-                    }
-                }
-
-                // Open the connection, if not node already
-                if (urlConnection == null) {
-                    urlConnection = newURL.openConnection();
-                    urlConnectionInputStream = urlConnection.getInputStream();
-                }
-                // Get length and last modified, if not done already
-                if (length == -1) length = urlConnection.getContentLength();
-                if (lastModified == -1) lastModified = NetUtils.getLastModified(urlConnection);
+                // Get length and last modified
+                final int length = urlConnection.getContentLength();
+                final long lastModified = NetUtils.getLastModified(urlConnection);
 
                 // Set Last-Modified, required for caching and conditional get
                 if (isVersioned) {

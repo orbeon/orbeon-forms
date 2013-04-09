@@ -33,56 +33,53 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
     @Test def createClerkAdminPermissions(): Unit = {
         if (Version.isPE) {
             Builder.onNewForm {
+                for {
+                    // Enable permissions
+                    _ ← click on OpenPermissions
+                    _ ← click on HasPermissions
 
-                // Enable permissions
-                patientlyClick(OpenPermissions)
-                patientlyClick(HasPermissions)
+                    // Clerks can read
+                    _ ← click on AddPermission
+                    _ ← textField(role(2)).value = "clerk"
+                    _ ← click on checkbox(2, "read")
 
-                // Clerks can read
-                patientlyClick(AddPermission)
-                patientlySendKeys(role(2), "clerk")
-                patientlyClick(checkbox(2, "read"))
+                    // Admins can do everything
+                    _ ← click on AddPermission
+                    _ ← patientlySendKeys(role(3), "admin")
+                    _ ← click on checkbox(3, "update")
+                    _ ← assert(checkbox(checkbox(3, "read")).isSelected)
+                    // Read auto-selected when selecting update
+                    _ ← click on checkbox(3, "delete")
 
-                // Admins can do everything
-                patientlyClick(AddPermission)
-                patientlySendKeys(role(3), "admin")
-                patientlyClick(checkbox(3, "update"))
-                eventually { assert(checkbox(checkbox(3, "read")).isSelected) }
-                // Read auto-selected when selecting update
-                patientlyClick(checkbox(3, "delete"))
+                    // Everyone can create
+                    _ ← click on checkbox(1, "create")
+                    // Read auto-selected when selecting update
+                    _ ← assert(checkbox(checkbox(2, "read")).isSelected)
+                    _ ← assert(checkbox(checkbox(3, "read")).isSelected)
 
-                // Everyone can create
-                patientlyClick(checkbox(1, "create"))
-                // Read auto-selected when selecting update
-                eventually {
-                    assert(checkbox(checkbox(2, "read")).isSelected)
-                    assert(checkbox(checkbox(3, "read")).isSelected)
-                }
-
-                // Save, reopen, and check the permissions are correct
-                patientlyClick(Apply)
-                patientlyClick(OpenPermissions)
-                eventually {
-                    assert(  checkbox(HasPermissions).isSelected)
+                    // Save, reopen, and check the permissions are correct
+                    _ ← click on Apply
+                    _ ← click on OpenPermissions
+                    _ ← assert(  checkbox(HasPermissions).isSelected)
                     // Roles are re-ordered by alphabetic order, see #917
-                    assert(  checkbox(checkbox(1, "create")).isSelected)
-                    assert(! checkbox(checkbox(1, "read"  )).isSelected)
-                    assert(! checkbox(checkbox(1, "update")).isSelected)
-                    assert(! checkbox(checkbox(1, "delete")).isSelected)
-                    assert(textField(role(2)).value === "admin")
-                    assert(  checkbox(checkbox(2, "create")).isSelected)
-                    assert(  checkbox(checkbox(2, "read"  )).isSelected)
-                    assert(  checkbox(checkbox(2, "update")).isSelected)
-                    assert(  checkbox(checkbox(2, "delete")).isSelected)
-                    assert(textField(role(3)).value === "clerk")
-                    assert(  checkbox(checkbox(3, "create")).isSelected)
-                    assert(  checkbox(checkbox(3, "read"  )).isSelected)
-                    assert(! checkbox(checkbox(3, "update")).isSelected)
-                    assert(! checkbox(checkbox(3, "delete")).isSelected)
-                }
+                    _ ← assert(  checkbox(checkbox(1, "create")).isSelected)
+                    _ ← assert(! checkbox(checkbox(1, "read"  )).isSelected)
+                    _ ← assert(! checkbox(checkbox(1, "update")).isSelected)
+                    _ ← assert(! checkbox(checkbox(1, "delete")).isSelected)
+                    _ ← assert(textField(role(2)).value === "admin")
+                    _ ← assert(  checkbox(checkbox(2, "create")).isSelected)
+                    _ ← assert(  checkbox(checkbox(2, "read"  )).isSelected)
+                    _ ← assert(  checkbox(checkbox(2, "update")).isSelected)
+                    _ ← assert(  checkbox(checkbox(2, "delete")).isSelected)
+                    _ ← assert(textField(role(3)).value === "clerk")
+                    _ ← assert(  checkbox(checkbox(3, "create")).isSelected)
+                    _ ← assert(  checkbox(checkbox(3, "read"  )).isSelected)
+                    _ ← assert(! checkbox(checkbox(3, "update")).isSelected)
+                    _ ← assert(! checkbox(checkbox(3, "delete")).isSelected)
 
-                // Done, close dialog
-                patientlyClick(Apply)
+                    // Done, close dialog
+                    _ ← click on Apply
+                }()
             }
         }
     }

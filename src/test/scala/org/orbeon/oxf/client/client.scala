@@ -66,6 +66,12 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     def patientlyClick(css: CssSelectorQuery): Unit = eventually { click on css.element }
     def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = eventually { css.element.underlying.sendKeys(keys) }
 
+    implicit class EventuallyMonad[A](operation: => A) {
+        def map[B](continuation: A => B): B = continuation(eventually(operation))
+        def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B] = continuation(eventually(operation))
+        def foreach[B](continuation: A ⇒ Unit): Unit = continuation(eventually(operation))
+    }
+
     // For a given id, return:
     //
     // 1. that id if it exists as is on the client
@@ -159,18 +165,14 @@ trait FormBuilderOps extends FormRunnerOps {
         val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
         val SaveButton = cssSelector(".fr-save-button button")
 
-        private def newForm(): Unit = {
+        def onNewForm[T](block: ⇒ T): Unit = {
             loadOrbeonPage("/fr/orbeon/builder/new")
             elementByStaticId("fb-application-name-input").sendKeys("a")
             elementByStaticId("fb-form-name-input").sendKeys("a")
             click on NewContinueButton
             waitForAjaxResponse()
-        }
-
-        def onNewForm[T](block: ⇒ T): Unit = {
-            newForm()
             block
-            patientlyClick(SaveButton)
+            eventually { click on SaveButton }
             waitForAjaxResponse()
         }
     }

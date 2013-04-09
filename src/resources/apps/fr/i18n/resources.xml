@@ -109,6 +109,7 @@
                 <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
                 <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
                 <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                <validate>&lt;i class="icon-ok"/&gt; Validate</validate>
                 
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
@@ -288,6 +289,7 @@
                 <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
                 <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
                 <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                <validate>&lt;i class="icon-ok"/&gt; Valider</validate>
 
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
@@ -469,6 +471,7 @@
                 <edit>&lt;i class="icon-arrow-left"/&gt; [Edit]</edit>
                 <send>&lt;i class="icon-arrow-right"/&gt; [Send]</send>
                 <email>&lt;i class="icon-envelope"/&gt; Correo Electrónico</email>
+                <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
                 
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
@@ -652,6 +655,7 @@
                 <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
                 <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
                 <email>&lt;i class="icon-envelope"/&gt; Epost</email>
+                <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
                 
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
@@ -827,6 +831,7 @@
                 <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
                 <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
                 <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
                 
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>

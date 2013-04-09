@@ -552,11 +552,10 @@
                     </xsl:when>
                     <!-- Test mode -->
                     <xsl:when test="$mode = ('test')">
-                        <xh:div class="fr-buttons-placeholder">
-                            <xh:div>
-                                <xf:output value="$fr-resources/detail/messages/buttons-placeholder"/>
-                            </xh:div>
-                        </xh:div>
+                        <xsl:variable name="buttons" as="node()*">
+                            <fr:validate-button appearance="xxf:primary"/>
+                        </xsl:variable>
+                        <xsl:apply-templates select="$buttons"/>
                     </xsl:when>
                     <!-- In PDF mode, don't include anything -->
                     <xsl:when test="$mode = ('pdf')"/>

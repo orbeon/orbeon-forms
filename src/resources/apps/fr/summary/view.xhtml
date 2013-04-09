@@ -710,8 +710,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
                                 <xf:label>
-                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_first.png" alt="First" title="First"/>
-                                    <!--<xf:output value="$fr-resources/summary/labels/first"/>-->
+                                    <xh:i class="icon-step-backward"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
@@ -723,8 +722,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
                                 <xf:label>
-                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
-                                    <!--<xf:output value="$fr-resources/summary/labels/previous"/>-->
+                                    <xh:i class="icon-chevron-left"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
@@ -751,8 +749,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
                                 <xf:label>
-                                    <!--<xf:output value="$fr-resources/summary/labels/next"/>-->
-                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
+                                    <xh:i class="icon-chevron-right"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
@@ -764,8 +761,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
                                 <xf:label>
-                                    <!--<xf:output value="$fr-resources/summary/labels/last"/>-->
-                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_last.png" alt="Last" title="Last"/>
+                                    <xh:i class="icon-step-forward"/>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>

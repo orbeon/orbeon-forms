@@ -111,7 +111,7 @@
                                                      https://github.com/orbeon/orbeon-forms/issues/723
                                                  -->
                                                 <xf:label xml:space="preserve">
-                                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_previous.png" alt="Previous" title="Previous"/>
+                                                    <xh:i class="icon-chevron-left"/>
                                                 </xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <xf:toggle case="{{$prev-cases[last()]}}"/>
@@ -133,7 +133,7 @@
                                                      https://github.com/orbeon/orbeon-forms/issues/723
                                                  -->
                                                 <xf:label xml:space="preserve">
-                                                    <xh:img width="16" height="16" src="/apps/fr/style/images/silk/resultset_next.png" alt="Next" title="Next"/>
+                                                    <xh:i class="icon-chevron-right"/>
                                                 </xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <xf:toggle case="{{$next-cases[1]}}"/>

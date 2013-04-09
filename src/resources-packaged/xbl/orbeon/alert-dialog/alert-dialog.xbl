@@ -122,17 +122,13 @@
 
                 <xsl:template match="fr:positive-choice">
                     <!-- TODO: i18n -->
-                    <xsl:variable name="default">
-                        <xh:img src="/apps/fr/style/images/silk/tick.png" alt=""/><xh:span>Yes</xh:span>
-                    </xsl:variable>
+                    <xsl:variable name="default"><xh:i class="icon-ok"/> Yes</xsl:variable>
                     <xsl:copy-of select="xf:trigger(*, $default, 'positive')"/>
                 </xsl:template>
 
                 <xsl:template match="fr:negative-choice">
                     <!-- TODO: i18n -->
-                    <xsl:variable name="default">
-                        <xh:img src="/apps/fr/style/images/silk/cross.png" alt=""/><xh:span>No</xh:span>
-                    </xsl:variable>
+                    <xsl:variable name="default"><xh:i class="icon-remove"/> No</xsl:variable>
                     <xsl:copy-of select="xf:trigger(*, $default, 'negative')"/>
                 </xsl:template>
 
@@ -152,8 +148,8 @@
                                 <xsl:when test="exists($fr-label)">
                                     <!-- We used to use an <xf:output> wrapper here because we prepended icons above.
                                          This change broke the case where there was a non-default static label. Now we
-                                         pass <xh:img> via $default instead. It's not ideal that we need to hardcode
-                                         <xh:img> and it would be better if we could revert to using CSS for this.
+                                         pass <xh:i> via $default instead. It's not ideal that we need to hardcode
+                                         <xh:i> and it would be better if we could revert to using CSS for this.
                                          See: https://github.com/orbeon/orbeon-forms/issues/607 -->
                                     <xsl:copy-of select="$fr-label/(@* | node())"/>
                                 </xsl:when>

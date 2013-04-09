@@ -105,11 +105,16 @@
                 <save>&lt;i class="icon-hdd"/&gt; Save</save>
                 <save-final>&lt;i class="icon-hdd"/&gt; Save</save-final>
                 <save-draft>&lt;i class="icon-inbox"/&gt; Save</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Review</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Edit</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                
+                <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
                 <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Edit</workflow-edit>
                 <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
 
                 <!-- Other standard buttons -->
                 <home>&lt;i class="icon-home"/&gt; Home</home>
@@ -121,6 +126,7 @@
                 <save-locally>Save Locally</save-locally>
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Clear and close</submit-dialog-clear>
@@ -278,12 +284,17 @@
                 <save>&lt;i class="icon-hdd"/&gt; Enregistrer</save>
                 <save-final>&lt;i class="icon-hdd"/&gt; Enregistrer</save-final>
                 <save-draft>&lt;i class="icon-inbox"/&gt; Enregistrer</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Valider</review>
+                <send>&lt;i class="icon-arrow-right"/&gt; Envoyer</send>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Editer</edit>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+
+                <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Envoyer</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
                 <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
                 <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
-
+                
                 <!-- Other standard buttons -->
                 <home>&lt;i class="icon-home"/&gt; Accueil</home>
                 <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
@@ -294,6 +305,7 @@
                 <save-locally>Enreg. Local</save-locally>
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
@@ -453,11 +465,16 @@
                 <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
                 <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
                 <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; [Review]</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; [Edit]</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; [Send]</send>
+                <email>&lt;i class="icon-envelope"/&gt; Correo Electrónico</email>
+                
+                <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; [Review]</workflow-review>
                 <workflow-edit>&lt;i class="icon-arrow-left"/&gt; [Edit]</workflow-edit>
                 <workflow-send>&lt;i class="icon-arrow-right"/&gt; [Send]</workflow-send>
-                <email>&lt;i class="icon-envelope"/&gt; Correo Electrónico</email>
 
                 <!-- Other standard buttons -->
                 <home>&lt;i class="icon-home"/&gt; [Home]</home>
@@ -469,6 +486,7 @@
                 <save-locally>Guardar en su computador</save-locally>
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Borrar y cerrar</submit-dialog-clear>
@@ -630,10 +648,16 @@
                 <save-final>&lt;i class="icon-hdd"/&gt; Lagre</save-final>
                 <save-draft>&lt;i class="icon-inbox"/&gt; Lagre</save-draft>
                 <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
+                <review>&lt;i class="icon-arrow-right"/&gt; Vis</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Rediger</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
+                <email>&lt;i class="icon-envelope"/&gt; Epost</email>
+                
+                <!-- Legacy buttons -->
+                <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Vis</workflow-review>
                 <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Rediger</workflow-edit>
                 <workflow-send>&lt;i class="icon-arrow-right"/&gt; Send</workflow-send>
-                <email>&lt;i class="icon-envelope"/&gt; Epost</email>
 
                 <!-- Other standard buttons -->
                 <home>&lt;i class="icon-home"/&gt; Hjem</home>
@@ -645,6 +669,7 @@
                 <save-locally>Lagre lokalt</save-locally>
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
@@ -798,11 +823,16 @@
                 <save>&lt;i class="icon-hdd"/&gt; Сохранить</save>
                 <save-final>&lt;i class="icon-hdd"/&gt; Сохранить</save-final>
                 <save-draft>&lt;i class="icon-inbox"/&gt; Сохранить</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Править</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                
+                <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</workflow-review>
                 <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Править</workflow-edit>
                 <workflow-send>&lt;i class="icon-arrow-right"/&gt; Отправить</workflow-send>
-                <email>&lt;i class="icon-envelope"/&gt; Email</email>
 
                 <!-- Other standard buttons -->
                 <home>&lt;i class="icon-home"/&gt; На главную</home>
@@ -814,6 +844,7 @@
                 <save-locally>Сохр.на диск</save-locally>
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>

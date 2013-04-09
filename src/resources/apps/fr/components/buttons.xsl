@@ -54,9 +54,7 @@
         <xf:group ref=".[property('xxf:noscript')]">
             <xf:trigger class="fr-refresh-button">
                 <xsl:copy-of select="@appearance"/>
-                <xf:label>
-                    <xh:img width="11" height="16" src="/apps/fr/style/images/silk/arrow_refresh.png" alt="{{$fr-resources/summary/labels/refresh}}"/>
-                </xf:label>
+                <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/refresh"/>
                 <!-- NOP -->
             </xf:trigger>
         </xf:group>
@@ -95,10 +93,7 @@
 
     <xsl:template match="fr:save-locally-button">
         <xf:trigger id="fr-save-locally-button" class="fr-save-locally-button" ref="xxf:instance('fr-triggers-instance')/other">
-            <xf:label>
-                <xh:img width="16" height="16" src="/apps/fr/style/images/silk/disk.png" alt=""/>
-                <xf:output value="$fr-resources/detail/buttons/save-locally"/>
-            </xf:label>
+            <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/save-locally"/>
         </xf:trigger>
     </xsl:template>
 

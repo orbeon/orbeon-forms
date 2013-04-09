@@ -58,11 +58,6 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
             click on cssSelector(css).element
         }
 
-    def clickImgByAlt(alt: String, wait: Boolean = true) =
-        withAjaxAction(wait) {
-            click on xpath(s"//img[@alt = '$alt']").element
-        }
-
     private def waitEnabled(css: CssSelectorQuery): STElement = eventually {
         val element = css.element
         element should be ('displayed)
@@ -144,10 +139,10 @@ trait FormRunnerOps extends OrbeonFormsOps {
     object Summary {
         def navigate(app: String, form: String) = loadOrbeonPage("/fr/" + app + "/" + form + "/summary")
 
-        def firstPage() = clickImgByAlt("First")
-        def nextPage()  = clickImgByAlt("Next")
-        def prevPage()  = clickImgByAlt("Prev")
-        def lastPage()  = clickImgByAlt("Last")
+        def firstPage() = clickElementByCSS(".fr-navigate-first a")
+        def prevPage()  = clickElementByCSS(".fr-navigate-prev a")
+        def nextPage()  = clickElementByCSS(".fr-navigate-next a")
+        def lastPage()  = clickElementByCSS(".fr-navigate-last a")
 
         def paging = cssSelector(".fr-paging-numbers:not(.xforms-group-begin-end)").element.text
     }

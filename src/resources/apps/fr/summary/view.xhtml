@@ -708,7 +708,7 @@
                 <div class="pagination pagination-left">
                     <ul>
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
+                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
                                 <xf:label>
                                     <xh:i class="icon-step-backward"/>
                                 </xf:label>
@@ -720,7 +720,7 @@
                             </xf:trigger>
                         </li>
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal">
+                            <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
                                 <xf:label>
                                     <xh:i class="icon-chevron-left"/>
                                 </xf:label>
@@ -747,7 +747,7 @@
                             <!-- No results -->
                         </xf:group>
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
+                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
                                 <xf:label>
                                     <xh:i class="icon-chevron-right"/>
                                 </xf:label>
@@ -759,7 +759,7 @@
                             </xf:trigger>
                         </li>
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
-                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal">
+                            <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
                                 <xf:label>
                                     <xh:i class="icon-step-forward"/>
                                 </xf:label>

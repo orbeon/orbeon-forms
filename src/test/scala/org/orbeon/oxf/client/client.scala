@@ -164,7 +164,7 @@ trait FormBuilderOps extends FormRunnerOps {
 
     object Builder {
         val NewContinueButton = cssSelector("*[id $= 'fb-metadata-continue-trigger'] button")
-        val SaveButton = cssSelector("#fr-save-button button")
+        val SaveButton = cssSelector(".fr-save-button button")
 
         private def newForm(): Unit = {
             loadOrbeonPage("/fr/orbeon/builder/new")

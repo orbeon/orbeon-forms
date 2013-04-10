@@ -7,13 +7,13 @@ $ ->
     gridsCache = []; do ->
         Builder.onOffsetMayHaveChanged ->
             gridsCache.length = 0                                                                                       # Update gridsCache in-place, as references are kept by other functions
-            _.each ($ 'div.xbl-fr-grid:visible'), (grid) ->
-                grid = $ grid
+            _.each ($ '.fr-grid.fr-editable:visible'), (table) ->
+                table = $(table)
+                grid = table.parent()
                 gridInfo =
                     el: grid
                     offset: Builder.adjustedOffset grid
                     height: f$.outerHeight grid                                                                         # Include grid padding
-                table = f$.children '.fr-grid', gridInfo.el
                 if f$.is '.fr-repeat', table
                     head = f$.find 'thead', table
                     gridInfo.head =

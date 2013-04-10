@@ -15,8 +15,9 @@
         xmlns:xh="http://www.w3.org/1999/xhtml"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:xf="http://www.w3.org/2002/xforms"
-        id="fr-clear-confirm-dialog" level="modal" close="false" draggable="false" class="fr-dialog">
+        id="fr-clear-confirm-dialog" level="modal" close="true" draggable="true" class="fr-dialog">
     <xf:label ref="$fr-resources/detail/labels/confirm"/>
+    <xf:setfocus ev:event="xxforms-dialog-open" control="fr-clear-confirm-dialog-cancel"/>
     <xh:div>
         <xh:img src="/apps/fr/style/images/pixelmixer/info_64.png" alt="Question" class="fr-dialog-icon"/>
         <xh:div class="fr-dialog-message">
@@ -26,11 +27,11 @@
     <xh:div class="fr-dialog-buttons">
         <xf:group>
             <xxf:hide ev:event="DOMActivate" dialog="fr-clear-confirm-dialog"/>
-            <xf:trigger>
+            <xf:trigger appearance="xxf:danger">
                 <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/clear"/>
                 <xf:dispatch ev:event="DOMActivate" name="fr-clear" targetid="fr-persistence-model"/>
             </xf:trigger>
-            <xf:trigger>
+            <xf:trigger id="fr-clear-confirm-dialog-cancel">
                 <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/cancel"/>
             </xf:trigger>
         </xf:group>

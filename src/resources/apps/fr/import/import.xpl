@@ -96,8 +96,8 @@
 
                                 <!-- Save -->
                                 <xf:dispatch name="fr-new-document" targetid="fr-persistence-model"/>
-                                <xf:action type="xpath" xmlns:send="java:org.orbeon.oxf.fr.ProcessButton">
-                                    send:runProcess('save')
+                                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.ProcessButton">
+                                    process:runProcess('save')
                                 </xf:action>
 
                                 <xf:setvalue ref="instance('fr-import-stats')/succeeded" value="xs:integer(.) + 1"/>

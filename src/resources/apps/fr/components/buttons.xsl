@@ -25,28 +25,31 @@
         xmlns:p="http://www.orbeon.com/oxf/pipeline"
         xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
-    <!-- Buttons that translate to fr:send-button -->
+    <!-- Buttons that translate to fr:process-button -->
     <xsl:template match="fr:home-button
                        | fr:summary-button
                        | fr:close-button
                        | fr:save-final-button
                        | fr:save-draft-button
                        | fr:validate-button
-                       | fr:workflow-review-button
-                       | fr:workflow-edit-button
+                       | fr:review-button
+                       | fr:edit-button
+                       | fr:send-button
                        | fr:email-button
                        | fr:collapse-all-button
                        | fr:expand-all-button
                        | fr:save-button
                        | fr:submit-button
+                       | fr:workflow-review-button
+                       | fr:workflow-edit-button
                        | fr:workflow-send-button
                        | fr:*[starts-with(local-name(), 'custom-')]">
         <xsl:variable name="button-name" select="substring-before(local-name(), '-button')"/>
-        <fr:send-button
+        <fr:process-button
             name="{$button-name}"
             ref="xxf:instance('fr-triggers-instance')/{if ($button-name = 'workflow-edit') then 'workflow-edit' else 'other'}">
             <xsl:copy-of select="@appearance"/>
-        </fr:send-button>
+        </fr:process-button>
     </xsl:template>
 
     <xsl:template match="fr:refresh-button">

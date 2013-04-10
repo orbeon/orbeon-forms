@@ -4,14 +4,18 @@ $ ->
 
     # Calls listener when what is under the pointer has potentially changed
     onUnderPointerChange = (f) ->
-        ($ document).on 'mousemove', f
+        $(document).on('mousemove', f)
+        # Resizing the window might change what is under the pointer the last time we saw it in the window
+        $(window).on('resize', f)
         Events.ajaxResponseProcessedEvent.subscribe f
 
     # Call listener when anything on the page that could change element positions happened
     Builder.onOffsetMayHaveChanged = (f) ->
-        Events.orbeonLoadedEvent.subscribe f                                                                            # After the form is first shown
-        Events.ajaxResponseProcessedEvent.subscribe f                                                                   # After an Ajax response, as it might have changed the DOM
-        f$.on 'resize', f, $ window
+        # After the form is first shown
+        Events.orbeonLoadedEvent.subscribe f
+        # After an Ajax response, as it might have changed the DOM
+        Events.ajaxResponseProcessedEvent.subscribe f
+        $(window).on('resize', f)
 
     # Finds the container, if any, based on a vertical position
     Builder.findInCache = (containerCache, top) ->
@@ -69,7 +73,16 @@ $ ->
         currentValue = null
         (newValue) ->
             if newValue?
-                if currentValue is null or not f$.is newValue.el, currentValue.el
+                firstTime = -> _.isNull(currentValue)
+                domElementChanged = ->
+                    # Typically after an Ajax request, maybe a column/row was added/removed, so we might consequently
+                    # need to update the icon position
+                    not(newValue.el.is(currentValue.el))
+                elementPositionChanged = ->
+                    # The elements could be the same, but their position could have changed, in which case want to
+                    # reposition relative icons, so we don't consider the value to be the "same"
+                    not(_.isEqual(newValue.offset, currentValue.offset))
+                if firstTime() or domElementChanged() or elementPositionChanged()
                     was currentValue if currentValue?
                     currentValue = newValue
                     becomes newValue

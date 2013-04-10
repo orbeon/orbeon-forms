@@ -31,7 +31,7 @@ $ ->
                     width: f$.width $ td
                 gridsCache.unshift gridInfo
 
-    # Position delete icon
+    # Position delete and grid details icon
     do ->
         deleteIcon = $ '.fb-delete-grid-trigger'
         detailsIcon = $ '.fb-grid-details-trigger'

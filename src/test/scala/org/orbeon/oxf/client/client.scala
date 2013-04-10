@@ -68,8 +68,8 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
 
     implicit class EventuallyMonad[A](operation: => A) {
         def map[B](continuation: A => B): B = continuation(eventually(operation))
-        def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B] = continuation(eventually(operation))
-        def foreach[B](continuation: A ⇒ Unit): Unit = continuation(eventually(operation))
+        def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B] = map(continuation)
+        def foreach[B](continuation: A ⇒ Unit): Unit = map(continuation)
     }
 
     // For a given id, return:

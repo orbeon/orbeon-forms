@@ -318,14 +318,24 @@
     <xf:recalculate ev:event="xxforms-value-changed" ev:observer="fr-error-summary-instance"/>
 
     <!-- Configurable send -->
-    <xf:submission id="fr-send-submission"
+    <!-- TODO: Remove duplication once @replace is an AVT -->
+    <xf:submission id="fr-send-submission-all"
         resource="{event('uri')}"
         relevant="{event('prune')}"
         validate="false"
         method="{event('method')}"
         serialization="{if (event('method') = 'get') then 'none' else 'application/xml'}"
         ref="if (instance('fr-pdf-service-instance') != '') then instance('fr-pdf-service-instance') else xxf:instance('fr-form-instance')"
-        replace="event('replace')"/>
+        replace="all"/>
+
+    <xf:submission id="fr-send-submission-none"
+        resource="{event('uri')}"
+        relevant="{event('prune')}"
+        validate="false"
+        method="{event('method')}"
+        serialization="{if (event('method') = 'get') then 'none' else 'application/xml'}"
+        ref="if (instance('fr-pdf-service-instance') != '') then instance('fr-pdf-service-instance') else xxf:instance('fr-form-instance')"
+        replace="none"/>
 
     <!-- Call email service -->
     <xf:submission id="fr-email-service-submission"

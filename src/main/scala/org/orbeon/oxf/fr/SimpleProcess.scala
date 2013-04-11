@@ -416,18 +416,21 @@ object SimpleProcess extends Logging {
 
             implicit val formRunnerParams @ FormRunnerParams(app, form, document, _) = FormRunnerParams()
 
-            // TODO: replace doesn't work yet
-            val eventProperties =
+            val propertiesAsPairs =
                 Seq("uri", "method", "prune", "replace") map (key ⇒ key → formRunnerProperty(prefix + "." + key))
 
             // Append query parameters to the URL
             val withUpdatedURI =
-                eventProperties map {
+                propertiesAsPairs map {
                     case ("uri", Some(uri)) ⇒ "uri" → Some(appendQueryString(uri, s"app=$app&form=$form&document=$document&valid=$dataValid"))
                     case other              ⇒ other
                 }
 
-            sendThrowOnError("fr-send-submission", withUpdatedURI.toMap)
+            val propertiesAsMap = withUpdatedURI.toMap
+
+            // TODO: Remove duplication once @replace is an AVT
+            val replace = if (propertiesAsMap.get("replace") exists (_ == "all")) "all" else "none"
+            sendThrowOnError(s"fr-send-submission-$replace", propertiesAsMap)
         }
 
     private def tryNavigateTo(path: String): Try[Any] =

@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import FormRunner._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.{NetUtils, Logging}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -58,7 +58,6 @@ object SimpleProcess extends Logging {
         "review"                      → tryNavigateToReview,
         "edit"                        → tryNavigateToEdit,
         "summary"                     → tryNavigateToSummary,
-        "home"                        → tryNavigateToHome,
         "visit-all"                   → tryVisitAll,
         "unvisit-all"                 → tryUnvisitAll,
         "collapse-all"                → tryCollapseSections,
@@ -413,7 +412,7 @@ object SimpleProcess extends Logging {
 
     def trySend(params: ActionParams): Try[Any] =
         Try {
-            val prefix = params.get(Some("properties")) getOrElse params(None)
+            val prefix = params.get(Some("property")) getOrElse params(None)
 
             implicit val formRunnerParams = FormRunnerParams()
 
@@ -433,14 +432,27 @@ object SimpleProcess extends Logging {
         Try {
             implicit val formRunnerParams = FormRunnerParams()
 
-            def fromParams = params.get(Some("uri")) flatMap nonEmptyOrNone
+            // Heuristic: If the parameter is anonymous, we take it as a URL or path if it looks like one. Otherwise, we
+            // consider it is a property. We could also look at whether the value looks like a property. To resolve
+            // ambiguity, we'll need to parse named parameters.
+            def isAbsolute(s: String) = s.startsWith("/") || NetUtils.urlHasProtocol(s)
+
+            def fromParams = params.get(Some("uri")) orElse (params.get(None) filter isAbsolute)
 
             def fromProperties = {
-                val prefix =  params.get(Some("properties")) orElse params.get(None) getOrElse "oxf.fr.detail.close"
-                formRunnerProperty(prefix + ".uri") flatMap nonEmptyOrNone
+                val property =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
+                formRunnerProperty(property)
             }
 
-            fromParams orElse fromProperties get
+            // Try to automatically append fr-noscript
+            // Heuristic: We append it only if the URL doesn't have a protocol. This might not always be a right guess.
+            def appendNoscriptIfNeeded(s: String) =
+                if (XFormsProperties.isNoscript(containingDocument) && ! NetUtils.urlHasProtocol(s))
+                    appendQueryString(s, "fr-noscript=true")
+                else
+                    s
+
+            fromParams orElse fromProperties flatMap nonEmptyOrNone map appendNoscriptIfNeeded get
         } flatMap
             tryNavigateTo
 
@@ -450,22 +462,10 @@ object SimpleProcess extends Logging {
     def tryNavigateToEdit(params: ActionParams): Try[Any] =
         Try(sendThrowOnError("fr-workflow-edit-submission"))
 
-    private def appendNoscriptIfNeeded(path: String) =
-        if (XFormsProperties.isNoscript(containingDocument))
-            appendQueryString(path, "fr-noscript=true")
-        else
-            path
-
     def tryNavigateToSummary(params: ActionParams): Try[Any]  =
         Try {
             val FormRunnerParams(app, form, _, _) = FormRunnerParams()
-            appendNoscriptIfNeeded(s"/fr/$app/$form/summary")
-        } flatMap
-            tryNavigateTo
-
-    def tryNavigateToHome(params: ActionParams): Try[Any] =
-        Try {
-            appendNoscriptIfNeeded("/fr/")
+            s"/fr/$app/$form/summary"
         } flatMap
             tryNavigateTo
 

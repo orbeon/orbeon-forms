@@ -277,6 +277,7 @@ body.orbeon {
   color: #555555;
   display: block;
   min-height: 36px;
+  overflow: hidden;
 }
 .orbeon .xbl-fr-section .fr-section-title .fr-section-label label {
   font-size: 18px;

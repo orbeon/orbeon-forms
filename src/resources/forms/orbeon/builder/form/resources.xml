@@ -839,7 +839,7 @@
             <edit-metadata-output/>
             <save-as-metadata-output>Enter a new application name and form name to be used for the copy of this form:</save-as-metadata-output>
             <xpath-errors>There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.</xpath-errors>
-            <lhha-checkbox>Mark this checkbox if you'd like to type HTML tags in your label</lhha-checkbox>
+            <lhha-checkbox>Mark this checkbox if you'd like to type HTML tags</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Untitled Form</untitled-form>
@@ -1675,7 +1675,7 @@
             <edit-metadata-output/>
             <save-as-metadata-output>Veuillez fournir un nom d'application et un nom de formulaire qui sera utilisé pour la copie de ce formulaire:</save-as-metadata-output>
             <xpath-errors>Il y a {0,choice,1#une erreur|1&lt;{0,number,integer} erreurs} XPath dans votre formulaire.</xpath-errors>
-            <lhha-checkbox>Cochez cette case si vous souhaitez saisir des balises HTML dans le libellé</lhha-checkbox>
+            <lhha-checkbox>Cochez cette case si vous souhaitez saisir des balises HTML</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Formulaire sans titre</untitled-form>
@@ -2513,7 +2513,7 @@
             <edit-metadata-output/>
             <save-as-metadata-output>[Enter a new application name and form name to be used for the copy of this form:]</save-as-metadata-output>
             <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
-            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags in your label]</lhha-checkbox>
+            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Uten tittel</untitled-form>
@@ -3350,7 +3350,7 @@
             <edit-metadata-output/>
             <save-as-metadata-output>Задайте название приложения и название формы, куда необходимо сохранить данную форму:</save-as-metadata-output>
             <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} errors} in your form.]</xpath-errors>
-            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags in your label]</lhha-checkbox>
+            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Новая форма</untitled-form>

@@ -195,6 +195,7 @@ body.orbeon { background-color: @frBackground }
                                                 // For positioning of the .fb-section-label-editor-click-interceptor, positioned relative to the anchor:
                     display: block;             // - So it extends all the way to the right
                     min-height: @frSectionTitleLineHeight;
+                    overflow: hidden;           // For correct positioning of click interceptor; see issue #636
                 }
 
                 // Override default label styles

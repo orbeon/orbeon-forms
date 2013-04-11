@@ -51,6 +51,7 @@
             </buttons>
             <titles>
                 <summary-title>Summary</summary-title>
+                <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <row-number>No.</row-number>
                 <created>Created</created>
                 <last-modified>Last Modified</last-modified>
@@ -231,6 +232,7 @@
             </buttons>
             <titles>
                 <summary-title>Sommaire</summary-title>
+                <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <row-number>No.</row-number>
                 <created>Création</created>
                 <last-modified>Dernière modification</last-modified>
@@ -413,6 +415,7 @@
             </buttons>
             <titles>
                 <summary-title>Síntesis</summary-title>
+                <delete-confirmation>[Confirm Deletion]</delete-confirmation>
                 <row-number>Número</row-number>
                 <created>Creado</created>
                 <last-modified>Fecha de modificación</last-modified>
@@ -596,6 +599,7 @@
             </buttons>
             <titles>
                 <summary-title>Oppsummering</summary-title>
+                <delete-confirmation>[Confirm Deletion]</delete-confirmation>
                 <row-number>Nr.</row-number>
                 <created>Opprettet</created>
                 <last-modified>Sist endret</last-modified>
@@ -745,6 +749,7 @@
             </labels>
         </components>
         <errors>
+            <summary-title>[Your form contains the following errors]</summary-title>
             <some>Есть ошибки</some>
             <none>Ошибок нет</none>
             <unsaved>Несохраненные изменения</unsaved>
@@ -773,6 +778,7 @@
             </buttons>
             <titles>
                 <summary-title>Общая информация</summary-title>
+                <delete-confirmation>[Confirm Deletion]</delete-confirmation>
                 <row-number>№.</row-number>
                 <created>Дата создания</created>
                 <last-modified>Дата изменения</last-modified>

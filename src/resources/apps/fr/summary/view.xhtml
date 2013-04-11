@@ -838,8 +838,8 @@
 
         <!-- Delete confirmation dialog -->
         <fr:alert-dialog id="delete-confirmation-dialog">
-            <fr:label mediatype="text/html" ref="$fr-resources/summary/buttons/delete"/>
-            <fr:message><xf:output value="$fr-resources/summary/messages/delete-confirmation"/></fr:message>
+            <fr:label ref="$fr-resources/summary/titles/delete-confirmation"/>
+            <fr:message value="$fr-resources/summary/messages/delete-confirmation"/>
             <fr:negative-choice/>
             <fr:positive-choice>
                 <xf:action ev:event="DOMActivate">

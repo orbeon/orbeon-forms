@@ -50,6 +50,9 @@ object FormRunner {
     def buildPropertyName(name: String)(implicit p: FormRunnerParams) =
         name :: p.app :: p.form :: Nil mkString "."
 
+    def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
+        Option(properties.getObject(buildPropertyName(name))) map (_.toString)
+
     type UserRoles = {
         def getRemoteUser(): String
         def isUserInRole(role: String): Boolean
@@ -445,6 +448,9 @@ object FormRunner {
     // We use instance('fr-error-summary-instance')/valid and not xxf:valid() because the instance validity may not be
     // reflected with the use of XBL components.
     def dataValid = errorSummaryInstance.rootElement \ "valid" === "true"
+
+    // Whether the form has a captcha
+    def hasCaptcha = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")
 
     // The standard Form Runner parameters
     case class FormRunnerParams(app: String, form: String, document: Option[String], mode: String)

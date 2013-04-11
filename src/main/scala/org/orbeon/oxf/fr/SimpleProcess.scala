@@ -62,14 +62,12 @@ object SimpleProcess extends Logging {
         "unvisit-all"                 → tryUnvisitAll,
         "collapse-all"                → tryCollapseSections,
         "expand-all"                  → tryExpandSections,
-        "result-dialog"               → tryShowResultDialog
+        "result-dialog"               → tryShowResultDialog,
+        "captcha"                     → tryCaptcha
     )
 
     private val processBreaks = new Breaks
     import processBreaks._
-
-    private def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
-        Option(properties.getObject(buildPropertyName(name))) map (_.toString)
 
     private object ProcessParser {
 
@@ -246,7 +244,7 @@ object SimpleProcess extends Logging {
 
                 val buffer = ListBuffer[String]()
 
-                buffer += "validate"
+                buffer += "require-valid"
                 buffer += Then
                 buffer += "save"
                 buffer += Then
@@ -402,6 +400,12 @@ object SimpleProcess extends Logging {
             show("fr-submission-result-dialog", Map(
                 "fr-content" → Some(topLevelInstance("fr-persistence-model", "fr-create-update-submission-response").get.rootElement)
             ))
+        }
+    
+    def tryCaptcha(params: ActionParams): Try[Any] =
+        Try {
+            if (hasCaptcha && (persistenceInstance.rootElement \ "captcha" === "false"))
+                dispatch(name = "fr-verify", targetId = "captcha")
         }
 
     def tryCreatePDF(params: ActionParams): Try[Any] =

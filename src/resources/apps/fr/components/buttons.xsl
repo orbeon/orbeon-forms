@@ -58,7 +58,9 @@
             <xf:trigger class="fr-refresh-button">
                 <xsl:copy-of select="@appearance"/>
                 <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/refresh"/>
-                <!-- NOP -->
+                <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                    process:runProcessByName('refresh')
+                </xf:action>
             </xf:trigger>
         </xf:group>
     </xsl:template>

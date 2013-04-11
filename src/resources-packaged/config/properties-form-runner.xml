@@ -178,8 +178,8 @@
     <property as="xs:string"  name="oxf.fr.detail.send.process.save-import.*.*"                 value='save'/>
 
     <!-- Reusable processes -->
-    <property as="xs:string"  name="oxf.fr.detail.send.process.require-valid.*.*"               value='validate recover require-valid-recover'/>
-    <property as="xs:string"  name="oxf.fr.detail.send.process.maybe-require-valid.*.*"         value='validate("oxf.fr.detail.save.validate") recover require-valid-recover'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.require-valid.*.*"               value='visit-all then captcha then validate recover require-valid-recover'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.maybe-require-valid.*.*"         value='visit-all then captcha then validate("oxf.fr.detail.save.validate") recover require-valid-recover'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.orbeon-home.*.*"                 value='navigate("/")'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.form-runner-home.*.*"            value='navigate("/fr")'/>
 
@@ -193,10 +193,11 @@
     <property as="xs:string"  name="oxf.fr.detail.send.process.validate.*.*"                    value='validate'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.review.*.*"                      value='require-valid then review'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.edit.*.*"                        value='edit'/>
-    <property as="xs:string"  name="oxf.fr.detail.send.process.send.*.*"                        value='send("oxf.fr.detail.send.success")'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.send.*.*"                        value='require-valid then send("oxf.fr.detail.send.success")'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.email.*.*"                       value='require-valid then email then success-message("email-success) recover email-error-dialog'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.collapse-all.*.*"                value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.send.process.expand-all.*.*"                  value='expand-all'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.refresh.*.*"                     value='visit-all'/>
 
     <!-- Legacy buttons and processes -->
     <property as="xs:string"  name="oxf.fr.detail.send.process.submit.*.*"                      value='require-valid then save then success-message("save-success") then result-dialog recover error-message("database-error")'/>

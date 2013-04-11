@@ -274,26 +274,6 @@
             </xf:instance>
             <xf:bind ref="trigger" readonly="not(../valid = 'true')"/>
 
-            <!-- Verify captcha and mark all controls as visited when certain buttons are activated -->
-            <xf:action ev:event="DOMActivate" ev:observer="fr-save-button fr-workflow-review-button fr-workflow-send-button fr-print-button fr-pdf-button fr-email-button fr-refresh-button fr-submit-button">
-
-                <!-- Do captcha verification, if needed -->
-                <!-- NOTE: The code would be shorter here if we were to use the XSLT app/form variables, but we want to move away from XSLT for FR -->
-                <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
-                <xf:var name="app" value="$parameters/app" as="xs:string"/>
-                <xf:var name="form" value="$parameters/form" as="xs:string"/>
-                <xsl:if test="$has-captcha">
-                    <xf:action if="xxf:instance('fr-persistence-instance')/captcha = 'false'">
-                        <xf:dispatch targetid="captcha" name="fr-verify"/>
-                    </xf:action>
-                </xsl:if>
-
-                <!-- Show all error in error summaries -->
-                <xsl:if test="$error-summary-top"><xf:dispatch name="fr-visit-all" targetid="error-summary-control-top"/></xsl:if>
-                <xf:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
-
-            </xf:action>
-
             <!-- Mark all controls as unvisited -->
             <xf:action ev:event="fr-unvisit-all">
                 <!-- Dispatch to the appropriate error summaries -->

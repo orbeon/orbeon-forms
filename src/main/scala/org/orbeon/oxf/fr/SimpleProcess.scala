@@ -28,11 +28,14 @@ import scala.util.control.{ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.common.OXFException
 
-// All the logic associated with the universal detail page button. This button is able to run customizable processes.
-// A button has a name, and the name translates into the definition of a process defined in a property. Each process is
-// defined by a series of actions separated by combinators. The actions are predefined, but some of them are
-// configurable.
-object ProcessButton extends Logging {
+// Implementation of simple processes
+//
+// - A process is usually associated with a Form Runner button.
+// - A process can have a name which translates into a definition defined in a property.
+// - The property specifies a sequence of actions separated by combinators.
+// - Actions are predefined, but some of them are configurable.
+//
+object SimpleProcess extends Logging {
 
     private val Then    = "then"
     private val Recover = "recover"

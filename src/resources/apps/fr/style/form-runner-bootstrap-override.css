@@ -207,7 +207,7 @@ body.orbeon {
 .orbeon .btn-warning i,
 .orbeon .btn-primary i,
 .orbeon .btn-inverse i {
-  background-image: url(/apps/fr/style/bootstrap/img/glyphicons-halflings-white.png);
+  background-image: url(bootstrap/img/glyphicons-halflings-white.png);
 }
 .orbeon .nav > li > span > a {
   display: block;

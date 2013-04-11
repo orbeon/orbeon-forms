@@ -109,7 +109,9 @@
 
                                 </xsl:element>
 
-                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="true">
+                                <!-- Can't make switch non-relevant at runtime as we depend on relevance for validation:
+                                     https://github.com/orbeon/orbeon-forms/issues/927 -->
+                                <xf:switch id="switch" xxf:readonly-appearance="dynamic" xxf:element="div" xxf:xforms11-switch="{$editable}">
                                     <!-- Closed section -->
                                     <xf:case id="case-closed" selected="{not($initially-open)}"/>
                                     <!-- Open section -->

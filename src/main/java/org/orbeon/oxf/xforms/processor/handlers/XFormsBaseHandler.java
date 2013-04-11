@@ -30,7 +30,6 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Base XForms handler used as base class in both the xml and xhtml handlers.
@@ -240,8 +239,4 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
 		return attributes;
 	}
-
-    protected Set<QName> getAppearances() {
-        return XFormsControl.jAppearances(elementAnalysis);
-    }
 }

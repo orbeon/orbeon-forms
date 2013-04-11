@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
-import scala.collection.JavaConverters._
+import collection.breakOut
 
 /**
  * Default full appearance (button).
@@ -72,8 +72,8 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
             if (isNoscriptMinimal)
                 "btn-link" :: Nil
             else
-                (getAppearances.asScala flatMap (appearance ⇒ BootstrapAppearances.get(appearance)) toList))
-
+                XFormsControl.appearances(elementAnalysis) flatMap BootstrapAppearances.get toList
+        )
 
         // xh:button or xh:input
         val elementName = "button"

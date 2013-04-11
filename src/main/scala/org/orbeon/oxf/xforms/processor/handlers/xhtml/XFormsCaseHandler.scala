@@ -87,7 +87,7 @@ class XFormsCaseHandler extends XFormsControlLifecyleHandler(false, true) {
                     if (isMustGenerateBeginEndDelimiters)
                         outputInterceptor.outputDelimiter(currentSavedOutput, firstDelimiterClasses, "xforms-case-begin-" + XFormsUtils.namespaceId(containingDocument, effectiveId))
 
-            }, XFormsControl.jAppearances(elementAnalysis.parent.get).contains(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME))
+            }, XFormsControl.appearances(elementAnalysis.parent.get)(XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME))
             
             val controlClasses = {
                 val classes = new jl.StringBuilder(selectedClasses)

@@ -319,7 +319,7 @@
 
     <!-- Configurable send -->
     <xf:submission id="fr-send-submission"
-        resource="{formRunner:appendQueryString(event('uri'), concat('app=', $app, '&amp;form=', $form, '&amp;document=', $document))}"
+        resource="{event('uri')}"
         relevant="{event('prune')}"
         validate="false"
         method="{event('method')}"

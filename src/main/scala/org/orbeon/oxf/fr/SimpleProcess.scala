@@ -414,13 +414,20 @@ object SimpleProcess extends Logging {
         Try {
             val prefix = params.get(Some("property")) getOrElse params(None)
 
-            implicit val formRunnerParams = FormRunnerParams()
+            implicit val formRunnerParams @ FormRunnerParams(app, form, document, _) = FormRunnerParams()
 
             // TODO: replace doesn't work yet
             val eventProperties =
                 Seq("uri", "method", "prune", "replace") map (key ⇒ key → formRunnerProperty(prefix + "." + key))
 
-            sendThrowOnError("fr-send-submission", eventProperties.toMap)
+            // Append query parameters to the URL
+            val withUpdatedURI =
+                eventProperties map {
+                    case ("uri", Some(uri)) ⇒ "uri" → Some(appendQueryString(uri, s"app=$app&form=$form&document=$document&valid=$dataValid"))
+                    case other              ⇒ other
+                }
+
+            sendThrowOnError("fr-send-submission", withUpdatedURI.toMap)
         }
 
     private def tryNavigateTo(path: String): Try[Any] =

@@ -40,7 +40,7 @@
     <xsl:variable name="mode" select="doc('input:instance')/*/mode" as="xs:string?"/>
 
     <xsl:variable name="is-pe" select="version:isPE()"/>
-    
+
     <xsl:variable name="is-detail" select="not($mode = ('summary', ''))" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript-support" select="not(/xh:html/xh:head/xf:model[1]/@xxf:noscript-support = 'false')" as="xs:boolean"/>
@@ -128,6 +128,18 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
 
+            <!-- Set XHTML title -->
+            <xh:title>
+                <xsl:apply-templates select="xh:title/@*"/>
+
+                <!-- Display localized errors count and form title -->
+                <xf:output model="fr-error-summary-model"
+                               value="for $c in visible-errors-count return
+                                        if ($c castable as xs:integer and xs:integer($c) > 0)
+                                        then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count), ' - ', $title)
+                                        else $title"/>
+            </xh:title>
+
             <!-- Form Runner CSS stylesheets -->
             <xsl:for-each select="$css-uri, $custom-css-uri">
                 <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
@@ -141,7 +153,7 @@
             </xsl:for-each>
 
             <!-- Process the rest -->
-            <xsl:apply-templates select="node() except (xh:link | xh:style)"/>
+            <xsl:apply-templates select="node() except (xh:title | xh:link | xh:style)"/>
 
             <!-- For IE debugging -->
             <!--<xh:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>-->
@@ -191,20 +203,6 @@
                     ]]>
                 </xh:script>
             </xsl:if>
-        </xsl:copy>
-    </xsl:template>
-
-    <!-- Set XHTML title -->
-    <xsl:template match="xh:head/xh:title">
-        <xsl:copy>
-            <xsl:apply-templates select="@*"/>
-
-            <!-- Display localized errors count and form title -->
-            <xf:output model="fr-error-summary-model"
-                           value="for $c in visible-errors-count return
-                                    if ($c castable as xs:integer and xs:integer($c) > 0)
-                                    then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count), ' - ', $title)
-                                    else $title"/>
         </xsl:copy>
     </xsl:template>
 

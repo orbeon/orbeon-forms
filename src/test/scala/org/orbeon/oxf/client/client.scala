@@ -67,9 +67,9 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = eventually { css.element.underlying.sendKeys(keys) }
 
     implicit class EventuallyMonad[A](operation: => A) {
-        def map[B](continuation: A => B): B = continuation(eventually(operation))
-        def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B] = map(continuation)
-        def foreach[B](continuation: A ⇒ Unit): Unit = map(continuation)
+        def map[B](continuation: A => B): B                                        = continuation(eventually(operation))
+        def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B]  = continuation(eventually(operation))
+        def foreach[B](continuation: A ⇒ Unit): Unit                              = continuation(eventually(operation))
     }
 
     // For a given id, return:

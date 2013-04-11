@@ -16,13 +16,12 @@ package org.orbeon.oxf.client.builder
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.client.FormBuilderOps
 import org.junit.Test
-import org.scalatest.concurrent.Eventually._
 import org.orbeon.oxf.common.Version
 
 trait Permissions extends AssertionsForJUnit with FormBuilderOps {
 
-    private def permissionSelector(selector: String) = cssSelector(s".fb-permissions-dialog $selector")
-    private def role(line: Int) = permissionSelector(s".fb-role-name[id $$= '$line'] input")
+    private def permissionSelector(selector: String): CssSelectorQuery = cssSelector(s".fb-permissions-dialog $selector")
+    private def role(line: Int): CssSelectorQuery = permissionSelector(s".fb-role-name[id $$= '$line'] input")
     private def checkbox(line: Int, crud: String): CssSelectorQuery = permissionSelector(s".fb-$crud-permission[id $$= '$line'] input")
 
     private val OpenPermissions  = cssSelector("#fb-permissions-button button")
@@ -33,33 +32,34 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
     @Test def createClerkAdminPermissions(): Unit = {
         if (Version.isPE) {
             Builder.onNewForm {
+
                 for {
                     // Enable permissions
-                    _ ← click on OpenPermissions
-                    _ ← click on HasPermissions
+                    _ ← clickOn(OpenPermissions)
+                    _ ← clickOn(HasPermissions)
 
                     // Clerks can read
-                    _ ← click on AddPermission
+                    _ ← clickOn(AddPermission)
                     _ ← textField(role(2)).value = "clerk"
-                    _ ← click on checkbox(2, "read")
+                    _ ← clickOn(checkbox(2, "read"))
 
                     // Admins can do everything
-                    _ ← click on AddPermission
+                    _ ← clickOn(AddPermission)
                     _ ← patientlySendKeys(role(3), "admin")
-                    _ ← click on checkbox(3, "update")
+                    _ ← clickOn(checkbox(3, "update"))
                     _ ← assert(checkbox(checkbox(3, "read")).isSelected)
                     // Read auto-selected when selecting update
-                    _ ← click on checkbox(3, "delete")
+                    _ ← clickOn(checkbox(3, "delete"))
 
                     // Everyone can create
-                    _ ← click on checkbox(1, "create")
+                    _ ← clickOn(checkbox(1, "create"))
                     // Read auto-selected when selecting update
                     _ ← assert(checkbox(checkbox(2, "read")).isSelected)
                     _ ← assert(checkbox(checkbox(3, "read")).isSelected)
 
                     // Save, reopen, and check the permissions are correct
-                    _ ← click on Apply
-                    _ ← click on OpenPermissions
+                    _ ← clickOn(Apply)
+                    _ ← clickOn(OpenPermissions)
                     _ ← assert(  checkbox(HasPermissions).isSelected)
                     // Roles are re-ordered by alphabetic order, see #917
                     _ ← assert(  checkbox(checkbox(1, "create")).isSelected)
@@ -78,7 +78,7 @@ trait Permissions extends AssertionsForJUnit with FormBuilderOps {
                     _ ← assert(! checkbox(checkbox(3, "delete")).isSelected)
 
                     // Done, close dialog
-                    _ ← click on Apply
+                    _ ← clickOn(Apply)
                 }()
             }
         }

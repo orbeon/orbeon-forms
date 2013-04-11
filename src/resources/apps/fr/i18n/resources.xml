@@ -157,7 +157,6 @@
                 <errors>Summary of errors</errors>
                 <check-errors-in-form>This form contains errors</check-errors-in-form>
                 <error-details>View error details</error-details>
-                <language-choice>Language</language-choice>
                 <confirm>Confirm</confirm>
                 <alert>Missing or incorrect value</alert>
 
@@ -339,7 +338,6 @@
                 <errors>Résumé des erreurs</errors>
                 <check-errors-in-form>Ce formulaire contient des erreurs</check-errors-in-form>
                 <error-details>Détail des erreurs</error-details>
-                <language-choice>Langue</language-choice>
                 <confirm>Confirmer</confirm>
                 <alert>Valeur manquante ou incorrecte</alert>
 
@@ -517,15 +515,10 @@
                 <buttons-placeholder>Botones del formulario será colocado aquí</buttons-placeholder>
             </messages>
             <labels>
-                <!-- FIXME: This is Form Builder-specific -->
-                <save-as>[Save as…]</save-as>
-                <publish>Publicar...</publish>
-
                 <language-choice>Idioma</language-choice>
                 <errors>Resumen de errores</errors>
                 <check-errors-in-form>Este formulario contiene errores</check-errors-in-form>
                 <error-details>Ver detalles de error</error-details>
-                <language-choice>Idioma</language-choice>
                 <confirm>Confirmar</confirm>
                 <alert>Valor no especificado o incorrecto</alert>
 
@@ -706,7 +699,6 @@
                 <errors>Oppsummering av feil</errors>
                 <check-errors-in-form>Skjemaet inneholder feil</check-errors-in-form>
                 <error-details>Vis feilmeldingsdetaljer</error-details>
-                <language-choice>Språk</language-choice>
                 <confirm>Bekreft</confirm>
                 <alert>Manglende eller ugyldig svar</alert>
 
@@ -884,7 +876,6 @@
                 <errors>Ошибки</errors>
                 <check-errors-in-form>В форме есть ошибки</check-errors-in-form>
                 <error-details>Подробности об ошибках</error-details>
-                <language-choice>Язык</language-choice>
                 <confirm>Подтвердить</confirm>
                 <alert>Значение неверное или отсутствует</alert>
 

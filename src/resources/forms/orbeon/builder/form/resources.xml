@@ -252,6 +252,7 @@
         </select>
         <dialog-form-settings>
             <label>Form Settings</label>
+            <save-as>Save as…</save-as>
             <open><label>Form settings</label></open>
             <stats>Form statistics</stats>
             <sections>Sections</sections>
@@ -1093,6 +1094,7 @@
         </select>
         <dialog-form-settings>
             <label>Paramètres du formulaire</label>
+            <save-as>Sauvegarder sous…</save-as>
             <open><label>Paramètres du formulaire</label></open>
             <stats>Statistiques du formulaire</stats>
             <sections>Sections</sections>
@@ -1931,6 +1933,7 @@
         </select>
         <dialog-form-settings>
             <label>[Form Settings]</label>
+            <save-as>[Save as…]</save-as>
             <open><label>[Form settings]</label></open>
             <stats>[Form statistics</stats>
             <sections>[Sections]</sections>
@@ -2768,6 +2771,7 @@
         </select>
         <dialog-form-settings>
             <label>[Form Settings]</label>
+            <save-as>[Save as…]</save-as>
             <open><label>[Form Settings]</label></open>
             <stats>[Form statistics</stats>
             <sections>[Sections]</sections>

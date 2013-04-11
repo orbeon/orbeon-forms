@@ -82,9 +82,9 @@
             <!-- Once AVTs are supported: close="{not($is-new-form)}"  -->
             <xxf:dialog id="dialog" close="false" class="fb-dialog-form-settings">
                 <!-- Dialog title -->
-                <xf:label value="if ($is-new-form) then ()
-                                 else if ($is-save-as) then $fr-resources/detail/labels/save-as
-                                 else $resources/dialog-form-settings/label"/>
+                <xf:label value="$resources/dialog-form-settings/(if ($is-new-form) then ()
+                                                                  else if ($is-save-as) then save-as
+                                                                  else label)"/>
                 <xh:div>
                     <!-- IE warning -->
                     <xf:group ref=".[$is-new-form and xxf:instance('fb-user-agent-instance')/is-supported-browser = 'false']">
@@ -220,8 +220,8 @@
                             <!-- Or go back to the summary -->
                             <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
                                  window.close() in the old home/back button. But it's a bit unclear what's best. -->
-                            <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.ProcessButton">
-                                process:runProcess('summary')
+                            <xf:action ev:event="DOMActivate" if="$is-new-form" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.ProcessButton">
+                                process:runProcessByName('fb-home')
                             </xf:action>
                         </xf:trigger>
                     </xh:div>

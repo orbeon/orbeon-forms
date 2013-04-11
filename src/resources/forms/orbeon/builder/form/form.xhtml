@@ -362,7 +362,7 @@
                                         <xf:setvalue ref="xxf:instance('fr-parameters-instance')/document" value="secure:randomHexId()"/>
                                         <!-- Actually save -->
                                         <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.ProcessButton">
-                                            process:runProcess('validate then save then success-message("save-success") recover error-message("database-error")')
+                                            process:runProcessByName('fb-save-as')
                                         </xf:action>
                                         <!-- Change URL to have new document id -->
                                         <xxf:script>

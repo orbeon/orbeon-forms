@@ -58,4 +58,8 @@
     <!-- In case somebody overrides with weaker properties -->
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"       value="true"/>
 
+    <!-- Processes associated with Form Builder buttons -->
+    <property as="xs:string"  name="oxf.fr.detail.send.process.fb-save-as.*.*"       value='save-final'/>
+    <property as="xs:string"  name="oxf.fr.detail.send.process.fb-home.*.*"          value='summary'/>
+
 </properties>

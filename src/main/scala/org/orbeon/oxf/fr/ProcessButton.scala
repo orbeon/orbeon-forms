@@ -16,7 +16,7 @@ package org.orbeon.oxf.fr
 import FormRunner._
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{IndentedLogger, Logging}
+import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
@@ -26,6 +26,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.{Success, Try}
 import scala.util.control.{ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
+import org.orbeon.oxf.common.OXFException
 
 // All the logic associated with the universal detail page button. This button is able to run customizable processes.
 // A button has a name, and the name translates into the definition of a process defined in a property. Each process is
@@ -41,8 +42,8 @@ object ProcessButton extends Logging {
 
     private val AllowedActions = Map[String, ActionParams ⇒ Try[Any]](
         "done"                        → tryDone,
+        "process"                     → tryProcess,
         "validate"                    → tryValidate,
-        "maybe-validate"              → tryMaybeValidate,
         "save"                        → trySaveAttachmentsAndData,
         "success-message"             → trySuccessMessage,
         "error-message"               → tryErrorMessage,
@@ -55,33 +56,18 @@ object ProcessButton extends Logging {
         "edit"                        → tryNavigateToEdit,
         "summary"                     → tryNavigateToSummary,
         "home"                        → tryNavigateToHome,
+        "visit-all"                   → tryVisitAll,
+        "unvisit-all"                 → tryUnvisitAll,
         "collapse-all"                → tryCollapseSections,
         "expand-all"                  → tryExpandSections,
-        "result-dialog"               → tryShowSubmitDialog
+        "result-dialog"               → tryShowResultDialog
     )
 
     private val processBreaks = new Breaks
-    import processBreaks.{breakable, break}
+    import processBreaks._
 
-    private def formRunnerProperty(prefix: String, local: String)(implicit p: FormRunnerParams) =
-        Option(properties.getObject(buildPropertyName(prefix + "." + local))) map (_.toString)
-
-    // Main entry point for starting the process associated with a named button
-    def runProcessByName(buttonName: String): Unit = {
-
-        implicit val logger = containingDocument.getIndentedLogger("send")
-
-        implicit val formRunnerParams = FormRunnerParams()
-
-        // Read properties
-        val rawProcess = (
-            formRunnerProperty("oxf.fr.detail.send.process", buttonName) orElse
-            buildProcessFromLegacyProperties(buttonName)
-            getOrElse ""
-        )
-
-        runProcess(rawProcess)
-    }
+    private def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
+        Option(properties.getObject(buildPropertyName(name))) map (_.toString)
 
     private object ProcessParser {
 
@@ -106,11 +92,20 @@ object ProcessButton extends Logging {
                 ProcessNode(None, Nil)
             else {
                 // Non-empty process
+
+                // Allowed actions are either built-in actions or other processes
+                val allowedActions = AllowedActions.keySet ++ (
+                    for {
+                        property ← properties.propertiesStartsWith("oxf.fr.detail.send.process")
+                        tokens = property split """\."""
+                    } yield
+                        tokens(5)
+                )
     
-                def actionUsage(action: String)         = s"action '$action' is not supported, must be one of: ${AllowedActions.keys mkString ", "}"
+                def actionUsage(action: String)         = s"action '$action' is not supported, must be one of: ${allowedActions mkString ", "}"
                 def combinatorUsage(combinator: String) = s"combinator '$combinator' is not supported, must be one of: ${AllowedCombinators mkString ", "}"
     
-                def checkAction(action: String)         = require(AllowedActions.contains(action), actionUsage(action))
+                def checkAction(action: String)         = require(allowedActions(action), actionUsage(action))
                 def checkCombinator(combinator: String) = require(AllowedCombinators(combinator) , combinatorUsage(combinator))
     
                 def parseAction(rawAction: String) = {
@@ -145,89 +140,107 @@ object ProcessButton extends Logging {
         }
     }
 
-    def runProcess(process: String)(implicit logger: IndentedLogger): Unit = {
+    // Main entry point for starting the process associated with a named button
+    def runProcessByName(name: String): Unit =
+        runProcess(rawProcessByName(name))
+
+    private def rawProcessByName(name: String) = {
+        implicit val formRunnerParams = FormRunnerParams()
+
+        formRunnerProperty(s"oxf.fr.detail.send.process.$name") orElse
+        buildProcessFromLegacyProperties(name) getOrElse ""
+    }
+
+    def runProcess(process: String): Try[Any] = {
+        implicit val logger = containingDocument.getIndentedLogger("process")
+        withDebug("running process", Seq("process" → process)) {
+            tryBreakable {
+                runSubProcess(process) recoverWith { case _ ⇒
+                    // Send a final error if there is one
+                    tryErrorMessage(Map(Some("message") → "process-error"))
+                }
+            } catchBreak {
+                // Consider response to "done" as a success
+                // Q: Should allow success/failure?
+                Success(())
+            }
+        }
+    }
+
+    private def runSubProcess(process: String): Try[Any] = {
 
         import ProcessParser._
+
+        implicit val logger = containingDocument.getIndentedLogger("process")
 
         // Parse
         val parsedProcess = ProcessParser.parseProcess(process)
 
         if (parsedProcess.action.isEmpty) {
             debug("empty process, canceling process")
-            return
-        }
-
-        // This is required before all in any case
-        if (tryCheckUploads().get) {
-            debug("uploads in progress, canceling process")
-            return
-        }
-
-        // Run process
-        withDebug("running process", Seq("process" → process)) {
-
-            // Actions which must cause an early termination, like `validate`, call `break()`
-            breakable {
-
-                def runAction(action: ActionAst) =
-                    withDebug("running action", Seq("action" → action.toString)) {
-                        AllowedActions(action.name).apply(action.params)
-                    }
-
-                // Interpret process recursively
-                @tailrec def nextGroup(tried: Try[Any], groups: Iterator[PairAst]): Try[Any] =
-                    if (groups.hasNext) {
-                        val PairAst(nextCombinator, nextAction) = groups.next()
-
-                        val newTried =
-                            nextCombinator.name match {
-                                case Then ⇒
-                                    debug("combining with then", Seq("action" → nextAction.toString))
-                                    tried flatMap (_ ⇒ runAction(nextAction))
-                                case Recover ⇒
-                                    debug("combining with recover", Seq("action" → nextAction.toString))
-                                    tried recoverWith {
-                                        case t: ControlThrowable ⇒
-                                            debug("rethrowing ControlThrowable")
-                                            throw t
-                                        case t ⇒
-                                            debug("recovering", Seq("throwable" → OrbeonFormatter.format(t)))
-                                            runAction(nextAction)
-                                    }
-                            }
-
-                        nextGroup(newTried, groups)
-                    } else
-                        tried
-
-                // Run first action and recurse
-                val processIterator = parsedProcess.actions.iterator
-                val processResult = nextGroup(runAction(parsedProcess.action.get), processIterator)
-
-                // Send a final error if there is one
-                processResult recoverWith { case _ ⇒
-                    tryErrorMessage(Map(Some("message") → "process-error"))
-                }
+            Success(())
+        } else {
+            // This is required before all in any case
+            if (tryCheckUploads().get) {
+                debug("uploads in progress, canceling process")
+                return Success(()) // ?
             }
+
+            def runAction(action: ActionAst) =
+                withDebug("running action", Seq("action" → action.toString)) {
+                    AllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
+                }
+
+            // Interpret process recursively
+            @tailrec def nextGroup(tried: Try[Any], groups: Iterator[PairAst]): Try[Any] =
+                if (groups.hasNext) {
+                    val PairAst(nextCombinator, nextAction) = groups.next()
+
+                    val newTried =
+                        nextCombinator.name match {
+                            case Then ⇒
+                                debug("combining with then", Seq("action" → nextAction.toString))
+                                tried flatMap (_ ⇒ runAction(nextAction))
+                            case Recover ⇒
+                                debug("combining with recover", Seq("action" → nextAction.toString))
+                                tried recoverWith {
+                                    case t: ControlThrowable ⇒
+                                        debug("rethrowing ControlThrowable")
+                                        throw t
+                                    case t ⇒
+                                        debug("recovering", Seq("throwable" → OrbeonFormatter.format(t)))
+                                        runAction(nextAction)
+                                }
+                        }
+
+                    nextGroup(newTried, groups)
+                } else
+                    tried
+
+            // Run first action and recurse
+            val processIterator = parsedProcess.actions.iterator
+            nextGroup(runAction(parsedProcess.action.get), processIterator)
         }
     }
 
-    private def buildProcessFromLegacyProperties(buttonName: String)(implicit logger: IndentedLogger, p: FormRunnerParams) = {
+    private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
 
-        def booleanPropertySet(prefix: String, name: String) = formRunnerProperty(prefix, name) exists (_ == "true")
-        def stringPropertySet (prefix: String, name: String) = formRunnerProperty(prefix, name) flatMap nonEmptyOrNone isDefined
+        implicit val logger = containingDocument.getIndentedLogger("process")
+
+        def booleanPropertySet(name: String) = formRunnerProperty(name) exists (_ == "true")
+        def stringPropertySet (name: String) = formRunnerProperty(name) flatMap nonEmptyOrNone isDefined
 
         buttonName match {
             case "workflow-send" ⇒
-                val isLegacySendAlfresco    = booleanPropertySet("oxf.fr.detail.send", "alfresco")
-                val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send", "email")
-                val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send", "success.uri")
-                val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send", "error.uri")
+                val isLegacySendAlfresco    = booleanPropertySet("oxf.fr.detail.send.alfresco")
+                val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send.email")
+                val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send.success.uri")
+                val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send.error.uri")
 
                 def isLegacyCreatePDF =
-                    isLegacySendEmail       && booleanPropertySet("oxf.fr.email", "attach-pdf")  ||
-                    isLegacySendAlfresco    && booleanPropertySet("oxf.fr.alfresco", "send-pdf") ||
-                    isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send", "pdf")
+                    isLegacySendEmail       && booleanPropertySet("oxf.fr.email.attach-pdf")  ||
+                    isLegacySendAlfresco    && booleanPropertySet("oxf.fr.alfresco.send-pdf") ||
+                    isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
 
                 val buffer = ListBuffer[String]()
 
@@ -273,57 +286,33 @@ object ProcessButton extends Logging {
         Try {
             val hasPendingUploads = containingDocument.countPendingUploads > 0
 
-            if (hasPendingUploads) {
-                // Open error dialog
-                dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map(
-                    "message" → Some(currentFRResources \ "detail" \ "messages" \ "upload-in-progress")
-                ))
-            }
+            if (hasPendingUploads)
+                tryErrorMessage(Map(Some("message") → "upload-in-progress"))
 
             hasPendingUploads
         }
 
     // Running this action will interrupt the process
     // We will rethrow this as we explicitly check for ControlThrowable above
-    def tryDone(params: ActionParams): Try[Unit] = Try(break())
+    def tryDone(params: ActionParams): Try[Any] = Try(break())
+    
+    // Run a sub-process
+    def tryProcess(params: ActionParams): Try[Any] =
+        Try(params.get(Some("name")) getOrElse params(None)) map rawProcessByName flatMap runSubProcess
 
-    // Validate form data
-    // Interrupt the process if the data is not valid
-    def tryValidate(params: ActionParams): Try[Unit] =
+    // Validate form data and fail if invalid
+    def tryValidate(params: ActionParams): Try[Any] =
         Try {
-            // We use instance('fr-error-summary-instance')/valid and not xxf:valid() because the instance validity may
-            // not be reflected with the use of XBL components.
-            val isValid = errorSummaryInstance.rootElement \ "valid" === "true"
+            val property = params.get(Some("property")) orElse params.get(None)
 
-            if (! isValid) {
-                // Mark all controls as visited
-                dispatch(name = "fr-visit-all", targetId = "fr-error-summary-model")
+            implicit val formRunnerParams = FormRunnerParams()
+            def ignore = property flatMap formRunnerProperty exists (_ == "false")
 
-                // Open all sections
-                tryExpandSections(Map()).get
-
-                // Open error dialog
-                dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map(
-                    "message" → Some(currentFRResources \ "detail" \ "messages" \ "form-validation-error")
-                ))
-
-                // It makes sense at this point for this to break right away.
-                // One ideas was "validate recover done", but it's unclear that this buys much.
-                // OTOH if you had parentheses, you could write:
-                // "validate recover (visit-alerts then expand-sections then validation-error-dialog then done) then ..."
-                break()
-            }
+            if (! ignore && ! dataValid)
+                throw new OXFException("Data is invalid")
         }
 
-    // For backward compatibility: if "oxf.fr.detail.save" is false, consider validation successful, otherwise perform
-    // regular validation
-    def tryMaybeValidate(params: ActionParams): Try[Unit] =
-        if (formRunnerProperty("oxf.fr.detail.save", "validate")(FormRunnerParams()) == "false")
-            Success(())
-        else
-            tryValidate(params)
-
-    def trySaveAttachmentsAndData(params: ActionParams): Try[Unit] =
+    def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, document, _) = FormRunnerParams()
 
@@ -381,14 +370,14 @@ object ProcessButton extends Logging {
             ))
         }
 
-    def trySuccessMessage(params: ActionParams): Try[Unit] =
+    def trySuccessMessage(params: ActionParams): Try[Any] =
         Try {
             val resourceKey = params.get(Some("message")) getOrElse params(None)
             setvalue(persistenceInstance.rootElement \ "message", currentFRResources \ "detail" \ "messages" \ resourceKey)
             toggle("fr-message-success")
         }
 
-    def tryErrorMessage(params: ActionParams): Try[Unit] =
+    def tryErrorMessage(params: ActionParams): Try[Any] =
         Try {
             val resourceKey = params.get(Some("message")) getOrElse params(None)
             dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map(
@@ -396,37 +385,38 @@ object ProcessButton extends Logging {
             ))
         }
 
-    def tryShowSubmitDialog(params: ActionParams): Try[Unit] =
+    def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {
             show("fr-submission-result-dialog", Map(
                 "fr-content" → Some(topLevelInstance("fr-persistence-model", "fr-create-update-submission-response").get.rootElement)
             ))
         }
 
-    def tryCreatePDF(params: ActionParams): Try[Unit] =
+    def tryCreatePDF(params: ActionParams): Try[Any] =
         Try(sendThrowOnError("fr-pdf-service-submission"))
 
-    def trySendEmail(params: ActionParams): Try[Unit] =
+    def trySendEmail(params: ActionParams): Try[Any] =
         Try(sendThrowOnError("fr-email-service-submission"))
 
-    def trySend(params: ActionParams): Try[Unit] =
+    def trySend(params: ActionParams): Try[Any] =
         Try {
-            val prefix = params.get(Some("properties")) orElse params.get(None) getOrElse "oxf.fr.detail.send.success"
+            val prefix = params.get(Some("properties")) getOrElse params(None)
 
             implicit val formRunnerParams = FormRunnerParams()
 
+            // TODO: replace doesn't work yet
             val eventProperties =
-                Seq("uri", "method", "prune", "replace") map (key ⇒ key → formRunnerProperty(prefix, key))
+                Seq("uri", "method", "prune", "replace") map (key ⇒ key → formRunnerProperty(prefix + "." + key))
 
             sendThrowOnError("fr-send-submission", eventProperties.toMap)
         }
 
-    private def tryNavigateTo(path: String): Try[Unit] =
+    private def tryNavigateTo(path: String): Try[Any] =
         Try(load(path, progress = false))
 
     // Navigate to a URL specified in parameters or indirectly in properties
     // If no URL is specified, the action fails
-    def tryNavigate(params: ActionParams): Try[Unit] =
+    def tryNavigate(params: ActionParams): Try[Any] =
         Try {
             implicit val formRunnerParams = FormRunnerParams()
 
@@ -434,17 +424,17 @@ object ProcessButton extends Logging {
 
             def fromProperties = {
                 val prefix =  params.get(Some("properties")) orElse params.get(None) getOrElse "oxf.fr.detail.close"
-                formRunnerProperty(prefix, "uri") flatMap nonEmptyOrNone
+                formRunnerProperty(prefix + ".uri") flatMap nonEmptyOrNone
             }
 
             fromParams orElse fromProperties get
         } flatMap
             tryNavigateTo
 
-    def tryNavigateToReview(params: ActionParams): Try[Unit] =
+    def tryNavigateToReview(params: ActionParams): Try[Any] =
         Try(sendThrowOnError("fr-workflow-review-submission"))
 
-    def tryNavigateToEdit(params: ActionParams): Try[Unit] =
+    def tryNavigateToEdit(params: ActionParams): Try[Any] =
         Try(sendThrowOnError("fr-workflow-edit-submission"))
 
     private def appendNoscriptIfNeeded(path: String) =
@@ -453,24 +443,28 @@ object ProcessButton extends Logging {
         else
             path
 
-    def tryNavigateToSummary(params: ActionParams): Try[Unit]  =
+    def tryNavigateToSummary(params: ActionParams): Try[Any]  =
         Try {
             val FormRunnerParams(app, form, _, _) = FormRunnerParams()
             appendNoscriptIfNeeded(s"/fr/$app/$form/summary")
         } flatMap
             tryNavigateTo
 
-    def tryNavigateToHome(params: ActionParams): Try[Unit] =
+    def tryNavigateToHome(params: ActionParams): Try[Any] =
         Try {
             appendNoscriptIfNeeded("/fr/")
         } flatMap
             tryNavigateTo
 
-    // Collapse/expand sections
-    def tryCollapseSections(params: ActionParams): Try[Unit] = Try(dispatch(name = "fr-collapse-all", targetId = "fr-sections-model"))
-    def tryExpandSections(params: ActionParams)  : Try[Unit] = Try(dispatch(name = "fr-expand-all",   targetId = "fr-sections-model"))
+    // Visit/unvisit controls
+    def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = "fr-error-summary-model"))
+    def tryUnvisitAll(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-unvisit-all", targetId = "fr-error-summary-model"))
 
-    def trySendAlfresco(params: ActionParams): Try[Unit] =
+    // Collapse/expand sections
+    def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = "fr-sections-model"))
+    def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = "fr-sections-model"))
+
+    def trySendAlfresco(params: ActionParams): Try[Any] =
         Try {
             ???
 //                    <!-- Pass metadata with current language, or first language if current language is not found -->

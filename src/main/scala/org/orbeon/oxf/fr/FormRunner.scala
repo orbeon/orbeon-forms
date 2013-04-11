@@ -441,6 +441,11 @@ object FormRunner {
     def currentFRResources   = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-fr-resources"))
     def currentFormResources = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-form-resources"))
 
+    // Whether the form data is valid
+    // We use instance('fr-error-summary-instance')/valid and not xxf:valid() because the instance validity may not be
+    // reflected with the use of XBL components.
+    def dataValid = errorSummaryInstance.rootElement \ "valid" === "true"
+
     // The standard Form Runner parameters
     case class FormRunnerParams(app: String, form: String, document: Option[String], mode: String)
 

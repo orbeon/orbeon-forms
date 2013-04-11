@@ -133,15 +133,15 @@ $ ->
             section = Builder.findInCache sectionsCache, interceptorOffset.top
             labelAnchor = f$.find '.fr-section-label:first a', section.el
             if (f$.text labelAnchor) == ''
-                enterTitleOutput = f$.children '.fb-enter-section-title-label', sectionEditor
-                enterTitleValue = Controls.getCurrentValue enterTitleOutput[0]
-                f$.text enterTitleValue, clickInterceptor
+                outputWithHintMessage = sectionEditor.children('.fb-enter-section-title-label')
+                hintMessage = Controls.getCurrentValue(outputWithHintMessage.get(0))
+                clickInterceptor.text(hintMessage)
 
-        # Handle click
+        # Create an position click interceptors
         do ->
             labelClickInterceptors = []
             Builder.onOffsetMayHaveChanged ->
-                sections = $ '.xbl-fr-section'
+                sections = $('.xbl-fr-section')
                 # Create interceptor divs, so we have enough to cover all the sections
                 _.each _.range(sections.length - labelClickInterceptors.length), ->
                     container = $ '<div class="fb-section-label-editor-click-interceptor">'

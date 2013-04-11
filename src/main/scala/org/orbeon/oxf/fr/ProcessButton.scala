@@ -333,10 +333,16 @@ object ProcessButton extends Logging {
             // For each one compute the persistence resource name
             val afterURLs  = beforeURLs map (url ⇒ createAttachmentPath(app, form, document.get, url))
 
+            val commonQueryString = s"valid=$dataValid"
+
             // Save all attachments
+            // - also pass a "valid" argument with whether the data was valid
             def saveAttachments() =
                 uploadHolders zip afterURLs map { case pair @ (holder, resource) ⇒
-                    sendThrowOnError("fr-create-update-attachment-submission", Map("holder" → Some(holder), "resource" → Some(resource)))
+                    sendThrowOnError("fr-create-update-attachment-submission", Map(
+                        "holder"   → Some(holder),
+                        "resource" → Some(appendQueryString(resource, commonQueryString)))
+                    )
                     pair
                 }
 
@@ -345,9 +351,13 @@ object ProcessButton extends Logging {
                 s foreach { case (holder, resource) ⇒ setvalue(holder, resource) }
 
             // Save XML document
-            // We always store form data as "data.xml"
+            // - always store form data as "data.xml"
+            // - also pass a "valid" argument with whether the data was valid
             def saveData() =
-                sendThrowOnError("fr-create-update-submission", Map("holder" → Some(formInstance.rootElement), "resource" → Some("data.xml")))
+                sendThrowOnError("fr-create-update-submission", Map(
+                    "holder"   → Some(formInstance.rootElement),
+                    "resource" → Some(appendQueryString("data.xml", commonQueryString)))
+                )
 
             // Do things in order
             val attachments = saveAttachments()

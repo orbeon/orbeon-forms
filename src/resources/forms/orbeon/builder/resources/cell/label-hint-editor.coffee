@@ -1,5 +1,6 @@
 $ ->
     Builder = ORBEON.Builder
+    Events = ORBEON.xforms.Events
     OD = ORBEON.xforms.Document
 
     LabelHintSelector = '.fr-editable .xforms-label, .fr-editable .xforms-hint'
@@ -115,3 +116,40 @@ $ ->
             then repeat.find('thead tr th:nth-child(' + (container.index() + 1) + ') .xforms-label')
             else container.find('.xforms-label')
         startEdit()
+
+    do ->
+        lhhaNames = ['label', 'hint']
+        gridTdUpdated = []
+        placeholderText = {}
+
+        # Set the placeholder attributes in the LHHA inside this gridTd
+        updateGridTd = (gridTd) ->
+            gridTd = $(gridTd)
+            _.each lhhaNames, (lhha) ->
+                elementInDiv = gridTd.find(".xforms-#{lhha}")
+                elementInDiv.attr('placeholder', placeholderText[lhha])
+
+        # Reads and stores the placeholder text
+        updatePlacehodlerText = ->
+            foundDifference = false
+            _.each lhhaNames, (lhha) ->
+                newText = $("#fb-placeholder-#{lhha}").children().text()
+                if newText != placeholderText[lhha]
+                    placeholderText[lhha] = newText
+                    foundDifference = true
+            if foundDifference
+                # Only keep the gridTds still in the DOM
+                isInDoc = (e) -> $.contains(document.body, e)
+                gridTdUpdated = _.filter(gridTdUpdated, isInDoc)
+                # Update the placeholders in the gridTds we have left
+                _.each(gridTdUpdated, updateGridTd)
+        # Do initial update when the page is loaded
+        updatePlacehodlerText()
+        # Update on Ajax response in case the language changed
+        Events.ajaxResponseProcessedEvent.subscribe updatePlacehodlerText
+
+        # When label/hint empty, show placeholder hinting users can click to edit the label/hint
+        Builder.mouseEntersGridTdEvent.subscribe ({gridTd}) ->
+            if ! _.contains(gridTdUpdated, gridTd)
+                gridTdUpdated.push(gridTd)
+                updateGridTd(gridTd)

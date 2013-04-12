@@ -100,11 +100,13 @@ body {
     }
 
     .fr-view .fb .fr-section-container .fr-grid.fr-editable {               // Tons of classes to take precedence over FR styling
-        .fb-grid-td:hover {
-            .xforms-label, .xforms-hint {
-                &:empty:before {
-                    content: attr(placeholder);
-                    color: #bbb;
+        .fb-grid-td, .fb-grid-th {
+            &:hover {
+                .xforms-label, .xforms-hint {
+                    &:empty:before {
+                        content: attr(placeholder);
+                        color: #bbb;
+                    }
                 }
             }
         }

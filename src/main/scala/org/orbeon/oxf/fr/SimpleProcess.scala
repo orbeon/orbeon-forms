@@ -433,7 +433,7 @@ object SimpleProcess extends Logging {
             // Append query parameters to the URL
             val withUpdatedURI =
                 propertiesAsPairs map {
-                    case ("uri", Some(uri)) ⇒ "uri" → Some(appendQueryString(uri, s"app=$app&form=$form&document=$document&valid=$dataValid"))
+                    case ("uri", Some(uri)) ⇒ "uri" → Some(appendQueryString(uri, s"app=$app&form=$form&document=${document.get}&valid=$dataValid"))
                     case other              ⇒ other
                 }
 

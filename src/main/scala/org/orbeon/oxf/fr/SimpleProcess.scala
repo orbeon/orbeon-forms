@@ -420,8 +420,15 @@ object SimpleProcess extends Logging {
 
             implicit val formRunnerParams @ FormRunnerParams(app, form, document, _) = FormRunnerParams()
 
+            // Defaults except for "uri"
+            val Defaults = Map(
+                "method"  → "post",
+                "prune"   → "true",
+                "replace" → "none"
+            )
+
             val propertiesAsPairs =
-                Seq("uri", "method", "prune", "replace") map (key ⇒ key → formRunnerProperty(prefix + "." + key))
+                Seq("uri", "method", "prune", "replace") map (key ⇒ key → (formRunnerProperty(prefix + "." + key) orElse Defaults.get(key)))
 
             // Append query parameters to the URL
             val withUpdatedURI =

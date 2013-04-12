@@ -99,7 +99,15 @@ body {
         padding: 0;                                                         // Space between icons and grid, and at top/left in case the mouse moves a bit out
     }
 
-    .fr-view .fb .fr-section-container .fr-grid .fr-grid-content {          // Tons of classes to take precedence over FR styling
+    .fr-view .fb .fr-section-container .fr-grid.fr-editable {               // Tons of classes to take precedence over FR styling
+        .fb-grid-td:hover {
+            .xforms-label, .xforms-hint {
+                &:empty:before {
+                    content: attr(placeholder);
+                    color: #bbb;
+                }
+            }
+        }
         .xforms-label {
             .fb-edit-label-html {
                 float: right;                                               // Checkbox to the right of the input

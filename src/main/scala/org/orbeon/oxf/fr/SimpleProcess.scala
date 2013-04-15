@@ -35,36 +35,21 @@ import org.orbeon.oxf.common.OXFException
 // - The property specifies a sequence of actions separated by combinators.
 // - Actions are predefined, but some of them are configurable.
 //
-object SimpleProcess extends Logging {
+object SimpleProcess extends Actions with Logging {
 
     private val Then    = "then"
     private val Recover = "recover"
     private val AllowedCombinators = Set(Then, Recover)
     
     type ActionParams = Map[Option[String], String]
+    type Action       = ActionParams ⇒ Try[Any]
 
-    private val AllowedActions = Map[String, ActionParams ⇒ Try[Any]](
-        "done"                        → tryDone,
-        "process"                     → tryProcess,
-        "validate"                    → tryValidate,
-        "save"                        → trySaveAttachmentsAndData,
-        "success-message"             → trySuccessMessage,
-        "error-message"               → tryErrorMessage,
-        "pdf"                         → tryCreatePDF,
-        "email"                       → trySendEmail,
-        "send"                        → trySend,
-        "navigate"                    → tryNavigate,
-        "alfresco"                    → trySendAlfresco,
-        "review"                      → tryNavigateToReview,
-        "edit"                        → tryNavigateToEdit,
-        "summary"                     → tryNavigateToSummary,
-        "visit-all"                   → tryVisitAll,
-        "unvisit-all"                 → tryUnvisitAll,
-        "collapse-all"                → tryCollapseSections,
-        "expand-all"                  → tryExpandSections,
-        "result-dialog"               → tryShowResultDialog,
-        "captcha"                     → tryCaptcha
+    private val StandardActions = Map[String, Action](
+        "done"    → tryDone,
+        "process" → tryProcess
     )
+
+    private val AllAllowedActions = StandardActions ++ AllowedActions
 
     private val processBreaks = new Breaks
     import processBreaks._
@@ -94,7 +79,7 @@ object SimpleProcess extends Logging {
                 // Non-empty process
 
                 // Allowed actions are either built-in actions or other processes
-                val allowedActions = AllowedActions.keySet ++ (
+                val allowedActions = AllAllowedActions.keySet ++ (
                     for {
                         property ← properties.propertiesStartsWith("oxf.fr.detail.send.process")
                         tokens = property split """\."""
@@ -181,6 +166,7 @@ object SimpleProcess extends Logging {
             Success(())
         } else {
             // This is required before all in any case
+            // Q: Should we instead run this only before actions which need it, such as "save", "send", etc.?
             if (tryCheckUploads().get) {
                 debug("uploads in progress, canceling process")
                 return Success(()) // ?
@@ -188,7 +174,7 @@ object SimpleProcess extends Logging {
 
             def runAction(action: ActionAst) =
                 withDebug("running action", Seq("action" → action.toString)) {
-                    AllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
+                    AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
                 }
 
             // Interpret process recursively
@@ -223,6 +209,15 @@ object SimpleProcess extends Logging {
         }
     }
 
+    // Running this action will interrupt the process
+    // We will rethrow this as we explicitly check for ControlThrowable above
+    def tryDone(params: ActionParams): Try[Any] = Try(break())
+
+    // Run a sub-process
+    def tryProcess(params: ActionParams): Try[Any] =
+        Try(params.get(Some("name")) getOrElse params(None)) map rawProcessByName flatMap runSubProcess
+
+    // Legacy: build "workflow-send" process based on properties
     private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
 
         implicit val logger = containingDocument.getIndentedLogger("process")
@@ -280,6 +275,32 @@ object SimpleProcess extends Logging {
                 None
         }
     }
+}
+
+trait Actions {
+
+    import SimpleProcess._
+
+    def AllowedActions = Map[String, Action](
+        "validate"                    → tryValidate,
+        "save"                        → trySaveAttachmentsAndData,
+        "success-message"             → trySuccessMessage,
+        "error-message"               → tryErrorMessage,
+        "pdf"                         → tryCreatePDF,
+        "email"                       → trySendEmail,
+        "send"                        → trySend,
+        "navigate"                    → tryNavigate,
+        "alfresco"                    → trySendAlfresco,
+        "review"                      → tryNavigateToReview,
+        "edit"                        → tryNavigateToEdit,
+        "summary"                     → tryNavigateToSummary,
+        "visit-all"                   → tryVisitAll,
+        "unvisit-all"                 → tryUnvisitAll,
+        "collapse-all"                → tryCollapseSections,
+        "expand-all"                  → tryExpandSections,
+        "result-dialog"               → tryShowResultDialog,
+        "captcha"                     → tryCaptcha
+    )
 
     // Check whether there are pending uploads
     def tryCheckUploads() =
@@ -291,14 +312,6 @@ object SimpleProcess extends Logging {
 
             hasPendingUploads
         }
-
-    // Running this action will interrupt the process
-    // We will rethrow this as we explicitly check for ControlThrowable above
-    def tryDone(params: ActionParams): Try[Any] = Try(break())
-    
-    // Run a sub-process
-    def tryProcess(params: ActionParams): Try[Any] =
-        Try(params.get(Some("name")) getOrElse params(None)) map rawProcessByName flatMap runSubProcess
 
     // Validate form data and fail if invalid
     def tryValidate(params: ActionParams): Try[Any] =

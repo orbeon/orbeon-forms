@@ -565,7 +565,7 @@
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <label>Itemset Editor</label>
+            <label>Edit Choices</label>
             <resources-language>
                 <label>Resources Language</label>
             </resources-language>
@@ -1393,7 +1393,7 @@
             </source>
         </dialog-edit-source>
         <dialog-view-source>
-            <label>Visualisation du code source</label>
+            <label>Code source</label>
         </dialog-view-source>
         <dialog-upload-pdf>
             <label>Joindre un fichier PDF</label>
@@ -1402,7 +1402,7 @@
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <label>Editeur de listes de choix</label>
+            <label>Editer liste de choix</label>
             <resources-language>
                 <label>Langue des ressources</label>
             </resources-language>
@@ -2241,9 +2241,9 @@
             </upload-pdf>
         </dialog-upload-pdf>
         <dialog-itemsets>
-            <label>Itemset Editor</label>
+            <label>[Edit Choices]</label>
             <resources-language>
-                <label>Resources Language</label>
+                <label>[Resources Language]</label>
             </resources-language>
             <label>
                 <label>Label</label>

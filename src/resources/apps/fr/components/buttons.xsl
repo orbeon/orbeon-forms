@@ -106,14 +106,11 @@
         <!-- NOTE: Only the XForms document id is strictly needed. Keep app/form/document for filtering purposes. -->
         <!-- Don't show the PDF template button in CE (also on summary page) -->
         <xsl:if test="not($has-pdf-template and not($is-pe))">
-            <xsl:variable name="pdf-disable-if-invalid" select="p:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))" as="xs:boolean"/>
             <fr:href-button
                     model="fr-persistence-model"
+                    ref="instance('fr-triggers-instance')/pdf"
                     href="/fr/service/{$app}/{$form}/pdf/{{xxf:instance('fr-parameters-instance')/document}}/{{xxf:document-id()}}.pdf">
                 <xsl:copy-of select="@appearance"/>
-                <xsl:if test="$pdf-disable-if-invalid">
-                    <xsl:attribute name="ref">instance('fr-triggers-instance')/strict-submit</xsl:attribute>
-                </xsl:if>
                 <xf:label>
                     <xh:img width="16" height="16" src="/apps/fr/style/pdf.png" alt=""/>
                     <xf:output value="$fr-resources/detail/labels/print-pdf"/>

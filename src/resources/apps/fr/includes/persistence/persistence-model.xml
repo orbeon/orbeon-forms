@@ -464,6 +464,8 @@
             <workflow-review/>
             <workflow-edit/>
             <workflow-send/>
+            <!-- PDF button -->
+            <pdf/>
             <!-- Discard button -->
             <discard/>
             <!-- Other buttons (bind here to make sure they are not read-only) -->
@@ -488,9 +490,15 @@
         <xf:bind ref="publish" readonly="not($persistence-instance/data-status = 'clean') or xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0"/>
 
         <!-- Conditions for disabling workflow buttons -->
-        <xf:bind ref="workflow-review" readonly="exf:readonly(../submit)"/>
+        <xf:bind ref="workflow-review" readonly="exf:readonly(../submit)" relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'read')"/>
         <xf:bind ref="workflow-edit" readonly="exf:readonly(../submit)" relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'update')"/>
         <xf:bind ref="workflow-send" readonly="exf:readonly(../submit)"/>
+
+        <xf:bind ref="pdf"
+                 readonly="if (xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.')))
+                           then exf:readonly(../strict-submit)
+                           else exf:readonly(../submit)"
+                 relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'read')"/>
     </xf:bind>
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity

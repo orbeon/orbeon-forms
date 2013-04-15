@@ -453,7 +453,7 @@ trait Actions {
             val propertiesAsMap = withUpdatedURI.toMap
 
             // TODO: Remove duplication once @replace is an AVT
-            val replace = if (propertiesAsMap.get("replace") exists (_ == "all")) "all" else "none"
+            val replace = if (propertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
             sendThrowOnError(s"fr-send-submission-$replace", propertiesAsMap)
         }
 

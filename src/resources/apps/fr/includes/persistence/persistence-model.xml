@@ -283,7 +283,9 @@
     <xf:instance id="fr-triggers-instance">
         <triggers xmlns="">
             <strict-submit/>
-            <workflow-edit/>
+            <can-update/>
+            <can-read/>
+            <pdf/>
             <other/>
             <!-- TODO: Move out, this is Form Builder-specific -->
             <publish/>
@@ -302,8 +304,16 @@
                            and (xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0)"/>
 
         <!-- Conditions for disabling workflow buttons -->
-        <xf:bind ref="workflow-edit"
+        <xf:bind ref="can-update"
                  relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'update')"/>
+
+        <xf:bind ref="can-read"
+                 relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'read')"/>
+
+        <xf:bind ref="pdf"
+                 readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
+                           and exf:readonly(../strict-submit)"
+                 relevant="exf:relevant(../can-read)"/>
 
         <!-- Condition for disabling Publish button -->
         <!-- TODO: Move out, this is Form Builder-specific -->

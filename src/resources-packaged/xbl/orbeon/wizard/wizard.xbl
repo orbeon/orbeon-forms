@@ -30,6 +30,14 @@
         <xbl:resources>
             <xbl:style src="/xbl/orbeon/wizard/wizard.css"/>
         </xbl:resources>
+        <xbl:handlers>
+            <xbl:handler event="fr-prev" phase="target">
+                <xf:dispatch name="DOMActivate" targetid="fr-wizard-prev" xxbl:scope="outer"/>
+            </xbl:handler>
+            <xbl:handler event="fr-next" phase="target">
+                <xf:dispatch name="DOMActivate" targetid="fr-wizard-next" xxbl:scope="outer"/>
+            </xbl:handler>
+        </xbl:handlers>
         <xbl:implementation>
             <xf:model>
                 <xf:instance id="local">
@@ -105,7 +113,7 @@
                                 <xh:div class="pagination pagination-centered">
                                     <xh:ul>
                                         <xh:li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
-                                            <xf:trigger ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
+                                            <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
                                                 <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
                                                      a CSS  bug with IE 7:
                                                      https://github.com/orbeon/orbeon-forms/issues/723
@@ -127,7 +135,7 @@
                                             </xh:span>
                                         </xh:li>
                                         <xh:li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
-                                            <xf:trigger ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
+                                            <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
                                                 <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
                                                      a CSS  bug with IE 7:
                                                      https://github.com/orbeon/orbeon-forms/issues/723

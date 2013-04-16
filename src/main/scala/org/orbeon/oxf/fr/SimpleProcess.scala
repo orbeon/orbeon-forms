@@ -306,7 +306,9 @@ trait Actions {
         "expand-all"                  → tryExpandSections,
         "collapse-all"                → tryCollapseSections,
         "result-dialog"               → tryShowResultDialog,
-        "captcha"                     → tryCaptcha
+        "captcha"                     → tryCaptcha,
+        "wizard-prev"                 → tryWizardPrev,
+        "wizard-next"                 → tryWizardNext
     )
 
     // Check whether there are pending uploads
@@ -517,6 +519,12 @@ trait Actions {
     // Collapse/expand sections
     def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = "fr-sections-model"))
     def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = "fr-sections-model"))
+
+    def tryWizardPrev(params: ActionParams): Try[Any] =
+        Try (dispatch(name = "fr-prev", targetId = "fr-view-wizard"))
+
+    def tryWizardNext(params: ActionParams): Try[Any] =
+        Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
 
     def trySendAlfresco(params: ActionParams): Try[Any] =
         Try {

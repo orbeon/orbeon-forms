@@ -149,15 +149,15 @@
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.dmv-14.fr-us-state"                   value="select-value"/>
     <property as="xs:boolean" name="oxf.fr.noscript-link.orbeon.contact"                        value="true"/>
 
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh pdf review"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh pdf wizard-prev wizard-next review"/>
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.controls"              value="wizard"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.controls"                          value="-1"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh summary clear pdf save-final review"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.controls"                      value="refresh summary clear pdf save-final wizard-prev wizard-next review"/>
 
     <property as="xs:string"  name="oxf.fr.detail.view.appearance.orbeon.w9"                    value="wizard"/>
     <property as="xs:integer" name="oxf.fr.detail.toc.orbeon.w9"                                value="-1"/>
     <property as="xs:string"  name="oxf.fr.pdf.map.orbeon.w9.xforms-select1.*"                  value="select-value"/>
-    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"                            value="refresh summary clear pdf save-final review"/>
+    <property as="xs:string"  name="oxf.fr.detail.buttons.orbeon.w9"                            value="refresh summary save-final wizard-prev wizard-next review"/>
 
     <!-- Register and license forms -->
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.register.form"           value="resource"/>
@@ -197,6 +197,8 @@
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.refresh.*.*"                          value='visit-all'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.wizard-prev.*.*"                      value='wizard-prev'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.wizard-next.*.*"                      value='wizard-next'/>
 
     <!-- Legacy buttons and processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.save.*.*"                             value='maybe-require-valid then save then success-message("save-success") recover error-message("database-error")'/>

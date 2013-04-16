@@ -104,6 +104,7 @@
                     <!-- NOTE: Once we support XBL matching on @appearance, use instead
                          <fr:view appearance="{$view-appearance}">. -->
                     <xsl:element name="fr:{$view-appearance}">
+                        <xsl:attribute name="id" select="concat('fr-view-', $view-appearance)"/>
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
                     </xsl:element>
                 </xsl:otherwise>

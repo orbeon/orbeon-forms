@@ -32,12 +32,19 @@
          placing buttons like fr:buttons/fr:save. -->
     <xsl:template match="fr:*[ends-with(local-name(), '-button') and not(local-name() = ('href-button', 'process-button', 'select1-button'))]" priority="-20">
         <xsl:variable name="button-name" select="substring-before(local-name(), '-button')"/>
+        <!-- FIXME: We need a better way to configure button visibility/readonly. Currently, this is hardcoded below.
+             For the wizard, we even rely on the fact that internal wizard controls are in XBL outer scope. See also:
+             https://github.com/orbeon/orbeon-forms/issues/940 -->
         <fr:process-button
             name="{$button-name}"
             ref="xxf:instance('fr-triggers-instance')/{if ($button-name = ('edit', 'workflow-edit'))
                                                        then 'can-update'
                                                        else if ($button-name = ('summary', 'review', 'workflow-review'))
                                                        then 'can-read'
+                                                       else if ($button-name = 'wizard-prev')
+                                                       then 'xxf:binding(''fr-wizard-prev'')'
+                                                       else if ($button-name = 'wizard-next')
+                                                       then 'xxf:binding(''fr-wizard-next'')'
                                                        else 'other'}">
             <xsl:copy-of select="@appearance"/>
         </fr:process-button>

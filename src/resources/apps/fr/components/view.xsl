@@ -402,7 +402,7 @@
         <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
 
         <!-- Error dialog -->
-        <fr:alert-dialog id="fr-error-dialog">
+        <fr:alert-dialog id="fr-error-dialog" close="true">
             <fr:label ref="$fr-resources/detail/messages/error-dialog-title"/>
             <fr:neutral-choice/>
         </fr:alert-dialog>

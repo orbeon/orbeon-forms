@@ -48,7 +48,7 @@
                     <xsl:variable name="has-multiple-choices" select="count(fr:positive-choice | fr:negative-choice | fr:neutral-choice) > 1"/>
 
                     <!-- Once AVTs are supported: close="{exists(fr:neutral-choice) and not ($has-multiple-choices)}"  -->
-                    <xxf:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="false"
+                    <xxf:dialog xxbl:scope="inner" id="dialog" level="modal" appearance="full" close="{(@close, 'false')[1]}"
                             class="xbl-fr-alert-dialog xbl-fr-alert-dialog-{if ($has-multiple-choices) then 'question' else 'info'}">
 
                         <xf:model>

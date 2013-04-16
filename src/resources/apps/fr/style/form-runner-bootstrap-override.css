@@ -206,7 +206,8 @@ body.orbeon {
 .orbeon .btn-danger i,
 .orbeon .btn-warning i,
 .orbeon .btn-primary i,
-.orbeon .btn-inverse i {
+.orbeon .btn-inverse i,
+.orbeon .navbar-inverse i {
   background-image: url(bootstrap/img/glyphicons-halflings-white.png);
 }
 .orbeon .nav > li > span > a {

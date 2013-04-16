@@ -192,7 +192,8 @@ body.orbeon {
   color: #777777;
 }
 .orbeon .fr-language-choice,
-.orbeon .fr-noscript-choice {
+.orbeon .fr-noscript-choice,
+.orbeon .fr-status-icons {
   float: right;
 }
 .orbeon .fr-goto-content {

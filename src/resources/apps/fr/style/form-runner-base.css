@@ -211,14 +211,16 @@
 }
 .orbeon .fr-language-choice,
 .orbeon .fr-noscript-choice,
-.orbeon .fr-goto-content {
-  margin-right: 1em;
+.orbeon .fr-goto-content,
+.orbeon .fr-status-icons {
+  margin-right: 10px;
 }
 .orbeon .fr-language-choice .xforms-label,
 .orbeon .fr-noscript-choice .xforms-label,
-.orbeon .fr-goto-content .xforms-label {
+.orbeon .fr-goto-content .xforms-label,
+.orbeon .fr-status-icons .xforms-label {
   display: inline;
-  margin-right: .5em;
+  margin-right: 5px;
 }
 .orbeon .fr-noscript-icon {
   display: none;

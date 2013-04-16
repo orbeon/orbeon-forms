@@ -78,7 +78,6 @@
 
     <!-- Template for the default layout of the bottom bar -->
     <xsl:variable name="default-bottom-template" as="element(*)*">
-        <fr:status-icons/>
         <fr:buttons-bar/>
     </xsl:variable>
 
@@ -153,6 +152,7 @@
                                          https://github.com/orbeon/orbeon-forms/issues/721 -->
                                     <fr:language-selector/>
                                     <fr:noscript-selector/>
+                                    <fr:status-icons/>
                                     <fr:goto-content/>
                                     <!-- These are typically to the left -->
                                     <fr:logo/>

@@ -31,8 +31,8 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
     require(parent.isDefined)
 
     val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
-    val isLocal = forStaticIdOption.isEmpty
-    val isHTML  = element.attributeValue(MEDIATYPE_QNAME) == "text/html"
+    val isLocal          = forStaticIdOption.isEmpty
+    val defaultToHTML    = LHHAAnalysis.isHTML(element)
 
     // Find the target control if any
     def targetControl =
@@ -130,6 +130,10 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 }
 
 object LHHAAnalysis {
+
+    def isHTML(e: Element)      = e.attributeValue(MEDIATYPE_QNAME) == "text/html"
+    def isPlainText(e: Element) = e.attributeValue(MEDIATYPE_QNAME) == "text/plain"
+
     // Try to figure out if we have a dynamic LHHA element, including nested xf:output and AVTs.
     private def hasStaticValue(staticStateContext: StaticStateContext, lhhaElement: Element): Boolean = {
         XPathCache.evaluateSingle(new DocumentWrapper(lhhaElement.getDocument, null, XPathCache.getGlobalConfiguration).wrap(lhhaElement),

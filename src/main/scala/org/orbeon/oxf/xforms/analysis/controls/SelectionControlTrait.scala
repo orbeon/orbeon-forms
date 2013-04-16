@@ -208,7 +208,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                             val attributes = SelectionControlUtil.getAttributes(element)
                             val newContainer = Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, false), null)
                             position += 1
-                            currentContainer.addChildItem(newContainer);
+                            currentContainer.addChildItem(newContainer)
                             currentContainer = newContainer
                         }
 

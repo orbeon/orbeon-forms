@@ -20,6 +20,7 @@ import org.dom4j.Text;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.SelectionControlTrait;
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control;
 import org.orbeon.oxf.xforms.itemset.Item.Label;
@@ -263,8 +264,11 @@ public class XFormsItemUtils {
                 final Scope elementScope = select1Control.getChildElementScope(labelElement);
                 final String elementEffectiveId = getElementEffectiveId(labelElement);
                 final boolean supportsHTML = select1Control.isFullAppearance(); // Only support HTML when appearance is "full"
-                final boolean[] containsHTML = new boolean[] { false }; 
-                final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, false, containsHTML);
+                final boolean[] containsHTML = new boolean[] { false };
+
+                // FIXME: Would be good to do this check statically
+                final boolean defaultToHTML = LHHAAnalysis.isHTML(labelElement);
+                final String label =  XFormsUtils.getChildElementValue(container, elementEffectiveId, elementScope, labelElement, supportsHTML, defaultToHTML, containsHTML);
                 return new Label(StringUtils.defaultString(label), containsHTML[0]);
             }
 

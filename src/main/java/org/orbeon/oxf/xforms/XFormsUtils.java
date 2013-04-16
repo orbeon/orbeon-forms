@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.util.XPath;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
@@ -870,8 +871,7 @@ public class XFormsUtils {
                 };
 
                 final boolean isHTMLMediatype =
-                        ! defaultHTML && "text/html".equals(element.attributeValue(XFormsConstants.MEDIATYPE_QNAME))
-                     || defaultHTML && ! "text/plain".equals(element.attributeValue(XFormsConstants.MEDIATYPE_QNAME));
+                    ! defaultHTML && LHHAAnalysis.isHTML(element) || defaultHTML && ! LHHAAnalysis.isPlainText(element);
 
                 contextStack.pushBinding(element, sourceEffectiveId, outputControl.getChildElementScope(element));
                 {

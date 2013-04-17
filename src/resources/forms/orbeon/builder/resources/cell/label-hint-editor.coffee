@@ -85,8 +85,9 @@ $ ->
         labelHintEditor().textfield.outerWidth(currentLabelHint.outerWidth() - labelHintEditor().checkbox.outerWidth(true))
         labelHintEditor().textfield.val(labelHintValue()).focus()
         labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
-        # Setup tooltip for editor (don't do this once for all, as the language can change)
+        # Set tooltip for checkbox and HTML5 placeholders (don't do this once for all, as the language can change)
         labelHintEditor().checkbox.tooltip(title: $('.fb-lhha-checkbox-message').text())
+        labelHintEditor().textfield.attr('placeholder', $(".fb-#{lhha()}-placeholder").text())
         # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
         currentLabelHint.css('visibility', 'hidden')
         # Add class telling if this is a label or hint editor

@@ -26,7 +26,7 @@
 
             <xf:var name="button-name" xbl:attr="xbl:text=name">save</xf:var>
             <xf:var name="fr-resources"><xxf:sequence xxbl:scope="outer" value="$fr-resources"/></xf:var>
-            <!-- Q: Should modality be configured in properties? oxf.fr.detail.send.process.home.modal = false -->
+            <!-- Q: Should modality be configured in properties? oxf.fr.detail.process.home.modal = false -->
             <xf:var name="modal" value="not($button-name = ('collapse-all', 'expand-all', 'home', 'summary', 'close', 'clear', 'validate'))"/>
 
             <xf:trigger

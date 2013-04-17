@@ -37,6 +37,9 @@ import org.orbeon.oxf.common.OXFException
 //
 object SimpleProcess extends Actions with Logging {
 
+    private val ProcessPropertyPrefix = "oxf.fr.detail.process"
+    private val ProcessPropertyTokens = ProcessPropertyPrefix split """\.""" size
+
     private val Then    = "then"
     private val Recover = "recover"
     private val AllowedCombinators = Set(Then, Recover)
@@ -45,7 +48,8 @@ object SimpleProcess extends Actions with Logging {
     type Action       = ActionParams ⇒ Try[Any]
 
     private val StandardActions = Map[String, Action](
-        "done"    → tryDone,
+        "success" → trySuccess,
+        "failure" → tryFailure,
         "process" → tryProcess
     )
 
@@ -81,10 +85,10 @@ object SimpleProcess extends Actions with Logging {
                 // Allowed actions are either built-in actions or other processes
                 val allowedActions = AllAllowedActions.keySet ++ (
                     for {
-                        property ← properties.propertiesStartsWith("oxf.fr.detail.send.process")
-                        tokens = property split """\."""
+                        property ← properties.propertiesStartsWith(ProcessPropertyPrefix)
+                        tokens   = property split """\."""
                     } yield
-                        tokens(5)
+                        tokens(ProcessPropertyTokens)
                 )
     
                 def actionUsage(action: String)         = s"action '$action' is not supported, must be one of: ${allowedActions mkString ", "}"
@@ -132,7 +136,7 @@ object SimpleProcess extends Actions with Logging {
     private def rawProcessByName(name: String) = {
         implicit val formRunnerParams = FormRunnerParams()
 
-        formRunnerProperty(s"oxf.fr.detail.send.process.$name") orElse
+        formRunnerProperty(ProcessPropertyPrefix + '.' + name) orElse
         buildProcessFromLegacyProperties(name) getOrElse ""
     }
 
@@ -209,9 +213,12 @@ object SimpleProcess extends Actions with Logging {
         }
     }
 
-    // Running this action will interrupt the process
+    // Interrupt the process and complete with a success
     // We will rethrow this as we explicitly check for ControlThrowable above
-    def tryDone(params: ActionParams): Try[Any] = Try(break())
+    def trySuccess(params: ActionParams): Try[Any] = Try(break())
+
+    // Interrupt the process and complete with a failure
+    def tryFailure(params: ActionParams): Try[Any] = ???
 
     // Run a sub-process
     def tryProcess(params: ActionParams): Try[Any] =
@@ -296,8 +303,8 @@ trait Actions {
         "summary"                     → tryNavigateToSummary,
         "visit-all"                   → tryVisitAll,
         "unvisit-all"                 → tryUnvisitAll,
-        "collapse-all"                → tryCollapseSections,
         "expand-all"                  → tryExpandSections,
+        "collapse-all"                → tryCollapseSections,
         "result-dialog"               → tryShowResultDialog,
         "captcha"                     → tryCaptcha
     )

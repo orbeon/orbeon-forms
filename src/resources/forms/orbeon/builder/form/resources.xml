@@ -971,11 +971,17 @@
             <label>Saisisez le titre de section</label>
         </type-section-title>
         <enter-label>
-            <label>cliquez pour entrer un libellé</label>
+            <label>Cliquez pour saisir un libellé</label>
         </enter-label>
+        <type-label>
+            <label>Saisissez le libellé ici</label>
+        </type-label>
         <enter-hint>
-            <label>cliquez pour entrer une suggestion optionnelle</label>
+            <label>Cliquez pour entrer une suggestion optionnelle</label>
         </enter-hint>
+        <type-hint>
+            <label>Saisissez la suggestion ici</label>
+        </type-hint>
         <enter-text>
             <label>cliquez pour entrer un texte</label>
         </enter-text>
@@ -1812,9 +1818,15 @@
         <enter-label>
             <label>klikk for å legge inn en ledetekst</label>
         </enter-label>
+        <type-label>
+            <label>[Type your label here]</label>
+        </type-label>
         <enter-hint>
             <label>klikk for å skrive inn et valgfritt hint</label>
         </enter-hint>
+        <type-hint>
+            <label>[Type your hint here]</label>
+        </type-hint>
         <enter-text>
             <label>klikk for å skrive inn tekst</label>
         </enter-text>
@@ -2650,9 +2662,15 @@
         <enter-label>
             <label>Нажмите чтобы ввести название</label>
         </enter-label>
+        <type-label>
+            <label>[Type your label here]</label>
+        </type-label>
         <enter-hint>
             <label>Нажмите чтобы ввести подсказку</label>
         </enter-hint>
+        <type-hint>
+            <label>[Type your hint here]</label>
+        </type-hint>
         <enter-text>
             <label>Нажмите чтобы ввести текст</label>
         </enter-text>

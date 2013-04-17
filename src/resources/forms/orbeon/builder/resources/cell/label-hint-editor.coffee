@@ -76,19 +76,21 @@ $ ->
     startEdit = () ->
         # Remove `for` so browser doesn't set the focus to the control on click
         currentLabelHint.removeAttr('for')
+        # Show, position, and populate editor
+        # Get position before showing editor, so showing doesn't move things in the page
+        labelHintOffset = currentLabelHint.offset()
+        labelHintEditor().container.show()
+        labelHintEditor().container.offset(labelHintOffset)
+        labelHintEditor().container.width(currentLabelHint.outerWidth())
+        labelHintEditor().textfield.outerWidth(currentLabelHint.outerWidth() - labelHintEditor().checkbox.outerWidth(true))
+        labelHintEditor().textfield.val(labelHintValue()).focus()
+        labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
         # Setup tooltip for editor (don't do this once for all, as the language can change)
         labelHintEditor().checkbox.tooltip(title: $('.fb-lhha-checkbox-message').text())
         # Hide setting visibility instead of .hide(), as we still want the label to take space, on which we show the input
         currentLabelHint.css('visibility', 'hidden')
         # Add class telling if this is a label or hint editor
         annotateWithLhhaClass(true)
-        # Show, position, and populate editor
-        labelHintEditor().container.show()
-        labelHintEditor().container.offset(currentLabelHint.offset())
-        labelHintEditor().container.width(currentLabelHint.outerWidth())
-        labelHintEditor().textfield.outerWidth(currentLabelHint.outerWidth() - labelHintEditor().checkbox.outerWidth(true))
-        labelHintEditor().textfield.val(labelHintValue()).focus()
-        labelHintEditor().checkbox.prop('checked', isLabelHintHtml())
 
     # Click on label/hint
     $('.fb-main').on 'click', LabelHintSelector, ({currentTarget}) ->

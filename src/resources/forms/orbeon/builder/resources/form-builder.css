@@ -517,11 +517,14 @@ body {
   -moz-border-radius: 0;
   border-radius: 0;
 }
-.orbeon .fb-label-editor-for-hint input {
-  font-size: smaller;
+.orbeon .fb-label-editor {
+  position: absolute;
 }
 .orbeon .fb-label-editor input[type='checkbox'] {
   margin-left: 5px;
+}
+.orbeon .fb-label-editor.fb-label-editor-for-hint input {
+  font-size: smaller;
 }
 .orbeon h2 .fr-section-label {
   height: 36px;

@@ -85,6 +85,7 @@ $ ->
         # Show, position, and populate editor
         labelHintEditor().container.show()
         labelHintEditor().container.offset(currentLabelHint.offset())
+        labelHintEditor().container.width(currentLabelHint.outerWidth())
         labelHintEditor().textfield.outerWidth(currentLabelHint.outerWidth() - labelHintEditor().checkbox.outerWidth(true))
         labelHintEditor().textfield.val(labelHintValue()).focus()
         labelHintEditor().checkbox.prop('checked', isLabelHintHtml())

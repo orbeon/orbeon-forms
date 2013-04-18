@@ -26,24 +26,11 @@
         xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
     <!-- Buttons that translate to fr:process-button -->
-    <xsl:template match="fr:home-button
-                       | fr:summary-button
-                       | fr:close-button
-                       | fr:save-final-button
-                       | fr:save-draft-button
-                       | fr:validate-button
-                       | fr:review-button
-                       | fr:edit-button
-                       | fr:send-button
-                       | fr:email-button
-                       | fr:collapse-all-button
-                       | fr:expand-all-button
-                       | fr:save-button
-                       | fr:submit-button
-                       | fr:workflow-review-button
-                       | fr:workflow-edit-button
-                       | fr:workflow-send-button
-                       | fr:*[starts-with(local-name(), 'custom-')]">
+    <!-- NOTE: Lower priority so that rules for fr:refresh-button, etc. below match. -->
+    <!-- NOTE: Be sure to exclude existing fr:*-button XBL components. This is not ideal. Maybe we can skip this step
+         whereby we first generate fr:*-button elements and then match on them here. Would remain the case of manually
+         placing buttons like fr:buttons/fr:save. -->
+    <xsl:template match="fr:*[ends-with(local-name(), '-button') and not(local-name() = ('href-button', 'process-button', 'select1-button'))]" priority="-20">
         <xsl:variable name="button-name" select="substring-before(local-name(), '-button')"/>
         <fr:process-button
             name="{$button-name}"

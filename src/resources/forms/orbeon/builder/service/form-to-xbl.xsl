@@ -121,7 +121,11 @@
     </xsl:template>
     <xsl:template match="xxf:variable[@name = 'control-resources'] | xf:var[@name = 'control-resources']" mode="filter-actions">
         <!-- Original is `$fr-form-resources` -->
-        <xf:var name="control-resources" value="$form-resources/*[name() = $control-name]"/>
+        <!-- NOTE: We duplicate the logic to access current resources, which is not optimal. This could be fixed with
+             `xf:function`, or by using a `xxf:resource()` to access localized resources.
+             See also: https://github.com/orbeon/orbeon-forms/issues/932 -->
+        <xf:var name="control-resources"
+                value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]/*[name() = $control-name]"/>
     </xsl:template>
 
     <!-- When copying actions, update references to xforms-ready and fr-form-model -->

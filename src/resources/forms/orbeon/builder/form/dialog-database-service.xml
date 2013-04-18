@@ -132,7 +132,9 @@
                     <!-- Insert new instance just before submission if needed -->
                     <xf:action if="not(exists($model/fb:instance[@id = $instance-id]))">
                         <xf:insert ref="$submission" position="before" origin="instance('fb-database-instance-template')"/>
-                        <xf:setvalue ref="$submission/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
+                        <!-- Don't reuse $submission because it might be out of date due to the insertion before! -->
+                        <!-- See https://github.com/orbeon/orbeon-forms/issues/934 -->
+                        <xf:setvalue ref="$model/fb:submission[@id = $submission-id]/preceding-sibling::fb:instance[1]/@id" value="$instance-id"/>
                     </xf:action>
 
                     <!-- Set instance content -->

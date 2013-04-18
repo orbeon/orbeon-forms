@@ -136,7 +136,8 @@ object SimpleProcess extends Actions with Logging {
     private def rawProcessByName(name: String) = {
         implicit val formRunnerParams = FormRunnerParams()
 
-        formRunnerProperty(ProcessPropertyPrefix + '.' + name) orElse
+        formRunnerProperty(ProcessPropertyPrefix + '.' + name) flatMap
+        nonEmptyOrNone orElse // don't accept an existing but blank property
         buildProcessFromLegacyProperties(name) getOrElse ""
     }
 

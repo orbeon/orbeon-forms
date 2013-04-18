@@ -258,7 +258,7 @@ object Controls {
         private val xpathDependencies = containingDocument.getXPathDependencies
 
         private var level = 0
-        private var newlyRelevantLevel = -1
+        private var relevanceChangeLevel = -1
 
         private var _visitedCount = 0
         def visitedCount = _visitedCount
@@ -286,11 +286,11 @@ object Controls {
 
             // Update is required if:
             //
-            // - we are within a newly relevant container
+            // - we are within a container whose content relevance has changed
             // - or dependencies tell us an update is required
             // - or the control has a @model attribute (TODO TEMP HACK: because that causes model variable evaluation!)
             def mustReEvaluateBinding =
-                (newlyRelevantLevel != -1 && level > newlyRelevantLevel)   ||
+                (relevanceChangeLevel != -1 && level > relevanceChangeLevel)   ||
                 xpathDependencies.requireBindingUpdate(control.prefixedId) ||
                 (control.staticControl.element.attribute(XFormsConstants.MODEL_QNAME) ne null)
 
@@ -325,18 +325,21 @@ object Controls {
             // Update context for children controls
             bindingContext = control.bindingContextForChild
 
-            // Remember whether we are in a newly relevant subtree
-            if (newlyRelevantLevel == -1 && control.isInstanceOf[XFormsContainerControl] && ! wasContentRelevant && control.contentRelevant)
-                newlyRelevantLevel = level // entering level of containing
+            // Remember whether we are in a container whose content relevance has changed
+            // NOTE: The correct logic at this time is to force binding re-evaluation if container relevance has
+            // changed. Doing this only when content becomes relevant is not enough as shown with the following bug:
+            // https://github.com/orbeon/orbeon-forms/issues/939
+            if (relevanceChangeLevel == -1 && control.isInstanceOf[XFormsContainerControl] && wasContentRelevant != control.contentRelevant)
+                relevanceChangeLevel = level // entering level of containing
 
             true
         }
 
         def endVisitControl(control: XFormsControl) = {
 
-            // Check if we are exiting the level of a containing control becoming relevant
-            if (newlyRelevantLevel == level)
-                newlyRelevantLevel = -1
+            // Check if we are exiting the level of a container whose content relevance has changed
+            if (relevanceChangeLevel == level)
+                relevanceChangeLevel = -1
 
             // Update context for following controls
             bindingContext = control.bindingContextForFollowing

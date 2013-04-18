@@ -66,8 +66,9 @@
     <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="tokenize(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="custom-css-uri" select="tokenize(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
-    <xsl:variable name="buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
-    <xsl:variable name="buttons" select="tokenize(p:property(string-join(($buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="bottom-buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
+    <xsl:variable name="bottom-buttons" select="tokenize(p:property(string-join(($bottom-buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="inner-buttons" select="tokenize(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')), '\s+')" as="xs:string*"/>
     <xsl:variable name="is-show-explanation" select="p:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>

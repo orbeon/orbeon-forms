@@ -256,7 +256,8 @@
 .orbeon .fr-buttons {
   display: block;
   float: right;
-  margin-bottom: 110px;
+  padding-left: 10px;
+  padding-right: 10px;
   /* Space between the image and the text in a button, only for the buttons bar
            (not other buttons in the form which might contain just an image) */
 

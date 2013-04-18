@@ -1,10 +1,10 @@
 @import "../../../../resources/apps/fr/style/form-runner-common";
 
-.xbl-fr-wizard {
+.orbeon .xbl-fr-wizard {
 
     .fr-wizard-toc {
-        width: 198px;
-        border-right: 1px solid darken(@wellBackground, 7%);
+        width: 199px;
+        float: left;
         margin-bottom: 0;
         overflow: hidden;   // so that content is contained
 
@@ -28,16 +28,41 @@
             ul ul {
                 list-style-type: none;
             }
+
+            margin-bottom: 15px;
         }
     }
 
     .fr-wizard-body {
         width: 738px;
         float: right;
+        border-left: 1px solid darken(@wellBackground, 7%);
+        border-bottom: 1px solid darken(@wellBackground, 7%);
+    }
+
+    .fr-wizard-navigation {
+        .pagination {
+            margin: 10px 0;
+            .fr-page-number {
+                width: 60px;
+            }
+        }
     }
 
     .fr-buttons {
-        margin: 1em 0;
-        button { margin-left: .3em }
+
+        display: block;
+        float: right;
+        box-sizing: border-box;
+        width: 738px;
+        padding-top: 10px;
+        padding-bottom: 10-5px; // adjust for the 5px bottom margin of buttons (see below)
+        padding-right: 10-1px;  // align with bottom buttons
+        padding-left: 10-1px;   // same as right
+        text-align: right;
+
+        margin-bottom: 0 !important;
+
+        &> * { display: inline-block; margin-bottom: 5px }
     }
 }

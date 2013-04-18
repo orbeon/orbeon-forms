@@ -69,16 +69,11 @@
             <fr:messages/>
         </fr:row>
         <fr:row>
-            <fr:bottom-bar/>
+            <fr:buttons-bar/>
         </fr:row>
         <fr:row>
             <fr:version/>
         </fr:row>
-    </xsl:variable>
-
-    <!-- Template for the default layout of the bottom bar -->
-    <xsl:variable name="default-bottom-template" as="element(*)*">
-        <fr:buttons-bar/>
     </xsl:variable>
 
     <xsl:template match="fr:row">
@@ -105,6 +100,13 @@
                     <xsl:element name="fr:{$view-appearance}">
                         <xsl:attribute name="id" select="concat('fr-view-', $view-appearance)"/>
                         <xsl:apply-templates select="if ($body) then $body/(node() except fr:buttons) else node()"/>
+                        <!-- Optional inner buttons -->
+                        <xsl:if test="exists($inner-buttons)">
+                            <xsl:call-template name="fr-buttons-bar">
+                                <xsl:with-param name="buttons"           select="$inner-buttons" tunnel="yes"/>
+                                <xsl:with-param name="highlight-primary" select="false()"        tunnel="yes"/>
+                            </xsl:call-template>
+                        </xsl:if>
                     </xsl:element>
                 </xsl:otherwise>
             </xsl:choose>
@@ -391,7 +393,7 @@
         <xsl:apply-templates select=".//fr:dialogs//xxf:dialog"/>
 
         <!-- This model handles import/export -->
-        <xsl:if test="$buttons = ('save-locally')">
+        <xsl:if test="$bottom-buttons = 'save-locally'">
             <xi:include href="oxf:/apps/fr/save-locally/save-locally-dialog.xml" xxi:omit-xml-base="true"/>
         </xsl:if>
 
@@ -534,39 +536,38 @@
         </xf:switch>
     </xsl:template>
 
-    <xsl:template match="fr:bottom-bar">
-        <xsl:apply-templates select="$default-bottom-template"/>
-    </xsl:template>
-
     <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">
+        <!-- $bottom-buttons by default -->
+        <xsl:param name="buttons"           tunnel="yes" as="xs:string*" select="$bottom-buttons"/>
+        <xsl:param name="highlight-primary" tunnel="yes" as="xs:boolean" select="true()"/>
         <!-- Buttons -->
         <xsl:if test="not($hide-buttons-bar)">
             <xh:span class="fr-buttons">
                 <xsl:choose>
+                    <!-- In PDF mode, don't include anything -->
+                    <xsl:when test="$mode = 'pdf'"/>
                     <!-- Use user-provided buttons -->
                     <xsl:when test="exists($custom-buttons)">
                         <!-- Copy all the content -->
                         <xsl:apply-templates select="$custom-buttons/node()"/>
                     </xsl:when>
                     <!-- Test mode -->
-                    <xsl:when test="$mode = ('test')">
-                        <xsl:variable name="buttons" as="node()*">
-                            <fr:validate-button appearance="xxf:primary"/>
+                    <xsl:when test="$mode = 'test'">
+                        <xsl:variable name="b" as="node()*">
+                            <fr:validate-button appearance="xxf:inverse"/>
                         </xsl:variable>
-                        <xsl:apply-templates select="$buttons"/>
+                        <xsl:apply-templates select="$b"/>
                     </xsl:when>
-                    <!-- In PDF mode, don't include anything -->
-                    <xsl:when test="$mode = ('pdf')"/>
-                    <!-- Use configured buttons -->
+                    <!-- Use requested buttons -->
                     <xsl:otherwise>
                         <!-- Message shown next to the buttons -->
                         <xh:span class="fr-buttons-message">
                             <xf:output mediatype="text/html" ref="$fr-resources/detail/messages/buttons-message"/>
                         </xh:span>
                         <!-- List of buttons we include based on property -->
-                        <xsl:variable name="configured-buttons" as="node()*">
+                        <xsl:variable name="b" as="node()*">
                             <xsl:for-each select="$buttons">
-                                <xsl:variable name="is-primary" select="position() = last()"/>
+                                <xsl:variable name="is-primary" select="$highlight-primary and position() = last()"/>
                                 <xsl:element name="fr:{.}-button">
                                     <xsl:if test="$is-primary">
                                         <xsl:attribute name="appearance">xxf:primary</xsl:attribute>
@@ -575,7 +576,7 @@
                                 <xsl:text> </xsl:text>
                             </xsl:for-each>
                         </xsl:variable>
-                        <xsl:apply-templates select="$configured-buttons"/>
+                        <xsl:apply-templates select="$b"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xh:span>

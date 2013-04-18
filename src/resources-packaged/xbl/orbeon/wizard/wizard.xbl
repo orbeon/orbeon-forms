@@ -92,11 +92,10 @@
                             </xf:switch>
                         </xh:div>
                         <xh:div class="fr-wizard-toc">
-                            <xf:group>
-                                <xh:ul class="nav nav-list">
-                                    <xsl:apply-templates mode="toc-sections"/>
-                                </xh:ul>
-
+                            <xh:ul class="nav nav-list">
+                                <xsl:apply-templates mode="toc-sections"/>
+                            </xh:ul>
+                            <xh:div class="fr-wizard-navigation">
                                 <xf:var
                                     name="relevant-cases"
                                     value="xxf:cases('switch')[for $c in replace(., '-case$', '')
@@ -146,7 +145,7 @@
                                             </xf:trigger>
                                         </xh:li>
                                         <xh:li>
-                                            <xh:span>
+                                            <xh:span class="fr-page-number">
                                                 <xf:output value="$case-index"/>
                                                 <xf:output value="concat(' ', $fr-resources/summary/paging/of, ' ')"/>
                                                 <xf:output value="count($relevant-cases)"/>
@@ -169,8 +168,7 @@
                                         </xh:li>
                                     </xh:ul>
                                 </xh:div>
-
-                            </xf:group>
+                            </xh:div>
                         </xh:div>
                         <!-- In case the view contains elements other than sections (like dialogs) -->
                         <xsl:apply-templates select="* except fr:section"/>

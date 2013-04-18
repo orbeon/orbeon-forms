@@ -15,7 +15,7 @@ import org.scalatest.junit.AssertionsForJUnit
  */
 class Numberer_svTest extends AssertionsForJUnit {
 
-    val N = new Numberer_sv()
+    val N = new Numberer_sv
     val ONE_MILLION = 1000000L
     val ONE_BILLION = 1000000000L // Swedish definition 10^9
 

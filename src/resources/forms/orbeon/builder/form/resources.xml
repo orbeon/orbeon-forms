@@ -799,7 +799,7 @@
             <message>
                 <div>
                     <p>This feature is only available in Orbeon Forms PE.</p>
-                    <p>For more information, please visit the <a href="http://www.orbeon.com/support-services/professional" target="_blank">Orbeon web site</a>.</p>
+                    <p>For more information, please visit the <a href="http://www.orbeon.com/download" target="_blank">Orbeon web site</a>.</p>
                 </div>
             </message>
         </dialog-pe>
@@ -1642,7 +1642,7 @@
             <message>
                 <div>
                     <p>Cette fonction n'est disponible que dans Orbeon Forms PE.</p>
-                    <p>Pour plus d'information, veuillez visiter le <a href="http://www.orbeon.com/support-services/professional" target="_blank">site web d'Orbeon</a>.</p>
+                    <p>Pour plus d'information, veuillez visiter le <a href="http://www.orbeon.com/download" target="_blank">site web d'Orbeon</a>.</p>
                 </div>
             </message>
         </dialog-pe>
@@ -2487,7 +2487,7 @@
             <message>
                 <div>
                     <p>Denne funksjonaliteten er bare tilgjengelig i Orbeon Forms PE.</p>
-                    <p>For mer informasjon, besøke <a href="http://www.orbeon.com/support-services/professional" target="_blank">Orbeons nettside</a>.</p>
+                    <p>For mer informasjon, besøke <a href="http://www.orbeon.com/download" target="_blank">Orbeons nettside</a>.</p>
                 </div>
             </message>
         </dialog-pe>
@@ -3331,7 +3331,7 @@
             <message>
                 <div>
                     <p>Эта возможность доступна только в Orbeon Forms PE.</p>
-                    <p>Для дополнительной информации обратитесь к <a href="http://www.orbeon.com/support-services/professional" target="_blank">веб-сайту Orbeon</a>.</p>
+                    <p>Для дополнительной информации обратитесь к <a href="http://www.orbeon.com/download" target="_blank">веб-сайту Orbeon</a>.</p>
                 </div>
             </message>
         </dialog-pe>

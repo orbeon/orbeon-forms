@@ -205,7 +205,7 @@ public class XFormsModelSchemaValidator {
 
         void addInclude(final URL url) throws IOException {
             // Get the time first. This way if there's a problem the array lengths will remain the same.
-            final Long lastModified = NetUtils.getLastModifiedAsLong(url);
+            final long lastModified = NetUtils.getLastModified(url); // can be 0 if unknown
             includes.add(url);
             modTimes.add(lastModified);
         }
@@ -216,9 +216,9 @@ public class XFormsModelSchemaValidator {
             for (int i = 0; ret && i < size; i++) {
                 final URL url = includes.get(i);
                 try {
-                    final Long lastModified = NetUtils.getLastModifiedAsLong(url);
-                    final Long lastTime = modTimes.get(i);
-                    ret = lastModified.equals(lastTime);
+                    final long lastModified = NetUtils.getLastModified(url); // can be 0 if unknown
+                    final long lastTime = modTimes.get(i);
+                    ret = lastModified == lastTime;
                 } catch (final IOException e) {
                     // We won't propagate here. Reason is that while an include may be missing it may just be the case
                     // that it isn't included anymore _and_ it has been removed. So, we return false and then on a
@@ -689,7 +689,7 @@ public class XFormsModelSchemaValidator {
     private Grammar loadCacheGrammar(final String absoluteSchemaURL) {
         try {
             final URL url = URLFactory.createURL(absoluteSchemaURL);
-            final Long modificationTime = NetUtils.getLastModifiedAsLong(url);
+            final long modificationTime = NetUtils.getLastModified(url); // can be 0 if unknown
 
             final Cache cache = ObjectCache.instance();
             final SchemaKey schemaKey = new SchemaKey(absoluteSchemaURL);

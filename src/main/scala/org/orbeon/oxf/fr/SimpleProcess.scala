@@ -298,7 +298,6 @@ trait Actions {
         "email"                       → trySendEmail,
         "send"                        → trySend,
         "navigate"                    → tryNavigate,
-        "alfresco"                    → trySendAlfresco,
         "review"                      → tryNavigateToReview,
         "edit"                        → tryNavigateToEdit,
         "summary"                     → tryNavigateToSummary,
@@ -526,48 +525,4 @@ trait Actions {
 
     def tryWizardNext(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
-
-    def trySendAlfresco(params: ActionParams): Try[Any] =
-        Try {
-            ???
-//                    <!-- Pass metadata with current language, or first language if current language is not found -->
-//                    <xf:var name="form-titles" value="xxf:instance('fr-form-metadata')/title" as="xs:string"/>
-//                    <xf:var name="form-descriptions" value="xxf:instance('fr-form-metadata')/description" as="xs:string"/>
-//                    <xf:var name="form-title" value="($form-titles[@xml:lang = xxf:instance('fr-language-instance')], $form-titles[1])[1]" as="xs:string"/>
-//                    <xf:var name="form-description" value="($form-descriptions[@xml:lang = xxf:instance('fr-language-instance')], $form-descriptions[1])[1]" as="xs:string"/>
-//
-//                    <!-- Send PDF data if requested -->
-//                    <xf:action if="xxf:property(string-join(('oxf.fr.alfresco.send-pdf', $app, $form), '.'))">
-//
-//                        <xf:message level="xxf:log-debug">Sending PDF to Alfresco...</xf:message>
-//
-//                        <!-- Get URI of PDF data -->
-//                        <xf:var name="pdf-uri" value="xpl:rewriteServiceURI(instance('fr-workflow-send-instance'), true())" as="xs:anyURI"/>
-//
-//                        <!-- Send everything to Alfresco -->
-//                        <xf:dispatch targetid="fr-alfresco-model" name="alfresco-send-document">
-//                            <xf:property name="fr:name" value="concat($form-title, ' (#', $document, ').pdf')"/>
-//                            <xf:property name="fr:title" value="$form-title"/>
-//                            <xf:property name="fr:description" value="$form-description"/>
-//                            <xf:property name="fr:mimetype" value="'application/pdf'"/>
-//                            <!-- Content as Base64 -->
-//                            <xf:property name="fr:content" value="xxf:doc-base64($pdf-uri)"/>
-//                        </xf:dispatch>
-//                    </xf:action>
-//                    <!-- Send XML data if requested -->
-//                    <xf:action if="xxf:property(string-join(('oxf.fr.alfresco.send-xml', $app, $form), '.'))">
-//
-//                        <xf:message level="xxf:log-debug">Sending XML to Alfresco...</xf:message>
-//
-//                        <!-- Send data to Alfresco -->
-//                        <xf:dispatch targetid="fr-alfresco-model" name="alfresco-send-document">
-//                            <xf:property name="fr:name" value="concat($form-title, ' (#', $document, ').xml')"/>
-//                            <xf:property name="fr:title" value="$form-title"/>
-//                            <xf:property name="fr:description" value="$form-description"/>
-//                            <xf:property name="fr:mimetype" value="'application/xml'"/>
-//                            <!-- XML data -> string -> Base64 -->
-//                            <xf:property name="fr:content" value="saxon:string-to-base64Binary(saxon:serialize(xxf:instance('fr-form-instance'), 'xml'), 'UTF-8')"/>
-//                        </xf:dispatch>
-//                    </xf:action>
-    }
 }

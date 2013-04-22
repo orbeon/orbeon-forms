@@ -91,7 +91,9 @@
 
                 <!-- Initialize itemsets upon initialization -->
                 <xf:action ev:event="xforms-model-construct-done">
-                    <xf:action iterate="(1970 to year-from-date(current-date()))">
+                    <xf:var name="start-year" value="saxon:evaluate(xxf:property('oxf.xforms.xbl.fr.dropdown-date.start-year'))" as="xs:integer"/>
+                    <xf:var name="end-year"   value="saxon:evaluate(xxf:property('oxf.xforms.xbl.fr.dropdown-date.end-year'  ))" as="xs:integer"/>
+                    <xf:action iterate="($start-year to $end-year)">
                         <xf:var name="year" value="." as="xs:string"/>
                         <xf:insert context="instance('years-itemset')" origin="xxf:element('year', $year)"/>
                     </xf:action>

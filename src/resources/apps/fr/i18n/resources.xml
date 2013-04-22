@@ -152,7 +152,6 @@
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
-                <buttons-placeholder>Your form's buttons will be placed here</buttons-placeholder>
             </messages>
             <labels>
                 <language-choice>Language</language-choice>
@@ -335,7 +334,6 @@
                 <buttons-message/>
                 <!-- TODO: check translation -->
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
-                <buttons-placeholder>Les boutons de votre formulaire seront placés ici</buttons-placeholder>
             </messages>
             <labels>
                 <language-choice>Langue</language-choice>
@@ -518,7 +516,6 @@
                 <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted ingresó al momento de guardar su documento.</saved-locally-open>
-                <buttons-placeholder>Botones del formulario será colocado aquí</buttons-placeholder>
             </messages>
             <labels>
                 <language-choice>Idioma</language-choice>
@@ -700,7 +697,6 @@
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
-                <buttons-placeholder>Knappene i skjemaet vil bli vist her</buttons-placeholder>
             </messages>
             <labels>
                 <language-choice>Språk</language-choice>
@@ -879,7 +875,6 @@
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
-                <buttons-placeholder>Здесь будут размещены кнопки</buttons-placeholder>
             </messages>
             <labels>
                 <language-choice>Язык</language-choice>

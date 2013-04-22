@@ -698,17 +698,6 @@ body {
   background-image: none;
   background-color: #cccccc;
 }
-.orbeon .fr-buttons-placeholder {
-  width: 100%;
-  display: block;
-  text-align: center;
-}
-.orbeon .fr-buttons-placeholder .xforms-output {
-  color: #808080;
-}
-.orbeon .fr-buttons-placeholder div {
-  margin: 0.5em;
-}
 .orbeon .fr-messages,
 .orbeon .fb-xpath-errors {
   display: inline-block;

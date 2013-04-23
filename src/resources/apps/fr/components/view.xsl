@@ -131,9 +131,6 @@
         <xh:div class="{string-join($header-classes, ' ')}">
             <xh:div class="navbar-inner">
                 <xh:div class="container">
-                    <!-- Copy width attribute on view if specified -->
-                    <xsl:copy-of select="$view/@width"/>
-
                     <xsl:if test="not($mode = ('email')) and not($hide-header)">
                         <xsl:choose>
                             <xsl:when test="$mode = 'view'">

@@ -39,10 +39,6 @@ object SimpleProcess extends Actions with Logging {
 
     private val ProcessPropertyPrefix = "oxf.fr.detail.process"
     private val ProcessPropertyTokens = ProcessPropertyPrefix split """\.""" size
-
-    private val Then    = "then"
-    private val Recover = "recover"
-    private val AllowedCombinators = Set(Then, Recover)
     
     type ActionParams = Map[Option[String], String]
     type Action       = ActionParams ⇒ Try[Any]
@@ -58,13 +54,21 @@ object SimpleProcess extends Actions with Logging {
     private val processBreaks = new Breaks
     import processBreaks._
 
+    import ProcessParser._
+
     private object ProcessParser {
+
+        sealed abstract class Combinator(val name: String)
+        case object ThenCombinator    extends Combinator("then")
+        case object RecoverCombinator extends Combinator("recover")
+
+        val CombinatorsByName = Seq(ThenCombinator, RecoverCombinator) map (c ⇒ c.name → c) toMap
 
         sealed abstract class ProcessAst
         case class ProcessNode(action: Option[ActionAst], actions: List[PairAst]) extends ProcessAst
         case class PairAst(combinator: CombinatorAst, action: ActionAst) extends ProcessAst
         case class ActionAst(name: String, params: Map[Option[String], String]) extends ProcessAst
-        case class CombinatorAst(name: String) extends ProcessAst
+        case class CombinatorAst(combinator: Combinator) extends ProcessAst
 
         // Match actions of the form:
         // - foo
@@ -92,10 +96,10 @@ object SimpleProcess extends Actions with Logging {
                 )
     
                 def actionUsage(action: String)         = s"action '$action' is not supported, must be one of: ${allowedActions mkString ", "}"
-                def combinatorUsage(combinator: String) = s"combinator '$combinator' is not supported, must be one of: ${AllowedCombinators mkString ", "}"
+                def combinatorUsage(combinator: String) = s"combinator '$combinator' is not supported, must be one of: ${CombinatorsByName.keys mkString ", "}"
     
                 def checkAction(action: String)         = require(allowedActions(action), actionUsage(action))
-                def checkCombinator(combinator: String) = require(AllowedCombinators(combinator) , combinatorUsage(combinator))
+                def checkCombinator(combinator: String) = require(CombinatorsByName.contains(combinator) , combinatorUsage(combinator))
     
                 def parseAction(rawAction: String) = {
     
@@ -120,7 +124,7 @@ object SimpleProcess extends Actions with Logging {
                         case List(combinator, action) ⇒
                             checkCombinator(combinator)
     
-                            PairAst(CombinatorAst(combinator), parseAction(action))
+                            PairAst(CombinatorAst(CombinatorsByName(combinator)), parseAction(action))
     
                     }
     
@@ -150,16 +154,12 @@ object SimpleProcess extends Actions with Logging {
                     tryErrorMessage(Map(Some("message") → "process-error"))
                 }
             } catchBreak {
-                // Consider response to "done" as a success
-                // Q: Should allow success/failure?
                 Success(())
             }
         }
     }
 
     private def runSubProcess(process: String): Try[Any] = {
-
-        import ProcessParser._
 
         implicit val logger = containingDocument.getIndentedLogger("process")
 
@@ -170,12 +170,6 @@ object SimpleProcess extends Actions with Logging {
             debug("empty process, canceling process")
             Success(())
         } else {
-            // This is required before all in any case
-            // Q: Should we instead run this only before actions which need it, such as "save", "send", etc.?
-            if (tryCheckUploads().get) {
-                debug("uploads in progress, canceling process")
-                return Success(()) // ?
-            }
 
             def runAction(action: ActionAst) =
                 withDebug("running action", Seq("action" → action.toString)) {
@@ -188,11 +182,11 @@ object SimpleProcess extends Actions with Logging {
                     val PairAst(nextCombinator, nextAction) = groups.next()
 
                     val newTried =
-                        nextCombinator.name match {
-                            case Then ⇒
+                        nextCombinator.combinator match {
+                            case ThenCombinator ⇒
                                 debug("combining with then", Seq("action" → nextAction.toString))
                                 tried flatMap (_ ⇒ runAction(nextAction))
-                            case Recover ⇒
+                            case RecoverCombinator ⇒
                                 debug("combining with recover", Seq("action" → nextAction.toString))
                                 tried recoverWith {
                                     case t: ControlThrowable ⇒
@@ -247,34 +241,36 @@ object SimpleProcess extends Actions with Logging {
 
                 val buffer = ListBuffer[String]()
 
+                buffer += "require-uploads"
+                buffer += ThenCombinator.name
                 buffer += "require-valid"
-                buffer += Then
+                buffer += ThenCombinator.name
                 buffer += "save"
-                buffer += Then
+                buffer += ThenCombinator.name
                 buffer += """success-message("save-success")"""
 
                 if (isLegacyCreatePDF) {
-                    buffer += Then
+                    buffer += ThenCombinator.name
                     buffer += "pdf"
                 }
 
                 if (isLegacySendAlfresco) {
-                    buffer += Then
+                    buffer += ThenCombinator.name
                     buffer += "alfresco"
                 }
 
                 if (isLegacySendEmail) {
-                    buffer += Then
+                    buffer += ThenCombinator.name
                     buffer += "email"
                 }
 
                 if (isLegacyNavigateSuccess) {
-                    buffer += Then
+                    buffer += ThenCombinator.name
                     buffer += """send("oxf.fr.detail.send.success")"""
                 }
 
                 if (isLegacyNavigateError) {
-                    buffer += Recover
+                    buffer += RecoverCombinator.name
                     buffer += """send("oxf.fr.detail.send.error")"""
                 }
 
@@ -291,6 +287,7 @@ trait Actions {
 
     def AllowedActions = Map[String, Action](
         "validate"                    → tryValidate,
+        "pending-uploads"             → tryPendingUploads,
         "save"                        → trySaveAttachmentsAndData,
         "success-message"             → trySuccessMessage,
         "error-message"               → tryErrorMessage,
@@ -312,14 +309,10 @@ trait Actions {
     )
 
     // Check whether there are pending uploads
-    def tryCheckUploads() =
+    def tryPendingUploads(params: ActionParams): Try[Any] =
         Try {
-            val hasPendingUploads = containingDocument.countPendingUploads > 0
-
-            if (hasPendingUploads)
-                tryErrorMessage(Map(Some("message") → "upload-in-progress"))
-
-            hasPendingUploads
+            if (containingDocument.countPendingUploads > 0)
+                throw new OXFException("Pending uploads")
         }
 
     // Validate form data and fail if invalid

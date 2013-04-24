@@ -48,7 +48,7 @@ class TrampolineServletRequestWrapper(
         method: String)
     extends BaseServletRequestWrapper(request)
     with RequestPathQuery
-    with RequestAddHeaders {
+    with RequestPrependHeaders {
 
     // "Constructors" for traits
     def overriddenPathQuery = pathQuery
@@ -84,7 +84,7 @@ trait RequestPathQuery extends BaseServletRequestWrapper {
     override def getQueryString = queryString getOrElse ""
 }
 
-trait RequestAddHeaders extends BaseServletRequestWrapper {
+trait RequestPrependHeaders extends BaseServletRequestWrapper {
 
     def headersToPrepend: Map[String, Array[String]]
 

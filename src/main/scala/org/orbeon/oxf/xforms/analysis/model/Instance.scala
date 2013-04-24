@@ -44,14 +44,14 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val timeToLive = Instance.timeToLiveOrDefault(element)
     val handleXInclude = false
 
-    def exposeXPathTypes = part.isExposeXPathTypes // NOTE: per part
+    val exposeXPathTypes = Option(element.attributeValue(XXFORMS_EXPOSE_XPATH_TYPES_QNAME)) map (_ == "true") getOrElse part.isExposeXPathTypes
 
     val (indexIds, indexClasses) = {
         val tokens = attSet(element, XXFORMS_INDEX_QNAME)
         (tokens("id"), tokens("class"))
     }
 
-    val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
+    private val validation = element.attributeValue(XXFORMS_VALIDATION_QNAME)
 
     def isLaxValidation    = (validation eq null) || validation == "lax"
     def isStrictValidation = validation == "strict"

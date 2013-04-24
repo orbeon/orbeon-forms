@@ -362,7 +362,7 @@
             <!-- Group to scope variables -->
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->
-                <xh:a class="fr-goto-content" href="#{{if (errors-count castable as xs:integer and xs:integer(errors-count) > 0) then 'fr-errors' else 'fr-form'}}">
+                <xh:a class="fr-goto-content" href="#{{if (errors-count > 0) then 'fr-errors' else 'fr-form'}}">
                     <xf:output value="$fr-resources/summary/labels/goto-content"/>
                 </xh:a>
             </xf:group>
@@ -498,7 +498,7 @@
         <!-- Status icons for detail page -->
         <xsl:if test="$is-detail">
             <xh:span class="fr-status-icons">
-                <xf:group model="fr-error-summary-model" ref=".[valid = 'false']">
+                <xf:group model="fr-error-summary-model" ref=".[valid = false() and visible-errors-count gt 0]">
                     <!-- Form is invalid -->
 
                     <!-- Display localized errors count -->
@@ -510,7 +510,7 @@
 
                     <xh:span class="badge badge-important"><xf:output value="visible-errors-count"/></xh:span>
                 </xf:group>
-                <xf:group model="fr-error-summary-model" ref=".[valid = 'true']" class="fr-validity-icon">
+                <xf:group model="fr-error-summary-model" ref=".[valid = true()]" class="fr-validity-icon">
                     <!-- Form is valid -->
                     <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
                 </xf:group>

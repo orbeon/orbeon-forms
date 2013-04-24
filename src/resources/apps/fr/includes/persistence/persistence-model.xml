@@ -301,7 +301,7 @@
         <!-- NOTE: As of 2013-04-04, only used for PDF button which uses fr:href-button -->
         <xf:bind ref="strict-submit"
                  readonly="not(property('xxf:noscript'))
-                           and (xxf:instance('fr-error-summary-instance')/valid = 'false' or xxf:pending-uploads() > 0)"/>
+                           and (xxf:instance('fr-error-summary-instance')/valid = false() or xxf:pending-uploads() > 0)"/>
 
         <!-- Conditions for disabling workflow buttons -->
         <xf:bind ref="can-update"
@@ -319,7 +319,7 @@
         <!-- TODO: Move out, this is Form Builder-specific -->
         <xf:bind ref="publish"
                  readonly="not($persistence-instance/data-status = 'clean')
-                           or xxf:instance('fr-error-summary-instance')/valid = 'false'
+                           or xxf:instance('fr-error-summary-instance')/valid = false()
                            or xxf:pending-uploads() > 0"/>
     </xf:bind>
 

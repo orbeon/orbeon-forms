@@ -91,9 +91,9 @@
                             <xf:refresh/>
                             <!-- Remember validity -->
                             <xf:setvalue ref="instance('fr-import-stats')/processed" value="xs:integer(.) + 1"/>
-                            <xf:setvalue if="xxf:instance('fr-error-summary-instance')/valid = 'true'"
+                            <xf:setvalue if="xxf:instance('fr-error-summary-instance')/valid = true()"
                                          ref="instance('fr-import-stats')/succeeded" value="xs:integer(.) + 1"/>
-                            <xf:setvalue if="xxf:instance('fr-error-summary-instance')/valid != 'true'"
+                            <xf:setvalue if="xxf:instance('fr-error-summary-instance')/valid != true()"
                                          ref="instance('fr-import-stats')/invalid-rows" value="if (. != '') then concat(., ' ', $p) else $p"/>
 
                             <xf:action type="xpath">

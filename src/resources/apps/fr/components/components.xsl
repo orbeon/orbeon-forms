@@ -135,8 +135,8 @@
                 <!-- Display localized errors count and form title -->
                 <xf:output model="fr-error-summary-model"
                                value="for $c in visible-errors-count return
-                                        if ($c castable as xs:integer and xs:integer($c) > 0)
-                                        then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count), ' - ', $title)
+                                        if ($c > 0)
+                                        then concat($c, ' ', $fr-resources/summary/titles/(if ($c = 1) then error-count else errors-count), ' - ', $title)
                                         else $title"/>
             </xh:title>
 
@@ -253,7 +253,7 @@
         </xf:model>
         <!-- This model handles global error summary information -->
         <xf:model id="fr-error-summary-model">
-            <xf:instance id="fr-error-summary-instance">
+            <xf:instance id="fr-error-summary-instance" xxf:expose-xpath-types="true">
                 <error-summary>
                     <xsl:choose>
                         <!-- For form builder we disable the error summary and say that the form is always valid -->
@@ -264,15 +264,18 @@
                             <trigger/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <valid/>
-                            <errors-count/>
-                            <visible-errors-count/>
+                            <valid>false</valid>
+                            <errors-count>0</errors-count>
+                            <visible-errors-count>0</visible-errors-count>
                             <trigger/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </error-summary>
             </xf:instance>
-            <xf:bind ref="trigger" readonly="not(../valid = 'true')"/>
+
+            <xf:bind ref="valid" type="xs:boolean"/>
+            <xf:bind ref="errors-count | visible-errors-count" type="xs:integer"/>
+            <xf:bind ref="trigger" readonly="not(../valid)"/>
 
             <!-- Mark all controls as unvisited -->
             <xf:action ev:event="fr-unvisit-all">

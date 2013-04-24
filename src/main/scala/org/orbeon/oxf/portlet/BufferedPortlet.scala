@@ -63,7 +63,7 @@ trait BufferedPortlet {
 
         action match {
             case Redirect(path, parameters, true) ⇒
-                response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(path, parameters.asJava))
+                response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(path, toJavaMap(parameters)))
             case Redirect(path, parameters, false) ⇒
                 // Just update the render parameters to simulate a redirect within the portlet
                 val redirectParameters = parameters + (PathParameter → List(path))

@@ -23,7 +23,7 @@ import java.util.{Collections, HashMap}
 class AsyncRequest(req: Request) extends ExternalContext.Request {
 
     private val session = req.getSession(true) // assume it's ok to create a session
-    private lazy val platformClientContextPath = URLRewriterUtils.getClientContextPath(this, true)
+    private lazy val platformClientContextPath    = URLRewriterUtils.getClientContextPath(this, true)
     private lazy val applicationClientContextPath = URLRewriterUtils.getClientContextPath(this, false)
 
     def getSession(create: Boolean) = session

@@ -32,56 +32,5 @@
             <title>Orbeon Forms Portlet</title>
         </portlet-info>
     </portlet>
-
-    <!-- Sample separate deployment portlet (for Orbeon Forms running directly within a portlet) -->
-    <portlet>
-        <portlet-name>orbeon-filter-sample-portlet</portlet-name>
-        <portlet-class>org.orbeon.oxf.portlet.OrbeonPortletFilterSample</portlet-class>
-        <!-- Initialization parameters -->
-        <init-param>
-            <name>oxf.main-processor.name</name>
-            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
-        </init-param>
-        <init-param>
-            <name>oxf.main-processor.input.config</name>
-            <value>oxf:/config/prologue-portlet.xpl</value>
-        </init-param>
-        <init-param>
-            <name>oxf.error-processor.name</name>
-            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
-        </init-param>
-        <init-param>
-            <name>oxf.error-processor.input.config</name>
-            <value>oxf:/config/error.xpl</value>
-        </init-param>
-        <supports>
-            <mime-type>text/html</mime-type>
-            <portlet-mode>view</portlet-mode>
-        </supports>
-        <portlet-info>
-            <title>Orbeon Forms Filter Sample Portlet</title>
-        </portlet-info>
-    </portlet>
-
-    <!-- Define the Orbeon portlet XForms filter (for handling XForms within your own portlets) -->
-    <filter>
-        <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
-        <filter-class>org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter</filter-class>
-        <lifecycle>RENDER_PHASE</lifecycle>
-        <lifecycle>ACTION_PHASE</lifecycle>
-        <lifecycle>RESOURCE_PHASE</lifecycle>
-        <init-param>
-            <name>oxf.xforms.renderer.context</name>
-            <value>/orbeon</value>
-        </init-param>
-    </filter>
-
-    <!-- Uncomment and configure this to map the Orbeon portlet XForms filter -->
-    <!--
-    <filter-mapping>
-        <filter-name>orbeon-filter-sample-portlet</filter-name>
-        <portlet-name>orbeon-separate-sample-portlet</portlet-name>
-    </filter-mapping>
-    -->
     
 </portlet-app>

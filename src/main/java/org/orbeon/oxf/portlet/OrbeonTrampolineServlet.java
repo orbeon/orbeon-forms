@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.portlet;
 
+import org.orbeon.oxf.externalcontext.TrampolineServletRequestWrapper;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
 import javax.servlet.*;
@@ -37,8 +38,12 @@ public class OrbeonTrampolineServlet extends HttpServlet {
     @Override
     public void service(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException, IOException {
         // Simply forward to the renderer context in the other servlet
-        final MyRequestWrapper requestWrapper = new MyRequestWrapper(httpRequest);
-        getOrbeonDispatcher(requestWrapper.pathQuery).forward(requestWrapper, httpResponse);
+
+        final String method    = (String) httpRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_METHOD_ATTRIBUTE);
+        final String pathQuery = (String) httpRequest.getAttribute(OrbeonPortletXFormsFilter.PORTLET_PATH_QUERY_ATTRIBUTE);
+
+        final TrampolineServletRequestWrapper requestWrapper = new TrampolineServletRequestWrapper(httpRequest, pathQuery, method);
+        getOrbeonDispatcher(pathQuery).forward(requestWrapper, httpResponse);
     }
 
     private RequestDispatcher getOrbeonDispatcher(String path) throws ServletException {
@@ -55,41 +60,6 @@ public class OrbeonTrampolineServlet extends HttpServlet {
             throw new ServletException("Can't find Orbeon Forms context called '" + orbeonContextPath + "'. Check the '"
                     + OrbeonXFormsFilter.RENDERER_CONTEXT_PARAMETER_NAME + "' filter initialization parameter and the <Context crossContext=\"true\"/> attribute.");
 
-        return orbeonContext ;
-    }
-
-    private class MyRequestWrapper extends HttpServletRequestWrapper {
-
-        private String method;
-        private String pathQuery;
-
-        public MyRequestWrapper(HttpServletRequest request) {
-            super(request);
-            this.method = (String) request.getAttribute(OrbeonPortletXFormsFilter.PORTLET_METHOD_ATTRIBUTE);
-            this.pathQuery = (String) request.getAttribute(OrbeonPortletXFormsFilter.PORTLET_PATH_QUERY_ATTRIBUTE);
-        }
-
-        @Override
-        public String getPathInfo() {
-            final int questionIndex = pathQuery.indexOf('?');
-            return (questionIndex != -1) ? pathQuery.substring(0, questionIndex) : pathQuery;
-        }
-
-        @Override
-        public String getQueryString() {
-            final int questionIndex = pathQuery.indexOf('?');
-            return (questionIndex != -1) ? pathQuery.substring(questionIndex + 1) : pathQuery;
-        }
-
-        @Override
-        public String getServletPath() {
-            return "";
-        }
-
-        @Override
-        public String getMethod() {
-            return method;
-        }
+        return orbeonContext;
     }
 }
-

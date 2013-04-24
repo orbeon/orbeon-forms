@@ -442,21 +442,18 @@ public class NetUtils {
     /**
      * Combine a path info and a parameters map to form a path info with a query string.
      */
-    public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map parameters) throws IOException {
+    public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map<String, String[]> parameters) throws IOException {
         final StringBuilder redirectURL = new StringBuilder(pathInfo);
         if (parameters != null) {
             boolean first = true;
-            for (Object o: parameters.keySet()) {
-                final String name = (String) o;
-                final Object[] values = (Object[]) parameters.get(name);
-                for (final Object currentValue: values) {
-                    if (currentValue instanceof String) {
-                        redirectURL.append(first ? "?" : "&");
-                        redirectURL.append(URLEncoder.encode(name, NetUtils.STANDARD_PARAMETER_ENCODING));
-                        redirectURL.append("=");
-                        redirectURL.append(URLEncoder.encode((String) currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
-                        first = false;
-                    }
+            for (String name : parameters.keySet()) {
+                final String[] values = parameters.get(name);
+                for (final String currentValue : values) {
+                    redirectURL.append(first ? "?" : "&");
+                    redirectURL.append(URLEncoder.encode(name, NetUtils.STANDARD_PARAMETER_ENCODING));
+                    redirectURL.append("=");
+                    redirectURL.append(URLEncoder.encode(currentValue, NetUtils.STANDARD_PARAMETER_ENCODING));
+                    first = false;
                 }
             }
         }

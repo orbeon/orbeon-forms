@@ -1,5 +1,6 @@
 <display>
     <category name="Orbeon Forms">
         <portlet id="orbeon-forms-proxy-portlet"/>
+        <portlet id="orbeon-sample-xforms-portlet"/>
     </category>
 </display>

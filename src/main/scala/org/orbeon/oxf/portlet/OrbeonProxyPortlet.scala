@@ -218,14 +218,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         // - render requests
         // - resources: typically image, CSS, JavaScript, etc.
 
-        val newURL = {
-            val (path, query) = splitQuery(requestDetails.url)
-
-            val existingParams = query map decodeSimpleQuery getOrElse Seq()
-            val allParams = existingParams ++ requestDetails.params
-
-            recombineQuery(path, allParams)
-        }
+        val newURL = recombineQuery(requestDetails.url, requestDetails.params)
 
         val connection = new URL(newURL).openConnection.asInstanceOf[HttpURLConnection]
 

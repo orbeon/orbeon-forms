@@ -148,9 +148,9 @@ object ScalaUtils {
             (url.substring(0, index), Some(url.substring(index + 1)))
     }
 
-    // Recombine a path and parameters into a resulting URL
-    def recombineQuery(path: String, params: Seq[(String, String)]) =
-        path + (if (params.isEmpty) "" else "?" + encodeSimpleQuery(params))
+    // Recombine a path/query and parameters into a resulting URL
+    def recombineQuery(pathQuery: String, params: Seq[(String, String)]) =
+        pathQuery + (if (params.isEmpty) "" else ((if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params)))
 
     // Decode a query string into a sequence of pairs
     // We assume that there are no spaces in the input query

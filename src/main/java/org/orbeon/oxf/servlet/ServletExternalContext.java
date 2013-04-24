@@ -442,7 +442,7 @@ public class ServletExternalContext implements ExternalContext  {
             nativeResponse.addHeader(name, value);
         }
 
-        public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+        public void sendRedirect(String pathInfo, Map<String, String[]> parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
             // Create URL
             if (isServerSide) {
                 // Server-side redirect: do a forward
@@ -453,7 +453,7 @@ public class ServletExternalContext implements ExternalContext  {
                     // should be allowed on "this side" of the forward after the forward return.
                     pipelineContext.destroy(true);
                     // Execute the forward
-                    final ForwardHttpServletRequestWrapper wrappedRequest = new ForwardHttpServletRequestWrapper(nativeRequest, pathInfo, parameters);
+                    final ForwardServletRequestWrapper wrappedRequest = new ForwardServletRequestWrapper(nativeRequest, pathInfo, parameters);
                     requestDispatcher.forward(wrappedRequest, nativeResponse);
                 } catch (ServletException e) {
                     throw new OXFException(e);
@@ -716,7 +716,8 @@ public class ServletExternalContext implements ExternalContext  {
             // the headers map is generated internally as in that case it might be lowercase already.
             final String override = NetUtils.getHeader(request.getHeaderValuesMap(), "orbeon-client");
             if ("portlet".equals(override)) {
-                response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), true)); // always set wsrpEncodeResources to true if the client is a remote portlet
+                // Always set wsrpEncodeResources to true if the client is a remote portlet
+                response.setURLRewriter(new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), getRequest(), true));
             } else if ("servlet".equals(override)) {
                 response.setURLRewriter(new ServletURLRewriter(getRequest()));
             } else {

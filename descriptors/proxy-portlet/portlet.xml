@@ -39,4 +39,40 @@
         
     </portlet>
 
+    <!-- Define the Orbeon portlet XForms filter (for handling XForms within your own portlets) -->
+    <filter>
+        <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
+        <filter-class>org.orbeon.oxf.portlet.OrbeonPortletXFormsFilter</filter-class>
+        <lifecycle>RENDER_PHASE</lifecycle>
+        <lifecycle>ACTION_PHASE</lifecycle>
+        <lifecycle>RESOURCE_PHASE</lifecycle>
+        <init-param>
+            <name>oxf.xforms.renderer.context</name>
+            <value>/orbeon</value>
+        </init-param>
+    </filter>
+
+    <!-- Uncomment and configure this to map the Orbeon portlet XForms filter -->
+    <!--
+    <filter-mapping>
+        <filter-name>orbeon-forms-portlet-xforms-filter</filter-name>
+        <portlet-name>orbeon-sample-xforms-portlet</portlet-name>
+    </filter-mapping>
+    -->
+
+    <!-- Sample separate deployment portlet (for Orbeon Forms running directly within a portlet) -->
+    <!--
+    <portlet>
+        <portlet-name>orbeon-sample-xforms-portlet</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OrbeonPortletFilterSample</portlet-class>
+        <supports>
+            <mime-type>text/html</mime-type>
+            <portlet-mode>view</portlet-mode>
+        </supports>
+        <portlet-info>
+            <title>Orbeon Forms Sample XForms Portlet</title>
+        </portlet-info>
+    </portlet>
+    -->
+
 </portlet-app>

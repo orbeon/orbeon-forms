@@ -447,13 +447,6 @@
                                             controlOps:deleteCellContent($td)
                                         </xf:action>
                                     </xf:trigger>
-                                    <!-- Itemset editor -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
-                                        <xf:label><xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" title="{$fb-resources/edit-items/label}"/></xf:label>
-                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
-                                            <xf:property name="control-element" value="$control"/>
-                                        </xf:dispatch>
-                                    </xf:trigger>
                                 </xh:span>
                                 <xh:span class="fb-grid-control-icons">
                                     <!-- Edit details for any control -->
@@ -463,12 +456,18 @@
                                             <xf:property name="control-id" value="$control/@id"/>
                                         </xf:dispatch>
                                     </xf:trigger>
-
                                     <!-- Edit validation for any control -->
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-validation-trigger">
                                         <xf:label><xh:img class="fb-control-alert" alt="{$fb-resources/validation-settings-icon/label}" title="{$fb-resources/validation-settings-icon/label}" src="/apps/fr/style/images/silk/exclamation.png"/></xf:label>
                                         <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-validation-details">
                                             <xf:property name="control-id" value="$control/@id"/>
+                                        </xf:dispatch>
+                                    </xf:trigger>
+                                    <!-- Itemset editor -->
+                                    <xf:trigger tabindex="-1" appearance="minimal" class="fb-edit-items" id="fb-edit-items-trigger">
+                                        <xf:label><xh:img src="/apps/fr/style/images/silk/text_list_bullets.png" title="{$fb-resources/edit-items/label}"/></xf:label>
+                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-itemsets">
+                                            <xf:property name="control-element" value="$control"/>
                                         </xf:dispatch>
                                     </xf:trigger>
                                 </xh:span>

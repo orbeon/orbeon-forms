@@ -630,16 +630,30 @@ object ControlOps {
 
     // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
     def isControlLHHAHTMLMediatype(inDoc: NodeInfo, controlName: String, lhha: String) =
-        findControlByName(inDoc, controlName).toList child lhha exists (lhhaElement ⇒ (lhhaElement attValue "mediatype") == "text/html")
+        hasHTMLMediatype(findControlByName(inDoc, controlName).toList child lhha)
 
     // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
     def setControlLHHAMediatype(inDoc: NodeInfo, controlName: String, lhha: String, isHTML: Boolean): Unit =
-        findControlByName(inDoc, controlName).toList child lhha foreach { lhhaElement ⇒
-            if (isHTML != isControlLHHAHTMLMediatype(inDoc, controlName, lhha)) {
-                if (isHTML)
-                    insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
-                else
-                    delete(lhhaElement \@ "mediatype")
-            }
+        if (isHTML != isControlLHHAHTMLMediatype(inDoc, controlName, lhha))
+            setHTMLMediatype(findControlByName(inDoc, controlName).toList child lhha, isHTML)
+
+    // For a given control, whether the mediatype on itemset labels is HTML
+    def isItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String) =
+        hasHTMLMediatype(findControlByName(inDoc, controlName).toList child "itemset" child "label")
+
+    // For a given control, set the mediatype on the itemset labels to be HTML or plain text
+    def setItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String, isHTML: Boolean): Unit =
+        if (isHTML != isItemsetHTMLMediatype(inDoc, controlName))
+            setHTMLMediatype(findControlByName(inDoc, controlName).toList child "itemset" child "label", isHTML)
+
+    private def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
+        nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
+
+    private def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
+        nodes foreach { lhhaElement ⇒
+            if (isHTML)
+                insert(into = lhhaElement, origin = attributeInfo("mediatype", "text/html"))
+            else
+                delete(lhhaElement \@ "mediatype")
         }
 }

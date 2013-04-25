@@ -351,6 +351,16 @@ body {
 .orbeon .fb-dialog-itemsets .xforms-invalid .xforms-input-input {
   border-color: #df731b;
 }
+.orbeon .fb-dialog-itemsets .xforms-type-boolean {
+  display: block;
+  margin-bottom: 5px;
+}
+.orbeon .fb-dialog-itemsets .xforms-type-boolean input {
+  margin-top: -3px;
+}
+.orbeon .fb-dialog-itemsets .xforms-type-boolean label {
+  display: inline;
+}
 .orbeon #fb-service-dialog {
   width: 550px;
 }

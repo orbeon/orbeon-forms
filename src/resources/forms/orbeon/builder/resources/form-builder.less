@@ -269,6 +269,14 @@ body {
         .xbl-fr-link-select1 { margin-bottom: .5em; float: right }
         .xbl-fr-link-select1 .xforms-label { display: none }
         .xforms-invalid .xforms-input-input { border-color: #DF731B }     // show errors also for fields that aren't visited
+
+        // Ideally boolean inputs should display better by default (https://github.com/orbeon/orbeon-forms/issues/854)
+        .xforms-type-boolean {
+            display: block;
+            margin-bottom: 5px;
+            input { margin-top: -3px }
+            label { display: inline }
+        }
     }
 
     // Submission editor dialog

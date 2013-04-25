@@ -34,10 +34,10 @@ class XXFormsGetRequestParameter extends RequestFunction {
 class XXFormsGetRequestHeader extends RequestFunction {
 
     def fromDocument(containingDocument: XFormsContainingDocument, name: String) =
-        containingDocument.getRequestHeaders.get(name)
+        containingDocument.getRequestHeaders.get(name.toLowerCase)
 
     def fromRequest(request: Request, name: String) =
-        Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name))
+        Option(NetUtils.getExternalContext.getRequest.getHeaderValuesMap.get(name.toLowerCase))
 }
 
 trait RequestFunction extends XFormsFunction with FunctionSupport {

@@ -59,8 +59,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.hints.inline.orbeon.builder"       value="true"/>
 
     <!-- Processes associated with Form Builder buttons -->
-    <property as="xs:string"  name="oxf.fr.detail.process.save.orbeon.builder"       value='save-final'/><!-- so it's not overridden by default -->
-    <property as="xs:string"  name="oxf.fr.detail.process.fb-save-as.*.*"            value='save-final'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.fb-home.*.*"               value='summary'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.save.orbeon.builder"       value='save-final'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.close.orbeon.builder"      value='summary'/>
 
 </properties>

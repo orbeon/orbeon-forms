@@ -292,6 +292,7 @@ body {
 }
 .orbeon .xforms-dialog legend.xforms-label:after,
 .orbeon .xforms-dialog .fb-grid-th .xforms-label:after,
+.orbeon .xforms-dialog .fr-grid thead tr th .xforms-label:after,
 .orbeon .xforms-dialog .xbl-fr-alert-dialog-message .xforms-label:after {
   content: none;
 }

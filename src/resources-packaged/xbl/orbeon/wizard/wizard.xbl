@@ -57,12 +57,34 @@
                     <xh:div class="fr-clear-container" xxbl:scope="outer">
                         <xh:div class="fr-wizard-body">
                             <xf:switch id="switch">
+                                <!-- We need a way to listen to each case, but we don't want to duplicate the script and
+                                     anyway event.target doesn't work within case (which would be a bug) -->
+                                <xxf:script ev:event="fr-section-scroll" ev:target="#observer">
+                                    <![CDATA[
+                                    var target = event.target;
+                                    var sectionTitle = $(target).closest('.xbl-fr-wizard').find('.fr-wizard-body .xforms-case-selected .fr-section-title')[0];
+                                    //console.log(target);
+
+                                    if (sectionTitle) {
+                                        var r = sectionTitle.getBoundingClientRect();
+                                        //console.log(r);
+                                        if (r.top < 0 || r.bottom > $(window).height()) {
+                                            //console.log($(window).scrollLeft());
+                                            //console.log($(sectionTitle).offset().top);
+                                            window.scrollTo($(window).scrollLeft(), $(sectionTitle).offset().top);
+                                        }
+                                    }
+                                    ]]>
+                                </xxf:script>
                                 <!-- Wrap each top-level fr:section within each own case -->
                                 <xsl:for-each select="fr:section">
                                     <xf:case id="{@id}-case">
-                                        <xf:action ev:event="xforms-deselect" ev:target="#observer">
-                                            <xxf:setvisited control="{{event('xxf:targetid')}}" visited="true" recurse="true"/>
-                                        </xf:action>
+                                        <xxf:setvisited
+                                            ev:event="xforms-deselect" ev:target="#observer"
+                                            control="{{event('xxf:targetid')}}" visited="true" recurse="true"/>
+                                        <xf:dispatch
+                                            ev:event="xforms-select" ev:target="#observer"
+                                            name="fr-section-scroll" targetid="switch"/>
                                         <xf:group appearance="xxf:internal">
                                             <xsl:copy>
                                                 <xsl:attribute name="collapse">false</xsl:attribute>

@@ -35,9 +35,10 @@
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
                 <xf:delete ref="items/item"/>                       <!-- Clear local items -->
-                <xf:var name="control-name"     value="controlOps:controlName(event('control-id'))"/>
+                <xf:var name="control-name"     value="controlOps:controlName(event('control-element')/@id)"/>
                 <xf:setvalue ref="control-name" value="$control-name"/>
-                <xf:setvalue ref="control-type" value="event('control-type')"/>
+                <xf:setvalue ref="control-type" value="event('control-element')/local-name()"/>
+                <xf:setvalue ref="appearance"   value="event('control-element')/@appearance"/>
                 <xf:setvalue ref="html"         value="controlOps:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
@@ -48,6 +49,7 @@
                     <instance>
                         <control-name/>             <!-- So we can find back the control when saving if users change the name -->
                         <control-type/>             <!-- Either 'select' or 'select1' -->
+                        <appearance/>
                         <html/>                     <!-- Whether labels can contain HTML markup -->
                         <items/>                    <!-- Contains item elements in the current language -->
                         <template>
@@ -110,7 +112,8 @@
                 <xxf:dialog id="dialog" class="fb-dialog-itemsets" appearance="full" model="model" level="modal">
                     <xf:label ref="$resources/dialog-itemsets/label"/>
                     <xh:div class="fb-dialog-body fb-hide-alert">
-                        <xf:input ref="$local/html">
+                        <!-- Only allow HTML for full appearance -->
+                        <xf:input ref="$local/html[../appearance = 'full']">
                             <xf:label ref="$resources/messages/lhha-checkbox"/>
                         </xf:input>
                         <fr:grid repeat="true" ref="$local/items/item" id="fb-itemset-repeat" origin="$local/template/item" columns="2">

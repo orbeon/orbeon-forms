@@ -63,14 +63,10 @@
                                     <![CDATA[
                                     var target = event.target;
                                     var sectionTitle = $(target).closest('.xbl-fr-wizard').find('.fr-wizard-body .xforms-case-selected .fr-section-title')[0];
-                                    //console.log(target);
 
                                     if (sectionTitle) {
                                         var r = sectionTitle.getBoundingClientRect();
-                                        //console.log(r);
                                         if (r.top < 0 || r.bottom > $(window).height()) {
-                                            //console.log($(window).scrollLeft());
-                                            //console.log($(sectionTitle).offset().top);
                                             window.scrollTo($(window).scrollLeft(), $(sectionTitle).offset().top);
                                         }
                                     }

@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.util
 
-import Connection._
 import ScalaUtils._
+import Headers._
 import collection.JavaConverters._
 import java.net.{URI, URLConnection, URL}
 import java.util.{Map ⇒ JMap}
@@ -28,6 +28,7 @@ import org.orbeon.oxf.resources.handler.HTTPURLConnection
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils
+import Connection._
 
 /**
  * Connection to a URL.
@@ -620,7 +621,7 @@ object Connection extends Logging {
             }
 
         if (newHeaders.nonEmpty)
-            debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ capitalizeHeader(k) → v(0) })
+            debug("adding SOAP headers", newHeaders map { case (k, v) ⇒ capitalizeCommonOrSplitHeader(k) → v(0) })
 
         newHeaders
     }
@@ -635,7 +636,7 @@ object Connection extends Logging {
                 value ← values
                 if value ne null
             } yield
-                capitalizeHeader(name) → value
+                capitalizeCommonOrSplitHeader(name) → value
 
         // Set headers on connection
         capitalizedHeaders foreach {

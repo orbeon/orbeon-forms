@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -168,7 +169,7 @@ object FormRunner {
                 propertyName ← properties.propertiesStartsWith(propertyPrefix)
                 lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
                 if lowerSuffix != "uri"
-                headerName = "Orbeon-" + capitalizeHeader(lowerSuffix)
+                headerName = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
                 headerValue = properties.getObject(propertyName).toString
             } yield
                 headerName → headerValue) toMap

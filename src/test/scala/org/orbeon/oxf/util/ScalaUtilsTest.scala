@@ -18,6 +18,7 @@ import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.ScalaUtils._
 import scala.collection.mutable
+import org.orbeon.oxf.util.Headers._
 
 class ScalaUtilsTest extends AssertionsForJUnit {
 
@@ -61,9 +62,11 @@ class ScalaUtilsTest extends AssertionsForJUnit {
     }
 
     @Test def testCapitalizeHeader(): Unit = {
-        assert("Accept"       === capitalizeHeader("aCcEpT"))
-        assert("Content-Type" === capitalizeHeader("cOnTeNt-tYpE"))
-        assert("SOAPAction"   === capitalizeHeader("sOaPaCtIoN"))
+        assert("Accept"       === capitalizeCommonOrSplitHeader("aCcEpT"))
+        assert("Content-Type" === capitalizeCommonOrSplitHeader("cOnTeNt-tYpE"))
+        assert("SOAPAction"   === capitalizeCommonOrSplitHeader("sOaPaCtIoN"))
+        assert("TE"           === capitalizeCommonOrSplitHeader("tE"))
+        assert("Content-MD5"  === capitalizeCommonOrSplitHeader("cOnTeNt-Md5"))
     }
 
     @Test def testPipeOps(): Unit = {

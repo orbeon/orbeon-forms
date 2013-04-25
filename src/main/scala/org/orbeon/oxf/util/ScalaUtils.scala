@@ -23,7 +23,6 @@ import scala.collection.mutable
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.util.{Failure, Try}
-import scala.util.control.ControlThrowable
 
 object ScalaUtils {
 
@@ -127,9 +126,6 @@ object ScalaUtils {
     def dropStartingSlash(s: String) = if (s.size == 0 || s.head != '/') s else s.tail
     def appendStartingSlash(s: String) = if (s.size != 0 && s.head == '/') s else '/' + s
 
-    def capitalizeHeader(s: String) =
-        if (s equalsIgnoreCase "SOAPAction") "SOAPAction" else s split '-' map (_.toLowerCase.capitalize) mkString "-"
-
     // Semi-standard pipe operator
     class PipeOps[A](a: A) { def |>[B](f: A ⇒ B) = f(a) }
     implicit def anyToPipeOps[A](a: A) = new PipeOps(a)
@@ -204,28 +200,6 @@ object ScalaUtils {
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
     def collectByErasedType[T: ClassTag](value: AnyRef) = Option(value) collect { case t: T  ⇒ t }
-
-    // These headers are connection headers and must never be forwarded (content-length is handled separately below)
-    private val HeadersToFilter = Set("transfer-encoding", "connection", "host")
-
-    // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
-    // Q: Doesn't Scala already have such a type?
-    // Q: Should the type be parametrized with String?
-    type ConvertibleToStringSeq[T[_]] = T[String] ⇒ Seq[String]
-
-    // Filter headers that that should never be propagated in our proxies
-    // Also combine headers with the same name into a single header
-    def filterCapitalizeAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, String)] =
-        filterAndCapitalizeHeaders(headers, out) map { case (name, values) ⇒ name → (values mkString ",") }
-
-    def filterAndCapitalizeHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
-        for {
-            (name, values) ← headers
-            if ! HeadersToFilter(name.toLowerCase)
-            if ! out || name.toLowerCase != "content-length"
-            if (values ne null) && values.nonEmpty
-        } yield
-            capitalizeHeader(name) → values
 
     /*
      * Rewrite in Scala of Apache StringUtils.splitWorker (http://www.apache.org/licenses/LICENSE-2.0).

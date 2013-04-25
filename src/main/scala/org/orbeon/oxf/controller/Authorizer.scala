@@ -18,6 +18,7 @@ import java.net.URI
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.externalcontext.URLRewriter

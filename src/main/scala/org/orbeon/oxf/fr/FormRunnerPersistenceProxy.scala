@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.Headers._
 import scala.collection.JavaConversions._
 import org.orbeon.oxf.resources.handler.HTTPURLConnection
 import org.orbeon.oxf.processor.generator.RequestGenerator
@@ -91,7 +92,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         def setPersistenceHeaders(connection: HTTPURLConnection) {
             for ((name, value) ← headers)
-                connection.setRequestProperty(capitalizeHeader(name), value)
+                connection.setRequestProperty(capitalizeCommonOrSplitHeader(name), value)
         }
 
         def proxyOutgoingHeaders(connection: HTTPURLConnection) =

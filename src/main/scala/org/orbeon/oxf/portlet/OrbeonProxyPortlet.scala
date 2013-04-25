@@ -16,6 +16,7 @@ package org.orbeon.oxf.portlet
 import javax.portlet._
 import java.io._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.Headers._
 import java.net.{HttpURLConnection, URL}
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}

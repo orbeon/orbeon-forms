@@ -992,7 +992,7 @@
             <label>utilisez la boîte à outils pour insérer un contrôle</label>
         </insert-control>
         <edit-items>
-            <label>Editer la liste</label>
+            <label>Editer les choix</label>
         </edit-items>
         <expand-icon>
             <label>Etendre</label>

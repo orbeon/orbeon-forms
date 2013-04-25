@@ -596,14 +596,6 @@ body {
   margin-bottom: 0;
   padding: 0;
 }
-.orbeon .fb-edit-items {
-  text-decoration: none;
-  display: block;
-  clear: both;
-  position: absolute;
-  left: 2.5em;
-  bottom: 0.5em;
-}
 .orbeon #fr-form-group .fb-static-upload {
   background-color: none;
   position: absolute;
@@ -662,7 +654,6 @@ body {
   padding-left: 2.5em;
   padding-right: 2.5em;
 }
-.orbeon .fr-view .fr-grid .fr-grid-content.fb-itemset,
 .orbeon .fr-view .fr-grid .fr-grid-content.fb-upload {
   padding-bottom: 2.5em;
 }

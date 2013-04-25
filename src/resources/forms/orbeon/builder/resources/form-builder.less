@@ -479,9 +479,7 @@ body {
     // Control details and validation shown to the top right of the cell
     .fb-grid-control-icons { position: absolute; right: .5em; top: .5em }
     .fb-grid-control-icons img { margin-bottom: 0; padding: 0 }
-    // Optional link to itemset editor shown to the bottom of the cell
-    // Position to the left (2.5em) matched left margin of the fr-grid-content
-    .fb-edit-items { text-decoration: none; display: block; clear: both; position: absolute; left: 2.5em; bottom: .5em }
+
     // Simply styling for file select to just show "x"
     #fr-form-group .fb-static-upload {
         background-color: none;
@@ -529,8 +527,8 @@ body {
             padding-left: 2.5em;
             padding-right: 2.5em;
 
-            // Space for trigger showing the itemset editor and file upload
-            &.fb-itemset, &.fb-upload {
+            // Space for trigger showing the file upload
+            &.fb-upload {
                 padding-bottom: 2.5em;
             }
             // Inputs for editing the label and hint to take the whole width of the grid content

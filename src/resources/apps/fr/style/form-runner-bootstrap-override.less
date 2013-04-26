@@ -125,6 +125,13 @@ body.orbeon {
         &> .xforms-trigger { cursor: pointer }
         &> .xforms-trigger.xforms-readonly { cursor: auto; }
         a { text-decoration: none; }
+
+        // Reset rules that can be applied by external Bootstrap .pagination a rule
+        span a {
+            padding: 0;
+            border: none;
+            line-height: (@baseLineHeight * 2) - 2;
+        }
     }
 
     .input-append .add-on, .input-prepend .add-on {

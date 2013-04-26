@@ -22,6 +22,7 @@ import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import collection.JavaConverters._
+import collection.breakOut
 import com.liferay.portal.util.PortalUtil
 import java.util.{Enumeration ⇒ JEnumeration}
 
@@ -46,19 +47,16 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
     type AsyncContext = RequestDetails
 
     // Init parameters to configure headers and parameters forwarding
-    private var forwardHeaders = Set.empty[String]
+    private var forwardHeaders = Map.empty[String, String] // lowercase name → original name
     private var forwardParams  = Set.empty[String]
 
     override def init(config: PortletConfig) {
         super.init(config)
 
         // Read portlet init parameters
-        forwardHeaders = stringToSet(config.getInitParameter("forward-headers"))
+        forwardHeaders = stringToSet(config.getInitParameter("forward-headers")).map(name ⇒ name.toLowerCase → name)(breakOut)
         forwardParams  = stringToSet(config.getInitParameter("forward-parameters"))
     }
-
-    // Immutable information about an outgoing request
-    case class RequestDetails(content: Option[Content], session: PortletSession, url: String, namespace: String, headers: Seq[(String, String)], params: Seq[(String, String)])
 
     // Try to find getHttpServletRequest only the first time this is accessed
     private lazy val getHttpServletRequest =
@@ -67,6 +65,9 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private def findServletRequest(request: PortletRequest) =
         getHttpServletRequest flatMap (f ⇒ Option(f(request)))
+
+    // Immutable information about an outgoing request
+    case class RequestDetails(content: Option[Content], session: PortletSession, url: String, namespace: String, headers: Seq[(String, String)], params: Seq[(String, String)])
 
     object RequestDetails {
 
@@ -80,12 +81,14 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 } yield
                     name → values
 
+            // Match on headers in a case-insensitive way, but the header we sent follows the capitalization of the
+            // header specified in the init parameter.
             def headersToForward =
                 for {
-                    (name, value) ← filterCapitalizeAndCombineHeaders(headerPairs, out = true)
-                    if forwardHeaders(name)
+                    (name, value) ← filterAndCombineHeaders(headerPairs, out = true)
+                    originalName  ← forwardHeaders.get(name.toLowerCase)
                 } yield
-                    name → value
+                    originalName → value
 
             def paramsToForward =
                 for {

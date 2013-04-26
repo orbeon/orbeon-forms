@@ -18,7 +18,7 @@ import collection.breakOut
 object Headers {
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
-    private val HeadersToFilter = Set("transfer-encoding", "connection", "host")
+    private val HeadersToFilterOut = Set("transfer-encoding", "connection", "host")
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
     // Q: Doesn't Scala already have such a type?
@@ -31,13 +31,21 @@ object Headers {
         filterAndCapitalizeHeaders(headers, out) map { case (name, values) ⇒ name → (values mkString ",") }
 
     def filterAndCapitalizeHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
+        filterHeaders(headers, out) map { case (n, v) ⇒ capitalizeCommonOrSplitHeader(n) → v }
+
+    // NOTE: Filtering is case-insensitive, but original case is unchanged
+    def filterAndCombineHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, String)] =
+        filterHeaders(headers, out) map { case (name, values) ⇒ name → (values mkString ",") }
+
+    // NOTE: Filtering is case-insensitive, but original case is unchanged
+    def filterHeaders[T[_]: ConvertibleToStringSeq](headers: Iterable[(String, T[String])], out: Boolean): Iterable[(String, T[String])] =
         for {
             (name, values) ← headers
-            if ! HeadersToFilter(name.toLowerCase)
+            if ! HeadersToFilterOut(name.toLowerCase)
             if ! out || name.toLowerCase != "content-length"
             if (values ne null) && values.nonEmpty
         } yield
-            capitalizeCommonOrSplitHeader(name) → values
+            name → values
 
     // Capitalize any header
     def capitalizeCommonOrSplitHeader(name: String) =

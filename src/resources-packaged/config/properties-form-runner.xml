@@ -130,14 +130,6 @@
     <property as="xs:boolean" name="oxf.fr.email.attach-pdf.*.*"                                value="true"/>
     <property as="xs:boolean" name="oxf.fr.email.attach-xml.*.*"                                value="true"/>
 
-    <!-- Alfresco integration configuration -->
-    <property as="xs:anyURI"  name="oxf.fr.alfresco.uri.*.*"                                    value=""/>
-    <property as="xs:string"  name="oxf.fr.alfresco.username.*.*"                               value=""/>
-    <property as="xs:string"  name="oxf.fr.alfresco.credentials.*.*"                            value=""/>
-    <property as="xs:string"  name="oxf.fr.alfresco.path.*.*"                                   value="/app:company_home"/>
-    <property as="xs:boolean" name="oxf.fr.alfresco.send-pdf.*.*"                               value="false"/>
-    <property as="xs:boolean" name="oxf.fr.alfresco.send-xml.*.*"                               value="false"/>
-
     <!-- Configuration of built-in forms -->
     <property as="xs:string"  name="oxf.fr.detail.captcha.orbeon.builder"                       value=""/>
     <property as="xs:string"  name="oxf.fr.persistence.provider.orbeon.builder.form"            value="resource"/>

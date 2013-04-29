@@ -68,7 +68,6 @@
     <xsl:variable name="custom-css-uri" select="tokenize(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))), '\s+')" as="xs:string*"/>
     <xsl:variable name="buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
     <xsl:variable name="buttons" select="tokenize(p:property(string-join(($buttons-property, $app, $form), '.')), '\s+')" as="xs:string*"/>
-    <xsl:variable name="has-alfresco" select="p:property(string-join(('oxf.fr.detail.send.alfresco', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="is-show-explanation" select="p:property(string-join(('oxf.fr.detail.view.show-explanation', $app, $form), '.')) = true()" as="xs:boolean"/>
     <xsl:variable name="is-inline-hints" select="not(p:property(string-join(('oxf.fr.detail.hints.inline', $app, $form), '.')) = false())" as="xs:boolean"/>
     <xsl:variable name="is-animate-sections" select="not($is-noscript) and not(p:property(string-join(('oxf.fr.detail.ajax.section.animate', $app, $form), '.')) = false())" as="xs:boolean"/>
@@ -300,10 +299,6 @@
         <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->
         <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
-        <xsl:if test="$has-alfresco">
-            <!-- This model handles Alfresco integration -->
-            <xi:include href="oxf:/apps/fr/alfresco/alfresco-model.xml" xxi:omit-xml-base="true"/>
-        </xsl:if>
 
         <!-- This model supports Form Runner rendered through the xforms-renderer -->
         <xf:model id="fr-xforms-renderer-model">

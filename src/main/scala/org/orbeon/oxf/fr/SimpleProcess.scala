@@ -229,14 +229,12 @@ object SimpleProcess extends Actions with Logging {
 
         buttonName match {
             case "workflow-send" ⇒
-                val isLegacySendAlfresco    = booleanPropertySet("oxf.fr.detail.send.alfresco")
                 val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send.email")
                 val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send.success.uri")
                 val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send.error.uri")
 
                 def isLegacyCreatePDF =
                     isLegacySendEmail       && booleanPropertySet("oxf.fr.email.attach-pdf")  ||
-                    isLegacySendAlfresco    && booleanPropertySet("oxf.fr.alfresco.send-pdf") ||
                     isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
 
                 val buffer = ListBuffer[String]()
@@ -252,11 +250,6 @@ object SimpleProcess extends Actions with Logging {
                 if (isLegacyCreatePDF) {
                     buffer += ThenCombinator.name
                     buffer += "pdf"
-                }
-
-                if (isLegacySendAlfresco) {
-                    buffer += ThenCombinator.name
-                    buffer += "alfresco"
                 }
 
                 if (isLegacySendEmail) {

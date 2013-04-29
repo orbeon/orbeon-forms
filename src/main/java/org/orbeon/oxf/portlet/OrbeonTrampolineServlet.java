@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.portlet;
 
-import org.orbeon.oxf.externalcontext.TrampolineServletRequestWrapper;
+import org.orbeon.oxf.servlet.TrampolineServletRequestWrapper;
 import org.orbeon.oxf.servlet.OrbeonXFormsFilter;
 
 import javax.servlet.*;

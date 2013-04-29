@@ -375,13 +375,13 @@ object FormRunner {
         val availableFormLangs  = getFormLangSelection(app, form, formLangs).asScala.toList
         val actualRequestedLang = findRequestedLang(app, form, requestedLang) filter isAllowedLang(app, form)
 
-        selectLang(app, form, actualRequestedLang, availableFormLangs).orNull
+        selectLangUseDefault(app, form, actualRequestedLang, availableFormLangs).orNull
     }
 
     // Get the Form Runner language
     // If possible, try to match the form language, otherwise
     def selectFormRunnerLang(app: String, form: String, formLang: String, formRunnerLangs: JList[String]): String =
-        selectLang(app, form, Option(formLang), formRunnerLangs.asScala.toList).orNull
+        selectLangUseDefault(app, form, Option(formLang), formRunnerLangs.asScala.toList).orNull
 
     // Get the default language for the given app/form
     // If none is configured, return the global default "en"
@@ -422,7 +422,7 @@ object FormRunner {
     // Append a query string to a URL
     def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)
 
-    private def selectLang(app: String, form: String, requestedLang: Option[String], availableLangs: List[String]) = {
+    private def selectLangUseDefault(app: String, form: String, requestedLang: Option[String], availableLangs: List[String]) = {
         def matchingLanguage = availableLangs intersect requestedLang.toList headOption
         def defaultLanguage  = availableLangs intersect List(getDefaultLang(app, form)) headOption
         def firstLanguage    = availableLangs headOption

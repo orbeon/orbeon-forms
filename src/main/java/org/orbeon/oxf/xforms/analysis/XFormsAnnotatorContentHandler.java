@@ -32,14 +32,14 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.*;
 
 /**
- * ContentHandler that:
+ * XMLReceiver that:
  *
- * o adds ids on all the XForms elements which don't have one
- * o gathers namespace information on XForms elements (xf:*, xxf:*, exf:*, xbl:*).
- * o finds AVTs on non-XForms elements
- *   o adds ids to those elements
- *   o produces xxf:attribute elements
- * o finds title information and produces xxf:text elements
+ * - adds ids on all the XForms elements which don't have one
+ * - gathers namespace information on XForms elements (xf:*, xxf:*, exf:*, xbl:*).
+ * - finds AVTs on non-XForms elements
+ *   - adds ids to those elements
+ *   - produces xxf:attribute elements
+ * - finds title information and produces xxf:text elements
  *
  * NOTE: There was a thought of merging this with XFormsExtractorContentHandler but we need a separate annotated
  * document in XFormsToXHTML to produce the output. So if we modify this, we should modify it so that two separate

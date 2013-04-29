@@ -47,6 +47,8 @@ abstract class ElementAnalysis(
 
     require(element ne null)
 
+    implicit def logger = part.getIndentedLogger
+
     val namespaceMapping: NamespaceMapping
 
     // Element local name
@@ -400,34 +402,43 @@ object ElementAnalysis {
         }
     }
 
-    /**
-     * Return an iterator over all the element's ancestors.
-     */
-    def ancestorIterator(start: ElementAnalysis) = new Iterator[ElementAnalysis] {
+    abstract class IteratorBase(start: ElementAnalysis) extends Iterator[ElementAnalysis] {
 
-        private[this] var theNext = start.parent
+        def initialNext: Option[ElementAnalysis]
+        def subsequentNext(e: ElementAnalysis): Option[ElementAnalysis]
+
+        private[this] var theNext = initialNext
 
         def hasNext = theNext.isDefined
         def next() = {
             val newResult = theNext.get
-            theNext = newResult.parent
+            theNext = subsequentNext(newResult)
             newResult
         }
     }
 
     /**
+     * Return an iterator over all the element's ancestors.
+     */
+    def ancestorIterator(start: ElementAnalysis) = new IteratorBase(start) {
+        def initialNext = start.parent
+        def subsequentNext(e: ElementAnalysis) = e.parent
+    }
+
+    /**
      * Iterator over the element and all its ancestors.
      */
-    def ancestorOrSelfIterator(start: ElementAnalysis) = new Iterator[ElementAnalysis] {
+    def ancestorOrSelfIterator(start: ElementAnalysis) = new IteratorBase(start) {
+        def initialNext = Option(start)
+        def subsequentNext(e: ElementAnalysis) = e.parent
+    }
 
-        private[this] var theNext = Option(start)
-
-        def hasNext = theNext.isDefined
-        def next() = {
-            val newResult = theNext.get
-            theNext = newResult.parent
-            newResult
-        }
+    /**
+     * Iterator over the element's preceding siblings.
+     */
+    def precedingSiblingIterator(start: ElementAnalysis) = new IteratorBase(start) {
+        def initialNext = start.preceding
+        def subsequentNext(e: ElementAnalysis) = e.preceding
     }
 
     /**

@@ -572,7 +572,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
     private void setInlineInstance(Instance instance) {
         // Extract document
-        final DocumentInfo instanceDocument = instance.inlineContent().get();
+        final DocumentInfo instanceDocument = instance.inlineContent();
 
         // Set instance and associated information if everything went well
         // NOTE: No XInclude supported to read instances with @src for now

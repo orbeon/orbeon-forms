@@ -23,6 +23,7 @@ import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
+import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
@@ -33,7 +34,7 @@ case class AbstractBinding(
     scripts: Seq[HeadElement],
     styles: Seq[HeadElement],
     handlers: Seq[Element],
-    implementations: Seq[Element],
+    modelElements: Seq[Element],
     global: Option[Document]
 ) {
     val containerElementName =          // "div" by default
@@ -51,13 +52,28 @@ case class AbstractBinding(
     def modeHandlers    = ! xblMode("nohandlers")
 
     // Return a CSS-friendly name for this binding (no `|` or `:`)
-    val cssName = qNameMatch.getQualifiedName.replace(':', '-')
+    val cssName   = qNameMatch.getQualifiedName.replace(':', '-')
+
+    // Printable name for the binding match
+    def printableBindingName = qNameMatch.getQualifiedName
 
     // CSS classes to put in the markup
     val cssClasses = "xbl-component" :: ("xbl-" + cssName) :: (modeFocus list "xbl-focusable") mkString " "
 
     val allowedExternalEvents =
         attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (modeFocus set XFORMS_FOCUS)
+
+    // Constant instance DocumentInfo by model and instance index
+    // We use the indexes because at this time, no id annotation has taken place yet
+    val constantInstances = (
+        for {
+            (m, mi) ← modelElements.zipWithIndex
+            (i, ii) ← Dom4j.elements(m, XFORMS_INSTANCE_QNAME).zipWithIndex
+            im      = new ThrowawayInstance(i)
+            if im.readonly && im.useInlineContent
+        } yield
+            (mi, ii) → im.inlineContent
+    ) toMap
 
     def templateElement = Option(bindingElement.element(XBL_TEMPLATE_QNAME))
 
@@ -117,7 +133,7 @@ object AbstractBinding {
             } yield
                 handlerElement
 
-        val implementations =
+        val modelElements =
             for {
                 implementationElement ← Option(bindingElement.element(XBL_IMPLEMENTATION_QNAME)).toSeq
                 modelElement ← Dom4j.elements(implementationElement, XFORMS_MODEL_QNAME)
@@ -127,7 +143,7 @@ object AbstractBinding {
         val global = Option(bindingElement.element(XXBL_GLOBAL_QNAME)) map
             (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
 
-        new AbstractBinding(qNameMatch(bindingElement), bindingElement, lastModified, bindingId, scripts, styles, handlers, implementations, global)
+        new AbstractBinding(qNameMatch(bindingElement), bindingElement, lastModified, bindingId, scripts, styles, handlers, modelElements, global)
     }
 
     // From a binding element, extract the @element CSS-style selectors and return a QName

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis.model
 
 
 import org.orbeon.oxf.processor.ProcessorImpl
-import org.orbeon.oxf.util.{XPathCache, NetUtils}
+import org.orbeon.oxf.util.{Logging, XPathCache, NetUtils}
 import org.orbeon.oxf.xforms._
 import analysis.{StaticStateContext, SimpleElementAnalysis, ElementAnalysis}
 import xbl.Scope
@@ -29,12 +29,67 @@ import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.saxon.om.DocumentInfo
 import scala.collection.JavaConverters._
 import org.orbeon.saxon.dom4j.{DocumentWrapper, TypedDocumentWrapper}
+import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 
 /**
  * Static analysis of an XForms instance.
  */
 class Instance(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) {
+        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+        with InstanceMetadata
+        with Logging {
+
+    def partExposeXPathTypes = part.isExposeXPathTypes
+    override def extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", element, "id", staticId)
+
+    // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
+    // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple
+    // instances of a given form. This is useful in particular for component i18n resource instances.
+    def inlineContent = {
+
+        // An instance within xf:implementation has a ComponentControl grandparent
+        def componentForConstantInstances =
+            if (readonly && useInlineContent)
+                parent.get.parent collect { case component: ComponentControl ⇒ component }
+            else
+                None
+
+        componentForConstantInstances map { component ⇒
+
+            val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) filter (_.localName == "model") size
+            val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       filter (_.localName == "instance") size
+
+            debug("getting readonly inline instance from abstract binding", Seq(
+                "model id"       → parent.get.staticId,
+                "instance id"    → staticId,
+                "scope id"       → component.binding.innerScope.scopeId,
+                "binding name"   → component.binding.abstractBinding.printableBindingName,
+                "model index"    → modelIndex.toString,
+                "instance index" → instanceIndex.toString))
+
+            // Delegate to AbstractBinding
+            component.binding.abstractBinding.constantInstances((modelIndex, instanceIndex))
+        } getOrElse
+            extractInlineContent
+    }
+
+    // For now we don't want to see instances printed as controls in unit tests
+    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) = ()
+}
+
+// Used to gather instance metadata from AbstractBinding
+class ThrowawayInstance(val element: Element) extends InstanceMetadata {
+    def extendedLocationData = ElementAnalysis.createLocationData(element)
+    def partExposeXPathTypes = false
+    def inlineContent = extractInlineContent
+}
+
+// Separate trait that can also be used by AbstractBinding to extract instance metadata
+trait InstanceMetadata {
+
+    def element: Element
+    def partExposeXPathTypes: Boolean
+    def extendedLocationData: ExtendedLocationData
 
     import Instance._
     import ElementAnalysis._
@@ -44,7 +99,7 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     val timeToLive = Instance.timeToLiveOrDefault(element)
     val handleXInclude = false
 
-    val exposeXPathTypes = Option(element.attributeValue(XXFORMS_EXPOSE_XPATH_TYPES_QNAME)) map (_ == "true") getOrElse part.isExposeXPathTypes
+    val exposeXPathTypes = Option(element.attributeValue(XXFORMS_EXPOSE_XPATH_TYPES_QNAME)) map (_ == "true") getOrElse ! readonly && partExposeXPathTypes
 
     val (indexIds, indexClasses) = {
         val tokens = attSet(element, XXFORMS_INDEX_QNAME)
@@ -74,8 +129,10 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     private def hasInlineContent = root.isDefined
 
     // Create inline instance document if any
-    // NOTE: Result can't be shared. In the future we could share the extracted document and copy as needed.
-    def inlineContent = root map (extractDocument(_, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false))
+    def inlineContent: DocumentInfo
+
+    // Extract the inline content into a new document (mutable or not)
+    protected def extractInlineContent = extractDocument(root.get, excludeResultPrefixes, readonly, exposeXPathTypes, removeInstanceData = false)
 
     // Don't allow more than one child element
     if (Dom4j.elements(element).size > 1)
@@ -103,11 +160,6 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
     // Don't allow a blank src attribute
     if (useExternalContent && instanceSource == Some(""))
         throw new ValidationException("xf:instance must not specify a blank URL", extendedLocationData)
-
-    private def extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", element, "id", staticId)
-
-    // For now we don't want to see instances printed as controls in unit tests
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) = ()
 }
 
 object Instance {
@@ -122,6 +174,8 @@ object Instance {
     // @readonly         if true, the document returned is a compact TinyTree, otherwise a DocumentWrapper
     // @exposeXPathTypes if true, use a TypedDocumentWrapper
     def extractDocument(element: Element, excludeResultPrefixes: Set[String], readonly: Boolean, exposeXPathTypes: Boolean, removeInstanceData: Boolean): DocumentInfo = {
+
+        require(! (readonly && exposeXPathTypes)) // we can't expose types on readonly instances at the moment
 
         // Extract a document and adjust namespaces if requested
         // NOTE: Should implement exactly as per XSLT 2.0

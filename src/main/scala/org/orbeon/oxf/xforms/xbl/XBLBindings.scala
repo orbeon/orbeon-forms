@@ -197,8 +197,8 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
         def annotateByElement(element: Element) =
             annotateSubtreeByElement(boundElement, element, newInnerScope, outerScope, XXBLScope.inner, newInnerScope)
 
-        val annotatedHandlers = abstractBinding.handlers        map annotateByElement
-        val annotatedModels   = abstractBinding.implementations map annotateByElement
+        val annotatedHandlers = abstractBinding.handlers      map annotateByElement
+        val annotatedModels   = abstractBinding.modelElements map annotateByElement
 
         // Remember concrete binding information
         val newConcreteBinding =
@@ -245,7 +245,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
      * From a raw tree produce a full annotated tree and, optionally, a compact tree.
      */
     def annotateSubtree(
-           boundElement: Option[Element],
+           boundElement: Option[Element], // for xml:base resolution
            rawTree: Node,
            innerScope: Scope,
            outerScope: Scope,
@@ -398,7 +398,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
     /**
      *
-     * @param xmlReceiver           output of transformation
+     * @param xmlReceiver           output of transformation or null
      * @param innerScope            inner scope
      * @param outerScope            outer scope, i.e. scope of the bound element
      * @param startScope            scope of root element

@@ -89,7 +89,7 @@
                     <days/>
                 </xf:instance>
 
-                <xf:instance id="resources">
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
                         <resource xml:lang="en">
                             <year>Year</year>
@@ -124,7 +124,6 @@
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:var name="resource" value="(instance('resources')/resource[@xml:lang = (xxf:lang(), 'en')])[last()]"/>
             <!-- Read external value -->
             <xf:var name="binding" value="xxf:binding('fr-dropdown-date-binding')"/>
             <xf:var name="value" as="xs:string" value="$binding/string()">
@@ -162,7 +161,7 @@
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
                     <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
                         <xf:item>
-                            <xf:label value="$resource/year"/>
+                            <xf:label value="xxf:r('year')"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="instance('years-itemset')/year">
@@ -172,7 +171,7 @@
                     </xf:select1>
                     <xf:select1 ref="month">
                         <xf:item>
-                            <xf:label value="$resource/month"/>
+                            <xf:label value="xxf:r('month')"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="instance('months-itemset')/month">
@@ -182,7 +181,7 @@
                     </xf:select1>
                     <xf:select1 ref="day">
                         <xf:item>
-                            <xf:label value="$resource/day"/>
+                            <xf:label value="xxf:r('day')"/>
                             <xf:value/>
                         </xf:item>
                         <xf:itemset ref="instance('days-itemset')/day">

@@ -53,15 +53,22 @@
             </templates>
         </metadata>
 
+        <xbl:implementation>
+            <xf:model>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <resources>
+                        <resource xml:lang="en"><download>Download</download></resource>
+                        <resource xml:lang="fr"><download>Télécharger</download></resource>
+                    </resources>
+                </xf:instance>
+            </xf:model>
+        </xbl:implementation>
         <xbl:template>
             <xf:upload ref="xxf:binding('fr-attachment')">
                 <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
             </xf:upload>
             <xf:output appearance="xxf:download" ref="xxf:binding('fr-attachment')[normalize-space()]">
-                <xf:label>
-                    <xh:img src="/apps/fr/style/images/pixelmixer/down_16.png" alt=""/>
-                    <xh:span>Download</xh:span>
-                </xf:label>
+                <xf:label><xh:i class="icon-download"/><xf:output value="xxf:r('download')"/></xf:label>
                 <xbl:content includes=":root > xf|filename, :root > xf|mediatype"/>
             </xf:output>
         </xbl:template>

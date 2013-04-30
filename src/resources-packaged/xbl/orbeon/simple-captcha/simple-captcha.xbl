@@ -46,18 +46,16 @@
                     </instance>
                 </xf:instance>
                 <xf:bind ref="image" type="xs:base64Binary"/>
-                <xf:instance id="resources">
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
-                        <resource xml:lang="en">
-                            <ask-to-type-word>Type the word above:</ask-to-type-word>
-                        </resource>
+                        <resource xml:lang="en"><ask-to-type-word>Type the word above:</ask-to-type-word></resource>
+                        <resource xml:lang="fr"><ask-to-type-word>Veuillez entrer le mot ci-dessus:</ask-to-type-word></resource>
                     </resources>
                 </xf:instance>
             </xf:model>
         </xbl:implementation>
         <xbl:template>
             <xf:group id="component-inner-group" appearance="xxf:internal">
-                <xf:var name="resource" value="instance('resources')/resource[@xml:lang = 'en']"/>
                 <xf:action ev:event="xforms-enabled">
                     <xf:var name="captcha" value="SimpleCaptcha:createCaptcha()"/>
                     <xf:setvalue ref="instance()/image" value="SimpleCaptcha:image($captcha)"/>
@@ -71,7 +69,7 @@
                 <xh:div>
                     <xf:output ref="instance()/image" mediatype="image/png"/>
                     <xf:input ref="instance()/user-answer">
-                        <xf:label ref="$resource/ask-to-type-word"/>
+                        <xf:label ref="xxf:r('ask-to-type-word')"/>
                     </xf:input>
                 </xh:div>
             </xf:group>

@@ -176,6 +176,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("lang", classOf[XXFormsLang], 0, 0, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
+
+        // xxf:r()
+        Fun("r", classOf[XXFormsResource], 0, 0, STRING, ALLOWS_ZERO_OR_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
     
         // xxf:pending-uploads()
         Fun("pending-uploads", classOf[XXFormsPendingUploads], 0, 0, INTEGER, EXACTLY_ONE)

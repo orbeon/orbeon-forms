@@ -219,7 +219,7 @@ object ScalaUtils {
      * val result: Set[String]           = split("a b")(breakOut)
      * val result: LinkedHashSet[String] = split("a b")(breakOut)
      */
-    def split[T[_]](str: String, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
+    def split[T[_]](str: String, sep: String = null, max: Int = 0)(implicit cbf: CanBuildFrom[Nothing, String, T[String]]): T[String] = {
 
         val builder = cbf()
 
@@ -231,8 +231,17 @@ object ScalaUtils {
                 var start = 0
                 var doMatch = false
 
+                val test: Char ⇒ Boolean =
+                    if (sep eq null)
+                        Character.isWhitespace
+                    else if (sep.length == 1) {
+                        val sepChar = sep.charAt(0)
+                        sepChar ==
+                    } else
+                        sep.indexOf(_) >= 0
+
                 while (i < len) {
-                    if (Character.isWhitespace(str.charAt(i))) {
+                    if (test(str.charAt(i))) {
                         if (doMatch) {
                             if (sizePlus1 == max)
                                 i = len

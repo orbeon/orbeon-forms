@@ -13,7 +13,6 @@
  */
 package org.orbeon.scaxon
 
-import java.util.{List ⇒ JList}
 import org.orbeon.saxon.`type`.Type
 import org.orbeon.saxon.value.StringValue
 import xml.Elem
@@ -31,9 +30,11 @@ import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
 import org.orbeon.saxon.functions.FunctionLibrary
-import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.tinytree.TinyTree
 import org.orbeon.oxf.util.XPathCache
+import annotation.tailrec
+import collection._
 
 object XML {
 
@@ -403,6 +404,26 @@ object XML {
             case Seq() ⇒ ""
             case Seq(nodeInfo, _*) ⇒ nodeInfo.getStringValue
         }
+    }
+
+    // Hand-made simple path search
+    // - path *must* have the form "foo/bar/baz"
+    // - each path element must be a NCName (non-qualified)
+    // - as in XPath, non-qualified names mean "in no namespace"
+    def path(context: NodeInfo, path: String) = {
+
+        @tailrec def findChild(parent: Option[NodeInfo], tokens: List[String]): Option[NodeInfo] =
+            if (tokens.isEmpty)
+                parent
+            else
+                parent match {
+                    case Some(p) ⇒ findChild(p child ("" → tokens.head) headOption, tokens.tail)
+                    case None    ⇒ None
+                }
+
+        val tokens: List[String] = split(path, "/")(breakOut)
+
+        findChild(Some(context), tokens)
     }
 
     // Scope ops on NodeInfo / Seq[NodeInfo]

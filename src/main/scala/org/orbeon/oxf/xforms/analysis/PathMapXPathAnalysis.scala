@@ -118,9 +118,9 @@ object PathMapXPathAnalysis {
     def apply(partAnalysis: PartAnalysis, xpathString: String, namespaceMapping: NamespaceMapping,
               baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
               pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
-              locationData: LocationData, element: Element): XPathAnalysis = {
+              locationData: LocationData, element: Element, avt: Boolean): XPathAnalysis = {
 
-        val compiledExpression = XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt = false)
+        val compiledExpression = XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt)
         apply(partAnalysis, compiledExpression, baseAnalysis, inScopeVariables, pathMapContext, scope, defaultInstancePrefixedId, element)
     }
 

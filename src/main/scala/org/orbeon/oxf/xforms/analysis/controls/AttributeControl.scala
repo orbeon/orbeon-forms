@@ -25,8 +25,7 @@ class AttributeControl(staticStateContext: StaticStateContext, element: Element,
         with OptionalSingleNode {
 
     // Attribute control uses an AVT
-    // TODO: Add support for analyzing AVT
-    override def computeValueAnalysis = Some(NegativeAnalysis(value.get)) // we must have a value
+    override def computeValueAnalysis = Some(analyzeXPath(getChildrenContext, attributeValue, avt = true))
 
     val forStaticId = element.attributeValue(FOR_QNAME)
     val forPrefixedId = XFormsUtils.getRelatedEffectiveId(prefixedId, forStaticId)

@@ -27,7 +27,7 @@
 
     <property name="src.dir" location="src"/>
 
-    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20130217.jar"/>
+    <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20130501.jar"/>
 
     <property name="catalina.home" value=""/>
 

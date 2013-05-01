@@ -125,16 +125,16 @@ class SimpleElementAnalysis(
         part.scopeForPrefixedId(childPrefixedId)
     }
 
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String): XPathAnalysis =
-        analyzeXPath(contextAnalysis, inScopeVariables, xpathString)
+    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], xpathString: String, avt: Boolean = false): XPathAnalysis =
+        analyzeXPath(contextAnalysis, inScopeVariables, xpathString, avt)
 
     // For callers without a CompiledExpression
-    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String): XPathAnalysis = {
+    protected def analyzeXPath(contextAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait], xpathString: String, avt: Boolean): XPathAnalysis = {
 
         val defaultInstancePrefixedId = model flatMap (_.defaultInstancePrefixedId)
 
         PathMapXPathAnalysis(part, xpathString, part.metadata.getNamespaceMapping(prefixedId),
-            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element)
+            contextAnalysis, inScopeVariables, new SimplePathMapContext, scope, defaultInstancePrefixedId, locationData, element, avt)
     }
 
     // For callers with a CompiledExpression

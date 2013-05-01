@@ -62,7 +62,7 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
 
     override def getChildrenContext = defaultInstancePrefixedId map { defaultInstancePrefixedId ⇒ // instance('defaultInstanceId')
         PathMapXPathAnalysis(part, PathMapXPathAnalysis.buildInstanceString(defaultInstancePrefixedId),
-            null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element)
+            null, None, Map.empty[String, VariableTrait], null, scope, Some(defaultInstancePrefixedId), locationData, element, avt = false)
     }
     
     // For now this only checks actions and submissions, in the future should also build rest of content

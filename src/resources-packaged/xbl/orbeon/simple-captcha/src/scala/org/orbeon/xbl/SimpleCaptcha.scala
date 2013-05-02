@@ -1,6 +1,6 @@
 package org.orbeon.xbl
 
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import nl.captcha.Captcha
 import nl.captcha.backgrounds.GradiatedBackgroundProducer
 import nl.captcha.text.renderer.ColoredEdgesWordRenderer

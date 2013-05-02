@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events._
-import scala.Some
 
 trait VisitableTrait extends XFormsControl {
 

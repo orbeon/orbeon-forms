@@ -26,7 +26,7 @@ import org.orbeon.oxf.common.{ValidationException, Version}
 import org.orbeon.oxf.xml.{TransformerUtils, ContentHandlerHelper, Dom4j}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.saxon.om.DocumentInfo
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.{DocumentWrapper, TypedDocumentWrapper}
 import org.orbeon.oxf.xforms.analysis.controls.ComponentControl
 

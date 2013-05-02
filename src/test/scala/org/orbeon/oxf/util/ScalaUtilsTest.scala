@@ -17,7 +17,7 @@ package org.orbeon.oxf.util
 import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.util.ScalaUtils._
-import scala.collection.mutable
+import collection.mutable
 import org.orbeon.oxf.util.Headers._
 
 class ScalaUtilsTest extends AssertionsForJUnit {

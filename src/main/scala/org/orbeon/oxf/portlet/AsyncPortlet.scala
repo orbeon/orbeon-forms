@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.portlet
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
+import concurrent.{Await, Future}
+import concurrent.duration._
+import concurrent.ExecutionContext.Implicits.global
 import collection.mutable.LinkedHashSet
 import javax.portlet.{ResourceResponse, ResourceRequest, PortletRequest}
 import org.orbeon.oxf.externalcontext.WSRPURLRewriter

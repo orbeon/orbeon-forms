@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms._
 import action.XFormsActions
 import analysis._
 import event.EventHandlerImpl
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import java.lang.String
 import collection.immutable.List

@@ -30,7 +30,7 @@ import org.orbeon.saxon.value.CalendarValue
 import org.orbeon.saxon.value.DateValue
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.saxon.value.TimeValue
-import scala.util.matching.Regex
+import util.matching.Regex
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xml.XMLConstants._
 

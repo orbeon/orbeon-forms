@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import controls._
 import model.Model
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.{Buffer, HashMap, HashSet, LinkedHashMap}

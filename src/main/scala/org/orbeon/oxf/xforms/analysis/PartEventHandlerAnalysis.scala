@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.event.{XFormsEvents, EventHandlerImpl, EventHandler}
 import org.orbeon.oxf.xforms.script.ServerScript
 import org.orbeon.oxf.xforms.{Script, XFormsConstants}

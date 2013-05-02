@@ -28,8 +28,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
-import scala.collection.JavaConverters._
-import scala.util.{Failure, Try}
+import collection.JavaConverters._
+import util.{Failure, Try}
 
 object XFormsResourceRewriter extends Logging {
     /**

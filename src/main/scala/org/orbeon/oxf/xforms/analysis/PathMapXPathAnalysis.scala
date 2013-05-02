@@ -29,7 +29,7 @@ import org.orbeon.saxon.expr.PathMap.{PathMapNode, PathMapArc}
 import xml._
 import org.orbeon.oxf.xml.dom4j._
 import org.orbeon.saxon.Configuration
-import scala.collection.JavaConversions._
+import collection.JavaConversions._
 import org.orbeon.oxf.xforms._
 import xbl.Scope
 import org.orbeon.oxf.util.XPath.CompiledExpression

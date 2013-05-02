@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.event
 
-import scala.collection.Seq
+import collection.Seq
 import Dispatch.EventListener
 
 /**

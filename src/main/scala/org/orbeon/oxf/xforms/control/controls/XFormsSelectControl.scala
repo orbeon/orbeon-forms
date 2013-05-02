@@ -22,7 +22,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import scala.collection.mutable
+import collection.mutable
 import collection.{Set ⇒ CSet}
 
 /**

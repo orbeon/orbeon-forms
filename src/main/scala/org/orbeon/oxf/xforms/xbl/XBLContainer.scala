@@ -34,8 +34,8 @@ import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
 import org.orbeon.oxf.util.StringConversions
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
+import collection.mutable
+import collection.mutable.ArrayBuffer
 
 /**
  * Represent an XBL container of models and controls.

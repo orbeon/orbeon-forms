@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
 import org.orbeon.saxon.value.Whitespace
 import collection.mutable.Buffer
-import scala.annotation.tailrec
+import annotation.tailrec
 
 object Dom4j {
 

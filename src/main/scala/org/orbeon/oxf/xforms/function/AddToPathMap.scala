@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function
 
 import org.orbeon.saxon.expr._
-import scala.collection.JavaConversions._
+import collection.JavaConversions._
 import org.orbeon.saxon.`type`.AtomicType
 import org.orbeon.saxon.functions.SystemFunction
 

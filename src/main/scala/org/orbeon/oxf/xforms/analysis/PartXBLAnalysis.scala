@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis
 
 import controls.ComponentControl
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings}
 import org.orbeon.oxf.xforms.XFormsUtils

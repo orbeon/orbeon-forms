@@ -26,7 +26,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import javax.xml.transform.stream.StreamResult
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.xforms.XFormsServerSharedInstancesCache.Loader
 import org.orbeon.saxon.om.{NodeInfo, VirtualNode, DocumentInfo}

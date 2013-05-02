@@ -15,7 +15,7 @@ package org.orbeon.oxf.portlet.liferay
 
 import com.liferay.portal.util.PortalUtil
 import com.liferay.portal.model.User
-import scala.collection.JavaConversions._
+import collection.JavaConversions._
 import javax.portlet.filter._
 import javax.portlet._
 import org.orbeon.oxf.fr.FormRunner

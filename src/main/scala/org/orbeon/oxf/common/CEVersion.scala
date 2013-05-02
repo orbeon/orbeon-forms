@@ -15,7 +15,7 @@ package org.orbeon.oxf.common
 
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.DumbXPathDependencies
-import scala.collection.mutable
+import collection.mutable
 
 class CEVersion extends Version {
 

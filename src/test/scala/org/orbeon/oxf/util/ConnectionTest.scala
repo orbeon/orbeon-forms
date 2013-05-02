@@ -24,7 +24,7 @@ import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.webapp.WebAppContext
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
-import scala.collection.mutable
+import collection.mutable
 
 class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
     

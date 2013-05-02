@@ -29,7 +29,7 @@ import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.dom4j.{LocationDocumentResult, Dom4jUtils, LocationData}
 import org.xml.sax.Attributes
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 
 
 /**

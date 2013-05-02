@@ -26,7 +26,7 @@ import org.orbeon.saxon.functions.SystemFunction
 import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.value.QNameValue
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**

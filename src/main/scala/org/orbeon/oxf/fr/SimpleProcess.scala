@@ -20,11 +20,11 @@ import org.orbeon.oxf.util.{NetUtils, Logging}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import scala.annotation.tailrec
-import scala.collection.breakOut
-import scala.collection.mutable.ListBuffer
-import scala.util.{Success, Try}
-import scala.util.control.{ControlThrowable, Breaks}
+import annotation.tailrec
+import collection.breakOut
+import collection.mutable.ListBuffer
+import util.{Success, Try}
+import util.control.{ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.common.OXFException
 

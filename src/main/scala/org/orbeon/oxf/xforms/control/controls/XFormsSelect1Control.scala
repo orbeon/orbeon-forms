@@ -28,7 +28,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.helpers.AttributesImpl
-import scala.collection.mutable
+import collection.mutable
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
 
 /**

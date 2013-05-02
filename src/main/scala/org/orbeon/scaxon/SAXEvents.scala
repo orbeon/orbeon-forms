@@ -16,7 +16,7 @@ package org.orbeon.scaxon
 import org.xml.sax.{Attributes, Locator}
 import javax.xml.namespace.QName
 import org.orbeon.oxf.xml.XMLUtils
-import scala.collection.mutable.ListBuffer
+import collection.mutable.ListBuffer
 
 // Representation of all SAX events that are useful
 // We skip: ignorableWhitespace, skippedEntity, startDTD/endDTD, startEntity/endEntity, and startCDATA/endCDATA.

@@ -22,8 +22,8 @@ import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
-import scala.util.Try
-import scala.xml.Elem
+import util.Try
+import xml.Elem
 import java.security.SignatureException
 import org.orbeon.oxf.processor.validation.SchemaValidationException
 

@@ -25,8 +25,8 @@ import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Target, Capture, Phase}
 import org.orbeon.oxf.xforms.event.EventHandler
-import scala.collection.mutable
-import scala.util.control.Breaks
+import collection.mutable
+import util.control.Breaks
 import org.orbeon.oxf.xforms.XFormsConstants._
 
 // xml:lang reference

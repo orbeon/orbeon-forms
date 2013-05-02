@@ -31,7 +31,7 @@ import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.scaxon.XML
 import org.xml.sax.Attributes
-import scala.collection.mutable
+import collection.mutable
 
 /**
  * ContentHandler able to serialize text or binary documents to an output stream.

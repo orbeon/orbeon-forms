@@ -30,9 +30,8 @@ import org.orbeon.oxf.xforms.event.{XFormsEventTarget, Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import scala.Some
 import org.orbeon.oxf.xforms.control.controls.{XXFormsDialogControl, XFormsCaseControl}
-import scala.util.Try
+import util.Try
 
 object XFormsAPI {
 

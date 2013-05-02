@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.saxon.dom4j.DocumentWrapper

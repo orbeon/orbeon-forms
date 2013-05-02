@@ -18,7 +18,6 @@ import org.orbeon.oxf.client.FormBuilderOps
 import org.junit.Test
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.concurrent.Eventually._
-import scala.Predef._
 import org.scalatest.time.{Seconds, Span}
 import org.openqa.selenium.ElementNotVisibleException
 

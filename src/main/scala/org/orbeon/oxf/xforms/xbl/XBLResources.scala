@@ -18,9 +18,9 @@ import collection.JavaConverters._
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.dom4j.{QName, Element}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import scala.collection._
+import collection._
 import org.orbeon.oxf.xforms.processor.XFormsFeatures._
-import scala.collection.mutable.LinkedHashSet
+import collection.mutable.LinkedHashSet
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.util.ScalaUtils._
 

@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.control
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.xml.XMLUtils.DebugXML
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.om.{NodeInfo, Item}

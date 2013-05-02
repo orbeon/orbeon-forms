@@ -19,10 +19,10 @@ import org.apache.log4j.Logger
 import java.net.URLEncoder.{encode ⇒ encodeURL}
 import java.net.URLDecoder.{decode ⇒ decodeURL}
 import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
-import scala.collection.mutable
-import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
-import scala.util.{Failure, Try}
+import collection.mutable
+import collection.generic.CanBuildFrom
+import reflect.ClassTag
+import util.{Failure, Try}
 
 object ScalaUtils {
 

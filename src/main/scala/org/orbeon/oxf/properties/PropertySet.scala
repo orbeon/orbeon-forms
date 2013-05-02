@@ -23,7 +23,7 @@ import java.net.URI
 import java.util.{List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet, Date ⇒ JDate}
 import java.lang.{Boolean ⇒ JBoolean, Integer ⇒ JInteger}
 import collection.JavaConverters._
-import scala.collection.mutable
+import collection.mutable
 
 /**
  * Represent a set of properties.

@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xforms.xbl.XBLResources
 import org.orbeon.oxf.xml.{ContentHandlerHelper, XMLConstants}
 import org.xml.sax.helpers.AttributesImpl
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import state.XFormsStateManager
 import org.orbeon.oxf.xforms.event.XFormsEvents
 import org.orbeon.oxf.xforms.control.Controls

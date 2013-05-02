@@ -29,9 +29,9 @@ import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertie
 import org.orbeon.oxf.xml._
 import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.XML._
-import scala.collection.JavaConverters._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
+import collection.JavaConverters._
 
 object FormRunner {
 

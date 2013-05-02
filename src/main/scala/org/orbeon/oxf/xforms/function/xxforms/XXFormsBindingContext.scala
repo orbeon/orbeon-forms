@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.saxon.expr.XPathContext
 import org.orbeon.saxon.om._
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import org.orbeon.oxf.xforms.function.FunctionSupport
 
 class XXFormsBindingContext extends FunctionSupport {

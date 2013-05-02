@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import model.Model
 import collection.mutable.{LinkedHashMap, Buffer}
 import org.orbeon.oxf.xforms.event.EventHandlerImpl

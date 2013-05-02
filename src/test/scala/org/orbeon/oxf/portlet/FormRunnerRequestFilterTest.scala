@@ -18,7 +18,7 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.junit.Test
 import java.lang.String
-import scala.collection.JavaConversions._
+import collection.JavaConversions._
 import org.scalatest.mock.MockitoSugar
 import javax.portlet.PortletRequest
 import javax.portlet.filter.PortletRequestWrapper

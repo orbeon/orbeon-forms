@@ -31,7 +31,7 @@ import org.orbeon.oxf.xforms.analysis.PathMapXPathDependencies
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import java.io.{FileInputStream, File}
 import org.orbeon.oxf.xml.XMLUtils
-import scala.util.Try
+import util.Try
 import java.security.SignatureException
 
 class PEVersion extends Version {

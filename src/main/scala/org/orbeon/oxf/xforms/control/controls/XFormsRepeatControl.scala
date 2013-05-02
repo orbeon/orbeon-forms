@@ -38,7 +38,7 @@ import java.lang.{Integer ⇒ JInteger}
 import java.util.{ArrayList, Map ⇒ JMap, Collections}
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.BindingContext
-import scala.collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
+import collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
 
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)

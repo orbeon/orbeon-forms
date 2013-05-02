@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms.submission
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData}
 import org.orbeon.oxf.xforms._
-import scala.collection.JavaConversions._
+import collection.JavaConversions._
 import org.orbeon.oxf.common.OXFException
 import org.dom4j.{QName, Element}
-import scala.collection.mutable
+import collection.mutable
 import org.orbeon.oxf.util.XPathCache
 
 object Headers {

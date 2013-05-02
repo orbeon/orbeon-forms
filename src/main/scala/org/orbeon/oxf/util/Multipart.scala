@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.generator.RequestGenerator
 import java.util.{Map ⇒ JMap, HashMap ⇒ JHashMap}
 import ScalaUtils._
 
-import scala.collection.JavaConversions._
+import collection.JavaConversions._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Session
 import util.Streams
 import org.orbeon.oxf.xforms.control.XFormsValueControl

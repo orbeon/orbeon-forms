@@ -14,7 +14,7 @@
 package org.orbeon.oxf.fb
 
 import java.util.{List ⇒ JList}
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import annotation.tailrec
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.fb.FormBuilderFunctions._
@@ -32,7 +32,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.effectiveIdToAbsoluteId
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import scala.collection.mutable
+import collection.mutable
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.value.StringValue
 

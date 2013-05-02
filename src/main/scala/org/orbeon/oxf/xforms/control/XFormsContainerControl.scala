@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 import collection.mutable.{ArrayBuffer, Buffer}
 import org.orbeon.oxf.xml.ContentHandlerHelper
 import java.util.{List ⇒ JList}

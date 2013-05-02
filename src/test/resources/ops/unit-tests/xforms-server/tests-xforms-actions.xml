@@ -585,6 +585,7 @@
 
     <test description="#746: NPE in xf:load with AVT" name="oxf:pipeline">
         <!-- See: https://github.com/orbeon/orbeon-forms/issues/746 -->
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/972 -->
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -609,6 +610,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
+                    <xxf:load resource="/orbeon/doc/" show="replace"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

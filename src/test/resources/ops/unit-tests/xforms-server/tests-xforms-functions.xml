@@ -1526,12 +1526,11 @@
                         <xbl:binding id="fr-foo" element="fr|foo">
                             <xbl:template>
                                 <xf:group>
-                                    <!-- TODO: The variable value is evaluated when bindings are evaluated, so this won't work as expected -->
-                                    <!--<xf:var id="lang" name="lang" value="xxf:lang()"/>-->
-                                    <!--<xf:output id="output1" value="$lang"/>-->
+                                    <xf:var id="lang" name="lang" value="xxf:lang()"/>
+                                    <xf:output id="output1" value="$lang"/>
 
-                                    <xf:output id="output1" value="xxf:lang()"/>
-                                    <xf:output id="output2" value="xxf:lang()" xml:lang="zh"/>
+                                    <xf:output id="output2" value="xxf:lang()"/>
+                                    <xf:output id="output3" value="xxf:lang()" xml:lang="zh"/>
                                 </xf:group>
                             </xbl:template>
                         </xbl:binding>
@@ -1552,9 +1551,11 @@
                     <xxf:control-values>
                         <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
                         <xxf:control id="my-foo-1$output1">it</xxf:control>
-                        <xxf:control id="my-foo-1$output2">zh</xxf:control>
+                        <xxf:control id="my-foo-1$output2">it</xxf:control>
+                        <xxf:control id="my-foo-1$output3">zh</xxf:control>
                         <xxf:control id="my-foo-2$output1">es</xxf:control>
-                        <xxf:control id="my-foo-2$output2">zh</xxf:control>
+                        <xxf:control id="my-foo-2$output2">es</xxf:control>
+                        <xxf:control id="my-foo-2$output3">zh</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

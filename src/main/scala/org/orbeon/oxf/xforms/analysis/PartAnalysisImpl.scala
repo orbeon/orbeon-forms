@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, 
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import org.orbeon.oxf.xforms.analysis.model.Model
 import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
+import org.orbeon.oxf.xml.XMLUtils.DebugXML
 
 /**
  * Static analysis of a whole part, including:
@@ -53,7 +54,8 @@ class PartAnalysisImpl(
     with PartEventHandlerAnalysis
     with PartControlsAnalysis
     with PartXBLAnalysis
-    with Logging {
+    with Logging
+    with DebugXML {
 
     partAnalysis ⇒
 
@@ -252,18 +254,8 @@ class PartAnalysisImpl(
         freeTransientState()
     }
 
-    def toXML(helper: ContentHandlerHelper) {
-        XMLUtils.wrapWithRequestElement(helper, new XMLUtils.DebugXML {
-            def toXML(helper: ContentHandlerHelper) {
-                for {
-                    controlAnalysis ← controlAnalysisMap.values
-                    if ! controlAnalysis.isInstanceOf[LHHAAnalysis] // not sure why we are filtering out those
-                    if controlAnalysis.localName != "root"          // for now don't output root as it's not an interesting container and we don't want to modify the unit tests
-                } yield
-                    controlAnalysis.toXML(helper, List())()
-            }
-        })
-    }
+    def toXML(helper: ContentHandlerHelper) =
+        controlAnalysisMap(startScope.prefixedIdForStaticId("#document")).toXML(helper)
 
     def dumpAnalysis() =
         println(Dom4jUtils.domToPrettyString(XMLUtils.createDocument(this)))

@@ -13,12 +13,16 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
+import org.orbeon.oxf.xforms.analysis.controls.{SelectionControlUtil, LHHA}
 import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.action.XFormsActions
+import org.orbeon.oxf.xforms.XFormsConstants._
+import org.orbeon.oxf.xforms.XFormsConstants.FOR_QNAME
 
-trait ChildrenActionsTrait extends ChildrenBuilderTrait {
+trait ChildrenLHHAItemsetsAndActionsTrait extends ChildrenBuilderTrait {
 
-    // Keep nested actions only
+    // For leaf controls, keep nested LHHA and actions
     override def findRelevantChildrenElements =
         findAllChildrenElements collect
-            { case (e, s) if XFormsActions.isAction(e.getQName) ⇒ (e, s) }
+            { case (e, s) if LHHA.isLHHA(e) && (e.attribute(FOR_QNAME) eq null) || SelectionControlUtil.isTopLevelItemsetElement(e) || XFormsActions.isAction(e.getQName) ⇒ (e, s) }
 }

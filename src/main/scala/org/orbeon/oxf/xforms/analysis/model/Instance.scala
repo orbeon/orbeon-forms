@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.analysis.model
 
-
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.util.{Logging, XPathCache, NetUtils}
 import org.orbeon.oxf.xforms._
@@ -72,9 +71,6 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
         } getOrElse
             extractInlineContent
     }
-
-    // For now we don't want to see instances printed as controls in unit tests
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) = ()
 }
 
 // Used to gather instance metadata from AbstractBinding

@@ -67,7 +67,7 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
     
     // For now this only checks actions and submissions, in the future should also build rest of content
     override def findRelevantChildrenElements =
-        super.findRelevantChildrenElements collect
+        findAllChildrenElements collect
             { case (e, s) if XFormsActions.isAction(e.getQName) || Set(XFORMS_SUBMISSION_QNAME, XFORMS_INSTANCE_QNAME)(e.getQName) ⇒ (e, s) }
 
     // Above we only create actions, submissions and instances as children. But binds are also indexed so add them.
@@ -81,19 +81,19 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
         analyzeBindsXPath()
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: ⇒ Unit = ()) {
+    override def toXMLAttributes = Seq(
+        "scope"                        → scope.scopeId,
+        "prefixed-id"                  → prefixedId,
+        "default-instance-prefixed-id" → defaultInstancePrefixedId.orNull,
+        "analyzed-binds"               → figuredAllBindRefAnalysis.toString
+    )
 
-        super.toXML(helper, List(
-            "scope", scope.scopeId,
-            "prefixed-id", prefixedId,
-            "default-instance-prefixed-id", defaultInstancePrefixedId.orNull,
-            "analyzed-binds", figuredAllBindRefAnalysis.toString
-        )) {
-            variablesToXML(helper)
-            bindsToXML(helper)
-            instancesToXML(helper)
-            // TODO: output handlers
-        }
+    override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+        super.toXMLContent(helper)
+        variablesToXML(helper)
+        bindsToXML(helper)
+        instancesToXML(helper)
+        handlersToXML(helper)
     }
 
     override def freeTransientState(): Unit = {
@@ -108,7 +108,7 @@ trait ModelInstances {
     self: Model ⇒
 
     // Instance objects
-    lazy val instances = LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
+    lazy val instances: collection.Map[String, Instance] = LinkedHashMap(children collect { case instance: Instance ⇒ instance.staticId → instance }: _*)
 
     def instancesMap = instances.asJava
 
@@ -179,7 +179,7 @@ trait ModelVariables {
     def variablesToXML(helper: ContentHandlerHelper): Unit =
         // Output variable information
         for (variable ← variablesSeq)
-            variable.toXML(helper, List())({})
+            variable.toXML(helper)
 
     def freeVariablesTransientState(): Unit =
         for (variable ← variablesSeq)
@@ -200,8 +200,11 @@ trait ModelEventHandlers {
     self: Model ⇒
 
     // Event handlers, including on submissions and within nested actions
-    private lazy val _eventHandlers = descendants collect { case e: EventHandlerImpl ⇒ e }
-    def jEventHandlers = _eventHandlers.asJava
+    lazy val eventHandlers = descendants collect { case e: EventHandlerImpl ⇒ e }
+    def jEventHandlers = eventHandlers.asJava
+
+    def handlersToXML(helper: ContentHandlerHelper) =
+        eventHandlers foreach (_.toXML(helper))
 }
 
 class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ Boolean) {
@@ -507,21 +510,27 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
                 child.freeTransientState()
         }
 
-        override def toXML(helper: ContentHandlerHelper, attributes: List[String] = Nil)(content: ⇒ Unit = ()) {
-            super.toXML(helper, List("id", staticId, "context", context.orNull, "ref", ref.orNull)) {
-                // @ref analysis is handled by superclass
+        override def toXMLAttributes = Seq(
+            "id"      → staticId,
+            "context" → context.orNull,
+            "ref"     → ref.orNull
+        )
 
-                // MIP analysis
-                for ((_, mip) ← allMIPNameToXPathMIP.to[List].sortBy(_._1)) {
-                    helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
-                    mip.analysis.toXML(helper)
-                    helper.endElement()
-                }
+        override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+            super.toXMLContent(helper)
 
-                // Children
-                for (child ← _children)
-                    child.toXML(helper)()
+            // @ref analysis is handled by superclass
+
+            // MIP analysis
+            for ((_, mip) ← allMIPNameToXPathMIP.to[List].sortBy(_._1)) {
+                helper.startElement("mip", Array("name", mip.name, "expression", mip.compiledExpression.string))
+                mip.analysis.toXML(helper)
+                helper.endElement()
             }
+
+            // Children binds
+            for (child ← _children)
+                child.toXML(helper)
         }
     }
 
@@ -546,7 +555,7 @@ class BindTree(model: Model, bindElements: Seq[Element], isCustomMIP: QName ⇒ 
         if (topLevelBinds.nonEmpty) {
             helper.startElement("binds")
             for (bind ← topLevelBinds)
-                bind.toXML(helper)()
+                bind.toXML(helper)
             helper.endElement()
         }
 

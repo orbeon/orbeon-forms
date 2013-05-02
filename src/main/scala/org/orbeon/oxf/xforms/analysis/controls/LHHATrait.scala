@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xml.ContentHandlerHelper
 import collection.mutable.LinkedHashMap
 import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 import org.dom4j.Element
@@ -44,19 +43,6 @@ trait LHHATrait extends SimpleElementAnalysis {
         super.analyzeXPath()
         // Only analyze local LHHA as external LHHA are analyzed like controls
         getAllLHHA filter (_.isLocal) foreach (_.analyzeXPath())
-    }
-
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
-        super.toXML(helper, attributes) {
-            for (analysis ← getAllLHHA) {
-                helper.startElement(analysis.localName)
-                if (analysis.valueAnalyzed)
-                    analysis.getValueAnalysis.get.toXML(helper)
-                helper.endElement()
-            }
-
-            content
-        }
     }
 
     override def freeTransientState() {

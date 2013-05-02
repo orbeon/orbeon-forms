@@ -19,6 +19,6 @@ trait ChildrenActionsAndVariablesTrait extends ChildrenBuilderTrait {
 
     // Keep nested actions and variables
     override def findRelevantChildrenElements =
-        super.findRelevantChildrenElements collect
+        findAllChildrenElements collect
             { case (e, s) if XFormsActions.isAction(e.getQName) || ControlAnalysisFactory.isVariable(e.getQName) ⇒ (e, s) }
 }

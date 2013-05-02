@@ -144,6 +144,10 @@ class SimpleElementAnalysis(
     }
 
     class SimplePathMapContext {
+
+        // Current element
+        def element = self
+
         // Return the analysis for the context in scope
         def context = ElementAnalysis.getClosestAncestorInScope(self, self.scope)
 

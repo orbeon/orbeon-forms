@@ -13,14 +13,14 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.xforms.analysis.controls.{ValueTrait, RepeatControl}
+import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, ValueTrait, RepeatControl}
 import model.Model
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.dom4j.{QName, Element}
-import org.orbeon.oxf.xml.NamespaceMapping
+import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper}
+import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
-import org.orbeon.oxf.xml.ContentHandlerHelper
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.oxf.xforms.event.XFormsEvent.{Bubbling, Target, Capture, Phase}
@@ -28,7 +28,11 @@ import org.orbeon.oxf.xforms.event.EventHandler
 import scala.collection.mutable
 import scala.util.control.Breaks
 import org.orbeon.oxf.xforms.XFormsConstants._
-import scala.Some
+
+// xml:lang reference
+sealed abstract class LangRef
+case class LiteralLangRef(lang: String) extends LangRef
+case class AVTLangRef(att: AttributeControl) extends LangRef
 
 /**
  * Abstract representation of a common XForms element supporting optional context, binding and value.
@@ -48,6 +52,21 @@ abstract class ElementAnalysis(
     require(element ne null)
 
     implicit def logger = part.getIndentedLogger
+
+    // xml:lang, inherited from parent unless overridden locally
+    lazy val lang: Option[LangRef] = {
+        val v = element.attributeValue(XML_LANG_QNAME)
+        if (v ne null) {
+            if (! v.startsWith("#"))
+                Some(LiteralLangRef(v))
+            else {
+                val staticId   = v.substring(1)
+                val prefixedId = scope.prefixedIdForStaticId(staticId)
+                Some(AVTLangRef(part.getAttributeControl(prefixedId, "xml:lang")))
+            }
+        } else
+            parent flatMap (_.lang)
+    }
 
     val namespaceMapping: NamespaceMapping
 
@@ -142,7 +161,7 @@ abstract class ElementAnalysis(
     final def getBindingAnalysis = { assert(_bindingAnalyzed); bindingAnalysis }
     final def getValueAnalysis = { assert(_valueAnalyzed); valueAnalysis }
 
-    def analyzeXPath() {
+    def analyzeXPath(): Unit = {
         contextAnalysis = computeContextAnalysis
         _contextAnalyzed = true
         bindingAnalysis = computeBindingAnalysis
@@ -164,23 +183,16 @@ abstract class ElementAnalysis(
 
     val closestAncestorInScope = ElementAnalysis.getClosestAncestorInScope(self, scope)
 
-    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
-
-        def getModelPrefixedId = model map (_.prefixedId)
-
-        helper.startElement(localName,
-            attributes match {
-                case Nil ⇒ Array( // default attributes
-                        "scope", scope.scopeId,
-                        "prefixed-id", prefixedId,
-                        "model-prefixed-id", getModelPrefixedId.orNull,
-                        "binding", hasBinding.toString,
-                        "value", self.isInstanceOf[ValueTrait].toString,
-                        "name", element.attributeValue("name") // e.g. variables
-                    )
-                case _ ⇒ Array(attributes: _*)
-            })
-
+    def toXMLAttributes: Seq[(String, String)] = Seq(
+        "scope"             → scope.scopeId,
+        "prefixed-id"       → prefixedId,
+        "model-prefixed-id" → (model map (_.prefixedId) orNull),
+        "binding"           → hasBinding.toString,
+        "value"             → self.isInstanceOf[ValueTrait].toString,
+        "name"              → element.attributeValue("name")
+    )
+    
+    def toXMLContent(helper: ContentHandlerHelper): Unit = {
         // Control binding and value analysis
         if (_bindingAnalyzed)
             getBindingAnalysis match {
@@ -199,10 +211,11 @@ abstract class ElementAnalysis(
                     helper.endElement()
                 case _ ⇒ // NOP
             }
-
-        // Optional content
-        content
-
+    }
+    
+    final def toXML(helper: ContentHandlerHelper): Unit = {
+        helper.startElement(localName, toXMLAttributes flatMap (t ⇒ Seq(t._1, t._2)) toArray)
+        toXMLContent(helper)
         helper.endElement()
     }
 

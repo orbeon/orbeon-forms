@@ -233,18 +233,9 @@ object XFormsSelect1Control {
         if ((control ne null) && control.isRelevant) {
             // Control is there and relevant so just ask it (this will include static itemsets evaluation as well)
             control.getItemset
-        } else if (isStaticItemset(containingDocument, prefixedId)) {
+        } else {
             // Control is not there or is not relevant, so use static itemsets
             // NOTE: This way we output static itemsets during initialization as well, even for non-relevant controls
-            containingDocument.getStaticOps.getSelect1Analysis(prefixedId).evaluateStaticItemset()
-        } else {
-            // Not possible so return null
-            null
+            containingDocument.getStaticOps.getSelect1Analysis(prefixedId).staticItemset orNull
         }
-
-    // Whether the given control has a static set of items.
-    private def isStaticItemset(containingDocument: XFormsContainingDocument, prefixedId: String): Boolean = {
-        val analysis = containingDocument.getStaticOps.getSelect1Analysis(prefixedId)
-        analysis.hasStaticItemset
-    }
 }

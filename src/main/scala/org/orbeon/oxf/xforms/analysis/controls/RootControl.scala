@@ -36,7 +36,7 @@ class RootControl(staticStateContext: StaticStateContext, element: Element, scop
     // Also ignore <properties> and <last-id> elements
     // might place them there.
     override def findRelevantChildrenElements =
-        super.findRelevantChildrenElements filterNot
+        findAllChildrenElements filterNot
             { case (e, _) ⇒ Set(XBL_XBL_QNAME, STATIC_STATE_PROPERTIES_QNAME, LAST_ID_QNAME)(e.getQName) }
 
     override protected def externalEventsDef = super.externalEventsDef ++ Set(XXFORMS_LOAD, XXFORMS_POLL)

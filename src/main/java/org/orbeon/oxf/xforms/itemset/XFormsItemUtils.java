@@ -89,7 +89,7 @@ public class XFormsItemUtils {
 
         // Optimize static itemsets
         if (staticControl.hasStaticItemset())
-            return staticControl.evaluateStaticItemset();
+            return staticControl.staticItemset().get();
 
         final boolean isMultiple = staticControl.isMultiple();
         final XBLContainer container = select1Control.container();
@@ -116,7 +116,7 @@ public class XFormsItemUtils {
             public void startElement(Element element) {
                 final String localname = element.getName();
 
-                if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
+                if (XFormsConstants.XFORMS_ITEM_QNAME.getName().equals(localname)) {
                     // xf:item
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
@@ -127,7 +127,7 @@ public class XFormsItemUtils {
                     final Map<QName, String> attributes = getAttributes(element);
                     currentContainer.addChildItem(Item.apply(position++, isMultiple, isEncryptItemValues, attributes, label, StringUtils.defaultString(value)));
 
-                } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
                     // xf:itemset
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
@@ -164,7 +164,7 @@ public class XFormsItemUtils {
                                     {
                                         final Element valueElement = element.element(XFormsConstants.XFORMS_VALUE_QNAME);
                                         valueCopyElement = (valueElement != null)
-                                                ? valueElement : element.element(XFormsConstants.COPY_QNAME);
+                                                ? valueElement : element.element(XFormsConstants.XFORMS_COPY_QNAME);
                                     }
                                     if (valueCopyElement == null)
                                         throw new ValidationException("xf:itemset element must contain one xf:value or one xf:copy element.", select1Control.getLocationData());
@@ -215,7 +215,7 @@ public class XFormsItemUtils {
                         }
                     }
 
-                } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
                     // xf:choices
 
                     contextStack.pushBinding(element, getElementEffectiveId(element), select1Control.getChildElementScope(element));
@@ -236,11 +236,11 @@ public class XFormsItemUtils {
 
             public void endElement(Element element) {
                 final String localname = element.getName();
-                if (XFormsConstants.ITEM_QNAME.getName().equals(localname)) {
+                if (XFormsConstants.XFORMS_ITEM_QNAME.getName().equals(localname)) {
                     contextStack.popBinding();
-                } else if (XFormsConstants.ITEMSET_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.XFORMS_ITEMSET_QNAME.getName().equals(localname)) {
                     contextStack.popBinding();
-                } else if (XFormsConstants.CHOICES_QNAME.getName().equals(localname)) {
+                } else if (XFormsConstants.XFORMS_CHOICES_QNAME.getName().equals(localname)) {
                     contextStack.popBinding();
 
                     final Element labelElement = element.element(XFormsConstants.LABEL_QNAME);

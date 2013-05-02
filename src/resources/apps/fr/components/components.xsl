@@ -87,7 +87,7 @@
     <xsl:template match="/xh:html">
         <!-- Handle document language -->
         <xh:html lang="{{xxf:instance('fr-language-instance')}}"
-                    xml:lang="{{xxf:instance('fr-language-instance')}}">
+                 xml:lang="{{xxf:instance('fr-language-instance')}}">
             <xsl:apply-templates select="@*"/>
 
             <!-- Scope variable with Form Runner resources -->

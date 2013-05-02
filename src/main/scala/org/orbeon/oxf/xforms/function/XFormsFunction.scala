@@ -19,8 +19,7 @@ import org.dom4j.Namespace
 import org.dom4j.QName
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.{XPath, PooledXPathExpression, XPathCache}
-import org.orbeon.oxf.xforms.XFormsContextStack
-import org.orbeon.oxf.xforms.XFormsModel
+import org.orbeon.oxf.xforms.{XFormsUtils, XFormsContextStack, XFormsModel}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.saxon.expr._
 import org.orbeon.saxon.functions.SystemFunction
@@ -28,6 +27,7 @@ import org.orbeon.saxon.sxpath.IndependentContext
 import org.orbeon.saxon.value.AtomicValue
 import org.orbeon.saxon.value.QNameValue
 import scala.collection.JavaConverters._
+import org.orbeon.oxf.xforms.analysis.SimpleElementAnalysis
 
 /**
  * Base class for all XForms functions.
@@ -38,7 +38,7 @@ import scala.collection.JavaConverters._
 abstract class XFormsFunction extends SystemFunction {
 
     // Public accessor for Scala traits
-    def arguments: Array[Expression] = argument
+    def arguments: Seq[Expression] = argument
 
     /**
      * preEvaluate: this method suppresses compile-time evaluation by doing nothing
@@ -59,6 +59,17 @@ abstract class XFormsFunction extends SystemFunction {
 
     def getSourceEffectiveId(implicit xpathContext: XPathContext) =
         context.sourceEffectiveId ensuring (_ ne null, "Source effective id not available for resolution.")
+
+    def elementAnalysisForSource(implicit xpathContext: XPathContext) = {
+        val prefixedId = XFormsUtils.getPrefixedId(getSourceEffectiveId)
+        getXBLContainer.partAnalysis.getControlAnalysisOption(prefixedId)
+    }
+
+    def elementAnalysisForStaticId(staticId: String)(implicit xpathContext: XPathContext) = {
+        val scope = getXBLContainer.partAnalysis.scopeForPrefixedId(XFormsUtils.getPrefixedId(getSourceEffectiveId))
+        val prefixedId = scope.prefixedIdForStaticId(staticId)
+        getXBLContainer.partAnalysis.getControlAnalysisOption(prefixedId)
+    }
 
     def getContainingDocument(implicit xpathContext: XPathContext) =
         Option(context) map (_.container.getContainingDocument) orNull
@@ -176,6 +187,12 @@ abstract class XFormsFunction extends SystemFunction {
     // Access to Saxon's default implementation
     protected def saxonAddToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
         super.addToPathMap(pathMap, pathMapNodeSet)
+
+    def sourceElementAnalysis(pathMap: PathMap) =
+        pathMap.getPathMapContext match {
+            case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
+            case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+        }
 }
 
 object XFormsFunction {

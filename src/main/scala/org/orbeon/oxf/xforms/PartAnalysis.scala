@@ -22,7 +22,7 @@ import org.orbeon.oxf.util.IndentedLogger
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}
 
-trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtils.DebugXML {
+trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps {
 
     def locationData: LocationData
     def getIndentedLogger: IndentedLogger
@@ -52,7 +52,6 @@ trait PartAnalysis extends PartGlobalOps with PartStaticAnalysisOps with XMLUtil
     def xblBindings: XBLBindings
 
     def dumpAnalysis()
-    def toXML(helper: ContentHandlerHelper)
 
     // The element in our parent that created the current part
     def elementInParent = parent map (_.getControlAnalysis(startScope.fullPrefix.init)) // .init removes the trailing '$'

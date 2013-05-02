@@ -15,11 +15,11 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import collection.mutable.Stack
 import org.orbeon.oxf.xml.ContentHandlerHelper
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, StringAnalysis, XPathAnalysis, SimpleElementAnalysis}
+import org.orbeon.oxf.xforms.analysis._
 import org.orbeon.oxf.xforms.itemset.{ItemContainer, XFormsItemUtils, Item, Itemset}
 import org.dom4j.{QName, Text, Element}
 import org.orbeon.oxf.xforms._
@@ -27,8 +27,9 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.InputValueControl
+import ScalaUtils._
 
-trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait {
+trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait with ChildrenLHHAItemsetsAndActionsTrait {
 
     // Try to figure out if we have dynamic items. This attempts to cover all cases, including
     // nested xf:output controls. Check only under xf:choices, xf:item and xf:itemset so that we
@@ -60,6 +61,8 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
     def computeItemsetAnalysis() = {
 
+        // TODO: operate on nested ElementAnalysis instead of Element
+
         var combinedAnalysis: XPathAnalysis = StringAnalysis()
 
         Dom4jUtils.visitSubtree(element, new Dom4jUtils.VisitorListener() {
@@ -88,7 +91,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
                 element.getQName match {
 
-                    case ITEM_QNAME | ITEMSET_QNAME ⇒
+                    case XFORMS_ITEM_QNAME | XFORMS_ITEMSET_QNAME ⇒
 
                         // Analyze container and add as a value dependency
                         // We add this as dependency because the itemset must also be recomputed if any returned item of
@@ -103,14 +106,14 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         // This is not an issue with controls, as container relevance ensures we don't evaluate nested
                         // expressions, but it must be done for itemsets.
                         //
-                        // See also #289 https://github.com/orbeon/orbeon-forms/issues/289
+                        // See also #289 https://github.com/orbeon/orbeon-forms/issues/289 (closed)
                         itemElementAnalysis.analyzeXPath()
                         combinedAnalysis = combinedAnalysis combine itemElementAnalysis.getBindingAnalysis.get.makeValuesDependencies
 
                         processElement(LABEL_QNAME, required = true)
                         processElement(XFORMS_VALUE_QNAME, required = true)
 
-                    case CHOICES_QNAME ⇒
+                    case XFORMS_CHOICES_QNAME ⇒
 
                         // Analyze container and add as a value dependency (see above)
                         itemElementAnalysis.analyzeXPath()
@@ -126,7 +129,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             }
 
             def endElement(element: Element): Unit =
-                if (element.getQName == CHOICES_QNAME)
+                if (element.getQName == XFORMS_CHOICES_QNAME)
                     stack pop()
 
             def text(text: Text) = ()
@@ -135,21 +138,16 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
         Some(combinedAnalysis)
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
-        super.toXML(helper, attributes) {
-            // Optional content
-            content
-
-            // Itemset details
-            if (itemsetAnalyzed)
-                getItemsetAnalysis match {
-                    case Some(analysis) ⇒
-                        helper.startElement("itemset")
-                        analysis.toXML(helper)
-                        helper.endElement()
-                    case _ ⇒ // NOP
-                }
-        }
+    override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+        super.toXMLContent(helper)
+        if (_itemsetAnalyzed)
+            getItemsetAnalysis match {
+                case Some(analysis) ⇒
+                    helper.startElement("itemset")
+                    analysis.toXML(helper)
+                    helper.endElement()
+                case _ ⇒ // NOP
+            }
     }
 
     override def freeTransientState() = {
@@ -158,12 +156,12 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             getItemsetAnalysis.get.freeTransientState()
     }
 
-    /**
-     * Evaluate a static itemset.
-     */
-    def evaluateStaticItemset(): Itemset = {
+    // Return the control's static itemset if any
+    lazy val staticItemset = hasStaticItemset option evaluateStaticItemset
 
-        assert(hasStaticItemset)
+    private def evaluateStaticItemset = {
+
+        // TODO: operate on nested ElementAnalysis instead of Element
 
         val result = new Itemset(isMultiple)
 
@@ -176,7 +174,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 
                 element.getQName match {
 
-                    case ITEM_QNAME ⇒ // xf:item
+                    case XFORMS_ITEM_QNAME ⇒ // xf:item
 
                         val labelElement = element.element(LABEL_QNAME)
                         if (labelElement eq null)
@@ -193,11 +191,11 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
                         currentContainer.addChildItem(Item(position, isMultiple, isEncryptValues, attributes, new Item.Label(label, containsHTML(0)), StringUtils.defaultString(value)))
                         position += 1
 
-                    case ITEMSET_QNAME ⇒ // xf:itemset
+                    case XFORMS_ITEMSET_QNAME ⇒ // xf:itemset
 
                         throw new ValidationException("xf:itemset must not appear in static itemset.", ElementAnalysis.createLocationData(element))
 
-                    case CHOICES_QNAME ⇒ // xf:choices
+                    case XFORMS_CHOICES_QNAME ⇒ // xf:choices
 
                         val labelElement = element.element(LABEL_QNAME)
                         if (labelElement ne null) {
@@ -217,7 +215,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
             }
 
             def endElement(element: Element): Unit =
-                if (element.getQName == CHOICES_QNAME) {
+                if (element.getQName == XFORMS_CHOICES_QNAME) {
                     // xf:choices
                     val labelElement = element.element(LABEL_QNAME)
                     if (labelElement ne null)
@@ -231,6 +229,9 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
 }
 
 object SelectionControlUtil {
+
+    val TopLevelItemsetQNames = Set(XFORMS_ITEM_QNAME, XFORMS_ITEMSET_QNAME, XFORMS_CHOICES_QNAME)
+    def isTopLevelItemsetElement(e: Element) = TopLevelItemsetQNames(e.getQName)
 
     private val attributesToPropagate = XFormsItemUtils.ATTRIBUTES_TO_PROPAGATE.toSeq
 

@@ -144,14 +144,15 @@ object PathMapXPathAnalysis {
             val variablePathMaps: JMap[String, PathMap] =
                 for {
                     (name, variable) ← inScopeVariables
-                    valueAnalysis = variable.variableAnalysis
+                    valueAnalysis    = variable.variableAnalysis
                     if valueAnalysis.isDefined && valueAnalysis.get.figuredOutDependencies
-                } yield (name, valueAnalysis match {
-                    // Valid PathMap
-                    case Some(analysis: PathMapXPathAnalysis) ⇒ analysis.pathmap.get
-                    // Constant string
-                    case _ ⇒ stringPathmap
-                })
+                } yield
+                    (name, valueAnalysis match {
+                        // Valid PathMap
+                        case Some(analysis: PathMapXPathAnalysis) ⇒ analysis.pathmap.get
+                        // Constant string
+                        case _ ⇒ stringPathmap
+                    })
 
             def dependsOnFocus = (expression.getDependencies & StaticProperty.DEPENDS_ON_FOCUS) != 0
 

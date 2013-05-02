@@ -16,10 +16,10 @@ package org.orbeon.oxf.xforms
 import java.util.Set
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xml.dom4j.LocationData
-import org.orbeon.oxf.xml.XMLUtils
 import state.AnnotatedTemplate
+import org.orbeon.oxf.xml.ContentHandlerHelper
 
-trait XFormsStaticState extends XMLUtils.DebugXML  {
+trait XFormsStaticState {
 
     def locationData: LocationData
     def getIndentedLogger: IndentedLogger
@@ -47,5 +47,6 @@ trait XFormsStaticState extends XMLUtils.DebugXML  {
     def getBooleanProperty(propertyName: String): Boolean
     def getIntegerProperty(propertyName: String): Int
 
+    def toXML(helper: ContentHandlerHelper)
     def dumpAnalysis()
 }

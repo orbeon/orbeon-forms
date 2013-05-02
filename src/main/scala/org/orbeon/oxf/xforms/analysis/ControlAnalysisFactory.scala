@@ -160,7 +160,12 @@ object ControlAnalysisFactory {
         // Model
         XFORMS_MODEL_QNAME            → (new Model(_, _, _, _, _)),
         XFORMS_SUBMISSION_QNAME       → (new Submission(_, _, _, _, _)),
-        XFORMS_INSTANCE_QNAME         → (new Instance(_, _, _, _, _))
+        XFORMS_INSTANCE_QNAME         → (new Instance(_, _, _, _, _)),
+        // Itemsets
+        XFORMS_CHOICES_QNAME          → (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
+        XFORMS_ITEM_QNAME             → (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
+        XFORMS_ITEMSET_QNAME          → (new SimpleElementAnalysis(_, _, _, _, _) with ChildrenBuilderTrait),
+        XFORMS_VALUE_QNAME            → (new SimpleElementAnalysis(_, _, _, _, _) with ValueTrait with OptionalSingleNode)
     ) ++ variableFactory
 
     private val ControlFactory: PartialFunction[Element, ControlFactory] =

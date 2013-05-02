@@ -71,8 +71,8 @@ class XFormsToSchema extends XFormsToSomething {
         // Read form and library
         val ec = NetUtils.getExternalContext
         val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
-        val formSource = readPublishedForm(appName, formName).get
-        val library = Libraries(readPublishedForm("orbeon", "library"), readPublishedForm(appName, "library"))
+        val formSource = FormRunner.readPublishedForm(appName, formName).get
+        val library = Libraries(FormRunner.readPublishedForm("orbeon", "library"), FormRunner.readPublishedForm(appName, "library"))
 
         // Compute root xs:element
         val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
@@ -93,26 +93,6 @@ class XFormsToSchema extends XFormsToSomething {
 
         // Send result to output
         XMLUtils.stringToSAX(schema.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
-    }
-
-    // Retrieves a form from the persistence layer
-    private def readPublishedForm(appName: String, formName: String): Option[DocumentInfo] = {
-        val uri = "/fr/service/persistence/crud/" + appName + "/" + formName + "/form/form.xhtml"
-        val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
-        val url = URLFactory.createURL(urlString)
-
-        val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
-        val connectionResult = Connection("GET", url, credentials = None, messageBody = None, headers = headers, loadState = true, logBody = false).connect(saveState = true)
-
-        // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the first test),
-        // but the MySQL persistence layer returns a [200 with an empty body][1] (thus the second test).
-        //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-        if (connectionResult.statusCode == 200 && connectionResult.hasContent)
-            Some(useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
-            })
-        else
-            None
     }
 
     // Recursive function generating an xs:element from an xf:bind

@@ -27,9 +27,11 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import org.orbeon.oxf.xml._
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.{DocumentInfo, Item, NodeInfo}
 import org.orbeon.scaxon.XML._
 import scala.collection.JavaConverters._
+import org.orbeon.oxf.externalcontext.URLRewriter
+import org.orbeon.oxf.resources.URLFactory
 
 object FormRunner {
 
@@ -468,5 +470,25 @@ object FormRunner {
                 mode     = params \ "mode"
             )
         }
+    }
+
+    // Retrieves a form from the persistence layer
+    def readPublishedForm(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
+        val uri = "/fr/service/persistence/crud/" + appName + "/" + formName + "/form/form.xhtml"
+        val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
+        val url = URLFactory.createURL(urlString)
+
+        val headers = Connection.buildConnectionHeaders(None, Map(), Option(Connection.getForwardHeaders))
+        val connectionResult = Connection("GET", url, credentials = None, messageBody = None, headers = headers, loadState = true, logBody = false).connect(saveState = true)
+
+        // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the first test),
+        // but the MySQL persistence layer returns a [200 with an empty body][1] (thus the second test).
+        //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
+        if (connectionResult.statusCode == 200 && connectionResult.hasContent)
+            Some(useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
+                TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
+            })
+        else
+            None
     }
 }

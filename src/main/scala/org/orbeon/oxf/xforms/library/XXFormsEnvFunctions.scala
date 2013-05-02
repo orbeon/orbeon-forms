@@ -173,9 +173,7 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         )
     
         // xxf:lang()
-        Fun("lang", classOf[XXFormsLang], 0, 0, STRING, ALLOWS_ZERO_OR_ONE,
-            Arg(STRING, EXACTLY_ONE)
-        )
+        Fun("lang", classOf[XXFormsLang], 0, 0, STRING, ALLOWS_ZERO_OR_ONE)
 
         // xxf:r()
         Fun("r", classOf[XXFormsResource], 0, 0, STRING, ALLOWS_ZERO_OR_ONE,

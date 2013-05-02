@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import java.text.MessageFormat
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.Configuration
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.saxon.value.Value
 import org.orbeon.scaxon.XML._
@@ -36,7 +36,7 @@ class XXFormsFormatMessage extends XFormsFunction with FunctionSupport {
         // Find xml:lang and set locale if any
 
         val format =
-            elementAnalysisForSource(xpathContext) flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument(xpathContext), _)) match {
+            elementAnalysisForSource flatMap (XXFormsLang.resolveXMLangHandleAVTs(getContainingDocument, _)) match {
                 case Some(lang) ⇒
                     // Really not sure how xml:lang should be parsed, see:
                     //
@@ -51,5 +51,11 @@ class XXFormsFormatMessage extends XFormsFunction with FunctionSupport {
             }
 
         format.format(arguments)
+    }
+
+    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
+        XXFormsLang.addXMLLangDependency(pathMap)
+        arguments foreach (_.addToPathMap(pathMap, pathMapNodeSet))
+        null
     }
 }

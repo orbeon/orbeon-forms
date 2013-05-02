@@ -20,8 +20,6 @@ import org.orbeon.saxon.`type`.Type
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.saxon.value.StringValue
-import org.orbeon.oxf.xforms.analysis._
-import org.orbeon.oxf.xforms.analysis.AVTLangRef
 import org.orbeon.saxon.pattern.NameTest
 import org.orbeon.oxf.util.ScalaUtils._
 import org.apache.commons.lang3.StringUtils
@@ -71,24 +69,9 @@ class XXFormsResource extends XFormsFunction with FunctionSupport {
         }
 
         // Dependency on language
-
-        val avtLangAnalysis = sourceElementAnalysis(pathMap).lang collect {
-            case ref: AVTLangRef ⇒ ref.att.getValueAnalysis.get
-        }
-
-        // Only add the dependency if xml:lang is not a literal
-        avtLangAnalysis foreach {
-            case analysis: PathMapXPathAnalysis ⇒
-                // There is a pathmap for the xml:lang AVT, so add the new roots
-                pathMap.addRoots(analysis.pathmap.get.clone.getPathMapRoots)
-                //pathMap.findFinalNodes // FIXME: needed?
-                //pathMap.updateFinalNodes(finalNodes)
-            case analysis if ! analysis.figuredOutDependencies ⇒
-                // Dependencies not found
-                pathMap.setInvalidated(true)
-                return null
-            case _ ⇒ // NOP
-        }
+        XXFormsLang.addXMLLangDependency(pathMap)
+        if (pathMap.isInvalidated)
+            return null
 
         // Dependency on all arguments
         arguments foreach (_.addToPathMap(pathMap, pathMapNodeSet))

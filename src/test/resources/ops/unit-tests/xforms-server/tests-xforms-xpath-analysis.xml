@@ -7406,4 +7406,159 @@
         </output>
     </test>
 
+    <test description="xxf:lang()" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xml:lang="{xxf:instance('fr-language-instance')}">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="fr-language-instance">
+                            <lang>en</lang>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-foo" element="fr|foo">
+                            <xbl:template>
+                                <xf:output id="my-output" value="xxf:lang()"/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-output" value="xxf:lang()"/>
+                    <fr:foo id="my-foo"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
+                <attribute scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="xml:lang">
+                    <value>
+                        <analysis expression="{xxf:instance('fr-language-instance')}" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-language-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-language-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </attribute>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="fr-language-instance" analyzed-binds="true">
+                    <instance scope="" prefixed-id="fr-language-instance" model-prefixed-id="model" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="my-output" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:lang())[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-language-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-language-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+                <foo scope="" prefixed-id="my-foo" model-prefixed-id="model" binding="false" value="false">
+                    <template scope="my-foo" prefixed-id="my-foo$xf-4" binding="false" value="false">
+                        <output scope="my-foo" prefixed-id="my-foo$my-output" binding="false" value="true">
+                            <value>
+                                <analysis expression="string((xxf:lang())[1])" analyzed="true">
+                                    <value-dependent>
+                                        <path>instance('fr-language-instance')</path>
+                                    </value-dependent>
+                                    <dependent-models>
+                                        <model>model</model>
+                                    </dependent-models>
+                                    <dependent-instances>
+                                        <instance>fr-language-instance</instance>
+                                    </dependent-instances>
+                                </analysis>
+                            </value>
+                        </output>
+                    </template>
+                </foo>
+            </root>
+        </output>
+    </test>
+
+    <test description="xxf:format-message()" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/" class="org.orbeon.oxf.xforms.analysis.XPathAnalysisProcessor"/>
+        </input>
+        <input name="form">
+            <xh:html xml:lang="{xxf:instance('fr-language-instance')}">
+                <xh:head>
+                    <xf:model xxf:xpath-analysis="true" id="model">
+                        <xf:instance id="main">
+                            <form>
+                                <invalid>10</invalid>
+                                <processed>20</processed>
+                            </form>
+                        </xf:instance>
+                        <xf:instance id="fr-language-instance">
+                            <lang>en</lang>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="my-output" value="xxf:format-message(
+                        'NOTE: {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid. Only valid documents will be imported.',
+                        for $n in (invalid, processed) return xs:integer($n)
+                      )"/>
+                    <fr:foo id="my-foo"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="analysis">
+            <root scope="" prefixed-id="#document" model-prefixed-id="model" binding="false" value="false">
+                <attribute scope="" prefixed-id="xf-2" model-prefixed-id="model" binding="false" value="true" name="xml:lang">
+                    <value>
+                        <analysis expression="{xxf:instance('fr-language-instance')}" analyzed="true">
+                            <value-dependent>
+                                <path>instance('fr-language-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>fr-language-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </attribute>
+                <model scope="" prefixed-id="model" default-instance-prefixed-id="main" analyzed-binds="true">
+                    <instance scope="" prefixed-id="main" model-prefixed-id="model" binding="false" value="false"/>
+                    <instance scope="" prefixed-id="fr-language-instance" model-prefixed-id="model" binding="false" value="false"/>
+                </model>
+                <output scope="" prefixed-id="my-output" model-prefixed-id="model" binding="false" value="true">
+                    <value>
+                        <analysis expression="string((xxf:format-message(                         'NOTE: {0,number,integer} out of {1,number,integer} {1,choice,1#document|1&lt;documents} {0,choice,1#is|1&lt;are} invalid. Only valid documents will be imported.',                         for $n in (invalid, processed) return xs:integer($n)                       ))[1])" analyzed="true">
+                            <value-dependent>
+                                <path>instance('main')/invalid</path>
+                                <path>instance('main')/processed</path>
+                                <path>instance('fr-language-instance')</path>
+                            </value-dependent>
+                            <dependent-models>
+                                <model>model</model>
+                            </dependent-models>
+                            <dependent-instances>
+                                <instance>main</instance>
+                                <instance>fr-language-instance</instance>
+                            </dependent-instances>
+                        </analysis>
+                    </value>
+                </output>
+            </root>
+        </output>
+    </test>
+
 </group>

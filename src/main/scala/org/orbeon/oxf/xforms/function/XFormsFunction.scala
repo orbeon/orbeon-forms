@@ -187,12 +187,6 @@ abstract class XFormsFunction extends SystemFunction {
     // Access to Saxon's default implementation
     protected def saxonAddToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet) =
         super.addToPathMap(pathMap, pathMapNodeSet)
-
-    def sourceElementAnalysis(pathMap: PathMap) =
-        pathMap.getPathMapContext match {
-            case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
-            case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
-        }
 }
 
 object XFormsFunction {
@@ -216,4 +210,10 @@ object XFormsFunction {
         def containingDocument = container.getContainingDocument
         def controls = containingDocument.getControls
     }
+
+    def sourceElementAnalysis(pathMap: PathMap) =
+        pathMap.getPathMapContext match {
+            case context: SimpleElementAnalysis#SimplePathMapContext ⇒ context.element
+            case _ ⇒ throw new IllegalStateException("Can't process PathMap because context is not of expected type.")
+        }
 }

@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.xforms.analysis.{AVTLangRef, LiteralLangRef, ElementAnalysis}
+import org.orbeon.oxf.xforms.analysis.{PathMapXPathAnalysis, AVTLangRef, LiteralLangRef, ElementAnalysis}
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{PathMap, XPathContext}
 import org.orbeon.saxon.value.StringValue
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 
@@ -28,12 +28,14 @@ class XXFormsLang extends XFormsFunction with FunctionSupport {
 
         implicit val ctx = xpathContext
 
-        val elementAnalysis = stringArgumentOpt(0) match {
-            case Some(staticId) ⇒ elementAnalysisForStaticId(staticId)
-            case None           ⇒ elementAnalysisForSource
-        }
+        elementAnalysisForSource flatMap
+        (resolveXMLangHandleAVTs(getContainingDocument, _)) map
+        StringValue.makeStringValue orNull
+    }
 
-        elementAnalysis flatMap (resolveXMLangHandleAVTs(getContainingDocument, _)) map StringValue.makeStringValue orNull
+    override def addToPathMap(pathMap: PathMap, pathMapNodeSet: PathMap.PathMapNodeSet): PathMap.PathMapNodeSet = {
+        addXMLLangDependency(pathMap)
+        null
     }
 }
 
@@ -44,12 +46,30 @@ object XXFormsLang {
             case Some(LiteralLangRef(value)) ⇒
                 Some(value)
             case Some(AVTLangRef(att)) ⇒
-
                 // TODO: resolve concrete ancestor XXFormsAttributeControl instead of just using static id
-
                 val attributeControl = containingDocument.getControls.getObjectByEffectiveId(att.staticId).asInstanceOf[XXFormsAttributeControl]
-                Some(attributeControl.getExternalValue())
+                Option(attributeControl.getExternalValue())
             case None ⇒
                 None
         }
+
+    def addXMLLangDependency(pathMap: PathMap): Unit = {
+        // Dependency on language
+        val avtLangAnalysis = XFormsFunction.sourceElementAnalysis(pathMap).lang collect {
+            case ref: AVTLangRef ⇒ ref.att.getValueAnalysis.get
+        }
+
+        // Only add the dependency if xml:lang is not a literal
+        avtLangAnalysis foreach {
+            case analysis: PathMapXPathAnalysis ⇒
+                // There is a pathmap for the xml:lang AVT, so add the new roots
+                pathMap.addRoots(analysis.pathmap.get.clone.getPathMapRoots)
+                //pathMap.findFinalNodes // FIXME: needed?
+                //pathMap.updateFinalNodes(finalNodes)
+            case analysis if ! analysis.figuredOutDependencies ⇒
+                // Dependencies not found
+                pathMap.setInvalidated(true)
+            case _ ⇒ // NOP
+        }
+    }
 }

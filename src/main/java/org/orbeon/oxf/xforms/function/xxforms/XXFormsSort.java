@@ -65,7 +65,7 @@ public class XXFormsSort extends XFormsFunction {
                     } else if (v.getLength() == 1) {
                         c = v.itemAt(0);
                     } else {
-                        throw new XPathException("error in saxon:sort() - a node has a typed value of length > 1");
+                        throw new XPathException("error in xxf:sort() - a node has a typed value of length > 1");
                     }
                 }
                 return c;

@@ -131,7 +131,7 @@
                             <xf:group ref=".[not($is-input)]">
                                 <xf:select1 ref="app">
                                     <xf:label ref="$resources/application-name/label"/>
-                                    <xf:itemset model="fr-roles-model" ref="xxf:instance('fr-permissions')/app">
+                                    <xf:itemset ref="xxf:instance('fr-permissions')/app">
                                         <xf:label ref="@name"/>
                                         <xf:value ref="@name"/>
                                     </xf:itemset>

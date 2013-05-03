@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xml
 
 import java.util.{List ⇒ JList}
-import javax.xml.transform.Source
+import javax.xml.transform.{SourceLocator, Source}
 import org.orbeon.oxf.util.XPath._
 import org.orbeon.saxon.Configuration
 import org.orbeon.saxon.expr._
@@ -10,12 +10,14 @@ import org.orbeon.saxon.om.{NamespaceResolver, StructuredQName}
 import org.orbeon.saxon.sxpath.{XPathStaticContext, AbstractStaticContext}
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.{SequenceType, QNameValue}
+import org.orbeon.oxf.util.{Logging, IndentedLogger}
 
 // Similar to Saxon JAXPXPathStaticContext. JAXPXPathStaticContext holds a reference to an XPathVariableResolver, which
 // is not desirable as variable resolution occurs at runtime. So here instead we create a fully shareable context.
-class ShareableXPathStaticContext(config: Configuration, namespaceMapping: NamespaceMapping, functionLibrary: FunctionLibrary)
+class ShareableXPathStaticContext(config: Configuration, namespaceMapping: NamespaceMapping, functionLibrary: FunctionLibrary)(implicit logger: IndentedLogger)
         extends AbstractStaticContext
-        with XPathStaticContext {
+        with XPathStaticContext
+        with Logging {
 
     // This also creates an Executable
     setConfiguration(config)
@@ -89,4 +91,8 @@ class ShareableXPathStaticContext(config: Configuration, namespaceMapping: Names
     def importSchema(source: Source)        = getConfiguration.addSchemaSource(source, getConfiguration.getErrorListener)
     def isImportedSchema(namespace: String) = getConfiguration.isSchemaAvailable(namespace)
     def getImportedSchemaNamespaces         = getConfiguration.getImportedNamespaces
+
+    override def issueWarning(s: String, locator: SourceLocator) =
+        if (logger ne null)
+            debug(s)
 }

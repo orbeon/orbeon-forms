@@ -40,7 +40,6 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.*;
 import org.orbeon.saxon.value.*;
 import org.orbeon.saxon.value.StringValue;
@@ -766,28 +765,6 @@ public class XFormsUtils {
             throw new OXFException(errorMessage);
 
         return (Node) ((VirtualNode) nodeInfo).getUnderlyingNode();
-    }
-
-    /**
-     * Return whether the given string contains a well-formed XPath 2.0 expression.
-     *
-     * @param xpathString       string to check
-     * @param namespaceMapping  in-scope namespaces
-     * @return                  true iif the given string contains well-formed XPath 2.0
-     */
-    public static boolean isXPath2Expression(Configuration configuration, String xpathString, NamespaceMapping namespaceMapping, LocationData locationData) {
-        // Empty string is never well-formed XPath
-        if (xpathString.trim().length() == 0)
-            return false;
-
-        try {
-            XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary(), false);
-        } catch (Exception e) {
-            // Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
-            return false;
-        }
-
-        return true;
     }
 
     private static String[] voidElementsNames = {

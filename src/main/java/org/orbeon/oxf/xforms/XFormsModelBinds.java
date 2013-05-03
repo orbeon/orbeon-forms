@@ -808,7 +808,7 @@ public class XFormsModelBinds {
                         // ASSUMPTION: Binding to dom4j-backed node (which InstanceData assumes too)
                         final Element namespaceElement = XML.unwrapElement(namespaceNodeInfo);
                         final NamespaceMapping namespaceMapping = new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(namespaceElement));
-                        typeValid = isOptionalAndEmpty || XFormsUtils.isXPath2Expression(XPathCache.getGlobalConfiguration(), nodeValue, namespaceMapping, bind.staticBind.locationData());
+                        typeValid = isOptionalAndEmpty || XPath.isXPath2Expression(nodeValue, namespaceMapping, bind.staticBind.locationData(), indentedLogger);
                     } else {
                         // This means that we are bound to a node which is not an element and which does not have a
                         // parent element. This could be a detached attribute, or an element node, etc. Unsure if we

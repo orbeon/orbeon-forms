@@ -17,7 +17,7 @@ import org.orbeon.saxon.expr._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
-import org.orbeon.oxf.util.XPath
+import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import java.util.{Map ⇒ JMap}
@@ -118,7 +118,7 @@ object PathMapXPathAnalysis {
     def apply(partAnalysis: PartAnalysis, xpathString: String, namespaceMapping: NamespaceMapping,
               baseAnalysis: Option[XPathAnalysis], inScopeVariables: Map[String, VariableTrait],
               pathMapContext: AnyRef, scope: Scope, defaultInstancePrefixedId: Option[String],
-              locationData: LocationData, element: Element, avt: Boolean): XPathAnalysis = {
+              locationData: LocationData, element: Element, avt: Boolean)(implicit logger: IndentedLogger): XPathAnalysis = {
 
         val compiledExpression = XPath.compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt)
         apply(partAnalysis, compiledExpression, baseAnalysis, inScopeVariables, pathMapContext, scope, defaultInstancePrefixedId, element)

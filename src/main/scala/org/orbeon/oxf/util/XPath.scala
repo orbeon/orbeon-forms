@@ -30,6 +30,9 @@ import org.orbeon.oxf.resources.URLFactory
 import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
 import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.apache.commons.lang3.StringUtils._
+import org.orbeon.oxf.xforms.XFormsContainingDocument
+import util.Try
 
 object XPath {
 
@@ -65,7 +68,7 @@ object XPath {
     val DocumentWrapper = new DocumentWrapper(Dom4jUtils.createDocument, null, XPathCache.getGlobalConfiguration)
 
     // Create and compile an expression
-    def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean): CompiledExpression = {
+    def compileExpression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData, functionLibrary: FunctionLibrary, avt: Boolean)(implicit logger: IndentedLogger): CompiledExpression = {
         val staticContext = new ShareableXPathStaticContext(GlobalConfiguration, namespaceMapping, functionLibrary)
         CompiledExpression(compileExpressionWithStaticContext(staticContext, xpathString, avt), xpathString, locationData)
     }
@@ -188,4 +191,11 @@ object XPath {
                 case e: Exception ⇒ throw new TransformerException(e)
             }
     }
+
+    // Whether the given string contains a well-formed XPath 2.0 expression.
+    // NOTE: Ideally we would like the parser to not throw as this is time-consuming, but not sure how to achieve that
+    // NOTE: We should probably just do the parse and typeCheck parts and skip simplify and a few smaller operations
+    def isXPath2Expression(xpathString: String, namespaceMapping: NamespaceMapping, locationData: LocationData)(implicit logger: IndentedLogger) =
+        isNotBlank(xpathString) &&
+        Try(compileExpression(xpathString, namespaceMapping, locationData, XFormsContainingDocument.getFunctionLibrary, avt = false)).isSuccess
 }

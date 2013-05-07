@@ -5,11 +5,8 @@ import org.junit.Test
 import org.scalatest.junit.AssertionsForJUnit
 
 /**
- * @author Karel Goossens, BTR-Services, Belgium
- * @author Hakan Soderstrom
- * @author Erik Bruchez
- *         <p/>
- *         Numberer class for the Swedish language.
+ * Tests for numberer class for the Swedish language.
+ *
  * @see <a href="http://en.wikipedia.org/wiki/Swedish_grammar">http://en.wikipedia.org/wiki/Swedish_grammar</a>
  * @see <a href="http://www2.hhs.se/isa/swedish/chap4.htm">http://www2.hhs.se/isa/swedish/chap4.htm</a>
  */
@@ -266,3 +263,20 @@ class Numberer_svTest extends AssertionsForJUnit {
         assert("söndag" === N.dayName(7, 2, 10))
     }
 }
+
+//
+// The contents of this file are subject to the Mozilla Public License Version 1.0 (the "License");
+// you may not use this file except in compliance with the License. You may obtain a copy of the
+// License at http://www.mozilla.org/MPL/
+//
+// Software distributed under the License is distributed on an "AS IS" basis,
+// WITHOUT WARRANTY OF ANY KIND, either express or implied.
+// See the License for the specific language governing rights and limitations under the License.
+//
+// The Original Code is: all this file
+//
+// The Initial Developer of the Original Code is Hakan Soderstrom.
+//
+// Contributor(s): Karel Goossens, Hakan Soderstrom, Erik Bruchez
+// See also: http://discuss.orbeon.com/Swedish-localization-contribution-offered-td4656518.html
+//

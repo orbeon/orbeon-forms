@@ -19,16 +19,16 @@ AjaxServer.Event = (args) ->
 
     supportedArgs = ->
         form:               object ->
-                                if   _.isString args.targetId
-                                then Controls.getForm document.getElementById args.targetId
-                                else null
+                                      if   _.isString args.targetId
+                                      then Controls.getForm document.getElementById args.targetId
+                                      else null
         targetId:           string -> null
         value:              string -> null
         eventName:          string -> null
-        bubbles:            bool -> null
-        cancelable:         bool -> null
-        ignoreErrors:       bool -> null
-        showProgress:       bool -> true
+        bubbles:            bool   -> null
+        cancelable:         bool   -> null
+        ignoreErrors:       bool   -> null
+        showProgress:       bool   -> true
         progressMessage:    string -> null
         additionalAttribs:  object -> null
         properties:         object -> {}
@@ -46,7 +46,7 @@ AjaxServer.Event = (args) ->
         @[name] = if isType args[name] then args[name] else alternative()
     object = type _.isObject
     string = type _.isString
-    bool = type _.isBoolean
+    bool   = type _.isBoolean
     setDefault name for name, setDefault of supportedArgs()
 
     # Notify listeners, given them a chance to, say, add properties to the event

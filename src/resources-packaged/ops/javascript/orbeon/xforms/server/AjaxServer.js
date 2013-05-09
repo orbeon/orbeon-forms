@@ -663,15 +663,49 @@
                     AjaxServer.ajaxResponseReceived.fire();
 
                 // If neither of these two conditions is met, hide the modal progress panel:
-                //      a) The server tells us to do a submission or load, so we don't want to remove it otherwise
-                //         users could start interacting with a page which is going to be replaced shortly.
-                //      b) There is another Ajax request in the queue, which could be the one that triggered the
+                //      a) There is another Ajax request in the queue, which could be the one that triggered the
                 //         display of the modal progress panel, so we don't want to hide before that request ran.
+                //      b) The server tells us to do a submission or load, so we don't want to remove it otherwise
+                //         users could start interacting with a page which is going to be replaced shortly.
                 // We remove the modal progress panel before handling DOM response, as xxf:script may dispatch
                 // events and we don't want them to be filtered. If there are server events, we don't remove the
                 // panel until they have been processed, i.e. the request sending the server events returns.
-                if (! (AjaxServer.keepModelProgressPanelDisplayed(responseXML)
-                        || ORBEON.xforms.Globals.eventQueue.length > 0)) {
+                function doHideProgressDialog() {
+
+                    return ! (eventQueueHasShowProgressEvent()
+                              || serverSaysToKeepModelProgressPanelDisplayed());
+
+                    function eventQueueHasShowProgressEvent() {
+                        return _.some(ORBEON.xforms.Globals.eventQueue,
+                                      function(event) { return event.showProgress == true; });
+                    }
+
+                    /**
+                     * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
+                     * window and for which the user didn't specify xxf:show-progress="false".
+                     *
+                     * The logic here corresponds to the following XPath:
+                     * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
+                     */
+                    function serverSaysToKeepModelProgressPanelDisplayed() {
+                        if (responseXML && responseXML.documentElement
+                                    && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+                            var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
+                            YAHOO.util.Dom.getElementsBy(function(element) {
+                                var localName = ORBEON.util.Utils.getLocalName(element);
+                                var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
+                                if ((localName  == "submission" || localName == "load")) {
+                                    if (ORBEON.util.Dom.getAttribute(element, "target") == null && ORBEON.util.Dom.getAttribute(element, "show-progress") == null)
+                                        foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = true;
+                                }
+                            }, null, responseXML.documentElement);
+                            return foundLoadOrSubmissionOrLoadWithNoTargetNoDownload;
+                        }
+                        return false;
+                    }
+                }
+
+                if (doHideProgressDialog()) {
                     ORBEON.util.Utils.hideModalProgressPanel();
                 }
 
@@ -692,30 +726,6 @@
                 AjaxServer.handleFailureAjax(o);
             }
         }
-    };
-
-    /**
-     * Keep the model progress panel if the server tells us to do a submission or load which isn't opened in another
-     * window and for which the user didn't specify xxf:show-progress="false".
-     *
-     * The logic here corresponds to the following XPath:
-     * exists((//xxf:submission, //xxf:load)[empty(@target) and empty(@show-progress)])
-     */
-    AjaxServer.keepModelProgressPanelDisplayed = function(responseXML) {
-        if (responseXML && responseXML.documentElement
-                    && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-            var foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = false;
-            YAHOO.util.Dom.getElementsBy(function(element) {
-                var localName = ORBEON.util.Utils.getLocalName(element);
-                var hasTargetAttribute = ORBEON.util.Dom.getAttribute(element, "target") == null;
-                if ((localName  == "submission" || localName == "load")) {
-                    if (ORBEON.util.Dom.getAttribute(element, "target") == null && ORBEON.util.Dom.getAttribute(element, "show-progress") == null)
-                        foundLoadOrSubmissionOrLoadWithNoTargetNoDownload = true;
-                }
-            }, null, responseXML.documentElement);
-            return foundLoadOrSubmissionOrLoadWithNoTargetNoDownload;
-        }
-        return false;
     };
 
     /**

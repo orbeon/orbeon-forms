@@ -103,12 +103,12 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     private def storeExternalValueAndMetadata(rawNewValue: String, filename: String, mediatype: String, size: String): Unit = {
 
         def isFileURL(url: String) =
-            NetUtils.urlHasProtocol(url) && url.startsWith("file:")
+            NetUtils.getProtocol(url) == "file"
 
         def deleteFileIfPossible(url: String): Unit =
             if (isFileURL(url))
                 try {
-                    val file = new File(new URI(url))
+                    val file = new File(new URI(splitQuery(url)._1))
                     if (file.exists) {
                         if (file.delete())
                             getIndentedLogger.logDebug("xf:upload", "deleted temporary file upon upload", "path", file.getCanonicalPath)
@@ -117,7 +117,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     }
                 } catch {
                     case e: Exception ⇒
-                        getIndentedLogger.logWarning("xf:upload", "could not delete temporary file upon upload", "path", url)
+                        getIndentedLogger.logError("xf:upload", "could not delete temporary file upon upload", "path", url)
                 }
 
         // Clean values

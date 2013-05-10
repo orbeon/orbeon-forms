@@ -4,7 +4,7 @@ import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.relational.Index
-import org.orbeon.oxf.fr.relational.IndexedControl
+import org.orbeon.oxf.fr.relational.Index.IndexedControl
 
 class IndexTest extends AssertionsForJUnit {
 

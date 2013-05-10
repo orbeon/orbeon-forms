@@ -59,5 +59,5 @@ object Index {
         }
     }
 
-    //case class IndexedControl(name: String, inSearch: Boolean, inSummary: Boolean, xpath: String, xsType: String)
+    case class IndexedControl(name: String, inSearch: Boolean, inSummary: Boolean, xpath: String, xsType: String, control: String)
 }

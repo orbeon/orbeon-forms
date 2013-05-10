@@ -34,10 +34,10 @@ object DataModel {
         val metadataInstance = topLevelModel("fr-form-model").get.getVariable("is-custom-instance")
         (metadataInstance ne null) && effectiveBooleanValue(metadataInstance)
     }
-    
+
     private val bindWithName: PartialFunction[NodeInfo, NodeInfo] =
         { case bind if exists(bind \@ "name") ⇒ bind }
-    
+
     private def childrenBindsWithNames(bind: NodeInfo) =
         bind \ (XF → "bind") collect bindWithName
 
@@ -45,10 +45,10 @@ object DataModel {
         bind ancestorOrSelf (XF → "bind") collect bindWithName
 
     // Create a new data model from the binds
-    def dataModelFromBinds(inDoc: NodeInfo) = {
+    def dataModelFromBinds(inDoc: NodeInfo): NodeInfo = {
 
         def insertChildren(holder: NodeInfo, bind: NodeInfo): NodeInfo = {
-            
+
             val newChildren =
                 childrenBindsWithNames(bind) map
                     (bind ⇒ insertChildren(elementInfo(bind attValue "name" ), bind))
@@ -57,10 +57,10 @@ object DataModel {
 
             holder
         }
-        
-        findTopLevelBind(inDoc) map (insertChildren(elementInfo("form"), _)) orNull
+
+        findTopLevelBinds(inDoc).headOption map (insertChildren(elementInfo("form"), _)) orNull
     }
-    
+
     private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any) {
         def update(bind: NodeInfo) {
             childrenBindsWithNames(bind) foreach { child ⇒
@@ -68,8 +68,8 @@ object DataModel {
                 update(child)
             }
         }
-        
-        findTopLevelBind(inDoc) foreach (update(_))
+
+        findTopLevelBinds(inDoc) foreach (update(_))
     }
 
     // Update binds for automatic mode
@@ -118,7 +118,7 @@ object DataModel {
 
     def annotatedBindRef(bindId: String, ref: String) = "dataModel:bindRef('" + bindId + "', " + ref + ")"
     def deAnnotatedBindRef(ref: String) = AnnotatedBindRef.replaceFirstIn(ref.trim, "$1").trim
-    
+
     def annotatedBindRefIfNeeded(bindId: String, ref: String) =
         if (isCustomInstance) annotatedBindRef(bindId, ref) else ref
 

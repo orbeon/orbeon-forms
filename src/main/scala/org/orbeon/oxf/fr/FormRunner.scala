@@ -414,11 +414,9 @@ object FormRunner {
     }
 
     // Get a field's label for the summary page
-    def summaryLanguage(name: String, resources: NodeInfo, inlineLabel: String): String = {
-        def resourceLabelOpt = resources \ name \ "label" map (_.getStringValue) headOption
-        def inlineLabelOpt   = nonEmptyOrNone(inlineLabel)
-
-        resourceLabelOpt orElse inlineLabelOpt getOrElse '[' + name + ']'
+    def summaryLanguage(name: String, resources: NodeInfo): String = {
+        def resourceLabelOpt = (resources \ name \ "label" map (_.getStringValue)).headOption
+        resourceLabelOpt getOrElse '[' + name + ']'
     }
 
     // Append a query string to a URL

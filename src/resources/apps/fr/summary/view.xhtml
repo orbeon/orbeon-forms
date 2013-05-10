@@ -24,6 +24,8 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:index="org.orbeon.oxf.fr.relational.Index"
+      xmlns:indexedControl="org.orbeon.oxf.fr.relational.IndexedControl"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
@@ -150,7 +152,7 @@
             </xf:bind>
 
             <xf:instance id="fr-search-template" xxf:readonly="true">
-                <query xmlns="" name="" path="" inline-label="" type="" control="" search-field="" summary-field="" match="substring"/>
+                <query xmlns="" name="" path="" type="" control="" search-field="" summary-field="" match="substring"/>
             </xf:instance>
 
             <!-- Paging information -->
@@ -259,75 +261,15 @@
                 <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
                 <!-- Create elements holding structured search data -->
-                <xf:action iterate="$summary-elements">
-                    <xf:var name="control" value="." as="element()"/>
-
-                    <!-- Insert empty template -->
+                <xf:action iterate="index:jFindIndexedControls(instance('fr-source-form-instance')/root())">
                     <xf:insert context="instance('fr-search-instance')" ref="query" origin="instance('fr-search-template')"/>
                     <xf:var name="query" value="instance('fr-search-instance')/query[last()]"/>
-
-                    <!-- Add control information to template -->
-                    <xf:setvalue ref="$query/@control" value="$control/local-name()"/>
-
-                    <!-- Add whether we must show the search field -->
-                    <xf:setvalue ref="$query/@search-field" value="tokenize($control/@class, '\s+') = ('fr-search')"/>
-                    <xf:setvalue ref="$query/@summary-field" value="tokenize($control/@class, '\s+') = ('fr-summary')"/>
-
-                    <!-- All the control's "ancestor" @ref, @context or @bind -->
-                    <xf:var name="all-ancestors" value="$control/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
-                    <!-- First control @bind ancestor and its own ancestors with @ref, @context or @bind  -->
-                    <xf:var name="bind-ancestors" value="reverse($all-ancestors)[name() = 'bind'][1]/ancestor-or-self::*/(@ref | @context | @bind)" as="attribute()*"/>
-
-                    <!-- All control's ancestors based on a path (@ref or @context) up to the first @bind if any -->
-                    <xf:var name="path-ancestors" value="reverse($all-ancestors except $bind-ancestors)" as="attribute()*"/>
-                    <!-- First ancestor @bind if any -->
-                    <xf:var name="bind-ancestor" value="reverse($bind-ancestors)[1]" as="attribute()?"/>
-
-                    <!-- Add meta-information to template -->
-                    <!-- First, try paths -->
-                    <xf:action if="exists($path-ancestors)">
-                        <xf:setvalue ref="$query/@name" value="$path-ancestors[1]"/>
-                        <xf:setvalue ref="$query/@path" value="string-join(concat($path-ancestors, '[1]'), '/')"/>
-                    </xf:action>
-                    <!-- Then, try binds -->
-                    <xf:action if="exists($bind-ancestor)">
-                        <xf:var name="bind" value="instance('fr-source-form-instance')/xh:head/xf:model//xf:bind[@id = $bind-ancestor]"/>
-
-                        <!-- Set control name if not already done with @ref -->
-                        <xf:setvalue if="empty($path-ancestors)" ref="$query/@name" value="substring-before($bind-ancestor, '-bind')"/>
-                        <!-- Prepend path from binds -->
-                        <xf:var
-                            name="xpath-parts"
-                            value="($bind/ancestor-or-self::xf:bind/(@ref | @nodeset))[position() gt 1],
-                                   if (normalize-space($query/@path)) then $query/@path else ()"/>
-                        <xf:var
-                            name="xpath-parts-first"
-                            value="for $p in $xpath-parts return concat($p, '[1]')"/>
-                        <xf:setvalue
-                            ref="$query/@path"
-                            value="string-join($xpath-parts-first, '/')"/>
-
-                        <!--<xf:message level="xxf:log-info">XXX Bind: <xf:output value="saxon:serialize($bind, 'xml')"/></xf:message>-->
-                        <!--<xf:message level="xxf:log-info">XXX Path: <xf:output value="$query/@path"/></xf:message>-->
-
-                        <!-- Copy namespace declarations from form to <query> element -->
-                        <!-- Note: Copying namespaces from the xf:bind is tricky. We can't copy the namespaces nodes, as copying from
-                             a tiny tree to dom4j fails. If we copy the element, it doesn't copy nodes that are not used. So we go
-                             through serialization/parsing so all the namespaces are copied into the document. -->
-                        <xf:insert context="$query" origin="saxon:parse(saxon:serialize($bind, 'xml'))"/>
-                        <xf:insert context="$query" origin="$query/xf:bind/namespace::*[local-name() != '']"/>
-                        <xf:delete ref="$query/xf:bind"/>
-
-                        <xf:setvalue ref="$query/@type" value="if ($bind/@type) then $bind/@type else 'xs:string'"/>
-                    </xf:action>
-                    <!-- If control has labelref attribute, like the autocomplete, use value from labelref -->
-                    <xf:setvalue if="exists($control/@labelref)" ref="$query/@path" value="concat(., '/', $control/@labelref)"/>
-
-                    <!-- Store the inline label -->
-                    <xf:setvalue
-                        ref="$query/@inline-label"
-                        value="normalize-space($control/xf:label)"/>
-
+                    <xf:setvalue ref="$query/@name"          value="indexedControl:name     (context())"/>
+                    <xf:setvalue ref="$query/@path"          value="indexedControl:xpath    (context())"/>
+                    <xf:setvalue ref="$query/@type"          value="indexedControl:xsType   (context())"/>
+                    <xf:setvalue ref="$query/@summary-field" value="indexedControl:inSummary(context())"/>
+                    <xf:setvalue ref="$query/@search-field"  value="indexedControl:inSearch (context())"/>
+                    <xf:setvalue ref="$query/@control"       value="indexedControl:control  (context())"/>
                 </xf:action>
 
                 <!-- Query initial list of documents -->
@@ -411,7 +353,7 @@
 
                                     <!-- Application -->
                                     <xf:group ref="$app-query[$is-form-builder and $has-roles]" class="fr-summary-search-item">
-                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources)"/>
                                         <!-- Use an input if app name is a wildcard -->
                                         <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                                         <xf:input ref=".[$is-input]">
@@ -443,7 +385,7 @@
                                     </xf:group>
                                     <!-- Form -->
                                     <xf:group ref="$form-query" class="fr-summary-search-item">
-                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources)"/>
                                         <xf:var name="current-app" value="xxf:instance('fr-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
                                         <xf:var name="is-input" value="xxf:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
@@ -475,7 +417,7 @@
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
                                     <xf:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                         <xf:var name="control-name" value="@name"/>
-                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources)"/>
 
                                         <xf:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
@@ -562,7 +504,7 @@
                                         <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
-                                                <xf:output value="formRunner:summaryLanguage(@name, $form-resources, @inline-label)"/>
+                                                <xf:output value="formRunner:summaryLanguage(@name, $form-resources)"/>
                                             </xh:th>
                                         </xf:repeat>
                                     </xh:tr>

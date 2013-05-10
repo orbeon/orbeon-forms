@@ -218,16 +218,16 @@
     </xf:action>
 
     <!-- Annotated form instance -->
-    <xf:bind ref="instance('fb-form-instance')">
+    <xf:bind id="fb-form-binds" ref="instance('fb-form-instance')">
         <xf:bind ref="xh:head">
             <xf:bind ref="xf:model[@id = 'fr-form-model']">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*">
                     <xf:bind id="application-name-bind" ref="application-name"/>
-                    <xf:bind id="form-name-bind" ref="form-name"/>
-                    <xf:bind id="title-bind" ref="title[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="description-bind" ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind id="logo-bind" ref="logo"/>
+                    <xf:bind id="form-name-bind"        ref="form-name"/>
+                    <xf:bind id="title-bind"            ref="title[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="description-bind"      ref="description[@xml:lang = $fb-lang]"/>
+                    <xf:bind id="logo-bind"             ref="logo"/>
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*">
@@ -246,20 +246,13 @@
             <xf:bind ref="xf:model[@id = 'fr-form-model']">
                 <!-- Form metadata (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*">
-                    <xf:bind ref="application-name"
-                                 required="true()"
-                                 type="xs:NCName"/>
-                    <xf:bind ref="form-name"
-                                 required="true()"
-                                 type="xs:NCName"/>
+                    <xf:bind ref="application-name" required="true()" type="xs:NCName"/>
+                    <xf:bind ref="form-name"        required="true()" type="xs:NCName"/>
                     <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
                     <!-- TODO: somehow mark current title as "required" if title in other languages are missing -->
-                    <xf:bind ref="title[@xml:lang = $fb-lang]"
-                                 required="true()"
-                                 constraint="not((for $t in ../title return normalize-space($t) = '') = true())"/>
+                    <xf:bind ref="title[@xml:lang = $fb-lang]"  required="true()" constraint="not((for $t in ../title return normalize-space($t) = '') = true())"/>
                     <xf:bind ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind ref="logo"
-                                 type="xs:anyURI"/>
+                    <xf:bind ref="logo"  type="xs:anyURI"/>
                 </xf:bind>
             </xf:bind>
         </xf:bind>

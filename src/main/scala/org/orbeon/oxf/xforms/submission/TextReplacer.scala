@@ -75,8 +75,8 @@ class TextReplacer(submission: XFormsModelSubmission, containingDocument: XForms
             }
 
         def handleSetValueSuccess(oldValue: String) =
-            DataModel.logAndNotifyValueChange(containingDocument, containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY),
-                "submission", destinationNodeInfo, oldValue, responseBody, isCalculate = false)
+            DataModel.logAndNotifyValueChange(containingDocument,
+                "submission", destinationNodeInfo, oldValue, responseBody, isCalculate = false)(containingDocument.getIndentedLogger(XFormsActions.LOGGING_CATEGORY))
 
         def handleSetValueError(reason: Reason) =
             throwSubmissionException(

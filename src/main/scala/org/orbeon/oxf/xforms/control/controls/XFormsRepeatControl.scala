@@ -43,8 +43,7 @@ import collection.mutable.{ListBuffer, ArrayBuffer, LinkedHashMap}
 // Represents an xf:repeat container control.
 class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsNoSingleNodeContainerControl(container, parent, element, effectiveId)
-        with NoLHHATrait
-        with Logging {
+        with NoLHHATrait {
 
     override type Control <: RepeatControl
 
@@ -325,8 +324,6 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
         val isInsert = insertedItems ne null
 
         val currentControlTree = controls.getCurrentControlTree
-
-        implicit val indentedLogger = controls.getIndentedLogger
 
         val oldRepeatIndex = getIndex// 1-based
         var updated = false

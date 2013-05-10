@@ -57,7 +57,7 @@ class XFormsSetvalueAction extends XFormsAction {
                 DataModel.setValueIfChanged(
                     nodeInfo,
                     valueToSet,
-                    DataModel.logAndNotifyValueChange(containingDocument, indentedLogger, "setvalue", nodeInfo, _, valueToSet, isCalculate = false),
+                    DataModel.logAndNotifyValueChange(containingDocument, "setvalue", nodeInfo, _, valueToSet, isCalculate = false)(indentedLogger),
                     reason ⇒ throw new OXFException(reason.message)
                 )
             case _ ⇒

@@ -141,7 +141,7 @@ trait FileMetadata extends XFormsValueControl {
                         DataModel.setValueIfChanged(
                             currentSingleItem,
                             value,
-                            oldValue ⇒ DataModel.logAndNotifyValueChange(self.container.getContainingDocument, self.getIndentedLogger, "file metadata", currentSingleItem, oldValue, value, isCalculate = false),
+                            oldValue ⇒ DataModel.logAndNotifyValueChange(self.container.getContainingDocument, "file metadata", currentSingleItem, oldValue, value, isCalculate = false),
                             reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(self, self.getLocationData, reason))
                         )
                     case _ ⇒

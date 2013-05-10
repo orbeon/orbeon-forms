@@ -131,7 +131,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                     value
 
             def doProxyURI(uri: String, lastModified: Long) =
-                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument)))(getIndentedLogger)
+                proxyURI(uri, filename, mediatype, lastModified, evaluatedHeaders, Option(XFormsProperties.getForwardSubmissionHeaders(containingDocument)))
 
             val typeName = getBuiltinTypeName
 
@@ -165,9 +165,9 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             case e: Exception ⇒
                 // We don't want to fail if there is an issue proxying, for example if the resource is not found.
                 // Ideally, this would indicate some condition on the control (not found? out of range?).
-                getIndentedLogger.logWarning("xf:output", "exception while proxing value",
-                    "value",     internalValue,
-                    "throwable", OrbeonFormatter.format(e))
+                warn("exception while proxing value", Seq(
+                    "value"     → internalValue,
+                    "throwable" → OrbeonFormatter.format(e)))
 
                 defaultValue
         }

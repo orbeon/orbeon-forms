@@ -151,29 +151,28 @@ object DataModel {
      */
     def jSetValueIfChanged(
             containingDocument: XFormsContainingDocument,
-            indentedLogger: IndentedLogger,
             eventTarget: XFormsEventTarget,
             locationData: LocationData,
             nodeInfo: NodeInfo,
             valueToSet: String,
             source: String,
-            isCalculate: Boolean) = {
+            isCalculate: Boolean)(implicit logger: IndentedLogger) = {
 
         assert(containingDocument ne null)
-        assert(indentedLogger ne null)
+        assert(logger ne null)
 
         setValueIfChanged(
             nodeInfo,
             valueToSet,
-            logAndNotifyValueChange(containingDocument, indentedLogger, source, nodeInfo, _, valueToSet, isCalculate),
+            logAndNotifyValueChange(containingDocument, source, nodeInfo, _, valueToSet, isCalculate),
             reason ⇒ Dispatch.dispatchEvent(new XXFormsBindingErrorEvent(eventTarget, locationData, reason))
         )
     }
 
     // Standard success behavior: log and notify
-    def logAndNotifyValueChange(containingDocument: XFormsContainingDocument, indentedLogger: IndentedLogger, source: String,
-                                nodeInfo: NodeInfo, oldValue: String, newValue: String, isCalculate: Boolean) = {
-        logValueChange(indentedLogger, source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
+    def logAndNotifyValueChange(containingDocument: XFormsContainingDocument, source: String,
+                                nodeInfo: NodeInfo, oldValue: String, newValue: String, isCalculate: Boolean)(implicit logger: IndentedLogger) = {
+        logValueChange(logger, source, oldValue,  newValue, findInstanceEffectiveId(containingDocument, nodeInfo))
         notifyValueChange(containingDocument, nodeInfo, oldValue, newValue, isCalculate)
     }
 

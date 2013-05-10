@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
-import org.orbeon.oxf.util.NetUtils
+import org.orbeon.oxf.util.{Logging, NetUtils}
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
@@ -59,7 +59,8 @@ class XFormsControl(
     with ControlXMLDumpSupport
     with XFormsEventTarget
     with XFormsEventObserver
-    with ExternalCopyable {
+    with ExternalCopyable
+    with Logging {
 
     // Type of the associated static control
     type Control <: ElementAnalysis // TODO: Use more specific to represent controls. Note that those can also be actions.
@@ -92,7 +93,7 @@ class XFormsControl(
     final def localName = staticControl.localName
 
     def getContextStack = container.getContextStack
-    final def getIndentedLogger = containingDocument.getControls.getIndentedLogger
+    implicit final def logger = containingDocument.getControls.getIndentedLogger
 
     final def getResolutionScope =
         container.getPartAnalysis.scopeForPrefixedId(prefixedId)

@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsConstants.SUBMISSION_QNAME
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
@@ -29,8 +28,7 @@ import org.orbeon.oxf.xforms.xbl.XBLContainer
  * xf:submit control.
  */
 class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
-        extends XFormsTriggerControl(container, parent, element, id)
-        with Logging {
+        extends XFormsTriggerControl(container, parent, element, id) {
 
     override def performDefaultAction(event: XFormsEvent): Unit = {
         // Do the default stuff upon receiving a DOMActivate event
@@ -48,7 +46,6 @@ class XFormsSubmitControl(container: XBLContainer, parent: XFormsControl, elemen
                 case _ ⇒
                     // "If there is a null search result for the target object and the source object is an XForms action such as
                     // dispatch, send, setfocus, setindex or toggle, then the action is terminated with no effect."
-                    implicit val logger = containingDocument.getControls.getIndentedLogger
                     debug("submission does not refer to an existing xf:submission element, ignoring action",
                         Seq("submission id" → submissionId))
             }

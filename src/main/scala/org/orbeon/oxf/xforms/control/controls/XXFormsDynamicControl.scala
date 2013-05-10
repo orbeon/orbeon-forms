@@ -176,8 +176,6 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
         // Add listener to the single outer instance
         val docWrapper = new DocumentWrapper(element.getDocument, null, XPathCache.getGlobalConfiguration)
 
-        implicit val logger = getIndentedLogger
-
         // NOTE: Make sure to convert to an EventListener so that addListener/removeListener deal with the exact same object
         val outerListener: EventListener = {
 

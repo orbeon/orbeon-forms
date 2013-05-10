@@ -247,7 +247,7 @@ object InstanceMirror {
                                 DataModel.setValueIfChanged(
                                     matchingNode,
                                     valueChanged.newValue,
-                                    DataModel.logAndNotifyValueChange(containingDocument, logger, "mirror", matchingNode, _, valueChanged.newValue, isCalculate = false),
+                                    DataModel.logAndNotifyValueChange(containingDocument, "mirror", matchingNode, _, valueChanged.newValue, isCalculate = false),
                                     reason ⇒ throw new OXFException(reason.message)
                                 )
                             true

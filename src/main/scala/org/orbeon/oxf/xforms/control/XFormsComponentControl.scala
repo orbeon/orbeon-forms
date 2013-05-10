@@ -112,8 +112,6 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     // Return the reference node if a listener was created
     private def createMirrorListener(mirrorInstance: XFormsInstance, referenceNode: VirtualNode): Option[VirtualNode] = {
 
-        implicit val logger = getIndentedLogger
-
         val outerDocument = referenceNode.getDocumentRoot
         val outerInstance = containingDocument.getInstanceForNode(outerDocument)
 

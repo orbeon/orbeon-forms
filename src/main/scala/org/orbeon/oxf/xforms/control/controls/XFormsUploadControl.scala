@@ -18,7 +18,6 @@ import org.dom4j.Element
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
@@ -111,13 +110,13 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                     val file = new File(new URI(splitQuery(url)._1))
                     if (file.exists) {
                         if (file.delete())
-                            getIndentedLogger.logDebug("xf:upload", "deleted temporary file upon upload", "path", file.getCanonicalPath)
+                            debug("deleted temporary file upon upload", Seq("path" → file.getCanonicalPath))
                         else
-                            getIndentedLogger.logWarning("xf:upload", "could not delete temporary file upon upload", "path", file.getCanonicalPath)
+                            warn("could not delete temporary file upon upload", Seq("path" → file.getCanonicalPath))
                     }
                 } catch {
                     case e: Exception ⇒
-                        getIndentedLogger.logError("xf:upload", "could not delete temporary file upon upload", "path", url)
+                        error("could not delete temporary file upon upload", Seq("path" → url))
                 }
 
         // Clean values
@@ -137,7 +136,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                             converted
                         } else {
                             // Leave value as is and make file expire with session
-                            val newFile = NetUtils.renameAndExpireWithSession(newValue, getIndentedLogger.getLogger)
+                            val newFile = NetUtils.renameAndExpireWithSession(newValue, logger.getLogger)
                             val newFileURL = newFile.toURI.toString
 
                             // The result is a file: append a MAC

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.{Document, Element}
-import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsUtils.htmlStringToDom4jTagSoup
 import org.orbeon.oxf.xforms.control._
@@ -28,8 +27,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils.domToString
 class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, element: Element, id: String)
         extends XFormsSingleNodeControl(container, parent, element, id)
         with XFormsValueControl
-        with FocusableTrait
-        with Logging {
+        with FocusableTrait {
 
     override def getJavaScriptInitialization = {
         val hasInitialization = XFormsControl.isHTMLMediatype(this) || staticControl.appearances(XXFORMS_AUTOSIZE_APPEARANCE_QNAME)
@@ -44,7 +42,6 @@ class XFormsTextareaControl(container: XBLContainer, parent: XFormsControl, elem
 
         def sanitizeForMediatype(s: String) =
             if (XFormsControl.isHTMLMediatype(this)) {
-                implicit val logger = containingDocument.getControls.getIndentedLogger
 
                 withDebug("cleaning-up xf:textarea HTML", Seq("value" → s)) {
 

@@ -58,7 +58,7 @@ object DataModel {
             holder
         }
 
-        findTopLevelBinds(inDoc).headOption map (insertChildren(elementInfo("form"), _)) orNull
+        findTopLevelBind(inDoc).headOption map (insertChildren(elementInfo("form"), _)) orNull
     }
 
     private def foreachBindWithName(inDoc: NodeInfo)(op: NodeInfo ⇒ Any) {
@@ -69,7 +69,7 @@ object DataModel {
             }
         }
 
-        findTopLevelBinds(inDoc) foreach (update(_))
+        findTopLevelBind(inDoc) foreach (update(_))
     }
 
     // Update binds for automatic mode

@@ -83,8 +83,8 @@ object ControlOps {
     def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) = findBindByName(inDoc, name).orNull
 
     // Find a bind by predicate
-    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean) =
-        findTopLevelBinds(inDoc) \\ "*:bind" filter p headOption
+    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
+        findTopLevelBind(inDoc).toSeq \\ "*:bind" filter p headOption
 
     def isBindForName(bind: NodeInfo, name: String) =
         hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
@@ -149,19 +149,19 @@ object ControlOps {
         }
 
     // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
-    def findTopLevelBinds(inDoc: NodeInfo): Seq[NodeInfo] =
+    def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
         findModelElement(inDoc) \ "*:bind" filter {
             // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
             bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.attValue("id")) ||
                     bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
-        }
+        } headOption
 
     // Ensure that a tree of bind exists
     def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
 
         // Insert bind container if needed
         val model = findModelElement(inDoc)
-        val topLevelBind = findTopLevelBinds(inDoc).headOption match {
+        val topLevelBind = findTopLevelBind(inDoc).headOption match {
             case Some(bind) ⇒ bind
             case None ⇒ insert(into = model, after = model \ "*:instance" filter (hasIdValue(_, "fr-form-instance")), origin = topLevelBindTemplate).head
         }

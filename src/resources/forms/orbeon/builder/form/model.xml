@@ -231,31 +231,13 @@
                 </xf:bind>
                 <!-- Global attachments (also used by Form Runner) -->
                 <xf:bind ref="xf:instance[@id = 'fr-form-attachments']/*">
-                    <xf:bind id="css-attachment-bind" ref="css" type="xs:anyURI"/>
-                    <xf:bind id="pdf-attachment-bind" ref="pdf" type="xs:anyURI"/>
+                    <xf:bind id="css-attachment-bind"   ref="css" type="xs:anyURI"/>
+                    <xf:bind id="pdf-attachment-bind"   ref="pdf" type="xs:anyURI"/>
                 </xf:bind>
             </xf:bind>
         </xf:bind>
         <!-- Keep all @edit-ref attributes pointing to the right spot -->
         <xf:bind ref=".//@edit-ref" calculate="concat('xxf:instance(''fb-form-instance'')/root()', ../saxon:path())"/>
-    </xf:bind>
-
-    <!-- Standard Form Runner instance -->
-    <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
-        <xf:bind ref="xh:head">
-            <xf:bind ref="xf:model[@id = 'fr-form-model']">
-                <!-- Form metadata (also used by Form Runner) -->
-                <xf:bind ref="xf:instance[@id = 'fr-form-metadata']/*">
-                    <xf:bind ref="application-name" required="true()" type="xs:NCName"/>
-                    <xf:bind ref="form-name"        required="true()" type="xs:NCName"/>
-                    <!-- The constraint checks that all the titles are non-empty, not only the one currently visible -->
-                    <!-- TODO: somehow mark current title as "required" if title in other languages are missing -->
-                    <xf:bind ref="title[@xml:lang = $fb-lang]"  required="true()" constraint="not((for $t in ../title return normalize-space($t) = '') = true())"/>
-                    <xf:bind ref="description[@xml:lang = $fb-lang]"/>
-                    <xf:bind ref="logo"  type="xs:anyURI"/>
-                </xf:bind>
-            </xf:bind>
-        </xf:bind>
     </xf:bind>
 
     <!-- Metadata for Form Builder itself -->

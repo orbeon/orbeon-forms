@@ -29,6 +29,9 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
     val XXFormsIndependentFunctionsNS: Seq[String]
 
     Namespace(XXFormsIndependentFunctionsNS) {
+
+        // xxf:get-request-method()
+        Fun("get-request-method", classOf[XXFormsGetRequestMethod], 0, 0, STRING, ALLOWS_ONE)
     
         // xxf:get-request-path()
         Fun("get-request-path", classOf[XXFormsGetRequestPath], 0, 0, STRING, ALLOWS_ONE)

@@ -74,7 +74,7 @@
 
     <fileset id="war.libs" dir="lib">
 
-        <include name="orbeon-errorified-20121115.jar"/>
+        <include name="orbeon-errorified-20130510.jar"/>
 
         <!-- These JARs are checked in. They can be rebuilt with the jarjar target -->
         <include name="xerces-2.11-orbeon.jar"/>
@@ -583,7 +583,7 @@
             </lib>
             <lib dir="lib">
                 <include name="xerces-2.11-orbeon.jar"/>
-                <include name="orbeon-errorified-20121115.jar"/>
+                <include name="orbeon-errorified-20130510.jar"/>
                 <include name="scala-library-*.jar"/>
                 <include name="commons-fileupload-*.jar"/>
                 <include name="commons-lang3-*.jar"/>
@@ -636,7 +636,7 @@
                 <pathelement location="lib/commons-fileupload-1.2.2.jar"/>
                 <pathelement location="lib/log4j-1_2_15.jar"/>
                 <pathelement location="lib/scala-library-2.10.1.jar"/>
-                <pathelement location="lib/orbeon-errorified-20121115.jar"/>
+                <pathelement location="lib/orbeon-errorified-20130510.jar"/>
             </classpath>
         </taskdef>
 

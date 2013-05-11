@@ -522,6 +522,10 @@
         <class name="org.orbeon.oxf.xforms.processor.XFormsResourceServer"/>
     </processor>
 
+    <processor name="oxf:xforms-upload">
+        <class name="org.orbeon.oxf.xforms.processor.Upload"/>
+    </processor>
+
     <processor name="oxf:xforms-submission">
         <instantiation name="oxf:pipeline">
             <input name="config" href="oxf:/ops/xforms/xforms-submission.xpl"/>

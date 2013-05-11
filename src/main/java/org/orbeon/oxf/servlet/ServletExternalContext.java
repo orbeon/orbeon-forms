@@ -190,7 +190,7 @@ public class ServletExternalContext implements ExternalContext  {
                         throw new OXFException("Cannot call getParameterMap() after getInputStream() when a form was posted with multipart/form-data");
 
                     // Decode the multipart data
-                    parameterMap = Multipart.getParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
+                    parameterMap = Multipart.jGetParameterMapMultipart(pipelineContext, request, DEFAULT_HEADER_ENCODING);
 
                     // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
                     getParameterMapMultipartFormDataCalled = true;

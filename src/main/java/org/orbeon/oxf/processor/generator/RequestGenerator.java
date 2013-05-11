@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.generator;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
@@ -128,7 +129,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
                                             useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                     super.startElement("", "value", "value", newAttributes);
-                                    writeFileItem(pipelineContext, fileItem, state.isSessionScope, getXMLReceiver());
+                                    writeFileItem(pipelineContext, fileItem, state.isSessionScope, useBase64(pipelineContext, fileItem), getXMLReceiver());
                                     super.endElement("", "value", "value");
                                     super.endPrefixMapping(XMLConstants.XSD_PREFIX);
                                     super.endPrefixMapping(XMLConstants.XSI_PREFIX);
@@ -167,7 +168,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
                                             useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                     super.startElement(uri, localname, qName, newAttributes);
-                                    final String uriOrNull = writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, getXMLReceiver());
+                                    final String uriOrNull = writeFileItem(pipelineContext, context.bodyFileItem, state.isSessionScope, useBase64(pipelineContext, context.bodyFileItem), getXMLReceiver());
                                     super.endElement(uri, localname, qName);
                                     super.endPrefixMapping(XMLConstants.XSD_PREFIX);
                                     super.endPrefixMapping(XMLConstants.XSI_PREFIX);
@@ -239,63 +240,77 @@ public class RequestGenerator extends ProcessorImpl {
                 || (state.requestedStreamType != null && state.requestedStreamType.equals(XMLConstants.XS_BASE64BINARY_QNAME));
     }
 
-    private String writeFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
+    public static String writeFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, boolean useBase64, ContentHandler contentHandler) throws SAXException {
         if (!isFileItemEmpty(fileItem)) {
-            if (useBase64(pipelineContext, fileItem)) {
-                // The content of the file is streamed to the output (xs:base64Binary)
-                InputStream fileItemInputStream = null;
+            if (useBase64) {
+                writeBase64FileItem(fileItem, contentHandler);
+                return null;
+            } else
+                return writeURLFileItem(pipelineContext, fileItem, isSessionScope, contentHandler);
+        } else
+            return null;
+    }
+
+    public static void writeBase64FileItem(FileItem fileItem, ContentHandler contentHandler) throws SAXException {
+        // The content of the file is streamed to the output (xs:base64Binary)
+        InputStream fileItemInputStream = null;
+        try {
+            fileItemInputStream = fileItem.getInputStream();
+            XMLUtils.inputStreamToBase64Characters(fileItemInputStream, contentHandler);
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } finally {
+            if (fileItemInputStream != null) {
                 try {
-                    fileItemInputStream = fileItem.getInputStream();
-                    XMLUtils.inputStreamToBase64Characters(fileItemInputStream, contentHandler);
+                    fileItemInputStream.close();
                 } catch (IOException e) {
                     throw new OXFException(e);
-                } finally {
-                    if (fileItemInputStream != null) {
-                        try {
-                            fileItemInputStream.close();
-                        } catch (IOException e) {
-                            throw new OXFException(e);
-                        }
-                    }
                 }
-            } else {
-                // Only a reference to the file is output (xs:anyURI)
-                final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
-                final String uriExpiringWithRequest;
-                if (!fileItem.isInMemory()) {
-                    // File must exist on disk since isInMemory() returns false
-                    final File file = diskFileItem.getStoreLocation();
-                    uriExpiringWithRequest = file.toURI().toString();
-                } else {
-                    // File does not exist on disk, must convert
-                    // NOTE: Conversion occurs every time this method is called. Not optimal.
-                    try {
-                        uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-                }
+            }
+        }
+    }
 
-                // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
-                final String uriExpiringWithScope;
-                if (isSessionScope) {
-                    final String tempSessionURI = getContext(pipelineContext).getSessionURIForRequestURI(uriExpiringWithRequest);
-                    if (tempSessionURI == null) {
-                        uriExpiringWithScope = NetUtils.renameAndExpireWithSession(uriExpiringWithRequest, logger).toURI().toString();
-                        getContext(pipelineContext).putSessionURIForRequestURI(uriExpiringWithRequest, uriExpiringWithScope);
-                    } else
-                        uriExpiringWithScope = tempSessionURI;
-                } else
-                    uriExpiringWithScope = uriExpiringWithRequest;
-
-                final char[] chars = uriExpiringWithScope.toCharArray();
-                contentHandler.characters(chars, 0, chars.length);
-
-                return uriExpiringWithRequest;
+    public static String urlForFileItem(FileItem fileItem) throws SAXException {
+        // Only a reference to the file is output (xs:anyURI)
+        final DiskFileItem diskFileItem = (DiskFileItem) fileItem;
+        final String uriExpiringWithRequest;
+        if (!fileItem.isInMemory()) {
+            // File must exist on disk since isInMemory() returns false
+            final File file = diskFileItem.getStoreLocation();
+            uriExpiringWithRequest = file.toURI().toString();
+        } else {
+            // File does not exist on disk, must convert
+            // NOTE: Conversion occurs every time this method is called. Not optimal.
+            try {
+                uriExpiringWithRequest = NetUtils.inputStreamToAnyURI(fileItem.getInputStream(), NetUtils.REQUEST_SCOPE);
+            } catch (IOException e) {
+                throw new OXFException(e);
             }
         }
 
-        return null;
+        return uriExpiringWithRequest;
+    }
+
+    public static String writeURLFileItem(PipelineContext pipelineContext, FileItem fileItem, boolean isSessionScope, ContentHandler contentHandler) throws SAXException {
+
+        final String uriExpiringWithRequest = urlForFileItem(fileItem);
+
+        // If the content is meant to expire with the session, and we haven't yet renamed the file, then do this here.
+        final String uriExpiringWithScope;
+        if (isSessionScope) {
+            final String tempSessionURI = getContext(pipelineContext).getSessionURIForRequestURI(uriExpiringWithRequest);
+            if (tempSessionURI == null) {
+                uriExpiringWithScope = NetUtils.renameAndExpireWithSession(uriExpiringWithRequest, logger).toURI().toString();
+                getContext(pipelineContext).putSessionURIForRequestURI(uriExpiringWithRequest, uriExpiringWithScope);
+            } else
+                uriExpiringWithScope = tempSessionURI;
+        } else
+            uriExpiringWithScope = uriExpiringWithRequest;
+
+        final char[] chars = uriExpiringWithScope.toCharArray();
+        contentHandler.characters(chars, 0, chars.length);
+
+        return uriExpiringWithRequest;
     }
 
     private Document readRequestAsDOM4J(PipelineContext pipelineContext, Node config) {
@@ -535,7 +550,7 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private static boolean isFileItemEmpty(FileItem fileItem) {
-        return fileItem.getSize() <= 0 && (fileItem.getName() == null || fileItem.getName().trim().equals(""));
+        return fileItem.getSize() <= 0 && StringUtils.isBlank(fileItem.getName());
     }
 
     protected static void addBody(Element requestElement) {

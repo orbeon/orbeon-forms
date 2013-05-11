@@ -1507,9 +1507,11 @@
                                         ORBEON.xforms.Controls.setValid(documentElement, newValid);
 
                                     // Handle progress for upload controls
-                                    if (progressState != null && progressReceived != null && progressExpected != null
-                                            && progressState != "" && progressReceived != "" && progressExpected != "")
-                                        ORBEON.xforms.Page.getControl(documentElement).progress(progressState, parseInt(progressReceived), parseInt(progressExpected));
+                                    if (progressState != null && progressState != "")
+                                        ORBEON.xforms.Page.getControl(documentElement).progress(
+                                            progressState,
+                                            progressReceived != null && progressReceived != "" ? parseInt(progressReceived) : null,
+                                            progressExpected != null && progressExpected != "" ? parseInt(progressExpected) : null);
 
                                     // Handle visited flag
                                     var newVisited = ORBEON.util.Dom.getAttribute(controlElement, "visited");

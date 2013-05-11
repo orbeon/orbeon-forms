@@ -191,7 +191,7 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
         licenses foreach { case (license, expectedClass) ⇒
 
             val thrown = intercept[Exception] {
-                tryLicenseInfo(license) recoverWith recoverRootException get
+                tryLicenseInfo(license).rootFailure.get
             }
 
             assert(expectedClass === thrown.getClass)

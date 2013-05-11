@@ -89,7 +89,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
 
             def rootResource = t map getRootThrowable collect {
                 case e: ResourceNotFoundException ⇒ e.resource
-                case HttpStatusCodeException(_, Some(resource)) ⇒ resource
+                case HttpStatusCodeException(_, Some(resource), _) ⇒ resource
             }
 
             info("not found", logParams ++ (rootResource map ("resource" → _)))

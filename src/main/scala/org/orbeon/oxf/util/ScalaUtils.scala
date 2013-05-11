@@ -134,7 +134,7 @@ object ScalaUtils {
     def stringToSet(s: String)               = split[Set](s)
     def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
 
-    // Split a URL into a path and query part
+    // Split out a URL's query part
     def splitQuery(url: String): (String, Option[String]) = {
         val index = url.indexOf('?')
         if (index == -1)
@@ -177,8 +177,8 @@ object ScalaUtils {
     // The caller can specify the type of the resulting values, e.g.:
     // - combineValues[AnyRef, Array]
     // - combineValues[String, List]
-    def combineValues[U >: String, T[_]](parameters: Seq[(String, String)])(implicit cbf: CanBuildFrom[Nothing, U, T[U]]): Seq[(String, T[U])] = {
-        val result = mutable.LinkedHashMap[String, mutable.Builder[String, T[U]]]()
+    def combineValues[U, T[_]](parameters: Seq[(String, U)])(implicit cbf: CanBuildFrom[Nothing, U, T[U]]): Seq[(String, T[U])] = {
+        val result = mutable.LinkedHashMap[String, mutable.Builder[U, T[U]]]()
 
         for ((name, value) ← parameters)
             result.getOrElseUpdate(name, cbf()) += value
@@ -191,9 +191,15 @@ object ScalaUtils {
 
     // Extensions on Boolean
     implicit class BooleanWrapper(val b: Boolean) extends AnyVal {
-        def option[A](a: ⇒ A) = if (b) Option(a) else None
-        def list[A](a: ⇒ A)   = if (b) List(a) else Nil
-        def set[A](a: ⇒ A)    = if (b) Set(a)  else Set.empty[A]
+        def option[A](a: ⇒ A)   = if (b) Option(a)   else None
+        def list[A](a: ⇒ A)     = if (b) List(a)     else Nil
+        def set[A](a: ⇒ A)      = if (b) Set(a)      else Set.empty[A]
+        def iterator[A](a: ⇒ A) = if (b) Iterator(a) else Iterator.empty
+    }
+
+    // Extensions on Iterator[T]
+    implicit class IteratorWrapper[T](val i: Iterator[T]) extends AnyVal {
+        def headOption = i.hasNext option (i.next())
     }
 
     // WARNING: Remember that type erasure takes place! collectByErasedType[T[U1]] will work even if the underlying type was T[U2]!
@@ -265,9 +271,28 @@ object ScalaUtils {
         builder.result()
     }
 
-    implicit def tryToIterator[T](t: Try[T]) = t.toOption.iterator
+    private class OnFailurePF[U](f: PartialFunction[Throwable, Any]) extends PartialFunction[Throwable, Try[U]] {
+        def isDefinedAt(x: Throwable) = f.isDefinedAt(x)
+        def apply(v1: Throwable) = {
+            f.apply(v1)
+            Failure(v1)
+        }
+    }
 
-    def recoverRootException[T]: PartialFunction[Throwable, Try[T]] = {
-        case e: Exception ⇒ Failure(Exceptions.getRootThrowable(e))
+    private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = { case t: Throwable ⇒ Failure(Exceptions.getRootThrowable(t)) }
+
+    // Operations on Try
+    implicit class TryOps[U](val t: Try[U]) extends AnyVal {
+        def onFailure(f: PartialFunction[Throwable, Any]) =
+            t recoverWith new OnFailurePF(f)
+
+        def rootFailure: Try[U] = {
+            if (t.isFailure)
+                t recoverWith RootThrowablePF
+            else
+                t
+        }
+
+        def iterator: Iterator[U] = t.toOption.iterator
     }
 }

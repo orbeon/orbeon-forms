@@ -51,10 +51,9 @@ object XFormsResourceRewriter extends Logging {
             os.flush()
         }
 
-    private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Try[T]] = {
+    private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Any] = {
         case e: Exception ⇒
             error("could not read resource to aggregate", Seq("resource" → path))
-            Failure(e)
     }
 
     private def generateCSS(resources: Seq[ResourceConfig], namespaceOpt: Option[String], os: OutputStream, isMinimal: Boolean)(implicit logger: IndentedLogger): Unit = {
@@ -75,14 +74,14 @@ object XFormsResourceRewriter extends Logging {
         // - we recover and log resource read errors (a file can be missing for example during development)
         // - we don't recover when writing (writing the resources will be interupted)
         def tryInputStream(path: String) =
-            Try(rm.getContentAsStream(path)) recoverWith logFailure(path)
+            Try(rm.getContentAsStream(path)) onFailure logFailure(path)
 
         // Use iterators so that we don't open all input streams at once
         def inputStreamIterator =
             for {
                 resource ← resources.iterator
                 path     = resource.getResourcePath(isMinimal)
-                is       ← tryInputStream(path)
+                is       ← tryInputStream(path).iterator
             } yield
                 path → is
 
@@ -91,13 +90,13 @@ object XFormsResourceRewriter extends Logging {
                 val sbw = new StringBuilderWriter
                 copyReader(new InputStreamReader(is, "utf-8"), sbw)
                 sbw.toString
-            } recoverWith
+            } onFailure
                 logFailure(path)
 
         val readCSSIterator =
             for {
                 (path, is)  ← inputStreamIterator
-                originalCSS ← tryReadCSS(path, is)
+                originalCSS ← tryReadCSS(path, is).iterator
             } yield
                 path → originalCSS
 
@@ -164,11 +163,11 @@ object XFormsResourceRewriter extends Logging {
         val rm = ResourceManagerWrapper.instance
 
         def tryInputStream(path: String) =
-            Try(rm.getContentAsStream(path)) recoverWith logFailure(path)
+            Try(rm.getContentAsStream(path)) onFailure logFailure(path)
 
         // Use iterators so that we don't open all input streams at once
         def inputStreamIterator =
-            resources.iterator flatMap (r ⇒ tryInputStream(r.getResourcePath(isMinimal)))
+            resources.iterator flatMap (r ⇒ tryInputStream(r.getResourcePath(isMinimal)).iterator)
 
         // Write all resources one after the other
         inputStreamIterator foreach { is ⇒

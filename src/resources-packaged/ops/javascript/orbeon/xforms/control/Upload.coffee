@@ -56,7 +56,7 @@ class Upload extends Control
     progress: (state, received, expected) ->
         switch state
             when "interrupted" then UploadServer.uploadFailure()
-            else this.yuiProgressBar.set "value", 10 + 100 * received / expected if this.yuiProgressBar
+            else this.yuiProgressBar.set "value", 10 + 100 * received / expected if this.yuiProgressBar && received && expected
 
     # Called by UploadServer when the upload for this control is finished.
     uploadDone: () ->

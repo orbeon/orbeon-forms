@@ -82,21 +82,20 @@ object InitUtils {
             success = true
         } catch {
             case t: Throwable ⇒
-                def locationData = ValidationException.getRootLocationData(t)
+                def locationData    = Option(ValidationException.getRootLocationData(t))
+                def locationMessage = locationData map ("at " + _) getOrElse "with no location data"
 
                 Exceptions.getRootThrowable(t) match {
                     case e: HttpStatusCodeException ⇒
                         externalContext.getResponse.sendError(e.code)
-                        val message = Option(locationData) map ("HttpStatusCodeException at " + _) getOrElse "HttpStatusCodeException with no location data"
-                        logger.info(message)
+                        logger.info(e.toString + " " + locationMessage)
+                        if (logger.isDebugEnabled)
+                            logger.debug(e.throwable map OrbeonFormatter.format getOrElse "")
                     case e: ResourceNotFoundException ⇒
                         externalContext.getResponse.sendError(404)
-
-                        logger.info(
-                            "Resource not found" +
-                            (Option(e.resource)   map (": " + _)   getOrElse "") +
-                            (Option(locationData) map (" at " + _) getOrElse " with no location data"))
-                    case _ ⇒ throw t
+                        logger.info("Resource not found" + (Option(e.resource) map (": " + _) getOrElse "") + " " + locationMessage)
+                    case _ ⇒
+                        throw t
                 }
         } finally {
             if (logger.isInfoEnabled) {

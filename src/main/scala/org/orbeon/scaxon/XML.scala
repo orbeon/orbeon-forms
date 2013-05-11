@@ -23,7 +23,7 @@ import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{TransformerUtils, NamespaceMapping}
+import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils, NamespaceMapping}
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j.{Document, Attribute, QName, Element}
 import org.orbeon.saxon.pattern._
@@ -35,6 +35,7 @@ import org.orbeon.saxon.tinytree.TinyTree
 import org.orbeon.oxf.util.XPathCache
 import annotation.tailrec
 import collection._
+import org.orbeon.oxf.pipeline.api.XMLReceiver
 
 object XML {
 
@@ -445,7 +446,11 @@ object XML {
     def unwrapDocument(nodeInfo: NodeInfo): Document =
         nodeInfo.asInstanceOf[VirtualNode].getUnderlyingNode.asInstanceOf[Document]
 
+    def elemToSAX(e: Elem, xmlReceiver: XMLReceiver) =
+        XMLUtils.stringToSAX(e.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
+
     def elemToDom4j(e: Elem): Document = Dom4jUtils.readDom4j(e.toString)
+
     def elemToDocumentInfo(e: Elem, readonly: Boolean = true): DocumentInfo =
         if (readonly)
             TransformerUtils.stringToTinyTree(XPathCache.getGlobalConfiguration, e.toString, false, false)

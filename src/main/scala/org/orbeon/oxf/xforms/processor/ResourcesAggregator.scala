@@ -38,8 +38,8 @@ class ResourcesAggregator extends ProcessorImpl {
     addInputInfo(new ProcessorInputOutputInfo(ProcessorImpl.INPUT_DATA))
     addOutputInfo(new ProcessorInputOutputInfo(ProcessorImpl.OUTPUT_DATA))
 
-    override def createOutput(name: String) = {
-        val output = new ProcessorOutputImpl(ResourcesAggregator.this, name) {
+    override def createOutput(name: String) =
+        addOutput(name, new ProcessorOutputImpl(ResourcesAggregator.this, name) {
             override def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver) =
                 readInputAsSAX(pipelineContext, ProcessorImpl.INPUT_DATA,
                     if (! XFormsProperties.isCombinedResources) xmlReceiver else new SimpleForwardingXMLReceiver(xmlReceiver) {
@@ -267,10 +267,7 @@ class ResourcesAggregator extends ProcessorImpl {
 
             override def getValidityImpl(pipelineContext: PipelineContext) =
                 ProcessorImpl.getInputValidity(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA))
-        }
-        addOutput(name, output)
-        output
-    }
+        })
 }
 
 object ResourcesAggregator extends Logging {

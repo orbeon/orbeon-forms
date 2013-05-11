@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.control.controls
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.util.{NetUtils, Multipart}
+import org.orbeon.oxf.util.ScalaUtils._
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.saxon.om.NodeInfo
@@ -85,11 +86,9 @@ trait FileMetadata extends XFormsValueControl {
 
     def setFilename(filename: String): Unit = {
 
-        // Depending on web browsers, the filename may contain a path or not. Normalize and just keep the file name.
-        val normalized = filename.replaceAllLiterally("""\""", "/")
-        val index = normalized.lastIndexOf('/')
-        val justFileName = if (index == -1) normalized else normalized.substring(index + 1)
-
+        // Depending on web browsers, the filename may contain a path or not (sending the path is fairly insecure and a
+        // bad idea but some browsers do it. For consistency and security we just keep the filename.
+        val justFileName = split(filename, """\/""").lastOption getOrElse ""
         setInfoValue(filenameElement, justFileName)
     }
 

@@ -188,7 +188,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public ProcessorOutput getOutputByName(String outputName) {
-        ProcessorOutput ret = (ProcessorOutput) outputMap.get(outputName);
+        ProcessorOutput ret = outputMap.get(outputName);
         if (ret == null )
             throw new ValidationException("Exactly one output " + outputName + " is required", getLocationData());
         return ret;

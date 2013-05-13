@@ -53,6 +53,14 @@
         <xsl:apply-templates select="xh:script"/>
     </xsl:template>
 
+    <xsl:template match="xh:body">
+        <xsl:copy>
+            <xsl:apply-templates select="@* except @class"/>
+            <xsl:attribute name="class" select="string-join(('orbeon', @class), ' ')"/>
+            <xsl:apply-templates select="node()"/>
+        </xsl:copy>
+    </xsl:template>
+
     <!-- Simply copy everything that's not matched -->
     <xsl:template match="@*|node()" priority="-2">
         <xsl:copy>

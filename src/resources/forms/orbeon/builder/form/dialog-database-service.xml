@@ -65,11 +65,11 @@
                     <xf:toggle case="fb-service-dialog-none"/>
 
                     <!-- Send submission -->
-                    <xf:send submission="fb-test-submission-submission"/>
+                    <xf:send submission="fb-test-database-service-submission"/>
                 </xf:action>
 
                 <!-- Common response actions -->
-                <xf:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-submission-submission">
+                <xf:action ev:event="xforms-submit-done xforms-submit-error" ev:observer="fb-test-database-service-submission">
                     <xf:toggle case="fb-service-dialog-response"/>
                     <xf:action context="response">
                         <xf:setvalue ref="resource-uri" value="event('resource-uri')"/>
@@ -83,7 +83,7 @@
                     </xf:action>
                 </xf:action>
                 <!-- Error actions -->
-                <xf:action ev:event="xforms-submit-error" ev:observer="fb-test-submission-submission">
+                <xf:action ev:event="xforms-submit-error" ev:observer="fb-test-database-service-submission">
                     <xf:action context="response">
                         <xf:setvalue ref="error-type" value="event('error-type')"/>
                     </xf:action>

@@ -1,0 +1,73 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<form>
+    <action/>
+    <data>
+        <entries>
+            <entry>
+                <category>Apples</category>
+                <value1>10</value1>
+                <value2>11</value2>
+            </entry>
+            <entry>
+                <category>Oranges</category>
+                <value1>9</value1>
+                <value2>8</value2>
+            </entry>
+            <entry>
+                <category>Bananas</category>
+                <value1>8</value1>
+                <value2>6</value2>
+            </entry>
+            <entry>
+                <category>Berries</category>
+                <value1>7</value1>
+                <value2>10</value2>
+            </entry>
+            <entry>
+                <category>Pears</category>
+                <value1>6</value1>
+                <value2>4</value2>
+            </entry>
+        </entries>
+    </data>
+    <chart>
+        <map>fruits</map>
+        <background-color>#EFF6EF</background-color>
+        <title-color>#281154</title-color>
+        <type>vertical-bar</type>
+        <title>Sales in Unit</title>
+        <category-title>Fruits</category-title>
+        <category-margin>0.2</category-margin>
+        <serie-title>Units</serie-title>
+        <tick-unit>1.0</tick-unit>
+        <bar-margin>0.1</bar-margin>
+        <category-label-angle>0</category-label-angle>
+
+        <value title="May"
+            categories="/form/data/entries/entry/category"
+            series="/form/data/entries/entry/value1"
+            color="#ff0000"/>
+
+        <value title="June"
+            categories="/form/data/entries/entry/category"
+            series="/form/data/entries/entry/value2"
+            color="#00ff00"/>
+
+        <legend visible="true" position="south"/>
+
+        <x-size>500</x-size>
+        <y-size>375</y-size>
+    </chart>
+</form>

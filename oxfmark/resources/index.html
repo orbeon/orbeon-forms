@@ -1,0 +1,62 @@
+<html>
+<head>
+
+<SCRIPT LANGUAGE="JavaScript"> 
+var javawsInstalled = 0; 
+var javaws12Installed = 0; 
+var javaws142Installed=0; 
+isIE = "false"; 
+if (navigator.mimeTypes && navigator.mimeTypes.length) { 
+   x = navigator.mimeTypes['application/x-java-jnlp-file']; 
+   if (x) { 
+      javawsInstalled = 1; 
+      javaws12Installed=1; 
+      javaws142Installed=1; 
+   } 
+} 
+else { 
+   isIE = "true"; 
+} 
+</SCRIPT>
+
+<SCRIPT LANGUAGE="VBScript">
+on error resume next
+If isIE = "true" Then
+  If Not(IsObject(CreateObject("JavaWebStart.isInstalled"))) Then
+     javawsInstalled = 0
+  Else
+     javawsInstalled = 1
+  End If
+  If Not(IsObject(CreateObject("JavaWebStart.isInstalled.2"))) Then
+     javaws12Installed = 0
+  Else
+     javaws12Installed = 1
+  End If
+  If Not(IsObject(CreateObject("JavaWebStart.isInstalled.1.4.2.0"))) Then
+     javaws142Installed = 0
+  Else
+     javaws142Installed = 1
+  End If  
+End If
+</SCRIPT>
+
+</head>
+
+<body>
+
+<SCRIPT LANGUAGE="JavaScript">
+/* Note that the logic below always launches the JNLP application
+ *if the browser is Gecko based. This is because it is not possible
+ *to detect MIME type application/x-java-jnlp-file on Gecko-based browsers. 
+ */
+if (javawsInstalled || (navigator.userAgent.indexOf("Gecko") !=-1)) {
+    document.write('<a href="http://www.orbeon.com/public/oxfmark/oxfmark.jnlp">Start OXF Mark</a>');
+} else {
+    document.write("Click ");
+    document.write('<a href="http://java.sun.com/PluginBrowserCheck?pass=http://shanghai/jre.html&fail=http://java.sun.com/j2se/1.4.2/download.html">here</a>');
+    document.write("to download and install JRE 1.4.2 and the application.");
+}
+</SCRIPT>
+
+</body>
+</html>

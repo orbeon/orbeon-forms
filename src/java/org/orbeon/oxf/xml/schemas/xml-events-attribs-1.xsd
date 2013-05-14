@@ -28,7 +28,7 @@
       This is the XML Schema for XML Events global attributes
 
       URI: http://www.w3.org/MarkUp/SCHEMA/xml-events-attribs-1.xsd
-      $Id: xml-events-attribs-1.xsd,v 1.1 2004/08/21 20:06:31 ebruchez Exp $
+      $Id: xml-events-attribs-1.xsd,v 1.1.1.1 2004/08/21 20:06:31 ebruchez Exp $
     </xs:documentation>
     <xs:documentation source="xml-events-copyright-1.xsd"/>
   </xs:annotation>

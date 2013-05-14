@@ -1,0 +1,19 @@
+<jnlp spec="1.0+" codebase="http://shanghai/" href="oxfmark.jnlp">
+    <information>
+        <title>OXF Mark</title>
+        <vendor>Orbeon, Inc.</vendor>
+        <homepage href="http://www.orbeon.com/oxf/"/>
+        <description>OXF Mark - The Java Server-side Performance Benchmark</description>
+        <icon href="icon32.gif" width="32" height="32"/>
+        <icon href="icon64.gif" width="64" height="64"/>
+        <offline-allowed/>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.4" initial-heap-size="256m" max-heap-size="256m"/>
+        <jar href="oxfmark.jar"/>
+    </resources>
+    <application-desc main-class="org.orbeon.oxfmark.OXFMark"/>
+</jnlp>

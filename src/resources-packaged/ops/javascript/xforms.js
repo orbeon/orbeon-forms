@@ -791,9 +791,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     handler: function(bits) {
                         var d;
                         if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
-                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
-                        } else {
+                            // Day first
                             d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[2], 10) - 1, parseInt(bits[1], 10));
+                        } else {
+                            // Month first
+                            d = ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._currentYear, parseInt(bits[1], 10) - 1, parseInt(bits[2], 10));
                         }
                         return d;
                     }

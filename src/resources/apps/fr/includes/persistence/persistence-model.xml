@@ -335,7 +335,7 @@
         validate="false"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (instance('fr-pdf-service-instance') != '') then instance('fr-pdf-service-instance') else xxf:instance('fr-form-instance')"
+        ref="if (tokenize(instance('fr-send-submission-params')/@content, '\s+') = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="all">
         <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
         <xf:action ev:event="xforms-submit">
@@ -349,7 +349,7 @@
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
-        <params uri="" prune="" method="" serialization=""/>
+        <params uri="" prune="" method="" content="" serialization=""/>
     </xf:instance>
 
     <xf:submission id="fr-send-submission-none"
@@ -358,7 +358,7 @@
         validate="false"
         method="{event('method')}"
         serialization="{if (event('method') = 'get') then 'none' else 'application/xml'}"
-        ref="if (instance('fr-pdf-service-instance') != '') then instance('fr-pdf-service-instance') else xxf:instance('fr-form-instance')"
+        ref="if (tokenize(instance('fr-send-submission-params')/@content, '\s+') = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="none"/>
 
     <!-- Call email service -->
@@ -370,9 +370,9 @@
     <xf:submission id="fr-pdf-service-submission"
         resource="/fr/service/{$app}/{$form}/pdf/{$document}?fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"
         relevant="false" validate="false" method="post" ref="xxf:instance('fr-form-instance')"
-        replace="instance" instance="fr-pdf-service-instance"/>
+        replace="instance" instance="fr-pdf-url-instance"/>
 
-    <xf:instance id="fr-pdf-service-instance">
+    <xf:instance id="fr-pdf-url-instance">
         <uri/>
     </xf:instance>
 

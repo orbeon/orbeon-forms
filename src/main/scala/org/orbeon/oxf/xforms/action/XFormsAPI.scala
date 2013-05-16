@@ -248,7 +248,7 @@ object XFormsAPI {
 
     private val SubmitEvents = Seq("xforms-submit-done", "xforms-submit-error")
 
-    // The xf:send action
+    // xf:send
     // Send the given submission and applies the body with the resulting event if the submission completed
     def send[T](submissionId: String, properties: PropertyGetter = EmptyGetter)(body: XFormsEvent ⇒ T): Option[T] = {
 
@@ -280,6 +280,7 @@ object XFormsAPI {
 
     class SubmitException(e: XFormsSubmitErrorEvent) extends RuntimeException
 
+    // xf:send which throws a SubmitException in case of error
     def sendThrowOnError(submissionId: String, properties: PropertyGetter = EmptyGetter): Option[XFormsSubmitDoneEvent] =
         XFormsAPI.send(submissionId, properties) {
             case done:  XFormsSubmitDoneEvent  ⇒ done

@@ -205,9 +205,11 @@
     <property as="xs:string"  name="oxf.fr.detail.send.success.replace.*.*"                     value="all"/>
     <property as="xs:string"  name="oxf.fr.detail.send.success.method.*.*"                      value="post"/>
     <property as="xs:boolean" name="oxf.fr.detail.send.success.prune.*.*"                       value="true"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.success.content.*.*"                     value="xml"/>
     <property as="xs:string"  name="oxf.fr.detail.send.error.replace.*.*"                       value="all"/>
     <property as="xs:boolean" name="oxf.fr.detail.send.error.prune.*.*"                         value="true"/>
     <property as="xs:string"  name="oxf.fr.detail.send.error.method.*.*"                        value="get"/>
+    <property as="xs:string"  name="oxf.fr.detail.send.error.content.*.*"                       value="xml"/>
 
     <property as="xs:anyURI"  name="oxf.fr.detail.close.uri.*.*"                                value=""/>
 

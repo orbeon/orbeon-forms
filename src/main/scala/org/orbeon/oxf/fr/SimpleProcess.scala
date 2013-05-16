@@ -23,10 +23,11 @@ import org.orbeon.scaxon.XML._
 import annotation.tailrec
 import collection.breakOut
 import collection.mutable.ListBuffer
-import util.{Success, Try}
+import scala.util.{Success, Try}
 import util.control.{ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.common.OXFException
+import org.apache.commons.lang3.StringUtils
 
 // Implementation of simple processes
 //
@@ -133,7 +134,7 @@ object SimpleProcess extends Actions with Logging {
         }
     }
 
-    // Main entry point for starting the process associated with a named button
+    // Main entry point for starting a process associated with a named button
     def runProcessByName(name: String): Unit =
         runProcess(rawProcessByName(name))
 
@@ -148,14 +149,18 @@ object SimpleProcess extends Actions with Logging {
     def runProcess(process: String): Try[Any] = {
         implicit val logger = containingDocument.getIndentedLogger("process")
         withDebug("running process", Seq("process" → process)) {
-            tryBreakable {
-                runSubProcess(process) recoverWith { case _ ⇒
-                    // Send a final error if there is one
-                    tryErrorMessage(Map(Some("message") → "process-error"))
+            beforeProcess() flatMap { _ ⇒
+                tryBreakable {
+                    runSubProcess(process) recoverWith { case _ ⇒
+                        // Send a final error if there is one
+                        tryErrorMessage(Map(Some("message") → "process-error"))
+                    }
+                } catchBreak {
+                    // For now consider a break as a success
+                    Success(())
                 }
-            } catchBreak {
-                Success(())
-            }
+            } doEitherWay
+                afterProcess()
         }
     }
 
@@ -219,12 +224,18 @@ object SimpleProcess extends Actions with Logging {
     def tryProcess(params: ActionParams): Try[Any] =
         Try(params.get(Some("name")) getOrElse params(None)) map rawProcessByName flatMap runSubProcess
 
+    // NOTE: Clear the PDF URL *before* the process, because if we clear it after, it will be already cleared during the
+    // second pass of a two-pass submission.
+    // TODO: Delete temp file if any.
+    def beforeProcess(): Try[Any] = Try(setvalue(pdfURLInstanceRootElement, ""))
+    def afterProcess():  Try[Any] = Try(())
+
     // Legacy: build "workflow-send" process based on properties
     private def buildProcessFromLegacyProperties(buttonName: String)(implicit p: FormRunnerParams) = {
 
         implicit val logger = containingDocument.getIndentedLogger("process")
 
-        def booleanPropertySet(name: String) = formRunnerProperty(name) exists (_ == "true")
+        def booleanPropertySet(name: String) = booleanFormRunnerProperty(name)
         def stringPropertySet (name: String) = formRunnerProperty(name) flatMap nonEmptyOrNone isDefined
 
         buttonName match {
@@ -232,10 +243,6 @@ object SimpleProcess extends Actions with Logging {
                 val isLegacySendEmail       = booleanPropertySet("oxf.fr.detail.send.email")
                 val isLegacyNavigateSuccess = stringPropertySet("oxf.fr.detail.send.success.uri")
                 val isLegacyNavigateError   = stringPropertySet("oxf.fr.detail.send.error.uri")
-
-                def isLegacyCreatePDF =
-                    isLegacySendEmail       && booleanPropertySet("oxf.fr.email.attach-pdf")  ||
-                    isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
 
                 val buffer = ListBuffer[String]()
 
@@ -247,16 +254,16 @@ object SimpleProcess extends Actions with Logging {
                 buffer += ThenCombinator.name
                 buffer += """success-message("save-success")"""
 
-                if (isLegacyCreatePDF) {
-                    buffer += ThenCombinator.name
-                    buffer += "pdf"
-                }
-
                 if (isLegacySendEmail) {
                     buffer += ThenCombinator.name
                     buffer += "email"
                 }
 
+                def isLegacyCreatePDF =
+                    isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
+
+                // TODO: Pass `content = "pdf-url"` if isLegacyCreatePDF. Requires better parsing of process arguments.
+                // Workaround is to change config from oxf.fr.detail.send.pdf = true to oxf.fr.detail.send.success.content = "pdf-url"
                 if (isLegacyNavigateSuccess) {
                     buffer += ThenCombinator.name
                     buffer += """send("oxf.fr.detail.send.success")"""
@@ -284,7 +291,6 @@ trait Actions {
         "save"                        → trySaveAttachmentsAndData,
         "success-message"             → trySuccessMessage,
         "error-message"               → tryErrorMessage,
-        "pdf"                         → tryCreatePDF,
         "email"                       → trySendEmail,
         "send"                        → trySend,
         "navigate"                    → tryNavigate,
@@ -416,11 +422,15 @@ trait Actions {
                 dispatch(name = "fr-verify", targetId = "captcha")
         }
 
-    def tryCreatePDF(params: ActionParams): Try[Any] =
-        Try(sendThrowOnError("fr-pdf-service-submission"))
-
     def trySendEmail(params: ActionParams): Try[Any] =
-        Try(sendThrowOnError("fr-email-service-submission"))
+        Try {
+            // NOTE: As of 2013-05-15, email-form.xpl recreates the PDF anyway, which is wasteful
+//            implicit val formRunnerParams = FormRunnerParams()
+//            if (booleanFormRunnerProperty("oxf.fr.email.attach-pdf"))
+//                tryCreatePDFIfNeeded(Map()).get
+
+            sendThrowOnError("fr-email-service-submission")
+        }
 
     def trySend(params: ActionParams): Try[Any] =
         Try {
@@ -432,11 +442,12 @@ trait Actions {
             val Defaults = Map(
                 "method"  → "post",
                 "prune"   → "true",
-                "replace" → "none"
+                "replace" → "none",
+                "content" → "xml"
             )
 
             val propertiesAsPairs =
-                Seq("uri", "method", "prune", "replace") map (key ⇒ key → (formRunnerProperty(prefix + "." + key) orElse Defaults.get(key)))
+                Seq("uri") ++ Defaults.keys map (key ⇒ key → (formRunnerProperty(prefix + "." + key) orElse Defaults.get(key)))
 
             // Append query parameters to the URL
             val withUpdatedURI =
@@ -446,6 +457,10 @@ trait Actions {
                 }
 
             val propertiesAsMap = withUpdatedURI.toMap
+
+            // Create PDF if needed
+            if (stringOptionToSet(propertiesAsMap("content")) exists (x ⇒  Set("pdf", "pdf-url")(x)))
+                tryCreatePDFIfNeeded(Map()).get
 
             // TODO: Remove duplication once @replace is an AVT
             val replace = if (propertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
@@ -506,9 +521,20 @@ trait Actions {
     def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = "fr-sections-model"))
     def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = "fr-sections-model"))
 
+    // Navigate the wizard to the previous page
     def tryWizardPrev(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-prev", targetId = "fr-view-wizard"))
 
+    // Navigate the wizard to the next page
     def tryWizardNext(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
+
+    def pdfURLInstanceRootElement = topLevelInstance("fr-persistence-model", "fr-pdf-url-instance").get.rootElement
+
+    def tryCreatePDFIfNeeded(params: ActionParams): Try[Any] =
+        Try{
+            // Only create if not available yet
+            if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
+                sendThrowOnError("fr-pdf-service-submission")
+        }
 }

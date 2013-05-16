@@ -57,6 +57,10 @@ object FormRunner {
     def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =
         Option(properties.getObject(buildPropertyName(name))) map (_.toString)
 
+    // Return a boolean property using the form's app/name, false if the property is not defined
+    def booleanFormRunnerProperty(name: String)(implicit p: FormRunnerParams) =
+        Option(properties.getObject(buildPropertyName(name))) map (_.toString) exists (_ == "true")
+
     type UserRoles = {
         def getRemoteUser(): String
         def isUserInRole(role: String): Boolean

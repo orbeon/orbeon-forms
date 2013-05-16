@@ -22,7 +22,8 @@ import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
 import collection.mutable
 import collection.generic.CanBuildFrom
 import reflect.ClassTag
-import util.{Failure, Try}
+import scala.util.{Success, Failure, Try}
+import scala.util.control.NonFatal
 
 object ScalaUtils {
 
@@ -292,6 +293,14 @@ object ScalaUtils {
             else
                 t
         }
+
+        def doEitherWay(f: ⇒ Any): Try[U] =
+            try t match {
+                case result @ Success(_) ⇒ f; result
+                case result @ Failure(_) ⇒ f; result
+            } catch {
+                case NonFatal(e) ⇒ Failure(e)
+            }
 
         def iterator: Iterator[U] = t.toOption.iterator
     }

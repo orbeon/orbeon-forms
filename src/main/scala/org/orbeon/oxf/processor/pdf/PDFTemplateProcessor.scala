@@ -102,9 +102,9 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             // Add substitution fonts for Acrobat fields
             for (element ← Dom4jUtils.elements(configRoot, "substitution-font").asScala) {
                 val fontFamilyOrPath = decodeURL(element.attributeValue("font-family"), "utf-8")
-                val embed            = embedCode(element.attributeValue("embed") == "true")
+                val embed            = element.attributeValue("embed") == "true"
 
-                try initialContext.acroFields.addSubstitutionFont(BaseFont.createFont(fontFamilyOrPath, BaseFont.IDENTITY_H, embed))
+                try initialContext.acroFields.addSubstitutionFont(createFont(fontFamilyOrPath, embed))
                 catch {
                     case e: Exception ⇒
                         warn("could not load font", Seq(
@@ -234,7 +234,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
             val value          = Option(context.att("value")) getOrElse context.att("ref")
             val fontAttributes = context.getFontAttributes
 
-            val baseFont = BaseFont.createFont(fontAttributes.fontFamily, BaseFont.IDENTITY_H, embedCode(fontAttributes.embed))
+            val baseFont = createFont(fontAttributes.fontFamily, fontAttributes.embed)
 
             // Write value
             context.contentByte.beginText()
@@ -264,7 +264,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
         val text           = context.evaluateAsString(value)
 
         val fontAttributes = context.getFontAttributes
-        val baseFont = BaseFont.createFont(fontAttributes.fontFamily, BaseFont.IDENTITY_H, embedCode(fontAttributes.embed))
+        val baseFont = createFont(fontAttributes.fontFamily, fontAttributes.embed)
 
         val barcode = createBarCode(barcodeType)
 
@@ -344,7 +344,7 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
     def stampGrid(context: ElementContext): Unit = {
         val topPosition = 10f
-        val baseFont = BaseFont.createFont("Courier", BaseFont.CP1252, BaseFont.NOT_EMBEDDED)
+        val baseFont = createFont("Courier", embed = false)
 
         val contentByte = context.contentByte
         val width = context.pageWidth
@@ -399,8 +399,6 @@ object PDFTemplateProcessor {
         case "EAN"     ⇒ new BarcodeEAN
         case _         ⇒ new Barcode39
     }
-
-    def embedCode(embed: Boolean) = if (embed) BaseFont.EMBEDDED else BaseFont.NOT_EMBEDDED
 
     case class FontAttributes(fontPitch: Float, fontFamily: String, fontSize: Float, embed: Boolean)
 
@@ -462,5 +460,42 @@ object PDFTemplateProcessor {
 
             FontAttributes(newFontPitch, newFontFamily, newFontSize, att("embed") == "true")
         }
+    }
+
+    // Create a font
+    def createFont(fontFamilyOrPath: String, embed: Boolean) =
+        BaseFont.createFont(fontFamilyOrPath, findFontEncoding(fontFamilyOrPath), embed)
+
+    // PDF built-in fonts
+    val BuiltinFonts = Set(
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Symbol",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats"
+    )
+
+    // Find an encoding suitable for the given font family
+    def findFontEncoding(fontFamilyName: String) = {
+
+        // The reason we do this is that specifying Identity-H or Identity-V with a Type1 font always fails as iText
+        // tries to find an actual character encoding based on the value passed. For other font types, Identity-H and
+        // Identity-V are handled.
+        def isType1Font(name: String) =
+            BuiltinFonts(name) || (split(name, """.""").lastOption map (_.toLowerCase) exists Set("afm", "pfm"))
+
+        if (isType1Font(fontFamilyName))
+            BaseFont.CP1252
+        else
+            BaseFont.IDENTITY_H
     }
 }

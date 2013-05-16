@@ -92,7 +92,7 @@
             <xsl:variable name="barcode-value" select="upper-case($parameters/document)" as="xs:string?"/>
             <xsl:if test="normalize-space($barcode-value) != '' and xpl:property(string-join(('oxf.fr.detail.pdf.barcode', $parameters/app, $parameters/form), '.'))">
                 <group ref="/*" font-pitch="15.9" font-family="Courier" font-size="12">
-                    <barcode left="50" top="780" height="15" value="'{$barcode-value}'"/>
+                    <barcode left="80" top="800" height="15" value="'{$barcode-value}'"/>
                 </group>
             </xsl:if>
 

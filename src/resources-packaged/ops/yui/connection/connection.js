@@ -583,7 +583,8 @@ YAHOO.util.Connect =
 
 		try
 		{
-			if((o.conn.status !== undefined && o.conn.status !== 0) || xdrS){
+            // Orbeon change. See http://wiki.orbeon.com/forms/developer-documentation/yahoo-ui-library-yui
+			if((o.conn && o.conn.status !== undefined && o.conn.status !== 0) || xdrS){
 				// XDR requests will not have HTTP status defined. The
 				// statusText property will define the response status
 				// set by the Flash transport.

@@ -302,10 +302,10 @@
   padding-left: 8px;
   white-space: nowrap;
 }
-.orbeon .xforms-upload-size:before {
+.orbeon .xforms-upload-size:not(:empty):before {
   content: "(";
 }
-.orbeon .xforms-upload-size:after {
+.orbeon .xforms-upload-size:not(:empty):after {
   content: ")";
 }
 .orbeon .xforms-upload-remove {

@@ -544,14 +544,14 @@
         <xsl:if test="not($hide-buttons-bar)">
             <xh:span class="fr-buttons">
                 <xsl:choose>
-                    <!-- In PDF mode, don't include anything -->
+                    <!-- PDF mode: don't include anything -->
                     <xsl:when test="$mode = 'pdf'"/>
-                    <!-- Use user-provided buttons -->
+                    <!-- Use custom buttons -->
                     <xsl:when test="exists($custom-buttons)">
                         <!-- Copy all the content -->
                         <xsl:apply-templates select="$custom-buttons/node()"/>
                     </xsl:when>
-                    <!-- Test mode -->
+                    <!-- Test mode: validate button -->
                     <xsl:when test="$mode = 'test'">
                         <xsl:variable name="b" as="node()*">
                             <fr:validate-button appearance="xxf:inverse"/>

@@ -328,6 +328,7 @@
                 <!-- Try to match the current form language, or use the first language available if not found -->
                 <!-- NOTE: Put this in the view, as the variable doesn't update properly if in the model.
                      See: https://github.com/orbeon/orbeon-forms/issues/738 -->
+                <!-- NOTE: This won't be needed once all code uses xxf:r(). -->
                 <xf:var name="form-resources"
                         value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]" as="element(resource)"/>
 

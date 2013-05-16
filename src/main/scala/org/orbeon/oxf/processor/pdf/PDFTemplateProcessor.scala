@@ -187,9 +187,9 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
                     contextPosition = contextPosition,
                     offsetX         = context.resolveFloat("offset-x",     context.offsetX, context.offsetX),
                     offsetY         = context.resolveFloat("offset-y",     context.offsetY, context.offsetY),
-                    fontPitch       = context.resolveFloat("font-pitch",   context.fontPitch, context.fontPitch),
+                    fontPitch       = context.resolveFloat("font-pitch",   0f, context.fontPitch),
                     fontFamily      = context.resolveString("font-family", context.fontFamily),
-                    fontSize        = context.resolveFloat("font-size",    context.fontSize, context.fontSize))
+                    fontSize        = context.resolveFloat("font-size",    0f, context.fontSize))
 
             handleElements(newGroupContext, Dom4jUtils.elements(newGroupContext.element).asScala)
         }

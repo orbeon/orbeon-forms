@@ -54,7 +54,7 @@
             // Are we done, or do we still need to handle events for other forms?
             this.continueWithRemainingEvents();
         } else {
-            UploadServer.cancel(false);
+            UploadServer.cancel(false, 'xxforms-upload-error');
         }
     };
 
@@ -137,16 +137,16 @@
     };
 
     /**
-     * Cancels the uploads currently in process. This is called by the control, which delegates canceling to the
+     * Cancels the uploads currently in process. This can be called by the control, which delegates canceling to the
      * UploadServer as it can't know about other controls being "uploaded" at the same time. Indeed, we can have
      * uploads for multiple files at the same time, and for each one of the them, we want to clear the upload field,
      * and switch back to the empty state so users can again select a file to upload.
      */
-    UploadServer.cancel = function(doAbort) {
+    UploadServer.cancel = function(doAbort, event) {
         if (doAbort) Connect.abort(UploadServer.yuiConnection);
+        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, event)], false);
         this.processingEvent.upload.clear();
         this.processingEvent.upload.setState("empty");
-        AjaxServer.fireEvents([new AjaxServer.Event(null, this.processingEvent.upload.container.id, null, "xxforms-upload-cancel")], false);
         this.continueWithRemainingEvents();
     };
 

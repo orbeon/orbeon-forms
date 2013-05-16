@@ -55,7 +55,7 @@ class Upload extends Control
     # @param {number} expected     Total number of bytes the server expects
     progress: (state, received, expected) ->
         switch state
-            when "interrupted" then UploadServer.uploadFailure()
+            when "interrupted" then UploadServer.cancel(true)
             else this.yuiProgressBar.set "value", 10 + 100 * received / expected if this.yuiProgressBar && received && expected
 
     # Called by UploadServer when the upload for this control is finished.
@@ -72,7 +72,7 @@ class Upload extends Control
     # When users press on the cancel link, we cancel the upload, delegating this to the UploadServer.
     cancel: (event) ->
         Event.preventDefault event
-        UploadServer.cancel()
+        UploadServer.cancel(true)
 
     # Sets the state of the control to either "empty" (no file selected, or upload hasn't started yet), "progress"
     # (file is being uploaded), or "file" (a file has been uploaded).

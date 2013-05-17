@@ -86,6 +86,7 @@
 
     <!-- Deployed forms services -->
     <service path="/fr/service/resource/form" view="persistence/resource/form.xpl"/>
+    <service path="/fr/service/([^/]+)/reindex" model="persistence/reindex.xpl"/>
 
     <!-- ==== Internationalization ================================================================================= -->
 

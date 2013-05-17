@@ -488,7 +488,8 @@ object FormRunner {
         //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
         (connectionResult.statusCode == 200 && connectionResult.hasContent) option
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, false, false)
+                // do process XInclude, so FB's model gets included
+                TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, true, false)
             }
     }
 }

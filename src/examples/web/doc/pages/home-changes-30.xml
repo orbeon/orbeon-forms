@@ -47,7 +47,25 @@
             </p>
         </section>
         <section>
-            <title>Changes in Verion 3.0.1</title>
+            <title>Changes in Version 3.0.2</title>
+            <p>
+                OPS 3.0.2 is a minor update containing the following changes:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Some memory leaks in the cache involving the XForms Classic and XSLT have been fixed.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The Resource Server processor no longer locks the files it serves.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Changes in Version 3.0.1</title>
             <p>
                 OPS 3.0.1 is a minor update containing the following changes:
             </p>

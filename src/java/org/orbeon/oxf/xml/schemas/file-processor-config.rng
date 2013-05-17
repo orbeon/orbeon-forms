@@ -1,0 +1,29 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns="http://relaxng.org/ns/structure/1.0">
+    <element name="delete">
+        <interleave>
+            <element name="file">
+                <data type="string"/>
+            </element>
+            <optional>
+                <element name="directory">
+                    <data type="string"/>
+                </element>
+            </optional>
+        </interleave>
+    </element>
+    <!-- In the future, we can support other operations -->
+</element>

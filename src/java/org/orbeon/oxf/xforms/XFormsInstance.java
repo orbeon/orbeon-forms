@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -280,52 +283,6 @@ public class XFormsInstance implements XFormsEventTarget {
         read(th);
     }
 
-    /**
-     * This allows dumping all the current MIPs applying to this instance.
-     */
-    public void logMIPs() {
-
-        final Document result = Dom4jUtils.createDocument();
-
-        getDocument().accept(new VisitorSupport() {
-
-            private Element rootElement = result.addElement("mips");
-            private Element currentElement;
-
-            public final void visit(Element element) {
-                currentElement = rootElement.addElement("element");
-                currentElement.addAttribute("qname", element.getQualifiedName());
-                currentElement.addAttribute("namespace-uri", element.getNamespaceURI());
-
-                addMIPInfo(currentElement, element);
-            }
-
-            public final void visit(Attribute attribute) {
-                final Element attributeEement = currentElement.addElement("attribute");
-                attributeEement.addAttribute("qname", attribute.getQualifiedName());
-                attributeEement.addAttribute("namespace-uri", attribute.getNamespaceURI());
-                addMIPInfo(attributeEement, attribute);
-            }
-
-            private final void addMIPInfo(Element parentInfoElement, Node node) {
-                final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(node);
-                parentInfoElement.addAttribute("readonly", Boolean.toString(instanceData.getReadonly().get()));
-                parentInfoElement.addAttribute("relevant", Boolean.toString(instanceData.getRelevant().get()));
-                parentInfoElement.addAttribute("required", Boolean.toString(instanceData.getRequired().get()));
-                parentInfoElement.addAttribute("valid", Boolean.toString(instanceData.getValid().get()));
-                final String typeAsString = instanceData.getType().getAsString();
-                parentInfoElement.addAttribute("type", (typeAsString == null) ? "" : typeAsString);
-//                parentInfoElement.addAttribute("schema-error-messages", instanceData.getSchemaErrorsMsgs());
-            }
-        });
-
-        XFormsUtils.logDebugDocument("MIPs: ", result);
-    }
-
-
-    /**
-     * @deprecated legacy XForms engine
-     */
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
         ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_FORWARD_INSTANCE_DOCUMENT);

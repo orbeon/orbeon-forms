@@ -161,7 +161,6 @@ public class ImageServer extends ProcessorImpl {
                     Object transforms = XPathUtils.selectObjectValue(imageConfigDocument, "/image/transform");
                     if (transforms != null && transforms instanceof Node)
                         transforms = Collections.singletonList(transforms);
-                    result.transforms = transforms;
                     result.transformIterator = XPathUtils.selectIterator(imageConfigDocument, "/image/transform");
 
                     return result;

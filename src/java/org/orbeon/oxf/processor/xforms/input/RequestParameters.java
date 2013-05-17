@@ -34,7 +34,6 @@ import java.util.*;
 public class RequestParameters {
 
     private static final Map actionClasses = new HashMap();
-    private PipelineContext pipelineContext;
 
     static {
         actionClasses.put("insert", Insert.class);
@@ -52,7 +51,6 @@ public class RequestParameters {
 
     public RequestParameters(PipelineContext pipelineContext, Document requestDocument) {
         try {
-            this.pipelineContext = pipelineContext;
             List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
             if (XFormsUtils.isHiddenEncryptionEnabled()) {
@@ -90,26 +88,26 @@ public class RequestParameters {
                     String sizeName = s;
 
                     // Store file in instance
-                    addValue(fileName, values, type);
+                    addValue(pipelineContext, fileName, values, type);
 
                     // Store other information about file
                     if (filenameName.length() > 0) {
                         String filenameFromRequest = parameterElement.element("filename").getStringValue();
                         List vals = new ArrayList();
                         vals.add(filenameFromRequest);
-                        addValue(filenameName, vals, null);
+                        addValue(pipelineContext, filenameName, vals, null);
                     }
                     if (name.startsWith("$upload^") && mediatypeName.length() > 0) {
                         String contentTypeFromRequest = parameterElement.element("content-type").getStringValue();
                         List vals = new ArrayList();
                         vals.add(contentTypeFromRequest);
-                        addValue(mediatypeName, vals, null);
+                        addValue(pipelineContext, mediatypeName, vals, null);
                     }
                     if (name.startsWith("$upload^") && sizeName.length() > 0) {
                         String contentLengthFromRequest = parameterElement.element("content-length").getStringValue();
                         List vals = new ArrayList();
                         vals.add(contentLengthFromRequest);
-                        addValue(sizeName, vals, null);
+                        addValue(pipelineContext, sizeName, vals, null);
                     }
 
                 } else if (name.startsWith("$action^") || name.startsWith("$actionImg^")) {
@@ -155,7 +153,7 @@ public class RequestParameters {
                         actions.add(action);
                     }
                 } else if (name.startsWith("$node^")) {
-                    addValue(name, values, type);
+                    addValue(pipelineContext, name, values, type);
                 }
             }
         } catch (IOException e) {
@@ -170,10 +168,10 @@ public class RequestParameters {
     /**
      * Adds (id -> value) in idToValue. If there is already a value for this id,
      * concatenates the two values by adding a space.
-     * <p/>
+     * 
      * Also store the value type in idToType if present.
      */
-    private void addValue(String name, List values, String type) {
+    private void addValue(PipelineContext pipelineContext, String name, List values, String type) {
         String idString = name.substring("$node^".length());
         if (XFormsUtils.isNameEncryptionEnabled())
             idString = SecureUtils.decrypt(pipelineContext, encryptionKey, idString);

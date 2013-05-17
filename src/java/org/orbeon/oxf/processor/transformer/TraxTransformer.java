@@ -104,6 +104,7 @@ public class TraxTransformer extends ProcessorImpl {
                             final String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
                             transformerFactory = TransformerUtils.getFactory(transformerClass);
                         }
+                        // TODO: If we were to use setURIResolver(), be careful to null it afterwards so that no ref to TransformerURIResolver occurs
                         templatesHandler = transformerFactory.newTemplatesHandler();
 
 

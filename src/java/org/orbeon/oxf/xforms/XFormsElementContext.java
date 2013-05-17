@@ -127,4 +127,15 @@ public class XFormsElementContext extends XFormsControls {
                 : node instanceof Attribute ? ((Attribute) node).getValue()
                 : null;
     }
+
+    public void destroy() {
+        // HACK: this is a temp hack to help with a memory leak (XPath cache -> FunctionLibrary issue)
+        pipelineContext = null;
+        contentHandler = null;
+        repeatIdToIndex = null;
+        elements = null;
+        namespaceSupport = null;
+
+        super.destroy();
+    }
 }

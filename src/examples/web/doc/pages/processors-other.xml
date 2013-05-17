@@ -1,0 +1,386 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <header>
+        <title>Other Processors</title>
+    </header>
+    <body>
+        <a name="file-processor"/>
+        <section>
+            <title>File Processor</title>
+            <p>
+                The File Processor allows you to delete files on disk. In the future, it may be
+                enhanced to provide more actions such as renaming files, moving files, etc.
+            </p>
+            <section>
+                <title>Inputs and Outputs</title>
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                        <th>Mandatory</th>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td>
+                            <code>config</code>
+                        </td>
+                        <td>Configuration</td>
+                        <td align="center">Yes</td>
+                    </tr>
+                </table>
+                <p>
+                    The <code>config</code> input contains a single <code>delete</code> element. In
+                    turn, it contains a <code>file</code> element which specifies the name of the
+                    file to delete, and an optional <code>directory</code> element containing a base
+                    directory against which the file name is resolved.
+                </p>
+                <p>
+                    If the file exists and is writable, the processor attempts to delete it.
+                    Otherwise, no attempt is made. If an attempt is made and deleting fails, an
+                    exception is raised.
+                </p>
+            </section>
+            <section>
+                <title>Example</title>
+                <p>
+                    The following is an example of a pipeline running the File Processor in order to
+                    delete a file called <code>SomeImpossibleFileName.jpg</code> present under the
+                    <code>C:/TEMP</code> directory.
+                </p>
+                <xml-source>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                        <p:processor name="oxf:file-processor">
+                            <p:input name="config">
+                                <config>
+                                    <delete>
+                                        <file>SomeImpossibleFileName.jpg</file>
+                                        <directory>C:/TEMP</directory>
+                                    </delete>
+                                </config>
+                            </p:input>
+                        </p:processor>
+                    </p:config>
+                </xml-source>
+            </section>
+        </section>
+        <a name="resource-server"/>
+        <section>
+            <title>Resource Server</title>
+            <p>
+                The Resource Server serves resources such as images, CSS stylesheet or other static
+                files. Resources are sent to the HTTP response untouched, and the HTTP cache
+                control headers are set.
+            </p>
+            <section>
+                <title>Config Input</title>
+                <p>
+                    The <code>config</code> input contains a single <code>url</code> element
+                    containing an absolute URL. The URL can be any URL supported by your platform,
+                    in particular URLs with the following protocols:
+                </p>
+                <ul>
+                    <li><code>file</code></li>
+                    <li><code>http</code></li>
+                    <li><code>oxf</code> (to access OPS resources)</li>
+                </ul>
+                <p>
+                    The Resource Server supports the deprecated use of a <code>config</code> input
+                    containing a single <code>path</code> element representing the absolute Resource
+                    Manager path of the file to serve. Since the <code>url</code> element also
+                    allows to access to OPS resources, it is recommended to use it
+                    instead of <code>path</code>.
+                </p>
+            </section>
+            <section>
+                <title>MIME Types Input</title>
+                <p>
+                    The <code>mime-types</code> input contains a list of patterns and <link
+                    href="http://www.iana.org/assignments/media-types/">MIME Media Types</link>.
+                    This mapping list determines which <code>content-type</code> header to send to
+                    the browser. The patterns are case-insensitive. OPS is bundled
+                    with a default mapping file under the URL <code>oxf:/oxf/mime-types.xml</code>.
+                    You can create your own mapping to suit your needs. The RelaxNG schema is
+                    provided below.
+                </p>
+                <xml-source>
+                    <element name="mime-types" xmlns="http://relaxng.org/ns/structure/1.0"
+                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+                        <oneOrMore>
+                            <element name="mime-type">
+                                <element name="name">
+                                    <data type="string"/>
+                                </element>
+                                <oneOrMore>
+                                    <element name="pattern">
+                                        <data type="string"/>
+                                    </element>
+                                </oneOrMore>
+                            </element>
+                        </oneOrMore>
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Example</title>
+                <p>
+                    The example below shows the Resource Server configured to send a PNG image file
+                    with the appropriate MIME type.
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:resource-server">
+                        <p:input name="mime-types">
+                            <mime-types>
+                                <mime-type>
+                                    <name>image/png</name>
+                                    <pattern>*.png</pattern>
+                                </mime-type>
+                            </mime-types>
+                        </p:input>
+                        <p:input name="config">
+                            <url>oxf:/images/logo.png</url>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+            </section>
+        </section>
+        <a name="identity-processor"/>
+        <section>
+            <title>Identity Processor</title>
+            <p>
+                The Identity processor is one of the simplest processors of OPS: it
+                simply copies the content of its <code>data</code> input to its <code>data</code>
+                output. While at first this doesn't seem like a very useful feature, it actually can
+                be very convenient, for example in the following scenarios.
+            </p>
+            <section>
+                <title>Embedding XML Documents</title>
+                <p>
+                    XML documents can be embedded within pipeline inputs. When you want the same
+                    document to be passed to the input of multiple processors in a pipeline, instead
+                    of duplicating it and embedding it in every input, you can use the Identity
+                    processor: embed the document in the <code>data</code> input of the Identity
+                    processor, assign an id to the output of the Identity processor, and reference
+                    that id from other inputs you want to feed with that document.
+                </p>
+                <xml-source>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <comment> Embed employee data </comment>
+                        <p:processor name="oxf:identity">
+                            <p:input name="data">
+                                <employees>
+                                    <employee>
+                                        <first-name>Joe</first-name>
+                                        <last-name>Dalton</last-name>
+                                    </employee>
+                                    <employee>
+                                        <first-name>Averell</first-name>
+                                        <last-name>Dalton</last-name>
+                                    </employee>
+                                </employees>
+                            </p:input>
+                            <p:output name="data" id="employees"/>
+                        </p:processor>
+                        <comment> Apply a first transformation on the employee data </comment>
+                        <p:processor name="oxf:xslt">
+                            <p:input name="config" href="oxf:/transform-1.xsl"/>
+                            <p:input name="data" href="#employees"/>
+                            <p:output name="data" id="result-1"/>
+                        </p:processor>
+                        <comment> Apply a second transformation on the same employee data </comment>
+                        <p:processor name="oxf:xslt">
+                            <p:input name="config" href="oxf:/transform-2.xsl"/>
+                            <p:input name="data" href="#employees"/>
+                            <p:output name="data" id="result-2"/>
+                        </p:processor>
+                        <comment> ... </comment>
+                    </p:config>
+                </xml-source>
+            </section>
+            <section>
+                <title>Aggregating and Modifying Documents</title>
+                <p>
+                    Pipeline inputs support aggregation with the <code>aggregate()</code> function,
+                    as well as the XPointer syntax. The Identity processor can then be used to
+                    aggregate or otherwise modify existing documents in a pipeline, for example
+                    before sending a result to a pipeline output.
+                </p>
+                <xml-source>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                        <p:param type="output" name="data"/>
+                        <comment> ... </comment>
+                        <comment> Assuming the XSLT transformations in the previous example, transform the two results and send them to the data output </comment>
+                        <p:processor name="oxf:identity">
+                            <p:input name="data" href="aggregate('result', #result-1#xpointer(/*/*), , #result-2#xpointer(/*/*[position() *lt; 10]))"/>
+                            <p:output name="data" ref="data"/>
+                        </p:processor>
+                    </p:config>
+                </xml-source>
+            </section>
+        </section>
+        <a name="debug-processor"/>
+        <section>
+            <title>Debug Processor</title>
+            <p>
+                The Debug processor logs XML documents using the <link
+                href="http://jakarta.apache.org/log4j/docs/">Log4j</link> library. It has 2 inputs:
+                <code>data</code> contains the XML document to log, and <code>config</code> has a
+                <code>config</code> root element that contains a message typically be used to
+                describe the XML document. The <code>data</code> output document is the exactly the
+                same as the <code>data</code> input document. Consequently the debug processor can
+                be easily inserted in a pipeline to log the XML data flow at a given point.
+            </p>
+            <img print-format="pdf" src="pages/processors-other-debug.png"/>
+            <p>
+                For instance, the processor can be called with:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:debug">
+                    <p:input name="config">
+                        <config>Employee</config>
+                    </p:input>
+                    <p:input name="data">
+                        <employee>
+                            <firstname>John</firstname>
+                            <lastname>Smith</lastname>
+                        </employee>
+                    </p:input>
+                    <p:output name="data" id="emp"/>
+                </p:processor>
+            </xml-source>
+            <p>
+                This will generate the message:
+            </p>
+            <source>Employee:
+
+                &lt;employee>
+                &lt;firstname>John&lt;/firstname>
+                &lt;lastname>Smith&lt;/lastname>
+                &lt;/employee></source>
+            <p>
+                Using <code>debug</code> attributes in pipelines is a shortcut for actually
+                inserting the Debug processor in the pipeline: the Pipeline processor will insert a
+                Debug processor when encountering <code>debug</code> attributes. By changing the
+                <code>processors.xml</code> you can map the <code>oxf:debug</code> processor to your
+                own "Debug processor" and this processor will be called when you use
+                <code>debug</code> attributes in pipelines. If you decide to implement your own
+                debug processor, note that it must have the same interface as the default Debug
+                processor that comes with OPS.
+            </p>
+        </section>
+        <a name="redirect-processor"/>
+        <section>
+            <title>Redirect Processor</title>
+            <p>
+                The Redirect Processor allows redirecting or forwarding the execution to a new URL:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Client-side</b> the browser is redirected to another URL. Typically, for
+                        a Servlet environment, the <code>sendRedirect()</code> method is called on
+                        the HTTP response object.
+                    </p>
+                    <p>
+                        If the redirection URL is an absolute path (e.g. <code>/hello</code>) then
+                        it is interpreted as a path relative to the OPS Servlet context (i.e. if
+                        your OPS WAR file is under <code>/ops</code>, then the resulting path is
+                        <code>/ops/hello</code>). For other purposes, including redirecting to a
+                        path within the same Servlet container but outside the OPS WAR context, you
+                        have to use an absolute URL complete with scheme and host name.
+                    </p>
+                </li>
+                <li>
+                    <p><b>Server-side</b>: a server-side forward is executed. Typically, for a
+                    Servlet environment, the <code>forward</code> method is called on a Servlet
+                    request dispatcher.</p>
+                </li>
+            </ul>
+            <p>
+                The processor's <code>data</code> input must conform to the following Relax NG
+                schema:
+            </p>
+            <xml-source>
+<element name="redirect-url" xmlns="http://relaxng.org/ns/structure/1.0">
+    <interleave>
+        <optional>
+            <element name="server-side">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </element>
+        </optional>
+        <element name="path-info">
+            <text/>
+        </element>
+        <optional>
+            <element name="parameters">
+                <zeroOrMore>
+                    <element name="parameter">
+                        <element name="name">
+                            <text/>
+                        </element>
+                        <oneOrMore>
+                            <element name="value">
+                                <text/>
+                            </element>
+                        </oneOrMore>
+                    </element>
+                </zeroOrMore>
+            </element>
+        </optional>
+    </interleave>
+</element>
+            </xml-source>
+            <p>
+                The optional boolean <code>server-side</code> element determines whether a
+                server-side forward is performed. The default is <code>false</code>.
+            </p>
+            <p>
+                This example creates a processor that redirects the browser to
+                <code>/login?user=jsmith</code>:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:redirect">
+                    <p:input name="data">
+                        <redirect-url>
+                            <path-info>/login</path-info>
+                            <parameters>
+                                <parameter>
+                                    <name>user</name>
+                                    <value>jsmith</value>
+                                </parameter>
+                            </parameters>
+                        </redirect-url>
+                    </p:input>
+                </p:processor>
+            </xml-source>
+            <note>
+                <p>
+                    It is recommended, whenever possible, to use the <link
+                    href="reference-page-flow">Page Flow Controller</link> to perform page
+                    redirections within a OPS application. The Page Flow Controller provides a much
+                    higher-level abstraction of the notion of redirection than the Redirect
+                    processor.
+                </p>
+            </note>
+        </section>
+    </body>
+</document>

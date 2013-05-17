@@ -104,7 +104,7 @@
     <target name="init">
 
         <tstamp/>
-        <property name="version.number" value="3.0.1"/>
+        <property name="version.number" value="3.0.2"/>
         <tstamp>
             <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
         </tstamp>
@@ -585,7 +585,7 @@ ${files}
         <cvs command='tag -d TAG_Dummy_For_OW_Sync'
             cvsRoot='${local-repos}' failonerror='true'/>
 
-        <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
+        <copy file='${deployDir}/buildLogs/ops30x-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
 
         <!-- Post the unstable build -->
         <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}' >
@@ -595,7 +595,7 @@ ${files}
           <arg value='--rsh=/usr/bin/ssh' />
           <arg value='build.log' />
           <arg value='ops.war' />
-          <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops' />
+          <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops30x' />
         </exec>
 
         <delete>

@@ -2180,4 +2180,15 @@ public class XFormsControls {
             return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
         }
     }
+
+    public void destroy() {
+        // HACK: this is a temp hack to help with a memory leak (XPath cache -> FunctionLibrary issue)
+        locator = null;
+        initialControlsState = null;
+        currentControlsState = null;
+        containingDocument = null;
+        controlsDocument = null;
+        contextStack = null;
+        functionLibrary = null;
+    }
 }

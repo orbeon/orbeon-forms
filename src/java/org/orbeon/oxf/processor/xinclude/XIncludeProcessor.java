@@ -57,6 +57,7 @@ public class XIncludeProcessor extends ProcessorImpl {
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
 
                 // Try to cache URI references
+                // NOTE: Always be careful not to cache refs to TransformerURIResolver. We seem to be fine here.
                 final boolean[] wasRead = { false };
                 readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {

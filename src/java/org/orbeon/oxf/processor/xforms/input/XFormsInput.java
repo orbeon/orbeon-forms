@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.xforms.input;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -85,12 +84,15 @@ public class XFormsInput extends ProcessorImpl {
                     model.setInstanceDocument(pipelineContext, 0, contextInstance.getDocument());
                 } else {
                     // Extract parameters from request
-                    final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
-                        public Object read(PipelineContext context, ProcessorInput input) {
-                            Document requestDocument = readInputAsDOM4J(context, input);
-                            return new RequestParameters(pipelineContext, requestDocument);
-                        }
-                    });
+                    // This caches an instance document, which we then set on the model. This is probably incorrect!!!
+//                    final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
+//                        public Object read(PipelineContext context, ProcessorInput input) {
+//                            Document requestDocument = readInputAsDOM4J(context, input);
+//                            return new RequestParameters(pipelineContext, requestDocument);
+//                        }
+//                    });
+                    final RequestParameters requestParameters =
+                        new RequestParameters(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_REQUEST));
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)

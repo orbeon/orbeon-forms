@@ -751,8 +751,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // Call special listener to update instance
             if (instanceConstructListener != null) {
+                final InstanceConstructListener listener = instanceConstructListener;
+                // Make sure we don't keep a reference on this in case this is cache (legacy XForms engine)
+                instanceConstructListener = null;
+                // Use listener to update instances
                 for (Iterator i = getInstances().iterator(); i.hasNext();) {
-                    instanceConstructListener.updateInstance((XFormsInstance) i.next());
+                    listener.updateInstance((XFormsInstance) i.next());
                 }
             }
 

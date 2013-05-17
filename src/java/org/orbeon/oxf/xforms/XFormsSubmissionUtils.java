@@ -160,12 +160,6 @@ public class XFormsSubmissionUtils {
                         }
                     }
 
-                    // Forward authorization header
-                    // TODO: This should probably not be done automatically
-                    final String authorizationHeader = (String) externalContext.getRequest().getHeaderMap().get("authorization");
-                    if (authorizationHeader != null)
-                        httpURLConnection.setRequestProperty("authorization", authorizationHeader);
-
                     urlConnection.connect();
 
                     // Write request body if needed

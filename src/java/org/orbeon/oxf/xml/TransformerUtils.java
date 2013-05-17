@@ -249,10 +249,17 @@ public class TransformerUtils {
 
     public static Templates getTemplates(Source source, String clazz, Map attributes, ErrorListener errorListener, URIResolver uriResolver)
             throws TransformerConfigurationException {
-        SAXTransformerFactory factory = (attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz);
+        final SAXTransformerFactory factory = (attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz);
         factory.setErrorListener(errorListener);
         factory.setURIResolver(uriResolver);
-        return factory.newTemplates(source);
+
+        final Templates templates = factory.newTemplates(source);
+        // These should only be used during stylesheet compilation. It is dangerous to keep them around when the
+        // Templates object is cached especially the URI Resolver which may reference PipelineContext objects.
+//        factory.setErrorListener(null);// This causes issues with Xalan
+        factory.setURIResolver(null);
+
+        return templates;
     }
 
     /**

@@ -16,11 +16,6 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
-import org.orbeon.oxf.xforms.processor.XFormsServer;
-import org.orbeon.oxf.common.OXFException;
-
-import java.io.PrintWriter;
-import java.io.CharArrayWriter;
 
 
 /**
@@ -37,13 +32,6 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
         super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, true, false);
         this.urlString = urlString;
         this.throwable = throwable;
-
-        // Log exception
-        if (XFormsServer.logger.isDebugEnabled()) {
-            CharArrayWriter writer = new CharArrayWriter();
-            OXFException.getRootThrowable(throwable).printStackTrace(new PrintWriter(writer));
-            XFormsServer.logger.debug("XForms - submit error exception: " + writer.toString());
-        }
     }
 
     public Throwable getThrowable() {

@@ -1,0 +1,54 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <!-- Download a given file -->
+    <page id="download" path-info="/source/download/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
+            default-submission="summary/default-submission.xml"
+            model="summary/download-model.xpl">
+        <setvalue ref="/form/example-id" matcher-group="1"/>
+        <setvalue ref="/form/source-url" matcher-group="2"/>
+    </page>
+
+    <!-- Format a file -->
+    <page id="get-source" path-info="/source/service/format"
+            default-submission="summary/default-submission.xml"
+            model="summary/format-source.xpl">
+        <setvalue ref="/form/example-id" parameter="example-id"/>
+        <setvalue ref="/form/source-url" parameter="source-url"/>
+        <setvalue ref="/form/mediatype" parameter="mediatype"/>
+    </page>
+
+    <!-- Display the source for an individual file -->
+    <page id="goto-source" path-info="/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
+            default-submission="summary/default-submission.xml"
+            model="summary/summary-model.xpl"
+            view="summary/summary-view.xsl">
+        <setvalue ref="/form/example-id" matcher-group="1"/>
+        <setvalue ref="/form/source-url" matcher-group="2"/>
+    </page>
+
+    <!-- Produce the list of source files -->
+    <page id="summary" path-info="/(.+)" matcher="oxf:perl5-matcher"
+            default-submission="summary/default-submission.xml"
+            model="summary/summary-model.xpl"
+            view="summary/summary-view.xsl">
+        <setvalue ref="/form/example-id" matcher-group="1"/>
+    </page>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

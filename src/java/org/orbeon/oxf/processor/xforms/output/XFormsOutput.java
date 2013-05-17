@@ -68,9 +68,13 @@ public class XFormsOutput extends ProcessorImpl {
                 // Create evaluation context
                 XFormsElementContext elementContext =
                         new XFormsElementContext(pipelineContext, containingDocument, contentHandler);
-
-                // Send SAX events of view to ViewContentHandler
-                readInputAsSAX(pipelineContext, INPUT_DATA, new ViewContentHandler(contentHandler, elementContext));
+                try {
+                    // Send SAX events of view to ViewContentHandler
+                    readInputAsSAX(pipelineContext, INPUT_DATA, new ViewContentHandler(contentHandler, elementContext));
+                } finally {
+                    // HACK: this is a temp hack to help with a memory leak (XPath cache -> FunctionLibrary issue)
+                    elementContext.destroy();
+                }
             }
         };
         addOutput(name, output);

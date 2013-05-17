@@ -1,0 +1,140 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Web Services</title>
+    </header>
+    <body>
+        <section>
+            <title>Overview</title>
+
+            <p>
+                Your OPS applications can consume and expose Web services.</p>
+        </section>
+
+        <section>
+            <title>Consuming Web Services</title>
+
+            <p>Applications built on OPS call Web services using the <link
+            href="processors-delegation">delegation processor</link>. For example, this is how you
+            would call the famous highway traffic Web service to get the conditions on the 101
+            highway in California from an XPL:</p>
+
+            <xml-source>
+                <p:processor name="oxf:delegation">
+                    <p:input name="interface">
+                        <config>
+                            <service id="ca-traffic" type="webservice"
+                                endpoint="http://services.xmethods.net/soap/servlet/rpcrouter">
+                                <operation nsuri="urn:xmethods-CATraffic" name="getTraffic"/>
+                            </service>
+                        </config>
+                    </p:input>
+                    <p:input name="call">
+                        <delegation:execute service="ca-traffic" operation="getTraffic" xmlns:delegation="http://orbeon.org/oxf/xml/delegation">
+                            <hwynums>101</hwynums>
+                        </delegation:execute>
+                    </p:input>
+                    <p:output name="data" id="traffic"/>
+                </p:processor>
+            </xml-source>
+
+            <p>The output of that call would be:</p>
+            <xml-source>
+                <return xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+                    xmlns:v="http://orbeon.org/oxf/xml/validation"
+                    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:type="xsd:string">
+                    reported as of Wednesday, July 2, 2003 at 16:18 .
+                    Slow for the Cone Zone
+                    US 101
+                    [LOS ANGELES &amp; VENTURA CO.'S] NO TRAFFIC RESTRICTIONS ARE REPORTED FOR THIS AREA ...
+                </return>
+            </xml-source>
+        </section>
+        <section>
+            <title>Exposing Web Services</title>
+
+            <p>To expose a Web service, follow these steps:</p>
+
+            <ol>
+                <li>
+                    <p>Declare the Web service in the <code>page-flow.xml</code>, just like a
+                    regular page with no view. The Web services will be implemented in an XPL file.
+                    The OPS example portal features a Web service that sends
+                    instant messages to Yahoo! users. It is declared in the
+                    <code>page-flow.xml</code> as follows:</p>
+
+                    <xml-source>
+                        <page path-info="/examples/im"
+                            model="oxf:/im/yim-webservice.xpl"/>
+                    </xml-source>
+                </li>
+                <li>
+                    <p>To get the SOAP envelope sent to the Web service, use the <link
+                    href="processors-generators-request">Request generator</link> and
+                    include the path <code>/request/body</code>, specifying the
+                    <code>xs:anyURI</code> type for the result. The resuting URI can then be parsed
+                    with the URL generator:</p>
+
+                    <xml-source>
+                        <comment> Extract request body as a URI </comment>
+                        <p:processor name="oxf:request">
+                            <p:input name="config">
+                                <config stream-type="xs:anyURI" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                                    <include>/request/body</include>
+                                </config>
+                            </p:input>
+                            <p:output name="data" id="request"/>
+                        </p:processor>
+
+                        <comment> Dereference URI </comment>
+                        <p:processor name="oxf:url-generator">
+                            <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
+                            <p:output name="data" id="file"/>
+                        </p:processor>
+                    </xml-source>
+
+                    <p>You will find the SOAP envelope sent by the client of your Web service as the
+                    resulting file. For example:</p>
+
+                    <xml-source>
+                        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                            <soapenv:Body>...</soapenv:Body>
+                        </soapenv:Envelope>
+                    </xml-source>
+                </li>
+                <li>
+                    <p>Generate a SOAP envelope that responds to the client's
+                    request and send it to the client with the <link
+                    href="processors-serializers#html-serializer">XML
+                    serializer</link>, as follows:</p>
+
+                    <xml-source>
+                        <p:processor name="oxf:xml-serializer">
+                            <p:input name="config"><config/></p:input>
+                            <p:input name="data" href="#response"/>
+                        </p:processor>
+                    </xml-source>
+                </li>
+            </ol>
+        </section>
+    </body>
+</document>

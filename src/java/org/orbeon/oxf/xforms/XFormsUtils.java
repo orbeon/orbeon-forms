@@ -20,7 +20,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.DebugProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
@@ -591,16 +590,5 @@ public class XFormsUtils {
         } catch (URISyntaxException e) {
             throw new ValidationException("Error while resolving URI: " + uri, e, (LocationData) element.getData());
         }
-    }
-
-    /**
-     * Log a message and Document.
-     *
-     * @param debugMessage  the message to display
-     * @param document      the Document to display
-     */
-    public static void logDebugDocument(String debugMessage, Document document) {
-//        XFormsServer.logger.debug(debugMessage + ":\n" + Dom4jUtils.domToString(document));
-        DebugProcessor.logger.info(debugMessage + ":\n" + Dom4jUtils.domToString(document));
     }
 }

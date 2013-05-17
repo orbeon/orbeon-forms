@@ -151,16 +151,18 @@ object SimpleProcess extends Actions with Logging {
         withDebug("running process", Seq("process" → process)) {
             beforeProcess() flatMap { _ ⇒
                 tryBreakable {
-                    runSubProcess(process) recoverWith { case _ ⇒
-                        // Send a final error if there is one
-                        tryErrorMessage(Map(Some("message") → "process-error"))
-                    }
+                    runSubProcess(process)
                 } catchBreak {
-                    // For now consider a break as a success
-                    Success(())
+                    Success(()) // to change once `tryFailure` is supported
                 }
-            } doEitherWay
+            } doEitherWay {
                 afterProcess()
+            } recoverWith { case t ⇒
+                // Log and send a user error if there is one
+                // NOTE: In the future, it would be good to provide the user with an error id.
+                error(OrbeonFormatter.format(t))
+                tryErrorMessage(Map(Some("message") → "process-error"))
+            }
         }
     }
 
@@ -259,10 +261,9 @@ object SimpleProcess extends Actions with Logging {
                     buffer += "email"
                 }
 
-                def isLegacyCreatePDF =
-                    isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
-
                 // TODO: Pass `content = "pdf-url"` if isLegacyCreatePDF. Requires better parsing of process arguments.
+                //def isLegacyCreatePDF = isLegacyNavigateSuccess && booleanPropertySet("oxf.fr.detail.send.pdf")
+
                 // Workaround is to change config from oxf.fr.detail.send.pdf = true to oxf.fr.detail.send.success.content = "pdf-url"
                 if (isLegacyNavigateSuccess) {
                     buffer += ThenCombinator.name

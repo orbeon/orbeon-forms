@@ -22,10 +22,10 @@ import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.processor.test.TestExternalContext.TestSession
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.util.Multipart.UploadProgress
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
-import scala.collection.mutable
+import collection.mutable
+import Multipart._
 
 class MultipartTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
 
@@ -57,36 +57,36 @@ class MultipartTest extends ResourceManagerTestBase with AssertionsForJUnit with
         }
 
         def newRead(request: Request, maxSize: Int) = {
-            val (pairs, throwableOpt) = Multipart.parseMultipartRequest(request, maxSize, "utf-8")
+            val (pairs, throwableOpt) = parseMultipartRequest(request, maxSize, "utf-8")
             (pairs map { case (a, b) ⇒ a → convertFileItemContent(b) }, throwableOpt map (_.getClass.getName))
         }
 
         locally {
-            val mustSucceedWith = Seq(-1, 8326, 10000)
+            val mustSucceedWithLimits = Seq(-1, 8326, 10000)
 
             val expectedPairs = Seq(
                 ("$uuid", UUID),
                 (FieldName,  FileItemContent("text/plain", FieldName, 8000L, "miserables-8000.txt", miserables))
             )
 
-            mustSucceedWith foreach { limit ⇒
+            mustSucceedWithLimits foreach { limit ⇒
                 val request = newRequest
                 assert((expectedPairs, None) === newRead(request, limit))
-                assert(Some(UploadProgress(FieldName, Some(body.length), miserables.length, Multipart.Completed)) === Multipart.getUploadProgress(request, UUID, FieldName))
+                assert(Some(UploadProgress(FieldName, Some(body.length), miserables.length, Completed)) === getUploadProgress(request, UUID, FieldName))
             }
         }
 
         locally {
-            val mustFailWith = Seq(0, 4097, 8000)// NOTE: any value under 4096 is the same as 4096 (buffer size)
+            val mustFailWithLimits = Seq(0, 4097, 8000)// NOTE: any value under 4096 is the same as 4096 (buffer size)
 
             val expectedPairs = Seq(
                 ("$uuid", UUID)
             )
 
-            mustFailWith foreach { limit ⇒
+            mustFailWithLimits foreach { limit ⇒
                 val request = newRequest
                 assert((expectedPairs, Some("org.apache.commons.fileupload.FileUploadBase$SizeLimitExceededException")) === newRead(request, limit))
-                assert(Some(UploadProgress(FieldName, Some(body.length), 0, Multipart.Interrupted)) === Multipart.getUploadProgress(request, UUID, FieldName))
+                assert(Some(UploadProgress(FieldName, Some(body.length), 0, Interrupted(Some(SizeReason(adjustMaxSize(limit), 8326))))) === getUploadProgress(request, UUID, FieldName))
             }
         }
     }

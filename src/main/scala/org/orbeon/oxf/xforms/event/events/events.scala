@@ -103,8 +103,27 @@ object XXFormsLoadEvent {
     val StandardProperties = Map(XXFORMS_LOAD → Seq("resource"))
 }
 
+// NOTE: Event default behavior done at target so event is left cancelable.
+class XXFormsUploadStartEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XXFORMS_UPLOAD_START, target, properties, bubbles = true, cancelable = true) {
+    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
+// NOTE: Event default behavior done at target so event is left cancelable.
+class XXFormsUploadProgressEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XXFORMS_UPLOAD_PROGRESS, target, properties, bubbles = false, cancelable = true) {
+    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
+// NOTE: Event default behavior done at target so event is left cancelable.
+class XXFormsUploadCancelEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XXFORMS_UPLOAD_CANCEL, target, properties, bubbles = true, cancelable = true) {
+    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
+// NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadDoneEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_UPLOAD_DONE, target, properties, bubbles = true, cancelable = false) {
+    extends XFormsEvent(XXFORMS_UPLOAD_DONE, target, properties, bubbles = true, cancelable = true) {
 
     // These properties come from the client
     def file      = property[String]("file").get
@@ -117,23 +136,14 @@ object XXFormsUploadDoneEvent {
     val StandardProperties = Map(XXFORMS_UPLOAD_DONE → Seq("file", "filename", "content-type", "content-length"))
 }
 
+// NOTE: Event default behavior done at target so event is left cancelable.
+class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsEvent(XXFORMS_UPLOAD_ERROR, target, properties, bubbles = true, cancelable = true) {
+    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
 class XXFormsInstanceInvalidate(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XXFORMS_INSTANCE_INVALIDATE, target, properties, bubbles = true, cancelable = true) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
-}
-
-class XXFormsUploadCancelEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_UPLOAD_CANCEL, target, properties, bubbles = true, cancelable = false) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
-}
-
-class XXFormsUploadProgressEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_UPLOAD_PROGRESS, target, properties, bubbles = false, cancelable = false) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
-}
-
-class XXFormsUploadStartEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_UPLOAD_START, target, properties, bubbles = true, cancelable = false) {
     def this(target: XFormsEventTarget) = this(target, EmptyGetter)
 }
 

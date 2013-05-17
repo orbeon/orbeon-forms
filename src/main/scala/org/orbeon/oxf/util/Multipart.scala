@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import scala.util.Try
 import collection.{immutable ⇒ i, mutable ⇒ m}
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
+import org.orbeon.errorified.Exceptions
 
 
 /**
@@ -62,17 +63,18 @@ object Multipart {
         foreach (fileItem ⇒ runQuietly(fileItem.delete()))
     )
 
+    // MultipartStream buffer size is 4096, and it will always attempt to read that much. So even if we are just
+    // reading the first headers, which are smaller than that, but have say a limit of 2000, an exception will be
+    // thrown. Because we want to be able to read the first headers for $uuid and the next item, we adjust the limit
+    // to the size of the buffer. This means we can read those headers without an exception due to the limit.
+    def adjustMaxSize(maxSize: Long) =
+        if (maxSize < 0) -1L else Math.max(maxSize, 4096) // MultipartStream.DEFAULT_BUFSIZE
+
     // Decode a multipart/form-data request and return all the successful parameters.
     def parseMultipartRequest(request: Request, maxSize: Long, headerEncoding: String): (i.Seq[(String, AnyRef)], Option[Throwable]) = {
 
         require(request ne null)
         require(headerEncoding ne null)
-
-        // MultipartStream buffer size is 4096, and it will always attempt to read that much. So even if we are just
-        // reading the first headers, which are smaller than that, but have say a limit of 2000, an exception will be
-        // thrown. Because we want to be able to read the first headers for $uuid and the next item, we adjust the limit
-        // to the size of the buffer. This means we can read those headers without an exception due to the limit.
-        val adjustedMaxSize = if (maxSize < 0) -1 else Math.max(maxSize, 4096) // MultipartStream.DEFAULT_BUFSIZE
 
         // Read properties
         // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
@@ -94,6 +96,7 @@ object Multipart {
         // - even if the request is too large, we still try to read $uuid as first item
         // - FileUploadBase wraps with LimitedInputStream
         //
+        val adjustedMaxSize = adjustMaxSize(maxSize)
 
         upload.setSizeMax(adjustedMaxSize)
         upload.setFileSizeMax(adjustedMaxSize)
@@ -128,10 +131,13 @@ object Multipart {
             _.getAttributesMap.remove(getProgressSessionKey(control.containingDocument.getUUID, control.getEffectiveId))
         }
 
-    sealed trait UploadState
-    case object Started     extends UploadState
-    case object Completed   extends UploadState
-    case object Interrupted extends UploadState
+    sealed trait Reason
+    case class SizeReason(permitted: Long, actual: Long) extends Reason
+
+    sealed trait UploadState { def name: String }
+    case object Started                             extends UploadState { val name = "started" }
+    case object Completed                           extends UploadState { val name = "completed" }
+    case class  Interrupted(reason: Option[Reason]) extends UploadState { val name = "interrupted" }
 
     // NOTE: Fields don't need to be @volatile as they are accessed via the session, which provides synchronized access.
     case class UploadProgress(fieldName: String, expectedSize: Option[Long], var receivedSize: Long = 0L, var state: UploadState = Started)
@@ -165,7 +171,34 @@ object Multipart {
 
         Try {
 
-            def processStreamItem(fis: FileItemStream, progressUUIDOpt: Option[String], checkSize: () ⇒ Unit = () ⇒ ()): Unit = {
+            // Create new progress indicator
+            def newUploadProgress(progressUUID: String, fis: FileItemStream) = {
+                // Browsers don't seem to want to put a Content-Length per part, how dumb
+                def expectedSizeFromPart =
+                    for {
+                        headers ← Option(fis.getHeaders)
+                        header  ← Option(headers.getHeader("content-length"))
+                    } yield
+                        header.toLong
+
+                def expectedSizeFromRequest =
+                    requestUntrustedSize > 0 option requestUntrustedSize.toLong
+
+                // Try size first from part then from request
+                val expectedLength = expectedSizeFromPart orElse expectedSizeFromRequest
+
+                val progress = UploadProgress(fis.getFieldName, expectedLength)
+
+                // Store into session with start value
+                val newSessionKey = getProgressSessionKey(progressUUID, fis.getFieldName)
+                sessionKeys += newSessionKey
+                sessionOpt.get.getAttributesMap.put(newSessionKey, progress)
+
+                progress
+            }
+
+            // Process a single item
+            def processStreamItem(fis: FileItemStream, uploadProgressOpt: Option[UploadProgress], checkSize: () ⇒ Unit = () ⇒ ()): Unit = {
                 val fieldName = fis.getFieldName
 
                 if (fis.isFormField) {
@@ -197,47 +230,28 @@ object Multipart {
                     }
 
                     def tryCopyAndAddProgress =
-                        progressUUIDOpt match {
-                            case Some(progressUUID) ⇒
+                        uploadProgressOpt match {
+                            case Some(uploadProgress) ⇒
                                 // File upload with progress notification
-
-                                // Create new progress indicator
-                                val uploadProgress = {
-
-                                    // Browsers don't seem to want to put a Content-Length per part, how dumb
-                                    def expectedSizeFromPart =
-                                        for {
-                                            headers ← Option(fis.getHeaders)
-                                            header  ← Option(headers.getHeader("content-length"))
-                                        } yield
-                                            header.toLong
-
-                                    def expectedSizeFromRequest =
-                                        requestUntrustedSize > 0 option requestUntrustedSize.toLong
-
-                                    // Try size first from part then from request
-                                    val expectedLength = expectedSizeFromPart orElse expectedSizeFromRequest
-
-                                    val progress = UploadProgress(fieldName, expectedLength)
-
-                                    // Store into session with start value
-                                    val newSessionKey = getProgressSessionKey(progressUUID, fieldName)
-                                    sessionKeys += newSessionKey
-                                    sessionOpt.get.getAttributesMap.put(newSessionKey, progress)
-
-                                    progress
-                                }
-
                                 Try(checkSize()) flatMap {
                                     // Copy stream and update progress information as we go
                                     _ ⇒ tryCopyAndAdd(uploadProgress.receivedSize += _)
                                 } map {
                                     // Only in case of success, mark the progress as Completed
                                     _ ⇒ uploadProgress.state = Completed
-                                } onFailure {
+                                } onFailure { case t: Throwable ⇒
                                     // Only in case of failure, mark the progress as Interrupted
                                     // NOTE: We get here if checkSizeTry is a failure too
-                                    case _ ⇒ uploadProgress.state = Interrupted
+                                    uploadProgress.state = Interrupted(
+                                        Exceptions.getRootThrowable(t) match {
+                                            case root: SizeLimitExceededException ⇒
+                                                println(root)
+                                                Some(SizeReason(root.getPermittedSize, root.getActualSize))
+                                            case root                             ⇒
+                                                println(root)
+                                                None
+                                        }
+                                    )
                                 }
 
                             case None ⇒
@@ -250,14 +264,14 @@ object Multipart {
                 }
             }
 
-            val itemIterator = asScalaIterator(upload.getItemIterator(trustedRequestContext))
-
             def checkTotalSize() =
                 if (upload.getSizeMax >=0 && requestUntrustedSize > upload.getSizeMax)
                     throw new SizeLimitExceededException(
                         f"the request was rejected because its size ($requestUntrustedSize%d) exceeds the configured maximum (${upload.getSizeMax}%d)",
                         requestUntrustedSize,
                         upload.getSizeMax)
+
+            val itemIterator = asScalaIterator(upload.getItemIterator(trustedRequestContext))
 
             sessionOpt match {
                 case Some(session) ⇒
@@ -272,13 +286,20 @@ object Multipart {
                             }
                         }
 
-                    // No need delaying further if we don't have a uuid
+                    // No need delaying checking the size further if we don't have a uuid
                     if (progressUUIDOpt.isEmpty)
                         checkTotalSize()
 
                     // Process the rest of the stream
-                    for (fis ← itemIterator)
-                        processStreamItem(fis, progressUUIDOpt, () ⇒ checkTotalSize())
+                    var uploadProgressOpt: Option[UploadProgress] = None
+                    for (fis ← itemIterator) {
+
+                        // Try to create the progress indicator if not present
+                        if (uploadProgressOpt.isEmpty)
+                            uploadProgressOpt = progressUUIDOpt map (newUploadProgress(_, fis))
+
+                        processStreamItem(fis, uploadProgressOpt, () ⇒ checkTotalSize())
+                    }
                 case None ⇒
                     // Simplified processing
                     checkTotalSize()
@@ -289,10 +310,14 @@ object Multipart {
             (result.toList, None)
         } recover { case t ⇒
             // - don't remove UploadProgress objects from the session
-            // - instead mark all entries added so far as being in state Interrupted
+            // - instead mark all entries added so far as being in state Interrupted if not already the case
             // - return all completed values up to the point of failure alongside the throwable
             for (sessionKey ← sessionKeys)
-                runQuietly(getUploadProgress(sessionOpt, sessionKey) foreach (_.state = Interrupted))
+                runQuietly (
+                    getUploadProgress(sessionOpt, sessionKey)
+                    collect { case p @ UploadProgress(_, _, _, Started | Completed ) ⇒ p }
+                    foreach (_.state = Interrupted(None))
+                )
 
             (result.toList, Some(t))
         } get

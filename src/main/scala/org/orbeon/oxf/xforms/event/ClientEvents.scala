@@ -377,7 +377,7 @@ object ClientEvents extends Logging {
                             helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "control-values")
                             helper.element("xxf", XXFORMS_NAMESPACE_URI, "control",
                                 Array[String]("id", sourceControlId,
-                                    "progress-state",    progress.state.toString.toLowerCase,
+                                    "progress-state",    progress.state.name,
                                     "progress-received", progress.receivedSize.toString,
                                     "progress-expected", progress.expectedSize map (_.toString) orNull))
                             helper.endElement()

@@ -406,6 +406,24 @@
             <fr:label ref="$fr-resources/detail/messages/error-dialog-title"/>
             <fr:neutral-choice/>
         </fr:alert-dialog>
+
+        <!-- Listen for upload events -->
+        <xf:action
+            ev:event="xxforms-upload-error"
+            ev:observer="fr-form-group"
+            xxf:phantom="true"
+            type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+            process:runProcess('error-message("upload-error")')
+        </xf:action>
+
+        <xf:action
+            ev:event="xxforms-upload-start xxforms-upload-cancel xxforms-upload-done"
+            ev:observer="fr-form-group"
+            xxf:phantom="true"
+            type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+            process:runProcess(concat('success-message("', substring-after(event('xxf:type'), 'xxforms-'), '")'))
+        </xf:action>
+
     </xsl:template>
 
     <!-- Noscript section help entry -->

@@ -26,7 +26,8 @@ import org.orbeon.oxf.xforms.event.events._
 import XFormsUploadControl._
 import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.util.{SecureUtils, Multipart, NetUtils}
+import org.orbeon.oxf.util.{SecureUtils, NetUtils}
+import org.orbeon.oxf.util.Multipart._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import java.net.{URLEncoder, URI}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
@@ -60,21 +61,29 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             case startEvent: XXFormsUploadStartEvent ⇒
                 // Upload started
                 containingDocument.startUpload(getUploadUniqueId)
+            case progressEvent: XXFormsUploadProgressEvent ⇒
+                // NOP: upload progress information will be sent through the diff process
             case cancelEvent: XXFormsUploadCancelEvent ⇒
-                // Upload canceled
+                // Upload canceled by the user
                 containingDocument.endUpload(getUploadUniqueId)
-                Multipart.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+                removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
             case doneEvent: XXFormsUploadDoneEvent ⇒
                 // Upload done: process upload to this control
                 // Notify that the upload has ended
                 containingDocument.endUpload(getUploadUniqueId)
-                Multipart.removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
-                val uploadDoneEvent: XXFormsUploadDoneEvent = event.asInstanceOf[XXFormsUploadDoneEvent]
-                handleUploadedFile(uploadDoneEvent.file, uploadDoneEvent.filename, uploadDoneEvent.mediatype, uploadDoneEvent.size)
-            case progressEvent: XXFormsUploadProgressEvent ⇒
-                // NOP: upload progress information will be sent through the diff process
+                removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
+                handleUploadedFile(doneEvent.file, doneEvent.filename, doneEvent.mediatype, doneEvent.size)
+            case errorEvent: XXFormsUploadErrorEvent ⇒
+                // Upload error: sent by the client in case of error
+                containingDocument.endUpload(getUploadUniqueId)
+                removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
             case _ ⇒ super.performTargetAction(event)
         }
+
+    override def performDefaultAction(event: XFormsEvent): Unit = {
+        // TODO: show default error as if with xf:message
+        super.performDefaultAction(event)
+    }
 
     override def onDestroy(): Unit = {
         super.onDestroy()

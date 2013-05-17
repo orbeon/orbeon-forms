@@ -152,6 +152,10 @@
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
+                <upload-start>Upload started</upload-start>
+                <upload-cancel>Upload canceled by the user</upload-cancel>
+                <upload-done>Upload complete</upload-done>
+                <upload-error>There was an error during the upload. Please try again.</upload-error>
             </messages>
             <labels>
                 <language-choice>Language</language-choice>
@@ -332,8 +336,11 @@
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <buttons-message/>
-                <!-- TODO: check translation -->
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
+                <upload-start>Téléchargement vers le serveur commencé</upload-start>
+                <upload-cancel>Téléchargement vers le serveur annulé par l'utilisateur</upload-cancel>
+                <upload-done>Téléchargement vers le serveur terminé</upload-done>
+                <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
             </messages>
             <labels>
                 <language-choice>Langue</language-choice>
@@ -516,6 +523,10 @@
                 <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted ingresó al momento de guardar su documento.</saved-locally-open>
+                <upload-start>[Upload started]</upload-start>
+                <upload-cancel>[Upload canceled by the user]</upload-cancel>
+                <upload-done>[Upload complete]</upload-done>
+                <upload-error>[There was an error during the upload. Please try again.]</upload-error>
             </messages>
             <labels>
                 <language-choice>Idioma</language-choice>
@@ -697,6 +708,10 @@
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
+                <upload-start>[Upload started]</upload-start>
+                <upload-cancel>[Upload canceled by the user]</upload-cancel>
+                <upload-done>[Upload complete]</upload-done>
+                <upload-error>[There was an error during the upload. Please try again.]</upload-error>
             </messages>
             <labels>
                 <language-choice>Språk</language-choice>
@@ -875,6 +890,10 @@
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
+                <upload-start>[Upload started]</upload-start>
+                <upload-cancel>[Upload canceled by the user]</upload-cancel>
+                <upload-done>[Upload complete]</upload-done>
+                <upload-error>[There was an error during the upload. Please try again.]</upload-error>
             </messages>
             <labels>
                 <language-choice>Язык</language-choice>

@@ -1,0 +1,144 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <header>
+        <title>Yahoo Instant Messaging Processor</title>
+    </header>
+    <body>
+        <section>
+            <title>Scope</title>
+            <p>
+                This processor can send and receive Yahoo Instant Messages (IM) from within a Web
+                application. To use this processor, you need to create a Yahoo account that will act
+                as the sender. You can send an IM to any Yahoo subscriber. The processor launches a
+                customizable pipeline when an IM is received. The IM processor has two mandatory
+                inputs: <code>session</code> contains login information, and <code>message</code>
+                contains the message to send. A third input, declared in the
+                <code>on-message-received</code> element contains the pipeline to be executed when a
+                message is received. This pipeline must have a <code>data</code> input parameter
+                containing a document describing the incoming message:
+            </p>
+            <p>
+                <xml-source>
+                    <message>
+                        <from>john</from>
+                        <body>Hello!</body>
+                    </message>
+                </xml-source>
+            </p>
+        </section>
+        <section>
+            <title>Config Input</title>
+            <p>
+                The
+                <code>config</code> input contains basic information
+                such as login, password and definition of the pipeline to
+                execute when an IM is received.
+            </p>
+            <p>
+                <table ca="|l|p{0.6\textwidth}|">
+                    <tr>
+                        <th>
+                            <code>login</code>
+                        </th>
+                        <td>A Yahoo account, used as the sender of the IM</td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <code>password</code>
+                        </th>
+                        <td>The matching password</td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <code>on-message-received</code>
+                        </th>
+                        <td>
+                            <ul>
+                                <li>A URL pointing to an XPL pipeline</li>
+                                <li>An input name, starting with a
+                                    <code>#</code>. The IMSerializer must have
+                                    the corresponding input declared.
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+        </section>
+        <section>
+            <title>Data Input</title>
+            <p>
+                The
+                <code>data</code> input contains the message to send under
+                the
+                <code>message</code> element.
+            </p>
+            <p>
+                <table>
+                    <tr>
+                        <th>
+                            <code>to</code>
+                        </th>
+                        <td>A Yahoo account to send to message to</td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <code>body</code>
+                        </th>
+                        <td>The body of the message to send</td>
+                    </tr>
+                </table>
+            </p>
+        </section>
+        <section>
+            <title>Example</title>
+            <p>
+                The following code illustrates the instantiation of the
+                IMSerializer to send a message to the Yahoo account
+                <code>tove</code> from
+                <code>jani</code>. Additionally, a
+                statement is written in the log file when a message is received.
+            </p>
+            <xml-source>
+                <p:processor name="oxf:im">
+                    <p:input name="config">
+                        <session>
+                            <login>jani</login>
+                            <password>secret</password>
+                            <on-message-received>#response-pipeline</on-message-received>
+                        </session>
+                    </p:input>
+                    <p:input name="data">
+                        <message>
+                            <to>trove</to>
+                            <body>Don't forget me!</body>
+                        </message>
+                    </p:input>
+                    <p:input name="response-pipeline">
+                        <p:config>
+                            <p:param name="data" type="input"/>
+                            <p:processor name="oxf:null-serializer">
+                                <p:input name="data" href="#data"/>
+                            </p:processor>
+                        </p:config>
+                    </p:input>
+                </p:processor>
+            </xml-source>
+        </section>
+    </body>
+</document>

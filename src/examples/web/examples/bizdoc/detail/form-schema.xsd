@@ -1,0 +1,38 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xs:schema
+    xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xs:import namespace="http://orbeon.org/oxf/examples/bizdoc/claim" schemaLocation="../schema/claim-schema.xsd"/>
+
+    <xs:element name="form">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="message" type="xs:string"/>
+                <xs:element name="show-errors" type="xs:string"/>
+                <xs:element name="document-id" type="xs:string"/>
+                <xs:element name="document">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element ref="claim:claim"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

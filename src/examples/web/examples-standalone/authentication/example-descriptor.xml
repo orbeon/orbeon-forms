@@ -1,0 +1,38 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>Authentication</title>
+    <path>authentication</path>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
+    <description>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example shows how:
+            </p>
+            <ul>
+                <li>You can restrict the access to a page with the standard mechanism provided in your application server</li>
+                <li>You can programmatically obtain the name of the currently logged in user, as well as other security related information</li>
+                <li>You can implement a "logout" feature</li>
+            </ul>
+            <p>
+                If you are not logged in (e.g. the first time you access this page), you will be
+                redirected to a login page. After you have successfully logged in, a page will display
+                your user name and other authentication information.
+            </p>
+            <p>
+                Use admin/password as username and password.
+            </p>
+        </div>
+    </description>
+</example-descriptor>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+  Universal Business Language (UBL) Schema 1.0-beta
+
+  Copyright (C) OASIS Open (2003). All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to others, and
+  derivative works that comment on or otherwise explain it or assist in its
+  implementation may be prepared, copied, published and distributed, in whole or
+  in part, without restriction of any kind, provided that the above copyright
+  notice and this paragraph are included on all such copies and derivative works.
+  However, this document itself may not be modified in any way, such as by
+  removing the copyright notice or references to OASIS, except as needed for the
+  purpose of developing OASIS specifications, in which case the procedures for
+  copyrights defined in the OASIS Intellectual Property Rights document must be
+  followed, or as required to translate it into languages other than English.
+
+  The limited permissions granted above are perpetual and will not be revoked by
+  OASIS or its successors or assigns.
+
+  This document and the information contained herein is provided on an "AS IS"
+  basis and OASIS DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+  LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION HEREIN WILL NOT
+  INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR
+  A PARTICULAR PURPOSE.
+
+  ===============================================================================
+
+  For our absent friend, Michael J. Adcock  - il miglior fabbro
+
+  ===============================================================================
+
+  Universal Business Langauge Specification
+      (http://www.oasis-open.org/committees/tc_home.php?wg_abbrev=ubl)
+  OASIS Open (http://www.oasis-open.org/)
+
+
+  Document Type:     CoreComponentParameters
+
+-->
+<xsd:schema version="1:0-beta"
+ xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+ targetNamespace="urn:oasis:names:tc:ubl:CoreComponentParameters:1:0-beta"
+ xmlns="urn:oasis:names:tc:ubl:CoreComponentParameters:1:0-beta"
+ xmlns:ccts="urn:oasis:names:tc:ubl:CoreComponentParameters:1:0-beta"
+ elementFormDefault="qualified"
+ attributeFormDefault="unqualified">
+  <xsd:element name="Component" type="ccts:ComponentType"/>
+  <xsd:complexType name="ComponentType">
+    <xsd:sequence>
+      <xsd:element ref="CategoryCode" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="DictionaryEntryName" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="Definition" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="QualifierObjectClass" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="ObjectClass" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="QualifierPropertyTerm" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="PropertyTerm" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="QualifierRepresentationTerm" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="RepresentationTerm" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="QualifierDataType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="DataType" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="QualifierAssociatedObjectClass" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="AssociatedObjectClass" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="BusinessTerm" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="Context" type="ccts:ContextType"/>
+  <xsd:complexType name="ContextType">
+  	<xsd:sequence>
+   		<xsd:element ref="IndustryClassification" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="Geopolitical" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="BusinessProcess" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="OfficialConstraint" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="ProductClassification" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="BusinessProcessRole" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="SupportingRole" minOccurs="0" maxOccurs="unbounded"/>
+   		<xsd:element ref="SystemCapability" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+  <xsd:element name="Contextualization" type="ccts:ContextualizationType"/>
+  <xsd:complexType name="ContextualizationType">
+  	<xsd:sequence>
+	  	<xsd:element ref="Context" minOccurs="0" maxOccurs="unbounded"/>
+  	</xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="Instance" type="ccts:InstanceType"/>
+  <xsd:complexType name="InstanceType">
+    <xsd:sequence>
+      <xsd:element ref="Prefix" minOccurs="0" maxOccurs="1"/>
+      <!--
+           The following elements are to be used in Code List Schemas
+           to record the metadata of the code list for which the schema
+           represents.
+           Examples are:
+              CountryCode:
+                  CodeListQualifier="ISO 3166"
+                  CodeListAgency="6"
+                  CodeListVersion="0.3"
+              CurrencyCode:
+                  CodeListQualifier="ISO 4217"
+                  CodeListAgency="6"
+                  CodeListVersion="0.3"
+      -->
+      <xsd:element ref="CodeListQualifier" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="CodeListAgency" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="CodeListVersion" minOccurs="0" maxOccurs="1"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="CategoryCode" type="xsd:token"/>
+  <xsd:element name="DictionaryEntryName" type="xsd:string"/>
+  <xsd:element name="Definition" type="xsd:string"/>
+  <xsd:element name="QualifierObjectClass" type="xsd:token"/>
+  <xsd:element name="ObjectClass" type="xsd:token"/>
+  <xsd:element name="QualifierPropertyTerm" type="xsd:token"/>
+  <xsd:element name="PropertyTerm" type="xsd:token"/>
+  <xsd:element name="QualifierRepresentationTerm" type="xsd:token"/>
+  <xsd:element name="RepresentationTerm" type="xsd:token"/>
+  <xsd:element name="QualifierDataType" type="xsd:token"/>
+  <xsd:element name="DataType" type="xsd:token"/>
+  <xsd:element name="QualifierAssociatedObjectClass" type="xsd:token"/>
+  <xsd:element name="AssociatedObjectClass" type="xsd:token"/>
+  <xsd:element name="BusinessTerm" type="xsd:string"/>
+  <xsd:element name="IndustryClassification" type="xsd:string"/>
+  <xsd:element name="Geopolitical" type="xsd:string"/>
+  <xsd:element name="BusinessProcess" type="xsd:string"/>
+  <xsd:element name="OfficialConstraint" type="xsd:string"/>
+  <xsd:element name="ProductClassification" type="xsd:string"/>
+  <xsd:element name="BusinessProcessRole" type="xsd:string"/>
+  <xsd:element name="SupportingRole" type="xsd:string"/>
+  <xsd:element name="SystemCapability" type="xsd:string"/>
+  <xsd:element name="Prefix" type="xsd:token"/>
+  <xsd:element name="CodeListQualifier" type="xsd:token"/>
+  <xsd:element name="CodeListAgency" type="xsd:token"/>
+  <xsd:element name="CodeListVersion" type="xsd:token"/>
+</xsd:schema>

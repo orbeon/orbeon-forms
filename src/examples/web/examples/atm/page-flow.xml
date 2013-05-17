@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller" 
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page path-info="/atm" xforms="enter-pin-form.xml" view="enter-pin-view.xml">
+        <action when="/form/action = 'submit'" action="enter-pin-action.xsl">
+            <result when="/valid = 'true'" page="view-account"/>
+            <result>
+                <xu:append select="/form/pin" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                    <xu:attribute name="xxforms:valid">false</xu:attribute>
+                </xu:append>
+            </result>
+        </action>
+    </page>
+
+    <page id="view-account" path-info="/atm/atm-view-account" xforms="view-account-form.xml"
+            model="view-account-get-balance.xpl" view="view-account-view.xsl">
+        <action when="/amount != ''" action="view-account-action.xpl">
+            <result when="/success = 'true'" page="anything-else"/>
+            <result when="/success = 'false'" page="low-balance"/>
+        </action>
+    </page>
+
+    <page id="low-balance" path-info="/atm/atm-low-balance"
+            xforms="low-balance-form.xml" view="low-balance-view.xml">
+        <action when="/action = 'ok'">
+            <result page="view-account"/>
+        </action>
+    </page>
+
+    <page id="anything-else" path-info="/atm/atm-anything-else" xforms="anything-else-form.xml" view="anything-else-view.xml">
+        <action when="/anything-else = 'yes'">
+            <result page="view-account"/>
+        </action>
+        <action when="/anything-else = 'no'">
+            <result page="see-you-again"/>
+        </action>
+    </page>
+
+    <page id="see-you-again" path-info="/atm/atm-see-you-again" view="see-you-again-view.xml"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

@@ -1,0 +1,166 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Model 2X</title>
+    </header>
+    <body>
+        <section>
+            <title>Limitations of Early JSP</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    JSP tries to be both intuitive enough for
+                    non-Java programmers and powerful enough for Java
+                    programmers to accomplish complex enterprise-class
+                    tasks on the server. Experience shows that
+                    JSP often encourages bad practices that are detrimental
+                    to application modularity and maintainability, even when
+                    developers try to adhere to the Model 2 paradigm.
+                    One reason for this is that JSP started off
+                    with a doubly difficult strategy.
+                </p>
+            </section>
+            <section>
+                <title>Java within HTML</title>
+                <p>
+                    By encouraging the use of embedded Java, developers
+                    are too often tempted to embed some business logic in the
+                    presentation layer. The result
+                    is that JSP developers must rely on externally-defined
+                    and enforced so-called best practices to build clean Web
+                    applications with JSP.
+                </p>
+             </section>
+            <section>
+                <title>Non-compliance with XML</title>
+                <p>
+                    The format of JSP files is similar to XML, but is
+                    not XML at all. In particular, scriptlets use a syntax
+                    borrowed from Microsoft's ASP, which is not XML compliant.
+                    Leaving alone the issues that
+                    this poses to the implementers of JSP technology, this makes
+                    it difficult to process JSP source files and to enhance on
+                    the technology. While it is possible to generate
+                    well-formed XML or even well-formed HTML from a JSP page,
+                    there is no support in JSP engines to help developers
+                    generate well-formed content. Alternative
+                    technologies, such as XSP, elegantly address this
+                    particular issue. However such technologies have
+                    not been able to compete with JSP in the marketplace.
+                </p>
+            </section>
+            <section>
+                <title>Learning new languages</title>
+                <p>
+                    The advent of JSP 1.1 and custom tag libraries is a welcome
+                    addition to the original JSP design. But developers have to implement those tag libraries, which is
+                    a difficult task that requires recompilation and learning a
+                    new API. When using existing tag
+                    libraries, developers must learn a new language for each tag library.
+                </p>
+                <p>
+                    The Struts framework is a good example of this. Struts
+                    does a good job at minimizing the amount of Java
+                    programming in JSP pages. In fact, using the Struts tag
+                    libraries, it is possible
+                    to write JSP pages with no embedded Java at all through
+                     a combination of standard JSP tags and
+                    Struts-specific tags. Using Struts cleans
+                    things up significantly regarding embedded scriptlets,
+                    but several JSP quirks are still visible.
+                    The JavaServer Pages Standard Tag Library (JSTL) goes in the same
+                    direction.
+                </p>
+            </section>
+            <section>
+                <title>Monolithic presentation layer</title>
+                <p>
+                    It makes sense to have a central place where the look and feel
+                    is defined for the whole Web application. The same applies to
+                    internationalization, page layout and other aspects of the
+                    presentation layer. JSP does not support this at all.
+                </p>
+            </section>
+            <section>
+                <title>Long development cycles</title>
+                <p>
+                    Every time a JSP developer makes a change there is a tedious cycle
+                    to go through: edit -> compile -> package -> deploy -> run.
+                    Even if most JSP engines compile JSP pages on the fly,
+                    changes to custom tag libraries or business logic (EJBs for
+                    instance) still require long cycles.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Model 2X</title>
+            <p>
+                In an <link
+                href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</link>
+                published in February 2001 in <link
+                href="http://www.javaworld.com/">JavaWorld</link> magazine,
+                Orbeon introduced Model 2X, which enhances the <link
+                href="http://jakarta.apache.org/struts/">Struts</link>
+                implementation of Model 2 by replacing JSP with XML and XSLT.
+                Model 2X is the result of using Model 2 on several projects and
+                dealing with its limitations.
+            </p>
+            <p>
+                XSLT is a functional language designed to perform
+                transformations on XML documents. It is part of a
+                stylesheet language for XML known as XSL. XSLT uses
+                XPath, an expression language that accesses
+                parts of an XML document. At a high level, an XSLT
+                transformer can be considered a black box with two
+                inputs: a stylesheet and a source document as well as one
+                output: the result document.
+            </p>
+
+            <img print-format="pdf" src="pages/intro-xslt.png"/>
+            
+            <p>
+                In addition to producing documents in XML dialects
+                such as XHTML and XSL/FO (formatting objects), XSLT
+                can output HTML and any text-based format, including
+                CSV (comma-separated values).
+            </p>
+            <p>
+                Model 2X is the combination of Struts (or any similar
+                MVC framework) and XSLT. Model 2X uses the Struts controller and models
+                but views are implemented with XSLT instead of JSP.
+            </p>
+            <p>
+                Using XML/XSLT in Model 2X encourages
+                developers to deliver a pure separation of business and
+                presentation logic and brings the Web application world
+                one step closer to delivering on the MVC architecture's original
+                promise. Additional benefits including well-formed output
+                documents, reliance on standardized languages instead of
+                custom tag libraries, increased presentation layer flexibility,
+                and shortened development cycles; make Model 2X applications
+                more flexible and powerful than the traditional Model 2
+                implementations.
+            </p>
+            <p>
+                See the original <link
+                href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</link>
+                for a more detailed description of Model 2X.
+            </p>
+        </section>
+    </body>
+</document>

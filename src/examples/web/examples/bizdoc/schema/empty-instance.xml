@@ -1,0 +1,57 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<claim xmlns="http://orbeon.org/oxf/examples/bizdoc/claim">
+    <insured-info>
+        <general-info>
+            <name-info>
+                <title-prefix></title-prefix>
+                <last-name></last-name>
+                <first-name></first-name>
+                <title-suffix></title-suffix>
+            </name-info>
+            <address>
+                <address-detail>
+                    <street-name></street-name>
+                    <street-number></street-number>
+                    <unit-number></unit-number>
+                </address-detail>
+                <city></city>
+                <state-province></state-province>
+                <postal-code></postal-code>
+                <country></country>
+                <email></email>
+            </address>
+        </general-info>
+        <person-info>
+            <gender-code>U</gender-code>
+            <birth-date></birth-date>
+            <marital-status-code>U</marital-status-code>
+            <occupation></occupation>
+        </person-info>
+        <family-info>
+            <children>
+                <child>
+                    <birth-date></birth-date>
+                    <first-name></first-name>
+                </child>
+            </children>
+            <comments></comments>
+        </family-info>
+        <claim-info>
+            <accident-type>OTHER</accident-type>
+            <accident-date></accident-date>
+            <rate></rate>
+        </claim-info>
+    </insured-info>
+</claim>

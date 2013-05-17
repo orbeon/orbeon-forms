@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="SQL Processor" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <test description="Validation 1" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/processor/sql/sql-processor-config.rng"/>
+        <input name="config">
+            <config>
+                <decorate>false</decorate>
+            </config>
+        </input>
+        <input name="data" href="sql/config-1.xml"/>
+        <output name="data" href="sql/config-1.xml"/>
+    </test>
+
+    <test description="Validation 2" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/processor/sql/sql-processor-config.rng"/>
+        <input name="config">
+            <config>
+                <decorate>false</decorate>
+            </config>
+        </input>
+        <input name="data" href="sql/config-2.xml"/>
+        <output name="data" href="sql/config-2.xml"/>
+    </test>
+
+    <test description="Validation 3" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/processor/sql/sql-processor-config.rng"/>
+        <input name="config">
+            <config>
+                <decorate>false</decorate>
+            </config>
+        </input>
+        <input name="data" href="sql/config-3.xml"/>
+        <output name="data" href="sql/config-3.xml"/>
+    </test>
+
+    <test description="Validation 4" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/processor/sql/sql-processor-config.rng"/>
+        <input name="config">
+            <config>
+                <decorate>false</decorate>
+            </config>
+        </input>
+        <input name="data" href="sql/config-4.xml"/>
+        <output name="data" href="sql/config-4.xml"/>
+    </test>
+
+    <test description="Validation 5" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/processor/sql/sql-processor-config.rng"/>
+        <input name="config">
+            <config>
+                <decorate>false</decorate>
+            </config>
+        </input>
+        <input name="data" href="sql/config-5.xml"/>
+        <output name="data" href="sql/config-5.xml"/>
+    </test>
+
+</group>

@@ -1,0 +1,59 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:xi="http://www.w3.org/2001/XInclude"
+              xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
+              schema="form-schema.xsd">
+    <!-- The XForms instance with application data -->
+    <xforms:instance>
+        <form>
+            <action/>
+            <message/>
+            <show-errors/>
+            <document-id/>
+            <document>
+                <!-- The document is included  -->
+                <xi:include href="../schema/empty-instance.xml"/>
+            </document>
+        </form>
+    </xforms:instance>
+    <xforms:submission method="post"/>
+    <!-- Add some required elements -->
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:general-info/claim:name-info/claim:last-name"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:general-info/claim:name-info/claim:first-name"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:address-detail/claim:street-name"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:city"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:state-province"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:country"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date"
+        required="true()"/>
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:person-info/claim:occupation"
+        required="true()"/>
+    <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child"
+        relevant="count(following-sibling::claim:child) > 0"/>
+    <!-- This bind element handles calculated values -->
+    <xforms:bind nodeset="document/claim:claim/claim:insured-info/claim:claim-info/claim:rate"
+                 calculate="if (/form/document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date castable as xs:date)
+                            then if (current-date() - xs:date(/form/document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date) > xdt:dayTimeDuration('P365D'))
+                                 then 10
+                                 else 5
+                            else 0"/>
+</xforms:model>

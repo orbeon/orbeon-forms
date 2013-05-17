@@ -1,0 +1,580 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Resource Managers</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                A <i>resource manager</i> is an Orbeon PresentationServer (OPS) component
+                responsible for reading and writing XML and other resources like binary and text
+                documents. A resource manager abstracts the actual mechanisms used to store
+                resources. An important benefit of using such an abstraction is that it is possible
+                to store all your application files in a sandbox which can be moved at will within a
+                filesystem or between storage mechanisms. For instance, resources can be stored:</p>
+            <ul>
+                <li><p>As files on disk (using your operating system's file system)</p></li>
+                <li><p>As resources within a WAR file</p></li>
+                <li><p>As resources within one or more JAR files</p></li>
+                <li><p>In a WebDAV server</p></li>
+            </ul>
+            <p>A resource manager is both used:</p>
+            <ul>
+                <li><p>Internally by OPS</p></li>
+                <li><p>By your own OPS applications through URLs with the <code>oxf:</code> protocol</p></li>
+            </ul>
+            <p>
+                This chapter describes the different types of resource managers and explains their
+                configuration.
+            </p>
+        </section>
+        <section>
+            <title>General Configuration</title>
+            <p>
+                A single resource manager is initialized per OPS web application. Configuration is
+                handled in the web application descriptor (<code>web.xml</code>) by setting a number
+                of context parameters. The first parameter indicates the resource manager factory:
+            </p>
+            <xml-source>
+                <context-param>
+                    <param-name>oxf.resources.factory</param-name>
+                    <param-value>org.orbeon.oxf.resources.DefaultResourceManagerFactory</param-value>
+                </context-param>
+            </xml-source>
+            <p>
+                Other properties depend on the resource manager defined by the factory. These
+                properties are described in the following sections.
+            </p>
+        </section>
+        <a name="filesystem"/>
+        <section>
+            <title>Filesystem Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a filesystem</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>oxf.resources.filesystem.sandbox-directory</code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                The Filesystem resource manager loads resources from a filesystem. This is
+                especially useful during development, since no packaging of resources is necessary.
+                The <code>oxf.resources.filesystem.sandbox-directory</code> property can be used to
+                define a sandbox, and if used must point to a valid directory on a filesystem. If
+                not specified, no sandbox is defined, and it is possible to access all the files on
+                the filesystem.
+            </p>
+            <p>
+                Using the Filesystem resource manager without a sandbox is particularly useful for
+                command-line applications.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.filesystem.sandbox-directory</param-name>
+                        <param-value>/home/user/oxf/myapp/resources</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <!--
+        <section>
+            <title>JDBC Database Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a relational database</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.DefaultResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>
+                            org.orbeon.oxf.resources.DBResourceManagerFactory.jdbcUrl
+                            org.orbeon.oxf.resources.DBResourceManagerFactory.driver
+                            org.orbeon.oxf.resources.DBResourceManagerFactory.username
+                            org.orbeon.oxf.resources.DBResourceManagerFactory.password
+                            </code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p> The database resource manager is able to load resource from a
+            relational database. This resource manager is typically useful in a
+            distributed environment, where multiple applications access the same
+            resources. </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.DefaultResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>org.orbeon.oxf.resources.DBResourceManagerFactory.jdbcUrl</param-name>
+                        <param-value>jdbc:mysql:localhost/mydb</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>org.orbeon.oxf.resources.DBResourceManagerFactory.driver</param-name>
+                        <param-value>org.gjt.mm.mysql.Driver</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>org.orbeon.oxf.resources.DBResourceManagerFactory.username</param-name>
+                        <param-value>scott</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>org.orbeon.oxf.resources.DBResourceManagerFactory.password</param-name>
+                        <param-value>tiger</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <section>
+            <title>JDBC Datasource Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resource from a relational database</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.DataSourceResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.DataSourceResourceManagerFactory.datasource</code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p> This resource manager is similar to the JDBC resource manager,
+            only that it is initialized with a JDBC 2.0 datasource. This is
+            especially useful in a J2EE application server. </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.DataSourceResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>org.orbeon.oxf.resources.DataSourceResourceManagerFactory.datasource</param-name>
+                        <param-value>jdbc/employeesDB</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        -->
+        <section>
+            <title>ClassLoader Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a JAR file in the classpath</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>None</td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                The class loader resource manager can load resource from a JAR file or from a
+                directory in the classpath. This resource manager is required to load internal
+                resources for OPS.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <section>
+            <title>WebApp Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a WAR file or deployed Web Application</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.WebAppResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>oxf.resources.webapp.rootdir</code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                This resource manager is useful when you want to package an application into a
+                single WAR file for distribution and deployment. The configuration property
+                indicates the path prefix of the resources directory inside a WAR file. It is
+                recommended to store resources under the WEB-INF directory to make sure that the
+                resources are not exposed to remote clients.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webapp.rootdir</param-name>
+                        <param-value>/WEB-INF/resources</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <section>
+            <title>URL Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a URL</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.URLResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>oxf.resources.url.base</code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                This resource manager is able to load resources form any URL (http or ftp). It can
+                be used if your resources are located on a web server or a content management
+                system with an HTTP interface.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.URLResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.url.base</param-name>
+                        <param-value>http://www.somwhere.com/base/</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <a name="webdav"/>
+        <section>
+            <title>WebDAV Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a WebDAV repository</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.WebDAVResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>oxf.resources.webdav.base</code><br/>
+                            <code>oxf.resources.webdav.username</code><br/>
+                            <code>oxf.resources.webdav.password</code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                This resource manager is able to load resources form a WebDAV repository through
+                HTTP. Examples of WebDAV repositories include:
+            </p>
+            <ul>
+                <li><a href="http://jakarta.apache.org/slide/">Apache Jakarta Slide</a></li>
+                <li><a href="http://subversion.tigris.org/">Subversion</a></li>
+            </ul>
+            <p>
+                For more information about WebDAV, please consult <a
+                href="http://www.webdav.org/">WebDAV Resources</a>.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebDAVResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webdav.base</param-name>
+                        <param-value>http://www.somwhere.com/base/</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webdav.username</param-name>
+                        <param-value>joe</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webdav.password</param-name>
+                        <param-value>password</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+            <warning>
+                <p>
+                    The WebDAV resource manager is considered experimental.
+                </p>
+            </warning>
+        </section>
+        <section>
+            <title>Priority Resource Manager</title>
+            <p>
+                <table ca="|p{0.2\textwidth}|p{0.8\textwidth}|">
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Chains several resource managers in order</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.PriorityResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>
+                                oxf.resources.priority.1<br/>
+                                oxf.resources.priority.2<br/>
+                                oxf.resources.priority.n
+                            </code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                With the priority resource manager you can chain several resource managers. It is
+                crucial to be able to load resources from multiple sources since some resources are
+                bundled in the OPS JAR file. Thus, the class loader resource
+                manager must always be in the priority chain. It usually has the lowest priority so
+                the application developer can override system resources.
+            </p>
+            <p>
+                There can be any number of chained resource managers. They are configured by adding
+                a <code>oxf.resources.priority.n</code> property, where <code>n</code> is an
+                integer.
+            </p>
+            <warning>
+                <p>
+                    The priority resource manager is more efficient when most resources are found
+                    in the first resource manager specified.
+                </p>
+            </warning>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webapp.rootdir</param-name>
+                        <param-value>/WEB-INF/resources</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.1</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.2</param-name>
+                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <section>
+            <title>Cach&#233; Database Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from the Cach&#233; database</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.CacheResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>oxf.resources.cache.url</code><br/>
+                            <code>oxf.resources.cache.username</code><br/>
+                            <code>oxf.resources.cache.password</code><br/>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                This resource manager loads XML documents from <link
+                href="http://www.intersystems.com/">InterSystems</link> Cach&#233; Object Database.
+                <link href="http://www.mgateway.tzo.com/eXtc.htm">eXtc</link> provides a W3C DOM
+                interface to Cach&#233; and allows OPS to store and retrieve XML
+                documents. This section assumes Cach&#233; and eXtc are already installed on your
+                system.
+            </p>
+
+            <note>
+                <p>
+                    To enable this Resource Manager, you must copy <code>CacheDB.jar</code> from
+                    Cach&#233; distribution into OPS <code>WEB-INF/lib</code> directory.
+                </p>
+            </note>
+
+            <warning>
+                <p>
+                    The Cach&#233; Resource Manager only supports XML document. To serve other
+                    document types (like text, images), you must cascade a second resource manager
+                    with the help of the Priority Resource Manager.
+                </p>
+            </warning>
+            <section>
+                <title>Importing XML Files into Cach&#233;</title>
+                <p>
+                    OPS ships with <code>CacheImport</code> to populate the
+                    database with resource from a directory. Set your <code>CLASSPATH</code>
+                    environment variable to include the following JAR files to run
+                    <code>CacheImport</code>:
+                </p>
+
+                <p>
+                    <ul>
+                        <li>ops.jar</li>
+                        <li>CacheDB.jar</li>
+                        <li>commons-cli.jar</li>
+                        <li>xercesImpl-2_2_1_orbeon.jar</li>
+                        <li>xml-apis-2_5_1.jar</li>
+                        <li>dom4j-1_4.jar</li>
+                    </ul>
+                </p>
+                <p>
+                    The options below are available:
+                    <table>
+                        <tr>
+                            <th>Option</th>
+                            <th>Meaning</th>
+                        </tr>
+                        <tr>
+                            <td>-u,--url arg</td>
+                            <td>Cach&#233; URL</td>
+                        </tr>
+                        <tr>
+                            <td>-l,--login arg</td>
+                            <td>Cach&#233; Login</td>
+                        </tr>
+                        <tr>
+                            <td>-p,--password arg</td>
+                            <td>Cach&#233; Password</td>
+                        </tr>
+                        <tr>
+                            <td>-r,--root arg </td>
+                            <td>Resource Root</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    You run <code>CacheImport</code> with the following command:
+                    <source>java org.orbeon.oxf.resources.CacheImport</source>
+                </p>
+            </section>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.CacheResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.cache.url</param-name>
+                        <param-value>jdbc:Cache://localhost:1972/OXF</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.cache.username</param-name>
+                        <param-value>_SYSTEM</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.cache.password</param-name>
+                        <param-value>sys</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,122 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Introduction</title>
+    </header>
+    <body>
+        <section>
+            <title>From static HTML to Java Servlets</title>
+            <p>
+                In the early days of the World Wide Web, serving
+                static HTML was the dominant form of content. Soon the growing
+                need for Web-based applications and more
+                advanced Web publishing systems
+                fueled the development of
+                dynamic HTML and technologies for Web site generation. In particular, the
+                Common Gateway Interface (CGI) was developed to
+                standardize how Web servers interacted with scripts
+                written in various languages such as Perl and C.
+                CGI has performance limitations because it
+                requires spawning a new process at every request.
+            </p>
+            <p>
+                Web server vendors started providing proprietary solutions to
+                overcome the performance issues of CGI. Those solutions were
+                based on C or C++ APIs. The Java community naturally responded
+                with a Java API: the Java Servlets API. Servlets require users
+                to programmatically generate HTML in Java, and println()
+                statements are commonly used. This requires recompilation
+                whenever HTML changes, and the nature of Java and HTML makes it
+                awkward and time-consuming to add or modify HTML contents.
+                Furthermore, Servlets don't have any provision to separate
+                presentation and business logic.
+            </p>
+        </section>
+        <section>
+            <title>JavaServer Pages (JSP)</title>
+            <p>
+                During this time, Microsoft created the Active
+                Server Pages (ASP), to which Sun responded with JavaServer
+                Pages (JSP). JSP can be considered Servlets turned inside-out,
+                in that Java code is now embedded into HTML pages. With
+                JSP, mixing Java and HTML is less confusing, but JSP
+                makes it easy to mix presentation and other application
+                logic in the same place. In medium- to large-scale
+                applications, enforcing the separation between presentation
+                logic and business logic becomes crucial to produce reliable
+                and maintainable applications.
+            </p>
+        </section>
+        <section>
+            <title>Model 1</title>
+            <p>
+                A naive way of approaching JSP programming is to consider
+                JSP the center of a Web page. This conception is called
+                Model 1, and consists of using JSP to
+                extract HTTP request parameters, call the
+                business logic (implemented in JavaBeans, if not
+                directly in the JSP), handle the HTTP session, and
+                generate HTML output. Although Model 1 is suitable for simple
+                applications, it rapidly shows limitations. Random usage
+                of this architecture usually leads to a significant amount of
+                scriptlets (Java code embedded within HTML code in the JSP page),
+                especially if there is a significant amount of request
+                processing to be performed.
+            </p>
+            <p>
+                Another limitation of Model 1 is that each
+                JSP page must be individually responsible for
+                managing the application state and verifying
+                authentication and security.
+                </p>
+            <img print-format="pdf" src="pages/intro-model1.png"/>
+        </section>
+        <section>
+            <title>Model 2 and MVC</title>
+            <p>
+                What if both Java Servlets and JSP were leveraged to
+                solve all these issues?
+            </p>
+            <p>
+                With Model 2, Servlets control the flow of the Web
+                application and delegate the business logic to external
+                components, usually JavaBeans or EJBs,
+                while JSP pages take care of producing the HTML for Web
+                browsers. This is commonly called the MVC
+                Model View Controller (MVC) architecture.
+            </p>
+            <img print-format="pdf" src="pages/intro-model2.png"/>
+            <p>
+                The benefits of this model is that Servlets do not deal
+                with presentation logic at all but rather just process
+                HTTP requests and control the flow of the application.
+                The model implementing the business logic sends objects
+                or JavaBeans to the view,
+                therefore encouraging a much cleaner separation
+                of business and presentation logic and making application
+                development and maintenance much easier. This is an
+                important factor in the recent popularity of frameworks
+                such as Struts that implement this model.
+            </p>
+            <p>
+                The next section shows how Model 2X, using XML and XSLT,
+                builds upon and enhances Model 2.
+            </p>
+        </section>
+    </body>
+</document>

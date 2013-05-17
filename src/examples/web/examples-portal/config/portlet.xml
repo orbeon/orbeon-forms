@@ -1,0 +1,112 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<portlet-app>
+    <portlet>
+        <portlet-name>OXFExamplesPortlet</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+        <init-param>
+            <name>oxf.main-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.main-processor.input.config</name>
+            <value>oxf:/examples/dispatch.xpl</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
+        </init-param>
+        <init-param>
+            <name>oxf.portlet-initialized-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.portlet-initialized-processor.input.config</name>
+            <value>oxf:/context/portlet-initialized.xpl</value>
+        </init-param>
+        <init-param>
+            <name>oxf.portlet-destroyed-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.portlet-destroyed-processor.input.config</name>
+            <value>oxf:/context/portlet-destroyed.xpl</value>
+        </init-param>
+        <supports>
+            <mime-type>text/html</mime-type>
+        </supports>
+        <portlet-info>
+            <title>Run Example</title>
+            <short-title>Run Example</short-title>
+        </portlet-info>
+    </portlet>
+    <portlet>
+        <portlet-name>OXFExamplesDocumentationPortlet</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+        <init-param>
+            <name>oxf.main-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
+        </init-param>
+        <init-param>
+            <name>oxf.main-processor.input.controller</name>
+            <value>oxf:/examples-portal/portlets/documentation/page-flow.xml</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
+        </init-param>
+        <supports>
+            <mime-type>text/html</mime-type>
+        </supports>
+        <portlet-info>
+            <title>View Description</title>
+            <short-title>View Description</short-title>
+        </portlet-info>
+    </portlet>
+    <portlet>
+        <portlet-name>OXFExamplesSourceCodePortlet</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+        <init-param>
+            <name>oxf.main-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}page-flow</value>
+        </init-param>
+        <init-param>
+            <name>oxf.main-processor.input.controller</name>
+            <value>oxf:/examples-portal/portlets/source/page-flow.xml</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
+        </init-param>
+        <supports>
+            <mime-type>text/html</mime-type>
+        </supports>
+        <portlet-info>
+            <title>View Source</title>
+            <short-title>View Source</short-title>
+        </portlet-info>
+    </portlet>
+</portlet-app>

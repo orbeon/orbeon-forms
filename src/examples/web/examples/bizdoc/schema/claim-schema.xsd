@@ -1,0 +1,190 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xs:schema targetNamespace="http://orbeon.org/oxf/examples/bizdoc/claim"
+    xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    elementFormDefault="qualified"
+    attributeFormDefault="unqualified">
+
+    <xs:element name="claim">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="insured-info">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="general-info">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="name-info">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="title-prefix">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:enumeration value=""/>
+                                                                <xs:enumeration value="Dr."/>
+                                                                <xs:enumeration value="Pr."/>
+                                                                <xs:enumeration value="Mr."/>
+                                                                <xs:enumeration value="Ms."/>
+                                                                <xs:enumeration value="Mrs."/>
+                                                                <xs:enumeration value="Dr"/>
+                                                                <xs:enumeration value="Pr"/>
+                                                                <xs:enumeration value="Mr"/>
+                                                                <xs:enumeration value="Ms"/>
+                                                                <xs:enumeration value="Mrs"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <!--<xs:element type="claim:requiredNonEmptyString" name="last-name"/>-->
+                                                    <xs:element ref="claim:last-name"/>
+                                                    <xs:element ref="claim:first-name"/>
+                                                    <xs:element type="xs:string" name="title-suffix"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element name="address">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="address-detail">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element type="xs:string" name="street-name"/>
+                                                                <xs:element type="xs:integer" name="street-number"/>
+                                                                <xs:element type="xs:string" name="unit-number"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element type="claim:requiredNonEmptyString" name="city"/>
+                                                    <xs:element type="xs:string" name="state-province"/>
+                                                    <xs:element name="postal-code">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:nonNegativeInteger">
+                                                                <xs:pattern value="[1-9][0-9]{4}"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                    <xs:element type="claim:requiredNonEmptyString" name="country"/>
+                                                    <xs:element name="email">
+                                                        <xs:simpleType>
+                                                            <xs:restriction base="xs:string">
+                                                                <xs:pattern value="[^@]+@[^\.]+\..+"/>
+                                                            </xs:restriction>
+                                                        </xs:simpleType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="person-info">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="gender-code">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="M"/>
+                                                    <xs:enumeration value="F"/>
+                                                    <xs:enumeration value="U"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:date" name="birth-date"/>
+                                        <xs:element name="marital-status-code">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="C"/>
+                                                    <xs:enumeration value="D"/>
+                                                    <xs:enumeration value="M"/>
+                                                    <xs:enumeration value="P"/>
+                                                    <xs:enumeration value="S"/>
+                                                    <xs:enumeration value="U"/>
+                                                    <xs:enumeration value="W"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="occupation"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="family-info">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="children">
+                                            <xs:complexType>
+                                                <xs:sequence maxOccurs="unbounded">
+                                                    <xs:element name="child">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element type="claim:optionalDate" name="birth-date"/>
+                                                                <xs:element type="xs:string" name="first-name"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element type="xs:string" name="comments"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="claim-info">
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="accident-type">
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:enumeration value="HAND"/>
+                                                    <xs:enumeration value="HEAD"/>
+                                                    <xs:enumeration value="FOOT"/>
+                                                    <xs:enumeration value="OTHER"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element type="xs:date" name="accident-date"/>
+                                        <xs:element type="xs:decimal" name="rate"/>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="last-name" type="claim:requiredNonEmptyString"/>
+    <xs:element name="first-name" type="claim:requiredNonEmptyString"/>
+
+    <xs:simpleType name="requiredNonEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1" />
+            <xs:whiteSpace value="collapse"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:simpleType name="optionalDate">
+		<xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:date"/>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:maxLength value="0"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:union>
+	</xs:simpleType>
+
+</xs:schema>

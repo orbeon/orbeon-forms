@@ -1,0 +1,761 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Page Flow Epilogue</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction to the Page Flow Epilogue</title>
+            <p>
+                The OPS <i>page flow epilogue</i> is an <a href="reference-xpl-pipelines">XPL
+                pipeline</a> executed by the <a href="reference-page-flow">Page Flow
+                Controller</a> (PFC) in order to perform tasks common to all the pages in an OPS
+                application. Such tasks include:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Look and feel.</b> Adding a common look and feel to all the XHTML pages
+                        in an application.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Page layout.</b> Adding a page header, footer, or navigation bar.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Linking common files.</b> Adding common links to external CSS
+                        stylesheets or scripts.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Document-aware formatting.</b> Formatting the document differently
+                        depending on the type of document produced by a page view, for example XHTML
+                        or XSL-FO.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Client-aware formatting.</b> Producing XHTML or plain HTML depending on
+                        the user agent requesting the page, or different versions of HTML depending
+                        on different clients.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Server-side XForms processing.</b> The OPS server-side XForms engine is
+                        hooked up in the epilogue.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>URL rewriting.</b> Rewriting URLs so that XHTML pages are written
+                        independently from their final location.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Servlet and portlet support.</b> Formatting pages differently for
+                        deployment as a portlet.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>User-defined configuration.</b> Finally, because the epilogue is a
+                        configurable XPL pipeline, there is no limit to the tasks it can acomplish!
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Thanks to the page flow epilogue, it is not necessary to duplicate common behavior
+                in all the page views of a given OPS application.
+            </p>
+        </section>
+        <section>
+            <title>Basics</title>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The epilogue pipeline is specified with the <a
+                    href="reference-page-flow#epilogue-element"><code>&lt;epilogue&gt;</code>
+                    element</a> in your page flow. By default, the <i>standard epilogue</i> located
+                    under <code>oxf:/config/epilogue.xpl</code> is used.
+                </p>
+            </section>
+            <section>
+                <title>Execution</title>
+                <p>
+                    The epilogue is executed by the PFC only after a page view executes. This means
+                    that for a given execution of a page, the following conditions must be met for the
+                    epilogue to execute:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>&lt;page&gt;</code> elements has a <code>view</code> attribute.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            No page result element with a <code>page</code> attribute executes
+                            (because in that case, a redirection to another page occurs, and neither
+                            model nor view of the current page executes).
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Inputs and Outputs</title>
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>data</code></td>
+                        <td>
+                            <p>
+                                When executed, the epilogue XPL pipeline has a <code>data</code> input containing
+                                the XML document produced by the page view which just executed. In particular, if
+                                the page view is:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <b>A static XML file:</b> the <code>data</code> input directly receives the
+                                        unmodified content of that file.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>An XSLT template:</b> the <code>data</code> input receives the default
+                                        output of the XSLT template.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>An XPL pipeline:</b> the <code>data</code> input receives the content of
+                                        the <code>data</code> output of that pipeline.
+                                    </p>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>instance</code></td>
+                        <td>
+                            <p>
+                                The epilogue XPL pipeline receives on its <code>instance</code> input the <a
+                                href="reference-page-flow#xml-submission"> XML submission</a> performed on the
+                                page, if any. The epilogue usually does not use this input.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>xforms-model</code></td>
+                        <td>
+                            <p>
+                                The epilogue XPL pipeline also receives on its <code>xforms-model</code> input
+                                the legacy XForms model as specified on the <code>&lt;page&gt;</code> element's
+                                <code>xforms</code> attribute. This input is for the private use of the legacy
+                                server-side XForms engine in OPS. You usually do not have to deal with it.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Output</td>
+                        <td><code>-</code></td>
+                        <td>
+                            <p>
+                                The epilogue XPL pipeline does not have any output: the result of
+                                the XPL pipeline must be produced using a serializer, usually the <a
+                                href="processors-serializers-http">HTTP serializer</a>, which
+                                serializes the resulting data directly to an HTTP client such as a
+                                web browser.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+        </section>
+        <a name="standard-epilogue"/>
+        <section>
+            <title>The Standard Epilogue: epilogue.xpl</title>
+            <p>
+                The standard epilogue is found under <code>oxf:/config/epilogue.xpl</code>. It
+                performs the following tasks:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>XForms processing:</b> it applies server-side XForms processing if
+                        needed. If your application does not use the OPS built-in XForms engine
+                        at all, you can bypass XForms processing.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Container type selection:</b> it dispatches to two sub-epilogues,
+                        <code>oxf:/config/epilogue-servlet.xpl</code> and
+                        <code>oxf:/config/epilogue-portlet.xpl</code>, depending on whether the
+                        page is running in a servlet or portlet environment. If your application
+                        does not use portlets at all, you can bypass this choice.
+                    </p>
+                    <note>
+                        <p>
+                            With OPS 3.0, only the servlet environment is officially supported. The
+                            portlet environment is however used for the examples portal. Please also
+                            refer to this <a href="home-faq#jsr-168">FAQ entry</a>.
+                        </p>
+                        <p>
+                            This means that for your OPS applications,
+                            <code>epilogue-servlet.xpl</code> is usually the relevant file to
+                            consider.
+                        </p>
+                    </note>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>The Servlet Epilogue: epilogue-servlet.xpl</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    <code>oxf:/config/epilogue-servlet.xpl</code> is the epilogue file you are the
+                    most likely to configure.
+                </p>
+            </section>
+            <section>
+                <title>Inputs and Outputs</title>
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>xformed-data</code></td>
+                        <td>
+                            <p>
+                                This XPL pipeline receives on this input the XML document produced
+                                by the page view and then transformed by server-side XForms
+                                processing. This means that if the page view produces an XHTML +
+                                XForms document, the document received by
+                                <code>epilogue-servlet.xpl</code> on its <code>xformed-data</code>
+                                is already transformed by the server-sided XForms engine into XHTML.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>data</code></td>
+                        <td>
+                            <p>
+                                This XPL pipeline also receives on its <code>data</code> input the
+                                raw XML document produced by the page view. This is the same XML
+                                document received by <code>epilogue.xpl</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Output</td>
+                        <td><code>-</code></td>
+                        <td>
+                            <p>
+                                This XPL pipeline does not have any output: the result of the XPL
+                                pipeline must be produced using a serializer, usually the <a
+                                href="processors-serializers-http">HTTP serializer</a>, which
+                                serializes the resulting data directly to an HTTP client such as a
+                                web browser.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>Processing Logic</title>
+                <p>
+                    <code>epilogue-servlet.xpl</code> performs different tasks depending on the input
+                    XML document.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>XHTML:</b> for XHTML documents, identified with a root element of
+                            <code>xhtml:html</code> (in the XHTML namespace), two options are
+                            proposed:
+                        </p>
+                        <ul>
+                            <li>
+                                <p>
+                                    <b>Option 1: conversion from XHTML to HTML.</b>
+                                </p>
+                                <ol>
+                                    <li>
+                                        <p>The standard theme is applied.</p>
+                                    </li>
+                                    <li>
+                                        <p>URLs are rewritten.</p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            XHTML is converted to HTML by moving the XHTML elements
+                                            to no namespace and by removing their prefixes, if any.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            The result is converted to plain HTML according to the
+                                            <a
+                                            href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT
+                                            2.0 and XQuery 1.0 Serialization</a> HTML output method.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>The resulting HTML document is sent to the client through HTTP.</p>
+                                    </li>
+                                </ol>
+                            </li>
+                            <li>
+                                <p>
+                                    <b>Option 2: browser detection with native XHTML output
+                                    option.</b> This option is commented out so that the default is
+                                    just to send plain HTML to the client.
+                                </p>
+                                <ol>
+                                    <li>
+                                        <p>The standard theme is applied.</p>
+                                    </li>
+                                    <li>
+                                        <p>URLs are rewritten.</p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            If the client tells the server, with an
+                                            <code>accept</code> header, that it accepts XHTML
+                                            documents:
+                                        </p>
+                                        <ol>
+                                            <li>
+                                                <p>
+                                                    XHTML elements are stripped from their prefixes,
+                                                    if any, but they are left in the XHTML
+                                                    namespace. This makes the XHTML more compatible
+                                                    with certain non-XHTML-aware user agents.
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    The result is converted to serialized XHTML
+                                                    according to the <a
+                                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT
+                                                    2.0 and XQuery 1.0 Serialization</a> XHTML
+                                                    output method.
+                                                </p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p>Otherwise:</p>
+                                        <ol>
+                                            <li>
+                                                <p>
+                                                    XHTML is converted to HTML by moving the XHTML
+                                                    elements to no namespace and by removing their
+                                                    prefixes, if any.
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    The result is converted to plain HTML according
+                                                    to the <a
+                                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT
+                                                    2.0 and XQuery 1.0 Serialization</a> HTML output
+                                                    method.
+                                                </p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p>The resulting document is sent to the client through HTTP.</p>
+                                    </li>
+                                </ol>
+                            </li>
+                        </ul>
+                        <note>
+                            <p>
+                                You can easily construct variations on those options, such as
+                                sending XHTML only to certain user agents, or always sending XHTML.
+                            </p>
+                        </note>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Pseudo-HTML:</b> for pseudo-HTML documents, identified with a root
+                            element of <code>html</code> (in lowercase and in no namespace):
+                        </p>
+                        <ol>
+                            <li>
+                                <p>URLs are rewritten.</p>
+                            </li>
+                            <li>
+                                <p>
+                                    The result is converted to plain HTML according to the <a
+                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT 2.0
+                                    and XQuery 1.0 Serialization</a> HTML output method.
+                                </p>
+                            </li>
+                            <li>
+                                <p>The resulting HTML document is sent to the client through HTTP.</p>
+                            </li>
+                        </ol>
+                        <note>
+                            <p>
+                                No theme stylesheet is applied in this case. You are encouraged to
+                                write XHTML and use a single theme which matches against XHTML
+                                elements only, leaving possible conversion to HTML for subsequent
+                                steps. It is however possible to apply a theme stylesheet in this
+                                case as well by inserting a call to the XSLT processor in this case
+                                as well.
+                            </p>
+                            <p>
+                                It should also be noted that URL rewriting only applies to lowercase
+                                HTML elements. URL rewriting for pseudo-HTML documents is
+                                deprecated.
+                            </p>
+                        </note>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XSL-FO:</b> if the document is an XSL-FO document, identified with a root
+                            element of <code>fo:root</code> (in the XSL-FO namespace):
+                        </p>
+                        <ol>
+                            <li>
+                                <p>
+                                    The XSL-FO converter is called. It generates a binary PDF
+                                    document.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    The resulting PDF document is sent to the client through HTTP.
+                                </p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Binary and text documents:</b> if the document root is
+                            <code>document</code> and has an <code>xsi:type</code> attribute:
+                        </p>
+                        <ol>
+                            <li>
+                                <p>
+                                    The encapsulated binary or text document is sent as per the
+                                    semantic described in <a href="reference-formats">Non-XML
+                                    Documents</a>.
+                                </p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Plain XML:</b> in all other cases:
+                        </p>
+                        <ol>
+                            <li>
+                                <p>
+                                    The result is converted to plain XML according to the <a
+                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT 2.0
+                                    and XQuery 1.0 Serialization</a> XML output method.
+                                </p>
+                            </li>
+                            <li>
+                                <p>The plain XML document is sent to the client through HTTP.</p>
+                            </li>
+                        </ol>
+                    </li>
+                </ul>
+                <p>
+                    You are free to:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Modify the support for the document formats handled by default.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Add support for his own document formats by adding <code>p:when</code>
+                            branches to the <code>p:choose</code> statement.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <title>The Portlet Epilogue: epilogue-portlet.xpl</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    <code>oxf:/config/epilogue-portlet.xpl</code> is the epilogue file used for the
+                    examples portal. You usually do not have to worry about this XPL pipeline unless
+                    you add new examples, or unless you deploy as a JSR-168 portlet.
+                </p>
+            </section>
+            <section>
+                <title>Inputs and Outputs</title>
+                <p>
+                    <code>epilogue-portlet.xpl</code> has the same inputs as the
+                    <code>epilogue-servlet.xpl</code> epilogue.
+                </p>
+            </section>
+            <section>
+                <title>Processing Logic</title>
+                <p>
+                    <code>epilogue-portlet.xpl</code> performs different tasks depending on the input
+                    XML document.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>XHTML:</b> for XHTML documents, identified with a root element of
+                            <code>xhtml:html</code> (in the XHTML namespace):
+                        </p>
+                        <ol>
+                            <li>
+                                <p>
+                                    The standard theme is applied but an XHTML fragment enclosed in a
+                                    <code>xhtml:div</code> element is produced instead of a
+                                    full-fledged XHTML document.
+                                </p>
+                            </li>
+                            <li>
+                                <p>URLs are rewritten.</p>
+                            </li>
+                            <li>
+                                <p>The resulting XHTML document is sent to the portlet container as an XHTML fragment.</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Plain XML:</b> in all other cases:
+                        </p>
+                        <ol>
+                            <li>
+                                <p>The XML document is included in a simple XHTML document and formatted into XHTML.</p>
+                            </li>
+                            <li>
+                                <p>The resulting XHTML document then goes through the same steps as a regular XHTML document..</p>
+                            </li>
+                        </ol>
+                    </li>
+                </ul>
+                <p>
+                    You are free to:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Modify the support for the document formats handled by default.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Add support for his own document formats by adding <code>p:when</code>
+                            branches to the <code>p:choose</code> statement. In a portlet
+                            environment, it is important to remember that a portlet can usually only
+                            output a markup fragment such as HTML or XML, but no associated
+                            resources such as images, PDF files, etc.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <title>XForms Processing</title>
+            <p>
+                The OPS built-in <a href="reference-xforms-ng">XForms engine</a> allows you to write
+                not only raw XHTML, but also supports XForms 1.0. To achieve this, the XForms engine
+                rewrites XHTML + XForms into XHTML + Javascript + CSS. This transformation also
+                occurs in the epilogue, as mentioned <a href="#standard-epilogue">above</a>.
+            </p>
+            <p>
+                While it is not necessary to know in details the work performed by the XForms
+                engine, it is important to know that:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        XForms processing is triggered when either a legacy XForms model is found on
+                        the <code>xforms-model</code> input of the epilogue, or when an XForms model
+                        is found under <code>/xhtml:html/xhtml:head</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The result of XForms processing is that all the elements in the XForms
+                        namespace are removed, including the XForms models you may have under
+                        <code>xhtml:head</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Instead of XForms elements, you will find XHTML elements. Those elements may
+                        use some CSS classes defined in <code>xforms.css</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The standard theme includes some default OPS CSS stylesheets and scripts
+                        used by the XForms engine.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>The Standard Theme</title>
+            <p>
+                The standard OPS theme is found under the <code>oxf:/config/theme</code> directory.
+                The entry point of the theme is the <code>theme.xsl</code> stylesheet, called from
+                the epilogue XPL pipelines.
+            </p>
+            <p>
+                As documented above, the standard theme is called only for views that generate XHTML
+                documents. The standard theme does not run, for example, on pseudo-HTML, XSL-FO, or
+                plain XML documents.
+            </p>
+            <p>
+                The standard theme does the following:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        It copies, under <code>xhtml:head</code>, the <code>xhtml:meta</code>,
+                        <code>xhtml:link</code>, <code>xhtml:style</code>, and
+                        <code>xhtml:script</code> elements from the source XHTML document. This
+                        allows you for example to link to a particualar Javascript script on a page
+                        by page basis, instead of including the script in all the pages of your
+                        application.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It adds, under <code>xhtml:head</code>, links to OPS CSS stylesheets and
+                        scripts necessary for the server-side XForms engine, in particular the
+                        following CSS stylesheets:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>orbeon.css:</b> definitions proprietary to the default theme.
+                                These definitions are likely to be overridden by the user as they
+                                create their own theme.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>xforms.css:</b> definitions related to XForms controls. These
+                                definitions may be changed by users if they are not happy with the
+                                defaults.
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
+                        It generates, under <code>xhtml:head</code>, an <code>xhtml:title</code>
+                        element, first by looking in the XHTML document if present. If not found, it
+                        looks for a <code>f:example-header</code> element (this element is used by
+                        some OPS examples). Finally, it looks for the first <code>xhtml:h1</code>
+                        element in the body of the XHTML document.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It handles the <code>f:tabs</code> element used by some OPS examples.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It processes the source <code>xhtml:body</code> element. This mostly results
+                        in copying the content of the source <code>xhtml:body</code>, with the
+                        following exceptions:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                 Styling is applied to some XHTML forms elements.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Attribute in the XHTML namespace are copied but in no namespace.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Some special handling is performed for the body of included portlets
+                                so that URLs do not get rewritten in this case. This is useful only
+                                for the examples portal.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Any element within the
+                                <code>http://orbeon.org/oxf/xml/formatting</code> namespace, usually
+                                prefixed with <code>f:</code>, is handled by the included
+                                <code>formatting.xsl</code> stylesheet. This stylesheet contains
+                                some useful formatting templates, in particular to format XML and
+                                display tabs. None of the templates in this stylesheet is required
+                                for your OPS application.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        The categories above are implemented with sets of <code>xsl:template</code>
+                        elements. Those are clearly delimited in <code>theme.xsl</code>.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                You can configure the standard theme at your leisure for your own application. You
+                typically get started by modifying <code>theme.xsl</code>.
+            </p>
+        </section>
+        <!--
+        <section>
+            <title></title>
+            <p>
+
+            </p>
+        </section>
+        -->
+    </body>
+</document>

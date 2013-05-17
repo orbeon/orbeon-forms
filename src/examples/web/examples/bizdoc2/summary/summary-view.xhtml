@@ -1,0 +1,164 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
+      xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Summary</title>
+        <xforms:model>
+            <!-- This instance is used to generate requests to the server -->
+            <xforms:instance id="request-instance">
+                <form xmlns="">
+                    <action/>
+                    <document-id/>
+                </form>
+            </xforms:instance>
+            <!-- This instance contains the list of documents to display -->
+            <xforms:instance id="document-infos-instance">
+                <xi:include href="input:data"/>
+            </xforms:instance>
+            <!-- This instance controls visibility of groups -->
+            <xforms:instance id="control">
+                <control xmlns="">
+                    <full/>
+                    <empty/>
+                </control>
+            </xforms:instance>
+            <xforms:bind id="full" nodeset="instance('control')/full" relevant="count(instance('document-infos-instance')/document-info) > 0"/>
+            <xforms:bind id="empty" nodeset="instance('control')/empty" relevant="count(instance('document-infos-instance')/document-info) = 0"/>
+            <!-- Submissions -->
+            <xforms:submission id="main-submission" ref="instance('request-instance')" method="post" action="/bizdoc2"/>
+            <xforms:submission id="delete-submission" ref="instance('request-instance')" replace="instance" instance="document-infos-instance" method="post" action="/bizdoc2/delete"/>
+            <xforms:submission id="import-submission" ref="instance('request-instance')" replace="instance" instance="document-infos-instance" method="post" action="/bizdoc2/import"/>
+            <xforms:submission id="refresh-submission" ref="instance('request-instance')" replace="instance" instance="document-infos-instance" method="post" action="/bizdoc2/refresh"/>
+        </xforms:model>
+    </head>
+    <body>
+        <div class="maincontent">
+            <xi:include href="../view-logo.xml"/>
+            <h2 style="margin-top: 0">Available Documents</h2>
+            <xforms:group ref="instance('control')/full">
+                <table class="gridtable">
+                    <tr>
+                        <th>Last Name</th>
+                        <th>First Name</th>
+                        <th>Document Identifier</th>
+                        <th>Edit</th>
+                        <th>XML</th>
+                        <th>Delete</th>
+                    </tr>
+                    <xforms:repeat id="document-info-repeat" nodeset="instance('document-infos-instance')/document-info">
+                        <tr>
+                            <td>
+                                <xforms:output ref="claim:last-name"/>
+                            </td>
+                            <td>
+                                <xforms:output ref="claim:first-name"/>
+                            </td>
+                            <td>
+                                <xforms:output ref="document-id"/>
+                            </td>
+                            <td>
+                                <xforms:trigger>
+                                    <xforms:label>Edit</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="instance('request-instance')/action">show-detail</xforms:setvalue>
+                                        <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('document-info-repeat')]/document-id"/>
+                                        <xforms:send submission="main-submission"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </td>
+                            <td>
+                                <xforms:trigger>
+                                    <xforms:label>XML</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="instance('request-instance')/action">show-xml</xforms:setvalue>
+                                        <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('document-info-repeat')]/document-id"/>
+                                        <xforms:send submission="main-submission"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </td>
+                            <td align="center">
+                                <xforms:trigger appearance="xxforms:image">
+                                    <xxforms:img src="/images/remove.png"/>
+                                    <xforms:label>Delete</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="instance('request-instance')/action">delete-documents</xforms:setvalue>
+                                        <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('document-info-repeat')]/document-id"/>
+                                        <xforms:send submission="delete-submission"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                            </td>
+                        </tr>
+                    </xforms:repeat>
+                    <tr/>
+                </table>
+            </xforms:group>
+            <xforms:group ref="instance('control')/empty">
+                <table class="gridtable">
+                    <tr>
+                        <th>Last Name</th>
+                        <th>First Name</th>
+                        <th>Document Identifier</th>
+                        <th>Edit</th>
+                        <th>XML</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <i>
+                                No document found.<br/>Please press the "Import Documents"
+                                button to get started.
+                            </i>
+                        </td>
+                    </tr>
+                </table>
+            </xforms:group>
+            <xforms:group ref="instance('request-instance')">
+                <table>
+                    <tr>
+                        <td align="left" valign="bottom">
+                            <xforms:trigger>
+                                <xforms:label>Refresh</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="action">refresh</xforms:setvalue>
+                                    <xforms:send submission="refresh-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:trigger>
+                                <xforms:label>Import Documents</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="action">import-documents</xforms:setvalue>
+                                    <xforms:send submission="import-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:trigger>
+                                <xforms:label>New Document</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="action">new-document</xforms:setvalue>
+                                    <xforms:send submission="main-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </td>
+                    </tr>
+                </table>
+            </xforms:group>
+            <hr/>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<order:Order xmlns:order="urn:oasis:names:tc:ubl:Order:1.0:0.70" xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70">
+    <cat:ID>20031234-1</cat:ID>
+    <cat:IssueDate>2003-02-02</cat:IssueDate>
+    <cat:LineExtensionTotalAmount currencyID="USD">498.5</cat:LineExtensionTotalAmount>
+    <cat:BuyerParty>
+        <cat:ID/>
+        <cat:PartyName>
+
+            <cat:Name>Bills Microdevices</cat:Name>
+        </cat:PartyName>
+        <cat:Address>
+            <cat:ID/>
+            <cat:Street>413 Spring St</cat:Street>
+            <cat:CityName>Elgin</cat:CityName>
+            <cat:PostalZone>60123</cat:PostalZone>
+
+            <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+        </cat:Address>
+        <cat:BuyerContact>
+            <cat:ID/>
+            <cat:Name>George Tirebiter</cat:Name>
+        </cat:BuyerContact>
+    </cat:BuyerParty>
+    <cat:SellerParty>
+
+        <cat:ID>JOS</cat:ID>
+        <cat:PartyName>
+            <cat:Name>Joes Office Supply</cat:Name>
+        </cat:PartyName>
+        <cat:Address>
+            <cat:ID/>
+            <cat:Street>511 N Columbus Dr.</cat:Street>
+            <cat:CityName>Chicago</cat:CityName>
+            <cat:PostalZone>60611</cat:PostalZone>
+            <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+        </cat:Address>
+    </cat:SellerParty>
+    <cat:DeliveryTerms>
+        <cat:ID/>
+        <cat:SpecialTerms>Signature Required</cat:SpecialTerms>
+
+    </cat:DeliveryTerms>
+    <cat:OrderLine>
+        <cat:BuyersID>1</cat:BuyersID>
+        <cat:SellersID/>
+        <cat:LineExtensionAmount currencyID="USD">12.50</cat:LineExtensionAmount>
+        <cat:Quantity unitCode="PKG">5</cat:Quantity>
+        <cat:Item>
+
+            <cat:ID/>
+            <cat:Description>Pencils, box #2 red</cat:Description>
+            <cat:SellersItemIdentification>
+                <cat:ID>32145-12</cat:ID>
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">2.50</cat:PriceAmount>
+
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+
+                <cat:PostalZone>60123</cat:PostalZone>
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+    <cat:OrderLine>
+        <cat:BuyersID>2</cat:BuyersID>
+        <cat:LineExtensionAmount currencyID="USD">360.00</cat:LineExtensionAmount>
+
+        <cat:Quantity unitCode="PKG">12</cat:Quantity>
+        <cat:Item>
+            <cat:ID/>
+            <cat:Description>Xeorox Paper- case</cat:Description>
+            <cat:SellersItemIdentification>
+                <cat:ID>78-697-24</cat:ID>
+            </cat:SellersItemIdentification>
+
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">30.00</cat:PriceAmount>
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+                <cat:PostalZone>60123</cat:PostalZone>
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+    <cat:OrderLine>
+
+        <cat:BuyersID>3</cat:BuyersID>
+        <cat:SellersID/>
+        <cat:LineExtensionAmount currencyID="USD">50.00</cat:LineExtensionAmount>
+        <cat:Quantity unitCode="CTN">10</cat:Quantity>
+        <cat:Item>
+            <cat:ID/>
+            <cat:Description>Pens, box, blue finepoint</cat:Description>
+
+            <cat:SellersItemIdentification>
+                <cat:ID>091356-3</cat:ID>
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">5.00</cat:PriceAmount>
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+                <cat:PostalZone>60123</cat:PostalZone>
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+    <cat:OrderLine>
+        <cat:BuyersID>4</cat:BuyersID>
+        <cat:SellersID/>
+        <cat:LineExtensionAmount currencyID="USD">37.50</cat:LineExtensionAmount>
+        <cat:Quantity unitCode="CTN">3</cat:Quantity>
+
+        <cat:Item>
+            <cat:ID/>
+            <cat:Description>Tape, 1in case</cat:Description>
+            <cat:SellersItemIdentification>
+                <cat:ID>543-165-1</cat:ID>
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">12.50</cat:PriceAmount>
+
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+
+                <cat:PostalZone>60123</cat:PostalZone>
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+    <cat:OrderLine>
+        <cat:BuyersID>5</cat:BuyersID>
+        <cat:SellersID/>
+
+        <cat:LineExtensionAmount currencyID="USD">10.00</cat:LineExtensionAmount>
+        <cat:Quantity unitCode="CTN">10</cat:Quantity>
+        <cat:Item>
+            <cat:ID/>
+            <cat:Description>Staples, wire, box</cat:Description>
+            <cat:SellersItemIdentification>
+                <cat:ID>984567-12</cat:ID>
+
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">1.00</cat:PriceAmount>
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+
+                <cat:ID/>
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+                <cat:PostalZone>60123</cat:PostalZone>
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+
+                <cat:ID/>
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+
+    <cat:OrderLine>
+        <cat:BuyersID>6</cat:BuyersID>
+        <cat:SellersID/>
+        <cat:LineExtensionAmount currencyID="USD">22.50</cat:LineExtensionAmount>
+        <cat:Quantity unitCode="PKG">5</cat:Quantity>
+        <cat:Item>
+            <cat:ID/>
+
+            <cat:Description>Pens, box red felt tip </cat:Description>
+            <cat:SellersItemIdentification>
+                <cat:ID>091344-5</cat:ID>
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">5.00</cat:PriceAmount>
+            </cat:BasePrice>
+
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+                <cat:PostalZone>60123</cat:PostalZone>
+
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+    <cat:OrderLine>
+        <cat:BuyersID>7</cat:BuyersID>
+        <cat:SellersID/>
+        <cat:LineExtensionAmount currencyID="USD">6.00</cat:LineExtensionAmount>
+        <cat:Quantity unitCode="UNIT">12</cat:Quantity>
+
+        <cat:Item>
+            <cat:ID/>
+            <cat:Description>Mousepad, blue</cat:Description>
+            <cat:SellersItemIdentification>
+                <cat:ID>21457-3</cat:ID>
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD">.50</cat:PriceAmount>
+
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+                <cat:Street>413 N Spring St</cat:Street>
+                <cat:CityName>Elgin</cat:CityName>
+
+                <cat:PostalZone>60123</cat:PostalZone>
+                <cat:CountrySub-Entity>IL</cat:CountrySub-Entity>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+                <cat:RequestedDeliveryDate>2003-02-14</cat:RequestedDeliveryDate>
+                <cat:DeliveryRequirement>
+
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+    <cat:OrderLine>
+        <cat:BuyersID/>
+        <cat:SellersID/>
+        <cat:LineExtensionAmount currencyID="USD"/>
+        <cat:Quantity unitCode="UNIT"/>
+        <cat:Item>
+            <cat:ID/>
+            <cat:Description/>
+            <cat:SellersItemIdentification>
+                <cat:ID/>
+            </cat:SellersItemIdentification>
+            <cat:BasePrice>
+                <cat:PriceAmount currencyID="USD"/>
+            </cat:BasePrice>
+        </cat:Item>
+        <cat:DeliveryRequirement>
+            <cat:ID/>
+            <cat:DeliverToAddress>
+                <cat:ID/>
+                <cat:Street/>
+                <cat:CityName/>
+                <cat:PostalZone/>
+                <cat:CountrySub-Entity/>
+            </cat:DeliverToAddress>
+            <cat:DeliverySchedule>
+                <cat:ID/>
+                <cat:RequestedDeliveryDate/>
+                <cat:DeliveryRequirement>
+                    <cat:ID/>
+                </cat:DeliveryRequirement>
+            </cat:DeliverySchedule>
+        </cat:DeliveryRequirement>
+    </cat:OrderLine>
+</order:Order>
+

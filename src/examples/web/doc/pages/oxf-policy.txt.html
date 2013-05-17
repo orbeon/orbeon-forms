@@ -1,0 +1,374 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<html>
+<header>
+<title>oxf-policy.txt</title>
+</header>
+<body>
+<pre>
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}xercesImpl-2_2_1_orbeon.jar" {
+    permission java.security.AllPermission;
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}ops.jar" {
+
+   // log4j
+   permission java.util.PropertyPermission "log4j.*", "read";
+
+   //dom4j
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.util.PropertyPermission "org.dom4j.*", "read";
+
+   // Xalan
+   permission java.util.PropertyPermission "dtm.debug", "read";
+   permission java.util.PropertyPermission "{http://xml.apache.org/xalan}content-handler", "read,write";
+   permission java.util.PropertyPermission "method", "read,write";
+   permission java.util.PropertyPermission "encoding", "read,write";
+   permission java.util.PropertyPermission "omit-xml-declaration", "read,write";
+   permission java.util.PropertyPermission "indent", "read,write";
+   permission java.util.PropertyPermission "standalone", "read,write";
+   permission java.util.PropertyPermission "{http://xml.apache.org/xalan}entities", "read,write";
+   permission java.util.PropertyPermission "version", "read,write";
+   permission java.util.PropertyPermission "{http://xml.apache.org/xalan}indent-amount", "read,write";
+   permission java.util.PropertyPermission "media-type", "read,write";
+   permission java.util.PropertyPermission "*", "read,write";
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}xalan.properties", "read";
+
+   permission java.net.NetPermission "specifyStreamHandler";
+
+   permission java.io.FilePermission "${oxf.resources}", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+
+   // jfreechart
+   permission java.io.FilePermission "${catalina.home}${/}temp", "read,write,execute,delete";
+   permission java.io.FilePermission "${catalina.home}${/}temp${/}-", "read,write,execute,delete";
+
+   permission java.lang.RuntimePermission "accessClassInPackage.sun.misc";
+
+   // kawa
+   permission java.lang.RuntimePermission "createClassLoader";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.lang.RuntimePermission "accessClassInPackage.sun.io";
+   permission java.lang.RuntimePermission "shutdownHooks";
+
+
+   // axis
+   permission java.io.FilePermission "client-config.wsdd", "read, write";
+   permission java.util.PropertyPermission "org.apache.commons.logging.LogFactory", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read,write";
+   permission java.lang.RuntimePermission "getClassLoader";
+   permission java.util.PropertyPermission "http.proxyHost", "read";
+   permission java.util.PropertyPermission "http.proxyPort", "read";
+   permission java.util.PropertyPermission "http.nonProxyHosts", "read";
+   permission java.util.PropertyPermission "http.proxyUser", "read";
+   permission java.util.PropertyPermission "http.proxyPassword", "read";
+   permission java.net.SocketPermission "*", "resolve, connect";
+
+   //POI
+   permission java.util.PropertyPermission "org.apache.poi.*", "read";
+
+   //javamail
+   permission java.io.FilePermission "${java.home}${/}lib${/}javamail.providers", "read";
+   permission java.io.FilePermission "${catalina.home}${/}common${/}lib${/}mail.jar", "read";
+   permission java.io.FilePermission "${catalina.home}${/}common${/}lib${/}activation.jar", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}javamail.address.map", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}mailcap", "read";
+
+   // mondrian
+   permission java.lang.RuntimePermission "accessClassInPackage.sun.net.www.content.application";
+   permission java.io.FilePermission "mondrian.properties", "read";
+
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}log4j-1_2_5.jar" {
+   permission java.util.PropertyPermission "log4j.*", "read";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}dom4j-1_4.jar" {
+   permission java.util.PropertyPermission "org.dom4j.*", "read";
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.util.PropertyPermission "javax.xml.parsers.*", "read";
+   permission java.util.PropertyPermission "javax.xml.parsers.*", "read";
+
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.util.PropertyPermission "hsqldb.*", "read";
+   permission java.net.SocketPermission "localhost", "resolve,connect";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}xalan-2_5_1_orbeon.jar" {
+   permission java.util.PropertyPermission "dtm.debug", "read";
+   permission java.util.PropertyPermission "{http://xml.apache.org/xalan}content-handler", "read,write";
+   permission java.util.PropertyPermission "method", "read,write";
+   permission java.util.PropertyPermission "encoding", "read,write";
+   permission java.util.PropertyPermission "omit-xml-declaration", "read,write";
+   permission java.util.PropertyPermission "indent", "read,write";
+   permission java.util.PropertyPermission "standalone", "read,write";
+   permission java.util.PropertyPermission "{http://xml.apache.org/xalan}entities", "read,write";
+   permission java.util.PropertyPermission "version", "read,write";
+   permission java.util.PropertyPermission "{http://xml.apache.org/xalan}indent-amount", "read,write";
+   permission java.util.PropertyPermission "media-type", "read,write";
+   permission java.util.PropertyPermission "*", "read,write";
+
+   permission java.io.FilePermission "${java.home}${/}lib${/}xalan.properties", "read";
+   permission java.io.FilePermission "${oxf.resources}", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+
+   permission java.net.NetPermission "specifyStreamHandler";
+
+   permission java.lang.RuntimePermission "accessClassInPackage.sun.io";
+
+   //axis
+   permission java.io.FilePermission "client-config.wsdd", "read, write";
+   permission java.io.FilePermission "${java.home}${/}jre${/}lib${/}xalan.properties", "read";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.net.SocketPermission "*", "resolve, connect";
+   permission java.util.PropertyPermission "axis.*", "read";
+
+   //dom4j
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}saxpath-dev_orbeon.jar" {
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jaxen-1_1-beta-1-dev.jar" {
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}hsqldb-1_7_1.jar" {
+  permission java.io.FilePermission "*", "read, write, delete";
+  permission java.util.PropertyPermission "hsqldb.*", "read";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jing-2003_01_31.jar" {
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jfreechart-0_9_6.jar" {
+   permission java.util.PropertyPermission "java.io.tmpdir", "read";
+   permission java.io.FilePermission "${catalina.home}${/}temp", "read,write,execute,delete";
+   permission java.io.FilePermission "${catalina.home}${/}temp${/}-", "read,write,execute,delete";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}kawa-1_7.jar" {
+   permission java.lang.RuntimePermission "createClassLoader";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.lang.RuntimePermission "shutdownHooks";
+
+   permission java.io.FilePermission "${oxf.resources}", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}axis-1_0b3-axis.jar" {
+   permission java.util.PropertyPermission "axis.*", "read";
+   permission java.util.PropertyPermission "org.apache.commons.logging.LogFactory", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "client-config.wsdd", "read, write";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read,write";
+   permission java.lang.RuntimePermission "getClassLoader";
+   permission java.util.PropertyPermission "http.proxyHost", "read";
+   permission java.util.PropertyPermission "http.proxyPort", "read";
+   permission java.util.PropertyPermission "http.nonProxyHosts", "read";
+   permission java.util.PropertyPermission "http.proxyUser", "read";
+   permission java.util.PropertyPermission "http.proxyPassword", "read";
+   permission java.net.SocketPermission "*", "resolve, connect";
+   permission java.io.FilePermission "${catalina.home}${/}temp", "read,write,execute,delete";
+   permission java.io.FilePermission "${catalina.home}${/}temp${/}-", "read,write,execute,delete";
+   permission java.util.PropertyPermission "user.dir", "read";
+};
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}axis-1_0b3-commons-logging.jar" {
+   permission java.util.PropertyPermission "axis.*", "read";
+   permission java.util.PropertyPermission "org.apache.commons.logging.LogFactory", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "client-config.wsdd", "read, write";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read,write";
+   permission java.lang.RuntimePermission "getClassLoader";
+   permission java.util.PropertyPermission "http.proxyHost", "read";
+   permission java.util.PropertyPermission "http.proxyPort", "read";
+   permission java.util.PropertyPermission "http.nonProxyHosts", "read";
+   permission java.util.PropertyPermission "http.proxyUser", "read";
+   permission java.util.PropertyPermission "http.proxyPassword", "read";
+   permission java.net.SocketPermission "*", "resolve, connect";
+   permission java.util.PropertyPermission "log4j.*", "read";
+};
+
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}joost-20030623-orbeon.jar" {
+   permission java.util.PropertyPermission "org.xml.*", "read";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}saxon-7_5_1.jar" {
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.net.NetPermission "specifyStreamHandler";
+   permission java.io.FilePermission "${oxf.resources}", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+};
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}saxon-6_5_2.jar" {
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.net.NetPermission "specifyStreamHandler";
+   permission java.io.FilePermission "${oxf.resources}", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jakarta-poi-1.11.0-dev-20030610.jar" {
+   permission java.util.PropertyPermission "org.apache.poi.*", "read";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}ymsg9-v0_21.jar" {
+   permission java.net.SocketPermission "scs.yahoo.com", "resolve,connect";
+   permission java.util.PropertyPermission "ymsg.*", "read";
+   permission java.io.FilePermission "${oxf.resources}", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+   permission java.util.PropertyPermission "user.dir", "read";
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.net.NetPermission "specifyStreamHandler";
+   permission java.util.PropertyPermission "org.apache.commons.*", "read";
+
+
+   //axis
+   permission java.util.PropertyPermission "axis.*", "read";
+   permission java.util.PropertyPermission "org.apache.commons.*", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read,write";
+   permission java.util.PropertyPermission "http.proxyHost", "read";
+   permission java.util.PropertyPermission "http.proxyPort", "read";
+   permission java.util.PropertyPermission "http.nonProxyHosts", "read";
+   permission java.util.PropertyPermission "http.proxyUser", "read";
+   permission java.util.PropertyPermission "http.proxyPassword", "read";
+   permission java.util.PropertyPermission "user.dir", "read";
+   permission java.io.FilePermission "client-config.wsdd", "read, write";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.io.FilePermission "${java.home}${/}jre${/}lib${/}xalan.properties", "read";
+   permission java.io.FilePermission "${catalina.home}${/}temp", "read,write,execute,delete";
+   permission java.io.FilePermission "${catalina.home}${/}temp${/}-", "read,write,execute,delete";
+   permission java.lang.RuntimePermission "getClassLoader";
+   permission java.lang.RuntimePermission "accessDeclaredMembers";
+   permission java.net.SocketPermission "*", "resolve, connect";
+
+   //dom4j
+   permission java.util.PropertyPermission "org.dom4j.*", "read";
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.util.PropertyPermission "javax.xml.parsers.*", "read";
+   permission java.util.PropertyPermission "javax.xml.parsers.*", "read";
+
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.util.PropertyPermission "hsqldb.*", "read";
+   permission java.net.SocketPermission "localhost", "resolve,connect";
+
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}commons-beanutils-1_5.jar" {
+   permission java.util.PropertyPermission "org.apache.commons.*", "read";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}commons-fileupload-1.0-beta-1.jar" {
+   permission java.io.FilePermission "${catalina.home}${/}temp", "read,write,execute,delete";
+   permission java.io.FilePermission "${catalina.home}${/}temp${/}-", "read,write,execute,delete";
+   permission java.util.PropertyPermission "org.apache.commons.*", "read";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}mondrian-0_5_orbeon.jar" {
+   permission java.io.FilePermission "mondrian.properties", "read";
+   permission java.net.SocketPermission "*", "connect,resolve";
+   permission java.lang.RuntimePermission "accessClassInPackage.sun.net.www.content.application";
+   permission java.util.PropertyPermission "*", "read,write";
+
+   // dom4j
+   permission java.util.PropertyPermission "org.dom4j.*", "read";
+   permission java.util.PropertyPermission "org.saxpath.*", "read";
+   permission java.util.PropertyPermission "javax.xml.parsers.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+
+};
+
+// Kawa special classloader doesn't have a codeBase, we need to grant these permissions to everybody
+grant {
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+   permission java.io.FilePermission "${oxf.resources}${/}-", "read";
+   permission java.io.FilePermission "${oxf.home}${/}WEB-INF${/}lib${/}*", "read";
+   permission java.net.NetPermission "specifyStreamHandler";
+};
+
+// JSF
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jsf-ri-ea4.jar" {
+   permission java.util.PropertyPermission "org.apache.commons.logging.*", "read";
+   permission java.util.PropertyPermission "javax.faces.*", "read";
+   permission java.util.PropertyPermission "log4j.*", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+   permission java.util.PropertyPermission "com.sun.faces.*", "read";
+   permission java.util.PropertyPermission "*", "read,write";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jsf-api-ea4.jar" {
+   permission java.util.PropertyPermission "javax.faces.*", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+   permission java.util.PropertyPermission "com.sun.faces.*", "read";
+   permission java.util.PropertyPermission "*", "read,write";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}commons-digester-1_5.jar" {
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}commons-beanutils-1_5.jar" {
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+
+grant codeBase "file:${oxf.home}${/}WEB-INF${/}lib${/}jsf-xml-renderkit.jar" {
+   permission java.util.PropertyPermission "*", "read,write";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+
+
+grant codeBase "file:${oxf.home}" {
+   // JSP Compiler
+   permission java.lang.RuntimePermission "defineClassInPackage.org.apache.jasper.runtime";
+   permission java.util.PropertyPermission "com.sun.faces.*", "read";
+   permission java.util.PropertyPermission "javax.xml.*", "read";
+   permission java.io.FilePermission "${java.home}${/}lib${/}jaxp.properties", "read";
+   permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+};
+</pre>
+</body>
+</html>

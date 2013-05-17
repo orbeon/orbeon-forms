@@ -1,0 +1,83 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        instance-passing="forward">
+
+    <!-- Files to serve directly (for standalone operation) -->
+    <files path-info="*.gif"/>
+    <files path-info="*.css"/>
+    <files path-info="*.js"/>
+    <files path-info="*.png"/>
+    <files path-info="*.jpg"/>
+    <files path-info="*.wsdl"/>
+    <files path-info="*.html" mime-type="text/html"/>
+    <files path-info="*.java" mime-type="text/plain"/>
+    <files path-info="*.txt" mime-type="text/plain"/>
+
+    <page id="summary" path-info="/bizdoc2" model="../bizdoc/summary/summary-model.xpl" view="summary/summary-view.xhtml">
+        <!-- View an existing document -->
+        <action when="/form/action = 'show-detail'" action="../bizdoc/summary/find-document-action.xpl">
+            <result page="detail" transform="oxf:xslt">
+                <form xsl:version="2.0" xmlns="">
+                    <document-id><xsl:value-of select="doc('input:action')/document-info/document-id"/></document-id>
+                    <document><xsl:copy-of select="doc('input:action')/document-info/document/*"/></document>
+                </form>
+            </result>
+        </action>
+        <!-- Create a new document -->
+        <action when="/form/action = 'new-document'" action="../bizdoc/summary/new-document-action.xpl">
+            <result page="detail" transform="oxf:xslt">
+                <form xsl:version="2.0" xmlns="">
+                    <document-id><xsl:value-of select="doc('input:action')/document-info/document-id"/></document-id>
+                    <document><xsl:copy-of select="doc('input:action')/document-info/document/*"/></document>
+                </form>
+            </result>
+        </action>
+        <!-- View XML -->
+        <action when="/form/action = 'show-xml'" action="../bizdoc/summary/find-document-action.xpl">
+            <result page="xml-detail" transform="oxf:xslt" instance-passing="redirect-exit-portal">
+                <document-id xsl:version="2.0" xmlns="">
+                    <xsl:value-of select="doc('input:action')/document-info/document-id"/>
+                </document-id>
+            </result>
+        </action>
+    </page>
+
+    <!-- Show XML document -->
+    <page id="xml-detail" path-info="/direct/bizdoc2/xml-detail" model="detail/xml-detail-model.xpl"/>
+
+    <page id="detail" path-info="/bizdoc2/detail" view="detail/detail-view.xsl"/>
+
+    <!-- Services -->
+    <page path-info="/bizdoc2/save" model="../bizdoc/detail/save-document-action.xpl"/>
+    <page path-info="/bizdoc2/delete" view="summary/list-documents-response.xpl">
+        <action action="../bizdoc/summary/delete-documents-action.xpl"/>
+    </page>
+    <page path-info="/bizdoc2/import" view="summary/list-documents-response.xpl">
+        <action action="../bizdoc/summary/import-documents-action.xpl"/>
+    </page>
+    <page path-info="/bizdoc2/refresh" view="summary/list-documents-response.xpl"/>
+    
+    <!-- Home (for standalone operation) -->
+    <page id="home" path-info="/">
+        <action>
+            <result page="summary"/>
+        </action>
+    </page>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

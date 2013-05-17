@@ -1,0 +1,698 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+ Copyright 2002, 2003 Sun Microsystems, Inc. All Rights Reserved.
+
+ Redistribution and use in source and binary forms, with or
+ without modification, are permitted provided that the following
+ conditions are met:
+
+ - Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+ - Redistribution in binary form must reproduce the above
+   copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials
+   provided with the distribution.
+
+ Neither the name of Sun Microsystems, Inc. or the names of
+ contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
+
+ This software is provided "AS IS," without a warranty of any
+ kind. ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND
+ WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE HEREBY
+ EXCLUDED. SUN AND ITS LICENSORS SHALL NOT BE LIABLE FOR ANY
+ DAMAGES OR LIABILITIES SUFFERED BY LICENSEE AS A RESULT OF OR
+ RELATING TO USE, MODIFICATION OR DISTRIBUTION OF THIS SOFTWARE OR
+ ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE
+ FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT,
+ SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER
+ CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF
+ THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF SUN HAS
+ BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+ You acknowledge that this software is not designed, licensed or
+ intended for use in the design, construction, operation or
+ maintenance of any nuclear facility.
+-->
+<!--
+ The original source code by Sun Microsystems has been modifed by
+ Orbeon, Inc.
+-->
+<!DOCTYPE taglib
+  PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
+  "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+
+<taglib>
+
+    <tlib-version>0.03</tlib-version>
+    <jsp-version>1.2</jsp-version>
+    <short-name>JavaServerFaces Example Components Tag Library</short-name>
+    <uri>http://java.sun.com/jsf/demo/components</uri>
+    <description>
+        This tag library contains tags for several useful demo components.
+        These components are *not* part of the standard JavaServer Faces
+        Specification, but are provided as examples of how components, renderers,
+        and component tags can be built on top of the framework.
+    </description>
+
+
+    <tag>
+
+        <name>area</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.AreaTag</tag-class>
+
+        <attribute>
+            <name>id</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+
+        <attribute>
+            <name>valueRef</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+
+        <attribute>
+            <name>onmouseout</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+
+        <attribute>
+            <name>onmouseover</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>graph_menubar</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.GraphMenuBarTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render a components.model.Graph (referenced by the current value of a
+            UIOutput component) as a menu bar (whose items are from the children
+            of the root node of the graph), with expanded menus (and submenus)
+            underneath.
+        </description>
+
+        <attribute>
+            <name>action_listener</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Optional listener to handle tree expansion and contraction events.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>graphClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                CSS style class to use when rendering this component.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>id</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>valueRef</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Model reference expression pointing at a components.model.Graph
+                instance.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>selectedClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                CSS style class to use when rendering a seelcted node.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>unselectedClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                CSS style class to use when rendering a unselected node.
+            </description>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>graph_menutree</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.GraphMenuTreeTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render a components.model.Graph (referenced by the current value of a
+            UIOutput component) as a tree control with subtrees expanded or
+            contracted based on the "expanded" property.
+        </description>
+
+        <attribute>
+            <name>action_listener</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Optional listener to handle tree expansion and contraction events.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>graphClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                CSS style class to use when rendering this component.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>id</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>valueRef</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Model reference expression pointing at a components.model.Graph instance.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>selectedClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                CSS style class to use when rendering a seelcted node.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>unselectedClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                CSS style class to use when rendering a unselected node.
+            </description>
+        </attribute>
+    </tag>
+
+
+    <tag>
+
+        <name>graph_menunode</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.GraphMenuNodeTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render a components.model.Node that represents a node of the tree.
+        </description>
+
+        <attribute>
+            <name>action</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                context-relative URL triggered when node selected.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>enabled</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                should the node be enabled ?
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>expanded</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Should the node appear expanded or collapased ?
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>icon</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                icon to visually represent the node. This can be used with or without
+                label.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>label</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                visual representation of the node.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Name of the node.
+            </description>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>graph_treenode</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.GraphTreeNodeTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render a components.model.Node that represents a node of the tree.
+        </description>
+
+        <attribute>
+            <name>action</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                context-relative URL triggered when node selected.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>enabled</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                should the node be enabled ?
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>expanded</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Should the node appear expanded or collapased ?
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>icon</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                icon to visually represent the node. This can be used with or without
+                label.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>label</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                visual representation of the node.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Name of the node.
+            </description>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>map</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.MapTag</tag-class>
+
+        <attribute>
+            <name>currentArea</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+
+        <attribute>
+            <name>id</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>panel_resultset</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.ResultSetTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render a repeating set of data using an HTML "table" element for
+            layout management.  Child tags nested inside this tag must be:
+
+            * panel_group tag containing the individual values for each
+            column header (if headerClass is defined).  The number of
+            child components should match the number of columns to be created.
+
+            * panel_data tag(s) containing a template of the components that will
+            be used to render each row of the list.  The number of child
+            components should match the number of columns to be created.
+
+            * panel_group tag containing the individual values for each
+            column footer (if footerClass is defined).  The number of
+            child components should match the number of columns to be created.
+        </description>
+
+        <attribute>
+            <name>columnClasses</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Comma-delimited list of the class names of the CSS styles to be
+                used for each column.  These styles should specialize the styles
+                specified by rowClasses and panelClass (if any), because CSS
+                cascading is performed.  If the number of class names on this list
+                is less than the value specified for "columns", the pattern will
+                be repeated for the remaining columns of the current row; however,
+                the first column in each row will always use the first style listed.
+
+                Note that these styles are applied only to content rows, not to the
+                header or footer rows (if any).
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>footerClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                If this panel has a "footer" facet, it will be rendered with
+                this CSS style.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>headerClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                If this panel has a "header" fact, it will be rendered with
+                this CSS style.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>navFacetOrientation</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                When rendering a widget representing "page navigation" where
+                should the facet markup be rendered in relation to the page
+                navigation widget?  Values are "NORTH", "SOUTH", "EAST", "WEST".
+                Case insensitive.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>panelClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Class name of the CSS style to be used for the entire panel.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>rowClasses</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Comma-delimited list of the class names of the CSS styles to be
+                used for each row.  These styles should specialize the style
+                specified by panelClass (if any), because CSS cascading is
+                performed.  If the number of class names on this list
+                is less than the actual number of rows over which the list is
+                iterating, the pattern will be repeated as many times as needed.
+
+                Note that these styles are applied only to content rows, not to the
+                header or footer rows (if any).
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>rowsPerPage</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                How many rows of the result set should we display at one time.
+            </description>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>pane_tab</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.PaneTabTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render an individual pane of a tabbed control.  This tag is only
+            valid when immediately nested in a pane_tabbed tag.
+        </description>
+
+        <attribute>
+            <name>id</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component
+            </description>
+        </attribute>
+
+<!--        <attribute>-->
+<!--            <name>paneClass</name>-->
+<!--            <required>false</required>-->
+<!--            <rtexprvalue>false</rtexprvalue>-->
+<!--            <description>-->
+<!--                CSS style class to use when rendering this component.-->
+<!--            </description>-->
+<!--        </attribute>-->
+
+        <attribute>
+            <name>selected</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Boolean attribute describing whether this pane should be the
+                initially selected one.  If no pane is marked as selected, the
+                first one will arbitrarily be chosen.
+            </description>
+        </attribute>
+
+    </tag>
+
+
+    <tag>
+
+        <name>pane_tabbed</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.PaneTabbedTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render a tabbed control with immediately nested pane_tab tags
+            to represent each pane.
+        </description>
+
+        <attribute>
+            <name>contentClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                If present, specifies the CSS style class to be used when
+                rendering the content of the selected pane.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>id</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>paneClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                If present, specifies the CSS style class to be used when
+                rendering the entire tabbed pane control.  Style classes
+                for the selected tab, unselected tabs, and the content data
+                support overriding these defaults in the usual CSS manner.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>selectedClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                If present, specifies the CSS style class to be used when
+                rendering the tab for the currently selected pane.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>unselectedClass</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                If present, specifies the CSS style class to be used when
+                rendering the tabs for panes that are not currently selected.
+            </description>
+        </attribute>
+    </tag>
+
+
+    <tag>
+
+        <name>pane_tablabel</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.PaneTabLabelTag</tag-class>
+        <body-content>JSP</body-content>
+        <description>
+            Render an individual pane tab label of a tabbed control.  This
+            tag is only valid when immediately nested in a pane_tab tag.
+        </description>
+
+        <attribute>
+            <name>commandName</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                command name for this component
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>image</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                image for the face of this component
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>label</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                label "text" for the face of this component
+            </description>
+        </attribute>
+
+<!--        <attribute>-->
+<!--            <name>paneTabLabelClass</name>-->
+<!--            <required>false</required>-->
+<!--            <rtexprvalue>false</rtexprvalue>-->
+<!--            <description>-->
+<!--                CSS style class to use when rendering this component.-->
+<!--            </description>-->
+<!--        </attribute>-->
+
+    </tag>
+
+
+    <tag>
+
+        <name>stylesheet</name>
+        <tag-class>org.orbeon.faces.components.demo.taglib.StylesheetTag</tag-class>
+        <body-content>empty</body-content>
+        <description>
+            Renders an HTML link element to a CSS stylesheet (content type text/css)
+            at the context-relative path specified by the "path" attribute.
+        </description>
+
+        <attribute>
+            <name>id</name>
+            <required>false</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Component id of this component.
+            </description>
+        </attribute>
+
+        <attribute>
+            <name>path</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+            <description>
+                Context-relative path to a CSS stylesheet resource within this
+                webapp.  The path must start with a slash ("/") character.
+            </description>
+        </attribute>
+
+    </tag>
+
+
+</taglib>

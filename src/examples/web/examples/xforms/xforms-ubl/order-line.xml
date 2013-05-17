@@ -1,0 +1,29 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<cat:OrderLine xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70">
+    <cat:BuyersID/>
+    <cat:SellersID/>
+    <cat:LineExtensionAmount currencyID=""/>
+    <cat:Quantity unitCode="">1</cat:Quantity>
+    <cat:Item>
+        <cat:ID/>
+        <cat:Description>Enter description here</cat:Description>
+        <cat:SellersItemIdentification>
+            <cat:ID>Enter part number here</cat:ID>
+        </cat:SellersItemIdentification>
+        <cat:BasePrice>
+            <cat:PriceAmount currencyID="">0.00</cat:PriceAmount>
+        </cat:BasePrice>
+    </cat:Item>
+</cat:OrderLine>

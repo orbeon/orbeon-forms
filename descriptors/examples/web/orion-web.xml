@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE orion-web-app PUBLIC "-//Evermind//DTD Orion Web Application 2.3//EN" "http://xmlns.oracle.com/ias/dtds/orion-web.dtd">
+
+<orion-web-app
+    file-modification-check-interval="10000"
+    directory-browsing="allow">
+
+<!--    <web-app-class-loader search-local-classes-first="true"  include-war-manifest-class-path="false" />-->
+
+    <resource-ref-mapping name="jdbc/db" location="jdbc/hsqldbDS"/>
+    <security-role-mapping name="administrator">
+        <group name="administrators"/>
+    </security-role-mapping>
+</orion-web-app>

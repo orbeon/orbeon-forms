@@ -1,0 +1,63 @@
+body {  background-color: #FFFFFF; margin: 0px 0px 0px 0px;
+        font-family: Verdana, Helvetica, sans-serif;  font-size : 12px;  }
+
+a:link { color: #0F3660; }
+a:visited { color: #009999; }
+a:active { color: #000066; }
+a:hover { color: #000066; }
+
+.menu { background-color: #FFCC66; margin: 0px; padding: 3px 8px 5px 3px;  font-size : 12px;  }
+.menu a:link { color: #000000;  text-decoration : none;  }
+.menu a:visited { color: #000000; text-decoration : none; }
+//.menu a:active { font-weight: bold }
+.menu a:hover { color: #333333; text-decoration : none; }
+.menu ul { margin: 0px 0px 0px 20px; padding: 0px; }
+.menu li  { list-style: none; font-weight : bold; }
+.menu ul ul li .sel { list-style-image: url('../images/current.gif'); font-weight : normal; }
+.menu ul ul li  { list-style: none; font-weight : normal; }
+
+table .title { background-color: #FFFFFF; width:100%; border: 0px; }
+.dida { font-size: 9px; }
+.image { margin-top: 2em; margin-bottom: 2em; text-align: center; }
+
+p { margin-top: 1em; margin-bottom: 1em; }
+h1 { font-size: 24px; margin-top: 0; }
+h3 { font-size: 14px; margin-top: 2em; color: #0A2D4C; }
+h4 { font-size: 12px; margin-top: 2em; color: #4A6D8C; }
+b { color: #4A6D8C; }
+
+.content { padding: 5px 5px 5px 10px;  font : small;  font-size : 12px;   }
+.content .ForrestTable { width: 100%; background-color: #7099C5; color: #ffffff;  font-size : 12px;}
+.content .ForrestTable .caption { text-align: left; color: black; font-size : 12px; }
+.content .ForrestTable th { text-align: center;  font-size : 12px;}
+.content .ForrestTable td { background-color: #f0f0ff; color: black;  font-size : 12px;}
+
+.frame { margin: 5px 20px 5px 20px; font-size: 12px; }
+.frame .content { margin: 0px; }
+
+.note { border: solid 1px #7099C5; background-color: #f0f0ff; }
+.note .label { background-color: #7099C5; color: #ffffff; }
+
+.notes { border: solid 1px #7099C5; background-color: #f0f0ff; }
+.notes .label { background-color: #7099C5; color: #ffffff; }
+
+.warning { border: solid 1px #D00000; background-color: #fff0f0; }
+.warning .label { background-color: #D00000; color: #ffffff; }
+
+.fixme { border: solid 1px #C6C600; background-color: #FAF9C3; }
+.fixme .label { background-color: #C6C600; color: #ffffff; }
+
+.code { font-family: "Lucida Console", "Courier New", Courier, monospace;
+        border-color: #FF9933; border-style: solid; border-width: 1px; line-height: 1.2em;
+        padding-top: 0.5em; padding-bottom: 0.5em; padding-right: 1em; padding-left: 1em}
+
+.codefrag { font-family: "Courier New", Courier, monospace; }
+
+.highlight { background-color: yellow; }
+
+.minitoc { list-style: none; margin-top: 0; }
+li { line-height: 1.2em; }
+
+.dtdElement { width: 100%;	font-size: 12px; background-color : #ffffff; }
+
+.dtdTag {    color: #990000; text-transform : uppercase;  font-style : normal;  font-size : 15px;  font-weight : bold; }

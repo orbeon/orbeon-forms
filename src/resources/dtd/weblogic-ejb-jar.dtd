@@ -1,0 +1,1080 @@
+<!--
+This is the DTD for the EJB deployment parameters that are specific to the 
+WebLogic Server in WebLogic 6.0.0.
+
+Overview of changes since weblogic-510-ejb-jar.dtd:
+  * Reorganized information into descriptors for each type of bean
+  * Moved transaction-isolation to weblogic-ejb-jar element
+  * Removed weblogic-version element
+  * Added elements relating to message driven beans
+  * Added new elements for caching of stateful beans
+  * Stylistic changes to be more consistent with EJB 2.0 ejb-jar.dtd style
+
+Copyright (c) 1999-2001 by BEA Systems, Inc. All Rights Reserved.
+-->
+
+
+<!--
+The concurrency-strategy specifies how the container should manage concurrent 
+access to an entity bean.
+
+The concurrent-strategy can be one of the following values:
+  - "Exclusive":  The exclusive locking scheme used in WebLogic 
+                  Server versions 3.1 through 5.1
+  - "Database":   A scheme where a separate Entity Bean instance is 
+                  allocated for each transaction and the locking and
+                  caching is handled by the database.
+  - "ReadOnly" :  For read-only entity beans
+
+Used in: entity-cache
+-->
+<!ELEMENT concurrency-strategy (#PCDATA)>
+
+<!--
+This parameter specifies the JNDI name of the JMS ConnectionFactory
+that the MessageDriven Bean should look up to create its Queues and Topics.
+If not specified, it will default to weblogic.jms.MessageDrivenBeanConnectionFactory,
+which must have been declared in config.xml.
+
+Used in: message-driven-descriptor
+-->
+<!ELEMENT connection-factory-jndi-name (#PCDATA)>
+
+<!--
+Each Message-Driven EJB listens on an associated JMS destination.  If
+the JMS destination is located on another WebLogic Server instance or
+a foreign JMS provider, it is possible that the JMS destination will
+become unreachable.  In this case, the EJB container automatically
+attempts to reconnect to the JMS Server.  Once the JMS Server is up
+again, the Message-Driven EJB can again receive JMS messages.
+
+The jms-polling-interval-seconds determines the number of seconds
+between each attempt to reconnect to the JMS destination.
+
+The default value is 10 seconds.
+
+Example:
+
+<jms-polling-interval-seconds>5</jms-polling-interval-seconds>
+
+Since: WebLogic Server 6.1
+
+-->
+<!ELEMENT jms-polling-interval-seconds (#PCDATA)>
+
+<!--
+
+The JMS specification allows JMS consumers to specify an associated
+id.  This id is necessary for durable subscriptions to
+JMS topics.
+
+A Message-Driven EJB with a durable subscription needs an associated
+client id.  If a separate connection factory is used, the
+client id can be set on the connection factory.  In this case,
+the Message-Driven EJB uses this client id.
+
+If the associated connection factory does not have a client id
+(or you are using the default connection factory), the Message-Driven
+EJB uses the jms-client-id value as its client id.
+
+Default:
+
+  The default client identifier is the ejb-name for this EJB.
+
+Example:
+
+<jms-client-id>MyClientID</jms-client-id>
+
+Since: WebLogic Server 6.1
+
+-->
+<!ELEMENT jms-client-id (#PCDATA)>
+
+
+<!--
+The value of db-is-shared must be "True" or "False".
+
+This parameter applies only to entity beans. If the value is set to
+"False" the container will assume that it has exclusive access to the
+bean data in the persistence store. If it is set to "True" the bean
+will assume that the bean data could be modified between transactions
+and will therefore reload data at the beginning of each transaction.
+
+Used in: persistence
+-->
+<!ELEMENT db-is-shared (#PCDATA)>
+
+   
+<!--
+Applicable to entity beans only (both container- and bean-managed).
+This optional optimization affects when changes to a bean's state
+propogated to the persistent store. If this is set to "True" (which is
+the default) updates of the persistent store of all beans in the
+transaction will be performed just before the end of the transaction.
+If this is set to "False" the pstore update of a bean will be
+performed at the conclusion of each method invoke.
+
+Used in: persistence
+-->
+<!ELEMENT delay-updates-until-end-of-tx (#PCDATA)>
+
+
+<!-- 
+The description element is used to provide text describing the parent element.
+
+Used in: weblogic-ejb-jar, method
+-->
+<!ELEMENT description (#PCDATA)>
+
+
+<!--
+The destination-jndi-name element is used to associate a message-driven bean
+with a JMS Queue or Topic that has been deployed in the WebLogic JNDI tree.
+
+Used in: message-driven-descriptor
+-->
+<!ELEMENT destination-jndi-name (#PCDATA)>
+
+
+<!--
+The ejb-name element specifies an enterprise bean's name. This name is
+assigned by the ejb-jar file producer to name the enterprise bean in
+the ejb-jar file's deployment descriptor. The name must be unique
+among the names of the enterprise beans in the same ejb-jar file. The
+enterprise bean code does not depend on the name; therefore the name
+can be changed during the application-assembly process without
+breaking the enterprise bean's function. There is no architected
+relationship between the ejb-name in the deployment descriptor and the
+JNDI name that the Deployer will assign to the enterprise bean's home.
+The name must conform to the lexical rules for an NMTOKEN.
+
+Used in: weblogic-enterprise-bean, method
+
+Example:
+<ejb-name>EmployeeService</ejb-name>
+-->
+<!ELEMENT ejb-name (#PCDATA)>
+
+
+<!--
+The ejb-ref-name element contains the name of an EJB reference. The
+EJB reference is an entry in the enterprise bean's environment.
+
+Used in: ejb-reference-description, ejb-local-reference-description
+
+Example: 
+<ejb-ref-name>ejb/EmplRecords</ejb-ref-name>
+
+-->
+<!ELEMENT ejb-ref-name (#PCDATA)>
+
+
+<!--
+The ejb-reference-description is used to map the JNDI name in the WebLogic 
+server of an EJB that is referenced by the bean in an ejb-reference.
+
+ Used in: reference-descriptor
+
+ Example:
+    <ejb-reference-description>
+      <ejb-ref-name>
+        AdminBean
+      </ejb-ref-name>
+      <jndi-name>
+        payroll.AdminBean
+      </jndi-name>
+    </ejb-reference-description>
+-->
+<!ELEMENT ejb-reference-description (ejb-ref-name, jndi-name)>
+
+<!--
+The ejb-local-reference-description is used to map the JNDI name in the 
+WebLogic server of an EJB that is referenced by the bean in an ejb-local-ref.
+
+ Used in: reference-descriptor
+
+ Since: WLS 6.1
+
+ Example:
+    <ejb-local-reference-description>
+      <ejb-ref-name>
+        LocalAdminBean
+      </ejb-ref-name>
+      <jndi-name>
+        local.payroll.AdminBean
+      </jndi-name>
+    </ejb-local-reference-description>
+-->
+<!ELEMENT ejb-local-reference-description (ejb-ref-name, jndi-name)>
+
+<!--
+Pass by value is always necessary when the EJB is called remotely (not
+from within the server). By setting enable-call-by-reference to
+"True", EJB methods called from within the same server will pass
+arguments by reference. This increases the performance of method
+invocation since parameters are not copied.
+
+The value of enable-call-by-reference must be "True" or "False".
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT enable-call-by-reference (#PCDATA)>
+
+
+<!--
+The entity-cache element is used to specify various options for the 
+caching of an entity bean.
+
+Used in: entity-descriptor
+-->
+<!ELEMENT entity-cache (    
+    max-beans-in-cache?,
+    idle-timeout-seconds?,
+    read-timeout-seconds?,
+    concurrency-strategy?)
+>
+
+
+<!--
+The entity-clustering element is used to specify various options for 
+how an entity bean will be replicated in a WebLogic cluster
+
+Used in: entity-descriptor
+-->
+<!ELEMENT entity-clustering (
+    home-is-clusterable?,
+    home-load-algorithm?,
+    home-call-router-class-name?)
+>
+
+
+<!--
+The entity-descriptor element is used to specify deployment parameters 
+that are applicable to an entity bean.
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT entity-descriptor (
+  pool?,
+  entity-cache?,
+  lifecycle?,
+  persistence?,
+  entity-clustering?,
+  invalidation-target?)
+>
+
+
+<!--
+Applicable to CMP entity beans only.  This optional optimization
+affects whether the beans returned by a finder (or ejbSelect method) are
+loaded immediately into the cache before the finder method returns.
+
+If this is set to "True", the beans will immediately be loaded into
+the cache by the finder. If this is set to "False", the beans will not
+be loaded into the cache until the first invoke of the bean.
+
+The default value is "True", which generally provides the best performance.
+
+Used in: persistence
+-->
+
+<!ELEMENT finders-load-bean (#PCDATA)>
+
+
+<!--
+The home-call-router-class-name specifies a custom class to be used for 
+routing home method calls.  This class must implement
+weblogic.rmi.cluster.CallRouter.  If specified, an instance of
+this class will be called before each method call and be given the
+opportunity to choose a server to route to based on the method
+parameters.  It either returns a server name or null indicating
+that the current load algorithm should be used to pick the server.
+
+Used in: stateful-session-clustering, entity-clustering
+-->
+<!ELEMENT home-call-router-class-name (#PCDATA)>
+
+
+<!--
+The valid values of the home-is-clusterable parameter are 
+"True" or "False."
+
+If "True," this bean can be deployed from multiple servers
+in a cluster.  Calls to the home stub will be load-balanced
+between the servers on which this bean is deployed, and if
+a server hosting the bean is unreachable, the call will
+automatically failover to another server hosting the bean.
+
+Used in: stateful-session-clustering, entity-clustering
+-->
+<!ELEMENT home-is-clusterable (#PCDATA)>
+
+
+<!--
+The home-load-algorithm specifies the algorithm to use for load-balancing 
+between replicas of this home.  If this property is not specified, the 
+algorithm specified by the server property 
+weblogic.cluster.defaultLoadAlgorithm will be used.  
+
+The value of this element must be one of the following:
+  RoundRobin
+  Random
+  WeightBased
+
+Used in: stateful-session-clustering, entity-clustering
+-->
+<!ELEMENT home-load-algorithm (#PCDATA)>
+
+
+<!--
+The cache (see "max-beans-in-cache" above) is scrubbed of
+inactive objects after at least this many seconds. Objects 
+scrubbed are passivated.
+
+Used in: cache
+-->
+<!ELEMENT idle-timeout-seconds (#PCDATA)>
+
+
+<!--
+The cache-type can be one of "NRU" or "LRU".  The default is "NRU".
+
+Used in: stateful-session-cache
+
+Since: WLS 6.1
+-->
+<!ELEMENT cache-type (#PCDATA)>
+
+
+<!--
+WebLogic EJB maintains a free pool of beans for every bean class.
+This property decides the initial size of the pool.
+
+Used in: pool
+-->
+<!ELEMENT initial-beans-in-free-pool (#PCDATA)>
+
+
+<!--
+This element specifies the initial ContextFactory that the container will
+use to create its connection factories.  If not specified, it will default
+to weblogic.jndi.WLInitialContextFactory.
+
+For example, to use Fiorano as a JMS provider:
+
+<message-driven-descriptor>
+  ...
+  <initial-context-factory>fiorano.jms.rtl.FioranoInitialContextFactory</initial-context-factory>
+  <connection-factory-jndi-name>java:comp/env/jms/MyConnectionFactory</connection-factory-jndi-name>
+
+Used in: message-driven-descriptor
+-->
+<!ELEMENT initial-context-factory (#PCDATA)>
+
+<!--
+Applies to bean managed persistence or EJB 1.1 container-managed
+persistence entity EJBs. EJB 2.0 entity EJBs do not need to implement
+an is-modified-method. The EJB container can automatically detect
+which fields were modified in a transaction.
+
+This parameter declares the name of an EJBean method that tells the
+container whether the bean data has been modified. The method is
+called when the bean managed EJBean is stored. If a method is not specified,
+WebLogic always assumes that the EJBean has been modified and always
+saves it. Providing a method and setting it as appropriate will
+improve performance.
+
+Used in: persistence
+-->
+<!ELEMENT is-modified-method-name (#PCDATA)>
+
+
+<!--
+Specify a transaction isolation level
+ 
+The value of this element must be one of the following:
+
+   TRANSACTION_SERIALIZABLE  
+   TRANSACTION_READ_COMMITTED
+   TRANSACTION_READ_UNCOMMITTED
+   TRANSACTION_REPEATABLE_READ
+
+
+Special value for use with Oracle DBMS Only:
+
+   TRANSACTION_READ_COMMITTED_FOR_UPDATE
+
+   When this Isolation level is set for a method, the following happens:
+
+     The Isolation Level is set to: TRANSACTION_READ_COMMITTED
+
+     For duration of the Transaction, all SQL 'SELECT' statements
+       executed in any method are executed with 'FOR UPDATE' 
+       appended to them.  This causes the SELECTed rows to be locked for update.
+
+   This isolation level can be used to avoid the error:
+       java.sql.SQLException: ORA-08177: can't serialize access for this transaction
+
+     which can happen when using the TRANSACTION_SERIALIZABLE isolation with Oracle DBMS
+
+
+
+Used in: transaction-isolation
+-->
+<!ELEMENT isolation-level (#PCDATA)>
+
+
+<!-- 
+This specifies a jndi-name for a bean, resource or reference.
+
+Used in: weblogic-enterprise-bean, resource-description, 
+         ejb-reference-description, ejb-local-reference-description
+-->
+<!ELEMENT jndi-name (#PCDATA)>
+
+<!-- 
+This specifies a jndi-name for a bean's local home. If a bean has both a
+remote home and a local home, then it must be given two JNDI names; one
+for each home.
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT local-jndi-name (#PCDATA)>
+
+<!--
+The lifecycle element is used to specify various options for the management of 
+the lifecycle of stateful beans
+
+Used in: stateful-session-descriptor, entity-descriptor
+-->
+<!ELEMENT lifecycle (passivation-strategy?)>
+   
+
+<!--
+Maximum number of objects of this class that are allowed in memory.
+Objects are kept in an LRU chain, and the ones dropped from the
+end of the chain are passivated.
+
+Used in: cache
+-->
+<!ELEMENT max-beans-in-cache (#PCDATA)>
+
+
+
+<!--
+WebLogic EJB maintains a free pool of beans for every bean class.
+This property decides the maximum size of the pool.
+
+Used in: pool
+-->
+<!ELEMENT max-beans-in-free-pool (#PCDATA)>
+
+
+<!--
+The message-driven-descriptor element is used to specify deployment 
+parameters that are applicable to a message-driven bean.
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT message-driven-descriptor (
+  pool?,
+  destination-jndi-name?,
+  initial-context-factory?,
+  provider-url?,
+  connection-factory-jndi-name?,
+  jms-polling-interval-seconds?,
+  jms-client-id?
+)
+>
+
+
+<!-- 
+The method element is used to denote a method of an enterprise bean's 
+home or remote interface, or a set of methods.
+
+For further information, see the description of the element in ejb-jar.dtd.
+
+Used in: transaction-isolation
+-->
+<!ELEMENT method (description?, ejb-name, method-intf?, method-name, method-params?)>
+
+<!-- 
+The method-intf element allows a method element to differentiate
+between the methods with the same name and signature that are defined
+in both the remote and home interfaces. The method-intf element must
+be one of the following: 
+  <method-intf>Home</method-intf>
+  <method-intf>Remote</method-intf> 
+
+Used in: method 
+-->
+<!ELEMENT method-intf (#PCDATA)>
+
+<!-- 
+The method-name element contains a name of an enterprise bean method,
+or the asterisk (*) character. The asterisk is used when the element
+denotes all the methods of an enterprise bean's remote and home
+interfaces.
+
+Used in: method 
+-->
+<!ELEMENT method-name (#PCDATA)>
+
+<!-- 
+The method-param element contains the fully-qualified Java type name
+of a method parameter.
+
+Used in: method-params 
+-->
+<!ELEMENT method-param (#PCDATA)>
+
+<!-- 
+The method-params element contains a list of the fully-qualified Java
+type names of the method parameters.
+
+Used in: method
+--> 
+<!ELEMENT method-params (method-param*)>
+
+
+<!--
+The passivation-strategy can be either "default" or "transaction".  With
+the default setting the container will attempt to keep a working set
+of beans in the cache.  With the "transaction" setting, the container will 
+passivate the bean after every transaction (or method call for a 
+non-transactional invocation).
+
+Used in: lifecycle
+-->
+<!ELEMENT passivation-strategy (#PCDATA)>
+
+
+<!--
+The persistence element is used to specify persistence options 
+
+Used in: entity-descriptor
+-->
+<!ELEMENT persistence (
+    is-modified-method-name?,
+    delay-updates-until-end-of-tx?,
+    finders-load-bean?,
+    persistence-type*, 
+    db-is-shared?, 
+    persistence-use?)
+>
+
+
+<!--
+A persistence-type is a holder for data that is particular to a particular
+bean's use of a particular persistence type.
+
+Used in: persistence
+
+Example:
+    <persistence-type>
+        <type-identifier>...</type-identifier>
+        ...
+    </persistence-type>
+-->
+<!ELEMENT persistence-type (
+    type-identifier,
+    type-version,
+    type-storage
+)>
+
+
+<!--
+The persistence-use tag stores an identifier of the Persistence Type to be 
+used for this particular bean.
+
+Used in: persistence
+
+Example:
+    <persistence-use>
+        <type-identifier>WebLogic_CMP_JDBC</type-identifier>
+        <type-version>1.3.2</type-version>
+    </persistence-use>
+-->
+<!ELEMENT persistence-use (type-identifier, type-version)>
+
+
+<!--
+The persistent-store-dir specifies the directory in the
+server's file system where the state of passivated stateful session beans is 
+to be stored.
+
+Used in: stateful-session-descriptor
+-->
+<!ELEMENT persistent-store-dir (#PCDATA)>
+
+<!--
+The allow-concurrent-calls specifies whether a stateful session bean
+instance will allow concurrent method calls.  The value of this
+element may be either "True" or "False".  The default value is
+"False".  When a stateful session bean instance is currently in a
+method call and another (concurrent) method call arrives on the
+server, the EJB specification requires that the server throw a
+RemoteException.  By default, allow-concurrent-calls is false, and the
+EJB container will follow the EJB specification.  When this value is
+set to true, the EJB container will block the concurrent method call
+and allow it to proceed when the previous call has completed.
+
+
+Used in: stateful-session-descriptor
+-->
+<!ELEMENT allow-concurrent-calls (#PCDATA)>
+
+
+
+<!--
+The pool element is used to specify various options for instance pooling.
+
+Used in: stateless-session-descriptor, entity-descriptor,
+	 message-driven-descriptor
+-->
+<!ELEMENT pool (
+    max-beans-in-free-pool?, 
+    initial-beans-in-free-pool?)
+>
+
+
+<!--
+The principal-name element contains the name of a security principal.
+
+Used in: security-role-assignment
+-->
+<!ELEMENT principal-name (#PCDATA)>
+
+
+<!--
+The read-timeout-seconds is the number of seconds between ejbLoad calls on 
+a Read-Only entity bean.  If read-timeout-seconds is 0, 
+ejbLoad will only be called when the bean is brought into the cache.
+
+Used in: cache
+-->
+<!ELEMENT read-timeout-seconds (#PCDATA)>
+
+
+<!--
+The reference-descriptor specifies a list of resource-descriptions that
+describe the resources used in the bean.
+
+ Used in: weblogic-enterprise-bean
+
+ Example:
+     <reference-descriptor>
+        <resource-description>
+	        <res-ref-name>
+	          jdbc/EmployeeAppDB
+	        </res-ref-name>
+	        <jndi-name>
+	          weblogic.jdbc.jts.ejbPool
+	        </jndi-name>
+        </resource-description>
+        <resource-description>
+          <res-ref-name>
+            jdbc/PersonDB
+          </res-ref-name>
+          <jndi-name>
+            weblogic.jdbc.jts.personPool
+          </jndi-name>
+        </resource-description>
+     </reference-descriptor>
+-->
+<!ELEMENT reference-descriptor (
+  resource-description*,
+  resource-env-description*,
+  ejb-reference-description*,
+  ejb-local-reference-description*
+)>
+
+
+<!-- 
+The replication-type element describes how to replicate stateful session
+beans in a cluster. The legal values are:
+  "InMemory":   The bean will be replicated in memory across the cluster
+  "None":       The bean will not be replicated.
+
+Used in: stateful-session-clustering
+-->
+<!ELEMENT replication-type (#PCDATA)>
+
+
+<!--
+The res-env-ref-name element specifies the name of a resource environment
+reference.
+
+Used in: resource-env-description
+
+-->
+<!ELEMENT res-env-ref-name (#PCDATA)>
+
+
+<!--
+The res-ref-name element specifies the name of a resource factory
+reference.
+
+Used in: resource-description
+
+-->
+<!ELEMENT res-ref-name (#PCDATA)>
+
+
+<!--
+The resource-description element is used to map a resource-ref, declared in
+the ejb-jar.xml deployment descriptor, to the JNDI name of the server resource 
+factory it represents.
+
+ Used in: reference-descriptor
+
+ Example:
+     <resource-description>
+	<res-ref-name>
+	  jdbc/EmployeeAppDB
+	</res-ref-name>
+        <jndi-name>
+	  weblogic.jdbc.jts.ejbPool
+        </jndi-name>
+     </resource-description>
+-->
+<!ELEMENT resource-description (res-ref-name, jndi-name)>
+
+
+<!--
+The resource-env-description element is used to map a resource-env-ref,
+declared in the ejb-jar.xml deployment descriptor, to the JNDI name of the 
+server resource it represents.
+
+ Used in: reference-descriptor
+
+ Example:
+     <resource-env-description>
+	<res-env-ref-name>
+	  jms/StockInfo
+	</res-env-ref-name>
+        <jndi-name>
+	  mystockapp.jms.queue.nasdaq
+        </jndi-name>
+     </resource-description>
+-->
+<!ELEMENT resource-env-description (res-env-ref-name, jndi-name)>
+
+
+<!--
+The role-name element contains the name of a security role.
+
+Used in: security-role-assignment
+-->
+<!ELEMENT role-name (#PCDATA)>
+
+
+<!-- 
+The run-as-identity-principal element specifies which security principal is
+to be used for the run-as identity.  This tag is necessary if the role 
+specified in the run-as element of the ejb-jar.xml descriptor does not map to 
+a single security principal representing a User in the security realm.  This
+could be true in two cases.  One case is where the role maps to multiple
+security principals (see security-role-assignment element).  In this case,
+the run-as-identity-principal element must be used to specify which of the 
+security principals you would like to be used.  The other case is where the 
+role maps to a single security principal that represents a Group in the 
+security realm.  In this case the run-as-identity-principal element must be
+used to specify a particular User in the security realm.
+
+Used in: weblogic-enterprise-bean
+
+Example:
+   <run-as-identity-principal>
+      Fred
+   </run-as-identity-principal>
+-->
+<!ELEMENT run-as-identity-principal (#PCDATA)>
+
+
+<!--
+The security-role-assigment declares a mapping between an EJB security role
+and one or more principals in the WebLogic server.
+
+Example:
+   <security-role-assignment>
+     <role-name>
+       PayrollAdmin
+     </role-name>
+     <principal-name>
+       Tanya
+     </principal-name>
+     <principal-name>
+       Fred
+     </principal-name>
+     <principal-name>
+       system
+     </principal-name>
+   </security-role-assignment>
+
+Used in: weblogic-ejb-jar
+-->
+<!ELEMENT security-role-assignment (role-name, principal-name+)>
+
+
+<!--
+The stateful-session-clustering element is used to specify various options for 
+how a stateful session bean will be replicated in a WebLogic cluster
+
+Used in: stateful-session-descriptor
+-->
+<!ELEMENT stateful-session-clustering (
+    home-is-clusterable?,
+    home-load-algorithm?,
+    home-call-router-class-name?,
+    replication-type?)
+>
+
+
+<!--
+The stateful-session-cache element is used to specify various options for the 
+caching of a stateful session bean.
+
+Used in: stateful-session-descriptor
+-->
+<!ELEMENT stateful-session-cache (    
+    max-beans-in-cache?,
+    idle-timeout-seconds?,
+    cache-type?)
+>
+
+
+<!--
+The stateful-session-descriptor element is used to specify deployment 
+parameters that are applicable to a stateful session bean.
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT stateful-session-descriptor (
+  stateful-session-cache?,
+  lifecycle?,
+  persistent-store-dir?,
+  stateful-session-clustering?,
+  allow-concurrent-calls?)
+>
+
+
+<!--
+The stateless-bean-call-router-class-name specifies a custom class 
+to be used for routing bean method calls.  This class must implement
+weblogic.rmi.cluster.CallRouter.  If specified, an instance of
+this class will be called before each method call and be given the
+opportunity to choose a server to route to based on the method
+parameters.  It either returns a server name or null indicating
+that the current load algorithm should be used to pick the server.
+
+Used in: stateless-clustering
+-->
+<!ELEMENT stateless-bean-call-router-class-name (#PCDATA)>
+
+
+<!--
+The valid values of the stateless-bean-is-clusterable parameter 
+are "True" or "False."
+
+The parameter is applicable only to session EJBeans with a 
+session-type value of "Stateless" (see ejb-jar.dtd).
+If home-is-clusterable is "True" and this parameter is also "true",
+calls to this bean stub will be load-balanced between all the
+the servers on which this bean is deployed, and if a server
+hosting the bean becomes unreachable, the call will automatically
+failover to another server hosting the bean.
+
+Used in: stateless-clustering
+-->
+<!ELEMENT stateless-bean-is-clusterable (#PCDATA)>
+
+
+<!--
+The stateless-bean-load-algorithm specifies the algorithm to use 
+for load-balancing between replicas of this bean.  If this property 
+is not specified, the algorithm specified by the server property
+weblogic.cluster.defaultLoadAlgorithm will be used.  
+
+The legal values of stateless-bean-load-algorithm are:
+  RoundRobin
+  Random
+  WeightBased
+
+Used in: stateless-clustering
+-->
+<!ELEMENT stateless-bean-load-algorithm (#PCDATA)>
+
+
+<!--
+The value of the stateless-bean-methods-are-idempotent must be
+either "True" or "False."
+
+This parameter is applicable only to session EJBeans with a 
+session-type of "Stateless" (see ejb-jar.dtd).
+The value should be set to "True" only if the bean is written
+such that repeated calls to the same method with the same arguments
+has exactly the same effect as a single call. This allows the failover
+handler to retry a failed call without knowing whether the call
+actually completed on the failed server. Setting this property to
+"true" makes it possible for the bean stub to automatically recover
+from any failure as long as another server hosting the bean can be
+reached.
+
+Used in: stateless-clustering
+-->
+<!ELEMENT stateless-bean-methods-are-idempotent (#PCDATA)>
+
+
+<!--
+The stateless-clustering element is used to specify various options for 
+how a stateless session bean will be replicated in a WebLogic cluster
+
+Used in: stateless-session-descriptor
+-->
+<!ELEMENT stateless-clustering (
+    stateless-bean-is-clusterable?,
+    stateless-bean-load-algorithm?,
+    stateless-bean-call-router-class-name?,
+    stateless-bean-methods-are-idempotent?)
+>
+ 
+
+<!--
+The stateless-session-descriptor element is used to specify deployment 
+parameters that are applicable to a stateless session bean.
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT stateless-session-descriptor (
+  pool?,
+  stateless-clustering?)
+>
+
+
+<!--
+Specify transaction isolation level on a per-method basis.
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT transaction-isolation (isolation-level, method+)>
+
+
+<!--
+Sets the default timeout for container-initiated transactions for this
+bean. If a transaction's duration is longer than this value, it will
+be rolled back. 
+
+Used in: transaction-descriptor
+-->
+<!ELEMENT trans-timeout-seconds (#PCDATA)>
+
+
+<!--
+The transaction-descriptor specifies properties relating to transactions
+
+Used in: weblogic-enterprise-bean
+-->
+<!ELEMENT transaction-descriptor (
+  trans-timeout-seconds?)
+>
+
+
+<!--
+This stores the identifier of the Persistence Type that this tag describes.
+
+Used in: persistence-type, persistence-use
+
+Example:
+    <type-identifier>WebLogic_CMP_JDBC</type-identifier>
+-->
+<!ELEMENT type-identifier (#PCDATA)>
+
+
+<!--
+The type-storage tag stores a file (path relative within the ejb-jar file) 
+which stores data specific to this Persistence Type.
+
+Used in: persistence-type
+
+Example:
+    <type-storage>persistence/weblogic/cmp_jdbc.xml</type-storage>
+-->
+<!ELEMENT type-storage (#PCDATA)>
+
+
+<!--
+This element specifies the URL provider to be put in the Properties used
+by the InitialContext.  It is typically host:port and used in conjunction
+with initial-context-factory and connection-factory-jndi-name.
+
+Used in: message-driven-descriptor
+-->
+<!ELEMENT provider-url (#PCDATA)>
+
+<!--
+The type-version tag stores the version of the Persistence Type to be used for 
+this particular bean. Most useful when a server deployment has multiple 
+compatible versions of the same Persistence Type installed, as the Persistence 
+Type identifier is not unique between versions.
+
+Used in: persistence-use, persistence-type
+
+Example:
+    <type-version>1.3.2</type-version>   
+
+-->
+<!ELEMENT type-version (#PCDATA)>
+
+<!-- 
+The weblogic-ejb-jar is the root element of the weblogic component of the
+EJB deployment descriptor 
+-->
+<!ELEMENT weblogic-ejb-jar (description?, weblogic-enterprise-bean*, 
+            security-role-assignment*, transaction-isolation*)
+>
+
+<!-- 
+The weblogic-enterprise-bean element contains the deployment
+information for a bean that is specific to the WebLogic Server
+
+Used in: weblogic-ejb-jar
+-->
+<!ELEMENT weblogic-enterprise-bean (
+     ejb-name, 
+     (entity-descriptor|
+      stateless-session-descriptor|
+      stateful-session-descriptor|
+      message-driven-descriptor
+     )?,
+     transaction-descriptor?,
+     reference-descriptor?,
+     enable-call-by-reference?,
+     run-as-identity-principal?,
+     jndi-name?,
+     local-jndi-name?)
+>
+
+<!--
+The invalidation-target element specifies a Read-Only Entity EJB which
+should be invalidated when this Container-Managed Persistence Entity
+EJB has been modified.
+
+Note that the target ejb-name must be a Read-Only Entity EJB, and this
+tag may only be specified in an EJB 2.0 Container-Managed Persistence Entity
+EJB. 
+
+Example:
+
+<invalidation-target>
+  <ejb-name>StockReaderEJB</ejb-name
+</invalidation-target>
+
+Since: WebLogic Server 6.1
+
+-->
+
+<!ELEMENT invalidation-target (
+  ejb-name)
+>
+

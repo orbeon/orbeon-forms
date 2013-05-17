@@ -1,0 +1,53 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:xu="http://www.xmldb.org/xupdate"
+        instance-passing="forward">
+
+    <page path-info="/goto-example/(.+)" matcher="oxf:perl5-matcher" xforms="page/xforms-model.xml" model="page/model.xpl" view="page/examples.xpl">
+        <param ref="/form/example-id"/>
+        <action>
+            <result page="home">
+                <xu:update select="/form/example-id">
+                    <xu:value-of select="document('input:instance')/form/example-id"/>
+                </xu:update>
+                <xu:update select="/form/action">show-example</xu:update>
+                <xu:update select="/form/visible-portlet">OXFExamplesPortlet</xu:update>
+            </result>
+        </action>
+    </page>
+
+    <page path-info="/goto-source/([^/]+)/(.+)" matcher="oxf:perl5-matcher" xforms="page/xforms-model.xml" model="page/model.xpl" view="page/examples.xpl">
+        <param ref="/form/example-id"/>
+        <param ref="/form/source-url"/>
+        <action>
+            <result page="home">
+                <xu:update select="/form/example-id">
+                    <xu:value-of select="document('input:instance')/form/example-id"/>
+                </xu:update>
+                <xu:update select="/form/source-url">
+                    <xu:value-of select="document('input:instance')/form/source-url"/>
+                </xu:update>
+                <xu:update select="/form/action">show-source</xu:update>
+                <xu:update select="/form/visible-portlet">OXFExamplesSourceCodePortlet</xu:update>
+            </result>
+        </action>
+    </page>
+
+    <page id="home" path-info="/" xforms="page/xforms-model.xml" model="page/model.xpl" view="page/examples.xpl"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

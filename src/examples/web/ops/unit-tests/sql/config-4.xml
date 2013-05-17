@@ -1,0 +1,193 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:recording="http://bruchez.org/recording">
+    <recording:collection>
+        <sql:connection>
+            <sql:datasource>db</sql:datasource>
+            <sql:execute>
+                <sql:query>
+                    SELECT * FROM
+                    (SELECT DISTINCT r.*, p.performance_id, p.execution_date, p.execution_place, p.studio_live,
+                                     w.work_id, w.title work_title, w.subtitle work_subtitle, w.abbreviation work_abbreviation,
+                                     w2.work_id parent_work_id, w2.title parent_work_title, w2.subtitle parent_work_subtitle, w2.abbreviation parent_work_abbreviation,
+                                     rm.position media_position, rt.position track_position
+                      FROM ps_recording r, ps_recording_media rm, ps_recording_track rt,
+                           ps_work_performance wp, ps_performance p, ps_work w, ps_work w2
+                     WHERE r.recording_id IN (<sql:param type="xs:int" select="/query/recording-id"/>)
+                       AND r.recording_id = rm.recording_id
+                       AND rm.recording_media_id = rt.recording_media_id
+                       AND rt.work_performance_id = wp.work_performance_id
+                       AND p.performance_id = wp.performance_id
+                       AND wp.work_id = w.work_id
+                       AND w.parent_work_id = w2.work_id (+))
+                    UNION
+                    (SELECT DISTINCT r.*, p.performance_id, p.execution_date, p.execution_place, p.studio_live,
+                                     w.work_id, w2.title work_title, w2.subtitle work_subtitle, w.abbreviation work_abbreviation,
+                                     w2.work_id parent_work_id, w2.title parent_work_title, w2.subtitle parent_work_subtitle, w2.abbreviation parent_work_abbreviation,
+                                     rm.position media_position, rt.position track_position
+                      FROM ps_recording r, ps_recording_media rm, ps_recording_track rt,
+                           ps_work w, ps_work w2, ps_performance p, ps_recording_performance rp
+                     WHERE r.recording_id IN (<sql:param type="xs:int" select="/query/recording-id"/>)
+                       AND r.recording_id = rm.recording_id
+                       AND rm.recording_media_id = rt.recording_media_id
+                       AND rt.work_id = w.work_id
+                       AND r.recording_id = rp.recording_id
+                       AND p.performance_id = rp.performance_id
+                       AND w.parent_work_id = w2.work_id (+))
+                    UNION
+                    (SELECT DISTINCT r.*, p.performance_id, p.execution_date, p.execution_place, p.studio_live,
+                                     w.work_id, w.title work_title, w.subtitle work_subtitle, w.abbreviation work_abbreviation,
+                                     w2.work_id parent_work_id, w2.title parent_work_subtitle, w2.title parent_work_subtitle, w2.abbreviation parent_work_abbreviation,
+                                     0 media_position, 0 track_position
+                      FROM ps_recording r, ps_work w, ps_work w2, ps_performance p, ps_recording_performance rp,
+                           ps_work_performance wp
+                     WHERE r.recording_id IN (<sql:param type="xs:int" select="/query/recording-id"/>)
+                       AND r.recording_id = rp.recording_id
+                       AND p.performance_id = rp.performance_id
+                       AND wp.performance_id = p.performance_id
+                       AND wp.work_id = w.work_id
+                       AND w.parent_work_id = w2.work_id (+)
+                       AND NOT EXISTS (SELECT 1
+                                         FROM ps_recording_media rm, ps_recording_track rt
+                                        WHERE r.recording_id = rm.recording_id
+                                          AND rm.recording_media_id = rt.recording_media_id
+                                                              AND (rt.work_performance_id IS NOT NULL
+                                               OR rt.work_id IS NOT NULL)))
+                    ORDER BY media_position, track_position
+                </sql:query>
+                <sql:results>
+                    <sql:row-results>
+                        <sql:group column="recording_id">
+                            <recording:recording>
+                                <recording:recording-id><sql:get-column type="xs:decimal" column="recording_id"/></recording:recording-id>
+                                <recording:title><sql:get-column type="xs:string" column="title"/></recording:title>
+                                <recording:author><sql:get-column type="xs:string" column="author"/></recording:author>
+                                <recording:label><sql:get-column type="xs:string" column="label"/></recording:label>
+                                <recording:code><sql:get-column type="xs:string" column="code"/></recording:code>
+                                <recording:series><sql:get-column type="xs:string" column="series"/></recording:series>
+                                <recording:checked><sql:get-column type="xs:decimal" column="checked"/></recording:checked>
+                                <recording:media-count><sql:get-column type="xs:decimal" column="media_count"/></recording:media-count>
+                                <recording:media-type><sql:get-column type="xs:string" column="media_type"/></recording:media-type>
+                                <recording:digital-process><sql:get-column type="xs:string" column="digital_process"/></recording:digital-process>
+                                <recording:channels><sql:get-column type="xs:decimal" column="channels"/></recording:channels>
+                                <recording:release-date><sql:get-column type="xs:string" column="release_date"/></recording:release-date>
+                                <recording:rating><sql:get-column type="xs:decimal" column="rating"/></recording:rating>
+                                <sql:execute>
+                                    <sql:query>
+                                          SELECT i.*
+                                            FROM ps_recording_image i
+                                           WHERE i.recording_id = <sql:param type="xs:decimal"><sql:get-column type="xs:decimal" column="recording_id"/></sql:param>
+                                        ORDER BY I.recording_image_id
+                                    </sql:query>
+                                    <sql:results>
+                                        <sql:row-results>
+                                            <recording:image><sql:get-column type="xs:string" column="name"/></recording:image>
+                                        </sql:row-results>
+                                    </sql:results>
+                                </sql:execute>
+                                <sql:execute>
+                                    <sql:query>
+                                        SELECT at.*, af.*
+                                          FROM ps_audio_track at JOIN ps_audio_format af ON af.audio_track_id = at.audio_track_id
+                                         WHERE at.recording_id = <sql:param type="xs:decimal"><sql:get-column type="xs:decimal" column="recording_id"/></sql:param>
+                                         ORDER BY at.audio_track_id, af.format, bytes
+                                    </sql:query>
+                                    <sql:results>
+                                        <sql:row-results>
+                                            <!--<test>-->
+                                                <!--<sql:get-columns format="xml"/>-->
+                                            <!--</test>-->
+                                            <sql:group column="audio_track_id">
+                                                <recording:audio-track>
+                                                    <recording:audio-track-id><sql:get-column type="xs:int" column="audio_track_id"/></recording:audio-track-id>
+                                                    <recording:duration><sql:get-column type="xs:int" column="duration"/></recording:duration>
+                                                    <recording:short-description><sql:get-column type="xs:string" column="short_description"/></recording:short-description>
+                                                    <recording:description><sql:get-column type="xs:string" column="description"/></recording:description>
+                                                    <sql:member>
+                                                        <recording:audio-format>
+                                                            <recording:audio-format-id><sql:get-column type="xs:int" column="audio_format_id"/></recording:audio-format-id>
+                                                            <recording:format><sql:get-column type="xs:string" column="format"/></recording:format>
+                                                            <recording:bytes><sql:get-column type="xs:int" column="bytes"/></recording:bytes>
+                                                            <recording:path><sql:get-column type="xs:string" column="path"/></recording:path>
+                                                        </recording:audio-format>
+                                                    </sql:member>
+                                                </recording:audio-track>
+                                            </sql:group>
+                                        </sql:row-results>
+                                    </sql:results>
+                                </sql:execute>
+                                <sql:member>
+                                    <sql:group column="performance_id">
+                                        <recording:performance>
+                                            <recording:performance-id><sql:get-column type="xs:decimal" column="performance_id"/></recording:performance-id>
+                                            <recording:execution-date><sql:get-column type="xs:string" column="execution_date"/></recording:execution-date>
+                                            <recording:execution-place><sql:get-column type="xs:string" column="execution_place"/></recording:execution-place>
+                                            <recording:studio-live><sql:get-column type="xs:string" column="studio_live"/></recording:studio-live>
+                                            <sql:execute>
+                                                <sql:query>
+                                                      SELECT f.name function_name, f.actor function_actor
+                                                        FROM ps_function f
+                                                       WHERE f.performance_id = <sql:param type="xs:decimal"><sql:get-column type="xs:decimal" column="performance_id"/></sql:param>
+                                                    ORDER BY f.function_id
+                                                </sql:query>
+                                                <sql:results>
+                                                    <sql:row-results>
+                                                        <recording:function>
+                                                            <recording:name><sql:get-column type="xs:string" column="function_name"/></recording:name>
+                                                            <recording:actor><sql:get-column type="xs:string" column="function_actor"/></recording:actor>
+                                                        </recording:function>
+                                                    </sql:row-results>
+                                                </sql:results>
+                                            </sql:execute>
+                                            <sql:execute>
+                                                <sql:query>
+                                                    SELECT n.note
+                                                      FROM ps_performance_note n
+                                                     WHERE n.performance_id = <sql:param type="xs:decimal"><sql:get-column type="xs:decimal" column="performance_id"/></sql:param>
+                                                </sql:query>
+                                                <sql:results>
+                                                    <sql:row-results>
+                                                        <recording:note><sql:get-column type="xs:string" column="note"/></recording:note>
+                                                    </sql:row-results>
+                                                </sql:results>
+                                            </sql:execute>
+                                            <sql:member>
+                                                <recording:work>
+                                                    <recording:media-position><sql:get-column type="xs:decimal" column="media_position"/></recording:media-position>
+                                                    <recording:track-position><sql:get-column type="xs:decimal" column="track_position"/></recording:track-position>
+                                                    <recording:work-id><sql:get-column type="xs:decimal" column="work_id"/></recording:work-id>
+                                                    <recording:work-title><sql:get-column type="xs:string" column="work_title"/></recording:work-title>
+                                                    <recording:work-subtitle><sql:get-column type="xs:string" column="work_subtitle"/></recording:work-subtitle>
+                                                    <recording:work-abbreviation><sql:get-column type="xs:string" column="work_abbreviation"/></recording:work-abbreviation>
+                                                    <recording:parent-work-id><sql:get-column type="xs:decimal" column="parent_work_id"/></recording:parent-work-id>
+                                                    <recording:parent-work-title><sql:get-column type="xs:string" column="parent_work_title"/></recording:parent-work-title>
+                                                    <recording:parent-work-subtitle><sql:get-column type="xs:string" column="parent_work_subtitle"/></recording:parent-work-subtitle>
+                                                    <recording:parent-work-abbreviation><sql:get-column type="xs:string" column="parent_work_abbreviation"/></recording:parent-work-abbreviation>
+                                                </recording:work>
+                                            </sql:member>
+                                        </recording:performance>
+                                    </sql:group>
+                                </sql:member>
+                            </recording:recording>
+                        </sql:group>
+                    </sql:row-results>
+                </sql:results>
+            </sql:execute>
+        </sql:connection>
+    </recording:collection>
+</sql:config>

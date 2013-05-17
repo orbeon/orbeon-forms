@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<!DOCTYPE web-app PUBLIC
+ "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+ "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <!-- JSF configuration -->
+    <context-param>
+        <param-name>saveStateInClient</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>com.sun.faces.validateXml</param-name>
+        <param-value>true</param-value>
+    </context-param>
+
+    <!-- The sample Model 2X servlet filter -->
+    <filter>
+        <filter-name>model2x-filter</filter-name>
+        <filter-class>org.orbeon.faces.servlet.Filter</filter-class>
+        <init-param>
+            <param-name>stylesheet1</param-name>
+            <param-value>/WEB-INF/jsf-theme.xsl</param-value>
+        </init-param>
+        <init-param>
+            <param-name>stylesheet2</param-name>
+            <param-value>/WEB-INF/standalone-theme.xsl</param-value>
+        </init-param>
+        <init-param>
+            <param-name>stylesheet3</param-name>
+            <param-value>/WEB-INF/standalone-fix-paths.xsl</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>model2x-filter</filter-name>
+        <url-pattern>/faces/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Listeners to initialize the JSF application -->
+    <listener>
+        <listener-class>org.orbeon.faces.renderkit.ServletContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.sun.faces.config.ConfigListener</listener-class>
+    </listener>
+
+    <!-- JavaServer Faces servlet  -->
+    <servlet>
+        <servlet-name>jsf</servlet-name>
+        <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>jsf</servlet-name>
+        <url-pattern>/faces/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

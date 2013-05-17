@@ -1,0 +1,63 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<form xmlns="http://orbeon.org/oxf/examples/dmv">
+    <personal-information>
+        <name>
+            <first-name>Alicia</first-name>
+            <initial>M</initial>
+            <last-name>Martin</last-name>
+        </name>
+        <driver-license-number>B314159</driver-license-number>
+        <birth-date>1980-12-31</birth-date>
+    </personal-information>
+    <address-information>
+        <voter-address-change>
+            <change-address/>
+        </voter-address-change>
+        <address type="residence">
+            <street>
+                <number>100</number>
+                <name-1>Mash Road</name-1>
+                <name-2/>
+            </street>
+            <apt></apt>
+            <city>San Giovanni</city>
+            <state>AL</state>
+            <zip>10001</zip>
+        </address>
+        <address type="old">
+            <street>
+                <number></number>
+                <name-1>Mountain Road</name-1>
+                <name-2/>
+            </street>
+            <apt/>
+            <city>Great Peak</city>
+            <state>CO</state>
+            <zip>11223</zip>
+        </address>
+    </address-information>
+    <vehicle-information>
+        <vehicles>
+            <vehicle>
+                <plate-number>3BBB319</plate-number>
+                <vin>85987654321031535</vin>
+                <leased/>
+            </vehicle>
+        </vehicles>
+        <leased-vehicles>
+            <company-name/>
+        </leased-vehicles>
+    </vehicle-information>
+</form>

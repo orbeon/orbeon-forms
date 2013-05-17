@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+ Copyright 2002, 2003 Sun Microsystems, Inc. All Rights Reserved.
+
+ Redistribution and use in source and binary forms, with or
+ without modification, are permitted provided that the following
+ conditions are met:
+
+ - Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+ - Redistribution in binary form must reproduce the above
+   copyright notice, this list of conditions and the following
+   disclaimer in the documentation and/or other materials
+   provided with the distribution.
+
+ Neither the name of Sun Microsystems, Inc. or the names of
+ contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
+
+ This software is provided "AS IS," without a warranty of any
+ kind. ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND
+ WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE HEREBY
+ EXCLUDED. SUN AND ITS LICENSORS SHALL NOT BE LIABLE FOR ANY
+ DAMAGES OR LIABILITIES SUFFERED BY LICENSEE AS A RESULT OF OR
+ RELATING TO USE, MODIFICATION OR DISTRIBUTION OF THIS SOFTWARE OR
+ ITS DERIVATIVES. IN NO EVENT WILL SUN OR ITS LICENSORS BE LIABLE
+ FOR ANY LOST REVENUE, PROFIT OR DATA, OR FOR DIRECT, INDIRECT,
+ SPECIAL, CONSEQUENTIAL, INCIDENTAL OR PUNITIVE DAMAGES, HOWEVER
+ CAUSED AND REGARDLESS OF THE THEORY OF LIABILITY, ARISING OUT OF
+ THE USE OF OR INABILITY TO USE THIS SOFTWARE, EVEN IF SUN HAS
+ BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+ You acknowledge that this software is not designed, licensed or
+ intended for use in the design, construction, operation or
+ maintenance of any nuclear facility.
+-->
+
+<!DOCTYPE taglib
+  PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.2//EN"
+  "http://java.sun.com/dtd/web-jsptaglibrary_1_2.dtd">
+
+<taglib>
+
+    <!-- ============== Tag Library Description Elements ============= -->
+    <tlib-version>0.03</tlib-version>
+    <jsp-version>1.2</jsp-version>
+    <short-name>JavaServerFaces Framework Tag Library</short-name>
+    <uri>cardemotaglibrary_1.1</uri>
+    <description>
+        This tag library contains tags used by the CarDemo application.
+    </description>
+
+    <!-- ===================== ImageMap tags ====================== -->
+    <tag>
+        <name>format_validator</name>
+        <tag-class>org.orbeon.faces.example.cardemo.FormatValidatorTag</tag-class>
+        <attribute>
+            <name>formatPatterns</name>
+            <required>true</required>
+            <rtexprvalue>false</rtexprvalue>
+        </attribute>
+    </tag>
+</taglib>

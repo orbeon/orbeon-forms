@@ -1,0 +1,147 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+	<header>
+		<title>EJB Support</title>
+	</header>
+	<body>
+		<section>
+			<title>Classification</title>
+			<p>OPS provides EJB support in two different
+            areas:</p>
+			<ul>
+				<li>Calling existing EJBs</li>
+				<li>Encapsulating a processor in an EJB</li>
+			</ul>
+		</section>
+		<section>
+			<title>Calling Existing EJBs</title>
+			<p>Regular EJBs (typically implementing business logic)
+            can be called from a pipeline using the Delegation
+            processor. For instance, this could be used in a Web
+            application to call a credit card validation service
+            available in an EJB session bean to validate a number
+            entered by a user on a Web page. The Delegation processor can
+            not only call EJB session beans, but also Web services and
+            JavaBeans. Please see the <link href="processors-delegation">Delegation processor</link>
+            documentation for more information about how to call existing
+            EJBs.</p>
+			<img print-format="pdf" src="pages/ejb-delegation-call.png"/>
+		</section>
+		<section>
+			<title>Processor EJB Encapsulation</title>
+			<section>
+				<title>Overview</title>
+				<p>When code is encapsulated inside an EJB, the EJB
+                container will provide a number of features to the
+                developer almost hassle-free (i.e. with no coding
+                involved), including:</p>
+				<ul>
+					<li>Load balancing: the application can be deployed on
+                    a cluster of servers and the application server will
+                    take care of load balancing.</li>
+					<li>Transaction handling: one can define in a
+                    declarative way (XML in the ejb-jar.xml) the
+                    transactional behavior of a component. For
+                    example, when deciding which set of operations need to
+                    be executed in a single transaction. Then, the
+                    application server will automatically do whatever
+                    is necessary to handle those transactions properly.</li>
+					<li>Code distribution: one can decide at
+                    deploy-time to deploy EJB A on a given server and
+                    EJB B on another remote server (perhaps because B
+                    is intensively accessing a database local to that
+                    remote server).</li>
+				</ul>
+				<p>
+                    With Processor EJB Encapsulation, OPS processors can benefit
+                    from the same advantages provided to EJB components by the application server.
+                </p>
+			</section>
+			<section>
+				<title>Usage</title>
+				<p>In the pipeline language, the attribute
+                <code>delegation="ejb"</code> can be added to any
+                <code>&lt;p:processor&gt;</code> element.</p>
+				<xml-source>
+<p:config>
+    <p:processor name="oxf:sql" delegation="ejb">
+        <p:input name="config">...</p:input>
+        <p:input name="data">...</p:input>
+        <p:output name="data" id="result-set"/>
+    </p:processor>
+    <p:processor name="oxf:xslt">
+        <p:input name="config">...</p:input>
+        <p:input name="data" ref="result-set">...</p:input>
+        <p:output name="data" id="result-set"/>
+    </p:processor>
+</p:config>
+				</xml-source>
+				<p>In the above example we first execute some SQL
+                using the SQL processor and then transform the
+                returned data via the XSLT processor. Since we have a
+                <code>delegation="ejb"</code> attribute:</p>
+				<ol>
+					<li>The pipeline processor will get the home
+                    interface stub by looking up
+                    <code>java:comp/env/ejb/oxf/proxy</code> from the
+                    JNDI tree.</li>
+					<li>From the home interface stub, the pipeline
+                    processor creates the Proxy Service stub and then
+                    calls the service.</li>
+					<li>Wherever it is deployed, the service creates
+                    and runs the processor.</li>
+				</ol>
+				<p>The figure below illustrates a scenario where the
+                Proxy Service EJB is deployed on a remote server.</p>
+				<img print-format="pdf" src="pages/ejb-delegation-remote.png"/>
+			</section>
+			<section>
+				<title>Deployment Descriptors</title>
+				<p>To find the Proxy Service EJB, the pipeline
+                processor must be able to lookup the name
+                <code>java:comp/env/ejb/oxf/proxy</code>. Typically
+                for Web applications, this pipeline will be called
+                from the OXFServlet which is deployed in a
+                WAR. In that case, the WAR's web.xml will have to
+                declare an EJB reference:</p>
+				<xml-source>
+<ejb-ref>
+    <ejb-ref-name>ejb/oxf/proxy</ejb-ref-name>
+    <ejb-ref-type>Session</ejb-ref-type>
+    <home>org.orbeon.oxf.proxy.ProxyServiceHome</home>
+    <remote>org.orbeon.oxf.proxy.ProxyService</remote>
+</ejb-ref>
+				</xml-source>
+				<p>Depending on the application server, additional
+                configuration will be needed. For instance, on
+                WebLogic, the WAR's weblogic.xml descriptor might look like
+                this:</p>
+				<xml-source>
+<weblogic-web-app>
+    <reference-descriptor>
+        <ejb-reference-description>
+            <ejb-ref-name>ejb/oxf/proxy</ejb-ref-name>
+            <jndi-name>org/orbeon/oxf/ProxyService</jndi-name>
+        </ejb-reference-description>
+    </reference-descriptor>
+</weblogic-web-app>
+				</xml-source>
+			</section>
+		</section>
+	</body>
+</document>

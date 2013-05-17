@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE weblogic-web-app PUBLIC
+ "-//BEA Systems, Inc.//DTD Web Application 6.0//EN"
+ "http://www.bea.com/servers/wls600/dtd/weblogic-web-jar.dtd">
+
+<weblogic-web-app>
+
+    <!-- Uncomment this for the authentication example -->
+    <!--
+    <security-role-assignment>
+        <role-name>administrator</role-name>
+        <principal-name>admin</principal-name>
+    </security-role-assignment>
+    -->
+    <!-- End authentication example -->
+
+    <reference-descriptor>
+        <resource-description>
+            <res-ref-name>jdbc/db</res-ref-name>
+            <jndi-name>weblogic.jdbc.jts.oxf</jndi-name>
+        </resource-description>
+    </reference-descriptor>
+
+</weblogic-web-app>

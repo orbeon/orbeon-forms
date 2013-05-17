@@ -1,0 +1,187 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Error Processor</title>
+    </header>
+    <body>
+        <section>
+            <title>Rationale</title>
+            <p>
+                When OPS encounters an error, it throws two kinds of exceptions:
+                <code>OXFException</code> and its subclass, <code>ValidationException</code>. They
+                both contain a nested root cause, and <code>ValidationException</code> contains
+                document location information.
+            </p>
+            <p>
+                When an exception is thrown, OPS displays a default error page containing the root
+                cause and location information if available, as well as a detailed OPS stack trace.
+                However, the application developer can display a different page by specifying a
+                processor to be executed upon error. This processor could be, for example, a
+                pipeline logging the error and displaying a nice error page to the user.
+            </p>
+        </section>
+        <section>
+            <title>Configuration</title>
+            <p>
+                The error processor is configured in <code>web.xml</code>. For more information,
+                please refer to the <a href="integration-packaging#error-configuration">Packaging
+                and Deployment</a> documentation.
+            </p>
+        </section>
+        <section>
+            <title>Example</title>
+            <section>
+                <title>Setup</title>
+                <p>
+                    The following code in <code>web.xml</code> specifies that upon error, the
+                    Pipeline processor must run using the <code>oxf:/config/error.xpl</code>
+                    pipeline:
+                </p>
+                <xml-source>
+                    <servlet>
+                        <servlet-name>oxf</servlet-name>
+                        <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                        <comment>The error processor that OXFServlet must execute</comment>
+                        <init-param>
+                            <param-name>oxf.error-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </init-param>
+                        <comment>The pipeline to execute</comment>
+                        <init-param>
+                            <param-name>oxf.error-processor.input.config</param-name>
+                            <param-value>oxf:/config/error.xpl</param-value>
+                        </init-param>
+                    </servlet>
+                </xml-source>
+            </section>
+            <section>
+                <title>error.xpl</title>
+                <p>
+                    In most cases, the custom error processor logs or displays the exception that
+                    occurred. A simple error pipeline is shown below, using the <a
+                    href="processors-generators#exception-generator">Exception generator</a> to
+                    display the root cause message, but not the exception stack trace.
+                </p>
+                <xml-source>
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <comment> Generate exception document </comment>
+    <p:processor name="oxf:exception">
+        <p:output name="data" id="exception"/>
+    </p:processor>
+    <comment> Apply stylesheet </comment>
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#exception"/>
+        <p:input name="config">
+            <xsl:stylesheet version="1.0">
+                <xsl:template match="/">
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <head>
+                            <title>OPS - Custom Error Page</title>
+                        </head>
+                        <body>
+                            <h1>An error occured:</h1>
+                            <p>
+                                The screen demonstrates a custom error pipeline. For this example,
+                                only the message of the first exception is displayed.
+                            </p>
+                            <p>
+                                <code>
+                                    <xsl:value-of select="/exceptions/exception[1]/message"/>
+                                </code>
+                            </p>
+                        </body>
+                    </html>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="document"/>
+    </p:processor>
+
+    <comment> Get some request information </comment>
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/container-type</include>
+                <include>/request/request-path</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
+    <comment> Apply theme </comment>
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#document"/>
+        <p:input name="request" href="#request"/>
+        <p:input name="config" href="oxf:/config/theme/theme.xsl"/>
+        <p:output name="data" id="themed"/>
+    </p:processor>
+
+    <comment> Rewrite all URLs in XHTML documents </comment>
+    <p:processor name="oxf:xhtml-rewrite">
+        <p:input name="rewrite-in" href="#themed"/>
+        <p:output name="rewrite-out" id="rewritten-data"/>
+    </p:processor>
+
+    <comment> Convert to HTML </comment>
+    <p:processor name="oxf:qname-converter">
+        <p:input name="config">
+            <config>
+                <match>
+                    <uri>http://www.w3.org/1999/xhtml</uri>
+                </match>
+                <replace>
+                    <uri></uri>
+                    <prefix></prefix>
+                </replace>
+            </config>
+        </p:input>
+        <p:input name="data" href="#rewritten-data"/>
+        <p:output name="data" id="html-data"/>
+    </p:processor>
+
+    <p:processor name="oxf:html-converter">
+        <p:input name="config">
+            <config>
+                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                <version>4.01</version>
+                <encoding>utf-8</encoding>
+            </config>
+        </p:input>
+        <p:input name="data" href="#html-data"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
+    <comment> Serialize </comment>
+    <p:processor name="oxf:http-serializer">
+        <p:input name="config">
+            <config>
+                <status-code>500</status-code>
+                <header>
+                    <name>Cache-Control</name>
+                    <value>post-check=0, pre-check=0</value>
+                </header>
+            </config>
+        </p:input>
+        <p:input name="data" href="#converted"/>
+    </p:processor>
+</p:config>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

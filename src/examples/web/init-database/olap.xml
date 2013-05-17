@@ -1,0 +1,54 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<sql>
+    drop table olap_product if exists;
+    drop table olap_region if exists;
+    drop table olap_time if exists;
+    drop table olap_sales if exists;
+
+    create cached table olap_product (id integer, product_line varchar, product_name varchar);
+    create cached table olap_region (id integer, zone_name varchar, territory_name varchar);
+    create cached table olap_time (id integer, year varchar, quarter varchar);
+    create cached table olap_sales (product_id integer, region_id integer, time_id integer, price integer);
+
+    insert into olap_product values (1, 'Big Server', 'Enterprise 10000');
+    insert into olap_product values (2, 'Big Server', 'Sun Fire 12k');
+    insert into olap_product values (3, 'Midrange Server', 'Sun Fire 3800');
+    insert into olap_product values (4, 'Midrange Server', 'Sun Fire 4800');
+    insert into olap_product values (5, 'Midrange Server', 'Dell PowerEdge 6600');
+    insert into olap_product values (6, 'Notebook', 'IBM Thinkpad T40');
+    insert into olap_product values (7, 'Notebook', 'Dell Inspiron 8500');
+
+    insert into olap_region values (1, 'Americas', 'USA East Coast');
+    insert into olap_region values (2, 'Americas', 'USA West Coast');
+    insert into olap_region values (3, 'Americas', 'USA Central');
+    insert into olap_region values (4, 'Americas', 'Latin America');
+    insert into olap_region values (5, 'EMEA', 'Switzerland');
+    insert into olap_region values (6, 'EMEA', 'Morocco');
+    insert into olap_region values (7, 'EMEA', 'UK');
+    insert into olap_region values (8, 'EMEA', 'Germany');
+    insert into olap_region values (9, 'Asia', 'Japan');
+    insert into olap_region values (10, 'Asia', 'China');
+
+    insert into olap_time values (1, '2001', 'Q1');
+    insert into olap_time values (2, '2001', 'Q2');
+    insert into olap_time values (3, '2001', 'Q3');
+    insert into olap_time values (4, '2001', 'Q4');
+    insert into olap_time values (5, '2002', 'Q1');
+    insert into olap_time values (6, '2002', 'Q2');
+    insert into olap_time values (7, '2002', 'Q3');
+    insert into olap_time values (8, '2002', 'Q4');
+    insert into olap_time values (9, '2003', 'Q1');
+    insert into olap_time values (10, '2003', 'Q2');
+</sql>

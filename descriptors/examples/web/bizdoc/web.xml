@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+<!-- This is a simple web.xml for standalone examples -->
+<web-app>
+    <!-- Initialize a resource manager -->
+    <context-param>
+        <param-name>oxf.resources.factory</param-name>
+        <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.resources.webapp.rootdir</param-name>
+        <param-value>/WEB-INF/resources</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.resources.priority.1</param-name>
+        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.resources.priority.2</param-name>
+        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+    </context-param>
+    <!-- Set location of properties.xml (read by resource manager) -->
+    <context-param>
+        <param-name>oxf.properties</param-name>
+        <param-value>oxf:/config/properties.xml</param-value>
+    </context-param>
+    <!-- Set main processor -->
+    <context-param>
+        <param-name>oxf.main-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+    </context-param>
+    <context-param>
+        <param-name>oxf.main-processor.input.controller</param-name>
+        <param-value>oxf:/bizdoc/page-flow.xml</param-value>
+    </context-param>
+    <!-- Servlets and mapping -->
+    <servlet>
+        <servlet-name>oxf</servlet-name>
+        <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>DisplayChart</servlet-name>
+        <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>oxf</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DisplayChart</servlet-name>
+        <url-pattern>/chartDisplay</url-pattern>
+    </servlet-mapping>
+</web-app>

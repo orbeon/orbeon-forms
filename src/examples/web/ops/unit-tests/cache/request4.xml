@@ -1,0 +1,71 @@
+<request>
+    <container-type>servlet</container-type>
+    <content-length>-1</content-length>
+    <parameters>
+        <parameter>
+            <name>id</name>
+            <value>12</value>
+        </parameter>
+        <parameter>
+            <name>print</name>
+            <value>false</value>
+        </parameter>
+    </parameters>
+    <body href="ois-powered-80.png" content-type="image/jpeg"/>
+    <protocol>HTTP/1.1</protocol>
+    <remote-addr>127.0.0.1</remote-addr>
+    <remote-host>localhost</remote-host>
+    <scheme>http</scheme>
+    <server-name>localhost</server-name>
+    <server-port>8080</server-port>
+    <is-secure>false</is-secure>
+    <auth-type>BASIC</auth-type>
+    <remote-user>jdoe</remote-user>
+    <context-path>/oxf</context-path>
+    <headers>
+        <header>
+            <name>host</name>
+            <value>localhost:8080</value>
+        </header>
+        <header>
+            <name>user-agent</name>
+            <value>Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.1) Gecko/20020826</value>
+        </header>
+        <header>
+            <name>accept-language</name>
+            <value>en-us, en;q=0.50</value>
+        </header>
+        <header>
+            <name>accept-encoding</name>
+            <value>gzip, deflate, compress;q=0.9</value>
+        </header>
+        <header>
+            <name>accept-charset</name>
+            <value>ISO-8859-1, utf-8;q=0.66, *;q=0.66</value>
+        </header>
+        <header>
+            <name>keep-alive</name>
+            <value>300</value>
+        </header>
+        <header>
+            <name>connection</name>
+            <value>keep-alive</value>
+        </header>
+        <header>
+            <name>referer</name>
+            <value>http://localhost:8080/oxf/</value>
+        </header>
+        <header>
+            <name>cookie</name>
+            <value>JSESSIONID=DA6E64FC1E6DFF0499B5D6F46A32186A</value>
+        </header>
+    </headers>
+    <method>POST</method>
+    <path-info>/doc/home-welcome</path-info>
+    <request-path>/doc/home-welcome</request-path>
+    <path-translated>C:\orbeon\projects\OXF\build\oxf-war\doc\home-welcome</path-translated>
+    <query-string>id=12&amp;print=false</query-string>
+    <requested-session-id>DA6E64FC1E6DFF0499B5D6F46A32186A</requested-session-id>
+    <request-uri>/oxf/doc/home-welcome</request-uri>
+    <servlet-path/>
+</request>

@@ -1,0 +1,547 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>JSR-168 Portlets</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <section>
+                <title>Servlet and Portlet Deployment</title>
+                <p>
+                    OPS is typically used to create Web applications. In this case, OPS relies on
+                    standard Java Servlet technology, and the Web application's <code>web.xml</code>
+                    file is configured to use the Presentation Server Servlet or OPS Servlet Filter.
+                    OPS conforms to the Java Servlet API and handles a Web client's entire real
+                    estate on the browser.
+                </p>
+                <p>
+                    OPS also provides the OPS Portlet, which supports the implementation of
+                    standard Java portlets that can be deployed within any portal or portlet
+                    container compatible with the Java Portlet specification. This specification is
+                    also known as JSR-168. It is expected to be finalized around September or
+                    October 2003, and provides a standardization of the Portlet API. All major
+                    Portal vendors have announced support for JSR-168.
+                </p>
+            </section>
+            <section>
+                <title>What is a Portal?</title>
+                <p>
+                    A portal is a Web application that provides several features
+                    such as:
+                </p>
+                <ul>
+                    <li>
+                        <b>Content Aggregation.</b> A single Web page within the application
+                        aggregates the output or user interface of several data sources or
+                        applications.
+                    </li>
+                    <li>
+                        <b>Personalization.</b> Users or administrators of the portal can customize
+                        the user interface. This often means not only customizing the look and feel,
+                        but also selecting a certain set of available functionalities within the
+                        application.
+                    </li>
+                    <li>
+                        <b>Single Sign-On.</b> The user logs in only once to access several
+                        applications in the portal.
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>What Is a Portlet?</title>
+                <p>
+                    According to the Java Portlet Specification, a portlet is a "Java technology
+                    based Web component, managed by a portlet container that processes requests and
+                    generates dynamic content. Portlets are used by portals as pluggable user
+                    interface components that provide a presentation layer to Information Systems".
+                    An implementation agnostic definition can be found in the <i>Web Services for
+                    Remote Portals (WSRP) White Paper of 22 September 2002</i> "Portlets are
+                    user-facing, interactive Web application components rendering markup fragments
+                    to be aggregated and displayed by the portal."
+                </p>
+                <p>
+                    In other words, a portlet is usually a Web application that can be embedded
+                    within a portal, and shares Web page real estate with other portlets.
+                    Traditionally portlets available in public portals have provided simple features
+                    such as stock quotes, news feeds, weather reports, etc. In particular thanks to
+                    the Java Portlet specification, there is no limit to the extent of the features
+                    provided by a portlet, and it is expected that complex interactive portlets will
+                    become more and more widespread.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>OPS and Portlets</title>
+            <warning>
+                <p>
+                    The current OPS Portlet integration is based on the <a
+                    href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">Portlet
+                    Specification Version 1.0 Public Final Draft of August 26, 2003 </a>. The
+                    Portlet API will only be frozen as of the final 1.0 specification, due around
+                    September or October 2003.
+                </p>
+                <p>
+                    Make sure that you follow the <a href="intro-install">installation</a> notes
+                    and download the Portlet API JAR file before you use the OPS
+                    Portlet functionality. This is necessary until the final version of the Portlet
+                    API specification is available and redistributable.
+                </p>
+            </warning>
+            <p>
+                OPS hides the complexity of the Portlet API to allow most
+                OPS applications to work unmodified within portlet containers and to
+                follow best practices allowed by the Web Application Controller. In particular,
+                the Portlet API requires:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Separation of faceless actions from rendering.</b> OPS
+                        allows actions to generate output while still adhering to the Java Portlet
+                        specification. Developers are obviously free to only write faceless actions.
+                        In the Page Flow Controller, such actions end with a <code>&lt;result
+                        page="some-page-id"></code> directive.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Getting rid of the familiar concept of URL path.</b> OPS
+                        abstracts this behavior and provides OPS Portlet developers
+                        with the notion of a path, implicitly in the Web Application Controller, or
+                        explicitly with the Request Generator, while still adhering to the Java
+                        Portlet specification.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Getting rid of the familiar concept of URL redirection.</b> Instead,
+                        portlet actions can set parameters to use in subsequent portlet rendering.
+                        OPS abstracts this behavior and provides, indirectly in the
+                        Page Flow Controller, or explicitly with the Redirect Processor, the notion
+                        of redirecting to another page within the portlet.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Calling APIs to generate URLs.</b> OPS handles this by
+                        providing automatic <a href="reference-url-rewriting">URL rewriting</a>.
+                    </p>
+                </li>
+                 <li>
+                    <p>
+                        <b>Generating Markup Fragments.</b> The default OPS
+                        epilogue automatically extracts a fragment from a OPS
+                        <code>&lt;d:document></code>. This allows pages to remain unmodified for
+                        both servlet and portlet deployment. The default epilogue also makes sure
+                        that no HTML or XML DOCTYPE is generated at the beginning of a fragment.
+                        The default epilogue can easily be modified.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Configuration</title>
+            <p>
+                Configuration of portlets is done in a standard file called
+                <code>portlet.xml</code> that sits in the same directory <code>(WEB-INF)</code> as
+                your <code>web.xml</code>. The <code>portlet-class</code> element must always be
+                <code>org.orbeon.oxf.portlet.OPSPortlet</code> for OPS Portlets (you
+                can also configure non-OPS Portlets within the same
+                <code>portlet.xml</code>). The main processor URI and optional inputs are specified
+                with the <code>oxf.main-processor.uri</code> and
+                <code>oxf.main-processor.input.*</code> initialization parameters. For example, the
+                OPS examples are configured to work within a portlet as follows:
+            </p>
+            <xml-source>
+<portlet-app>
+    <portlet>
+        <portlet-name>OXFExamples</portlet-name>
+        <portlet-class>org.orbeon.oxf.portlet.OPSPortlet</portlet-class>
+        <init-param>
+            <name>oxf.main-processor.uri</name>
+            <value>oxf/processor/page-flow</value>
+        </init-param>
+        <init-param>
+            <name>oxf.main-processor.input.controller</name>
+            <value>oxf:/config/page-flow.xml</value>
+        </init-param>
+        <supports>
+            <mime-type>text/html</mime-type>
+        </supports>
+        <portlet-info>
+            <title>OPS Example Application</title>
+        </portlet-info>
+    </portlet>
+</portlet-app>
+            </xml-source>
+            <p>
+                It is possible to configure several OPS Portlets within the same
+                <code>portlet.xml</code>, with the same or a different configuration. The
+                <code>portlet-name</code> element however must be different for each portlet, as per
+                the Java Portlet specification. For more examples, please consult the example
+                <code>portlet.xml</code> file in the OPS examples.
+            </p>
+        </section>
+        <section>
+            <title>Portlet Output</title>
+            <p>
+                The type of the portlet output is determined by the serializer. With the default
+                OPS epilogue, the HTML serializer is used. The Simple Portlet
+                example illustrates how to use the XML Serializer instead.
+            </p>
+        </section>
+        <section>
+            <title>Preferences</title>
+            <p>
+                Portlet preferences can be retrieved with the Portlet Preferences Generator.
+            </p>
+            <p>
+                To retrieve the preferences of your current portlet, use the
+                following code:
+            </p>
+            <xml-source>
+<p:processor name="oxf:portlet-preferences">
+    <p:output name="data" id="portlet-preferences"/>
+</p:processor>
+            </xml-source>
+            <p>
+                The generator outputs a document containing name / values in the following format:
+            </p>
+            <xml-source>
+<portlet-preferences>
+    <preference>
+        <name>name1</name>
+        <value>value1</value>
+    </preference>
+    <preference>
+        <name>name2</name>
+        <value>value1</value>
+        <value>value2</value>
+        <value>value3</value>
+    </preference>
+</portlet-preferences>
+            </xml-source>
+            <p>
+                For example:
+            </p>
+            <xml-source>
+<portlet-preferences>
+    <preference>
+        <name>max-items</name>
+        <value>10</value>
+    </preference>
+    <preference>
+        <name>url</name>
+        <value>http://xml.newsisfree.com/feeds/42/1842.xml</value>
+    </preference>
+</portlet-preferences>
+            </xml-source>
+        </section>
+        <section>
+            <title>Security</title>
+            <p>
+                Portlet security can be configured in <code>portlet.xml</code> as per the Portlet
+                specification. The <a
+                href="reference-authentication#request-security-processor">Request Security
+                processor</a> provides security information like in the case of Servlets.
+            </p>
+
+        </section>
+        <section>
+            <title>Deployment</title>
+            <p>
+                A OPS portlet application is deployed like a regular Web
+                application. You have to make sure that, in addition to the <code>web.xml</code>,
+                you have a valid <code>portlet.xml</code> configuration file as well.
+            </p>
+            <p>
+                You can deploy the application in any portlet container supporting the version of
+                the specification mentioned above. Alternatively, you can use the Presentation
+                Server Portal implementation, bundled with OPS (see below).
+            </p>
+            <p>
+                It is possible to deploy OPS Servlets, Servlet Filters, Servlet
+                Context Listeners, and Portlets within the same application:
+            </p>
+            <img print-format="pdf" src="pages/integration-portlets-deployment.png" width="522" height="234"/>
+            <p>
+                For more information, see <a href="integration-packaging">Packaging and
+                Deployment</a>. Note that the Page Flow Controller is always optional, but its use
+                is typical.
+            </p>
+        </section>
+        <section>
+            <title>OPS Portal (Alpha)</title>
+            <p>
+               OPS ships with the OPS Portlet Container and a
+               demonstration OPS Portal.
+            </p>
+            <note>
+                <p>
+                    This software is currently in Alpha stage and is provided for demonstration and
+                    evaluation purposes.
+                </p>
+            </note>
+            <p>
+                The OPS Portlet Container is based on two processors, described in
+                the following two sections.
+            </p>
+            <section>
+                <title>Portlet Container Processor</title>
+                <p>
+                    The Portlet Container Processor must be present in every pipeline that makes
+                    use of the OPS Portal. It manages the OPS
+                    Portlet Container and makes sure that the configured portlets are instantiated.
+                    The processor takes the following inputs and outputs:
+                </p>
+                <p>
+                    <table ca="|l|p{0.6\textwidth}|">
+                        <tr>
+                            <th>portal-config input</th>
+                            <td>
+                                This input configures what portlets must be
+                                instantiated, for example:
+                                <xml-source max-length="55">
+                                    <portal-config>
+                                        <portlet-instance>
+                                            <portlet-name>OXFSimplePortlet</portlet-name>
+                                        </portlet-instance>
+                                        <portlet-instance>
+                                            <portlet-name>OXFRSSPortlet</portlet-name>
+                                        </portlet-instance>
+                                        <portlet-instance>
+                                            <portlet-name>OXFExamples</portlet-name>
+                                        </portlet-instance>
+                                    </portal-config>
+                                </xml-source>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <th>portal-status output</th>
+                            <td>
+                                The current status of each portlet in the portal, for example:
+                                <xml-source max-length="55">
+                                    <portal-status>
+                                        <portlet-instance>
+                                            <portlet-id>1</portlet-id>
+                                            <portlet-name>OXFSimplePortlet</portlet-name>
+                                            <title>OPS Simple Portlet</title>
+                                            <portlet-mode>view</portlet-mode>
+                                            <window-state>normal</window-state>
+                                        </portlet-instance>
+                                        <portlet-instance>
+                                            <portlet-id>2</portlet-id>
+                                            <portlet-name>OXFRSSPortlet</portlet-name>
+                                            <title>OPS RSS Portlet</title>
+                                            <portlet-mode>view</portlet-mode>
+                                            <window-state>normal</window-state>
+                                        </portlet-instance>
+                                        <portlet-instance>
+                                            <portlet-id>3</portlet-id>
+                                            <portlet-name>OXFExamples</portlet-name>
+                                            <title>OPS Example Application</title>
+                                            <portlet-mode>view</portlet-mode>
+                                            <window-state>normal</window-state>
+                                        </portlet-instance>
+                                    </portal-status>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
+            <section>
+                <title>Portlet Include Generator</title>
+                <p>
+                    The Portlet Include Generator performs portlet actions and
+                    renders portlets.
+                </p>
+                <p>
+                    <table ca="|l|p{0.6\textwidth}|">
+                        <tr>
+                            <th>config input</th>
+                            <td>
+                                This input must receive one or several portlet ids, for example:
+                                <xml-source max-length="55">
+                                    <config>
+                                        <portlet-id>1</portlet-id>
+                                        <portlet-id>2</portlet-id>
+                                    </config>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>data output</th>
+                            <td>
+                                An example of the portlet output data:
+                                <xml-source max-length="55">
+                                    <portlet:portlets xmlns:portlet="http://orbeon.org/oxf/xml/portlet">
+                                        <portlet:portlet id="1" window-state="normal" portlet-mode="view">
+                                            <portlet:window-states>
+                                                <portlet:window-state>
+                                                    <portlet:name>normal</portlet:name>
+                                                    <portlet:url>url1</portlet:url>
+                                                </portlet:window-state>
+                                                <portlet:window-state>
+                                                    <portlet:name>minimized</portlet:name>
+                                                    <portlet:url>url2</portlet:url>
+                                                </portlet:window-state>
+                                                <portlet:window-state>
+                                                    <portlet:name>maximized</portlet:name>
+                                                    <portlet:url>url3</portlet:url>
+                                                </portlet:window-state>
+                                            </portlet:window-states>
+                                            <portlet:portlet-modes>
+                                                <portlet:portlet-mode>
+                                                    <portlet:name>view</portlet:name>
+                                                    <portlet:url>url4</portlet:url>
+                                                </portlet:portlet-mode>
+                                            </portlet:portlet-modes>
+                                            <portlet:portlet-title>OPS Simple Portlet</portlet:portlet-title>
+                                            <portlet:body>
+                                                <div>
+                                                    <h2>This is a title</h2>
+                                                    <p>This is my first portlet!</p>
+                                                </div>
+                                            </portlet:body>
+                                        </portlet:portlet>
+                                    </portlet:portlets>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    At most one instance of every instantiated portlet must be rendered by the
+                    Portlet Include Generator within one request. This can be done with one or more
+                    instances of the processor. For example using the XPL
+                    <code>&lt;p:for-each></code> construct over the output of the Portlet Container
+                    Processor. A complete example is included under the <code>portal</code>
+                    directory.
+                </p>
+                <p>
+                    The output of the Portlet Include Generator contains the body of the portlet to
+                    include. The body is always in XML, even if the portlet generated HTML. In this
+                    case, the HTML is transformed into XML before being included.
+                </p>
+                <p>
+                    Using OPS to implement the portal user interface gives the
+                    portal implementer a lot of power, including:
+                </p>
+                <ul>
+                    <li>
+                        <b>Third-party portlet output validation.</b> The output can for example be
+                        validated to make sure that it adheres to certain markup standards
+                        (prohibited markup elements, etc.).
+                    </li>
+                    <li>
+                        <b>Look and feel unification.</b> The Portlet specification makes
+                        recommendations in the case of HTML and CSS, but non-compliant portlets can
+                        easily be made compliant by applying a specific transformation on their
+                        output.
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <title>Limitations</title>
+            <section>
+                <title>OPS Portlets</title>
+                <p>
+                    The OPS Portlet developer should be aware of the following
+                    limitations:
+                </p>
+                <ul>
+                    <li>
+                        <b>Redirection.</b> In the Page Flow Controller, pages that are the target
+                        of a portlet render URL cannot end with a redirection. This in particular
+                        applies to the default portlet page ("/"). Developers have to make sure that
+                        a page exists for "/" that produces content and does not end in a redirect.
+                        Other pages can end with redirects by making sure that they are targeted by
+                        action URLs (<a href="reference-url-rewriting">by default</a>, only the
+                        target of HTML or XHTML form submissions generate action URLs).
+                    </li>
+                    <li>
+                        <b>Portlet Mode and Window State hints.</b> It is currently not possible to
+                        set a portlet mode or window state hint in a URL.
+                    </li>
+                    <li>
+                        <b>Content Type Hints.</b> It is not possible for an OPS
+                        Portlet to know which content types are supported by the portal.
+                    </li>
+                    <li>
+                        <b>Preferences.</b> It is currently not possible to modify portlet
+                        preferences or store them from within a portlet.
+                    </li>
+                    <li>
+                        <b>XML Fragments.</b> The OPS Portlet currently must
+                        generate XML fragments containing a root node. This is rarely an issue, as a
+                        fragment can for example be embedded within an XHTML <code>&lt;div></code>
+                        element.
+                    </li>
+                    <li>
+                        <b>Struts integration.</b> Currently, Struts does not natively support
+                        operations within a Java portlet.
+                    </li>
+                    <li>
+                        <b>JavaServer Faces integration.</b> JSF currently does not natively
+                        support operations within a Java portlet.
+                    </li>
+                </ul>
+                <p>
+                    In addition, and this is by design of the API, Java portlets cannot directly
+                    serve resources such as images, CSS stylesheets, standalone JavaScript files,
+                    etc. Those resources have to be served by a Servlet. Portlets therefore cannot
+                    directly serve resources using:
+                </p>
+                <ul>
+                    <li>The Chart processor</li>
+                    <li>The Image server</li>
+                    <li>The Resource server</li>
+                    <li>The PDF serializer</li>
+                    <li>The Excel serializer</li>
+                    <li>Or any processor serving resources</li>
+                </ul>
+                <p>
+                    OPS Portlets can however refer to resources served by the
+                    OPS Servlet.
+                </p>
+            </section>
+            <section>
+                <title>OPS Portal (Alpha)</title>
+                <p>
+                    This version of the OPS Portal has the following known limitations:
+                </p>
+                <ul>
+                    <li>PortletRequestDispatcher is only partially implemented.</li>
+                    <li>Portlet caching is not implemented yet</li>
+                    <li>Custom resource bundles are not supported</li>
+                    <li>Locales are not supported</li>
+                    <li>Only the text/html and text/xml content-types are supported</li>
+                    <li>Preferences are not persisted</li>
+                    <li>User information is not retrieved</li>
+                    <li>Portlet security is not implemented</li>
+                    <li>JSP tag libraries are only partially implemented</li>
+                </ul>
+            </section>
+        </section>
+    </body>
+</document>

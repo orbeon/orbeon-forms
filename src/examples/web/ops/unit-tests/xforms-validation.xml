@@ -1,0 +1,6 @@
+<xforms:group xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:textarea ref="a" appearance="full"/>
+    <xforms:textarea ref="a" appearance="compact"/>
+    <xforms:textarea ref="a" appearance="minimal"/>
+    <xforms:textarea ref="a" appearance="wrong"/>
+</xforms:group>

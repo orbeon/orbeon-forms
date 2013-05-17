@@ -1,0 +1,43 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<div xmlns:xforms="http://www.w3.org/2002/xforms"
+     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <h2 style="margin-top: 0">Document Information</h2>
+    <p>
+        <table>
+            <tr>
+                <th>Identifier</th>
+                <td>
+                    <xforms:output ref="document-id"/>
+                </td>
+            </tr>
+            <xsl:variable name="instance" select="doc('input:instance')" as="document-node()"/>
+            <xsl:if test="$instance/form/message != ''">
+                <tr>
+                    <th align="right">Action</th>
+                    <td>
+                        <xsl:choose>
+                            <xsl:when test="$instance/form/message = 'save-success'">
+                                <span style="color: green">Document saved!</span>
+                            </xsl:when>
+                            <xsl:when test="$instance/form/message = 'save-failure'">
+                                <span style="color: red">Document not saved! There may be errors on both pages.</span>
+                            </xsl:when>
+                        </xsl:choose>
+                    </td>
+                </tr>
+            </xsl:if>
+        </table>
+    </p>
+</div>

@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:portlet="http://orbeon.org/oxf/xml/portlet" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:d="http://orbeon.org/oxf/xml/document">
+
+    <xhtml:head>
+
+        <xhtml:title>PresentationServer Examples</xhtml:title>
+
+    </xhtml:head>
+
+    <xhtml:body>
+
+        <div id="banner">
+
+            <div style="float: left">
+
+                <a href="/" f:url-norewrite="true">
+
+                    <img f:url-norewrite="false" width="199" height="42" style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em" src="/config/theme/images/orbeon-small-blueorange.gif"/>
+
+                </a>
+
+            </div>
+
+            <span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
+
+                <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
+
+                    <a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</a>|
+
+                    <a href="doc/" f:url-norewrite="true">Documentation</a>|
+
+                    <span style="white-space: nowrap">Search:
+
+                        <input type="text" name="q" size="10" maxlength="255" value=""/>
+
+                        <input type="submit" name="sa" VALUE="Go" style="margin-left: 0.2em;"/>
+
+                    </span>
+
+                    <input type="hidden" name="cof" VALUE="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
+
+                    <input type="hidden" name="sitesearch" value="orbeon.com"/>
+
+                </form>
+
+            </span>
+
+        </div>
+
+        <div class="tabs">
+
+            <xhtml:form xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:saxon="http://saxon.sf.net/" xmlns:xforms-utils="java:org.orbeon.oxf.processor.xforms.XFormsUtils" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext" id="wsrp_rewrite_form_1" xhtml:style="margin-bottom: 0" method="post">
+
+                <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
+
+                <xhtml:input type="hidden" name="$submitted" value="true"/>
+
+                <span class="tab-selected-left"> </span>
+
+                <span class="tab-selected">Run Example</span>
+
+                <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_1&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-portlet&amp;setvalue%26ref%26%2Fform%2Fvisible-portlet%26content%26OXFExamplesDocumentationPortlet&apos;;                         document.forms[&apos;wsrp_rewrite_form_1&apos;].submit();                         event.returnValue=false;                         return false" xhtml:class="tab">View Description</xhtml:a>
+
+                <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_1&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-portlet&amp;setvalue%26ref%26%2Fform%2Fvisible-portlet%26content%26OXFExamplesSourceCodePortlet&apos;;                         document.forms[&apos;wsrp_rewrite_form_1&apos;].submit();                         event.returnValue=false;                         return false" xhtml:class="tab">View Source</xhtml:a>
+
+                <input type="hidden" name="$hidden" value="example-id[2]^tutorial-hello3^action[1]^^visible-portlet[3]^OXFExamplesPortlet"/>
+
+            </xhtml:form>
+
+        </div>
+
+        <div id="main">
+
+            <div id="main1">
+
+                <div id="leftcontent">
+
+                    <h1>PresentationServer Examples</h1>
+
+                    <xhtml:form xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:saxon="http://saxon.sf.net/" xmlns:xforms-utils="java:org.orbeon.oxf.processor.xforms.XFormsUtils" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext" id="wsrp_rewrite_form_2" method="post">
+
+                        <xhtml:input type="hidden" id="wsrp_rewrite_action_2" name="" value=""/>
+
+                        <xhtml:input type="hidden" name="$submitted" value="true"/>
+
+                        <ul class="tree-sections">
+
+                            <li class="tree-section">The Basics</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26tutorial-hello1&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Hello World Classic</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26tutorial-hello2&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Hello World MVC</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items-selected" style="white-space: nowrap">Hello World XForms</li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26tutorial-hello4&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Hello World Page Flow</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26cart&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Saving State in the Session</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26java&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Integrating w/Java</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <a href="/examples-standalone/authentication" xhtml:target="example">J2EE Authentication</a> 
+
+                                    <img src="/images/new-window.gif" align="middle"/>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Document-Centric App</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26bizdoc&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">The "BizDoc" Example</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Controlling Page Flow</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26atm&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">ATM Page Flow</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26counter&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Counter Page Flow</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Form Handling w/XForms</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-text&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Text Controls</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-selection&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Selection Controls</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-submit&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Submit Controls</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-repeat&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Repeating Elements</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-credit-card&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Credit Card Verifier</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-report&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Sortable Table</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-wizard&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Multi-Screen Wizard</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xforms-ubl&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Complex UBL Order</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Presenting Data</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26reports&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Data in multiple formats</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26charts&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Charts &amp; Graphs</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26imageserver&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Image Server</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Database Access</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26address-book&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Address Book</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xmldb&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">XML:DB Databases</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Query &amp; Transformation</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xquery&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">XQuery Sandbox</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xupdate&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">XUpdate Sandbox</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xpath&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">XPath Sandbox</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xpl&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">XPL Sandbox</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26knight&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Computations using XSLT</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26stx&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Streaming Transformations</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Calling a Web Service</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26quotes&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Famous Quotes</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26ca-traffic&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">California Traffic</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Messaging</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26email&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Sending Email</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Integrating with Struts</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <a href="/struts/hello" xhtml:target="example">Hello World</a> 
+
+                                    <img src="/images/new-window.gif" align="middle"/>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <a href="/struts/pdf-intro" xhtml:target="example">Struts PDF Generation</a> 
+
+                                    <img src="/images/new-window.gif" align="middle"/>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <a href="/struts/guess" xhtml:target="example">Struts Number Guess</a> 
+
+                                    <img src="/images/new-window.gif" align="middle"/>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <a href="/struts/jsType" xhtml:target="example">Struts Client-Side Validation</a> 
+
+                                    <img src="/images/new-window.gif" align="middle"/>
+
+                                </li>
+
+                            </ul>
+
+                            <li class="tree-section">Cool Stuff</li>
+
+                            <ul class="tree-items">
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26url&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">URL Generator</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26rss&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Create Your Own RSS Feeds</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26spellchecker&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">Google Spell Checker</xhtml:a>
+
+                                </li>
+
+                                <li class="tree-items" style="white-space: nowrap">
+
+                                    <xhtml:a href="" onclick="document.getElementById(&apos;wsrp_rewrite_action_2&apos;).name += &apos;$action^setvalue%26ref%26%2Fform%2Faction%26content%26show-example&amp;setvalue%26ref%26%2Fform%2Fexample-id%26content%26xml-to-url&apos;;                         document.forms[&apos;wsrp_rewrite_form_2&apos;].submit();                         event.returnValue=false;                         return false">XML to URL</xhtml:a>
+
+                                </li>
+
+                            </ul>
+
+                        </ul>
+
+                        <input type="hidden" name="$hidden" value="example-id[2]^tutorial-hello3^action[1]^^visible-portlet[3]^OXFExamplesPortlet"/>
+
+                    </xhtml:form>
+
+                </div>
+
+                <div class="maincontent">
+
+                    <div id="mainbody">
+
+                        <h1>Hello World XForms</h1>
+
+                        <div f:url-norewrite="true">
+
+                            <div xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext" xmlns:fo="http://www.w3.org/1999/XSL/Format" xmlns:xforms="http://www.w3.org/2002/xforms">
+
+                                <form id="p1_form_1" action="/oxf/?$portlet$x1.target=a&amp;$portlet$x1.mode=view&amp;$portlet$x1.state=normal&amp;$portlet$p1.oxf.path=/tutorial-hello3" method="post" portlet:is-portlet-form="true" portlet:form-portlet-id="1">
+
+                                    <input type="hidden" id="p1_action_1" name="" value=""/>
+
+                                    <input type="hidden" name="$submitted" value="true"/>
+
+                                    <p xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">Please enter your first name:
+
+                                        <input type="text" name="first-name" value=""/>
+
+                                        <input type="submit" name="$action^" value="Greet Me!"/>
+
+                                    </p>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="cleaner"> </div>
+
+            </div>
+
+        </div>
+
+    </xhtml:body>
+
+</xhtml:html>
+

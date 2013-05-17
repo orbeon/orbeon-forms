@@ -1,0 +1,592 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <header>
+        <title>Charts and Spreadsheets</title>
+    </header>
+    <body>
+        <a name="chart"/>
+        <section>
+            <title>Chart Processor</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    OPS uses the
+                    <link
+                        href="http://www.jfree.org/jfreechart/index.html">JFreeChart</link>
+                    to draw and display charts. The following features are supported:
+                    <ul>
+                        <li>Bar Chart</li>
+                        <li>Stacked  Bar Chart</li>
+                        <li>Line Chart</li>
+                        <li>Pie Chart</li>
+                        <li>Area Chart</li>
+                        <li>Customizable size, colors, title and legend</li>
+                        <li>Output HTML image map and tool tips</li>
+                    </ul>
+                </p>
+                <p>
+                    A chart consists of two axes. The horizontal  (X) axis is
+                    called the
+                    <i>category</i> axis. The vertical (Y) axis is
+                    called the
+                    <i>value</i> axis. The chart contains one or more
+                    <i>values</i>. Each value is a list of number to be
+                    charted. A value entry contains two lists:
+                    <ul>
+                        <li>the categories list, represented in the X axis</li>
+                        <li>the series list, represented on the Y axis</li>
+                    </ul>
+
+                    The lists of value are created with XPath expressions
+                    evaluated against the XML document in the
+                    <code>data</code>
+                    input. These expressions must return a node set, and every
+                    expression must return a node set of the same length.
+                </p>
+            </section>
+            <section>
+                <title>Chart Input</title>
+                <p>
+                    The
+                    <code>chart</code> input contains the configuration
+                    information for the processor. The following table shows
+                    elements that are available inside the
+                    <code>chart</code>
+                    root element. The
+                    <link href="../examples/chart">Chart
+                        Example</link> shows most of these options.
+                </p>
+                <note>
+                    The colors are always specified in RGB format, prefixed by a
+                    #. For instance, #FF0000 is a pure red.
+                </note>
+                <p>
+                    <table ca="|l|p{0.6\textwidth}|">
+                        <tr>
+                            <th>
+                                <code>type</code>
+                            </th>
+                            <td>The chart type. The following value are supported
+                                vertical-bar; horizontal-bar; vertical-bar-3d; horizontal-bar-3d;
+                                stacked-vertical-bar; stacked-horizontal-bar; stacked-vertical-bar-3d;
+                                stacked-horizontal-bar-3d; line; area; pie; pie-3d
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>title</code>
+                            </th>
+                            <td>The title, printed on top of the chart.</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>title-color</code>
+                            </th>
+                            <td>The font title color</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>background-color</code>
+                            </th>
+                            <td>Color of the background of the chart</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>x-size</code>
+                            </th>
+                            <td>The horizontal size of the chart image, in pixels</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>y-size</code>
+                            </th>
+                            <td>The vertical size of the chart image, in pixels</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>category-title</code>
+                            </th>
+                            <td>The label printed on the horizontal (X) axis</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>category-margin</code>
+                            </th>
+                            <td>Margin between two categories, in percentage of width. Applies only to the
+                                <code>vertical-bar</code> chart type. </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>serie-title</code>
+                            </th>
+                            <td>The label printed on the vertical (Y) axis</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>map</code>
+                            </th>
+                            <td>Name of the HTML image map</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>bar-margin</code>
+                            </th>
+                            <td>Margin between two vertical bars, in percentage of width. Applies only to the
+                                <code>vertical-bar</code> chart type.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>tick-unit</code>
+                            </th>
+                            <td>The vertical (Y) axis unit</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>category-label-angle</code>
+                            </th>
+                            <td>Controls the angle of the category axis labels. This value is a positive angle in degree.</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>legend</code>
+                            </th>
+                            <td>Controls the legend box.</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>legend/@visible</code>
+                            </th>
+                            <td>Control if the legend is displayed. Can be
+                                <code>true</code> or
+                                <code>false</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>legend/@position</code>
+                            </th>
+                            <td>The position of the legend relative to the chart. Possible values are east, north, west or south </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>legend/item</code>
+                            </th>
+                            <td>Forces manual legend. You can specify any number of items, each with a
+                                <code>label</code> and
+                                <code>color</code> attribute.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>value</code>
+                            </th>
+                            <td>Defines the values of the chart. At least one element must be present</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>value/@title</code>
+                            </th>
+                            <td>The name of the value item</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>value/@categories</code>
+                            </th>
+                            <td>XPath expression returning the category list</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>value/@series</code>
+                            </th>
+                            <td>XPath expression returning the serie list</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>value/@colors</code>
+                            </th>
+                            <td>XPath expression returning a color list</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>exploded-percent</code>
+                            </th>
+                            <td>XPath
+                                expression returning a percentage list. Valid only
+                                for Pie charts and allows certain slices to be exploded from the pie.</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>value/color</code>
+                            </th>
+                            <td>Manual override  of the color for this value</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    The full RelaxNG schema is shown below:
+                    <xml-source>
+                        <grammar xmlns="http://relaxng.org/ns/structure/1.0"
+                            datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+
+                            <start>
+                                <ref name="chart"/>
+                            </start>
+
+                            <define name="chart">
+                                <element name="chart">
+                                    <interleave>
+                                        <element name="type">
+                                            <choice>
+                                                <value>vertical-bar</value>
+                                                <value>horizontal-bar</value>
+                                                <value>vertical-bar-3d</value>
+                                                <value>horizontal-bar-3d</value>
+                                                <value>stacked-vertical-bar</value>
+                                                <value>stacked-horizontal-bar</value>
+                                                <value>stacked-vertical-bar-3d</value>
+                                                <value>stacked-horizontal-bar-3d</value>
+                                                <value>line</value>
+                                                <value>area</value>
+                                                <value>pie</value>
+                                                <value>pie-3d</value>
+                                            </choice>
+                                        </element>
+
+                                        <element name="title">
+                                            <data type="string"/>
+                                        </element>
+
+                                        <optional>
+                                            <element name="map">
+                                                <data type="string"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="category-title">
+                                                <data type="string"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="category-margin">
+                                                <data type="double"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="serie-title">
+                                                <data type="string"/>
+                                            </element>
+                                        </optional>
+
+                                        <oneOrMore>
+                                            <element name="value">
+                                                <attribute name="title"/>
+                                                <attribute name="categories"/>
+                                                <attribute name="series"/>
+                                                <optional>
+                                                    <attribute name="colors"/>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="exploded-percents"/>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="color">
+                                                        <ref name="color"/>
+                                                    </attribute>
+                                                </optional>
+                                                <empty/>
+                                            </element>
+                                        </oneOrMore>
+
+                                        <element name="x-size">
+                                            <data type="integer"/>
+                                        </element>
+
+                                        <element name="y-size">
+                                            <data type="integer"/>
+                                        </element>
+
+                                        <optional>
+                                            <element name="background-color">
+                                                  <ref name="color"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="title-color">
+                                               <ref name="color"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="bar-margin">
+                                                <data type="double"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="tick-unit">
+                                                <data type="double"/>
+                                            </element>
+                                        </optional>
+
+                                        <optional>
+                                            <element name="category-label-angle">
+                                                <data type="positiveInteger"/>
+                                            </element>
+                                        </optional>
+                                        
+                                        <optional>
+                                            <element name="legend">
+                                                <optional>
+                                                    <attribute name="visible">
+                                                        <data type="boolean"/>
+                                                    </attribute>
+                                                </optional>
+                                                <optional>
+                                                    <attribute name="position">
+                                                        <choice>
+                                                            <value>north</value>
+                                                            <value>east</value>
+                                                            <value>south</value>
+                                                            <value>west</value>
+                                                        </choice>
+                                                    </attribute>
+                                                </optional>
+                                                <zeroOrMore>
+                                                    <element name="item">
+                                                        <attribute name="color">
+                                                            <ref name="color"/>
+                                                        </attribute>
+                                                        <attribute name="label">
+                                                            <data type="string"/>
+                                                        </attribute>
+                                                        <empty/>
+                                                    </element>
+                                                </zeroOrMore>
+                                            </element>
+                                        </optional>
+
+                                    </interleave>
+                                </element>
+                            </define>
+
+                            <define name="color">
+                                <data type="string">
+                                    <param name="pattern">#[0-9A-Fa-f]{6}</param>
+                                </data>
+                            </define>
+
+                        </grammar>
+
+
+                    </xml-source>
+                </p>
+            </section>
+            <section>
+                <title>
+                    Displaying the Chart
+                </title>
+                <p>
+                    The Chart Serializer outputs an XML document on its
+                    <code>data</code> output, which describes the rendered chart
+                    information. It contains the chart image name and an
+                    optional HTML image map. A typical document looks like
+                    below. The
+                    <code>file</code> element contains the unique
+                    name of the generated chart. The
+                    <code>map</code> element
+                    contains the image map.
+                </p>
+                <xml-source>
+                    <chart-info>
+                        <file>jfreechart-20234.png</file>
+                        <map name="fruits">
+                            <area shape="RECT" coords="66,54,86,235" title="May, Apples = 10"/>
+                            <area shape="RECT" coords="93,35,113,234" title="June, Apples = 11"/>
+                            <area shape="RECT" coords="131,72,151,235" title="May, Oranges = 9"/>
+                            <area shape="RECT" coords="158,90,178,235" title="June, Oranges = 8"/>
+                            <area shape="RECT" coords="196,90,216,235" title="May, Bananas = 8"/>
+                            <area shape="RECT" coords="223,126,243,235" title="June, Bananas = 6"/>
+                            <area shape="RECT" coords="261,108,281,235" title="May, Berries = 7"/>
+                            <area shape="RECT" coords="289,54,309,235" title="June, Berries = 10"/>
+                            <area shape="RECT" coords="326,126,346,235" title="May, Pears = 6"/>
+                            <area shape="RECT" coords="354,163,374,235" title="June, Pears = 4"/>
+                        </map>
+                    </chart-info>
+                </xml-source>
+
+                <p>
+                    You need to setup a special servlet in your Web application
+                    descriptor (web.xml) to serve the chart image file. The
+                    following line declares the servlet and maps it to
+                    <code>/chartDisplay</code>
+                </p>
+
+                <xml-source>
+                    <servlet>
+                        <servlet-name>DisplayChart</servlet-name>
+                        <servlet-class>com.jrefinery.chart.servlet.DisplayChart</servlet-class>
+                        <load-on-startup>2</load-on-startup>
+                    </servlet>
+                    <servlet-mapping>
+                        <servlet-name>DisplayChart</servlet-name>
+                        <url-pattern>/chartDisplay</url-pattern>
+                    </servlet-mapping>
+                </xml-source>
+
+                <p>
+                    The following XSLT template can be used to extract the chart information and generate HTML:
+                </p>
+                <xml-source>
+                    <xsl:template match="chart-info" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                        <img src="chartDisplay?filename={file}" usemap="#fruits" border="0" width="400" height="300"/>
+                        <xsl:copy-of select="map"/>
+                    </xsl:template>
+                </xml-source>
+            </section>
+        </section>
+        <a name="excel"/>
+        <section>
+            <title>Excel Processors</title>
+            <note>
+                <p>
+                    These processors are deprecated. Please refer to the <a
+                    href="processors-converters#xls-converters">Converters</a> section for
+                    up-to-date information.
+                </p>
+            </note>
+            <p>
+                OPS ships with the <link
+                href="http://jakarta.apache.org/poi/index.html">POI</link> library which allows
+                import and export of Microsoft Excel documents. OPS uses an Excel
+                file template to define the layout of the spreadsheet. You define cells that will
+                contain the values with a special markup.
+            </p>
+            <section>
+                <title>Preparing the Spreadsheet</title>
+                <p>
+                    First, create an Excel spreadsheet with the formatting of your choosing.
+                    Values are taken from the <code>data</code> input document with an XPath
+                    expression. Apply a special markup to the cell you need to export values to:
+                    <ol>
+                        <li>Select the cell</li>
+                        <li>Go to the menu
+                            <code>Format->Cell</code>
+                        </li>
+                        <li>
+                            In the
+                            <code>Number</code> tab, choose the
+                            <code>Custom</code> format and enter a format that
+                            looks like:
+                            <code>#,##0;"/a/b|/c/d"</code>. In this
+                            example we have 2 XPath expressions separated by a
+                            pipe character (
+                            <code>|</code>):
+                            <code>/a/b</code>
+                            and
+                            <code>/c/d</code>. The first XPath expression is
+                            used when creating the Excel file (exporting) and
+                            is run against the
+                            <code>data</code> input document
+                            of the XLS Serializer processor (see below). The
+                            second expression is optional and is used when
+                            recreating an XML document from the Excel file
+                            (importing).
+                        </li>
+                    </ol>
+                </p>
+            </section>
+            <section>
+                <title>Export</title>
+                <p>
+                    The XLS Serializer processor takes a <code>config</code> input describing the
+                    XLS template file, and a <code>data</code> input containing the values to be
+                    inserted in the template. The processor scans the template, and applies XPath
+                    expressions to fill in the template. The <code>config</code> input takes a
+                    single element with two attributes:
+                </p>
+
+                <p>
+                    <table>
+                        <tr>
+                            <th>
+                                <code>template</code>
+                            </th>
+                            <td>A URL pointing to an XLS template file</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>filename</code>
+                            </th>
+                            <td>The name under which the file is saved.</td>
+                        </tr>
+                    </table>
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:xls-serializer">
+                        <p:input name="config">
+                            <config template="oxf:/excel/template.xls" filename="currency.xls"/>
+                        </p:input>
+                        <p:input name="data">
+                            <currency>
+                                <value1>10</value1>
+                                <value2>20</value2>
+                                <value3>30</value3>
+                            </currency>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+            </section>
+            <section>
+                <title>Import</title>
+                <p>
+                    The XLS Generator works in a similar way. It typically takes a file uploaded by
+                    a user, finds the special markup cells and reconstructs an XML document. The
+                    generator has one input <code>request</code> which must be connected to the
+                    output of the <a href="processors-generators-request">request
+                    generator</a>, and a <code>data</code> output containing the generated XML
+                    document. You must include a form within the HTML code with an <code>xls</code>
+                    file upload control. The following code can be used to perform this task:
+                </p>
+                <p>
+                    <xml-source>
+                        <form action="excel/import" method="post" enctype="multipart/form-data">
+                            <input type="file" name="xls"/>
+                            <input type="submit" value="Import"/>
+                        </form>
+                    </xml-source>
+                </p>
+                <p>The XPL pipeline can then instantiate the XLS Generator
+                    with the following:</p>
+                <p>
+                    <xml-source>
+                        <p:processor name="oxf:xls-generator">
+                            <p:input name="request" href="#request"/>
+                            <p:output name="data" id="xls"/>
+                        </p:processor>
+                    </xml-source>
+                </p>
+            </section>
+        </section>
+    </body>
+</document>

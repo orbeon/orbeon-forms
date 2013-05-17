@@ -1,0 +1,44 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page id="home" path-info="/xquery-the-web" xforms="xforms-model.xml" view="view.xml">
+        <action when="/instance/action = 'submit' and /instance/output != 'javascript'">
+            <result page="redirect" instance-passing="redirect-exit-portal">
+                <xu:update select="/"><xu:copy-of select="doc('input:instance')/*"/></xu:update>
+            </result>
+        </action>
+        <action when="/instance/action = 'submit'">
+            <result page="show-javascript">
+                <xu:update select="/"><xu:copy-of select="doc('input:instance')/*"/></xu:update>
+            </result>
+        </action>
+    </page>
+    
+    <page id="show-javascript" path-info="/xquery-the-web/javascript" xforms="xforms-model.xml" model="show-javascript-model.xpl" view="show-javascript-view.xsl">
+        <action when="/instance/action = 'back'">
+            <result page="home">
+                <xu:update select="/"><xu:copy-of select="doc('input:instance')/*"/></xu:update>
+            </result>
+        </action>
+    </page>
+    
+    <page id="redirect" path-info="/direct/xquery-the-web/redirect" xforms="xforms-model.xml" model="redirect.xpl"/>
+    
+    <page path-info="/direct/xquery-the-web" model="xquery-the-web.xpl"/>
+    
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

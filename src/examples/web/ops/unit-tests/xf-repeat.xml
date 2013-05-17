@@ -1,0 +1,308 @@
+<test description="xforms-repeat-speed-test" name="oxf:pipeline" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
+    xmlns:d="http://orbeon.org/oxf/xml/document"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xu="http://www.xmldb.org/xupdate"
+    xmlns:oxf="http://www.orbeon.com/oxf/processors"
+    xmlns:xi="http://www.w3.org/2003/XInclude"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
+    <input name="config">
+        <p:config>
+            <p:param name="result" type="output"/>
+
+            <p:processor uri="oxf/processor/xslt-2.0">
+                <p:input name="data">
+                    <dummy/>
+                </p:input>
+                <p:input name="config">
+                    <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+                        <xsl:template match="@*|node()" priority="-2">
+                            <xsl:copy>
+                                <xsl:apply-templates select="@*|node()"/>
+                            </xsl:copy>
+                        </xsl:template>
+
+                        <xsl:template match="/">
+                            <form>
+                                <sub-tasks>
+                                    <xsl:call-template name="task">
+                                        <xsl:with-param name="times" select="300"/>
+                                    </xsl:call-template>
+                                </sub-tasks>
+                            </form>
+                        </xsl:template>
+
+                        <xsl:template name="task">
+                            <xsl:param name="times" as="xs:integer"/>
+                            <xsl:if test="$times > 0">
+                                <xsl:call-template name="task">
+                                    <xsl:with-param name="times" select="$times - 1"/>
+                                </xsl:call-template>
+                                    <task>
+                                        <task-id><xsl:value-of select="$times"/></task-id>
+                                        <parent-task-id>826</parent-task-id>
+                                        <task-type-code>FS</task-type-code>
+                                        <task-status-code>A</task-status-code>
+                                        <task-status-date>
+                                            <month>11</month>
+                                            <day>05</day>
+                                            <year>2004</year>
+                                        </task-status-date>
+                                        <role-id>9</role-id>
+                                        <assigned-to/>
+                                        <person-id/>
+                                        <rec-num/>
+                                        <lodge-id>1</lodge-id>
+                                        <district-id/>
+                                        <task-name>Form a 2004 (<xsl:value-of select="$times"/>)</task-name>
+                                        <description>Form a 2004</description>
+                                        <seqn>0</seqn>
+                                        <start-date>
+                                            <month>11</month>
+                                            <day>05</day>
+                                            <year>2004</year>
+                                        </start-date>
+                                        <end-date>
+                                            <month/>
+                                            <day/>
+                                            <year/>
+                                        </end-date>
+                                        <days-to-complete/>
+                                        <projected-end-date>
+                                            <month>11</month>
+                                            <day>12</day>
+                                            <year>2004</year>
+                                        </projected-end-date>
+                                        <grace-period>7</grace-period>
+                                        <cmc-ref/>
+                                        <reminder-interval/>
+                                        <reminder-text/>
+                                        <received></received>
+                                    </task>
+                            </xsl:if>
+                        </xsl:template>
+
+                    </xsl:stylesheet>
+                </p:input>
+                <p:output name="data" id="instance"/>
+            </p:processor>
+
+            <p:processor uri="oxf/processor/identity">
+                <p:input name="data">
+<!--                    <xf:group ref="/form">-->
+                        <xf:repeat nodeset="/form/sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">
+                            <xf:input ref="task-id"/>
+                            <xf:input ref="task-name"/>
+                            <xf:select1 ref="task-type-code" appearance="minimal">
+                                <xf:choices>
+                                    <xf:item>
+                                        <xf:label>-</xf:label>
+                                        <xf:value></xf:value>
+                                    </xf:item>
+                                </xf:choices>
+                            </xf:select1>
+                            <xf:select1 ref="task-status-code" appearance="minimal">
+                                <xf:choices>
+                                    <xf:item>
+                                        <xf:label>-</xf:label>
+                                        <xf:value></xf:value>
+                                    </xf:item>
+                                </xf:choices>
+                            </xf:select1>
+                            <xf:input ref="lodge-id"/>
+                            <xxf:if test="task-status-code != 'C'">
+                                <xf:select ref="received" appearance="minimal">
+                                    <xf:item>
+                                        <xf:value>true</xf:value>
+                                        <xf:label/>
+                                    </xf:item>
+                                </xf:select>
+                            </xxf:if>
+                            <xxf:if test="task-status-code = 'C'">
+                              Yes
+                            </xxf:if>
+                    </xf:repeat>
+<!--                    </xf:group>-->
+                </p:input>
+                <p:output name="data" id="data"/>
+            </p:processor>
+
+            <p:processor name="oxf:xforms-output">
+                <p:input name="model">
+                    <xf:model id="form">
+                        <xf:submission method="post"/>
+                        <xf:instance>
+                            <form>
+                                <action/>
+                                <no-update/>
+                                <insert/>
+                                <calling-page/>
+
+                                <task>
+                                    <task-id/>
+                                    <parent-task-id/>
+                                    <task-type-code/>
+                                    <task-status-code>A</task-status-code>
+                                    <task-status-date>
+                                        <month/>
+                                        <day/>
+                                        <year/>
+                                    </task-status-date>
+                                    <role-id/>
+                                    <assigned-to/>
+                                    <person-id/>
+                                    <rec-num/>
+                                    <lodge-id/>
+                                    <district-id/>
+                                    <task-name/>
+                                    <description/>
+                                    <seqn/>
+                                    <start-date>
+                                        <month/>
+                                        <day/>
+                                        <year/>
+                                    </start-date>
+                                    <end-date>
+                                        <month/>
+                                        <day/>
+                                        <year/>
+                                    </end-date>
+                                    <days-to-complete/>
+                                    <projected-end-date>
+                                        <month/>
+                                        <day/>
+                                        <year/>
+                                    </projected-end-date>
+                                    <grace-period>2</grace-period>
+                                    <cmc-ref/>
+                                    <reminder-interval/>
+                                    <reminder-text/>
+                                </task>
+
+                                <selected-note/>
+                                <notes>
+                                    <note>
+                                        <note-id/>
+                                    </note>
+                                </notes>
+
+                                <selected-sub-task/>
+                                <show-sub-tasks-code>A</show-sub-tasks-code>
+                                <form-tasks-received-date>
+                                    <month/>
+                                    <day/>
+                                    <year/>
+                                </form-tasks-received-date>
+                                <sub-tasks>
+                                    <task>
+                                        <task-id/>
+                                        <parent-task-id/>
+                                        <task-type-code/>
+                                        <task-status-code/>
+                                        <task-status-date>
+                                            <month/>
+                                            <day/>
+                                            <year/>
+                                        </task-status-date>
+                                        <role-id/>
+                                        <member-id/>
+                                        <lodge-id/>
+                                        <district-id/>
+                                        <task-name/>
+                                        <description/>
+                                        <seqn/>
+                                        <start-date>
+                                            <month/>
+                                            <day/>
+                                            <year/>
+                                        </start-date>
+                                        <end-date>
+                                            <month/>
+                                            <day/>
+                                            <year/>
+                                        </end-date>
+                                        <days-to-complete/>
+                                        <projected-end-date>
+                                            <month/>
+                                            <day/>
+                                            <year/>
+                                        </projected-end-date>
+                                        <grace-period/>
+                                        <cmc-ref/>
+                                        <reminder-interval/>
+                                        <reminder-text/>
+                                    </task>
+                                </sub-tasks>
+
+                            </form>
+                        </xf:instance>
+
+                    </xf:model>
+                </p:input>
+                <p:input name="instance" href="#instance"/>
+                <p:input name="data" href="#data"/>
+                <p:output name="data" id="annotated"/>
+            </p:processor>
+
+            <p:processor uri="oxf/processor/xslt-2.0">
+                <p:input name="data" href="#annotated"/>
+                <p:input name="config">
+                    <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                         <xsl:template match="@*|node()" priority="-2">
+                            <xsl:copy>
+                                <xsl:apply-templates select="@*|node()"/>
+                            </xsl:copy>
+                        </xsl:template>
+
+                        <xsl:template match="/">
+                            <xsl:apply-templates select="/xf:repeat/xf:group[1]"/>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </p:input>
+                <p:output name="data" ref="result"/>
+            </p:processor>
+
+        </p:config>
+    </input>
+    <output name="result">
+        <xforms:group xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xxforms:position="1" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="/form/sub-tasks/task[task-id != &apos;&apos; and task-status-code = &apos;A&apos;][1]">
+            <xf:input ref="task-id" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="child::task-id" xxforms:name="sub-tasks/task[1]/task-id[1]" xxforms:value="1"/>
+            <xf:input ref="task-name" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="child::task-name" xxforms:name="sub-tasks/task[1]/task-name[12]" xxforms:value="Form a 2004 (1)"/>
+            <xf:select1 ref="task-type-code" appearance="minimal" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="child::task-type-code" xxforms:name="sub-tasks/task[1]/task-type-code[3]" xxforms:value="FS">
+                <xf:choices>
+                    <xf:item>
+                        <xf:label>-</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                </xf:choices>
+            </xf:select1>
+            <xf:select1 ref="task-status-code" appearance="minimal" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="child::task-status-code" xxforms:name="sub-tasks/task[1]/task-status-code[4]" xxforms:value="A">
+                <xf:choices>
+                    <xf:item>
+                        <xf:label>-</xf:label>
+                        <xf:value/>
+                    </xf:item>
+                </xf:choices>
+            </xf:select1>
+            <xf:input ref="lodge-id" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="child::lodge-id" xxforms:name="sub-tasks/task[1]/lodge-id[10]" xxforms:value="1"/>
+            <xxf:if test="task-status-code != &apos;C&apos;" xxforms:value="true">
+                <xf:select ref="received" appearance="minimal" xxforms:readonly="false" xxforms:relevant="true" xxforms:required="false" xxforms:valid="true" xxforms:ref-xpath="child::received" xxforms:name="sub-tasks/task[1]/received[23]" xxforms:value="">
+                    <xf:item>
+                        <xf:value>true</xf:value>
+                        <xf:label/>
+                    </xf:item>
+                </xf:select>
+            </xxf:if>
+            <xxf:if test="task-status-code = &apos;C&apos;" xxforms:value="false">Yes</xxf:if>
+        </xforms:group>
+    </output>
+
+</test>

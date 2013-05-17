@@ -1,0 +1,293 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <header>
+        <title>LDAP Processor</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                The LDAP Processor allows OPS to query an LDAP directory server. The
+                LDAP processor uses the <link href="http://java.sun.com/products/jndi/">Java Naming
+                and Directory Interface (JNDI)</link> and should work with all compatible servers.
+                However, it has only been tested with <link
+                href="http://wwws.sun.com/software/products/directory_srvr/home_directory.html">Sun
+                ONE Directory Server</link> and <link href="http://www.openldap.org/">Open
+                LDAP</link>.
+            </p>
+        </section>
+        <section>
+            <title>Usage</title>
+            <p>
+                You instantiate the LDAP Processor with the processor URI
+                <code>oxf/processor/ldap</code>. The Processor takes two inputs,
+                <code>config</code> and
+                <code>filter</code>, and one output,
+                <code>data</code>.
+            </p>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The configuration of the LDAP Processor can be done in two ways: either
+                    system-wide via the <link href="reference-properties">OPS
+                    Properties</link>, or locally for a specific instance of the processor through
+                    the <code>config</code> input. The local configuration takes precedence if
+                    available.
+                </p>
+                <note>
+                    <p>
+                        The <code>root-dn</code> and <code>attribute</code> configuration elements
+                        cannot be specified system-wide.
+                    </p>
+                </note>
+                <section>
+                    <title>
+                        <code>config</code> Input
+                    </title>
+                    <p>
+                        The
+                        <code>config</code> input document specifies the
+                        host name and port number of the LDAP server, as well as
+                        the credentials to use when connecting. The following
+                        table describes the configuration elements.
+                    </p>
+                    <p>
+                        <table ca="|l|p{0.6\textwidth}|">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>host</code>
+                                </td>
+                                <td>LDAP Server Host</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>port</code>
+                                </td>
+                                <td>LDAP Server Port Number</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>protocol</code>
+                                </td>
+                                <td>Protocol to connect to the server, eg.
+                                    <code>SSL</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>bind-dn</code>
+                                </td>
+                                <td>Distinguished Name to authenticate with the server</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>password</code>
+                                </td>
+                                <td>Password to authenticate with the server</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>root-dn</code>
+                                </td>
+                                <td>Root DN to bind to.</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>attribute</code>
+                                </td>
+                                <td>LDAP attributes to include in the LDAP
+                                    response. If no attribute is specified, all
+                                    returned attributes are included.</td>
+                            </tr>
+                        </table>
+                    </p>
+                    <p>
+                        This RelaxNG schema describes the expected
+                        document.
+                    </p>
+                    <xml-source>
+                        <element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                            xmlns="http://relaxng.org/ns/structure/1.0">
+                            <interleave>
+                                <optional>
+                                    <element name="host">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="port">
+                                        <data type="integer"/>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="bind-dn">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="password">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                                <element name="root-dn">
+                                    <data type="string"/>
+                                </element>
+                                <optional>
+                                    <element name="protocol">
+                                        <data type="string"/>
+                                    </element>
+                                </optional>
+                                <zeroOrMore>
+                                    <element name="attribute">
+                                        <data type="string"/>
+                                    </element>
+                                </zeroOrMore>
+                            </interleave>
+                        </element>
+                    </xml-source>
+                </section>
+                <section>
+                    <title>System-Wide Configuration</title>
+                    <p>
+                        The LDAP Processor can be configured through the <link
+                        href="reference-properties">OPS Properties</link>, allowing
+                        all instances to share the same configuration. The following properties are
+                        allowed:
+                    </p>
+                    <p>
+                        <table>
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>oxf.processor.ldap.host</code>
+                                </td>
+                                <td>LDAP Server Host</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>oxf.processor.ldap.port</code>
+                                </td>
+                                <td>LDAP Server Port Number</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>oxf.processor.ldap.protocol</code>
+                                </td>
+                                <td>Protocol to connect to the server, eg.
+                                    <code>SSL</code>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>oxf.processor.ldap.bind-dn</code>
+                                </td>
+                                <td>Distinguished Name to authenticate with the server</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <code>oxf.processor.ldap.password</code>
+                                </td>
+                                <td>Password to authenticate with the server</td>
+                            </tr>
+                        </table>
+                    </p>
+                </section>
+            </section>
+            <section>
+                <title>Query</title>
+                <p>
+                    The
+                    <code>filter</code> input takes the LDAP query sent to
+                    the server. The single
+                    <code>filter</code> element contains
+                    a query string that follows the standard LDAP filter syntax
+                    specified in
+                    <link
+                        href="http://www.ietf.org/rfc/rfc2254.txt">RFC 2254</link>.
+                </p>
+                <xml-source>
+                    <element name="filter" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                        xmlns="http://relaxng.org/ns/structure/1.0">
+                        <data type="string"/>
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Response</title>
+                <p>
+                    The LDAP processor outputs the query results in its
+                    <code>data</code> output. The resulting document looks like
+                    the example below:
+                </p>
+                <xml-source>
+                    <results>
+                        <result>
+                            <name>cn=John Smith</name>
+                            <attribute>
+                                <name>sn</name>
+                                <value>Smith</value>
+                            </attribute>
+                            [...]
+                        </result>
+                        [...]
+                    </results>
+                </xml-source>
+            </section>
+
+        </section>
+        <section>
+            <title>Example</title>
+            <p>
+                The following example shows a basic LDAP query. The LDAP
+                Processor connects to an LDAP server on the same machine using
+                the administrator account to log in. It then queries the server
+                for objects containing a
+                <code>uid</code> attribute with the
+                <code>12345</code> value. Only the
+                <code>cn</code> and
+                <code>description</code> attributes are returned.
+            </p>
+            <xml-source>
+                <p:processor name="oxf:ldap">
+                    <p:input name="config">
+                        <config>
+                            <host>localhost</host>
+                            <port>389</port>
+                            <bind-dn>cn=Directory Manager</bind-dn>
+                            <password>abcdef</password>
+                            <root-dn>o=Company.com</root-dn>
+                            <attribute>cn</attribute>
+                            <attribute>description</attribute>
+                        </config>
+                    </p:input>
+                    <p:input name="filter">
+                        <filter>(uid=12345)</filter>
+                    </p:input>
+                    <p:output name="data" id="ldap-results"/>
+                </p:processor>
+            </xml-source>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,94 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    <sql:connection>
+        <sql:datasource>mssql1</sql:datasource>
+        <result>
+            <proc>
+                <sql:execute>
+                    <!--<sql:call>-->
+                        <!--SalesByCategory2 "Beverages", "1998"-->
+                    <!--</sql:call>-->
+                    <sql:call>
+                        { call SalesByCategory2(<sql:param type="xs:string" select="/*/category"/>,
+                                                <sql:param type="xs:int" select="/*/year"/>) }
+                    </sql:call>
+                    <sql:result-set result-sets="1">
+                        <result-set>
+                            <metadata>
+                                <sql:column-iterator>
+                                    <column>
+                                        <sql:attribute name="index">
+                                            <sql:get-column-index/>
+                                        </sql:attribute>
+                                        <sql:attribute name="name">
+                                            <sql:get-column-name/>
+                                        </sql:attribute>
+                                        <sql:attribute name="type">
+                                            <sql:get-column-type/>
+                                        </sql:attribute>
+                                        <index><sql:get-column-index/></index>
+                                        <name><sql:get-column-name/></name>
+                                        <type><sql:get-column-type/></type>
+                                    </column>
+                                </sql:column-iterator>
+                            </metadata>
+                            <sql:row-iterator>
+                                <row>
+                                    <sql:get-columns format="xml"/>
+                                </row>
+                            </sql:row-iterator>
+                        </result-set>
+                    </sql:result-set>
+                    <sql:result-set result-sets="unbounded">
+                        <result-set>
+                            <metadata>
+                                <sql:column-iterator>
+                                    <column>
+                                        <sql:attribute name="index">
+                                            <sql:get-column-index/>
+                                        </sql:attribute>
+                                        <sql:attribute name="name">
+                                            <sql:get-column-name/>
+                                        </sql:attribute>
+                                        <sql:attribute name="type">
+                                            <sql:get-column-type/>
+                                        </sql:attribute>
+                                        <index><sql:get-column-index/></index>
+                                        <name><sql:get-column-name/></name>
+                                        <type><sql:get-column-type/></type>
+                                    </column>
+                                </sql:column-iterator>
+                            </metadata>
+                            <sql:row-iterator>
+                                <row>
+                                    <sql:get-columns format="xml"/>
+                                    <test>
+                                        <sql:get-column-value column-name="unitprice" type="xs:decimal"/>
+                                    </test>
+                                </row>
+                            </sql:row-iterator>
+                        </result-set>
+                    </sql:result-set>
+                    <sql:no-results>
+                        <there-are-no-results/>
+                    </sql:no-results>
+                </sql:execute>
+            </proc>
+        </result>
+    </sql:connection>
+</sql:config>

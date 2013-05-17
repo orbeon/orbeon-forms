@@ -1,0 +1,824 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:jsf="http://orbeon.org/oxf/xml/jsf-output"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <header>
+        <title>Using OPS with JavaServer&#8482; Faces (JSF)</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                <link href="http://java.sun.com/j2ee/javaserverfaces/">JavaServer Faces</link> (JSF)
+                is a server-side GUI component framework developed through the Java Community
+                Process under JSR-127. JSF is primarily designed to build Web applications.
+            </p>
+            <p>
+                This chapter explains how to integrate OPS with JSF. Most of this
+                documentation also applies to the <a
+                href="http://www.orbeon.com/model2x/xml-renderkit">standalone distribution</a> of
+                the XML RenderKit for JavaServer Faces. It may also be a good read for anyone
+                interested in using XML technologies such as XSLT with JSP and JSF.
+            </p>
+            <note>
+                <p>
+                    At the time of writing, the JSF specification is still not final: the version
+                    used is the JavaServer Faces Specification, 1.0 Public Review Draft 2, and the
+                    JavaServer Faces Reference implementation version 1.0 Early Access 4 (EA 4).
+                    The specification as well as the implementation may be subject to change before
+                    the final 1.0 version is released.
+                </p>
+            </note>
+        </section>
+        <section>
+            <title>Rationale</title>
+            <p>
+                The JSF Standard HTML RenderKit outputs raw HTML. Using this
+                RenderKit, the HTML output can be configured with:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        CSS classes assigned to the generated HTML tags by setting
+                        <code>yyyClass</code> attributes on the components, where <code>yyy</code>
+                        is the component name in lowercase without the "UI" prefix. For example,
+                        setting a <code>commandClass</code> attribute on a <code>UICommand</code>
+                        component generates a <code>class</code> attribute on the resulting HTML
+                        <code>&lt;input></code> element.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        A certain number of additional attributes on components are passed without
+                        modification to the resulting HTML element. Those attributes do not appear
+                        to be documented in the current JSF specification. Examples include
+                        <code>size</code>, <code>cols</code>, JavaScript event handlers, etc. They
+                        may modify the appearance and/or behavior of a component.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Often, CSS classes and other HTML attributes are not sufficient to completely
+                customize the appearance of a component. For example:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Support for multiple devices.</b> Rendering a component differently
+                        depending on the targeted device. For example, a PDA browser typically
+                        needs to render a component in a much simpler way, due to the limited space
+                        on its small screen.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Advanced internationalization.</b> For example, implementing
+                        right-to-left layouts for languages such as Arabic or Hebrew. In such
+                        cases, component captions must be placed on the other side of components and
+                        a grid (table) must be rendered right-to-left.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Advanced look and feels and support for older clients.</b> For example,
+                        rendering an HTML table with a colored border in an old Web browser such as
+                        Netscape 4. This requires embedding two HTML tables within each other. You
+                        may decide that all your HTML dropdowns must be surrounded by an HTML table.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                The classical solution to those problems is to:
+            </p>
+            <ul>
+                <li>Write a new JSF RenderKit in Java</li>
+                <li>Write one JSP page for each different layout</li>
+            </ul>
+            <p>
+                The OPS approach allows you to address this problem elegantly:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Write an XML RenderKit once and for all.</b> Note that if you use only
+                        the JSF Standard User Interface Components, you don't have to write your
+                        own renderer: you can use the one that comes with OPS. This
+                        means that you don't have to write a single line of Java to customize the
+                        appearance of JSF components.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Minimize the number of JSP pages.</b> Write one JSP page that generates
+                        XML, instead of duplicating JSP code and writing one page per device or
+                        language. This approach reduces the number of pages you need to write and
+                        maintain.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Centralize your look and feel.</b> Customize one or several XSLT
+                        stylesheets to change the appearance of components. This is a key advantage
+                        when requirements change: you go to one location to reflect you changes
+                        instead of having to go through an impact analysis and multiple changes.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>JSP and XML</title>
+            <p>
+                The JSP technology is well-suited to generate well-formed XML, but it does not
+                enforce well-formed XML output. To achieve this, the following conditions must be
+                met:
+            </p>
+            <p>
+                <ol>
+                    <li>
+                        <p>
+                            <b>JSP pages must contain only well-formed template text markup.</b> It
+                            is recommended (but not mandatory) to write <i>JSP documents</i> instead
+                            of regular JSP pages. A JSP document is similar to a JSP page, but is a
+                            well-formed XML document. A JSP document in JSP 2.0 usually ends with
+                            the extension .jspx, since JSP 2.0 engines automatically recognize this
+                            extension. With JSP 1.2, they usually end with .jsp, like regular JSP
+                            pages.
+                        </p>
+                        <note>
+                            Some JSP engines have trouble generating XML documents with namespaces
+                            from JSP documents. Tomcat 4.1.x does not appear to exhibit such
+                            problems, but WebLogic does.
+                        </note>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Tag libraries used in the JSP pages / documents must generate
+                            well-formed XML.</b> The JSF Standard HTML RenderKit Tag Library
+                            generates output through the RenderKit associated with the components.
+                            Since the output of the standard RenderKit is HTML and not XML, it is
+                            necessary to fix it. One way of doing this is to switch to an XML
+                            RenderKit instead. OPS comes with such an XML RenderKit
+                            implementation for the JSF Standard User Interface Components.
+                        </p>
+                        <p>
+                            NOTE: Another possibility is to use an HTML parser on the HTML output
+                            of the document. Using an XML RenderKit offers additional benefits, as
+                            explained below.
+                        </p>
+                        <p>
+                            NOTE: Not all tag libraries generate output directly. For example,
+                            JSTL iterators and conditionals do not generate any output of their own.
+                        </p>
+                    </li>
+                </ol>
+            </p>
+        </section>
+        <section>
+            <title>Standalone Control Flow</title>
+            <p>
+                When the XML RenderKit is used standalone (without OPS), the
+                following control flow (compatible with the Model 2X architecture) occurs: a custom
+                Servlet Filter implements a mini-controller, parses the JSP output and applies an
+                XSLT transformation. Such a filter can be modified at will to provide more or less
+                functionality.
+            </p>
+            <img print-format="pdf" src="pages/model2x-jsf-standalone.png"/>
+            <p>
+                <ol>
+                    <li>HTTP Request</li>
+                    <li>The filter dispatches the request to JSF</li>
+                    <li>The JSF Controller processes the request and forwards it to a JSP page</li>
+                    <li>
+                        If necessary using the JSF tag libraries and,
+                        indirectly, the XML RenderKit, the JSP page generates
+                        XML output
+                    </li>
+                    <li>The output from the JSP page is parsed</li>
+                    <li>Through an XSLT transformation, the response is sent to the client</li>
+                </ol>
+            </p>
+        </section>
+        <section>
+            <title>OPS Control Flow</title>
+            <p>
+                The current version of OPS supports rendering JSF components using
+                XML pipelines. You can use XSLT or other transformation languages. The flow is very
+                similar to the standalone flow, but dispatching the request to JSF and parsing the
+                JSP output is implemented in a generic XML processor in OPS called
+                the Servlet Filter Generator. The generator can be connected to any other XML
+                processors. A typical use is to connect its output to an XSLT Transformer.
+            </p>
+            <p>
+                 The following figure illustrates the flow of the request, from
+                 the client to OPS to JSF and back:
+            </p>
+            <img print-format="pdf" src="pages/model2x-jsf-overview.png"/>
+            <p>
+                <ol>
+                    <li>HTTP Request</li>
+                    <li>The OPS Controller dispatches the request to an XML pipeline</li>
+                    <li>Using a Servlet Filter Generator, the pipeline calls a JSF tree</li>
+                    <li>The JSF Controller processes the request and forwards it to a JSP page</li>
+                    <li>
+                        If necessary using the JSF tag libraries and, indirectly, the XML RenderKit,
+                        the JSP page generates XML output
+                    </li>
+                    <li>The resulting XML is generated within OPS by the Servlet Filter Generator</li>
+                    <li>Through an optional series of transformations, the response is sent to the client</li>
+                </ol>
+            </p>
+        </section>
+        <section>
+            <title>The XML RenderKit</title>
+            <p>
+                OPS comes with an XML RenderKit for the JSF Standard User Interface
+                Components. The XML RenderKit can also be used independently from Presentation
+                Server.
+            </p>
+            <section>
+                <title>Differences with the HTML RenderKit</title>
+                <p>
+                    The JSF Standard HTML RenderKit generates an output that can be directly
+                    interpreted by an HTML client such as a Web browser. For example, a
+                    <code>UICommand</code> rendered as a <code>button</code> using the
+                    <code>h:command_button</code> tag generates an HTML <code>&lt;input type="text"
+                    value="Submit"></code> HTML tag.
+                </p>
+                <p>
+                    The XML RenderKit does not try to generate output that can be interpreted by an
+                    HTML client. Instead, it generates a model of the component that contains all
+                    the information necessary to display it. For example, the same button is
+                    generated as a <code>&lt;jsf:command_button></code> element. It is up to an XSLT
+                    stylesheet to transform that element into an HTML element.
+                </p>
+                <p>
+                    With this approach it is possible:
+                </p>
+                <ul>
+                    <li>To use different features on different clients</li>
+                    <li>To customize the appearance of a component at will</li>
+                </ul>
+            </section>
+            <section>
+                <title>Differences with an XHTML RenderKit</title>
+                <p>
+                    The JSF Standard HTML RenderKit is currently not able to generate XHTML (the
+                    XML-compliant version of HTML). It may do so in the future, or third-party
+                    vendors may implement RenderKits with such functionality. It is important to
+                    note that a RenderKit generating XHTML is different from the OPS
+                    XML RenderKit. An XHTML RenderKit would generate the button above as
+                    <code>&lt;input type="text" value="Submit"/></code>. The only difference with
+                    the HTML version is the trailing slash (which is invalid in HTML). Similarly, a
+                    checkbox's <code>selected</code> boolean attribute would be rendered in HTML
+                    simply as <code>selected</code>, while in XHTML it must be rendered as
+                    <code>selected="selected"</code>. In summary, XHTML does not add information to
+                    HTML: it is simply a slightly different way of representing a document.
+                </p>
+                <p>
+                    With the JSF Standard HTML RenderKit, an <code>output_number</code> and
+                    <code>output_date</code> components, once rendered, cannot be discriminated.
+                    With the XML RenderKit, the discrimination is possible because the RenderKit
+                    generates, for each component, information that allows for the identification of
+                    the component type. This way, one can automatically display dates in a specific
+                    style by setting a CSS class once and for all in an XSLT stylesheet. With the
+                    HTML RenderKit, one would have to set a CSS class on every
+                    <code>h:output_date</code> tag.
+                </p>
+                <p>
+                    Another example is the <code>h:output_errors</code> JSF tag. The JSF Standard
+                    HTML RenderKit decides how to render the errors. For example, in EA 4, it
+                    renders errors separated by tabs: <code>Error1 Error2 ...</code>.
+                </p>
+                <p>
+                    If you want to change this, you have to implement your own renderer in Java and
+                    from scratch. Instead, the XML RenderKit generates a structured output:
+                </p>
+                <xml-source show-namespaces="false">
+                    <jsf:output_errors class="my-class">
+                        <jsf:errors>
+                            <jsf:error>Error 1</jsf:error>
+                            <jsf:error>Error 2</jsf:error>
+                        </jsf:errors>
+                    </jsf:output_errors>
+                </xml-source>
+                <p>
+                    With an XSLT template like the following, error handling becomes much more
+                    flexible. You can fully customize the display of the errors without changing
+                    the RenderKit:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xsl:template match="jsf:output_errors">
+                        <span style="color: red">
+                            <xsl:if test="count(jsf:error)">
+                                <xsl:for-each select="jsf:error">
+                                    <xsl:if test="position() > 1">
+                                        <xsl:text> / </xsl:text>
+                                    </xsl:if>
+                                    <xsl:value-of select="."/>
+                                </xsl:for-each>
+                            </xsl:if>
+                        </span>
+                    </xsl:template>
+                </xml-source>
+                <p>
+                    In this case, the errors are rendered in red and separated with slashes ('/').
+                </p>
+            </section>
+            <section>
+                <title>Sample XSLT Stylesheet</title>
+                <p>
+                    A sample XSLT stylesheet that generates an (X)HTML output for each component
+                    ships OPS as well as in the standalone distribution of the XML
+                    RenderKit for JavaServer Faces. It is also available online:
+                </p>
+                <p>
+                    <a href="/goto-source/jsf/themes/jsf-theme.xsl">jsf-theme.xsl</a>
+                </p>
+            </section>
+            <section>
+                <title>XML Output Format</title>
+                <p>
+                    As mentioned above, the XML RenderKit generates a structured output that
+                    represents the component to be displayed. The following rules are applied:
+                </p>
+                <ul>
+                    <li>
+                        All the elements are in the
+                        <code>http://orbeon.org/oxf/xml/jsf-output</code> namespace. The typical
+                        prefix associated with this namespace is <code>jsf</code>.
+                    </li>
+                    <li>
+                        Each component is rendered in the form
+                        <code>jsf:<i>component</i>_<i>rendertype</i></code>. The
+                        <code>component</code> part is the name of the component in lowercase,
+                        without the "UI" prefix. The <code>rendertype</code> part is the render type
+                        in lowercase.
+                    </li>
+                    <li>
+                        Most components have a <code>class</code> attribute that is copied from the
+                        component's <code>yyyClass</code> attribute when present.
+                    </li>
+                    <li>
+                        Every component label is rendered using the <code>&lt;jsf:label></code>
+                        element.
+                    </li>
+                    <li>
+                        Client ids are copied into the <code>id</code> attribute. It is up to the
+                        XSLT stylesheet to use this id to generate, for example, an HTML element
+                        <code>name</code> attribute.
+                    </li>
+                    <li>
+                        All resources are looked up in the RenderKit.
+                    </li>
+                    <li>
+                        Date / number formatting and parsing is done in the RenderKit.
+                    </li>
+                    <li>
+                        Most UISelectMany and UISelectOne output identical XML. It is up to the
+                        XSLT stylesheet to output the most adequate representation of the component.
+                    </li>
+                    <li>
+                        No JavaScript is produced by the RenderKits. It is up to the XSLT
+                        stylesheet to output JavaScript code if needed.
+                    </li>
+                    <li>
+                        Components that can be selected or deselected, such as lists, checkboxes,
+                        radio buttons, use a <code>selected</code> attribute set to
+                        <code>true</code> or <code>false</code>.
+                    </li>
+                </ul>
+                <p>
+                    The following table is a comprehensive list of the JSF Standard User Interface
+                    Components and Render Types defined in the JavaServer Faces Specification
+                    Version 1.0, Public Review Draft 2. For each combination, an informal example of
+                    output is shown.
+                </p>
+                <table ca="|p{0.15\textwidth}|p{0.15\textwidth}|p{0.7\textwidth}|">
+                    <pdf-part>
+                        <tr>
+                            <th>Component</th>
+                            <th>Render Type</th>
+                            <th>Format</th>
+                        </tr>
+                        <tr>
+                            <td valign="top" rowspan="2">UICommand</td>
+                            <td valign="top">Button</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:command_button class="class"
+                                            type="submit|reset" id="client-id">
+                                        <jsf:label>Label</jsf:label>
+                                    </jsf:command_button>
+                                </xml-source>
+
+                                The <code>id</code> attribute can be used to
+                                generate an HTML <code>name</code> attribute on a
+                                form submit element.
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Hyperlink</td>
+                            <td>
+                                If the <code>href</code> attribute is present:
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:command_hyperlink class="class"
+                                            href="http://example.org/test?a=1&amp;b=2&amp;c=3">
+                                        <jsf:path>http://example.org/test?a=1</jsf:path>
+                                        <jsf:parameters>
+                                            <jsf:parameter>
+                                                <jsf:name>b</jsf:name>
+                                                <jsf:value>2</jsf:value>
+                                            </jsf:parameter>
+                                            <jsf:parameter>
+                                                <jsf:name>c</jsf:name>
+                                                <jsf:value>3</jsf:value>
+                                            </jsf:parameter>
+                                        </jsf:parameters>
+                                        <jsf:label>Label</jsf:label>
+                                    </jsf:command_hyperlink>
+                                </xml-source>
+                                otherwise:
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:command_hyperlink class="class" id="client-id"
+                                            command-name="command-name">
+                                        <jsf:parameters>
+                                            <jsf:parameter>
+                                                <jsf:name>a</jsf:name>
+                                                <jsf:value>1</jsf:value>
+                                            </jsf:parameter>
+                                            <jsf:parameter>
+                                                <jsf:name>b</jsf:name>
+                                                <jsf:value>2</jsf:value>
+                                            </jsf:parameter>
+                                        </jsf:parameters>
+                                        <jsf:label>Label</jsf:label>
+                                    </jsf:command_hyperlink>
+                                </xml-source>
+
+                                A The request parameters are listed separately even when the
+                                <code>href</code> attribute is present, in order to provide more
+                                flexibility. A pre-computed <code>href</code> attribute is also
+                                generated, built on the <code>href</code> provided by the user and
+                                the embedded <code>UIParameter</code> components. The pre-computed
+                                <code>href</code> attribute can be rebuilt by appending the
+                                parameters to the <code>jsf:path</code> value (taking care of
+                                separating them with a '?' or '&amp;' if necessary).
+                            </td>
+                        </tr>
+                    </pdf-part>
+                    <pdf-part>
+                        <tr>
+                            <td valign="top">UIForm</td>
+                            <td valign="top">Form</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:form class="my-class" method="post"
+                                        action="/faces/test.jsp"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">UIGraphic</td>
+                            <td valign="top">Image</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:graphic_image class="my-class"
+                                        id="client-id" src="/images/test.gif"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top" rowspan="7">UIInput</td>
+                            <td valign="top">Date</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_date class="my-class"
+                                        id="client-id" value="Jun 12 2003"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">DateTime</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_datetime class="my-class"
+                                        id="client-id" value="Jun 12 17:59:27 2003"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Hidden</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_hidden id="client-id"
+                                        value="Hidden Value"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Number</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_number class="my-class"
+                                        id="client-id" value="42"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Secret</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_secret class="my-class"
+                                        id="client-id" value="password"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Text</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_text class="my-class"
+                                        id="client-id" value="JSF rocks!"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">TextArea</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:input_textarea class="my-class" id="client-id">
+                                        Content of the text area.
+                                    </jsf:input_textarea>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </pdf-part>
+                    <pdf-part>
+                        <tr>
+                            <td valign="top" rowspan="8">UIOutput</td>
+                            <td valign="top">Date</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_date class="my-class">Jun 12 2003</jsf:output_date>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">DateTime</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_datetime class="my-class">Jun 12 17:59:27 2003</jsf:output_datetime>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Errors</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_errors class="my-class">
+                                        <jsf:errors>
+                                            <jsf:error>Error 1</jsf:error>
+                                            <jsf:error>Error 2</jsf:error>
+                                        </jsf:errors>
+                                    </jsf:output_errors>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Label</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_label class="my-class" for="first-name"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Message</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_message class="my-class">You have 12 new emails in your inbox.</jsf:output_message>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Number</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_number class="my-class">42</jsf:output_number>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Text</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_text class="my-class">JSF rocks!</jsf:output_text>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Time</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:output_time class="my-class">17:59:27</jsf:output_time>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </pdf-part>
+                    <pdf-part>
+                        <tr>
+                            <td rowspan="4">UIPanel</td>
+                            <td>Data</td>
+                            <td>
+                                N/A
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Grid</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:panel_grid>
+                                        <comment>Optional header if header facet is present</comment>
+                                        <jsf:header class="my-class" colspan="colspan">
+                                            <comment>Children Components</comment>
+                                        </jsf:header>
+                                        <comment>Rows and column</comment>
+                                        <jsf:row class="my-class">
+                                            <jsf:column class="my-class">
+                                                <comment>Children Component</comment>
+                                            </jsf:column>
+                                        </jsf:row>
+                                        <jsf:row class="my-class">
+                                            <jsf:column class="my-class">
+                                                <comment>Children Component</comment>
+                                            </jsf:column>
+                                        </jsf:row>
+                                        <comment>Optional header if footer facet is present</comment>
+                                        <jsf:footer class="my-class" colspan="colspan">
+                                            <comment>Children Components</comment>
+                                        </jsf:footer>
+                                    </jsf:panel_grid>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Group</td>
+                            <td>
+                                N/A
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">List</td>
+                            <td>
+                                Not implememented yet.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td valign="top">UISelectBoolean</td>
+                            <td valign="top">Checkbox</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectboolean_checkbox class="my-class" id="client-id" selected="true"/>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </pdf-part>
+                    <pdf-part>
+                        <tr>
+                            <td valign="top" rowspan="3">UISelectMany</td>
+                            <td valign="top">Checkbox</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectmany_checkbox class="my-class" id="client-id" layout="PAGE_DIRECTION|LINE_DIRECTION">
+                                        <jsf:option value="value" selected="true">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                        <jsf:option value="value" selected="false">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                    </jsf:selectmany_checkbox>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Listbox</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectmany_listbox class="my-class" id="client-id" layout="PAGE_DIRECTION|LINE_DIRECTION">
+                                        <jsf:option value="value" selected="true">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                        <jsf:option value="value" selected="false">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                    </jsf:selectmany_listbox>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Menu</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectmany_menu class="my-class" id="client-id" layout="PAGE_DIRECTION|LINE_DIRECTION">
+                                        <jsf:option value="value" selected="true">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                        <jsf:option value="value" selected="false">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                    </jsf:selectmany_menu>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </pdf-part>
+                    <pdf-part>
+                        <tr>
+                            <td valign="top" rowspan="3">UISelectOne</td>
+                            <td valign="top">Listbox</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectone_listbox class="my-class" id="client-id" layout="PAGE_DIRECTION|LINE_DIRECTION">
+                                        <jsf:option value="value" selected="true">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                        <jsf:option value="value" selected="false">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                    </jsf:selectone_listbox>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Menu</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectone_menu class="my-class" id="client-id" layout="PAGE_DIRECTION|LINE_DIRECTION">
+                                        <jsf:option value="value" selected="true">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                        <jsf:option value="value" selected="false">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                    </jsf:selectone_menu>
+                                </xml-source>
+                            </td>
+                        </tr>
+                        <tr>
+                            <pdf-td/>
+                            <td valign="top">Radio</td>
+                            <td>
+                                <xml-source show-namespaces="false" max-length="58">
+                                    <jsf:selectone_radio class="my-class" id="client-id" layout="PAGE_DIRECTION|LINE_DIRECTION">
+                                        <jsf:option value="value" selected="true">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                        <jsf:option value="value" selected="false">
+                                            <jsf:label>Label</jsf:label>
+                                        </jsf:option>
+                                    </jsf:selectone_radio>
+                                </xml-source>
+                            </td>
+                        </tr>
+                    </pdf-part>
+                </table>
+            </section>
+        </section>
+
+    </body>
+</document>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Converters" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <!--
+    TODO: o all converters (XML, HTML, Text, XSL:FO, Chart)
+          o check that content-type incl. encoding attribute is correctly generated
+
+    -->
+
+    <test description="XML conversion" name="oxf:xml-converter">
+        <input name="data" href="oxf:/examples/bizdoc/schema/claim-1.xml"/>
+        <input name="config">
+            <config>
+                <content-type>application/xml</content-type>
+                <encoding>io-8859-1</encoding>
+                <version>1.0</version>
+            </config>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="application/xml; charset=io-8859-1">&lt;?xml version="1.0" encoding="io-8859-1"?&gt; &lt;claim xmlns="http://orbeon.org/oxf/examples/bizdoc/claim"&gt; &lt;insured-info&gt; &lt;general-info&gt; &lt;name-info&gt; &lt;title-prefix&gt;Dr.&lt;/title-prefix&gt; &lt;last-name&gt;Doe&lt;/last-name&gt; &lt;first-name&gt;John&lt;/first-name&gt; &lt;title-suffix/&gt; &lt;/name-info&gt; &lt;address&gt; &lt;address-detail&gt; &lt;street-name&gt;N Columbus Dr.&lt;/street-name&gt; &lt;street-number&gt;511&lt;/street-number&gt; &lt;unit-number/&gt; &lt;/address-detail&gt; &lt;city&gt;Chicago&lt;/city&gt; &lt;state-province&gt;IL&lt;/state-province&gt; &lt;postal-code&gt;60611&lt;/postal-code&gt; &lt;country&gt;USA&lt;/country&gt; &lt;email&gt;jdoe@acme.org&lt;/email&gt; &lt;/address&gt; &lt;/general-info&gt; &lt;person-info&gt; &lt;gender-code&gt;M&lt;/gender-code&gt; &lt;birth-date&gt;1972-10-01&lt;/birth-date&gt; &lt;marital-status-code&gt;C&lt;/marital-status-code&gt; &lt;occupation&gt;Manager&lt;/occupation&gt; &lt;/person-info&gt; &lt;family-info&gt; &lt;children&gt; &lt;child&gt; &lt;birth-date&gt;2003-02-02&lt;/birth-date&gt; &lt;first-name&gt;Marco&lt;/first-name&gt; &lt;/child&gt; &lt;child&gt; &lt;birth-date/&gt; &lt;first-name/&gt; &lt;/child&gt; &lt;/children&gt; &lt;comments&gt;No comments at this point!&lt;/comments&gt; &lt;/family-info&gt; &lt;claim-info&gt; &lt;accident-type&gt;FOOT&lt;/accident-type&gt; &lt;accident-date&gt;2004-07-06&lt;/accident-date&gt; &lt;rate/&gt; &lt;/claim-info&gt; &lt;/insured-info&gt; &lt;/claim&gt;</document>
+        </output>
+    </test>
+
+    <test description="HTML conversion" name="oxf:html-converter">
+        <input name="data" href="oxf:/examples/tutorial/hello3/view.xhtml"/>
+        <input name="config">
+            <config>
+                <content-type>text/html</content-type>
+                <encoding>io-8859-1</encoding>
+                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                <version>4.01</version>
+            </config>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/html; charset=io-8859-1">&lt;!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt; &lt;html&gt; &lt;head&gt; &lt;title&gt;Hello World XForms&lt;/title&gt; &lt;xforms:model&gt; &lt;xforms:instance&gt; &lt;first-name&gt;&lt;/first-name&gt; &lt;/xforms:instance&gt; &lt;/xforms:model&gt; &lt;/head&gt; &lt;body&gt; &lt;p&gt; Please enter your first name: &lt;xforms:input ref="/first-name" incremental="true"&gt;&lt;/xforms:input&gt; &lt;/p&gt; &lt;p&gt; &lt;xforms:output value="if (normalize-space(/first-name) = '') then '' else concat('Hello, ', /first-name, '!')"&gt;&lt;/xforms:output&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</document>
+        </output>
+    </test>
+
+    <test description="Text conversion" name="oxf:text-converter">
+        <input name="data">
+            <text>
+                This is just plain text. It will be output without the <em>text</em> and <em>em</em>
+                elements.
+            </text>
+        </input>
+        <input name="config">
+            <config/>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/plain; charset=utf-8">
+                This is just plain text. It will be output without the text and em elements.
+            </document>
+        </output>
+    </test>
+    <test description='Test from xls' name='oxf:from-xls-converter' >
+        <input name='data' href='employees2.xls' />
+        <output name="data">
+            <workbook>
+                <sheet>
+                    <employees>
+                        <employee-id>945</employee-id>
+                        <firstname>Nils</firstname>
+                        <lastname>Aas</lastname>
+                        <phone>(555) 123 0433</phone>
+                        <title>Norwegian sculptor and illustrator</title>
+                        <age>70</age>
+                        <manager-id/>
+                        <employee-id>576</employee-id>
+                        <firstname>Ali</firstname>
+                        <lastname>Abbasi</lastname>
+                        <phone>(555) 123 0060</phone>
+                        <title>BBC Scotland travel presenter</title>
+                        <age>42</age>
+                        <manager-id/>
+                        <employee-id>1111</employee-id>
+                        <firstname>AAAAA</firstname>
+                        <lastname>BBBBB</lastname>
+                        <phone>000 000 0000</phone>
+                        <title>CCCCC</title>
+                        <age>99</age>
+                        <manager-id/>
+                        <employee-id>569</employee-id>
+                        <firstname>Philip</firstname>
+                        <lastname>Abelson</lastname>
+                        <phone>(555) 123 0053</phone>
+                        <title>co-discoverer of Neptunium</title>
+                        <age>91</age>
+                        <manager-id/>
+                        <employee-id>823</employee-id>
+                        <firstname>Lélia</firstname>
+                        <lastname>Abramo</lastname>
+                        <phone>(555) 123 0309</phone>
+                        <title>and one of the founders of President Lula da Silv</title>
+                        <age>93</age>
+                        <manager-id/>
+                        <employee-id>558</employee-id>
+                        <firstname>Paul</firstname>
+                        <lastname>Adair</lastname>
+                        <phone>(555) 123 0042</phone>
+                        <title>American oil well fire-fighter</title>
+                        <age>89</age>
+                        <manager-id/>
+                        <employee-id>908</employee-id>
+                        <firstname>Cecily</firstname>
+                        <lastname>Adams</lastname>
+                        <phone>(555) 123 0396</phone>
+                        <title>actress</title>
+                        <age>39</age>
+                        <manager-id/>
+                        <employee-id>731</employee-id>
+                        <firstname>Umberto</firstname>
+                        <lastname>Agnelli</lastname>
+                        <phone>(555) 123 0216</phone>
+                        <title>head of Fiat</title>
+                        <age>69</age>
+                        <manager-id/>
+                        <employee-id>861</employee-id>
+                        <firstname>Dominic</firstname>
+                        <lastname>Agostino</lastname>
+                        <phone>(555) 123 0348</phone>
+                        <title>Ontario Liberal MPP</title>
+                        <age>44</age>
+                        <manager-id/>
+                        <employee-id>975</employee-id>
+                        <firstname>José</firstname>
+                        <lastname>Agrelot</lastname>
+                        <phone>(555) 123 0464</phone>
+                        <title>comedian and radio show host</title>
+                        <age/>
+                        <manager-id/>
+                        <employee-id>1029</employee-id>
+                        <firstname>Joan</firstname>
+                        <lastname>Aiken</lastname>
+                        <phone>(555) 123 0518</phone>
+                        <title>author of The Wolves of Willoughby Chase</title>
+                        <age>79</age>
+                        <manager-id/>
+                        <employee-id>784</employee-id>
+                        <firstname>Anthony</firstname>
+                        <lastname>Ainley</lastname>
+                        <phone>(555) 123 0269</phone>
+                        <title>British actor</title>
+                        <age>71</age>
+                        <manager-id/>
+                        <employee-id>730</employee-id>
+                        <firstname>Michael</firstname>
+                        <lastname>Alison</lastname>
+                        <phone>(555) 123 0215</phone>
+                        <title>British Privy Council member and former minister</title>
+                        <age>77</age>
+                        <manager-id/>
+                        <employee-id>925</employee-id>
+                        <firstname>Vijay</firstname>
+                        <lastname>Anand</lastname>
+                        <phone>(555) 123 0413</phone>
+                        <title>Bollywood filmmaker and brother of Dev Anand</title>
+                        <age>71</age>
+                        <manager-id/>
+                        <employee-id>922</employee-id>
+                        <firstname>Carl</firstname>
+                        <lastname>Anderson</lastname>
+                        <phone>(555) 123 0410</phone>
+                        <title>American actor (Judas in Jesus Christ Superstar)</title>
+                        <age>58</age>
+                        <manager-id/>
+                        <employee-id>659</employee-id>
+                        <firstname>Sophia</firstname>
+                        <lastname>Andresen</lastname>
+                        <phone>(555) 123 0144</phone>
+                        <title>Portuguese writer and poet</title>
+                        <age>84</age>
+                        <manager-id/>
+                        <employee-id>590</employee-id>
+                        <firstname>Oguz</firstname>
+                        <lastname>Aral</lastname>
+                        <phone>(555) 123 0074</phone>
+                        <title>and Utanmaz Adam</title>
+                        <age>68</age>
+                        <manager-id/>
+                        <employee-id>881</employee-id>
+                        <firstname>Amparo</firstname>
+                        <lastname>Arrebato</lastname>
+                        <phone>(555) 123 0369</phone>
+                        <title>Colombian dancer</title>
+                        <age>59</age>
+                        <manager-id/>
+                        <employee-id>534</employee-id>
+                        <firstname>Thea</firstname>
+                        <lastname>Astley</lastname>
+                        <phone>(555) 123 0017</phone>
+                        <title>Australian novelist</title>
+                        <age>78</age>
+                        <manager-id/>
+                        <employee-id>654</employee-id>
+                        <firstname>Jean-Marie</firstname>
+                        <lastname>Auberson</lastname>
+                        <phone>(555) 123 0139</phone>
+                        <title>Swiss orchestra conductor</title>
+                        <age>84</age>
+                        <manager-id/>
+                    </employees>
+                </sheet>
+            </workbook>        
+        </output>
+    </test>
+
+</group>

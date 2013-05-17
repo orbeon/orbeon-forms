@@ -1,0 +1,43 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:order="urn:oasis:names:tc:ubl:Order:1.0:0.70"
+        xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xi="http://www.w3.org/2001/XInclude">
+    <xforms:instance>
+        <form>
+            <action/>
+            <show-details>true</show-details>
+            <view>form</view>
+            <global-validation/>
+            <xi:include href="ubl_samp.xml"/>
+        </form>
+    </xforms:instance>
+    <xforms:submission method="post"/>
+    <xforms:bind nodeset="order:Order/cat:OrderLine" relevant="count(following-sibling::cat:OrderLine) > 0"/>
+    <xforms:bind nodeset="order:Order/cat:OrderLine/cat:LineExtensionAmount[../cat:Quantity castable as xs:decimal
+        and ../cat:Item/cat:BasePrice/cat:PriceAmount castable as xs:decimal]"
+        calculate="xs:decimal(../cat:Quantity) * xs:decimal(../cat:Item/cat:BasePrice/cat:PriceAmount)"/>
+    <xforms:bind nodeset="order:Order/cat:LineExtensionTotalAmount"
+        calculate="sum(for $a in ../cat:OrderLine/cat:LineExtensionAmount[. castable as xs:decimal] return xs:decimal($a))"/>
+    <xforms:bind nodeset="order:Order/cat:OrderLine/cat:Quantity"
+        type="xs:positiveInteger"/>
+    <xforms:bind nodeset="order:Order/cat:OrderLine/cat:Item/cat:BasePrice/cat:PriceAmount"
+        required="true()"/>
+    <xforms:bind nodeset="order:Order/cat:OrderLine/cat:Item/cat:BasePrice/cat:PriceAmount"
+        type="xs:decimal"/>
+    <xforms:bind nodeset="order:Order/cat:OrderLine/cat:Item/cat:BasePrice/cat:PriceAmount[. castable as xs:decimal]"
+        constraint="round(xs:decimal(.) * 100) mod 5 = 0"/>
+</xforms:model>

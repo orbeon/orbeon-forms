@@ -1,0 +1,84 @@
+<!--
+    Copyright (C) 2006 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<form xmlns="http://orbeon.org/oxf/examples/dmv">
+    <personal-information>
+        <name>
+            <first-name>John</first-name>
+            <initial>A</initial>
+            <last-name>Smith</last-name>
+        </name>
+        <driver-license-number>B987695</driver-license-number>
+        <birth-date>1983-03-03</birth-date>
+    </personal-information>
+    <address-information>
+        <voter-address-change>
+            <change-address>N</change-address>
+        </voter-address-change>
+        <address type="residence">
+            <street>
+                <number>456</number>
+                <name-1>Pine Avenue</name-1>
+                <name-2/>
+            </street>
+            <apt>1818</apt>
+            <city>San Francisco</city>
+            <state>CA</state>
+            <zip>94102</zip>
+        </address>
+        <address type="old">
+            <street>
+                <number>1</number>
+                <name-1>Ocean Blvd.</name-1>
+                <name-2/>
+            </street>
+            <apt/>
+            <city>Monterey</city>
+            <state>CA</state>
+            <zip>93940</zip>
+        </address>
+        <address type="mailing">
+            <street>
+                <number>123</number>
+                <name-1>Oak Avenue</name-1>
+                <name-2/>
+            </street>
+            <apt>212</apt>
+            <city>Mountain View</city>
+            <state>CA</state>
+            <zip>94041</zip>
+        </address>
+    </address-information>
+    <vehicle-information>
+        <vehicles>
+            <vehicle>
+                <plate-number>1CCD412</plate-number>
+                <vin>53585987654321031</vin>
+                <leased>Y</leased>
+            </vehicle>
+            <vehicle>
+                <plate-number>3TRE787</plate-number>
+                <vin>14393483498123400</vin>
+                <leased></leased>
+            </vehicle>
+            <vehicle>
+                <plate-number>6QWA76</plate-number>
+                <vin>34756976067146047</vin>
+                <leased>Y</leased>
+            </vehicle>
+        </vehicles>
+        <leased-vehicles>
+            <company-name>CA Leasing Co.</company-name>
+        </leased-vehicles>
+    </vehicle-information>
+</form>

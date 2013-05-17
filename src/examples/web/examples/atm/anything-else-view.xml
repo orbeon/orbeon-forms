@@ -1,0 +1,41 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <xhtml:head>
+        <xhtml:title>Anything Else</xhtml:title>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group ref="/">
+            <xhtml:p>
+                Would you like anything else?
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:submit>
+                    <xforms:label>Yes</xforms:label>
+                    <xforms:setvalue ref="anything-else">yes</xforms:setvalue>
+                </xforms:submit>
+                <xforms:submit>
+                    <xforms:label>No</xforms:label>
+                    <xforms:setvalue ref="anything-else">no</xforms:setvalue>
+                </xforms:submit>
+                <xhtml:p style="margin-top: 3em">
+                    <xhtml:a href="/atm">Back</xhtml:a> to ATM home<br/>
+                </xhtml:p>
+            </xhtml:p>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

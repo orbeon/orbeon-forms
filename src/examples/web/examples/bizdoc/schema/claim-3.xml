@@ -1,0 +1,57 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<claim xmlns="http://orbeon.org/oxf/examples/bizdoc/claim">
+    <insured-info>
+        <general-info>
+            <name-info>
+                <title-prefix></title-prefix>
+                <last-name>Alighieri</last-name>
+                <first-name>Dante</first-name>
+                <title-suffix></title-suffix>
+            </name-info>
+            <address>
+                <address-detail>
+                    <street-name>Main Street</street-name>
+                    <street-number>101</street-number>
+                    <unit-number></unit-number>
+                </address-detail>
+                <city>New York</city>
+                <state-province>NY</state-province>
+                <postal-code>10000</postal-code>
+                <country>USA</country>
+                <email>dante@example.org</email>
+            </address>
+        </general-info>
+        <person-info>
+            <gender-code>M</gender-code>
+            <birth-date>1971-06-07</birth-date>
+            <marital-status-code>U</marital-status-code>
+            <occupation>Writer</occupation>
+        </person-info>
+        <family-info>
+            <children>
+                <child>
+                    <birth-date></birth-date>
+                    <first-name></first-name>
+                </child>
+            </children>
+            <comments>No comments at this point!</comments>
+        </family-info>
+        <claim-info>
+            <accident-type>OTHER</accident-type>
+            <accident-date>2004-04-09</accident-date>
+            <rate></rate>
+        </claim-info>
+    </insured-info>
+</claim>

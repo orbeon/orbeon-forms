@@ -1,0 +1,48 @@
+<message>
+    <smtp-host/>
+    <from>
+        <email/>
+        <name/>
+    </from>
+    <to>
+        <email/>
+        <name/>
+    </to>
+    <subject/>
+    <body mime-multipart="alternative">
+        <!-- Provide simple text alternative -->
+        <part name="text" content-type="text/plain">Your email client does not support displaying HTML messages.</part>
+        <!-- HTML alternative -->
+        <part name="html" content-type="multipart/related">
+            <part name="main" content-type="text/html">
+                <html>
+                    <head>
+                        <title/>
+                    </head>
+                    <body>
+                        <p>
+                            This is text entered in PresentationServer's Email example form:
+                        </p>
+                        <p style="border: dotted 1px gray; padding: 5px">Orbeon PresentationServer is a J2EE-based MVC framework for building Web applications that present and capture XML using XForms, XSLT, and Web Services. PresentationServer benefits from standardized forms processing using XForms, rich controller semantics, and full-featured XML pipelines. PresentationServer is in fact built around Orbeon's optimized XML pipeline engine, a mature, high-performance engine for pipeline processing of XML. PresentationServer is ideal for building Composite Applications in a Service Oriented Architecture (SOA), an can be used on its own, or within the OIS suite.</p>
+                        <p>
+                            This is a static image attached to the email and referred to by the HTML version:
+                        </p>
+                        <div style="border: dotted 1px gray; padding: 5px">
+                            <img src="cid:id1"/>
+                        </div>
+                        <p>
+                            This is an dynamic chart image attached to the email and referred to by the HTML version:
+                        </p>
+                        <div style="border: dotted 1px gray; padding: 5px">
+                            <img src="cid:id2"/>
+                        </div>
+                    </body>
+                </html>
+            </part>
+            <!-- Attachments -->
+            <part name="image" content-type="image/gif" content-disposition="inline; filename=&quot;logo.gif&quot;" content-id="id1" src="oxf:/config/theme/images/oxf-powered-80.gif"/>
+            <part name="pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;report.pdf&quot;" src="input:pdf-document"/>
+            <part name="chart" content-type="image/png" content-disposition="inline; filename=&quot;chart.png&quot;" content-id="id2" src="input:png-document"/>
+        </part>
+    </body>
+</message>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<!DOCTYPE struts-config PUBLIC
+  "-//Apache Software Foundation//DTD Struts Configuration 1.1//EN"
+  "http://jakarta.apache.org/struts/dtds/struts-config_1_1.dtd">
+
+<struts-config>
+
+    <form-beans>
+        <form-bean name="hello" type="org.orbeon.oxf.struts.examples.hello.HelloForm"/>
+        <form-bean name="guess" type="org.orbeon.oxf.struts.examples.guess.GuessForm"/>
+        <form-bean name="weather" type="org.orbeon.oxf.struts.examples.portlets.WeatherForm"/>
+        <form-bean name="jsTypeForm" type="org.apache.struts.webapp.validator.TypeForm"/>
+    </form-beans>
+
+    <action-mappings type="org.apache.struts.action.RequestActionMapping">
+
+        <action path="/hello"
+            type="org.orbeon.oxf.struts.examples.hello.HelloAction"
+            name="hello">
+            <forward name="success" path="/examples-struts/hello.xpl"/>
+        </action>
+
+        <action path="/pdf-intro"
+            type="org.orbeon.oxf.struts.examples.hello.HelloAction"
+            name="hello">
+            <forward name="success" path="/examples-struts/hello-pdf-intro.xpl"/>
+        </action>
+
+        <action path="/pdf"
+            type="org.orbeon.oxf.struts.examples.hello.HelloAction"
+            name="hello">
+            <forward name="success" path="/examples-struts/hello-pdf.xpl"/>
+        </action>
+
+        <action path="/guess"
+            type="org.orbeon.oxf.struts.examples.guess.GuessAction"
+            name="guess" input="/examples-struts/guess-retry.xpl">
+            <forward name="retry" path="/examples-struts/guess-retry.xpl"/>
+            <forward name="success" path="/examples-struts/guess-success.xpl"/>
+        </action>
+
+        <action path="/jsType"
+            type="org.apache.struts.webapp.validator.TypeAction"
+            name="jsTypeForm"
+            scope="request"
+            validate="true"
+            input="/examples-struts/jsType.xpl">
+            <forward name="success" path="/examples-struts/jsType.xpl"/>
+        </action>
+
+    </action-mappings>
+
+    <controller locale="true"/>
+
+    <message-resources parameter="org.orbeon.oxf.struts.examples.ApplicationResources"
+        null="false"/>
+
+    <message-resources parameter="org.orbeon.oxf.struts.examples.ApplicationResources"
+        null="false"
+        key="messages"/>
+
+    <plug-in className="org.apache.struts.validator.ValidatorPlugIn">
+        <set-property property="pathnames" value="/WEB-INF/validator-rules.xml,
+                                                  /WEB-INF/validation.xml"/>
+    </plug-in>
+
+</struts-config>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<message>
+    <smtp-host>mail.example.org</smtp-host>
+    <from>
+        <email>joe@example.org</email>
+        <name>Joe</name>
+    </from>
+    <to>
+        <email>joe@example.org</email>
+        <name>Joe</name>
+    </to>
+    <subject>Hello</subject>
+    <body content-type="multipart/alternative">
+        <part name="text" content-type="text/plain">
+            This is text.
+        </part>
+        <part name="html" content-type="text/html">
+            <html><body><p>This is text</p></body></html>
+        </part>
+    </body>
+</message>

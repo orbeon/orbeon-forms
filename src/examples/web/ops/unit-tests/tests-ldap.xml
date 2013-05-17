@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="LDAP" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <test description="Search" name="oxf:ldap">
+        <input name="config">
+            <config>
+                <host>msr</host>
+                <port>7001</port>
+                <bind-dn>cn=Admin</bind-dn>
+                <password>password</password>
+                <root-dn>ou=people, ou=myrealm,dc=mydomain</root-dn>
+                <attribute>cn</attribute>
+                <attribute>wlsMemberOf</attribute>
+                <attribute>description</attribute>
+            </config>
+        </input>
+        <input name="filter">
+            <filter>(uid=jaw)</filter>
+        </input>
+        <output name="data">
+            <results>
+                <result>
+                    <name>uid=jaw</name>
+                    <attribute>
+                        <name>description</name>
+                        <value>John Wickey</value>
+                    </attribute>
+                    <attribute>
+                        <name>wlsMemberOf</name>
+                        <value>cn=msr-users,ou=groups,ou=myrealm,dc=mydomain</value>
+                        <value>cn=msr-bpi-delete-all-person,ou=groups,ou=myrealm,dc=mydomain</value>
+
+                        <value>cn=msr-bpi-edit-all-person,ou=groups,ou=myrealm,dc=mydomain</value>
+                        <value>cn=msr-bpi-delete-orgs,ou=groups,ou=myrealm,dc=mydomain</value>
+                        <value>cn=msr-bpi-edit-orgs,ou=groups,ou=myrealm,dc=mydomain</value>
+                        <value>cn=msr-lih-edit-lodge,ou=groups,ou=myrealm,dc=mydomain</value>
+                        <value>cn=msr-lih-view-lodge,ou=groups,ou=myrealm,dc=mydomain</value>
+                        <value>cn=msr-lih-delete-lodge,ou=groups,ou=myrealm,dc=mydomain</value>
+                    </attribute>
+                    <attribute>
+                        <name>cn</name>
+                        <value>jaw</value>
+                    </attribute>
+                </result>
+            </results>
+        </output>
+    </test>
+
+    <test description="Update" name="oxf:ldap">
+        <input name="config">
+            <config>
+                <host>localhost</host>
+                <port>7001</port>
+                <bind-dn>cn=Admin</bind-dn>
+                <password>password</password>
+                <root-dn>ou=people, ou=myrealm,dc=mydomain</root-dn>
+                <attribute>cn</attribute>
+                <attribute>wlsMemberOf</attribute>
+                <attribute>description</attribute>
+            </config>
+        </input>
+        <input name="filter">
+            <update>
+                <name>uid=jmercay, ou=people, ou=myrealm, dc=mydomain</name>
+                <attribute>
+                    <name>wlsMemberOf</name>
+                    <value>cn=msr-users,ou=groups,ou=myrealm,dc=mydomain</value>
+                    <value>cn=msr-bpi-edit-person,ou=groups,ou=myrealm,dc=mydomain</value>
+                </attribute>
+            </update>
+        </input>
+        <output name="data">
+            <update>success</update>
+        </output>
+    </test>
+
+    <test description="Add" name="oxf:ldap">
+        <input name="config">
+            <config>
+                <host>localhost</host>
+                <port>7001</port>
+                <bind-dn>cn=Admin</bind-dn>
+                <password>password</password>
+                <root-dn>ou=people, ou=myrealm,dc=mydomain</root-dn>
+                <attribute>cn</attribute>
+                <attribute>wlsMemberOf</attribute>
+                <attribute>description</attribute>
+            </config>
+        </input>
+        <input name="filter">
+            <add>
+                <name>uid=test1, ou=people, ou=myrealm, dc=mydomain</name>
+                <attribute>
+                    <name>objectclass</name>
+                    <value>person</value>
+                    <value>organizationalPerson</value>
+                    <value>inetOrgPerson</value>
+                    <value>wlsUser</value>
+                </attribute>
+                <attribute>
+                    <name>uid</name>
+                    <value>test1</value>
+                </attribute>
+                <attribute>
+                    <name>userpassword</name>
+                    <value>test</value>
+                </attribute>
+                <attribute>
+                    <name>description</name>
+                    <value>test test</value>
+                </attribute>
+                <attribute>
+                    <name>wlsMemberOf</name>
+                    <value>cn=msr-users,ou=groups,ou=myrealm,dc=mydomain</value>
+                    <value>cn=msr-bpi-edit-person,ou=groups,ou=myrealm,dc=mydomain</value>
+                </attribute>
+                <attribute>
+                    <name>sn</name>
+                    <value>test1</value>
+                </attribute>
+                <attribute>
+                    <name>cn</name>
+                    <value>test1</value>
+                </attribute>
+            </add>
+        </input>
+        <output name="data">
+            <add>success</add>
+        </output>
+    </test>
+
+    <test description="Delete" name="oxf:ldap">
+        <input name="config">
+            <config>
+                <host>localhost</host>
+                <port>7001</port>
+                <bind-dn>cn=Admin</bind-dn>
+                <password>password</password>
+                <root-dn>ou=people, ou=myrealm,dc=mydomain</root-dn>
+                <attribute>cn</attribute>
+                <attribute>wlsMemberOf</attribute>
+                <attribute>description</attribute>
+            </config>
+        </input>
+        <input name="filter">
+            <delete>
+                <name>uid=test1, ou=people, ou=myrealm, dc=mydomain</name>
+            </delete>
+        </input>
+        <output name="data">
+            <delete>success</delete>
+        </output>
+    </test>
+</group>

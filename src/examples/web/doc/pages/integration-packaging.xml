@@ -1,0 +1,399 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+	<header>
+		<title>Packaging and Deployment</title>
+	</header>
+	<body>
+		<section>
+			<title>Scope</title>
+			<p>
+                This section explains the structure of the standard WAR distributed with
+                OPS and how this WAR integrates with the application server (or
+                Servlet container). This information is useful if you need to repackage Presentation
+                Server. For instance, if you want to build an EAR file, or if you need to deploy
+                more complex OPS applications containing Servlets, Servlet Filters,
+                Portlets, and Servlet context listeners.
+            </p>
+		</section>
+		<section>
+			<title>WAR Structure</title>
+			<table ca="|l|p{0.5\textwidth}|">
+				<tr>
+					<th>Files</th>
+					<th>Description</th>
+				</tr>
+				<tr>
+					<td>
+						<code>WEB-INF/lib/ops.jar</code>
+					</td>
+					<td>JAR file with all the OPS classes.</td>
+				</tr>
+				<tr>
+					<td>
+						<code>WEB-INF/lib/*.jar</code>
+					</td>
+					<td>
+                        All the other JAR files in the <code>WEB-INF/lib</code> directory are used
+                        either by the OPS core engine, or one of the Presentation
+                        Server processors.
+                    </td>
+				</tr>
+				<tr>
+					<td>
+						<code>WEB-INF/web.xml</code>
+					</td>
+					<td>
+                        The standard descriptor for this WAR file. It declares
+                        <code>OXFServlet</code> as the default Servlet and passes some basic
+                        configuration parameters to this Servlet.
+                    </td>
+				</tr>
+                <tr>
+					<td>
+						<code>WEB-INF/portlet.xml</code>
+					</td>
+					<td>
+                        The standard portlet descriptor for this WAR file is required if you use
+                        portlets. It typically declares instances of <code>OXFPortlet</code>. For
+                        more information, see <a href="integration-portlets">Writing Portlets With
+                        OPS</a>.
+                    </td>
+				</tr>
+				<tr>
+					<td>
+						<code>WEB-INF/weblogic.xml</code>
+					</td>
+					<td>
+                        An additional descriptor for WebLogic. This descriptor typically maps
+                        resource names to actual resources configured in the application server
+                        (e.g. for EJBs, users, JDBC data sources, etc).
+                    </td>
+				</tr>
+                <tr>
+					<td>
+						<code>WEB-INF/sun-web.xml</code>
+					</td>
+					<td>
+                        An additional descriptor for SunOne. This descriptor typically maps
+                        resource names to actual resources configured in the application server
+                        (e.g. for EJBs, users, JDBC data sources, etc).
+                    </td>
+				</tr>
+				<tr>
+					<td>
+						<code>WEB-INF/resources/*</code>
+					</td>
+					<td>
+                        Contains the resources for the OPS example application.
+                        Most of the files in this directory will be replaced when you build your own
+                        OPS web applications. In particular, this directory
+                        contains <code>properties.xml</code>, the main OPS
+                        configuration file.
+                    </td>
+				</tr>
+			</table>
+		</section>
+		<section>
+			<title>OPS Initialization</title>
+            <p>
+                The following figure illustrates the initialization of a simple OPS
+                deployment in a J2EE application server:
+            </p>
+			<img print-format="pdf" src="pages/integration-packaging-bootstrap.png" width="593" height="581"/>
+            <p>
+                The initialization follows this lifecycle:
+            </p>
+			<ol>
+				<li>
+					<p>The application server reads the
+                    <code>WEB-INF/web.xml</code> file, which:</p>
+					<ul>
+						<li>Declares a Servlet named <code>oxf</code>
+                        implemented by the class
+                        <code>org.orbeon.oxf.servlet.OPSServlet</code>
+                        (loaded from <code>lib/ops.jar</code>)</li>
+						<li>Defines <code>oxf</code> as the default Servlet
+                        (i.e. the Servlet handling all the requests).</li>
+					</ul>
+					<xml-source>
+<web-app>
+    <servlet>
+        <servlet-name>oxf</servlet-name>
+        <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+        <comment>Initialization parameters here (see below)</comment>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>oxf</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>
+					</xml-source>
+				</li>
+				<li>
+					<p>
+                        The <code>web.xml</code> file configures the <code>OXFServlet</code> with a
+                        minimal set of parameters. Those parameters tell <code>OXFServlet</code>:
+                    </p>
+					<ul>
+						<li>
+                            What resource manager has to be used, and how this resource manager is
+                            configured. In the default WAR bundled in the OPS
+                            distribution, OPS loads resources from the
+                            <code>WEB-INF/resources</code> directory inside the WAR. If it can't
+                            find a resource in this directory, it will try to look for it inside
+                            <code>ops.jar</code>. Only static resources that are part of
+                            OPS are stored in <code>ops.jar</code> (as opposed to
+                            OPS applications). The <link
+                            href="reference-resource-managers">Resource Managers</link> section
+                            explains in detail how resource managers work.
+                        </li>
+						<li>
+                            The location of <code>properties.xml</code>.
+                        </li>
+                        <li>
+                            Optionally, what main processor or context listener
+                            processors must be used.
+                        </li>
+					</ul>
+				</li>
+				<li>
+					<p>
+                        OPS is configured through an XML file,
+                        <code>properties.xml</code>, stored with the resources. The exact name and
+                        path of this file is specified within <code>web.xml</code>.
+                        <code>properties.xml</code> may declare the main processor to be executed by
+                        <code>OXFServlet</code>, as well as optional inputs of this processor.
+                        Alternatively, the main processor can be declared directly within
+                        <code>web.xml</code>, which is the recommended approach. By default, the
+                        Page Flow Controller is used as the main processor. If the configuration is
+                        done in <code>web.xml</code>:
+                    </p>
+					<xml-source>
+<comment>The main processor that OXFServlet must execute</comment>
+<context-param>
+    <param-name>oxf.main-processor.name</param-name>
+    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+</context-param>
+<comment>The Page Flow Controller configuration file</comment>
+<context-param>
+    <param-name>oxf.main-processor.input.controller</param-name>
+    <param-value>oxf:/page-flow.xml</param-value>
+</context-param>
+					</xml-source>
+                    <p>
+                        If the configuration is done in <code>properties.xml</code>:
+                    </p>
+					<xml-source>
+<properties>
+    <comment>The main processor that OXFServlet must execute</comment>
+    <property as="xs:QName" name="oxf.main-processor.main" value="oxf:page-flow"/>
+    <comment>The Page Flow Controller configuration file</comment>
+    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
+</properties>
+					</xml-source>
+                    <p>
+                        For more information about the properties file, see
+                        <link href="reference-properties">OPS
+                        Properties</link>.
+                    </p>
+				</li>
+				<li>
+                    The <code>oxf.main-processor.input.controller</code> property connects the
+                    <code>controller</code> input of the Page Flow Controller to the configuration
+                    file <code>oxf:/page-flow.xml</code>. The Page Flow Controller reads
+                    this input before it starts to operate.
+                </li>
+                <p>
+                    <li>
+                        The Page Flow Controller now handles client requests and dispatches them
+                        to other pipelines. For more information about the role of the controller,
+                        see the <link href="reference-page-flow">Page Flow Controller
+                        reference</link>.
+                    </li>
+                </p>
+			</ol>
+		</section>
+        <a name="main-processor"/>
+        <section>
+			<title>Main Processor</title>
+            <section>
+                <title>Definition</title>
+                <p>
+                    In the same way that an old-fashioned program has a main function, Presentation
+                    Server has the concept of main processor. Within a web application, the main
+                    processor is the processor that is run each time a Servlet, Servlet filter or
+                    Portlet receives a client request. Within a command-line application, the main
+                    processor is simply the processor that runs when the application is run.
+                </p>
+                <p>
+                    In the simplest web application deployment scenario, as shown in the example
+                    above, only one OPS Servlet needs to be configured. In more
+                    complex scenarios, it is possible to deploy multiple OPS
+                    Servlets, Servlet filters, and Portlets, as well as one OPS
+                    Servlet context listener, within the same Web or Portlet Application. The
+                    following figure illustrates this:
+                </p>
+                <img print-format="pdf" src="pages/integration-portlets-deployment.png" width="522" height="234"/>
+                <p>
+                    Additional non-OPS components can obviously be deployed within
+                    the same Web or Portlet Application.
+                </p>
+            </section>
+            <section>
+                <title>OPS Servlet, OPS Servlet Filter, and OPS Portlet</title>
+                <p>
+                    These components can each have their own main processor. The main processor for
+                    such components is looked up in the following locations, in this order:
+                </p>
+                <ol>
+                    <li>
+                        The component's initialization parameters in <code>web.xml</code>. For
+                        example, in the case of a Servlet:
+                        <xml-source>
+                            <servlet>
+                                <servlet-name>oxf</servlet-name>
+                                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                                <comment>The main processor that OXFServlet must execute</comment>
+                                <init-param>
+                                    <param-name>oxf.main-processor.name</param-name>
+                                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                                </init-param>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <init-param>
+                                    <param-name>oxf.main-processor.input.controller</param-name>
+                                    <param-value>oxf:/page-flow.xml</param-value>
+                                </init-param>
+                            </servlet>
+					    </xml-source>
+                    </li>
+                    <li>
+                        <code>properties.xml</code>, for example:
+					    <xml-source>
+                            <properties>
+                                <comment>The main processor that OXFServlet must execute</comment>
+                                <property as="xs:QName" name="oxf.main-processor.name" value="oxf:page-flow"/>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
+                            </properties>
+					    </xml-source>
+                    </li>
+                    <li>
+                        The context parameters in <code>web.xml</code>
+					    <xml-source>
+                            <comment>The main processor that OXFServlet must execute</comment>
+                            <context-param>
+                                <param-name>oxf.main-processor.name</param-name>
+                                <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                            </context-param>
+                            <comment>The Page Flow Controller configuration file</comment>
+                            <context-param>
+                                <param-name>oxf.main-processor.input.controller</param-name>
+                                <param-value>oxf:/page-flow.xml</param-value>
+                            </context-param>
+					    </xml-source>
+                    </li>
+                </ol>
+                <p>
+                    It is recommended to configure each Web component individually in the
+                    component's initialization properties in <code>web.xml</code>, so that adding
+                    components with different configurations is facilitated. There are situations
+                    where several components need to share a configuration, but it is expected that
+                    such situations will be rare.
+                </p>
+            </section>
+        </section>
+        <a name="error-processor"/>
+        <section>
+			<title>Error Processor</title>
+            <section>
+                <title>Definition</title>
+                <p>
+                    In case an error is encoutered during the execution or the main processor,
+                    OPS tries to execute an error processor. The error processor is
+                    typically a pipeline that produces a page showing the exception that was
+                    encountered. For more information, please refer to the <a
+                    href="reference-error-pipeline">Error Pipeline</a> documentation.
+                </p>
+            </section>
+            <a name="error-configuration"/>
+            <section>
+                <title>Configuring the Error Processor</title>
+                <p>
+                    You can configure an error processor in the same way the main processor is
+                    configured. The error processor is looked up in the following locations, in
+                    this order:
+                </p>
+                <ol>
+                    <li>
+                        The component's initialization parameters in <code>web.xml</code>. For
+                        example, in the case of a Servlet:
+                        <xml-source>
+                            <servlet>
+                                <servlet-name>oxf</servlet-name>
+                                <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                                <comment>The error processor that OXFServlet must execute</comment>
+                                <init-param>
+                                    <param-name>oxf.error-processor.name</param-name>
+                                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                                </init-param>
+                                <comment>The pipeline to execute</comment>
+                                <init-param>
+                                    <param-name>oxf.error-processor.input.config</param-name>
+                                    <param-value>oxf:/config/error.xpl</param-value>
+                                </init-param>
+                            </servlet>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <code>properties.xml</code>, for example:
+                        <xml-source>
+                            <properties>
+                                <comment>The error processor that OXFServlet must execute</comment>
+                                <property as="xs:QName" name="oxf.error-processor.name" value="oxf:pipeline"/>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <property as="xs:anyURI" name="oxf.error-processor.input.config" value="oxf:/config/error.xpl"/>
+                            </properties>
+                        </xml-source>
+                    </li>
+                    <li>
+                        The context parameters in <code>web.xml</code>
+                        <xml-source>
+                            <comment>The error processor that OXFServlet must execute</comment>
+                            <context-param>
+                                <param-name>oxf.error-processor.name</param-name>
+                                <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                            </context-param>
+                            <comment>The pipeline to execute</comment>
+                            <context-param>
+                                <param-name>oxf.error-processor.input.config</param-name>
+                                <param-value>oxf:/config/error.xpl</param-value>
+                            </context-param>
+                        </xml-source>
+                    </li>
+                </ol>
+                <p>
+                    It is recommended to configure each Web or Portlet Application component
+                    individually in the component's initialization properties in <code>web.xml</code>,
+                    so that adding components with different configurations is facilitated. There are
+                    situations where several components need to share a configuration, but it is
+                    expected that such situations will be rare.
+                </p>
+            </section>
+        </section>
+	</body>
+</document>

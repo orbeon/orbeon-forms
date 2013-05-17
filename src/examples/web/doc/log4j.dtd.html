@@ -1,0 +1,171 @@
+<html>
+<header>
+<title>log4j.dtd</title>
+</header>
+<body>
+<pre>
+
+&lt;!-- Authors: Chris Taylor, Ceki Gulcu. --&gt;
+
+&lt;!-- Version: 1.2 --&gt;
+
+&lt;!-- A configuration element consists of optional renderer
+elements,appender elements, categories and an optional root
+element. --&gt;
+
+&lt;!ELEMENT log4j:configuration (renderer*, appender*,(category|logger)*,root?,
+                               categoryFactory?)&gt;
+
+&lt;!-- The "threshold" attribute takes a level value such that all --&gt;
+&lt;!-- logging statements with a level equal or below this value are --&gt;
+&lt;!-- disabled. --&gt;
+
+&lt;!-- Setting the "debug" or "configDebug" attributes enable the printing --&gt;
+&lt;!-- of internal log4j logging statements.                               --&gt;
+
+&lt;!-- By default, debug attribute is "null", meaning that we not touch    --&gt;
+&lt;!-- internal log4j logging settings.                                    --&gt;
+
+     
+&lt;!ATTLIST log4j:configuration
+  xmlns:log4j              CDATA #FIXED "http://jakarta.apache.org/log4j/" 
+  threshold                (all|debug|info|warn|error|fatal|off|null) "null"
+  debug                    (true|false|null)  "null"
+&gt;
+
+&lt;!-- renderer elements allow the user to customize the conversion of  --&gt;
+&lt;!-- message objects to String.                                       --&gt;
+
+&lt;!ELEMENT renderer EMPTY&gt;
+&lt;!ATTLIST renderer
+  renderedClass  CDATA #REQUIRED
+  renderingClass CDATA #REQUIRED
+&gt;
+
+&lt;!-- Appenders must have a name and a class. --&gt;
+&lt;!-- Appenders may contain an error handler, a layout, optional parameters --&gt;
+&lt;!-- and filters. They may also reference (or include) other appenders. --&gt;
+&lt;!ELEMENT appender (errorHandler?, param*, layout?, filter*, appender-ref*)&gt;
+&lt;!ATTLIST appender
+  name 		ID 	#REQUIRED
+  class 	CDATA	#REQUIRED
+&gt;
+
+&lt;!ELEMENT layout (param*)&gt;
+&lt;!ATTLIST layout
+  class		CDATA	#REQUIRED
+&gt;
+
+&lt;!ELEMENT filter (param*)&gt;
+&lt;!ATTLIST filter
+  class		CDATA	#REQUIRED
+&gt;
+
+&lt;!-- ErrorHandlers can be of any class. They can admit any number of --&gt;
+&lt;!-- parameters. --&gt;
+
+&lt;!ELEMENT errorHandler (param*, root-ref?, logger-ref*,  appender-ref?)&gt;
+&lt;!ATTLIST errorHandler
+   class        CDATA   #REQUIRED 
+&gt;
+
+&lt;!ELEMENT root-ref EMPTY&gt;
+
+&lt;!ELEMENT logger-ref EMPTY&gt;
+&lt;!ATTLIST logger-ref
+  ref IDREF #REQUIRED
+&gt;
+
+&lt;!ELEMENT param EMPTY&gt;
+&lt;!ATTLIST param
+  name		CDATA   #REQUIRED
+  value		CDATA	#REQUIRED
+&gt;
+
+
+&lt;!-- The priority class is org.apache.log4j.Level by default --&gt;
+&lt;!ELEMENT priority (param*)&gt;
+&lt;!ATTLIST priority
+  class   CDATA	#IMPLIED
+  value	  CDATA #REQUIRED
+&gt;
+
+&lt;!-- The level class is org.apache.log4j.Level by default --&gt;
+&lt;!ELEMENT level (param*)&gt;
+&lt;!ATTLIST level
+  class   CDATA	#IMPLIED
+  value	  CDATA #REQUIRED
+&gt;
+
+
+&lt;!-- If no level element is specified, then the configurator MUST not --&gt;
+&lt;!-- touch the level of the named category. --&gt;
+&lt;!ELEMENT category (param*,(priority|level)?,appender-ref*)&gt;
+&lt;!ATTLIST category
+  class         CDATA   #IMPLIED
+  name		CDATA	#REQUIRED
+  additivity	(true|false) "true"  
+&gt;
+
+&lt;!-- If no level element is specified, then the configurator MUST not --&gt;
+&lt;!-- touch the level of the named logger. --&gt;
+&lt;!ELEMENT logger (level?,appender-ref*)&gt;
+&lt;!ATTLIST logger
+  name		ID	#REQUIRED
+  additivity	(true|false) "true"  
+&gt;
+
+
+&lt;!ELEMENT categoryFactory (param*)&gt;
+&lt;!ATTLIST categoryFactory
+   class        CDATA #REQUIRED&gt;
+
+&lt;!ELEMENT appender-ref EMPTY&gt;
+&lt;!ATTLIST appender-ref
+  ref IDREF #REQUIRED
+&gt;
+
+&lt;!-- If no priority element is specified, then the configurator MUST not --&gt;
+&lt;!-- touch the priority of root. --&gt;
+&lt;!-- The root category always exists and cannot be subclassed. --&gt;
+&lt;!ELEMENT root (param*, (priority|level)?, appender-ref*)&gt;
+
+
+&lt;!-- ==================================================================== --&gt;
+&lt;!--                       A logging event                                --&gt;
+&lt;!-- ==================================================================== --&gt;
+&lt;!ELEMENT log4j:eventSet (log4j:event*)&gt;
+&lt;!ATTLIST log4j:eventSet
+  xmlns:log4j             CDATA #FIXED "http://jakarta.apache.org/log4j/" 
+  version                (1.1|1.2) "1.2" 
+  includesLocationInfo   (true|false) "true"
+&gt;
+
+
+
+&lt;!ELEMENT log4j:event (log4j:message, log4j:NDC?, log4j:throwable?,
+                       log4j:locationInfo?) &gt;
+
+&lt;!-- The timestamp format is application dependent. --&gt;
+&lt;!ATTLIST log4j:event
+    logger     CDATA #REQUIRED
+    level      CDATA #REQUIRED
+    thread     CDATA #REQUIRED
+    timestamp  CDATA #REQUIRED
+&gt;
+
+&lt;!ELEMENT log4j:message (#PCDATA)&gt;
+&lt;!ELEMENT log4j:NDC (#PCDATA)&gt;
+
+&lt;!ELEMENT log4j:throwable (#PCDATA)&gt;
+
+&lt;!ELEMENT log4j:locationInfo EMPTY&gt;
+&lt;!ATTLIST log4j:locationInfo
+  class  CDATA	#REQUIRED
+  method CDATA	#REQUIRED
+  file   CDATA	#REQUIRED
+  line   CDATA	#REQUIRED
+&gt;
+</pre>
+</body>
+</html>

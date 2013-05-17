@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE jpl SYSTEM "jpl.dtd" >
+
+<jpl version="1.6">
+	<program type="serverside">
+		<application
+			args=""
+			working_dir="M:\OXF\build\oxfmark"
+			source_dir=""
+			classname="org.orbeon.oxfmark.OXFMark">
+			<classpath>
+				<classpath.archive
+					location="oxfmark.jar"
+					type="jar"/>
+			</classpath>
+		</application>
+		<applet
+			working_dir=""
+			source_dir=""
+			htmlfile=""
+			main_package="">
+			<classpath>
+				<classpath.path location="%CLASSPATH%"/>
+			</classpath>
+		</applet>
+		<serverside
+			suggested_filters=""
+			id="Apache Tomcat 4.0"
+			server_dir=""
+			prepend_to_vm_args=""
+			source_dir=""
+			configuration="Apache Tomcat 4.1.29"
+			classname=""
+			main_package=""
+			exclude_server_classes="true"
+			args=""
+			working_dir=""
+			prepend_to_classpath="">
+			<classpath/>
+		</serverside>
+	</program>
+	<vm
+		snapshot_dir="C:\DOCUME~1\avernet\LOCALS~1\Temp"
+		location="C:\Program Files\jdk1.4\bin\java.exe"
+		args="-Xms256m -Xmx256m"
+		type="java2"
+		use_jit="true"/>
+	<viewer
+		socket=":4444"
+		type="local"/>
+	<analysis type="performance">
+		<performance
+			record_from_start="false"
+			timing="cpu"
+			track_natives="true"
+			final_snapshot="false"
+			granularity="method">
+			<performance.filter
+				visibility="invisible"
+				methodmask="*"
+				enabled="true"
+				classmask="*.*"
+				time="track"
+				granularity="method"/>
+			<performance.filter
+				visibility="visible"
+				methodmask="*"
+				enabled="true"
+				classmask="*"
+				time="track"
+				granularity="method"/>
+		</performance>
+		<heap
+			monitor_garbage_from_start="false"
+			record_from_start="true"
+			no_stack_trace_limit="false"
+			max_stack_trace="4"
+			track_dead_objects="false">
+			<heap.filter
+				visibility="invisible"
+				methodmask="*"
+				enabled="true"
+				classmask="*.*"/>
+			<heap.filter
+				visibility="visible"
+				methodmask="*"
+				enabled="true"
+				classmask="org.orbeon.*"/>
+		</heap>
+		<threadalyzer
+			record_from_start="true"
+			write_to_console="false">
+			<deadlock_detection
+				enabled="true"
+				deadlock_and_exit="true"
+				report_stalls="false"
+				track_system_threads="false"
+				block_can_stall="false"
+				deadlock_threshold="2"/>
+			<deadlock_prediction
+				enable_hold_and_wait="false"
+				enable_lock_order="false"
+				lock_order_maintains_covers="true"/>
+			<data_race
+				ignore_volatile="true"
+				enable_happens_before="true"
+				no_stack_trace_limit="false"
+				enable_lock_covers="false"
+				max_stack_trace="1"
+				ignore_atomic="false"
+				instrument_elements="false"/>
+			<visualizer
+				enabled="true"
+				visualization_level="1"/>
+		</threadalyzer>
+		<coverage
+			ignore_abstract="true"
+			record_from_start="true"
+			final_snapshot="true"
+			granularity="line"/>
+	</analysis>
+</jpl>

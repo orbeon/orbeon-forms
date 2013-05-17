@@ -1,0 +1,6 @@
+<xml-server>
+    <service implementation="oxf:/examples/xmlserver/service.xpl">
+        <binding type="bus" name="get-quote"/>
+        <binding type="soap" location="/get-quote" wsdl="/get-quote.wsdl"/>
+    </service>
+</xml-server>

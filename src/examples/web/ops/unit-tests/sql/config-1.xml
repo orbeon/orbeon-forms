@@ -1,0 +1,110 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    <sql:connection>
+        <result>
+            <sql:execute>
+                <sql:query>
+                    select * from oxf_address_book
+                </sql:query>
+                <sql:result-set>
+                    <friends>
+                        <sql:attribute name="xs:comment">
+                            This is a list of friends
+                        </sql:attribute>
+                        <metadata>
+                            <sql:column-iterator>
+                                <column>
+                                    <sql:attribute name="index">
+                                        <sql:get-column-index/>
+                                    </sql:attribute>
+                                    <sql:attribute name="name">
+                                        <sql:get-column-name/>
+                                    </sql:attribute>
+                                    <sql:attribute name="type">
+                                        <sql:get-column-type/>
+                                    </sql:attribute>
+                                    <index><sql:get-column-index/></index>
+                                    <name><sql:get-column-name/></name>
+                                    <type><sql:get-column-type/></type>
+                                </column>
+                            </sql:column-iterator>
+                        </metadata>
+                        <sql:row-iterator>
+                            <friend>
+                                <auto>
+                                    <sql:column-iterator>
+                                        <column>
+                                            <sql:attribute name="index">
+                                                <sql:get-column-index/>
+                                            </sql:attribute>
+                                            <sql:attribute name="name">
+                                                <sql:get-column-name/>
+                                            </sql:attribute>
+                                            <sql:attribute name="type">
+                                                <sql:get-column-type/>
+                                            </sql:attribute>
+                                            <sql:attribute name="value">
+                                                <sql:get-column-value/>
+                                            </sql:attribute>
+                                            <index><sql:get-column-index/></index>
+                                            <name><sql:get-column-name/></name>
+                                            <type><sql:get-column-type/></type>
+                                            <value><sql:get-column-value/></value>
+                                        </column>
+                                    </sql:column-iterator>
+                                </auto>
+                                <manual>
+                                    <id>
+                                        <index><sql:get-column-index column-name="id"/></index>
+                                        <name><sql:get-column-name column-name="id"/></name>
+                                        <type><sql:get-column-type column-name="id"/></type>
+                                        <value><sql:get-column-value column-name="id"/></value>
+                                    </id>
+                                    <first>
+                                        <index><sql:get-column-index column-name="first"/></index>
+                                        <name><sql:get-column-name column-name="first"/></name>
+                                        <type><sql:get-column-type column-name="first"/></type>
+                                        <value><sql:get-column-value column-name="first"/></value>
+                                    </first>
+                                    <last>
+                                        <index><sql:get-column-index column-name="last"/></index>
+                                        <name><sql:get-column-name column-name="last"/></name>
+                                        <type><sql:get-column-type column-name="last"/></type>
+                                        <value><sql:get-column-value column-name="last"/></value>
+                                    </last>
+                                    <phone>
+                                        <index><sql:get-column-index column-name="phone"/></index>
+                                        <name><sql:get-column-name column-name="phone"/></name>
+                                        <type><sql:get-column-type column-name="phone"/></type>
+                                        <value><sql:get-column-value column-name="phone"/></value>
+                                    </phone>
+                                </manual>
+                            </friend>
+                        </sql:row-iterator>
+                    </friends>
+                </sql:result-set>
+                <sql:result-set>
+                    <this-should-not-appear-if-there-is-only-one-result-set/>
+                </sql:result-set>
+                <sql:no-results>
+                    <there-is-no-result/>
+                </sql:no-results>
+            </sql:execute>
+        </result>
+    </sql:connection>
+</sql:config>

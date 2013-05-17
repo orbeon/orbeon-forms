@@ -1,0 +1,571 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Struts Support</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                <link href="http://jakarta.apache.org/struts/">Struts</link> is a popular Web
+                Application framework, based on the <link href="model2x-intro">MVC</link> pattern.
+                In recent years, Struts has quickly gained popularity due to its ease of use and
+                conformance to the Model 2 pattern.
+            </p>
+            <p>
+                This chapter demonstrates how to use OPS in conjunction with a
+                Struts-based Web Application in a pattern called <a href="model2x-model2x">Model
+                2X</a>. It assumes that the reader is familiar with Struts.
+            </p>
+
+            <p>
+                Please refer to <link href="model2x-model2x">this page</link> for more information
+                about the use of XSLT in place of JSP.
+            </p>
+
+        </section>
+
+        <section>
+            <title>Control Flow</title>
+            <p>
+                The following figure presents the flow of the request, from the client to the
+                Struts servlet and OPS pipeline:
+            </p>
+            <img print-format="pdf" src="pages/model2x-struts-model2x.png"/>
+            <p>
+                <ol>
+                    <li>HTTP Request</li>
+                    <li>Controller Servlet creates the Form Bean</li>
+                    <li>Controller Servlet calls the Action Class</li>
+                    <li>The Action Class creates and fills in the Result Bean(s)</li>
+                    <li>The Request is forwarded to the OPS Servlet</li>
+                    <li>The OPS Servlet serializes  the Result Bean in XML</li>
+                    <li>An OPS pipeline is applied on the XML Bean</li>
+                    <li>HTML is sent back to the client</li>
+                </ol>
+            </p>
+            <p></p>
+        </section>
+
+        <section>
+            <title>Implementation</title>
+            <p>
+                A Struts-OPS Web Application contains two servlets: the Struts
+                controller server and the OPS processor servlet. The former is the
+                default servlet, serving all URI, while the latter is bound to <code>xpl</code>
+                files and other resources served by OPS (images, css, etc.). Here is
+                a Web Application descriptor that instantiates both servlets:
+            </p>
+            <xml-source>
+                <web-app>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webapp.rootdir</param-name>
+                        <param-value>/WEB-INF/resources</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.1</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.2</param-name>
+                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                    </context-param>
+
+                    <context-param>
+                        <param-name>oxf.properties</param-name>
+                        <param-value>oxf:/config/properties.xml</param-value>
+                    </context-param>
+
+                    <servlet>
+                        <servlet-name>struts</servlet-name>
+                        <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+                        <init-param>
+                            <param-name>config</param-name>
+                            <param-value>/WEB-INF/struts-config.xml</param-value>
+                        </init-param>
+                        <load-on-startup>1</load-on-startup>
+                    </servlet>
+
+                    <servlet>
+                        <servlet-name>oxf</servlet-name>
+                        <servlet-class>org.orbeon.oxf.servlet.OPSServlet</servlet-class>
+                        <load-on-startup>1</load-on-startup>
+                    </servlet>
+
+                    <servlet-mapping>
+                        <servlet-name>struts</servlet-name>
+                        <url-pattern>/</url-pattern>
+                    </servlet-mapping>
+
+                    <servlet-mapping>
+                        <servlet-name>oxf</servlet-name>
+                        <url-pattern>*.xpl</url-pattern>
+                    </servlet-mapping>
+                    <servlet-mapping>
+                        <servlet-name>oxf</servlet-name>
+                        <url-pattern>*.css</url-pattern>
+                    </servlet-mapping>
+                    <servlet-mapping>
+                        <servlet-name>oxf</servlet-name>
+                        <url-pattern>*.js</url-pattern>
+                    </servlet-mapping>
+                    <servlet-mapping>
+                        <servlet-name>oxf</servlet-name>
+                        <url-pattern>*.gif</url-pattern>
+                    </servlet-mapping>
+                    <servlet-mapping>
+                        <servlet-name>oxf</servlet-name>
+                        <url-pattern>*.png</url-pattern>
+                    </servlet-mapping>
+
+                </web-app>
+
+            </xml-source>
+
+            <warning>
+                <p>
+                    The Struts servlet <code>mapping</code> parameter is set to:
+                    <source>org.apache.struts.action.RequestActionMapping</source> This instructs
+                    Struts to put the result bean in the request rather than the session.
+                </p>
+            </warning>
+
+            <p>
+                The Struts controller servlet interprets the request and creates form beans
+                containing the request parameters. It then instantiates and calls the appropriate
+                action class. The result bean is then set in the request, and the request is
+                forwarded to the OPS processor servlet. Struts chooses the forwarding
+                pages in the same way as the traditional JSP forward: through <code>forward</code>
+                commands in the <code>struts-config.xml</code> file. For example, the following
+                fragment shows a Struts action with one possible forward, the <code>hello.xpl</code>
+                pipeline:
+            </p>
+            <xml-source>
+                <action path="/hello"
+                    type="org.orbeon.oxf.struts.examples.hello.HelloAction"
+                    name="hello">
+                    <forward name="success" path="/hello.xpl"/>
+                </action>
+            </xml-source>
+
+            <p>
+                OPS utilizes a <link
+                href="processors-generators#bean-generator">Bean generator</link> to serialize
+                beans from the request or session into XML. This process makes use of the <link
+                href="http://castor.exolab.org/">Castor XML Marshaller</link>.
+            </p>
+
+            <p>
+                The OPS processor servlet is configured to use a simple pipeline that
+                looks at the request's path and executes the corresponding pipeline, feeding it with
+                the bean form generator. The pipeline's output is then processed through a second
+                pipeline, the epilogue. This allows to apply common stylesheets ot all pages, such
+                as style, internationalization, etc. The main pipeline is also responsible to serve
+                static resources, such as images or css style sheets. Theses resources are served
+                via the Resource Server processor. You will find below the complete source of the
+                Struts main pipeline. The same file, <code>struts.xpl</code> is also available with
+                the struts examples bundled in OPS distribution.
+            </p>
+
+            <xml-source>
+                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+                    xmlns:fo="http://www.w3.org/1999/XSL/Format">
+
+                    <p:param name="data" type="output"/>
+
+                    <p:processor name="oxf:request">
+                        <p:input name="config">
+                            <config>
+                                <include>/request/request-path</include>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="path"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:xslt">
+                        <p:input name="config">
+                            <xsl:stylesheet version="1.0">
+                                <xsl:template match="/">
+                                    <config>oxf:
+                                        <xsl:value-of select="substring-after(/request/request-path, '/WEB-INF')"/>
+                                    </config>
+                                </xsl:template>
+                            </xsl:stylesheet>
+                        </p:input>
+                        <p:input name="data" href="#path"/>
+                        <p:output name="data" id="url"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" href="#url"/>
+                        <p:output name="data" id="user-pipeline"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="aggregate('root', #user-pipeline, #url)"/>
+                        <p:input name="config">
+                            <xsl:stylesheet version="1.0">
+                                <xsl:template match="/">
+                                    <p:config>
+                                        <p:param name="data" type="output"/>
+
+                                        <xsl:for-each select="/root/p:config/p:param[@type='input' and @name != 'errors']">
+                                            <p:processor name="oxf:bean-generator">
+                                                <p:input name="mapping">
+                                                    <mapping/>
+                                                </p:input>
+                                                <p:input name="config">
+                                                    <config>
+                                                        <attribute>
+                                                            <xsl:value-of select="@name"/>
+                                                        </attribute>
+                                                        <source>request</source>
+                                                    </config>
+                                                </p:input>
+                                                <p:output name="data" id="bean-{@name}"/>
+                                            </p:processor>
+                                        </xsl:for-each>
+
+                                        <xsl:if test="/root/p:config/p:param[@type='input' and @name = 'errors']">
+                                            <p:processor name="oxf:struts-errors-generator">
+                                                <p:output name="data" id="errors"/>
+                                            </p:processor>
+                                        </xsl:if>
+
+                                        <p:processor name="oxf:url-generator">
+                                            <p:input name="config">
+                                                <config>
+                                                    <xsl:value-of select="/root/config"/>
+                                                </config>
+                                            </p:input>
+                                            <p:output name="data" id="user-pipeline"/>
+                                        </p:processor>
+
+                                        <p:processor name="oxf:pipeline">
+                                            <p:input name="config" href="#user-pipeline"/>
+                                            <xsl:for-each select="/root/p:config/p:param[@type='input' and @name != 'errors']">
+                                                <p:input name="{@name}" href="#bean-{@name}"/>
+                                            </xsl:for-each>
+                                            <xsl:if test="/root/p:config/p:param[@type='input' and @name = 'errors']">
+                                                <p:input name="errors" href="#errors"/>
+                                            </xsl:if>
+                                            <p:output name="data" ref="data"/>
+                                        </p:processor>
+
+                                    </p:config>
+                                </xsl:template>
+                            </xsl:stylesheet>
+                        </p:input>
+                        <p:output name="data" id="pipeline"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="#pipeline"/>
+                        <p:output name="data" ref="data"/>
+                    </p:processor>
+
+                </p:config>
+            </xml-source>
+
+        </section>
+
+        <a name="pipeline"/>
+        <section>
+            <title>Writing a Struts View Pipeline</title>
+
+            <p>
+                The <code>struts.xpl</code> pipeline presented in the previous section acts as a
+                dispatcher. When the Struts servlet forwards the request to the OPS
+                servlet, this pipeline is executed. It loads, connects and executes the view
+                pipeline for each page. The view pipeline must conform to the following contract:
+
+                <ul>
+                    <li>It
+                        <b>must</b> have one
+                        <code>data</code> output
+                    </li>
+
+                    <li>
+                        It <b>can</b> have any number of input. Each input is automatically
+                        connected to a Bean Generator, serializing a bean in the request. The name
+                        of the input determines the name of the request or session property where
+                        the bean is stored.
+                    </li>
+
+                    <li>
+                        It <b>can</b> have an <code>errors</code> input. This input is connected to
+                        a Struts ActionError generator. If no errors are available, an empty
+                        <code>errors</code> element is generated. The error messages come from the
+                        Struts application resources and can be internationalized. Refer to the
+                        <link href="processors-struts#StrutsActionErrorsGenerator">Struts
+                        ActionError documentation</link> for more information.
+                    </li>
+                </ul>
+            </p>
+        </section>
+        <a name="messages"/>
+        <section>
+            <title>Accessing the Struts Application Resources</title>
+            <p>
+                OPS provides a mechanism to access Struts resources from an XSLT
+                stylesheet. You define a resource bundle in <code>struts-config.xml</code>, in the
+                <code>message-resource</code> element. You can declare several resource bundles by
+                specifying a <code>key</code> attribute.
+            </p>
+            <xml-source>
+                <message-resources parameter="org.orbeon.oxf.struts.examples.ApplicationResources"
+                    null="false" key="messages"/>
+            </xml-source>
+            <p>
+                You access the resource bundle with the <code>struts:message()</code> function. This
+                function takes 6 parameters, but only the first one is mandatory.
+
+                <source>
+                    <code>struts:message(key, bundle, arg0, arg1, arg2, arg3, arg4)</code>
+                </source>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                        <th>Default Value</th>
+                    </tr>
+                    <tr>
+                        <td>key</td>
+                        <td>The message key of the requested message, which must have a corresponding value in the message resources</td>
+                        <td>Mandatory</td>
+                    </tr>
+                    <tr>
+                        <td>bundle</td>
+                        <td>The name of the application scope bean under which the MessageResources object containing your messages is stored.</td>
+                        <td>Globals.MESSAGE_KEY</td>
+                    </tr>
+                    <tr>
+                        <td>arg0</td>
+                        <td>First parametric replacement value, if any.</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>arg1</td>
+                        <td>Second parametric replacement value, if any.</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>arg2</td>
+                        <td>Third parametric replacement value, if any.</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>arg3</td>
+                        <td>Fourth parametric replacement value, if any.</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>arg4</td>
+                        <td>Fifth parametric replacement value, if any.</td>
+                        <td>null</td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                XSLT processors use a slightly different mechanism to access the Struts message
+                library. OPS provides wrappers for Xalan, Saxon 6 and 7. XSLTC
+                calls the Java method directly. Declare the <code>struts</code> namespace and import
+                the specified stylesheet to be able to call the <code>struts:message()</code>
+                function. The table below shows the namespaces and stylesheets to import for the
+                supported XSLT processors.
+            </p>
+            <p>
+                <table>
+                    <tr>
+                        <th></th>
+                        <th>Namespace</th>
+                        <th>Stylesheet</th>
+                        <th>Function</th>
+                    </tr>
+                    <tr>
+                        <th>Xalan</th>
+                        <td>http://www.orbeon.com/oxf/struts</td>
+                        <td>oxf:/oxf/struts/struts-support-xalan.xsl</td>
+                        <td>message()</td>
+                    </tr>
+                    <tr>
+                        <th>Saxon 6</th>
+                        <td>http://www.orbeon.com/oxf/struts</td>
+                        <td>oxf:/oxf/struts/struts-support-saxon.xsl</td>
+                        <td>message()</td>
+                    </tr>
+                    <tr>
+                        <th>Saxon 7 and 8</th>
+                        <td>http://www.orbeon.com/oxf/struts</td>
+                        <td>oxf:/oxf/struts/struts-support-saxon7.xsl</td>
+                        <td>message()</td>
+                    </tr>
+                    <tr>
+                        <th>XSLTC</th>
+                        <td>http://xml.apache.org/xalan/java/org.orbeon.oxf.util.StrutsUtils</td>
+                        <td>N/A</td>
+                        <td>messageTag()</td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                The following example calls the Struts support library for Xalan. It displays the
+                content of the <code>page.title</code> resource key.
+            </p>
+            <xml-source>
+                <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:struts="http://www.orbeon.com/oxf/struts">
+                    <xsl:import href="oxf:/oxf/struts/struts-support-xalan.xsl"/>
+                    <xsl:template match="/root/beans/guess">
+                        <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                            <xhtml:head>
+                                <xhtml:title>
+                                    <xsl:value-of select="struts:message('page.title')"/>
+                                </xhtml:title>
+                            </xhtml:head>
+                        </xhtml:html>
+                    </xsl:template>
+                </xsl:stylesheet>
+            </xml-source>
+
+        </section>
+
+        <a name="javascript"/>
+        <section>
+            <title>Using the Struts Validator</title>
+            <p>
+                The <a href="http://jakarta.apache.org/struts/userGuide/dev_validator.html">Struts
+                validator</a> allows you to write Javascript code to validate user input on the
+                browser. Struts uses the <code>html:javascript</code> tag to display the necessary
+                Javascript code.
+            </p>
+            <p>
+                Similarly, OPS exposes this functionality through an XSLT function.
+                Only the first parameter is mandatory.
+
+                <source>
+                    <code>struts:javascript(formName, dynamicJavaScript, staticJavaScript, method, page)</code>
+                </source>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Description</th>
+                        <th>Default Value</th>
+                    </tr>
+                    <tr>
+                        <td>formName</td>
+                        <td> The key (form name) to retrieve a specific set of validation rules</td>
+                        <td>Mandatory</td>
+                    </tr>
+                    <tr>
+                        <td>dynamicJavaScript</td>
+                        <td>Whether or not to render the dynamic JavaScript (boolean)</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>staticJavaScript</td>
+                        <td> Whether or not to render the static JavaScript (boolean)</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>method</td>
+                        <td>The alternate JavaScript method name to be used instead of the default one. The default is 'validate' concatenated in front of the key (form name) passed in (ex: validateRegistrationForm)</td>
+                        <td>null</td>
+                    </tr>
+                    <tr>
+                        <td>page</td>
+                        <td>The current page of a set of validation rules if the page attribute for the field element in the xml file is in use.</td>
+                        <td>null</td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                XSLT processors use a slightly different mechanism to access the Struts javascript
+                library. OPS provides wrappers for Xalan, Saxon 6 and 7. XSLTC
+                calls the Java method directly. Declare the <code>struts</code> namespace and import
+                the specified stylesheet to be able to call the <code>struts:javascript()</code>
+                function. The table below shows the namespaces and stylesheets to import for the
+                supported XSLT processors.
+            </p>
+            <p>
+                <table>
+                    <tr>
+                        <th></th>
+                        <th>Namespace</th>
+                        <th>Stylesheet</th>
+                        <th>Function</th>
+                    </tr>
+                    <tr>
+                        <th>Xalan</th>
+                        <td>http://www.orbeon.com/oxf/struts</td>
+                        <td>oxf:/oxf/struts/struts-support-xalan.xsl</td>
+                        <td>javascript()</td>
+                    </tr>
+                    <tr>
+                        <th>Saxon 6</th>
+                        <td>http://www.orbeon.com/oxf/struts</td>
+                        <td>oxf:/oxf/struts/struts-support-saxon.xsl</td>
+                        <td>javascript()</td>
+                    </tr>
+                    <tr>
+                        <th>Saxon 7 and 8</th>
+                        <td>http://www.orbeon.com/oxf/struts</td>
+                        <td>oxf:/oxf/struts/struts-support-saxon7.xsl</td>
+                        <td>javascript()</td>
+                    </tr>
+                    <tr>
+                        <th>XSLTC</th>
+                        <td>http://xml.apache.org/xalan/java/org.orbeon.oxf.util.StrutsUtils</td>
+                        <td>N/A</td>
+                        <td>javaScriptTag()</td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                The following example shows how to call the <code>struts:javascript</code> from a
+                simple Xalan template.
+
+                <xml-source>
+                    <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:struts="http://www.orbeon.com/oxf/struts">
+                        <xsl:import href="oxf:/oxf/struts/struts-support-xalan.xsl"/>
+
+                        <xsl:template match="/">
+                            <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                <xhtml:head>
+                                    <xhtml:script type="text/javascript">
+                                        <xsl:value-of select="struts:javascript('jsTypeForm')"/>
+                                    </xhtml:script>
+                                </xhtml:head>
+                                <xhtml:body>
+                                    ...
+                                </xhtml:body>
+                            </xhtml:html>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </xml-source>
+            </p>
+        </section>
+
+    </body>
+</document>

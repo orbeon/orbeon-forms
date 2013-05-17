@@ -413,11 +413,11 @@
             ev:observer="fr-form-group"
             xxf:phantom="true"
             type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-            process:runProcess('error-message("upload-error")')
+            process:runProcess(concat('error-message("', substring-after(event('xxf:type'), 'xxforms-'), '")')
         </xf:action>
 
         <xf:action
-            ev:event="xxforms-upload-start xxforms-upload-cancel xxforms-upload-done"
+            ev:event="xxforms-upload-done"
             ev:observer="fr-form-group"
             xxf:phantom="true"
             type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">

@@ -24,7 +24,6 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.mock.MockitoSugar
-import collection.mutable
 import Multipart._
 
 class MultipartTest extends ResourceManagerTestBase with AssertionsForJUnit with MockitoSugar {
@@ -92,10 +91,10 @@ class MultipartTest extends ResourceManagerTestBase with AssertionsForJUnit with
     }
 
     // NOTE: Use WrappedArray so that Array content comparison works
-    case class FileItemContent(contentType: String, fieldName: String, size: Long, filename: String, content: mutable.WrappedArray[Byte])
+    case class FileItemContent(contentType: String, fieldName: String, size: Long, filename: String, content: Seq[Byte])
 
-    def convertFileItemContent(a: AnyRef) = Some(a) collect {
+    def convertFileItemContent(a: AnyRef) = a match {
         case f: FileItem ⇒ FileItemContent(f.getContentType, f.getFieldName, f.getSize, f.getName, NetUtils.inputStreamToByteArray(f.getInputStream))
         case other       ⇒ other
-    } get
+    }
 }

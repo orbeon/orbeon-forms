@@ -25,7 +25,6 @@ import ScalaUtils._
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext._
 import org.orbeon.oxf.xforms.control.XFormsValueControl
-import scala.util.Try
 import collection.{immutable ⇒ i, mutable ⇒ m}
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.orbeon.errorified.Exceptions
@@ -169,7 +168,7 @@ object Multipart {
         // This contains all completed values up to the point of failure if any
         val result = m.ListBuffer[(String, AnyRef)]()
 
-        Try {
+        try {
 
             // Create new progress indicator
             def newUploadProgress(progressUUID: String, fis: FileItemStream) = {
@@ -216,51 +215,41 @@ object Multipart {
                         fileItem
                     }
 
-                    def tryCopyAndAdd(progress: Long ⇒ Unit): Try[Any] = {
+                    def copyAndAdd(progress: Long ⇒ Unit): Unit = {
                         val fileItem = createFileItem
-                        Try {
+                        try {
                             // Attempt copy
                             copyStream(fis.openStream, fileItem.getOutputStream, progress)
                             // Accumulate in any case if copy was successful
                             result += fileItem.getFieldName → fileItem
-                        } onFailure {
+                        } catch {
                             // Clean-up FileItem right away in case of failure
-                            case t: Throwable ⇒ runQuietly(fileItem.delete())
+                            case t: Throwable ⇒
+                                runQuietly(fileItem.delete())
+                                throw t
                         }
                     }
 
-                    def tryCopyAndAddProgress =
-                        uploadProgressOpt match {
-                            case Some(uploadProgress) ⇒
-                                // File upload with progress notification
-                                Try(checkSize()) flatMap {
-                                    // Copy stream and update progress information as we go
-                                    _ ⇒ tryCopyAndAdd(uploadProgress.receivedSize += _)
-                                } map {
-                                    // Only in case of success, mark the progress as Completed
-                                    _ ⇒ uploadProgress.state = Completed
-                                } onFailure { case t: Throwable ⇒
-                                    // Only in case of failure, mark the progress as Interrupted
-                                    // NOTE: We get here if checkSizeTry is a failure too
+                    uploadProgressOpt match {
+                        case Some(uploadProgress) ⇒
+                            // File upload with progress notification
+                            try {
+                                checkSize()
+                                copyAndAdd(uploadProgress.receivedSize += _)
+                                uploadProgress.state = Completed
+                            } catch {
+                                case t: Throwable ⇒
                                     uploadProgress.state = Interrupted(
-                                        Exceptions.getRootThrowable(t) match {
-                                            case root: SizeLimitExceededException ⇒
-                                                println(root)
-                                                Some(SizeReason(root.getPermittedSize, root.getActualSize))
-                                            case root                             ⇒
-                                                println(root)
-                                                None
-                                        }
+                                       Option(Exceptions.getRootThrowable(t))
+                                       collect { case root: SizeLimitExceededException ⇒ SizeReason(root.getPermittedSize, root.getActualSize) }
                                     )
-                                }
+                                    throw t
+                            }
 
-                            case None ⇒
-                                // File upload without progress notification → just copy the stream
-                                tryCopyAndAdd(_ ⇒ ())
-                        }
-
-                    // Make sure we throw in the end in case of failure
-                    tryCopyAndAddProgress.get
+                        case None ⇒
+                            // File upload without progress notification → just copy the stream
+                            copyAndAdd(_ ⇒ ())
+                    }
                 }
             }
 
@@ -308,19 +297,20 @@ object Multipart {
             }
 
             (result.toList, None)
-        } recover { case t ⇒
-            // - don't remove UploadProgress objects from the session
-            // - instead mark all entries added so far as being in state Interrupted if not already the case
-            // - return all completed values up to the point of failure alongside the throwable
-            for (sessionKey ← sessionKeys)
-                runQuietly (
-                    getUploadProgress(sessionOpt, sessionKey)
-                    collect { case p @ UploadProgress(_, _, _, Started | Completed ) ⇒ p }
-                    foreach (_.state = Interrupted(None))
-                )
+        } catch {
+            case t: Throwable ⇒
+                // - don't remove UploadProgress objects from the session
+                // - instead mark all entries added so far as being in state Interrupted if not already the case
+                // - return all completed values up to the point of failure alongside the throwable
+                for (sessionKey ← sessionKeys)
+                    runQuietly (
+                        getUploadProgress(sessionOpt, sessionKey)
+                        collect { case p @ UploadProgress(_, _, _, Started | Completed ) ⇒ p }
+                        foreach (_.state = Interrupted(None))
+                    )
 
-            (result.toList, Some(t))
-        } get
+                (result.toList, Some(t))
+        }
     }
 
     private def asScalaIterator(i: FileItemIterator) = new Iterator[FileItemStream] {

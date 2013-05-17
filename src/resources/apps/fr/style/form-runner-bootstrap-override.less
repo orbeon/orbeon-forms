@@ -90,12 +90,13 @@ body.orbeon {
     }
 
     input[type="file"] {
+        height: auto;                   // Don't specify a height because with FF the button is not native
         line-height: normal;            // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome
 
         // Reset these as Liferay adds its own stuff and we don't look good
-        border: none;
+        //border: 0 none;               // If specified, field is not native with FF
         background-image: none;
-        background-color: inherit;
+        background-color: none;         // So that with FF field is native
         padding: 0;
     }
 

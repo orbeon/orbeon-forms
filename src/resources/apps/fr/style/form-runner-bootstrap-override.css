@@ -130,10 +130,10 @@ body.orbeon {
   *line-height: 24px;
 }
 .orbeon input[type="file"] {
+  height: auto;
   line-height: normal;
-  border: none;
   background-image: none;
-  background-color: inherit;
+  background-color: none;
   padding: 0;
 }
 .orbeon textarea {

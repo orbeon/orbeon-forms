@@ -154,7 +154,7 @@ object XXFormsUploadErrorEvent {
                     "permitted"  → Some(permitted),
                     "actual"     → Some(actual))
             case _ ⇒
-                Seq("reason"    → Some("unknown"))
+                Seq("reason"    → Some("upload-error"))
         }
         flatten
     )

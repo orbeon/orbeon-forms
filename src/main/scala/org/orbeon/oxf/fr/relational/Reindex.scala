@@ -88,6 +88,7 @@ class Reindex extends ProcessorImpl {
                 new Iterator[ResultSet] {
                   def hasNext = resultSet.next()
                   def next() = resultSet
+                  override def toString = "[Iterator]"
                 }
             }
 

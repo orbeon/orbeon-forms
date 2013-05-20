@@ -25,7 +25,7 @@ import javax.naming.{Context, InitialContext}
 import javax.sql.DataSource
 import org.orbeon.oxf.fr.FormRunner
 import scala.Some
-import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
+wimport org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import org.orbeon.oxf.fr.relational.Index.IndexedControl
 import java.sql.ResultSet
 import org.orbeon.oxf.xforms.XFormsConstants
@@ -149,7 +149,7 @@ class Reindex extends ProcessorImpl {
                         insert.setString(4, form)
                         insert.setString(5, control.name)
                         insert.setInt   (6, position + 1)
-                        insert.setString(7, value.asInstanceOf[NodeInfo].getStringValue)
+                        insert.setString(7, truncateValue(provider, value.asInstanceOf[NodeInfo].getStringValue))
                         insert.execute()
                     }
                 }

@@ -186,7 +186,7 @@
     <property as="xs:string"  name="oxf.fr.detail.process.close.*.*"                            value='navigate("oxf.fr.detail.close.uri") recover summary'/>
     <property as="xs:string"  name="oxf.fr.detail.process.save-final.*.*"                       value='require-uploads then require-valid then save then success-message("save-success") recover error-message("database-error")'/>
     <property as="xs:string"  name="oxf.fr.detail.process.save-draft.*.*"                       value='save then success-message("save-draft-success") recover error-message("database-error")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='validate'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validate.*.*"                         value='require-valid'/>
     <property as="xs:string"  name="oxf.fr.detail.process.review.*.*"                           value='require-uploads then require-valid then review'/>
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
     <property as="xs:string"  name="oxf.fr.detail.process.send.*.*"                             value='require-uploads then require-valid then send("oxf.fr.detail.send.success")'/>

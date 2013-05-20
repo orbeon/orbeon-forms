@@ -30,10 +30,12 @@ class XXFormsResource extends XFormsFunction with FunctionSupport {
 
         implicit val ctx = xpathContext
 
-        def findResourcesElement =
-            resolveOrFindByEffectiveId("orbeon-resources") orElse
-            resolveOrFindByEffectiveId("fr-form-resources") collect
-            { case instance: XFormsInstance ⇒ instance.rootElement }
+        def findInstance = stringArgumentOpt(1) match {
+            case Some(instanceName) ⇒ resolveOrFindByEffectiveId(instanceName)
+            case None               ⇒ resolveOrFindByEffectiveId("orbeon-resources") orElse resolveOrFindByEffectiveId("fr-form-resources")
+        }
+
+        def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }
 
         def findResourceElementForLang(resourcesElement: NodeInfo, requestedLang: String) = {
             val availableLangs = resourcesElement \ "resource" \@ "lang"

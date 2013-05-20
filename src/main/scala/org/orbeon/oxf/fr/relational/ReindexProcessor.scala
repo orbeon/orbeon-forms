@@ -131,16 +131,18 @@ class ReindexProcessor extends ProcessorImpl {
                     for ((value, position) ← values.asScala.zipWithIndex) {
                         val insert = connection.prepareStatement(
                             """insert into orbeon_i_control_text
-                              |           (data_id, username, app, form, control, pos, val)
-                              |    values (?, ?, ?, ?, ?, ?, ?)
+                              |           (data_id, created, last_modified, username, app, form, control, pos, val)
+                              |    values (?, ?, ?, ?, ?, ?, ?, ?, ?)
                             """.stripMargin)
-                        insert.setInt   (1, resultSet.getInt("id"))
-                        insert.setString(2, resultSet.getString("username"))
-                        insert.setString(3, app)
-                        insert.setString(4, form)
-                        insert.setString(5, control.name)
-                        insert.setInt   (6, position + 1)
-                        insert.setString(7, truncateValue(provider, value.asInstanceOf[NodeInfo].getStringValue))
+                        insert.setInt      (1, resultSet.getInt("id"))
+                        insert.setTimestamp(2, resultSet.getTimestamp("created"))
+                        insert.setTimestamp(3, resultSet.getTimestamp("last_modified"))
+                        insert.setString   (4, resultSet.getString("username"))
+                        insert.setString   (5, app)
+                        insert.setString   (6, form)
+                        insert.setString   (7, control.name)
+                        insert.setInt      (8, position + 1)
+                        insert.setString   (9, truncateValue(provider, value.asInstanceOf[NodeInfo].getStringValue))
                         insert.execute()
                     }
                 }

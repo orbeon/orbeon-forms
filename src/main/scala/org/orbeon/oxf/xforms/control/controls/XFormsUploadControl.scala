@@ -56,7 +56,8 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
     }
 
     // NOTE: Perform all actions at target, so that user event handlers are called after these operations.
-    override def performTargetAction(event: XFormsEvent): Unit =
+    override def performTargetAction(event: XFormsEvent): Unit = {
+        super.performTargetAction(event)
         event match {
             case startEvent: XXFormsUploadStartEvent ⇒
                 // Upload started
@@ -77,12 +78,20 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Upload error: sent by the client in case of error
                 containingDocument.endUpload(getUploadUniqueId)
                 removeUploadProgress(NetUtils.getExternalContext.getRequest, this)
-            case _ ⇒ super.performTargetAction(event)
+            case _ ⇒
         }
+    }
 
     override def performDefaultAction(event: XFormsEvent): Unit = {
-        // TODO: show default error as if with xf:message
         super.performDefaultAction(event)
+        event match {
+            case errorEvent: XXFormsUploadErrorEvent ⇒
+                // Upload error: sent by the client in case of error
+                // It would be good to support i18n at the XForms engine level, but form authors can handle
+                // xxforms-upload-error in a custom way if needed. This is what Form Runner does.
+                containingDocument.addMessageToRun("There was an error during the upload.", "modal")
+            case _ ⇒
+        }
     }
 
     override def onDestroy(): Unit = {

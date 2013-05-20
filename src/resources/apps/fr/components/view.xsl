@@ -411,17 +411,22 @@
         <xf:action
             ev:event="xxforms-upload-error"
             ev:observer="fr-form-group"
-            xxf:phantom="true"
-            type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-            process:runProcess(concat('error-message("', substring-after(event('xxf:type'), 'xxforms-'), '")')
+            ev:defaultAction="cancel"
+            xxf:phantom="true">
+            <xf:action type="xpath">
+                formRunner:errorMessage(if (event('error-type') = 'size-error')
+                                        then xxf:format-message(xxf:r('detail.messages.upload-error-size', 'fr-fr-resources'), (event('permitted'), event('actual')))
+                                        else xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
+            </xf:action>
         </xf:action>
 
         <xf:action
             ev:event="xxforms-upload-done"
             ev:observer="fr-form-group"
+            ev:defaultAction="cancel"
             xxf:phantom="true"
-            type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-            process:runProcess(concat('success-message("', substring-after(event('xxf:type'), 'xxforms-'), '")'))
+            type="xpath">
+            formRunner:successMessage(xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
         </xf:action>
 
     </xsl:template>

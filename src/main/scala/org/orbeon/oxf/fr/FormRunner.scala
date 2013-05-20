@@ -492,4 +492,14 @@ object FormRunner {
                 TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, true, false)
             }
     }
+
+    // Display a success message
+    def successMessage(message: String): Unit = {
+        setvalue(persistenceInstance.rootElement \ "message", message)
+        toggle("fr-message-success")
+    }
+
+    // Display an error message
+    def errorMessage(message: String): Unit =
+        dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map("message" → Some(message)))
 }

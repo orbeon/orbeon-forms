@@ -18,6 +18,9 @@ import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.xforms.model.DataModel.Reason
 import XFormsEvent._
+import org.orbeon.oxf.util.ScalaUtils
+import org.orbeon.oxf.xforms.control.controls.{XFormsUploadControl, FileMetadata}
+import org.orbeon.oxf.util.Multipart.{SizeReason, Interrupted, UploadProgress}
 
 class XXFormsBindingErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsEvent(XXFORMS_BINDING_ERROR, target, properties, bubbles = true, cancelable = false) {
@@ -138,8 +141,23 @@ object XXFormsUploadDoneEvent {
 
 // NOTE: Event default behavior done at target so event is left cancelable.
 class XXFormsUploadErrorEvent(target: XFormsEventTarget, properties: PropertyGetter)
-    extends XFormsEvent(XXFORMS_UPLOAD_ERROR, target, properties, bubbles = true, cancelable = true) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+    extends XFormsEvent(XXFORMS_UPLOAD_ERROR, target, XXFormsUploadErrorEvent.reasonToProperties(target).toMap orElse properties, bubbles = true, cancelable = true)
+
+object XXFormsUploadErrorEvent {
+    // Attempt to retrieve a reason if any
+    def reasonToProperties(target: XFormsEventTarget): Seq[(String, Option[Any])] = (
+        ScalaUtils.collectByErasedType[XFormsUploadControl](target).toList
+        flatMap FileMetadata.progress
+        map {
+            case UploadProgress(_, _, _, Interrupted(Some(SizeReason(permitted, actual)))) ⇒
+                Seq("error-type" → Some("size-error"),
+                    "permitted"  → Some(permitted),
+                    "actual"     → Some(actual))
+            case _ ⇒
+                Seq("reason"    → Some("unknown"))
+        }
+        flatten
+    )
 }
 
 class XXFormsInstanceInvalidate(target: XFormsEventTarget, properties: PropertyGetter)

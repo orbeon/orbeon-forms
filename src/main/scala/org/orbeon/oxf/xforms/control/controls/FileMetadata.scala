@@ -166,7 +166,7 @@ object FileMetadata {
     // All possible property names
     val AllMetadataNames: Seq[String] = Evaluators.keys.toList
 
-    private def progress(metadata: FileMetadata) = {
+    def progress(metadata: FileMetadata) = {
         val option = Multipart.getUploadProgress(NetUtils.getExternalContext.getRequest, metadata.containingDocument.getUUID, metadata.getEffectiveId)
         option filter (_.fieldName == metadata.getEffectiveId)
     }

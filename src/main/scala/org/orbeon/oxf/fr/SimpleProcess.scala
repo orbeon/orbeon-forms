@@ -23,7 +23,7 @@ import org.orbeon.scaxon.XML._
 import annotation.tailrec
 import collection.breakOut
 import collection.mutable.ListBuffer
-import scala.util.{Success, Try}
+import util.{Success, Try}
 import util.control.{ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.common.OXFException
@@ -161,7 +161,7 @@ object SimpleProcess extends Actions with Logging {
                 // Log and send a user error if there is one
                 // NOTE: In the future, it would be good to provide the user with an error id.
                 error(OrbeonFormatter.format(t))
-                tryErrorMessage(Map(Some("message") → "process-error"))
+                tryErrorMessage(Map(Some("resource") → "process-error"))
             }
         }
     }
@@ -395,20 +395,19 @@ trait Actions {
             ))
         }
 
+    private def messageFromResourceOrInline(params: ActionParams) = {
+        def resourceKey  = params.get(Some("resource")) orElse params.get(None)
+        def fromResource = resourceKey map (k ⇒ currentFRResources \ "detail" \ "messages" \ k stringValue)
+        def fromInline   = params.get(Some("message"))
+
+        fromResource orElse fromInline get
+    }
+
     def trySuccessMessage(params: ActionParams): Try[Any] =
-        Try {
-            val resourceKey = params.get(Some("message")) getOrElse params(None)
-            setvalue(persistenceInstance.rootElement \ "message", currentFRResources \ "detail" \ "messages" \ resourceKey)
-            toggle("fr-message-success")
-        }
+        Try(FormRunner.successMessage(messageFromResourceOrInline(params)))
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
-        Try {
-            val resourceKey = params.get(Some("message")) getOrElse params(None)
-            dispatch(name = "fr-show", targetId = "fr-error-dialog", properties = Map(
-                "message" → Some(currentFRResources \ "detail" \ "messages" \ resourceKey)
-            ))
-        }
+        Try(FormRunner.errorMessage(messageFromResourceOrInline(params)))
 
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {

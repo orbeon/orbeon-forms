@@ -143,7 +143,6 @@
                 <save-draft-success>Draft saved successfully!</save-draft-success>
                 <email-success>Email sent successfully!</email-success>
                 <form-validation-error>There are validation errors. Please retry once all fields have been properly filled-out.</form-validation-error>
-                <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
                 <database-error>There was an error communicating with the database. Please contact the application administrator.</database-error>
                 <process-error>There was an error running the process. Please contact the application administrator.</process-error>
                 <clear-confirm-message>Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.</clear-confirm-message>
@@ -152,10 +151,12 @@
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
+                <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
                 <upload-start>Upload started</upload-start>
                 <upload-cancel>Upload canceled by the user</upload-cancel>
                 <upload-done>Upload complete</upload-done>
                 <upload-error>There was an error during the upload. Please try again.</upload-error>
+                <upload-error-size>The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {0,number,integer} bytes.</upload-error-size>
             </messages>
             <labels>
                 <language-choice>Language</language-choice>
@@ -328,7 +329,6 @@
                 <save-draft-success>Document en cours enregistré avec succès!</save-draft-success>
                 <email-success>Email envoyé avec succès!</email-success>
                 <form-validation-error>Le document contient des erreurs de validation. Veuillez ressayer la sauvegarde après les avoir corrigées.</form-validation-error>
-                <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
                 <database-error>Une erreur s'est produite en contactant la base de données. Veuillez contacter votre l'administrateur système.</database-error>
                 <process-error>Une erreur s'est produite en exécutant le processus. Veuillez contacter votre l'administrateur système.</process-error>
                 <clear-confirm-message>Êtes-vous sûr de vouloir effacer tous les champs de cette page? Vos données seront perdues si vous ne les avez pas enregistrées.</clear-confirm-message>
@@ -337,10 +337,12 @@
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
+                <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
                 <upload-start>Téléchargement vers le serveur commencé</upload-start>
                 <upload-cancel>Téléchargement vers le serveur annulé par l'utilisateur</upload-cancel>
                 <upload-done>Téléchargement vers le serveur terminé</upload-done>
                 <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
+                <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {0,number,integer} bytes.</upload-error-size>
             </messages>
             <labels>
                 <language-choice>Langue</language-choice>
@@ -514,7 +516,6 @@
                 <save-draft-success>[Draft saved successfully!]</save-draft-success>
                 <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>Documento no guardado. Por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
-                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <database-error>Documento no guardado. Por favor, contacte al administrador del sistema.</database-error>
                 <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
@@ -523,10 +524,12 @@
                 <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted ingresó al momento de guardar su documento.</saved-locally-open>
+                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <upload-start>[Upload started]</upload-start>
                 <upload-cancel>[Upload canceled by the user]</upload-cancel>
                 <upload-done>[Upload complete]</upload-done>
                 <upload-error>[There was an error during the upload. Please try again.]</upload-error>
+                <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {0,number,integer} bytes.]</upload-error-size>
             </messages>
             <labels>
                 <language-choice>Idioma</language-choice>
@@ -699,7 +702,6 @@
                 <save-draft-success>[Draft saved successfully!]</save-draft-success>
                 <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>Skjemaet er ikke innsendt. Vennligst rett opp feilene i skjemaet før du sender inn på nytt.</form-validation-error>
-                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <database-error>Feil i kommunikasjon med tjener. Vennligst kontakt din systemadministrator.</database-error>
                 <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>Er du sikker på at du vil slette innholdet i alle felter på siden? Innholdet vil bli tapt.</clear-confirm-message>
@@ -708,10 +710,12 @@
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
+                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
                 <upload-start>[Upload started]</upload-start>
                 <upload-cancel>[Upload canceled by the user]</upload-cancel>
                 <upload-done>[Upload complete]</upload-done>
                 <upload-error>[There was an error during the upload. Please try again.]</upload-error>
+                <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {0,number,integer} bytes.]</upload-error-size>
             </messages>
             <labels>
                 <language-choice>Språk</language-choice>
@@ -881,7 +885,6 @@
                 <save-draft-success>[Draft saved successfully!]</save-draft-success>
                 <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>Документ не сохранен! Пожалуйста, исправьте ошибки в форме и сохраните еще раз.</form-validation-error>
-                <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
                 <database-error>Нет соединения с базой данных. Свяжитесь с системным администратором.</database-error>
                 <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
                 <clear-confirm-message>Вы уверены, что хотите очистить все поля? Несохраненные данные будут потеряны.</clear-confirm-message>
@@ -890,10 +893,12 @@
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
+                <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>
                 <upload-start>[Upload started]</upload-start>
                 <upload-cancel>[Upload canceled by the user]</upload-cancel>
                 <upload-done>[Upload complete]</upload-done>
                 <upload-error>[There was an error during the upload. Please try again.]</upload-error>
+                <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {0,number,integer} bytes.]</upload-error-size>
             </messages>
             <labels>
                 <language-choice>Язык</language-choice>

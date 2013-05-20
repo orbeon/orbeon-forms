@@ -47,6 +47,8 @@ object XFormsEventFactory {
         XXFORMS_UPLOAD_CANCEL       → (new XXFormsUploadCancelEvent(_, _)),
         XXFORMS_UPLOAD_PROGRESS     → (new XXFormsUploadProgressEvent(_, _)),
         XXFORMS_UPLOAD_START        → (new XXFormsUploadStartEvent(_, _)),
+        XXFORMS_UPLOAD_DONE         → (new XXFormsUploadDoneEvent(_, _)),
+        XXFORMS_UPLOAD_ERROR        → (new XXFormsUploadErrorEvent(_, _)),
         XFORMS_MODEL_CONSTRUCT_DONE → (new XFormsModelConstructDoneEvent(_, _)),
         XFORMS_MODEL_CONSTRUCT      → (new XFormsModelConstructEvent(_, _)),
         XFORMS_MODEL_DESTRUCT       → (new XFormsModelDestructEvent(_, _)),

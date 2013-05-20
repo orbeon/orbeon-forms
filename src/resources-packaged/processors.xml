@@ -787,7 +787,7 @@
         <class name="org.orbeon.oxf.fr.FormRunnerPersistenceProxy"/>
     </processor>
     <processor name="fr:persistence-reindex">
-        <class name="org.orbeon.oxf.fr.relational.Reindex"/>
+        <class name="org.orbeon.oxf.fr.relational.ReindexProcessor"/>
     </processor>
     <processor name="fr:xforms-to-schema">
         <class name="org.orbeon.oxf.fr.XFormsToSchema"/>

@@ -25,7 +25,7 @@ import javax.naming.{Context, InitialContext}
 import javax.sql.DataSource
 import org.orbeon.oxf.fr.FormRunner
 import scala.Some
-wimport org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
+import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fr.relational.Index.IndexedControl
 import java.sql.ResultSet
 import org.orbeon.oxf.xforms.XFormsConstants
@@ -38,9 +38,9 @@ import collection.JavaConverters._
  * - mapped to `fr:persistence-reindex` in `processors.xml`
  * - mapped to `/fr/service/[provider]/reindex` in `fr/page-flow.xml`
  */
-class Reindex extends ProcessorImpl {
+class ReindexProcessor extends ProcessorImpl {
 
-    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[Reindex]), "")
+    private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[ReindexProcessor]), "")
 
     private val ReindexPathRegex    = """/fr/service/([^/]+)/reindex""".r
     private val XPathPredicateRegex = """\[[^\]]*\]""".r

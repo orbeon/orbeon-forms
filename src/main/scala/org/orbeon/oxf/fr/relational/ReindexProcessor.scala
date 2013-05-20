@@ -56,16 +56,7 @@ class ReindexProcessor extends ProcessorImpl {
         // Provider, e.g. "mysql", "oracle", inferred from the request path
         val ReindexPathRegex(provider) = NetUtils.getExternalContext.getRequest.getRequestPath
 
-        // Get connection to the database
-        val dataSource = {
-            val propertySet = Properties.instance.getPropertySet
-            val datasourceProperty = Seq("oxf.fr.persistence", provider, "datasource") mkString "."
-            val datasource = propertySet.getString(datasourceProperty)
-            val jndiContext = new InitialContext().lookup("java:comp/env/jdbc").asInstanceOf[Context]
-            jndiContext.lookup(datasource).asInstanceOf[DataSource]
-        }
-
-        useAndClose(dataSource.getConnection) { connection ⇒
+        RelationalUtils.withConnection(provider) { connection ⇒
 
             // Clean index
             connection.prepareStatement("delete from orbeon_i_control_text").execute()

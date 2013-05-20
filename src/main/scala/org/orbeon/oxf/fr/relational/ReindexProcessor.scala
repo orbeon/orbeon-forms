@@ -164,10 +164,14 @@ class ReindexProcessor extends ProcessorImpl {
      *   [MySQL utf]: http://dev.mysql.com/doc/refman/5.6/en/charset-unicode-utf8mb3.html
      */
     private def truncateValue(provider: String, value: String): String = {
+        // Limit, if any, based on the provider
         val limit: Option[Int] = provider match {
             case "mysql" ⇒ Option(math.floor((math.pow(2, 16) - 1) / 4).toInt)
             case _       ⇒ None
         }
-        limit map (value.substring(0, _)) getOrElse value
+        limit match {
+            case Some(l) if l < value.length ⇒ value.substring(0, l)
+            case _                           ⇒ value
+        }
     }
 }

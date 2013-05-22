@@ -6,15 +6,10 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
-      <root url="file://$PROJECT_DIR$/lib" />
-      <root url="file://$PROJECT_DIR$/../itext-2.1.7-sources/core" />
-      <root url="file://$PROJECT_DIR$/../Saxon/src" />
-      <root url="file://$PROJECT_DIR$/../Third Party/commons-lang3-3.1-src/src/main/java" />
-      <root url="file://$PROJECT_DIR$/../errorified/src/main" />
-      <root url="jar://$USER_HOME$/.ideaLibSources/commons-fileupload-1.2.2-sources.jar!/" />
+      <root url="file://$PROJECT_DIR$/lib/src" />
     </SOURCES>
     <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" />
     <jarDirectory url="file://$PROJECT_DIR$/lib/oracle" recursive="false" />
-    <jarDirectory url="file://$PROJECT_DIR$/lib" recursive="false" type="SOURCES" />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/src" recursive="false" type="SOURCES" />
   </library>
 </component>

@@ -15,19 +15,15 @@ package org.orbeon.oxf.fr.relational
 
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, TransformerUtils}
 import javax.xml.transform.stream.StreamSource
+import org.orbeon.oxf.fr.relational.RelationalUtils.ResultSetIterator
 import org.orbeon.oxf.util._
 import org.orbeon.scaxon.XML._
-import javax.naming.{Context, InitialContext}
-import javax.sql.DataSource
 import org.orbeon.oxf.fr.FormRunner
 import scala.Some
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fr.relational.Index.IndexedControl
-import java.sql.ResultSet
 import org.orbeon.oxf.xforms.XFormsConstants
 import collection.JavaConverters._
 
@@ -59,29 +55,22 @@ class ReindexProcessor extends ProcessorImpl {
         RelationalUtils.withConnection(provider) { connection ⇒
 
             // Clean index
+            connection.prepareStatement("delete from orbeon_i_current").execute()
             connection.prepareStatement("delete from orbeon_i_control_text").execute()
 
             // Get current data
-            val currentData = {
-                val resultSet = connection.prepareStatement(
-                    """select   id, created, last_modified, username, app, form, document_id, xml
-                      |  from   orbeon_form_data
-                      | where   (app, form, document_id, last_modified) in
-                      |         (
-                      |               select app, form, document_id, max(last_modified) last_modified
-                      |                 from orbeon_form_data
-                      |             group by app, form, document_id
-                      |         )
-                      |   and   deleted = 'N'
-                      |order by app, form
-                      |""".stripMargin).executeQuery()
-                // We create an iterator so we can use the result set in a foldLeft
-                new Iterator[ResultSet] {
-                  def hasNext = resultSet.next()
-                  def next() = resultSet
-                  override def toString = "[Iterator]"
-                }
-            }
+            val currentData = connection.prepareStatement(
+                """select   id, created, last_modified, username, app, form, document_id, xml
+                  |  from   orbeon_form_data
+                  | where   (app, form, document_id, last_modified) in
+                  |         (
+                  |               select app, form, document_id, max(last_modified) last_modified
+                  |                 from orbeon_form_data
+                  |             group by app, form, document_id
+                  |         )
+                  |   and   deleted = 'N'
+                  |order by app, form
+                  |""".stripMargin)
 
             // Info on indexed controls for a given app/form
             case class FormIndexedControls(app: String, form: String, indexedControls: Seq[IndexedControl])
@@ -108,6 +97,21 @@ class ReindexProcessor extends ProcessorImpl {
                         }
                 }
 
+                // Insert into the "current data" table
+                val insert = connection.prepareStatement(
+                    """insert into orbeon_i_current
+                      |           (data_id, document_id, created, last_modified, username, app, form)
+                      |    values (?, ?, ?, ?, ?, ?, ?)
+                    """.stripMargin)
+                insert.setInt      (1, resultSet.getInt      ("id"))
+                insert.setString   (2, resultSet.getString   ("document_id"))
+                insert.setTimestamp(3, resultSet.getTimestamp("created"))
+                insert.setTimestamp(4, resultSet.getTimestamp("last_modified"))
+                insert.setString   (5, resultSet.getString   ("username"))
+                insert.setString   (6, app)
+                insert.setString   (7, form)
+                insert.execute()
+
                 // Read data (XML)
                 // - using lazy, as we might not need the data, if there are no controls to index
                 // - return root element, as XPath this is the node XPath expressions are relative to
@@ -131,18 +135,16 @@ class ReindexProcessor extends ProcessorImpl {
                     for ((value, position) ← values.asScala.zipWithIndex) {
                         val insert = connection.prepareStatement(
                             """insert into orbeon_i_control_text
-                              |           (data_id, created, last_modified, username, app, form, control, pos, val)
-                              |    values (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              |           (data_id, username, app, form, control, pos, val)
+                              |    values (?, ?, ?, ?, ?, ?, ?)
                             """.stripMargin)
                         insert.setInt      (1, resultSet.getInt("id"))
-                        insert.setTimestamp(2, resultSet.getTimestamp("created"))
-                        insert.setTimestamp(3, resultSet.getTimestamp("last_modified"))
-                        insert.setString   (4, resultSet.getString("username"))
-                        insert.setString   (5, app)
-                        insert.setString   (6, form)
-                        insert.setString   (7, control.name)
-                        insert.setInt      (8, position + 1)
-                        insert.setString   (9, truncateValue(provider, value.asInstanceOf[NodeInfo].getStringValue))
+                        insert.setString   (2, resultSet.getString("username"))
+                        insert.setString   (3, app)
+                        insert.setString   (4, form)
+                        insert.setString   (5, control.name)
+                        insert.setInt      (6, position + 1)
+                        insert.setString   (7, truncateValue(provider, value.asInstanceOf[NodeInfo].getStringValue))
                         insert.execute()
                     }
                 }
@@ -158,7 +160,7 @@ class ReindexProcessor extends ProcessorImpl {
      * in the index table so it doesn't exceed the limit imposed by the type used to store the value in
      * `orbeon_i_control_text` for the relevant database.
      *
-     * - For MySQL, `text` can [store][MySQL text] up to 2^16-1 bytes. Since UTF-8 encoding can take up to 4 bytes
+     * - For MySQL, `text` can [store][MySQL text] up to pow(2, 16-1) bytes. Since UTF-8 encoding can take up to 4 bytes
      *   per character, we conservatively divide this by 4 to get the max number of characters. In MySQL 5.6, with the
      *   UTF-8 uses a [3-byte encoding][MySQL utf], but the documentation says it might use 4 in the future.
      *

@@ -14,6 +14,6 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
-    <p:processor name="fr:persistence-reindex"/>
+    <p:processor name="fr:relational-persistence-reindex"/>
 
 </p:config>

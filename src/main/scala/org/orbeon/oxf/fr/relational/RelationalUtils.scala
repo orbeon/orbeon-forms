@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.relational
 
-import java.sql.Connection
+import java.sql.{ResultSet, Connection, PreparedStatement}
 import org.orbeon.oxf.properties.Properties
 import javax.naming.{Context, InitialContext}
 import javax.sql.DataSource
@@ -32,5 +32,16 @@ object RelationalUtils {
         }
         useAndClose(dataSource.getConnection)(block)
     }
+
+    implicit class ResultSetIterator(statement: PreparedStatement) extends Iterator[ResultSet] {
+        val resultSet: ResultSet = statement.executeQuery()
+        def hasNext = resultSet.next()
+        def next() = resultSet
+        // Override default toString, which calls hasNext(), and thus advances the result set, causing issue when
+        // using the debugger
+        override def toString = "[Iterator]"
+    }
+
+    def sqlString(text: String) = "'" + text.replaceAllLiterally("'", "''") + "'"
 
 }

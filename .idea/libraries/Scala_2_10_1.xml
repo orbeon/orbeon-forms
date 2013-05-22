@@ -7,6 +7,8 @@
       <root url="jar://$PROJECT_DIR$/lib/typesafe-config-2.10.1.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/lib/src/scala-library-src-2.10.1.jar!/" />
+    </SOURCES>
   </library>
 </component>

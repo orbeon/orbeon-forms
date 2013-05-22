@@ -38,8 +38,8 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                 val SearchPathRegex(provider, app, form) = NetUtils.getExternalContext.getRequest.getRequestPath
                 withConnection(provider) { connection ⇒
 
-                    val searchRequest = readInputAsTinyTree(pipelineContext, XPathCache.getGlobalConfiguration,
-                                                            getInputByName(ProcessorImpl.INPUT_DATA))
+                    val searchRequest = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA),
+                        XPathCache.getGlobalConfiguration)
 
                     /**
                      * Get the documents that match the search criteria, for the page we're are, returning the metadata for

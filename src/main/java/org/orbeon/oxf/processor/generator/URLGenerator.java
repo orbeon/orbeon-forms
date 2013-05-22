@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
+import scala.Option;
 
 import javax.xml.transform.dom.DOMSource;
 import java.io.IOException;
@@ -969,7 +970,7 @@ public class URLGenerator extends ProcessorImpl {
 
         private void checkStatusCode() throws IOException {
             if (isFailureStatusCode())
-                throw new ValidationException("Got failure status code: " + getConnectionStatusCode(), new LocationData(config.getURL().toExternalForm(), -1, -1));
+                throw new HttpStatusCodeException(getConnectionStatusCode(), Option.<String>apply(config.getURL().toExternalForm()), Option.<Throwable>apply(null));
         }
 
         public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, XMLReceiver output) {

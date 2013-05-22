@@ -36,7 +36,7 @@ object OrbeonFormatter extends Formatter {
 
     // Create SourceLocation from LocationData
     private def sourceLocation(locationData: LocationData) =
-        if (isNotBlank(locationData.getSystemID) && !locationData.getSystemID.endsWith(".java")) {
+        if (isNotBlank(locationData.getSystemID) && ! locationData.getSystemID.endsWith(".java")) {
             val (description, params) =
                 locationData match {
                     case extended: ExtendedLocationData ⇒
@@ -50,6 +50,6 @@ object OrbeonFormatter extends Formatter {
 
     private def arrayToTuples(a: Array[String]): List[(String, String)] = Option(a) match {
         case Some(a) ⇒ a.grouped(2) map (sub ⇒ (sub(0), sub(1))) filter (_._2 ne null) toList
-        case None ⇒ Nil
+        case None    ⇒ Nil
     }
 }

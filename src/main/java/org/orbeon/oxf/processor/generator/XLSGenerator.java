@@ -64,8 +64,8 @@ public class XLSGenerator extends ProcessorImpl {
                     final byte[] fileContent;
                     {
                         final String NO_FILE = "No file was uploaded";
-                        final DocumentInfo requestDocument = readInputAsTinyTree(context, XPathCache.getGlobalConfiguration(),
-                                getInputByName(INPUT_REQUEST));
+                        final DocumentInfo requestDocument = readInputAsTinyTree(context, getInputByName(INPUT_REQUEST),
+                                XPathCache.getGlobalConfiguration());
 
                         final PooledXPathExpression expr = XPathCache.getXPathExpression(
                                 requestDocument.getConfiguration(), requestDocument,

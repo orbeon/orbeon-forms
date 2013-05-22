@@ -56,6 +56,10 @@
         <class name="org.orbeon.oxf.processor.generator.ExceptionGenerator"/>
     </processor>
 
+    <processor name="oxf:exception-catcher">
+        <class name="org.orbeon.oxf.processor.ExceptionCatcher"/>
+    </processor>
+
     <processor name="oxf:dom-generator">
         <class name="org.orbeon.oxf.processor.generator.DOMGenerator"/>
     </processor>
@@ -703,10 +707,6 @@
 
     <processor name="oxf:counter">
         <class name="org.orbeon.oxf.processor.test.CounterProcessor"/>
-    </processor>
-
-    <processor name="oxf:exception-catcher">
-        <class name="org.orbeon.oxf.processor.test.ExceptionCatcher"/>
     </processor>
 
     <processor name="oxf:sleep">

@@ -53,7 +53,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                 // Write out document
                 try {
                     while (throwable != null) {
-                        addThrowable(helper, throwable);
+                        addThrowable(helper, throwable, true);
                         throwable = Exceptions.getNestedThrowableOrNull(throwable);
                     }
                 } catch (Exception e) {
@@ -68,7 +68,7 @@ public class ExceptionGenerator extends ProcessorImpl {
         return output;
     }
 
-    public static void addThrowable(ContentHandlerHelper helper, Throwable throwable) {
+    public static void addThrowable(ContentHandlerHelper helper, Throwable throwable, boolean stackTrace) {
         helper.startElement("exception");
 
         helper.element("type", throwable.getClass().getName());
@@ -78,20 +78,22 @@ public class ExceptionGenerator extends ProcessorImpl {
 
         addLocationData(helper, ValidationException.getAllLocationData(throwable));
 
-        final StackTraceElement[] elements = throwable.getStackTrace();
+        if (stackTrace) {
+            final StackTraceElement[] elements = throwable.getStackTrace();
 
-        // We were able to get a structured stack trace
-        helper.startElement("stack-trace-elements");
-        for (int i = 0; i < elements.length; i++) {
-            final StackTraceElement element = elements[i];
-            helper.startElement("element");
-            helper.element("class-name", element.getClassName());
-            helper.element("method-name", element.getMethodName());
-            helper.element("file-name", element.getFileName());
-            helper.element("line-number", element.getLineNumber());
+            // We were able to get a structured stack trace
+            helper.startElement("stack-trace-elements");
+            for (int i = 0; i < elements.length; i++) {
+                final StackTraceElement element = elements[i];
+                helper.startElement("element");
+                helper.element("class-name", element.getClassName());
+                helper.element("method-name", element.getMethodName());
+                helper.element("file-name", element.getFileName());
+                helper.element("line-number", element.getLineNumber());
+                helper.endElement();
+            }
             helper.endElement();
         }
-        helper.endElement();
 
         helper.endElement();
     }

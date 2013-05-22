@@ -129,7 +129,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     // Get transformer attributes if any
                     final Map<String, Boolean> attributesFromProperties;
-                    // Read attributes input only if connected
+                    // Read optional attributes input only if connected
                     if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
                         // Read input as an attribute Map and cache it
                         attributesFromProperties = readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader<Map<String, Boolean>>() {

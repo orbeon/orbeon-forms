@@ -280,12 +280,12 @@ public abstract class ProcessorImpl implements Processor {
         return ch.getDocument();
     }
 
-    public DocumentInfo readInputAsTinyTree(PipelineContext pipelineContext, Configuration configuration, ProcessorInput input) {
+    public DocumentInfo readInputAsTinyTree(PipelineContext context, ProcessorInput input, Configuration configuration) {
         final TinyBuilder treeBuilder = new TinyBuilder();
 
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler(configuration);
         identity.setResult(treeBuilder);
-        readInputAsSAX(pipelineContext, input, identity);
+        readInputAsSAX(context, input, identity);
 
         return (DocumentInfo) treeBuilder.getCurrentRoot();
     }
@@ -314,7 +314,7 @@ public abstract class ProcessorImpl implements Processor {
     public DocumentInfo readCacheInputAsTinyTree(PipelineContext pipelineContext, final Configuration configuration, String inputName) {
         return readCacheInputAsObject(pipelineContext, getInputByName(inputName), new CacheableInputReader<DocumentInfo>() {
             public DocumentInfo read(PipelineContext context, ProcessorInput input) {
-                return readInputAsTinyTree(context, configuration, input);
+                return readInputAsTinyTree(context, input, configuration);
             }
         });
     }

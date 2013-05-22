@@ -62,6 +62,12 @@
         <p:output name="data" id="global-template-form"/>
     </p:processor>
 
+    <p:processor name="oxf:exception-catcher">
+        <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
+        <p:input name="data" href="#global-template-form"/>
+        <p:output name="data" id="global-template-form-safe"/>
+    </p:processor>
+
     <!-- Read template form for application library -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="/apps/fr/detail/read-form.xpl"/>
@@ -69,16 +75,22 @@
         <p:output name="data" id="custom-template-form"/>
     </p:processor>
 
+    <p:processor name="oxf:exception-catcher">
+        <p:input name="config"><config><stack-trace>false</stack-trace></config></p:input>
+        <p:input name="data" href="#custom-template-form"/>
+        <p:output name="data" id="custom-template-form-safe"/>
+    </p:processor>
+
     <!-- Convert templates to XBL -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="form-to-xbl.xsl"/>
-        <p:input name="data" href="#global-template-form"/>
+        <p:input name="data" href="#global-template-form-safe"/>
         <p:input name="parameters" href="#global-parameters"/>
         <p:output name="data" id="global-template-xbl"/>
     </p:processor>
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="config" href="form-to-xbl.xsl"/>
-        <p:input name="data" href="#custom-template-form"/>
+        <p:input name="data" href="#custom-template-form-safe"/>
         <p:input name="parameters" href="#parameters"/>
         <p:output name="data" id="custom-template-xbl"/>
     </p:processor>

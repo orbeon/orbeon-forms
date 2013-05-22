@@ -26,10 +26,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.handler.OXFHandler;
 import org.orbeon.oxf.resources.handler.SystemHandler;
 import org.orbeon.oxf.util.*;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.webapp.HttpStatusCodeException;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.tidy.Tidy;
@@ -615,7 +613,7 @@ public class URLGenerator extends ProcessorImpl {
                             // Create handler right here
                             handler = OXFHandler.PROTOCOL.equals(url.getProtocol())
                                 ? new OXFResourceHandler(new Config(url)) // Should use full config so that headers are forwarded?
-                                : new URLResourceHandler(pipelineContext, new Config(url));// Should use full config so that headers are forwarded?
+                                : new URLResourceHandler(new Config(url));// Should use full config so that headers are forwarded?
 
                             try {
                                 // FIXME: this can potentially be very slow with some URLs like HTTP URLs. We try to
@@ -783,6 +781,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
+            output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
@@ -802,6 +801,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
+            output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
@@ -813,13 +813,11 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     private static class URLResourceHandler implements ResourceHandler {
-        private PipelineContext pipelineContext;
         private Config config;
         private ConnectionResult connectionResult;
         private InputStream inputStream;
 
-        public URLResourceHandler(PipelineContext pipelineContext, Config config) {
-            this.pipelineContext = pipelineContext;
+        public URLResourceHandler(Config config) {
             this.config = config;
         }
 
@@ -865,15 +863,8 @@ public class URLGenerator extends ProcessorImpl {
             // getting the last modified date, the stream is
             // actually opened. When using the file: protocol, the
             // file can be locked on disk.
-            if (inputStream != null) {
+            if (inputStream != null)
                 inputStream.close();
-            }
-
-            // Just in case - although URLResourceHandler should be gc'ed quickly
-            pipelineContext = null;
-            config = null;
-            connectionResult = null;
-            inputStream = null;
         }
 
         private void openConnection() throws IOException {
@@ -934,11 +925,13 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readText(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
+            output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             ProcessorUtils.readText(inputStream, getExternalEncoding(), output, contentType, lastModified, getConnectionStatusCode());
         }
 
         public void readBinary(ContentHandler output, String contentType, Long lastModified) throws IOException {
             openConnection();
+            output.setDocumentLocator(new URLLocator(config.getURL().toExternalForm()));
             ProcessorUtils.readBinary(inputStream, output, contentType, lastModified, getConnectionStatusCode());
         }
 
@@ -978,8 +971,7 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, XMLReceiver output) {
-            Tidy tidy = new Tidy();
-//          tidy.setOnlyErrors(false);
+            final Tidy tidy = new Tidy();
             tidy.setShowWarnings(tidyConfig.isShowWarnings());
             tidy.setQuiet(tidyConfig.isQuiet());
 
@@ -990,13 +982,12 @@ public class URLGenerator extends ProcessorImpl {
             // Parse and output to SAXResult
             TransformerUtils.sourceToSAX(new DOMSource(tidy.parseDOM(is, null)), output);
         }
-
     }
 
     /**
-     * This resource handler reads from System.in...
+     * Read from System.in.
      */
-        private static class SystemResourceHandler implements ResourceHandler {
+    private static class SystemResourceHandler implements ResourceHandler {
         private Config config;
 
         public SystemResourceHandler(Config config) {
@@ -1079,6 +1070,7 @@ public class URLGenerator extends ProcessorImpl {
             return "system:in";
         }
     }
+
     // The idea of URLGeneratorState is that, during a pipeline execution with a given PipelineContext, there is typically:
     //
     // o a call to getValidity()
@@ -1110,8 +1102,8 @@ public class URLGenerator extends ProcessorImpl {
             if (mainResourceHandler == null) {
                 // Create and remember handler
                 mainResourceHandler = OXFHandler.PROTOCOL.equals(config.getURL().getProtocol()) ? new OXFResourceHandler(config)
-                        : SystemHandler.PROTOCOL.equals(config.getURL().getProtocol()) ?  new SystemResourceHandler(config)
-                        : new URLResourceHandler(pipelineContext, config);
+                        : SystemHandler.PROTOCOL.equals(config.getURL().getProtocol()) ? new SystemResourceHandler(config)
+                        : new URLResourceHandler(config);
                 // Make sure it is destroyed when the pipeline ends at the latest
                 pipelineContext.addContextListener(new PipelineContext.ContextListener() {
                     public void contextDestroyed(boolean success) {

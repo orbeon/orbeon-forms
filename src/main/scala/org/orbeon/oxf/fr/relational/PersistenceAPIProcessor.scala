@@ -38,8 +38,12 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                 val SearchPathRegex(provider, app, form) = NetUtils.getExternalContext.getRequest.getRequestPath
                 withConnection(provider) { connection ⇒
 
-                    val searchRequest = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA),
-                        XPathCache.getGlobalConfiguration)
+                    // <query> elements from request
+                    val requestQueries = {
+                        val searchRequest = readInputAsTinyTree(pipelineContext, getInputByName(ProcessorImpl.INPUT_DATA),
+                            XPathCache.getGlobalConfiguration)
+                        searchRequest \ "search" \ "query"
+                    }
 
                     /**
                      * Get the documents that match the search criteria, for the page we're are, returning the metadata for
@@ -47,17 +51,41 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                      */
                     val documentsMetadata: Seq[DocumentMetadata] = {
 
-                        val getDocuments = connection.prepareStatement(
-                            """  select data_id, document_id, created, last_modified from orbeon_i_current
-                              |   where app  = ?
-                              |	    and form = ?
-                              |order by last_modified desc, data_id
-                              |   limit 10;
-                              |""".stripMargin)
-                        getDocuments.setString(1, app)
-                        getDocuments.setString(2, form)
+                        val nonEmptyQueries = requestQueries filter (_.getStringValue != "")
+                        val getDocumentsQuery = {
+                            val selectStart =   """  select data_id, document_id, created, last_modified from orbeon_i_current
+                                                  |   where app  = ?
+                                                  |	    and form = ?
+                                                """.stripMargin
+                            val controlMatch =  """	 and data_id in
+                                                  |		 (
+                                                  |		  select distinct data_id from orbeon_i_control_text
+                                                  |		   where app     = ?
+                                                  |			 and form    = ?
+                                                  |			 and control = ?
+                                                  |			 and match(val) against (?)
+                                                  |		 )
+                                                """.stripMargin
+                            val selectEnd =     """order by last_modified desc, data_id
+                                                  |   limit 10;
+                                                """.stripMargin
+                            selectStart + (controlMatch * nonEmptyQueries.length) + selectEnd
+                        }
 
-                        (for (resultSet ← getDocuments) yield
+                        val getDocumentsStatement = {
+                            val statement = connection.prepareStatement(getDocumentsQuery)
+                            statement.setString(1, app)
+                            statement.setString(2, form)
+                            for ((query, index) ← nonEmptyQueries.zipWithIndex) {
+                                statement.setString(index * 4 + 3, app)
+                                statement.setString(index * 4 + 4, form)
+                                statement.setString(index * 4 + 5, query.attValue("name"))
+                                statement.setString(index * 4 + 6, query.getStringValue)
+                            }
+                            statement
+                        }
+
+                        (for (resultSet ← getDocumentsStatement) yield
                             DocumentMetadata(
                                 dataId       = resultSet.getInt      ("data_id"),
                                 documentId   = resultSet.getString   ("document_id"),
@@ -72,8 +100,7 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                      */
                     case class Value(dataId: Int, control: String, pos: Int, value: String)
                     val controls = {
-                        val allQueries = searchRequest \ "search" \ "query"
-                        val summaryQueries = allQueries filter (_.attValue("summary-field") == "true")
+                        val summaryQueries = requestQueries filter (_.attValue("summary-field") == "true")
                         summaryQueries map (_.attValue("name"))
                     }
                     val values = {
@@ -101,21 +128,21 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                      *   better left of to the front-end, but requires changing the format of the returned data
                      */
                     val documentsXML =
-                        <documents> {
+                        <documents>{
                             for (metadata ← documentsMetadata) yield
                             <document created       ={DateTime.print(metadata.created.getTime) }
                                       last-modified ={DateTime.print(metadata.lastModified.getTime)}
                                       name          ={metadata.documentId.toString}>
-                                <details> {
+                                <details>{
                                     val thisRowValues = values(metadata.dataId)
                                     for (control ← controls) yield
-                                    <detail> {
+                                    <detail>{
                                         val thisControlValues = thisRowValues(control) sortBy (_.pos)
                                         thisControlValues map (_.value) filter (_ != "") mkString ", "
                                     } </detail>
-                                } </details>
+                                }</details>
                             </document>
-                        } </documents>
+                        }</documents>
 
                     XMLUtils.stringToSAX(documentsXML.toString(), "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
                 }

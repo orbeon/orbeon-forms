@@ -26,6 +26,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fr.relational.Index.IndexedControl
 import org.orbeon.oxf.xforms.XFormsConstants
 import collection.JavaConverters._
+import org.orbeon.scaxon.XML
 
 /**
  * Processor repopulating the relational indices. This doesn't create the tables, but deletes their content
@@ -131,8 +132,8 @@ class ReindexProcessor extends ProcessorImpl {
                     // - in the FB form, the predicate for the language
                     val xpath = XPathPredicateRegex.replaceAllIn(control.xpath, "")
 
-                    val values = XPathCache.evaluate(dataRootElement, xpath, FbNamespaceMapping, null, null, null, null, null, null)
-                    for ((value, position) ← values.asScala.zipWithIndex) {
+                    val values = XML.eval(dataRootElement, xpath, FbNamespaceMapping).asInstanceOf[Seq[NodeInfo]]
+                    for ((value, position) ← values.zipWithIndex) {
                         val insert = connection.prepareStatement(
                             """insert into orbeon_i_control_text
                               |           (data_id, username, app, form, control, pos, val)
@@ -144,7 +145,7 @@ class ReindexProcessor extends ProcessorImpl {
                         insert.setString   (4, form)
                         insert.setString   (5, control.name)
                         insert.setInt      (6, position + 1)
-                        insert.setString   (7, truncateValue(provider, value.asInstanceOf[NodeInfo].getStringValue))
+                        insert.setString   (7, truncateValue(provider, value.getStringValue))
                         insert.execute()
                     }
                 }

@@ -29,22 +29,13 @@
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target">
-                <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
-
-                <xf:setvalue
-                    iterate="'app', 'form', 'title', 'description'"
-                    ref="instance()/*[name() = context()]"
-                    value="event(context())"/>
-                <xf:setvalue
-                    ref="mode"
-                    value="event('mode')"/>
-
-                <!-- Custom logo upload is removed in 4.0 -->
-                <!--<xf:setvalue ref="logo" value="event('logo')"/>-->
-                <!--<xf:setvalue ref="logo/@filename" value="event('logo')/@filename"/>-->
-                <!--<xf:setvalue ref="logo/@mediatype" value="event('logo')/@mediatype"/>-->
-                <!--<xf:setvalue ref="logo/@size" value="event('logo')/@size"/>-->
-
+                <!-- Clear local values -->
+                <xf:setvalue iterate="*[not(*)]" ref="."/>
+                <!-- Save event context information in local instance -->
+                <xf:setvalue iterate="'app', 'form', 'title', 'description', 'mode'"
+                    ref="instance()/*[name() = context()]" value="event(context())"/>
+                <!-- -->
+                <xf:setvalue if="$app-chooser = 'output'" ref="app" value="xxf:instance('fr-permissions')/app/@name"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
@@ -61,6 +52,12 @@
                         <mode/>
                     </instance>
                 </xf:instance>
+
+                <!-- Control used for choosing the app name; value can be: 'input', 'select1', or 'output' -->
+                <xf:var name="app-chooser" value="
+                    if (xxf:instance('fr-permissions')/app[@name = '*']) then 'input'
+                    else if (count(xxf:instance('fr-permissions')/app) = 1) then 'output'
+                    else 'select1'"/>
 
                 <!-- NOTE: use normalize-space() = . because type validation seems to allow leading and trailing spaces -->
                 <xf:bind ref="app" required="true()" type="xs:NCName" constraint="normalize-space() = ."/>
@@ -119,16 +116,15 @@
 
                             <!-- Application name -->
                             <!-- Use an input if app name is a wildcard -->
-                            <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
-                            <xf:group ref=".[$is-input]">
+                            <xf:group ref=".[$app-chooser = 'input']">
                                 <xf:input ref="app" id="fb-application-name-input" xxf:autocomplete="off">
                                     <xf:label ref="$resources/application-name/label"/>
                                     <xf:hint ref="$resources/application-name/hint"/>
                                     <xf:alert ref="$resources/application-name/alert"/>
                                 </xf:input>
                             </xf:group>
-                            <!-- Otherwise list apps allowed -->
-                            <xf:group ref=".[not($is-input)]">
+                            <!-- Otherwise, if there are multiple choices, use a dropdown -->
+                            <xf:group ref=".[$app-chooser = 'select1']">
                                 <xf:select1 ref="app">
                                     <xf:label ref="$resources/application-name/label"/>
                                     <xf:item>
@@ -141,20 +137,12 @@
                                     </xf:itemset>
                                 </xf:select1>
                             </xf:group>
-
-                            <!-- Logo -->
-                            <!-- Custom logo upload is removed in 4.0 -->
-                            <!--<xf:group ref=".[$is-form-settings]">-->
-                                <!--<xf:label ref="$resources/logo/label" class="xforms-hidden"/>-->
-                                <!--<fr:image-attachment ref="logo" class="fr-attachment">-->
-                                    <!--&lt;!&ndash; Only show hint if there is no attachment &ndash;&gt;-->
-                                    <!--<xf:hint ref="$resources/logo/hint[not(normalize-space(context()))]"/>-->
-                                    <!--&lt;!&ndash; Store all the details &ndash;&gt;-->
-                                    <!--<xf:filename ref="@filename"/>-->
-                                    <!--<xf:mediatype ref="@mediatype"/>-->
-                                    <!--<xxf:size ref="@size"/>-->
-                                <!--</fr:image-attachment>-->
-                            <!--</xf:group>-->
+                            <!-- Otherwise, if there is just one choice, just show what the value will be -->
+                            <xf:group ref=".[$app-chooser = 'output']">
+                                <xf:output ref="app">
+                                    <xf:label ref="$resources/application-name/label"/>
+                                </xf:output>
+                            </xf:group>
 
                         </xh:div>
 

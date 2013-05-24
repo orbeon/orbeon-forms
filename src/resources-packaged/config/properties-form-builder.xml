@@ -35,7 +35,8 @@
                                                                                             oxf:/xbl/orbeon/autocomplete/autocomplete.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.attachment.uri.*.*"         value="oxf:/forms/orbeon/builder/xbl/attachment-controls.xbl
                                                                                             oxf:/xbl/orbeon/image-attachment/image-attachment.xbl
-                                                                                            oxf:/xbl/orbeon/attachment/attachment.xbl"/>
+                                                                                            oxf:/xbl/orbeon/attachment/attachment.xbl
+                                                                                            oxf:/xbl/orbeon/wpaint/wpaint.xbl"/>
     <property as="xs:string"  name="oxf.fb.toolbox.group.button.uri.*.*"             value="oxf:/forms/orbeon/builder/xbl/button-controls.xbl"/>
 
     <property as="xs:boolean" name="oxf.fb.menu.schema"                              value="true"/>

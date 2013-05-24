@@ -1,0 +1,85 @@
+<!--
+  Copyright (C) 2013 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+
+    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.core.min.js"/>
+    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.widget.min.js"/>
+    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.mouse.min.js"/>
+    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.draggable.min.js"/>
+    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.js"/>
+    <xbl:script src="/xbl/orbeon/wpaint/1.13.1/wPaint.js"/>
+    <xbl:script src="/xbl/orbeon/wpaint/wpaint.js"/>
+
+    <xbl:binding id="fr-wpaint" element="fr|wpaint" xxbl:mode="lhha binding value">
+
+        <fb:metadata>
+            <fb:display-name lang="en">Image annotation</fb:display-name>
+            <fb:display-name lang="fr">Annotation d'image</fb:display-name>
+            <fb:display-name lang="ru">[Image annotation]</fb:display-name>
+            <fb:icon lang="en">
+                <fb:small-icon>/apps/fr/style/images/silk/paintbrush.png</fb:small-icon>
+                <fb:large-icon>/apps/fr/style/images/silk/paintbrush.png</fb:large-icon>
+            </fb:icon>
+            <fb:templates>
+                <fb:view>
+                    <fr:wpaint>
+                        <xf:label ref=""/>
+                        <xf:hint  ref=""/>
+                        <xf:help  ref=""/>
+                        <xf:alert ref=""/>
+                    </fr:wpaint>
+                </fb:view>
+            </fb:templates>
+        </fb:metadata>
+
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled"  ><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).enabled  ();</xxf:script></xbl:handler>
+            <xbl:handler event="xforms-readonly" ><xxf:script>YAHOO.xbl.fr.Button.instance(this).readonly ();</xxf:script></xbl:handler>
+            <xbl:handler event="xforms-readwrite"><xxf:script>YAHOO.xbl.fr.Button.instance(this).readwrite();</xxf:script></xbl:handler>
+        </xbl:handlers>
+
+        <xbl:implementation>
+            <xf:model id="wpaint-model">
+                <xf:instance id="wpaint-instance" xxbl:mirror="true"><dummy/></xf:instance>
+                <xf:instance id="template">
+                    <wpaint>
+                        <image/>
+                        <annotation>gaga</annotation>
+                    </wpaint>
+                </xf:instance>
+                <xf:insert event="xforms-model-construct-done" if="empty(instance()/*)"
+                           context="instance()" origin="instance('template')/*"/>
+            </xf:model>
+        </xbl:implementation>
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.css"/>
+            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/wPaint.css"/>
+            <xbl:style src="/xbl/orbeon/wpaint/wpaint.css"/>
+        </xbl:resources>
+
+        <xbl:template>
+            <xf:group appearance="xxf:internal">
+                <xh:div class="wpaint-container"/>
+                <xf:input ref="annotation"/>
+            </xf:group>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

@@ -35,6 +35,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import xml.Text
 import xml.NamespaceBinding
+import org.orbeon.scaxon.XML
 
 /**
  *  Supported:
@@ -92,7 +93,7 @@ class XFormsToSchema extends XFormsToSomething {
             </xs:schema>
 
         // Send result to output
-        XMLUtils.stringToSAX(schema.toString, "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
+        XML.elemToSAX(schema, xmlReceiver)
     }
 
     // Recursive function generating an xs:element from an xf:bind

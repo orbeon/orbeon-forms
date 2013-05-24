@@ -20,8 +20,7 @@ import org.orbeon.oxf.util.DateUtils.DateTime
 import org.orbeon.oxf.fr.relational.RelationalUtils._
 import org.orbeon.scaxon.XML._
 import java.sql.Timestamp
-import org.orbeon.oxf.xml.XMLUtils
-import collection.mutable
+import org.orbeon.scaxon.XML
 
 /**
  * Implementation of the persistence API for relational databases.
@@ -144,7 +143,7 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                             </document>
                         }</documents>
 
-                    XMLUtils.stringToSAX(documentsXML.toString(), "", xmlReceiver, XMLUtils.ParserConfiguration.PLAIN, true)
+                    XML.elemToSAX(documentsXML, xmlReceiver)
                 }
             }
         })

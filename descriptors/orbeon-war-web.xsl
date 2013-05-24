@@ -93,7 +93,12 @@
             <xsl:comment>Set run mode ("dev" or "prod")</xsl:comment>
             <context-param>
                 <param-name>oxf.run-mode</param-name>
-                <param-value>prod</param-value>
+                <param-value>
+                    <xsl:choose>
+                        <xsl:when test="$target = 'devel'">dev</xsl:when>
+                        <xsl:otherwise>prod</xsl:otherwise>
+                    </xsl:choose>
+                </param-value>
             </context-param>
 
             <xsl:comment>Set location of properties.xml</xsl:comment>

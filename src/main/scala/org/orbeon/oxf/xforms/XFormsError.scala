@@ -27,7 +27,7 @@ import dom4j.LocationData
 import processor.handlers.xhtml.XHTMLBodyHandler
 import org.orbeon.saxon.om.NodeInfo
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.common.{ValidationException, OXFException}
+import org.orbeon.oxf.common.{OrbeonLocationException, OXFException}
 import java.util.{List ⇒ JList}
 import xbl.{Scope, XBLContainer}
 
@@ -58,7 +58,7 @@ object XFormsError {
     object ServerError {
         def apply(t: Throwable): ServerError = {
             val root = Exceptions.getRootThrowable(t)
-            ServerError(StringUtils.trimToEmpty(root.getMessage), Option(ValidationException.getRootLocationData(t)), Some(root.getClass.getName))
+            ServerError(StringUtils.trimToEmpty(root.getMessage), OrbeonLocationException.getRootLocationData(t), Some(root.getClass.getName))
         }
     }
 

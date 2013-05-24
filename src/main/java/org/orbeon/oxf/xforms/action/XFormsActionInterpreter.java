@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
@@ -154,8 +155,8 @@ public class XFormsActionInterpreter {
             // Restore
             _actionXPathContext.popBinding();
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
-                    "action name", actionElement.getQName().getQualifiedName()));
+            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData((LocationData) actionElement.getData(), "running XForms action", actionElement,
+                    new String[]{"action name", actionElement.getQName().getQualifiedName()}));
         }
     }
 

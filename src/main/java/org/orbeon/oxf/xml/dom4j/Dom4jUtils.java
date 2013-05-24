@@ -739,16 +739,6 @@ public class Dom4jUtils {
         return newElement;
     }
 
-    public static Element saxToDebugElement(String qName, Attributes attributes) {
-        final Element element = createElement(qName);
-
-        for (int i = 0; i < attributes.getLength(); i++) {
-            element.addAttribute(attributes.getQName(i), attributes.getValue(i));
-        }
-
-        return element;
-    }
-
     /**
      * Workaround for Java's lack of an equivalent to C's __FILE__ and __LINE__ macros.  Use
      * carefully as it is not fast.
@@ -836,20 +826,7 @@ public class Dom4jUtils {
         } else {
             // Close start tag
             sb.append('>');
-
-            if (!element.elements().isEmpty()) {
-                // Mixed content
-                final Object firstChild = element.content().get(0);
-                if (firstChild instanceof Text) {
-                    sb.append(((Text) firstChild).getText());
-                }
-                sb.append("[...]");
-            } else {
-                // Not mixed content
-                final String text = element.getText();
-                sb.append(text);
-            }
-
+            sb.append("[...]");
             // Close element with end tag
             sb.append("</");
             sb.append(element.getQualifiedName());

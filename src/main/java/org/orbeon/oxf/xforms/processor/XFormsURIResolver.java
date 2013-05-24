@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.processor;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -112,7 +113,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             // XInclude handled by source if needed
             return TransformerUtils.readDom4j(source, false);
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
+            throw OrbeonLocationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
 
@@ -122,7 +123,7 @@ public class XFormsURIResolver extends TransformerURIResolver {
             // XInclude handled by source if needed
             return TransformerUtils.readTinyTree(configuration, source, false);
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new LocationData(urlString, -1, -1));
+            throw OrbeonLocationException.wrapException(e, new LocationData(urlString, -1, -1));
         }
     }
 }

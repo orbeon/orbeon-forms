@@ -55,7 +55,7 @@ public class Variable {
     private boolean evaluated;
     private ValueRepresentation variableValue;
 
-    public Variable(VariableAnalysisTrait staticVariable, XFormsContextStack contextStack, XFormsContainingDocument containingDocument) {
+    public Variable(VariableAnalysisTrait staticVariable, XFormsContainingDocument containingDocument) {
         this.staticVariable = staticVariable;
         this.containingDocument = containingDocument;
         this.variableElement = ((ElementAnalysis) staticVariable).element();
@@ -158,7 +158,7 @@ public class Variable {
     }
 
     public LocationData getLocationData() {
-        return (LocationData) variableElement.getData();
+        return ((ElementAnalysis) staticVariable).locationData();
     }
 
     /**

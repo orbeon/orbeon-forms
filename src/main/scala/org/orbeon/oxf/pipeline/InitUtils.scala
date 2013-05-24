@@ -24,7 +24,7 @@ import org.dom4j.Element
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.cache.ObjectCache
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
 import org.orbeon.oxf.pipeline.api.ExternalContext
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition
@@ -82,7 +82,7 @@ object InitUtils {
             success = true
         } catch {
             case t: Throwable ⇒
-                def locationData    = Option(ValidationException.getRootLocationData(t))
+                def locationData    = getRootLocationData(t)
                 def locationMessage = locationData map ("at " + _) getOrElse "with no location data"
 
                 Exceptions.getRootThrowable(t) match {

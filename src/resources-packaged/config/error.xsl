@@ -370,7 +370,7 @@
             </tr>
             <!-- Group so that if by any chance multiple location data for the same point occur, we show only one -->
             <xsl:variable name="location-exceptions"
-                          select="$exceptions[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer and not(ends-with(system-id, '.java'))]"/>
+                          select="$exceptions[location][1]/location[normalize-space(system-id) != '' and line castable as xs:integer]"/>
             <xsl:choose>
                 <xsl:when test="$location-exceptions">
                     <xsl:for-each-group
@@ -400,23 +400,7 @@
                             <td class="orbeon-error-panel-xml-cell">
                                 <!-- Display unique XML element -->
                                 <xsl:for-each-group select="current-group()[element != '']" group-by="string(element)">
-                                    <xsl:variable name="element" as="element()">
-                                        <xsl:copy-of select="saxon:parse(current-group()[1]/element)/*"/>
-                                    </xsl:variable>
-                                    <xsl:variable name="just-element" as="element()">
-                                        <xsl:for-each select="$element">
-                                            <xsl:copy>
-                                                <xsl:copy-of select="@*"/>
-                                                <xsl:if test="*">
-                                                    <xsl:text>...</xsl:text>
-                                                </xsl:if>
-                                            </xsl:copy>
-                                        </xsl:for-each>
-                                    </xsl:variable>
-                                    <!-- NOTE: use $just-element to show the enclosing element, and $element to show the element with content -->
-                                    <f:xml-source show-namespaces="false">
-                                        <xsl:copy-of select="$just-element"/>
-                                    </f:xml-source>
+                                    <xsl:value-of select="current-group()[1]/element"/>
                                 </xsl:for-each-group>
                             </td>
                         </tr>

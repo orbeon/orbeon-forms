@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.generator;
 
 import org.orbeon.errorified.Exceptions;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -73,10 +74,10 @@ public class ExceptionGenerator extends ProcessorImpl {
 
         helper.element("type", throwable.getClass().getName());
         helper.element("message", throwable instanceof ValidationException
-                ? ((ValidationException) throwable).getSimpleMessage()
+                ? ((ValidationException) throwable).message()
                 : throwable.getMessage());
 
-        addLocationData(helper, ValidationException.getAllLocationData(throwable));
+        addLocationData(helper, OrbeonLocationException.jGetAllLocationData(throwable));
 
         if (stackTrace) {
             final StackTraceElement[] elements = throwable.getStackTrace();
@@ -116,24 +117,21 @@ public class ExceptionGenerator extends ProcessorImpl {
 
                     String elementString = extendedLocationData.getElementString();
                     final String[] parameters = extendedLocationData.getParameters();
-                    if (parameters != null) {
+                    if (parameters.length > 0) {
                         helper.startElement("parameters");
                         for (int j = 0; j < parameters.length; j += 2) {
                             final String paramName = parameters[j];
                             final String paramValue = parameters[j + 1];
 
-                            if (paramValue != null) {
-                                if (elementString == null && paramName.equals("element")) {
-                                    // Use "element" parameter as element string if present and not already set
-                                    elementString = paramValue;
-                                } else {
-                                    // Just output the parameter
-                                    helper.startElement("parameter");
-                                    helper.element("name", paramName);
-                                    helper.element("value", paramValue);
-                                    helper.endElement();
-                                }
-
+                            if (elementString == null && paramName.equals("element")) {
+                                // Use "element" parameter as element string if present and not already set
+                                elementString = paramValue;
+                            } else {
+                                // Just output the parameter
+                                helper.startElement("parameter");
+                                helper.element("name", paramName);
+                                helper.element("value", paramValue);
+                                helper.endElement();
                             }
                         }
                         helper.endElement();

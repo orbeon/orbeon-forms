@@ -21,6 +21,7 @@ import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -522,7 +523,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     } else {
                         // Add template location data if possible
                         final LocationData templatesLocationData = (templatesInfo.systemId != null) ? new LocationData(templatesInfo.systemId, -1, -1) : null;
-                        throw ValidationException.wrapException(rootCause, new ExtendedLocationData(templatesLocationData, "executing XSLT transformation"));
+                        throw OrbeonLocationException.wrapException(rootCause, new ExtendedLocationData(templatesLocationData, "executing XSLT transformation"));
                     }
                 }
             }
@@ -696,7 +697,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         final LocationData transformerExceptionLocationData
                             = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetXMLReceiver.getSystemId());
                         if (transformerExceptionLocationData.getSystemID() != null)
-                            throw ValidationException.wrapException(e, new ExtendedLocationData(transformerExceptionLocationData, "creating XSLT transformer"));
+                            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(transformerExceptionLocationData, "creating XSLT transformer"));
                         else
                             throw new OXFException(e);
                     }
@@ -719,7 +720,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 //                    throw ve;
                 } catch (Exception e) {
                     if (topStylesheetXMLReceiver.getSystemId() != null) {
-                        throw ValidationException.wrapException(e, new ExtendedLocationData(topStylesheetXMLReceiver.getSystemId(), -1, -1, "creating XSLT transformer"));
+                        throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(topStylesheetXMLReceiver.getSystemId(), -1, -1, "creating XSLT transformer"));
                     } else {
                         throw new OXFException(e);
                     }

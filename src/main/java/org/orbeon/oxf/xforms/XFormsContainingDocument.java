@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.Cacheable;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.Version;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -217,7 +218,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             try {
                 initialize();
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData(), "initializing XForms containing document"));
             }
         }
         indentedLogger.endHandleOperation();
@@ -331,7 +332,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
         try {
             restoreDynamicState(xformsState.dynamicState());
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
+            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData(), "re-initializing XForms containing document"));
         }
         indentedLogger.endHandleOperation();
     }

@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.impl;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
 import org.orbeon.oxf.pipeline.api.TracingPipelineContext;
@@ -404,7 +404,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
             getRuntimeFilter().read(pipelineContext, xmlReceiver);
             // NOTE: Not sure why we used to catch and log AbstractMethodError here, but we should not!
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, getLocationData());
+            throw OrbeonLocationException.wrapException(e, getLocationData());
         } finally {
             if (traceEntry != null)
                 traceEntry.end = System.nanoTime();

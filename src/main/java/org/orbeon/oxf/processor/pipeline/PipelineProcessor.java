@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.pipeline;
 import org.dom4j.*;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -210,7 +211,7 @@ public class PipelineProcessor extends ProcessorImpl {
                 processor.setId(processorCall.getId());
                 processor.setLocationData(new ExtendedLocationData(processorLocationData,
                         "executing processor", (Element) processorCall.getNode(),
-                        new String[] { "name", processorNameOrURI }, true));
+                        new String[] { "name", processorNameOrURI }));
 
                 // Process outputs
                 for (Iterator j = processorCall.getOutputs().iterator(); j.hasNext();) {
@@ -508,7 +509,7 @@ public class PipelineProcessor extends ProcessorImpl {
                 }
 
                 processorInputOutput.setLocationData(new ExtendedLocationData(locationData,
-                        description, (Element) astNodeContainer.getNode(), params, true));
+                        description, (Element) astNodeContainer.getNode(), params));
             }
         }
     }
@@ -616,7 +617,7 @@ public class PipelineProcessor extends ProcessorImpl {
                     try {
                         processor.start(context);
                     } catch (Exception e) {
-                        throw ValidationException.wrapException(e, processor.getLocationData());
+                        throw OrbeonLocationException.wrapException(e, processor.getLocationData());
                     }
                 }
             });

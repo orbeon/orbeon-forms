@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -519,10 +520,10 @@ public class URLGenerator extends ProcessorImpl {
                 } catch (SAXParseException spe) {
                     throw new ValidationException(spe.getMessage(), new LocationData(spe));
                 } catch (ValidationException e) {
-                    final LocationData locationData = e.getLocationData();
+                    final LocationData locationData = e.firstLocationData();
                     // The system id may not be set
                     if (locationData == null || locationData.getSystemID() == null)
-                        throw ValidationException.wrapException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
+                        throw OrbeonLocationException.wrapException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                     else
                         throw e;
                 } catch (OXFException e) {

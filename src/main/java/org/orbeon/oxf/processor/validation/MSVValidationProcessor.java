@@ -176,16 +176,16 @@ public class MSVValidationProcessor extends ProcessorImpl {
                         private void generateErrorElement(SchemaValidationException ve) throws SAXException {
                             if (decorateOutput && ve != null) {
 
-                                final String systemId = ve.getLocationData().getSystemID();
+                                final String systemId = ve.firstLocationData().getSystemID();
                                 final AttributesImpl a = new AttributesImpl();
                                 a.addAttribute("", MESSAGE_ATTRIBUTE,
-                                        MESSAGE_ATTRIBUTE, "CDATA", ve.getSimpleMessage());
+                                        MESSAGE_ATTRIBUTE, "CDATA", ve.message());
                                 a.addAttribute("", SYSTEMID_ATTRIBUTE,
                                         SYSTEMID_ATTRIBUTE, "CDATA", systemId == null ? "" : systemId);
                                 a.addAttribute("", LINE_ATTRIBUTE,
-                                        LINE_ATTRIBUTE, "CDATA", Integer.toString(ve.getLocationData().getLine()));
+                                        LINE_ATTRIBUTE, "CDATA", Integer.toString(ve.firstLocationData().getLine()));
                                 a.addAttribute("", COLUMN_ATTRIBUTE,
-                                        COLUMN_ATTRIBUTE, "CDATA", Integer.toString(ve.getLocationData().getCol()));
+                                        COLUMN_ATTRIBUTE, "CDATA", Integer.toString(ve.firstLocationData().getCol()));
 
                                 xmlReceiver.startElement(ORBEON_ERROR_NS,
                                         ERROR_ELEMENT,

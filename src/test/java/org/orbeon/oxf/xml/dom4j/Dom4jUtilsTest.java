@@ -17,9 +17,6 @@ import junit.framework.TestCase;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.junit.Test;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.xml.sax.helpers.AttributesImpl;
 
 public class Dom4jUtilsTest extends TestCase {
     @Test
@@ -46,14 +43,5 @@ public class Dom4jUtilsTest extends TestCase {
 
         // Compact output
         assertEquals("<div><b>bold</b></div>", Dom4jUtils.domToCompactString(document));
-    }
-
-    @Test
-    public void testSaxToDebugElement() {
-        final AttributesImpl attributes = new AttributesImpl();
-        attributes.addAttribute("", "foo", "foo", ContentHandlerHelper.CDATA, "v1");
-        attributes.addAttribute(XMLConstants.XHTML_NAMESPACE_URI, "bar", "xh:bar", ContentHandlerHelper.CDATA, "v2");
-
-        assertEquals("<foo:bar foo=\"v1\" xh:bar=\"v2\"/>", Dom4jUtils.elementToDebugString(Dom4jUtils.saxToDebugElement("foo:bar", attributes)));
     }
 }

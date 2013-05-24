@@ -152,7 +152,7 @@ public class StringErrorListener implements ErrorListener {
             final Throwable t = Exceptions.getRootThrowable(te.getException());
             // TODO: check this, should maybe look for root validation data?
             if (t instanceof ValidationException)
-                return ((ValidationException) t).getLocationData().toString();
+                return ((ValidationException) t).firstLocationData().toString();
             else
                 return ((OXFException) te.getException()).getMessage();
         } else {

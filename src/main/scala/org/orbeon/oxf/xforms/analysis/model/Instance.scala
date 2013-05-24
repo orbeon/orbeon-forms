@@ -39,7 +39,13 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
         with Logging {
 
     def partExposeXPathTypes = part.isExposeXPathTypes
-    override def extendedLocationData = new ExtendedLocationData(locationData, "processing XForms instance", element, "id", staticId)
+
+    override def extendedLocationData =
+        new ExtendedLocationData(
+            locationData,
+            Some("processing XForms instance"),
+            List("id" → staticId),
+            Option(element))
 
     // Get constant inline content from AbstractBinding if possible, otherwise extract from element.
     // Doing so allows for sharing of constant instances globally, among uses of an AbstractBinding and among multiple

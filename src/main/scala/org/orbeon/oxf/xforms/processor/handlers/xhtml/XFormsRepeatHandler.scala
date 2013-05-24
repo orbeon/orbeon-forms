@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.control.XFormsControl
@@ -113,7 +113,7 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                     outputInterceptor.flushCharacters(true, true)
             } catch {
                 case e: Exception ⇒
-                    throw ValidationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element))
+                    throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element))
             }
             handlerContext.popRepeatContext()
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPathCache;
@@ -26,7 +27,6 @@ import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
 import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.Item;
@@ -204,7 +204,7 @@ public class XFormsContextStack {
     public BindingContext.VariableInfo scopeVariable(VariableAnalysisTrait staticVariable, String sourceEffectiveId, boolean handleNonFatal) {
         
         // Create variable object
-        final Variable variable = new Variable(staticVariable, this, containingDocument);
+        final Variable variable = new Variable(staticVariable, containingDocument);
 
         // Find variable scope
         final Scope newScope = ((ElementAnalysis) staticVariable).scope();
@@ -559,11 +559,10 @@ public class XFormsContextStack {
             }
         } catch (Exception e) {
             if (bindingElement != null) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression",
-                    bindingElement, "element", Dom4jUtils.elementToDebugString(bindingElement)));
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression", bindingElement));
             } else {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression",
-                    bindingElement, "ref", ref, "context", context, "nodeset", nodeset, "modelId", modelId, "bindId", bindId));
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(locationData, "evaluating binding expression",
+                    bindingElement, new String[] { "ref", ref, "context", context, "nodeset", nodeset, "modelId", modelId, "bindId", bindId }));
             }
         }
     }

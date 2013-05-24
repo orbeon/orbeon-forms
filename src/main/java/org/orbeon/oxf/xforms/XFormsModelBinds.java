@@ -17,10 +17,10 @@ import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.orbeon.errorified.Exceptions;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.XPath;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.XPathDependencies;
 import org.orbeon.oxf.xforms.analysis.model.BindTree;
 import org.orbeon.oxf.xforms.analysis.model.Model;
@@ -345,7 +345,7 @@ public class XFormsModelBinds {
             try {
                 currentBind.applyBinds(bindRunner);
             } catch (Exception e) {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind.locationData(), "evaluating XForms binds", currentBind.staticBind.element()));
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(currentBind.staticBind.locationData(), "evaluating XForms binds", currentBind.staticBind.element()));
             }
         }
     }
@@ -367,8 +367,8 @@ public class XFormsModelBinds {
                         "actual value",  typeValueException.nodeValue);
         } else {
             // All other errors dispatch an event and will cause the usual fatal-or-not behavior
-            final ValidationException ve = ValidationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
-                bind.staticBind.element(), "expression", xpathMIP.compiledExpression().string()));
+            final ValidationException ve = OrbeonLocationException.wrapException(e, new ExtendedLocationData(bind.staticBind.locationData(), message,
+                    bind.staticBind.element(), new String[]{"expression", xpathMIP.compiledExpression().string()}));
             Dispatch.dispatchEvent(new XXFormsXPathErrorEvent(model, ve.getMessage(), ve));
         }
     }
@@ -775,7 +775,7 @@ public class XFormsModelBinds {
                         context.declareNamespace(entry.getKey(), entry.getValue());
                     }
                 } catch (Exception e) {
-                    throw ValidationException.wrapException(e, bind.staticBind.locationData());
+                    throw OrbeonLocationException.wrapException(e, bind.staticBind.locationData());
 
                     // TODO: xxx check what XForms event must be dispatched
                 }

@@ -13,7 +13,7 @@
  */
 package org.orbeon.exception
 
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.apache.commons.lang3.StringUtils._
 import collection.JavaConverters._
@@ -27,29 +27,23 @@ object OrbeonFormatter extends Formatter {
 
     override def getThrowableMessage(throwable: Throwable): Option[String] =
         throwable match {
-            case ve: ValidationException ⇒ Option(ve.getSimpleMessage)
+            case ve: ValidationException ⇒ Option(ve.message)
             case t ⇒ Option(t.getMessage)
         }
 
     override def getAllLocationData(t: Throwable): List[SourceLocation] =
-        ValidationException.getAllLocationData(t).asScala.toList flatMap sourceLocation
+        OrbeonLocationException.getAllLocationData(t) flatMap sourceLocation
 
     // Create SourceLocation from LocationData
-    private def sourceLocation(locationData: LocationData) =
-        if (isNotBlank(locationData.getSystemID) && ! locationData.getSystemID.endsWith(".java")) {
+    private def sourceLocation(locationData: LocationData): Option[SourceLocation] =
+        if (isNotBlank(locationData.getSystemID)) {
             val (description, params) =
                 locationData match {
-                    case extended: ExtendedLocationData ⇒
-                        (Option(extended.getDescription), arrayToTuples(extended.getParameters))
-                    case _ ⇒ (None, Nil)
+                    case extended: ExtendedLocationData ⇒ (extended.description, extended.params)
+                    case _                              ⇒ (None, Nil)
                 }
 
             Some(SourceLocation(locationData.getSystemID, filterLineCol(locationData.getLine), filterLineCol(locationData.getCol), description, params))
         } else
             None
-
-    private def arrayToTuples(a: Array[String]): List[(String, String)] = Option(a) match {
-        case Some(a) ⇒ a.grouped(2) map (sub ⇒ (sub(0), sub(1))) filter (_._2 ne null) toList
-        case None    ⇒ Nil
-    }
 }

@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import java.util.{Map ⇒ JMap}
-import org.orbeon.oxf.common.{OXFException, ValidationException}
+import org.orbeon.oxf.common.{OrbeonLocationException, OXFException, ValidationException}
 import collection.mutable.{LinkedHashSet, Stack}
 import org.orbeon.saxon.trace.ExpressionPresenter
 import java.io.ByteArrayOutputStream
@@ -288,8 +288,12 @@ object PathMapXPathAnalysis {
 
         } catch {
             case e: Exception ⇒
-                throw ValidationException.wrapException(e, new ExtendedLocationData(compiledExpression.locationData, "analysing XPath expression",
-                        element, "expression", xpathString))
+                throw OrbeonLocationException.wrapException(e,
+                    new ExtendedLocationData(
+                        compiledExpression.locationData,
+                        Some("analysing XPath expression"),
+                        List("expression" → xpathString),
+                        Option(element)))
         }
     }
 

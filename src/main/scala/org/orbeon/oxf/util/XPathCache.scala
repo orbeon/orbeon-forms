@@ -513,6 +513,9 @@ object XPathCache {
                 result
             } else
                 body
-        } catch { case e: Exception ⇒ throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData) }
-        finally xpathExpression.returnToPool()
+        } catch {
+            case e: Exception ⇒
+                throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData)
+        } finally
+            xpathExpression.returnToPool()
 }

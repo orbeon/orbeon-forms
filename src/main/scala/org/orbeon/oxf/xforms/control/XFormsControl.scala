@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.processor.converter.XHTMLRewrite
 import org.orbeon.oxf.util.{Logging, NetUtils}
 import org.orbeon.oxf.xforms._
@@ -205,7 +205,7 @@ class XFormsControl(
         try evaluateImpl(relevant = true, parentRelevant = true)
         catch {
             case e: ValidationException ⇒ {
-                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element, "element", Dom4jUtils.elementToDebugString(element)))
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating control", element))
             }
         }
 

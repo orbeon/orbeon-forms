@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.XFormsUtils
@@ -91,7 +91,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
                 itemsetProperty.value()
         } catch {
             case e: Exception ⇒
-                throw ValidationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
+                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
         }
 
     override def evaluateExternalValue(): Unit = {

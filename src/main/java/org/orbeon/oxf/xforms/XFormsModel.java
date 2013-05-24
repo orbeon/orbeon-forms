@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -632,7 +633,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
             }
         } catch (Exception e) {
             final ValidationException validationException
-                = ValidationException.wrapException(e, new ExtendedLocationData(instance.locationData(), "reading external instance", instance.element()));
+                = OrbeonLocationException.wrapException(e, new ExtendedLocationData(instance.locationData(), "reading external instance", instance.element()));
             Dispatch.dispatchEvent(new XFormsLinkExceptionEvent(XFormsModel.this, instanceResource, validationException));
         }
     }

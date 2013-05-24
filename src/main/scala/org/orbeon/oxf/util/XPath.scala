@@ -23,7 +23,7 @@ import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.saxon.value.{Value, AtomicValue}
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.saxon.Configuration
 import javax.xml.transform.{TransformerException, Source, URIResolver}
 import org.orbeon.oxf.resources.URLFactory
@@ -170,7 +170,8 @@ object XPath {
         }
 
     def handleXPathException(e: Exception, xpathString: String, description: String, locationData: LocationData) = {
-        val validationException = ValidationException.wrapException(e, new ExtendedLocationData(locationData, description, "expression", xpathString))
+        val validationException =
+            OrbeonLocationException.wrapException(e, new ExtendedLocationData(locationData, Option(description), List("expression" → xpathString)))
 
         // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
         // so we need to explicitly add them.

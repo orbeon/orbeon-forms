@@ -43,6 +43,7 @@ import org.orbeon.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
+import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.validation.SchemaValidationException;
@@ -718,7 +719,7 @@ public class XFormsModelSchemaValidator {
             }
             return grammar;
         } catch (Exception e) {
-            throw ValidationException.wrapException(e, new ExtendedLocationData(absoluteSchemaURL, -1, -1, "loading schema from URI"));
+            throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(absoluteSchemaURL, -1, -1, "loading schema from URI"));
         }
     }
 

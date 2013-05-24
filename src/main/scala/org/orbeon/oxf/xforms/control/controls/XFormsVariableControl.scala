@@ -35,7 +35,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
     override type Control <: VariableControl
 
     // Actual variable name/value representation
-    private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], container.getContextStack, containingDocument)
+    private val variable = new Variable(staticControl.asInstanceOf[VariableAnalysisTrait], containingDocument)
 
     // This is the context within or after this control, which is affected by the value of the variable
     private var _bindingContextForChild: BindingContext = null

@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.event.events
 
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.OrbeonLocationException.getRootLocationData
 import org.orbeon.oxf.xforms.event.{XFormsEvent, XFormsEventTarget, XFormsEvents}
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import XFormsEvent._
@@ -30,7 +30,7 @@ class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 
     private var throwableOpt: Option[Throwable] = None
     def throwable = throwableOpt.orNull
-    private lazy val rootLocationOpt = throwableOpt map ValidationException.getRootLocationData
+    private lazy val rootLocationOpt = throwableOpt flatMap getRootLocationData
 
     override def lazyProperties = getters(this, XXFormsActionErrorEvent.Getters)
 }
@@ -38,7 +38,7 @@ class XXFormsActionErrorEvent(target: XFormsEventTarget, properties: PropertyGet
 private object XXFormsActionErrorEvent {
 
     val Getters = Map[String, XXFormsActionErrorEvent ⇒ Option[Any]](
-        "element"   → (e ⇒ e.rootLocationOpt collect { case x: ExtendedLocationData ⇒ x.getElementDebugString }),
+        "element"   → (e ⇒ e.rootLocationOpt collect { case x: ExtendedLocationData if x.elementString.isDefined ⇒ x.elementString.get }),
         "system-id" → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getSystemID))),
         "line"      → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getLine))),
         "column"    → (e ⇒ e.rootLocationOpt flatMap (l ⇒ Option(l.getCol))),

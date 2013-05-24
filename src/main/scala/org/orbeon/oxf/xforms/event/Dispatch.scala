@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.event
 
 
-import org.orbeon.oxf.common.ValidationException
+import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.event.XFormsEvent._
@@ -142,7 +142,14 @@ object Dispatch extends Logging {
             case e: Exception ⇒
                 // Add location information if possible
                 val locationData = Option(target.getLocationData).orNull
-                throw ValidationException.wrapException(e, new ExtendedLocationData(locationData, "dispatching XForms event", "event", event.name, "target id", target.getEffectiveId))
+                throw OrbeonLocationException.wrapException(e,
+                    new ExtendedLocationData(
+                        locationData,
+                        Some("dispatching XForms event"),
+                        List(
+                            "event"     → event.name,
+                            "target id" → target.getEffectiveId)
+                        ))
         }
     }
 }

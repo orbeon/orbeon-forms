@@ -159,7 +159,7 @@ abstract class ElementAnalysis(
 
     final def getContextAnalysis = { assert(_contextAnalyzed); contextAnalysis }
     final def getBindingAnalysis = { assert(_bindingAnalyzed); bindingAnalysis }
-    final def getValueAnalysis = { assert(_valueAnalyzed); valueAnalysis }
+    final def getValueAnalysis   = { assert(_valueAnalyzed)  ; valueAnalysis   }
 
     def analyzeXPath(): Unit = {
         contextAnalysis = computeContextAnalysis

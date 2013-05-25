@@ -15,8 +15,9 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.XFormsModel
-import org.orbeon.oxf.xforms.analysis.model.Model
+import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.ConstraintLevel
 
 /**
  * This implementation of dependencies simply says that everything must be updated all the time.
@@ -44,5 +45,5 @@ class DumbXPathDependencies extends XPathDependencies {
     def requireItemsetUpdate(controlPrefixedId: String) = true
     def hasAnyCalculationBind(model: Model, instancePrefixedId: String) = true
     def hasAnyValidationBind(model: Model, instancePrefixedId: String) = true
-    def requireModelMIPUpdate(model: Model, bind: Model#Bind, mipName: String) = true
+    def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ConstraintLevel) = true
 }

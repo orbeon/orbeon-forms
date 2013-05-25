@@ -95,7 +95,7 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         }
     }
 
-    override def isValueChanged() = {
+    override def isValueChangedCommit() = {
         val result = ! compareValues(_previousValue, _value)
         _previousValue = _value
         result

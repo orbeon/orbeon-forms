@@ -123,10 +123,10 @@ class ScalaUtilsTest extends AssertionsForJUnit {
         val expectedAsVector = Seq(("p1", Vector("v11", "v12", "")), ("p2", Vector("v21", "", "v23")))
         val expectedAsSet    = Seq(("p1", Set("v11", "v12", "")), ("p2", Set("v21", "", "v23")))
 
-        assert(expectedAsList   === combineValues[String, List](parameters))
-        assert(expectedAsVector === combineValues[String, Vector](parameters))
-        assert(expectedAsSet    === combineValues[String, Set](parameters))
-        assert(expectedAsList   === (combineValues[AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
+        assert(expectedAsList   === combineValues[String, String, List](parameters))
+        assert(expectedAsVector === combineValues[String, String, Vector](parameters))
+        assert(expectedAsSet    === combineValues[String, String, Set](parameters))
+        assert(expectedAsList   === (combineValues[String, AnyRef, Array](parameters) map { case (k, v) ⇒ k → v.to[List]}))
     }
 
     @Test def testNonEmptyOrNone(): Unit = {

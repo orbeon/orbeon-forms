@@ -261,7 +261,7 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         // Search binds
         if (binds != null) {
-            final XFormsModelBinds.Bind bind = binds.resolveBind(targetStaticId, contextItem);
+            final RuntimeBind bind = binds.resolveBind(targetStaticId, contextItem);
             if (bind != null)
                 return bind;
         }

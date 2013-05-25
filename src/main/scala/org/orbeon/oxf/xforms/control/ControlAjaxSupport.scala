@@ -69,8 +69,8 @@ trait ControlAjaxSupport {
 
         for {
             lhhaType ← LHHA.values
-            value1 = if (isNewlyVisibleSubtree) null else other.getLHHA(lhhaType).value()
-            lhha2 = self.getLHHA(lhhaType)
+            value1 = if (isNewlyVisibleSubtree) null else other.lhhaProperty(lhhaType).value()
+            lhha2 = self.lhhaProperty(lhhaType)
             value2 = lhha2.value()
             if value1 != value2
             attributeValue = Option(lhha2.escapedValue()) getOrElse ""

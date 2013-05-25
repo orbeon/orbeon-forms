@@ -49,9 +49,6 @@ object XPath {
     // Compiled expression with source information
     case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
 
-    // For Java callers, mix-in trait
-    abstract class JVariableResolver extends VariableResolver
-
     // Global Saxon configuration with a global name pool
     val GlobalConfiguration = new Configuration {
 

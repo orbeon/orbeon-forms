@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.SAXStore
 import org.orbeon.oxf.xforms.xbl.{AbstractBinding, Scope, XBLBindings, ConcreteBinding}
 import org.apache.commons.lang3.StringUtils
 import collection.JavaConverters._
+import org.orbeon.oxf.util.ScalaUtils._
 
 trait PartGlobalOps {
 
@@ -73,7 +74,7 @@ trait PartGlobalOps {
     // Functions derived from getControlAnalysis
     def getControlAnalysisOption(prefixedId: String) = Option(getControlAnalysis(prefixedId))
     def getControlElement(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.element) orNull
-    def hasBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) map (_.hasBinding) getOrElse false
+    def hasBinding(prefixedId: String) = getControlAnalysisOption(prefixedId) exists (_.hasBinding)
 
     def getControlPosition(prefixedId: String) = getControlAnalysisOption(prefixedId) match {
         case Some(viewTrait: ViewTrait) ⇒ viewTrait.index
@@ -86,7 +87,7 @@ trait PartGlobalOps {
     }
 
     def isValueControl(effectiveId: String) =
-        getControlAnalysisOption(XFormsUtils.getPrefixedId(effectiveId)) map (_.isInstanceOf[ValueTrait]) getOrElse false
+        getControlAnalysisOption(XFormsUtils.getPrefixedId(effectiveId)) exists (_.isInstanceOf[ValueTrait])
 
     def appendClasses(sb: java.lang.StringBuilder, prefixedId: String) =
         getControlAnalysisOption(prefixedId) foreach { controlAnalysis ⇒
@@ -98,14 +99,13 @@ trait PartGlobalOps {
             }
         }
 
-    def getLabel(prefixedId: String) = getLHHA(prefixedId, "label")
-    def getHelp(prefixedId: String) = getLHHA(prefixedId, "help")
-    def getHint(prefixedId: String) = getLHHA(prefixedId, "hint")
-    def getAlert(prefixedId: String) = getLHHA(prefixedId, "alert")
+    // LHHA
+    def getLHH(prefixedId: String, lhha: String) =
+        collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) flatMap (_.lhh(lhha)) orNull
 
-    def getLHHA(prefixedId: String, lhha: String) =
-        getControlAnalysisOption(prefixedId) match {
-            case Some(lhhaTrait: LHHATrait) ⇒ lhhaTrait.getLHHA(lhha).orNull
-            case _ ⇒ null
-        }
+    def getAlerts(prefixedId: String) =
+        collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)).toList flatMap (_.alerts)
+
+    def hasLHHA(prefixedId: String, lhha: String) =
+        collectByErasedType[StaticLHHASupport](getControlAnalysis(prefixedId)) exists (_.hasLHHA(lhha))
 }

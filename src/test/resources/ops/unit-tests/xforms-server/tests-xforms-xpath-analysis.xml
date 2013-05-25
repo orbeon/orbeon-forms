@@ -2605,6 +2605,7 @@
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="xforms-valid" target="g11"/>
+                                    <event type="xxforms-constraints-changed" target="g11"/>
                                 </events>
                             </instance>
                         </instances>

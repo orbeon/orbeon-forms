@@ -292,7 +292,8 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             for (newIteration ← newIterations)
                 currentControlTree.initializeSubTree(newIteration, true)
 
-            // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events if needed
+            // This will dispatch xforms-enabled/xforms-disabled/xxforms-nodeset-changed/xxforms-index-changed events
+            // if needed on the repeat control itself (subtrees are handled above).
             containingDocument.getControls.getCurrentControlTree.dispatchRefreshEvents(Seq(getEffectiveId).asJava)
 
             // Handle focus changes

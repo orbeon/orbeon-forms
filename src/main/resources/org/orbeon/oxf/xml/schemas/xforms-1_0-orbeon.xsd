@@ -231,6 +231,7 @@
             <xsd:sequence minOccurs="0" maxOccurs="unbounded">
                 <xsd:choice>
                     <xsd:element ref="xforms:bind"/>
+                    <xsd:element ref="xforms:constraint"/>
                     <xsd:any namespace="##other" processContents="lax"/>
                 </xsd:choice>
             </xsd:sequence>
@@ -249,6 +250,21 @@
             <xsd:attribute name="maxOccurs" type="xforms:XPathExpression" use="optional" default="INF"/>
             <xsd:attribute name="minOccurs" type="xforms:XPathExpression" use="optional" default="0"/>
             <xsd:attribute name="p3ptype" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="constraint">
+        <xsd:complexType>
+            <xsd:attributeGroup ref="xforms:Common.Attributes"/>
+            <xsd:attribute name="value" type="xforms:XPathExpression" use="required"/>
+            <xsd:attribute name="level" use="optional">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="error"/>
+                        <xsd:enumeration value="warning"/>
+                        <xsd:enumeration value="info"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:attribute>
         </xsd:complexType>
     </xsd:element>
     <!--
@@ -342,6 +358,8 @@
             <xsd:attribute name="for" type="xsd:string" use="optional"/>
             <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="lang" type="xsd:string" use="optional"/>
+            <xsd:attribute name="level" use="optional"/>
+            <xsd:attribute name="constraint" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>

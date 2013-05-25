@@ -16,7 +16,6 @@ package org.orbeon.exception
 import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 import org.apache.commons.lang3.StringUtils._
-import collection.JavaConverters._
 import org.orbeon.errorified._
 
 // Orbeon-specific exception formatter
@@ -43,7 +42,7 @@ object OrbeonFormatter extends Formatter {
                     case _                              ⇒ (None, Nil)
                 }
 
-            Some(SourceLocation(locationData.getSystemID, filterLineCol(locationData.getLine), filterLineCol(locationData.getCol), description, params))
+            Some(SourceLocation(locationData.getSystemID, filterLineCol(locationData.getLine), filterLineCol(locationData.getCol), description, params.to[List]))
         } else
             None
 }

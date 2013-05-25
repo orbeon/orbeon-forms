@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.xforms.processor.handlers;
 
-import org.dom4j.QName;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
@@ -239,4 +239,15 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
 		return attributes;
 	}
+
+    protected AttributesImpl getStaticLHHAAttributes(String controlPrefixedId, XFormsBaseHandler.LHHAC lhhaType) {
+        final LHHAAnalysis lhhaAnalysis;
+        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
+        if (lhhaType == LHHAC.ALERT)
+            lhhaAnalysis = globalOps.getAlerts(controlPrefixedId).head(); // for alerts, take the first one, but does this make sense?
+        else
+            lhhaAnalysis = globalOps.getLHH(controlPrefixedId, lhhaType.name().toLowerCase());
+
+        return XMLUtils.getSAXAttributes(lhhaAnalysis.element());
+    }
 }

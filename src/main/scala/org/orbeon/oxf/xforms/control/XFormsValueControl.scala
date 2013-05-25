@@ -105,7 +105,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
     protected def isExternalValueDirty: Boolean =
         ! isExternalValueEvaluated
 
-    override def isValueChanged(): Boolean = {
+    override def isValueChangedCommit(): Boolean = {
         val result = _previousValue != _value
         _previousValue = _value
         result

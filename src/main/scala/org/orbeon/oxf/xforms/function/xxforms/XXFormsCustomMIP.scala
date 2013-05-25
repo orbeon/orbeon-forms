@@ -34,9 +34,9 @@ class XXFormsCustomMIP extends XXFormsMIPFunction {
                 val name = Model.buildCustomMIPName(qName.getQualifiedName)
 
                 // Return the value or null
-                Option(InstanceData.getAllCustom(nodeInfo)) flatMap
-                    (m ⇒ Option(m get name)) map
-                        StringValue.makeStringValue orNull
+                Option(InstanceData.collectAllCustomMIPs(nodeInfo)) flatMap
+                    (m ⇒ m get name) map
+                    StringValue.makeStringValue orNull
             case _ ⇒
                 // $item is empty or its first item is not a node
                 null

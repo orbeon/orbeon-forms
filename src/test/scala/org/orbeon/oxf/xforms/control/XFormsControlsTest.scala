@@ -17,7 +17,7 @@ import org.dom4j.QName
 import org.junit.Test
 import org.mockito.{Matchers, Mockito}
 import org.orbeon.oxf.test.ResourceManagerTestBase
-import org.orbeon.oxf.xforms.{BindingContext, PartAnalysis, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.{PartAnalysis, XFormsContainingDocument}
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.xml.sax.helpers.AttributesImpl

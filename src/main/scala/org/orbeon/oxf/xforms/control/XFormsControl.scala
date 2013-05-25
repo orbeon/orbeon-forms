@@ -69,9 +69,11 @@ class XFormsControl(
 
     final val containingDocument = container.getContainingDocument
 
+    final def part = container.getPartAnalysis
+
     // Static information (never changes for the lifetime of the containing document)
     // TODO: Pass staticControl during construction (find which callers don't pass the necessary information)
-    final val staticControl: Control = container.getPartAnalysis.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)).asInstanceOf[Control]
+    final val staticControl: Control = part.getControlAnalysis(XFormsUtils.getPrefixedId(effectiveId)).asInstanceOf[Control]
 
     final val prefixedId = Option(staticControl) map (_.prefixedId) getOrElse XFormsUtils.getPrefixedId(effectiveId)
 
@@ -96,14 +98,14 @@ class XFormsControl(
     implicit final def logger = containingDocument.getControls.getIndentedLogger
 
     final def getResolutionScope =
-        container.getPartAnalysis.scopeForPrefixedId(prefixedId)
+        part.scopeForPrefixedId(prefixedId)
 
     // Resolve an object relative to this control
     final def resolve(staticId: String, contextItem: Item = null) =
         Option(container.resolveObjectByIdInScope(getEffectiveId, staticId, contextItem))
 
     final def getChildElementScope(element: Element) =
-        container.getPartAnalysis.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
+        part.scopeForPrefixedId(container.getFullPrefix + XFormsUtils.getElementId(element))
 
     // Update this control's effective id based on the parent's effective id
     def updateEffectiveId() {
@@ -325,13 +327,13 @@ object XFormsControl {
     // Base trait for a control property (label, itemset, etc.)
     trait ControlProperty[T >: Null] {
         def value(): T
-        def handleMarkDirty()
+        def handleMarkDirty(force: Boolean = false)
         def copy: ControlProperty[T]
     }
 
     // Immutable control property
     class ImmutableControlProperty[T >: Null](val value: T) extends ControlProperty[T] {
-        override def handleMarkDirty() = ()
+        override def handleMarkDirty(force: Boolean) = ()
         override def copy = this
     }
 
@@ -374,14 +376,14 @@ object XFormsControl {
             _value
         }
 
-        def handleMarkDirty() {
+        def handleMarkDirty(force: Boolean) {
 
             def isDirty = ! isEvaluated
             def markOptimized() = isOptimized = true
 
             if (! isDirty) {
                 // don't do anything if we are already dirty
-                if (isRelevant != wasRelevant) {
+                if (force || isRelevant != wasRelevant) {
                     // Control becomes relevant or non-relevant
                     markDirty()
                 } else if (isRelevant) {

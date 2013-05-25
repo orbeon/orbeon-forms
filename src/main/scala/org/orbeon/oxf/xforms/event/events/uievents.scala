@@ -17,6 +17,9 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import org.orbeon.oxf.xforms.BindNode
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{InfoLevel, WarningLevel, ConstraintLevel, ErrorLevel}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(DOM_ACTIVATE, target.asInstanceOf[XFormsControl], properties, bubbles = true, cancelable = true) {
@@ -103,4 +106,27 @@ class XXFormsUnvisitedEvent(target: XFormsEventTarget, properties: PropertyGette
 class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_VALUE_CHANGED, target.asInstanceOf[XFormsControl], properties) {
     def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+}
+
+class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
+    extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
+    def this(target: XFormsEventTarget, previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]) =
+        this(target, XXFormsConstraintsChangedEvent.properties(previous, current))
+}
+
+object XXFormsConstraintsChangedEvent {
+
+    private def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ConstraintLevel) = {
+        val previousIds = previous.map(_.id).toSet
+        current filter (_.level == level) map (_.id) filterNot previousIds
+    }
+
+    def properties(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]): PropertyGetter = {
+        case "added-errors"     ⇒ Some(diffConstraints(previous, current, ErrorLevel))
+        case "removed-errors"   ⇒ Some(diffConstraints(current, previous, ErrorLevel))
+        case "added-warnings"   ⇒ Some(diffConstraints(previous, current, WarningLevel))
+        case "removed-warnings" ⇒ Some(diffConstraints(current, previous, WarningLevel))
+        case "added-infos"      ⇒ Some(diffConstraints(previous, current, InfoLevel))
+        case "removed-infos"    ⇒ Some(diffConstraints(current, previous, InfoLevel))
+    }
 }

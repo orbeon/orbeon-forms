@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms;
 
 import org.dom4j.QName;
-import org.orbeon.oxf.util.PropertyContext;
+import org.orbeon.oxf.xforms.RuntimeBind;
 import org.orbeon.oxf.xforms.XFormsContextStack;
 import org.orbeon.oxf.xforms.XFormsModelBinds;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
@@ -36,7 +36,7 @@ public class XXFormsEvaluateBindProperty extends XFormsFunction {
 
         // TODO: We get the model and the current single item through different means. Is there potential for issues?
         final XFormsModelBinds binds = contextStack.getCurrentModel().getBinds();
-        final XFormsModelBinds.Bind bind = binds.resolveBind(bindId, contextStack.getCurrentSingleItem());
+        final RuntimeBind bind = binds.resolveBind(bindId, contextStack.getCurrentSingleItem());
         if (bind == null) {
             // Return empty sequence
             return null;

@@ -85,6 +85,8 @@ public class XFormsEvents {
     public static final String XFORMS_OPTIONAL = "xforms-optional";
     public static final String XFORMS_READWRITE = "xforms-readwrite";
     public static final String XFORMS_READONLY = "xforms-readonly";
+    public static final String XXFORMS_CONSTRAINTS_CHANGED = "xxforms-constraints-changed";
+
     public static final String XXFORMS_VISITED = "xxforms-visited";
     public static final String XXFORMS_UNVISITED = "xxforms-unvisited";
 

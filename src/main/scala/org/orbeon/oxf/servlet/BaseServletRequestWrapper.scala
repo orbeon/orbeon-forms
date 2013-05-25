@@ -73,7 +73,7 @@ trait RequestPathQuery extends BaseServletRequestWrapper {
     def overriddenPathQuery: String // will be called only once
 
     private lazy val (pathInfo, queryString) = splitQuery(overriddenPathQuery)
-    private lazy val parameters = combineValues[String, Array](queryString.toList flatMap decodeSimpleQuery).toMap
+    private lazy val parameters = combineValues[String, String, Array](queryString.toList flatMap decodeSimpleQuery).toMap
 
     override def getParameterMap                  = parameters.asJava
     override def getParameterNames                = parameters.keys.iterator.asJavaEnumeration

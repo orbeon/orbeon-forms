@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.analysis.controls
 
 import org.dom4j._
 import org.orbeon.oxf.util.XPathCache
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -22,29 +23,50 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import xbl.Scope
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 
 class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
-        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope) with AppearanceTrait {
+        extends SimpleElementAnalysis(staticStateContext, element, parent, preceding, scope)
+        with AppearanceTrait {
 
     self ⇒
 
     require(parent.isDefined)
 
     val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
-    val isLocal          = forStaticIdOption.isEmpty
-    val defaultToHTML    = LHHAAnalysis.isHTML(element)
+    val isLocal           = forStaticIdOption.isEmpty
+    val defaultToHTML     = LHHAAnalysis.isHTML(element)
+
+    val forConstraints =
+        if (localName == "alert")
+            stringToSet(element.attributeValue(CONSTRAINT_QNAME))
+        else
+            Set.empty[String]
+
+    val forLevels =
+        if (localName == "alert") {
+            val att = element.attributeValue(LEVEL_QNAME)
+            if (att ne null)
+                stringToSet(att) collect LevelByName
+            else if (element.attribute(CONSTRAINT_QNAME) ne null)
+                Set.empty[ConstraintLevel] // consider that the constraints prime over the levels
+            else
+                LevelSet                   // match all levels because we take it as "no level constraint was specified"
+        } else
+            Set.empty[ConstraintLevel]
 
     // Find the target control if any
-    def targetControl =
-        forStaticIdOption map
-            (forStaticId ⇒ part.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId))) orElse
-                parent collect
-                    { case lhhaControl: LHHATrait ⇒ lhhaControl }
+    def targetControl = (
+        forStaticIdOption
+        map (forStaticId ⇒ part.getControlAnalysis(scope.prefixedIdForStaticId(forStaticId)))
+        orElse parent
+        collect { case lhhaControl: StaticLHHASupport ⇒ lhhaControl }
+    )
 
     // Attach this LHHA to its target control if any
     def attachToControl() = targetControl match {
         case Some(lhhaControl) ⇒
-            lhhaControl.setExternalLHHA(self)
+            lhhaControl.attachLHHA(self)
         case None if ! isLocal ⇒
             part.getIndentedLogger.logWarning("", "cannot attach external LHHA to control",
                 Array("type", localName, "element", Dom4jUtils.elementToDebugString(element)): _*)
@@ -53,8 +75,8 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 
     // TODO: make use of static value
     //
-    // o output static value in HTML markup and repeat templates
-    // o if has static value, don't attempt to compare values upon diff, and never send new related information to client
+    // - output static value in HTML markup and repeat templates
+    // - if has static value, don't attempt to compare values upon diff, and never send new related information to client
     val (staticValue, containsHTML) =
         if (LHHAAnalysis.hasStaticValue(staticStateContext, element)) {
             // TODO: figure out whether to allow HTML or not (could default to true?)
@@ -148,8 +170,8 @@ object LHHAAnalysis {
     // Whether the control has a placeholder for the given LHHA type
     def hasLHHAPlaceholder(elementAnalysis: ElementAnalysis, lhhaType: String) =
         elementAnalysis match {
-            case lhhaTrait: LHHATrait ⇒
-                lhhaTrait.getLHHA(lhhaType).toSeq exists
+            case lhhaTrait: StaticLHHASupport ⇒
+                lhhaTrait.lhh(lhhaType).toList exists
                     (lhha ⇒ lhha.appearances(XFORMS_MINIMAL_APPEARANCE_QNAME) || lhha.appearances(XXFORMS_PLACEHOLDER_APPEARANCE_QNAME))
             case _ ⇒
                 false

@@ -65,7 +65,7 @@ public class ControlTree implements ExternalCopyable {
             final List<String> controlsEffectiveIds = new ArrayList<String>(controlIndex.getEffectiveIdsToControls().keySet());
             dispatchRefreshEvents(controlsEffectiveIds);
         } else {
-            // Make sure all controls state such as relevance, value changed, etc. does not mark a difference
+            // Make sure all control state such as relevance, value changed, etc. does not mark a difference
             for (final XFormsControl control: allControls) {
                 control.commitCurrentUIState();
             }

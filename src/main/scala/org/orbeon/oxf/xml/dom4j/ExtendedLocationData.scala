@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml.dom4j
 
 import org.dom4j.Element
-import collection.breakOut
+import collection.{breakOut, immutable}
 
 /**
  * LocationData information with additional information.
@@ -24,7 +24,7 @@ class ExtendedLocationData private (
         val line: Int,
         val col: Int,
         val description: Option[String],
-        paramsAllowNullValues: List[(String, String)])
+        paramsAllowNullValues: immutable.Seq[(String, String)])
     extends LocationData(systemID, line, col) {
 
     val params = paramsAllowNullValues filter (_._2 ne null)
@@ -34,13 +34,13 @@ class ExtendedLocationData private (
         this(systemID, line, col, Option(description), Nil)
 
     // With LocationData, description, params and element
-    def this(locationData: LocationData, description: Option[String] = None, params: List[(String, String)] = Nil, element: Option[Element] = None) =
+    def this(locationData: LocationData, description: Option[String] = None, params: immutable.Seq[(String, String)] = Nil, element: Option[Element] = None) =
         this(
             Option(locationData) map (_.getSystemID) orNull,
             Option(locationData) map (_.getLine) getOrElse -1,
             Option(locationData) map (_.getCol) getOrElse -1,
             description,
-            (if (element.isDefined) List("element" → (element map Dom4jUtils.elementToDebugString get)) else Nil) ::: params
+            (if (element.isDefined) List("element" → (element map Dom4jUtils.elementToDebugString get)) else Nil) ++: params
         )
 
     // For Java callers: with LocationData, description, element and parameters

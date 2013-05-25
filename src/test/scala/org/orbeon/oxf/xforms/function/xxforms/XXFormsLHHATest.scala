@@ -32,6 +32,8 @@ class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
                             <value label="My label" help="My help" hint="My hint" alert="My alert"/>
                         </xf:instance>
 
+                        <xf:bind ref="instance()" constraint="false()"/>
+
                         <xf:instance id="results">
                             <results label="" help="" hint="" alert=""/>
                         </xf:instance>
@@ -59,6 +61,7 @@ class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:body>
             </xh:html>
 
+        // NOTE: Make the control invalid so that the alert message is not empty
         for (lhha ← Seq("label", "help", "hint", "alert"))
             assert(getValueControl(lhha).getValue === "My " + lhha)
     }

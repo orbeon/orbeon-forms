@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
@@ -252,23 +251,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected ElementAnalysis getLHHAAnalysis(String controlPrefixedId, XFormsBaseHandler.LHHAC lhhaType) {
-        // Statically obtain attributes information
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        if (lhhaType == LHHAC.LABEL) {
-            return globalOps.getLabel(controlPrefixedId);
-        } else if (lhhaType == LHHAC.HELP) {
-            return globalOps.getHelp(controlPrefixedId);
-        } else if (lhhaType == LHHAC.HINT) {
-            return globalOps.getHint(controlPrefixedId);
-        } else if (lhhaType == LHHAC.ALERT) {
-            return globalOps.getAlert(controlPrefixedId);
-        } else {
-            throw new IllegalStateException("Illegal type requested");
-        }
-    }
-
-    protected void handleLabelHintHelpAlert(ElementAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
+    protected void handleLabelHintHelpAlert(Attributes attributes, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
 
         // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
         final boolean isLabel = lhhaType == LHHAC.LABEL;
@@ -305,7 +288,6 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
         final String elementName;
         {
-            // Statically obtain attributes information
             if (isLabel) {
                 elementName = handlerContext.getLabelElementName();
             } else if (isHelp) {
@@ -319,16 +301,14 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             }
         }
 
-        final Attributes labelHintHelpAlertAttributes = XMLUtils.getSAXAttributes(lhhaAnalysis.element());
-
-        if (labelHintHelpAlertAttributes != null || isAlert) {
+        if (attributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
 
             final StringBuilder classes = new StringBuilder(30);
 
             // Put user classes first if any
-            if (labelHintHelpAlertAttributes != null) {
-                final String userClass = labelHintHelpAlertAttributes.getValue("class");
+            if (attributes != null) {
+                final String userClass = attributes.getValue("class");
                 if (userClass != null)
                     classes.append(userClass);
             }
@@ -427,7 +407,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             if (!(isNoscript && isHelp)) {
 
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
-                final Attributes newAttributes = (labelHintHelpAlertAttributes != null) ? labelHintHelpAlertAttributes : new AttributesImpl();
+                final Attributes newAttributes = (attributes != null) ? attributes : new AttributesImpl();
                 outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), targetControlEffectiveId,
                         forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, addIds);
             }

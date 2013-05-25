@@ -14,7 +14,8 @@
 package org.orbeon.oxf.xforms.processor.handlers.xml;
 
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
 import org.xml.sax.Attributes;
@@ -101,27 +102,28 @@ public class XFormsControlLifecyleHandlerXML extends XFormsBaseHandlerXML {
     }
 
     private boolean hasLocalLabel() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getLabel(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        return hasLocalLHHA("label");
     }
 
     private boolean hasLocalHint() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getHint(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        return hasLocalLHHA("hint");
     }
 
     private boolean hasLocalHelp() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getHelp(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        return hasLocalLHHA("help");
     }
 
     private boolean hasLocalAlert() {
+        return hasLocalLHHA("alert");
+    }
+
+    private boolean hasLocalLHHA(String lhhaType) {
         final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getAlert(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        final ElementAnalysis analysis = globalOps.getControlAnalysis(getPrefixedId());
+        if (analysis instanceof StaticLHHASupport)
+            return ((StaticLHHASupport) analysis).hasLocal(lhhaType);
+        else
+            return false;
     }
 
     protected boolean isMustOutputControl(XFormsControl control) {

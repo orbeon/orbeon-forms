@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -155,7 +156,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
             // Process everything after the control has been shown
             if (endConfig != null) {
 
-                for (final String current: endConfig) {
+                for (final String current : endConfig) {
                     if ("control".equals(current)) {
                         // Handle control
                         handleControlEnd(uri, localname, qName, attributes, getEffectiveId(), getControl());
@@ -188,27 +189,28 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
     }
 
     private boolean hasLocalLabel() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getLabel(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        return hasLocalLHHA("label");
     }
 
     private boolean hasLocalHint() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getHint(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        return hasLocalLHHA("hint");
     }
 
     private boolean hasLocalHelp() {
-        final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getHelp(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        return hasLocalLHHA("help");
     }
 
     private boolean hasLocalAlert() {
+        return hasLocalLHHA("alert");
+    }
+
+    private boolean hasLocalLHHA(String lhhaType) {
         final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-        final LHHAAnalysis analysis = globalOps.getAlert(getPrefixedId());
-        return analysis != null && analysis.isLocal();
+        final ElementAnalysis analysis = globalOps.getControlAnalysis(getPrefixedId());
+        if (analysis instanceof StaticLHHASupport)
+            return ((StaticLHHASupport) analysis).hasLocal(lhhaType);
+        else
+            return false;
     }
 
     protected boolean isMustOutputControl(XFormsControl control) {
@@ -232,22 +234,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, getControl(), isTemplate(), false);
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, getControl(), isTemplate(), false);
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, getControl(), isTemplate(), false);
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getLHHAAnalysis(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, getControl(), isTemplate(), false);
     }
 
     // Must be overridden by subclasses

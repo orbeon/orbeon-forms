@@ -14,15 +14,14 @@
 package org.orbeon.oxf.xforms.processor.handlers.xml;
 
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
-import org.orbeon.oxf.xforms.StaticStateGlobalOps;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -97,33 +96,27 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
         }
         
         final String elementName;
-        final AttributesImpl labelHintHelpAlertAttributes;
-        {
-            // Statically obtain attributes information
-        	final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
-            final LHHAAnalysis lhhaAnalysis;
-            final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
-            if (isLabel) {
-                elementName = handlerContext.getLabelElementName();
-                lhhaAnalysis = globalOps.getLabel(forPrefixedId);
-            } else if (isHelp) {
-                elementName = handlerContext.getHelpElementName();
-                lhhaAnalysis = globalOps.getHelp(forPrefixedId);
-            } else if (isHint) {
-                elementName = handlerContext.getHintElementName();
-                lhhaAnalysis = globalOps.getHint(forPrefixedId);
-            } else if (isAlert) {
-                elementName = handlerContext.getAlertElementName();
-                lhhaAnalysis = globalOps.getAlert(forPrefixedId);
-            } else {
-                throw new IllegalStateException("Illegal type requested");
-            }
+        if (isLabel) {
+            elementName = handlerContext.getLabelElementName();
+        } else if (isHelp) {
+            elementName = handlerContext.getHelpElementName();
+        } else if (isHint) {
+            elementName = handlerContext.getHintElementName();
+        } else if (isAlert) {
+            elementName = handlerContext.getAlertElementName();
+        } else {
+            throw new IllegalStateException("Illegal type requested");
+        }
 
-            labelHintHelpAlertAttributes = (lhhaAnalysis != null) ? (AttributesImpl)XMLUtils.getSAXAttributes(lhhaAnalysis.element()) : null;
+        final Attributes labelHintHelpAlertAttributes;
+        {
+            final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
+            final AttributesImpl tempAttributes = getStaticLHHAAttributes(forPrefixedId, lhhaType);
             
-            if(labelHintHelpAlertAttributes != null) {
-            	updateID(labelHintHelpAlertAttributes, controlEffectiveId, lhhaType);
-            }
+            if (tempAttributes != null)
+            	updateID(tempAttributes, controlEffectiveId, lhhaType);
+
+            labelHintHelpAlertAttributes = tempAttributes;
         }
         
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();

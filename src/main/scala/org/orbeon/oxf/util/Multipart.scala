@@ -50,7 +50,7 @@ object Multipart {
                     override def contextDestroyed(success: Boolean) = deleteFileItems(nameValues)
                 })
 
-                combineValues[AnyRef, Array](nameValues).toMap.asJava
+                combineValues[String, AnyRef, Array](nameValues).toMap.asJava
             case (nameValues, Some(t)) ⇒
                 deleteFileItems(nameValues)
                 throw t

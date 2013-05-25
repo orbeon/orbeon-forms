@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.analysis.model.Model;
+import org.orbeon.oxf.xforms.analysis.model.StaticBind;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -37,7 +38,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     private LocationData locationData;
 
     // Point back to binds that impacted this node
-    private List<XFormsModelBinds.BindNode> bindNodes;
+    private List<BindNode> bindNodes;
 
     // Types set by schema or binds
     private QName bindType;
@@ -49,15 +50,15 @@ public class InstanceData {// rename to DataNodeProperties once done
     // Annotations (used only for multipart submission as of 2010-12)
     private Map<String, String> transientAnnotations;
 
-    public static void addBindNode(NodeInfo nodeInfo, XFormsModelBinds.BindNode bindNode) {
+    public static void addBindNode(NodeInfo nodeInfo, BindNode bindNode) {
         final InstanceData instanceData = getOrCreateInstanceData(nodeInfo, false);
         if (instanceData != READONLY_LOCAL_INSTANCE_DATA) {
             // only register ourselves if we are not a readonly node
             if (instanceData.bindNodes == null)
                 instanceData.bindNodes = Collections.singletonList(bindNode);
             else if (instanceData.bindNodes.size() == 1) {
-                final XFormsModelBinds.BindNode oldBindNode = instanceData.bindNodes.get(0);
-                instanceData.bindNodes = new ArrayList<XFormsModelBinds.BindNode>(4); // hoping that situations where many binds point to same node are rare
+                final BindNode oldBindNode = instanceData.bindNodes.get(0);
+                instanceData.bindNodes = new ArrayList<BindNode>(4); // hoping that situations where many binds point to same node are rare
                 instanceData.bindNodes.add(oldBindNode);
                 instanceData.bindNodes.add(bindNode);
             } else {
@@ -105,8 +106,8 @@ public class InstanceData {// rename to DataNodeProperties once done
 
     public boolean getLocalRelevant() {
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.isRelevant() != Model.DEFAULT_RELEVANT())
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.relevant() != Model.DEFAULT_RELEVANT())
                     return !Model.DEFAULT_RELEVANT();
 
         return Model.DEFAULT_RELEVANT();
@@ -114,8 +115,8 @@ public class InstanceData {// rename to DataNodeProperties once done
 
     public boolean getLocalReadonly() {
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.isReadonly() != Model.DEFAULT_READONLY())
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.readonly() != Model.DEFAULT_READONLY())
                     return !Model.DEFAULT_READONLY();
 
         return Model.DEFAULT_READONLY();
@@ -123,8 +124,8 @@ public class InstanceData {// rename to DataNodeProperties once done
 
     public boolean getRequired() {
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.isRequired() != Model.DEFAULT_REQUIRED())
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.required() != Model.DEFAULT_REQUIRED())
                     return !Model.DEFAULT_REQUIRED();
 
         return Model.DEFAULT_REQUIRED();
@@ -136,11 +137,21 @@ public class InstanceData {// rename to DataNodeProperties once done
             return false;
 
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.isValid() != Model.DEFAULT_VALID())
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.valid() != Model.DEFAULT_VALID())
                     return !Model.DEFAULT_VALID();
 
         return Model.DEFAULT_VALID();
+    }
+
+    public boolean constraintsSatisfiedForLevel(StaticBind.ConstraintLevel level) {
+
+        if (bindNodes != null && bindNodes.size() > 0)
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.constraintsSatisfiedForLevel(level) != Model.DEFAULT_CONSTRAINT())
+                    return ! Model.DEFAULT_CONSTRAINT();
+
+        return Model.DEFAULT_CONSTRAINT();
     }
 
     public boolean getTypeValid() {
@@ -149,34 +160,15 @@ public class InstanceData {// rename to DataNodeProperties once done
             return false;
 
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.isTypeValid() != Model.DEFAULT_VALID())
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.typeValid() != Model.DEFAULT_VALID())
                     return !Model.DEFAULT_VALID();
 
         return Model.DEFAULT_VALID();
     }
 
-    public Map<String, String> getAllCustom() {
-
-        Map<String, String> result = null;
-        boolean doCopy = false;
-        if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.getCustomMips() != null) {
-                    if (result == null) {
-                        // Just reference first Map (it is unmodifiable) as it's the common case
-                        result = bindNode.getCustomMips();
-                        doCopy = true;
-                    } else {
-                        if (doCopy) {
-                            result = new HashMap<String, String>(result);
-                            doCopy = false;
-                        }
-                        result.putAll(bindNode.getCustomMips());
-                    }
-                }
-
-        return result;
+    public scala.collection.immutable.Map<String, String> collectAllCustomMIPs() {
+        return BindNode.collectAllCustomMIPs(bindNodes);
     }
     
     public QName getSchemaOrBindType() {
@@ -190,14 +182,14 @@ public class InstanceData {// rename to DataNodeProperties once done
     public String getInvalidBindIds() {
         StringBuilder sb = null;
         if (bindNodes != null && bindNodes.size() > 0)
-            for (final XFormsModelBinds.BindNode bindNode : bindNodes)
-                if (bindNode.isValid() != Model.DEFAULT_VALID()) {
+            for (final BindNode bindNode : bindNodes)
+                if (bindNode.valid() != Model.DEFAULT_VALID()) {
                     if (sb == null)
                         sb = new StringBuilder();
                     else if (sb.length() > 0)
                         sb.append(' ');
 
-                    sb.append(bindNode.getBindStaticId());
+                    sb.append(bindNode.bindStaticId());
                 }
         return sb == null ? null : sb.toString();
     }
@@ -222,9 +214,9 @@ public class InstanceData {// rename to DataNodeProperties once done
         return (existingInstanceData == null) ? null : existingInstanceData.getTransientAnnotation(name);
     }
 
-    public static Map<String, String> getAllCustom(NodeInfo nodeInfo) {
+    public static scala.collection.immutable.Map<String, String> collectAllCustomMIPs(NodeInfo nodeInfo) {
         final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
-        return (existingInstanceData == null) ? null : existingInstanceData.getAllCustom();
+        return (existingInstanceData == null) ? null : existingInstanceData.collectAllCustomMIPs();
     }
 
     public static boolean getInheritedRelevant(NodeInfo nodeInfo) {
@@ -287,6 +279,15 @@ public class InstanceData {// rename to DataNodeProperties once done
     public static boolean getValid(Node node) {
         final InstanceData existingInstanceData = getLocalInstanceData(node);
         return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getValid();
+    }
+
+    public static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(NodeInfo nodeInfo) {
+        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        final Object o = (existingInstanceData == null)
+                ? BindNode.jCollectFailedConstraints(null)
+                : BindNode.jCollectFailedConstraints(existingInstanceData.bindNodes);
+
+        return (scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>>) o;
     }
 
     public static boolean getTypeValid(NodeInfo nodeInfo) {

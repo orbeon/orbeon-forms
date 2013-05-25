@@ -92,16 +92,16 @@ object ControlAnalysisFactory {
         override protected val allowedExtensionAttributes = Set(XXFORMS_MAXLENGTH_QNAME, XXFORMS_COLS_QNAME, XXFORMS_ROWS_QNAME)
     }
 
-    private val VariableControlFactory: ControlFactory = (new VariableControl(_, _, _, _, _) with ChildrenActionsTrait)
-    private val LHHAControlFactory    : ControlFactory = (new LHHAAnalysis(_, _, _, _, _))
-    private val ValueControlFactory   : ControlFactory = (new InputValueControl(_, _, _, _, _))
-    private val SwitchControlFactory  : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait with AppearanceTrait)
-    private val CaseControlFactory    : ControlFactory = (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait)
+    private val VariableControlFactory: ControlFactory = new VariableControl(_, _, _, _, _) with ChildrenActionsTrait
+    private val LHHAControlFactory    : ControlFactory = new LHHAAnalysis(_, _, _, _, _)
+    private val ValueControlFactory   : ControlFactory = new InputValueControl(_, _, _, _, _)
+    private val SwitchControlFactory  : ControlFactory = new ContainerControl(_, _, _, _, _) with OptionalSingleNode with StaticLHHASupport with ChildrenBuilderTrait with AppearanceTrait
+    private val CaseControlFactory    : ControlFactory = new ContainerControl(_, _, _, _, _) with OptionalSingleNode with StaticLHHASupport with ChildrenBuilderTrait
 
     class GroupControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends ContainerControl(staticStateContext, element, parent, preceding, scope)
             with OptionalSingleNode
-            with LHHATrait
+            with StaticLHHASupport
             with ChildrenBuilderTrait {
 
         // Extension attributes depend on the name of the element
@@ -115,9 +115,9 @@ object ControlAnalysisFactory {
     }
 
     private val DialogControlFactory: ControlFactory =
-        (new ContainerControl(_, _, _, _, _) with OptionalSingleNode with LHHATrait with ChildrenBuilderTrait {
+        new ContainerControl(_, _, _, _, _) with OptionalSingleNode with StaticLHHASupport with ChildrenBuilderTrait {
             override val externalEvents = super.externalEvents + XXFORMS_DIALOG_CLOSE // allow xxforms-dialog-close
-        })
+        }
 
     // Variable factories indexed by QName
     // NOTE: We have all these QNames for historical reasons (XForms 2 is picking <xf:var>)
@@ -177,9 +177,9 @@ object ControlAnalysisFactory {
 
     private val ComponentFactories: Map[(Boolean, Boolean), ControlFactory] = Map(
         (false, false) → (new ComponentControl(_, _, _, _, _)                               ),
-        (false, true)  → (new ComponentControl(_, _, _, _, _) with                 LHHATrait),
+        (false, true)  → (new ComponentControl(_, _, _, _, _) with                 StaticLHHASupport),
         (true,  false) → (new ComponentControl(_, _, _, _, _) with ValueTrait               ),
-        (true,  true)  → (new ComponentControl(_, _, _, _, _) with ValueTrait with LHHATrait)
+        (true,  true)  → (new ComponentControl(_, _, _, _, _) with ValueTrait with StaticLHHASupport)
     )
 
     def create(

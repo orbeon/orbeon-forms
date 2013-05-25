@@ -438,7 +438,7 @@ object ControlOps {
     }
 
     private def convertMIP(mipName: String) =
-        RewrittenMIPs.get(mipName) orElse (AllMIPsByName.get(mipName) map (_.qName)) getOrElse (throw new IllegalArgumentException)
+        RewrittenMIPs.get(mipName) orElse (AllMIPsByName.get(mipName) map (_.aName)) getOrElse (throw new IllegalArgumentException)
 
     // XForms callers: find the value of a MIP or null (the empty sequence)
     def getMipOrEmpty(inDoc: NodeInfo, controlName: String, mipName: String) =

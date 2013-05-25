@@ -14,17 +14,44 @@
 package org.orbeon.oxf.xforms.control
 
 import org.orbeon.oxf.xforms.control.XFormsControl.MutableControlProperty
-import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis
+import org.orbeon.oxf.xforms.analysis.controls.{StaticLHHASupport, LHHAAnalysis}
 import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.control.LHHASupport.LHHAProperty
+import org.apache.commons.lang3.StringUtils
+
+class MutableLHHProperty(control: XFormsControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
+    extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
+
+    protected def evaluateValueImpl(tempContainsHTML: Array[Boolean]) =
+        evaluateOne(control.staticControl.asInstanceOf[StaticLHHASupport].lhh(lhhaType.name).get, tempContainsHTML)
+}
+
+class MutableAlertProperty(control: XFormsSingleNodeControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
+    extends MutableLHHAProperty(control, lhhaType, supportsHTML) {
+
+    protected def evaluateValueImpl(tempContainsHTML: Array[Boolean]) = {
+
+        val activeAlertsOpt = LHHASupport.gatherActiveAlerts(control)
+
+        val values =
+            for {
+                (_, activeAlerts) ← activeAlertsOpt.toList
+                activeAlert       ← activeAlerts
+                value             ← Option(evaluateOne(activeAlert, tempContainsHTML))
+            } yield
+                value
+
+        // TODO: separator??? use HTML?
+        if (values.nonEmpty) values filter StringUtils.isNotBlank mkString " - " else null
+    }
+}
 
 // Mutable LHHA property
-class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, supportsHTML: Boolean) extends MutableControlProperty[String] with LHHAProperty {
+abstract class MutableLHHAProperty(control: XFormsControl, lhhaType: XFormsConstants.LHHA, supportsHTML: Boolean)
+    extends MutableControlProperty[String]
+    with LHHAProperty {
 
-    require((lhhaAnalysis ne null) && (lhhaAnalysis.element ne null), "LHHA analysis/element can't be null")
-
-    private val lhhaElement = lhhaAnalysis.element
     private var _isHTML = false
 
     protected def isRelevant = control.isRelevant
@@ -32,7 +59,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
 
     protected def evaluateValue() = {
         val tempContainsHTML = new Array[Boolean](1)
-        val result = doEvaluateValue(tempContainsHTML)
+        val result = evaluateValueImpl(tempContainsHTML)
         _isHTML = result != null && tempContainsHTML(0)
         result
     }
@@ -56,7 +83,7 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
     }
 
     protected def requireUpdate =
-        control.containingDocument.getXPathDependencies.requireLHHAUpdate(lhhaAnalysis.localName, control.getPrefixedId)
+        control.containingDocument.getXPathDependencies.requireLHHAUpdate(lhhaType.name, control.getPrefixedId)
 
     protected def notifyCompute() =
         control.containingDocument.getXPathDependencies.notifyComputeLHHA()
@@ -67,10 +94,14 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
     override def copy: MutableLHHAProperty =
         super.copy.asInstanceOf[MutableLHHAProperty]
 
+    protected def evaluateValueImpl(tempContainsHTML: Array[Boolean]): String
+
     // Evaluate the value of a LHHA related to this control
     // Can return null
-    private def doEvaluateValue(tempContainsHTML: Array[Boolean]) = {
+    protected def evaluateOne(lhhaAnalysis: LHHAAnalysis, tempContainsHTML: Array[Boolean]) = {
         val contextStack = control.getContextStack
+
+        val lhhaElement = lhhaAnalysis.element
 
         if (lhhaAnalysis.isLocal) {
             // LHHA is direct child of control, evaluate within context
@@ -82,11 +113,14 @@ class MutableLHHAProperty(control: XFormsControl, lhhaAnalysis: LHHAAnalysis, su
         } else {
             // LHHA is somewhere else, assumed as a child of xf:* or xxf:*
 
+            // TODO: This whole code sounds insanely complicated.
+            // LHHA elements should be present in the tree and we should 1) resolve them and 2) obtain their context.
+
             // Find context object for XPath evaluation
             val contextElement = lhhaElement.getParent
             val contextStaticId = XFormsUtils.getElementId(contextElement)
             val contextEffectiveId =
-                if (contextStaticId == null || (contextStaticId == "#document")) {
+                if (contextStaticId == null || contextStaticId == "#document") {
                     // Assume we are at the top-level
                     contextStack.resetBindingContext()
                     control.container.getFirstControlEffectiveId

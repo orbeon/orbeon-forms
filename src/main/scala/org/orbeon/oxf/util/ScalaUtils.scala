@@ -131,7 +131,6 @@ object ScalaUtils {
     implicit class PipeOps[A](val a: A) extends AnyVal { def |>[B](f: A ⇒ B) = f(a) }
 
     // Convert a string of tokens to a set
-    // NOTE: ("" split """\s+""" toSet).size == 1!
     def stringToSet(s: String)               = split[Set](s)
     def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
 
@@ -146,7 +145,7 @@ object ScalaUtils {
 
     // Recombine a path/query and parameters into a resulting URL
     def recombineQuery(pathQuery: String, params: Seq[(String, String)]) =
-        pathQuery + (if (params.isEmpty) "" else ((if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params)))
+        pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
 
     // Decode a query string into a sequence of pairs
     // We assume that there are no spaces in the input query
@@ -176,10 +175,10 @@ object ScalaUtils {
 
     // Combine the second values of each tuple that have the same name
     // The caller can specify the type of the resulting values, e.g.:
-    // - combineValues[AnyRef, Array]
-    // - combineValues[String, List]
-    def combineValues[U, T[_]](parameters: Seq[(String, U)])(implicit cbf: CanBuildFrom[Nothing, U, T[U]]): Seq[(String, T[U])] = {
-        val result = mutable.LinkedHashMap[String, mutable.Builder[U, T[U]]]()
+    // - combineValues[String, AnyRef, Array]
+    // - combineValues[String, String, List]
+    def combineValues[Key, U, T[_]](parameters: Seq[(Key, U)])(implicit cbf: CanBuildFrom[Nothing, U, T[U]]): Seq[(Key, T[U])] = {
+        val result = mutable.LinkedHashMap[Key, mutable.Builder[U, T[U]]]()
 
         for ((name, value) ← parameters)
             result.getOrElseUpdate(name, cbf()) += value

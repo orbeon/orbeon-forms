@@ -13,7 +13,6 @@
 */
 package org.orbeon.oxf.xforms.control
 
-import collection.JavaConverters._
 import org.dom4j.Element
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
@@ -29,12 +28,15 @@ import org.orbeon.saxon.om.NodeInfo
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.saxon.value.AtomicValue
-import org.orbeon.oxf.xforms.event.{XFormsEvents, Dispatch}
+import org.orbeon.oxf.xforms.event.Dispatch
+import org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_ITERATION_MOVED
 import org.orbeon.oxf.xforms.event.events._
 import org.orbeon.oxf.xforms.BindingContext
+import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 
 /**
-* Control with a single-node binding (possibly optional). Such controls can have MIPs.
+* Control with a single-node binding (possibly optional). Such controls can have MIPs (properties coming from a model).
 */
 abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsControl, element: Element, effectiveId: String)
         extends XFormsControl(container, parent, element, effectiveId) {
@@ -54,21 +56,32 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     private var _required = false
     final def isRequired = _required
 
-    private var _valid    = true
+    private var _valid = true
     def isValid = _valid
+
+    // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
+    // mixing of constraints among levels, like error and warning.
+    private var _constraintLevel: Option[ConstraintLevel] = None
+    def constraintLevel = _constraintLevel
+
+    private var _failedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
+    def failedConstraints = _failedConstraints
 
     // Previous values for refresh
     private var _wasReadonly = false
     private var _wasRequired = false
     private var _wasValid = true
+    private var _wasWarning = true
+
+    private var _wasFailedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
 
     // Type
     private var _valueType: QName = null
     def valueType = _valueType
 
     // Custom MIPs
-    private var _customMIPs: Map[String, String] = Map()
-    def customMIPs: Map[String, String] =  _customMIPs
+    private var _customMIPs = Map.empty[String, String]
+    def customMIPs: Map[String, String] = _customMIPs
     def customMIPsClasses = customMIPs map { case (k, v) ⇒ k + '-' + v }
     def jCustomMIPsClassesAsString = customMIPsClasses mkString " "
 
@@ -86,6 +99,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         _wasReadonly = false
         _wasRequired = false
         _wasValid = true
+        _wasWarning = true
     }
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
@@ -108,8 +122,30 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 this._valid     = InstanceData.getValid(nodeInfo)
                 this._valueType = InstanceData.getType(nodeInfo)
 
+                // Constraints
+
+                // Instance data stores all failed constraints
+                val allFailedConstraints = InstanceData.failedConstraints(nodeInfo)
+
+                // First identify the highest level. This means that e.g. if a control is on error, but doesn't have any
+                // matching alerts for the error level, then no alert shown. Alerts for lower levels, in particular, such as
+                // warnings, don't show. There may be no matching level.
+                val constraintLevel = {
+                    def controlHasLevel(level: ConstraintLevel) =
+                        level == ErrorLevel && ! isValid || allFailedConstraints.contains(level)
+
+                    LevelsByPriority find controlHasLevel
+                }
+
+                this._constraintLevel = constraintLevel
+
+                if (allFailedConstraints.nonEmpty)
+                    this._failedConstraints = constraintLevel flatMap allFailedConstraints.get getOrElse Nil
+                else
+                    this._failedConstraints = Nil
+
                 // Custom MIPs
-                this._customMIPs = Option(InstanceData.getAllCustom(nodeInfo)) map (_.asScala.toMap) getOrElse Map()
+                this._customMIPs = Option(InstanceData.collectAllCustomMIPs(nodeInfo)) map (_.toMap) getOrElse Map()
 
                 // Handle global read-only setting
                 if (XFormsProperties.isReadonly(containingDocument))
@@ -129,20 +165,23 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     }
 
     private def setDefaultMIPs(): Unit = {
-        this._readonly = false
-        this._required = false
-        this._valid = true // by default, a control is not invalid
-        this._valueType = null
-        this._customMIPs = Map()
+        this._readonly          = Model.DEFAULT_READONLY
+        this._required          = Model.DEFAULT_REQUIRED
+        this._valid             = Model.DEFAULT_VALID
+        this._valueType         = null
+        this._customMIPs        = Map.empty[String, String]
+
+        this._constraintLevel   = None
+        this._failedConstraints = Nil
     }
 
     override def commitCurrentUIState(): Unit = {
         super.commitCurrentUIState()
 
-        isValueChanged()
-        wasRequired()
-        wasReadonly()
-        wasValid()
+        isValueChangedCommit()
+        wasRequiredCommit()
+        wasReadonlyCommit()
+        wasValidCommit()
     }
 
     override def binding: Seq[Item] = Option(_boundItem).toList
@@ -150,25 +189,31 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     // Single-node controls support refresh events
     override def supportsRefreshEvents = true
 
-    final def wasReadonly(): Boolean = {
+    final def wasReadonlyCommit(): Boolean = {
         val result = _wasReadonly
         _wasReadonly = _readonly
         result
     }
 
-    final def wasRequired(): Boolean = {
+    final def wasRequiredCommit(): Boolean = {
         val result = _wasRequired
         _wasRequired = _required
         result
     }
 
-    final def wasValid(): Boolean = {
+    final def wasValidCommit(): Boolean = {
         val result = _wasValid
         _wasValid = _valid
         result
     }
 
-    def isValueChanged() = false
+    final def wasFailedConstraintsCommit() = {
+        val result = _wasFailedConstraints
+        _wasFailedConstraints = _failedConstraints
+        result
+    }
+
+    def isValueChangedCommit() = false // TODO: move this to trait shared by value control and variable
     def typeExplodedQName = Dom4jUtils.qNameToExplodedQName(valueType)
 
     /**
@@ -231,7 +276,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     def hasStaticReadonlyAppearance =
         XFormsProperties.isStaticReadonlyAppearance(containingDocument) ||
-            (XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME))
+            XFormsProperties.READONLY_APPEARANCE_STATIC_VALUE == element.attributeValue(XXFORMS_READONLY_APPEARANCE_ATTRIBUTE_QNAME)
 
     override def setFocus(inputOnly: Boolean): Boolean = Focus.focusWithEvents(this)
 
@@ -376,41 +421,45 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
         super.dispatchChangeEvents()
 
-        // xforms-value-changed
-        if (isValueChanged)
-            Dispatch.dispatchEvent(new XFormsValueChangeEvent(this))
+        // Gather changes
+        // 2013-06-20: This is a change from what we were doing before, but it makes things clearer. Later we might
+        // gather all events upon onCreate/onDestroy/onBindingUpdate. The behavior can change if a new refresh is
+        // triggered when processing one of the events below. The order of events in that case is hard to predict.
+        val valueChanged        = isValueChangedCommit()
+        val iterationMoved      = previousEffectiveIdCommit() != getEffectiveId && part.observerHasHandlerForEvent(getPrefixedId, XXFORMS_ITERATION_MOVED)
+        val validityChanged     = wasValidCommit()            != isValid
+        val requiredChanged     = wasRequiredCommit()         != isRequired
+        val readonlyChanged     = wasReadonlyCommit()         != isReadonly
 
-        // Dispatch moved xxforms-iteration-changed if needed
-        if (previousEffectiveIdCommit != getEffectiveId
-                && container.getPartAnalysis.observerHasHandlerForEvent(getPrefixedId, XFormsEvents.XXFORMS_ITERATION_MOVED))
-            Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(this))
+        val previousConstraints = wasFailedConstraintsCommit()
+        val constraintsChanged  = previousConstraints         != failedConstraints
 
-        // Dispatch events only if the MIP value is different from the previous value
+        // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
+        // on the control's current validity and constraints. Because we don't have yet a way of taking those in as
+        // dependencies, we force dirty alerts whenever such constraints change upon refresh.
+        if (validityChanged || constraintsChanged)
+            forceDirtyAlert()
 
-        // TODO: must reacquire control and test for relevance again
-        locally {
-            val previousValidState = wasValid
-            val newValidState = isValid
+        // Value change
+        if (isRelevant && valueChanged)
+            Dispatch.dispatchEvent(new XFormsValueChangeEvent(this)) // NOTE: should have context info
 
-            if (previousValidState != newValidState)
-                Dispatch.dispatchEvent(if (newValidState) new XFormsValidEvent(this) else new XFormsInvalidEvent(this))
-        }
-        // TODO: must reacquire control and test for relevance again
-        locally {
-            val previousRequiredState = wasRequired
-            val newRequiredState = isRequired
+        // Iteration change
+        if (isRelevant && iterationMoved)
+            Dispatch.dispatchEvent(new XXFormsIterationMovedEvent(this)) // NOTE: should have context info
 
-            if (previousRequiredState != newRequiredState)
-                Dispatch.dispatchEvent(if (newRequiredState) new XFormsRequiredEvent(this) else new XFormsOptionalEvent(this))
-        }
-        // TODO: must reacquire control and test for relevance again
-        locally {
-            val previousReadonlyState = wasReadonly
-            val newReadonlyState = isReadonly
+        // MIP change
+        if (isRelevant && validityChanged)
+            Dispatch.dispatchEvent(if (isValid) new XFormsValidEvent(this) else new XFormsInvalidEvent(this))
 
-            if (previousReadonlyState != newReadonlyState)
-                Dispatch.dispatchEvent(if (newReadonlyState) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this))
-        }
+        if (isRelevant && requiredChanged)
+            Dispatch.dispatchEvent(if (isRequired) new XFormsRequiredEvent(this) else new XFormsOptionalEvent(this))
+
+        if (isRelevant && readonlyChanged)
+            Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this))
+
+        if (isRelevant && constraintsChanged)
+            Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, previousConstraints, failedConstraints))
     }
 }
 
@@ -418,10 +467,10 @@ object XFormsSingleNodeControl {
 
     // Item relevance (atomic values are considered relevant)
     def isRelevantItem(item: Item) =
-        if (item.isInstanceOf[NodeInfo])
-            InstanceData.getInheritedRelevant(item.asInstanceOf[NodeInfo])
-        else
-            true
+        item match {
+            case info: NodeInfo ⇒ InstanceData.getInheritedRelevant(info)
+            case _              ⇒ true
+        }
 
     // Convenience method to figure out when a control is relevant, assuming a "null" control is non-relevant.
     def isRelevant(control: XFormsSingleNodeControl) = Option(control) exists (_.isRelevant)

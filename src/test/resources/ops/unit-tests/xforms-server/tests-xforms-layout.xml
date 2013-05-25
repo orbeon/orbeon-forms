@@ -94,7 +94,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -126,7 +126,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$p·1">My help</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$a·1">My alert</xh:span>
+                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$a·1"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
@@ -226,7 +226,7 @@
                     </xh:select>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -661,7 +661,7 @@
                     </xh:select>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -673,7 +673,7 @@
                     </xh:select>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -769,7 +769,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -793,7 +793,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-upload-2$$p·1">My help</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-upload-2$$a·1">My alert</xh:span>
+                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-upload-2$$a·1"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-upload-file·1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-upload-file$xforms-input·1">My label</xh:label>
@@ -808,7 +808,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -1413,7 +1413,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-alert-inactive xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>

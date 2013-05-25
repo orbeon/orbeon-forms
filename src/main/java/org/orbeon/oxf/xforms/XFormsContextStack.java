@@ -314,7 +314,7 @@ public class XFormsContextStack {
 
             // Handle nodeset
             final boolean isNewBind;
-            final XFormsModelBinds.Bind bind;
+            final RuntimeBind bind;
             final int newPosition;
             final List<Item> newNodeset;
             final boolean hasOverriddenContext;
@@ -336,7 +336,7 @@ public class XFormsContextStack {
                         contextItem = null;
                         isNewBind = true;
                         newPosition = 0;
-                    } else if (!(o instanceof XFormsModelBinds.Bind)) {
+                    } else if (!(o instanceof RuntimeBind)) {
                         // The bind attribute did not resolve to a bind
 
                         // NOTE: We used to dispatch xforms-binding-exception, but we want to be able to recover
@@ -351,7 +351,7 @@ public class XFormsContextStack {
                         isNewBind = true;
                         newPosition = 0;
                     } else {
-                        bind = (XFormsModelBinds.Bind) o;
+                        bind = (RuntimeBind) o;
                         newNodeset = bind.nodeset;
                         hasOverriddenContext = false;
                         contextItem = baseBindingContext.getSingleItem();

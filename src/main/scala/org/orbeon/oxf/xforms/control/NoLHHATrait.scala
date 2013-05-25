@@ -21,7 +21,8 @@ trait NoLHHATrait extends ControlLHHASupport {
     self: XFormsControl ⇒
 
     override def markLHHADirty() = ()
+    override def forceDirtyAlert() = ()
     override def updateLHHACopy(copy: XFormsControl) = ()
-    override def getLHHA(lhhaType: LHHA) = LHHASupport.NullLHHA
+    override def lhhaProperty(lhhaType: LHHA) = LHHASupport.NullLHHA
     override def compareLHHA(other: XFormsControl) = true
 }

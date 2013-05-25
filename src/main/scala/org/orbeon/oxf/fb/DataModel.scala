@@ -22,8 +22,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xml.NamespaceMapping
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xforms.InstanceData
-import org.orbeon.oxf.xforms.XFormsModelBinds.BindNode
+import org.orbeon.oxf.xforms.{BindNode, InstanceData}
 import org.orbeon.oxf.util.XPath
 import scala.util.control.NonFatal
 

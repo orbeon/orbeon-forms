@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.oxf.xforms.XFormsModelBinds
+import org.orbeon.oxf.xforms.RuntimeBind
 import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
 
 /**
@@ -32,7 +32,7 @@ class XXFormsBind extends XFormsFunction with FunctionSupport {
 
         // Get bind nodeset
         context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, context.contextStack.getCurrentSingleItem) match {
-            case bind: XFormsModelBinds#Bind ⇒ new ListIterator(bind.nodeset)
+            case bind: RuntimeBind ⇒ new ListIterator(bind.nodeset)
             case _ ⇒ EmptyIterator.getInstance
         }
     }

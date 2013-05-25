@@ -88,7 +88,7 @@ class LocalRequest(
                 Seq()
 
         // Make sure to keep order
-        mutable.LinkedHashMap() ++ combineValues[AnyRef, Array](queryParameters ++ bodyParameters) asJava
+        mutable.LinkedHashMap() ++ combineValues[String, AnyRef, Array](queryParameters ++ bodyParameters) asJava
     }
 
     // NOTE: Provide an empty stream if there is no body because caller might assume InputStream is non-null

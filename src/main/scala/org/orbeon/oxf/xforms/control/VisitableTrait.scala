@@ -46,7 +46,7 @@ trait VisitableTrait extends XFormsControl {
         visited = false
     }
 
-    final def wasVisited(): Boolean = {
+    final def wasVisitedCommit(): Boolean = {
         val result = _wasVisited
         _wasVisited = _visited
         result
@@ -55,7 +55,7 @@ trait VisitableTrait extends XFormsControl {
 
     override def commitCurrentUIState() = {
         super.commitCurrentUIState()
-        wasVisited()
+        wasVisitedCommit()
     }
 
     override def performTargetAction(event: XFormsEvent) = {
@@ -83,14 +83,14 @@ trait VisitableTrait extends XFormsControl {
 
     // Dispatch change events (between the control becoming enabled and disabled)
     override def dispatchChangeEvents() = {
+        // Gather change first for consistency with XFormsSingleNodeControl
+        val visitedChanged = wasVisitedCommit() != visited
+
+        // Dispatch other events
         super.dispatchChangeEvents()
 
-        locally {
-            val previous = wasVisited
-            val current = visited
-
-            if (previous != current)
-                Dispatch.dispatchEvent(if (current) new XXFormsVisitedEvent(this) else new XXFormsUnvisitedEvent(this))
-        }
+        // Dispatch our events
+        if (visitedChanged)
+            Dispatch.dispatchEvent(if (visited) new XXFormsVisitedEvent(this) else new XXFormsUnvisitedEvent(this))
     }
 }

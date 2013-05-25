@@ -155,7 +155,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
         // Create new part
         val element = node.getUnderlyingNode.asInstanceOf[Element]
-        val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), container.getPartAnalysis)
+        val (template, partAnalysis) = createPartAnalysis(Dom4jUtils.createDocumentCopyElement(element), part)
 
         // Save new scripts if any
 //            val newScriptCount = containingDocument.getStaticState.getScripts.size

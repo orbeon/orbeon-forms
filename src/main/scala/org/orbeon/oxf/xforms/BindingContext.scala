@@ -24,7 +24,7 @@ import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
 case class BindingContext(
         parent: BindingContext,
         model: XFormsModel,
-        bind: XFormsModelBinds#Bind,
+        bind: RuntimeBind,
         nodeset: JList[Item],
         position: Int,
         elementId: String,

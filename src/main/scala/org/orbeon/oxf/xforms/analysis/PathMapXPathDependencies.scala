@@ -13,8 +13,8 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import model.Model
-import collection.mutable.{HashSet, HashMap}
+import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
+import collection.mutable
 import org.orbeon.oxf.xforms._
 import analysis.controls._
 import org.w3c.dom.Node._
@@ -23,13 +23,15 @@ import java.util.{Map ⇒ JMap}
 import java.lang.String
 import collection.immutable.Nil
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.ConstraintLevel
+import org.orbeon.oxf.util.Logging
+import org.orbeon.oxf.util.ScalaUtils._
 
-class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument) extends XPathDependencies {
+class PathMapXPathDependencies(private val containingDocument: XFormsContainingDocument)
+        extends XPathDependencies
+        with Logging {
 
-    private val logger = containingDocument.getControls match {
-        case controls: XFormsControls ⇒ controls.getIndentedLogger
-        case _ ⇒ containingDocument.indentedLogger
-    }
+    private implicit val logger = containingDocument.indentedLogger
     
     // Represent the state of changes to a model
     private class ModelState(private val modelPrefixedId: String) {
@@ -123,7 +125,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         def refreshDone() = ()
 
-        def isMIPInitiallyDirty(mip: Model#Bind#MIP) =
+        def isMIPInitiallyDirty(mip: StaticBind#MIP) =
             mip.isValidateMIP && ! validateMIPsEvaluatedOnce || ! mip.isValidateMIP && ! calculateMIPsEvaluatedOnce
 
         // TODO: Scenario that can break this:
@@ -132,7 +134,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     }
 
     // State of models
-    private val modelStates = new HashMap[String, ModelState]
+    private val modelStates = new mutable.HashMap[String, ModelState]
 
     private def getModelState(modelPrefixedId: String) =
         modelStates.getOrElseUpdate(modelPrefixedId, new ModelState(modelPrefixedId))
@@ -144,16 +146,16 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     // Keep state related to the view
     private object RefreshState {
         // Structural changes
-        val structuralChangeModels = new HashSet[String]
+        val structuralChangeModels = new mutable.HashSet[String]
 
         // Modified paths by instance
         val changeset = new MapSet[String, String]
 
         // Caches to speedup checks on repeated items
-        val modifiedBindingCache = new HashMap[String, UpdateResult]
-        val modifiedValueCache = new HashMap[String, UpdateResult]
-        val modifiedLHHACache = new HashMap[String, Boolean]
-        val modifiedItemsetCache = new HashMap[String, Boolean]
+        val modifiedBindingCacheForRepeats = new mutable.HashMap[String, UpdateResult]
+        val modifiedValueCacheForRepeats   = new mutable.HashMap[String, UpdateResult]
+        val modifiedLHHACacheForRepeats    = new mutable.HashMap[String, Boolean]
+        val modifiedItemsetCacheForRepeats = new mutable.HashMap[String, Boolean]
 
         // Statistics
         var bindingUpdateCount: Int = 0
@@ -168,11 +170,11 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
             structuralChangeModels.clear()
             changeset.clear()
 
-            modifiedBindingCache.clear()
-            modifiedValueCache.clear()
+            modifiedBindingCacheForRepeats.clear()
+            modifiedValueCacheForRepeats.clear()
 
-            modifiedLHHACache.clear()
-            modifiedItemsetCache.clear()
+            modifiedLHHACacheForRepeats.clear()
+            modifiedItemsetCacheForRepeats.clear()
 
             bindingUpdateCount = 0
             valueUpdateCount = 0
@@ -215,17 +217,6 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
     def refreshStart() {
         inRefresh = true
-//        if (touchedMIPNodes.size() > 0) {
-//            // All revalidations and recalculations are done, process information about nodes touched
-//            for (final NodeInfo nodeInfo : touchedMIPNodes) {
-//                if (InstanceData.getPreviousInheritedRelevant(nodeInfo) != InstanceData.getInheritedRelevant(nodeInfo)
-//                        || InstanceData.getPreviousInheritedReadonly(nodeInfo) != InstanceData.getInheritedReadonly(nodeInfo)
-//                        || InstanceData.getPreviousRequired(nodeInfo) != InstanceData.getRequired(nodeInfo)
-//                        || InstanceData.getPreviousValid(nodeInfo) != InstanceData.getValid(nodeInfo)) {
-//                    markMIPChanged(model, nodeInfo)
-//                }
-//            }
-//        }
     }
 
     def refreshDone() {
@@ -324,7 +315,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         assert(inRefresh || inBindingUpdate)
 
-        val cached = RefreshState.modifiedBindingCache.get(controlPrefixedId)
+        val cached = RefreshState.modifiedBindingCacheForRepeats.get(controlPrefixedId)
         val updateResult: UpdateResult =
             cached match {
                 case Some(result) ⇒ result
@@ -349,7 +340,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                                 Array("prefixed id", controlPrefixedId, "XPath", control.getBindingAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedBindingCache += controlPrefixedId → tempResult
+                        RefreshState.modifiedBindingCacheForRepeats += controlPrefixedId → tempResult
                     tempResult
                 }
             }
@@ -367,7 +358,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         assert(inRefresh || inBindingUpdate)
 
-        val cached = RefreshState.modifiedValueCache.get(controlPrefixedId)
+        val cached = RefreshState.modifiedValueCacheForRepeats.get(controlPrefixedId)
         val (updateResult, valueAnalysis) =
             cached match {
                 case Some(result) ⇒ (result, if (result.requireUpdate) containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId).get.getValueAnalysis else null)
@@ -392,7 +383,7 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
                                 Array("prefixed id", controlPrefixedId, "XPath", tempValueAnalysis.get.xpathString): _*)
 
                     if (control.isWithinRepeat)
-                        RefreshState.modifiedValueCache += controlPrefixedId → tempUpdateResult
+                        RefreshState.modifiedValueCacheForRepeats += controlPrefixedId → tempUpdateResult
 
                     (tempUpdateResult, tempValueAnalysis)
                 }
@@ -411,59 +402,68 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
 
         assert(inRefresh || inBindingUpdate) // LHHA is evaluated lazily typically outside of refresh, but LHHA invalidation takes place during refresh
 
-        RefreshState.modifiedLHHACache.get(controlPrefixedId) match {
-            case Some(result) ⇒ result // cached
-            case None ⇒ // not cached
-                containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
-                    case Some(control: LHHATrait) ⇒ // control found
-                        val result = control.getLHHAValueAnalysis(lhhaName) match {
-                            case Some(analysis) if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
-                                lhhaUnknownDependencies += 1
-                                true
-                            case Some(analysis) ⇒ // dependencies are known
-                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
-                                if (result) lhhaHitCount += 1 else lhhaMissCount += 1
-                                result
-                            case None ⇒
-                                throw new OXFException("Control " + controlPrefixedId + " doesn't have LHHA " + lhhaName)
-                        }
-                        if (control.isWithinRepeat)
-                            RefreshState.modifiedLHHACache += controlPrefixedId → result
-                        result
-                    case _ ⇒
-                        throw new OXFException("Control " + controlPrefixedId + " not found")
-                }
-        }
-    }
+        val control = (
+            containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId)
+            flatMap collectByErasedType[StaticLHHASupport]
+            getOrElse (throw new OXFException(s"Control $controlPrefixedId not found or doesn't support LHHA"))
+        )
 
+        // NOTE: No side-effects except for stats
+        def requireUpdate = {
+
+            val analyses = (
+                control.lhhaValueAnalyses(lhhaName)
+                ensuring (_.nonEmpty, s"Control $controlPrefixedId doesn't have LHHA $lhhaName")
+            )
+
+            def requireUpdateForAnalysis(analysis: XPathAnalysis) =
+                analysis match {
+                    case analysis if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
+                        lhhaUnknownDependencies += 1
+                        true
+                    case analysis ⇒ // dependencies are known
+                        val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
+                        if (result) lhhaHitCount += 1 else lhhaMissCount += 1
+                        result
+                }
+
+            // Not the most optimal, but for now require an update if any has changed
+            analyses exists requireUpdateForAnalysis
+        }
+
+        if (control.isWithinRepeat)
+            RefreshState.modifiedLHHACacheForRepeats.getOrElseUpdate(controlPrefixedId, requireUpdate)
+        else
+            requireUpdate
+    }
 
     def requireItemsetUpdate(controlPrefixedId: String): Boolean = {
 
         assert(inRefresh || inBindingUpdate)
 
-        RefreshState.modifiedItemsetCache.get(controlPrefixedId) match {
-            case Some(result) ⇒ result // cached
-            case None ⇒ // not cached
-                containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId) match {
-                    case Some(control: SelectionControlTrait) ⇒ // control found
-                        val result = control.getItemsetAnalysis match {
-                            case Some(analysis) if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
-                                itemsetUnknownDependencies += 1
-                                true
-                            case Some(analysis) ⇒ // dependencies are known
-                                val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
-                                if (result) itemsetHitCount += 1 else itemsetMissCount += 1
-                                result
-                            case None ⇒
-                                throw new IllegalStateException("Itemset not analyzed")
-                        }
-                        if (control.isWithinRepeat)
-                            RefreshState.modifiedItemsetCache += controlPrefixedId → result
-                        result
-                    case _ ⇒
-                        throw new OXFException("Control " + controlPrefixedId + " not found")
-                }
-        }
+        val control = (
+            containingDocument.getStaticOps.getControlAnalysisOption(controlPrefixedId)
+            flatMap collectByErasedType[SelectionControlTrait]
+            getOrElse (throw new OXFException(s"Control $controlPrefixedId not found or is not a selection control"))
+        )
+
+        def requireUpdate =
+            control.getItemsetAnalysis match {
+                case Some(analysis) if ! analysis.figuredOutDependencies ⇒ // dependencies are unknown
+                    itemsetUnknownDependencies += 1
+                    true
+                case Some(analysis) ⇒ // dependencies are known
+                    val result = analysis.intersectsModels(RefreshState.getStructuralChangeModels) || analysis.intersectsValue(RefreshState.changeset)
+                    if (result) itemsetHitCount += 1 else itemsetMissCount += 1
+                    result
+                case None ⇒
+                    throw new IllegalStateException("Itemset not analyzed")
+            }
+
+        if (control.isWithinRepeat)
+            RefreshState.modifiedItemsetCacheForRepeats.getOrElseUpdate(controlPrefixedId, requireUpdate)
+        else
+            requireUpdate
     }
 
     def hasAnyCalculationBind(model: Model, instancePrefixedId: String) =
@@ -472,70 +472,66 @@ class PathMapXPathDependencies(private val containingDocument: XFormsContainingD
     def hasAnyValidationBind(model: Model, instancePrefixedId: String) =
         ! model.figuredAllBindRefAnalysis || model.validationBindInstances.contains(instancePrefixedId)
 
-//    public void visitInstanceNode(XFormsModel model, NodeInfo nodeInfo) {
-//        if (! touchedMIPNodes.contains(nodeInfo)) {
-//            // First time this is called for a NodeInfo: keep old MIP values and remember NodeInfo
-//            InstanceData.saveMIPs(nodeInfo)
-//            touchedMIPNodes += nodeInfo
-//        }
-//    }
-
-    def requireModelMIPUpdate(model: Model, bind: Model#Bind, mipName: String): Boolean = {
+    def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ConstraintLevel): Boolean = {
 
         // TODO: cache must store by MIP to optimize xf:bind/@ref over multiple nodes
 
-        bind.getMIP(mipName) match {
-            case Some(mip) ⇒
+        // Get constraints by the level specified
+        val mips = mipName match {
+            case Model.Constraint.name ⇒ bind.constraintsByLevel.getOrElse(level, Nil)
+            case _                     ⇒ bind.getMIPs(mipName)
+        }
 
-                val modelState = getModelState(model.prefixedId)
-                val updateResult =
-                    if (modelState.isMIPInitiallyDirty(mip)) {
-                        // We absolutely must evaluate the MIP
-                        MustUpdateResultOne
-                    } else  {
-                        // Check MIP dependencies for XPath and type MIPs
+        val modelState = getModelState(model.prefixedId)
 
-                        // Special case for type which is not an XPath expression
-                        // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
-                        // the value to type check has changed.
-                        val valueAnalysis = mip match {
-                            case xpathMIP: bind.XPathMIP ⇒ Some(xpathMIP.analysis)
-                            case typeMIP: bind.TypeMIP   ⇒ bind.getValueAnalysis
-                            case _ ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
-                        }
+        def resultForMIP(mip: StaticBind#MIP) =
+            if (modelState.isMIPInitiallyDirty(mip)) {
+                    // We absolutely must evaluate the MIP
+                    MustUpdateResultOne
+                } else  {
+                    // Check MIP dependencies for XPath and type MIPs
 
-                        def dependsOnOtherModel(analysis: XPathAnalysis) = analysis.dependentModels exists (_ != model.prefixedId)
-
-                        val tempUpdateResult = valueAnalysis match {
-                            case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
-                                // Value dependencies are unknown OR we depend on another model
-                                // A this time, if we depend on another model, we have to update because we don't have
-                                // the other model's dependencies reliably available, e.g. if the other model has
-                                // already done a recalculate, its dependencies are cleared.
-                                MustUpdateResultOne
-                            case Some(analysis) ⇒
-                                // Value dependencies are known
-                                UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
-                            case _ ⇒
-                                throw new IllegalStateException("No value analysis found for xf:bind with " + mipName)
-                        }
-
-                        if (tempUpdateResult.requireUpdate && logger.isDebugEnabled)
-                            logger.logDebug("dependencies", "MIP requires update",
-                                Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
-
-                        tempUpdateResult
+                    // Special case for type which is not an XPath expression
+                    // We don't check whether we need to update the type MIP, since it is constant, but whether we check whether
+                    // the value to type check has changed.
+                    val valueAnalysis = mip match {
+                        case xpathMIP: StaticBind#XPathMIP ⇒ Some(xpathMIP.analysis)
+                        case typeMIP: StaticBind#TypeMIP   ⇒ bind.getValueAnalysis
+                        case _                             ⇒ throw new IllegalStateException("Expecting XPath MIP or type MIP")
                     }
 
-                if (updateResult.requireUpdate)
-                    mipUpdateCount += 1
-                else
-                    // Update not required
-                    mipXPathOptimizedCount += updateResult.savedEvaluations
+                    def dependsOnOtherModel(analysis: XPathAnalysis) = analysis.dependentModels exists (_ != model.prefixedId)
 
-                updateResult.requireUpdate
+                    val updateResult = valueAnalysis match {
+                        case Some(analysis) if ! analysis.figuredOutDependencies || dependsOnOtherModel(analysis) ⇒
+                            // Value dependencies are unknown OR we depend on another model
+                            // A this time, if we depend on another model, we have to update because we don't have
+                            // the other model's dependencies reliably available, e.g. if the other model has
+                            // already done a recalculate, its dependencies are cleared.
+                            MustUpdateResultOne
+                        case Some(analysis) ⇒
+                            // Value dependencies are known
+                            UpdateResult(analysis.intersectsValue(if (mip.isValidateMIP) modelState.revalidateChangeset else modelState.recalculateChangeset), 1)
+                        case _ ⇒
+                            throw new IllegalStateException(s"No value analysis found for xf:bind with name = $mipName")
+                    }
 
-            case None ⇒ throw new IllegalArgumentException("No MIP found for name: " + mipName)
+                    if (updateResult.requireUpdate && logger.isDebugEnabled)
+                        logger.logDebug("dependencies", "MIP requires update",
+                            Array("prefixed id", bind.prefixedId, "MIP name", mip.name, "XPath", valueAnalysis.get.xpathString): _*)
+
+                    updateResult
+                }
+
+        // Stats and return value
+        // Require an update of all MIPs of the given name/level if at least one dependency fails
+        mips.iterator map resultForMIP find (_.requireUpdate) match {
+            case Some(firstUpdateResult) ⇒
+                mipUpdateCount += mips.size
+                true
+            case None ⇒
+                mipXPathOptimizedCount += mips.size // NOTE: stats a bit rough here
+                false
         }
     }
 }

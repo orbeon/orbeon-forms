@@ -17,12 +17,17 @@ import org.orbeon.oxf.xforms._
 import XFormsControl._
 import org.orbeon.oxf.xforms.XFormsConstants.LHHA
 import LHHASupport._
+import org.orbeon.oxf.xforms.analysis.model.StaticBind._
+import org.orbeon.oxf.xforms.analysis.controls.{StaticLHHASupport, LHHAAnalysis}
+import org.orbeon.oxf.util.ScalaUtils._
+import collection.breakOut
 
 trait ControlLHHASupport {
 
     self: XFormsControl ⇒
 
     // Label, help, hint and alert (evaluated lazily)
+    // 2013-06-19: We support multiple alerts, but only one client-facing alert value at this point.
     // NOTE: var because of cloning
     private[ControlLHHASupport] var lhha = new Array[LHHAProperty](XFormsConstants.LHHACount)
 
@@ -30,6 +35,15 @@ trait ControlLHHASupport {
         for (currentLHHA ← lhha)
             if (currentLHHA ne null)
                 currentLHHA.handleMarkDirty()
+
+    // This is needed because, unlike the other LHH, the alert doesn't only depend on its expressions: it also depends
+    // on the control's current validity and constraints. Because we don't have yet a way of taking those in as
+    // dependencies, we force dirty alerts whenever such constraints change upon refresh.
+    def forceDirtyAlert(): Unit = {
+        val alert = lhha(XFormsConstants.LHHA.alert.ordinal)
+        if (alert ne null)
+            alert.handleMarkDirty(force = true)
+    }
 
     def evaluateNonRelevantLHHA(): Unit =
         for (i ← 0 to lhha.size - 1)
@@ -51,13 +65,27 @@ trait ControlLHHASupport {
         }
     }
 
-    def getLHHA(lhhaType: XFormsConstants.LHHA) = {
+    def lhhaProperty(lhhaType: XFormsConstants.LHHA) = {
         val index = lhhaType.ordinal
+        // Evaluate lazily
         Option(lhha(index)) getOrElse {
-            val lhhaElement = container.getPartAnalysis.getLHHA(getPrefixedId, lhhaType.name)
-            val result = Option(lhhaElement) map (new MutableLHHAProperty(self, _, lhhaHTMLSupport(index))) getOrElse NullLHHA
-            lhha(index) = result
-            result
+
+            // NOTE: Ugly because of imbalanced hierarchy between static/runtime controls
+            val property =
+                if (containingDocument.getStaticOps.hasLHHA(prefixedId, lhhaType.name) && self.staticControl.isInstanceOf[StaticLHHASupport])
+                    self match {
+                        case singleNodeControl: XFormsSingleNodeControl if lhhaType == XFormsConstants.LHHA.alert ⇒
+                            new MutableAlertProperty(singleNodeControl, lhhaType, lhhaHTMLSupport(index))
+                        case control: XFormsControl if lhhaType != XFormsConstants.LHHA.alert ⇒
+                            new MutableLHHProperty(control, lhhaType, lhhaHTMLSupport(index))
+                        case _ ⇒
+                            NullLHHA
+                    }
+                else
+                    NullLHHA
+
+            lhha(index) = property
+            property
         }
     }
 
@@ -65,21 +93,21 @@ trait ControlLHHASupport {
     def lhhaHTMLSupport = DefaultLHHAHTMLSupport
 
     def compareLHHA(other: XFormsControl) =
-        LHHA.values forall (lhhaType ⇒ getLHHA(lhhaType).value() == other.getLHHA(lhhaType).value())
+        LHHA.values forall (lhhaType ⇒ lhhaProperty(lhhaType).value() == other.lhhaProperty(lhhaType).value())
 
     // Convenience accessors
-    final def getLabel = getLHHA(LHHA.label).value()
-    final def getEscapedLabel = getLHHA(LHHA.label).escapedValue()
-    final def isHTMLLabel = getLHHA(LHHA.label).isHTML
-    final def getHelp = getLHHA(LHHA.help).value()
-    final def getEscapedHelp = getLHHA(LHHA.help).escapedValue()
-    final def isHTMLHelp = getLHHA(LHHA.help).isHTML
-    final def getHint = getLHHA(LHHA.hint).value()
-    final def getEscapedHint = getLHHA(LHHA.hint).escapedValue()
-    final def isHTMLHint = getLHHA(LHHA.hint).isHTML
-    final def getAlert = getLHHA(LHHA.alert).value()
-    final def isHTMLAlert = getLHHA(LHHA.alert).isHTML
-    final def getEscapedAlert = getLHHA(LHHA.alert).escapedValue()
+    final def getLabel = lhhaProperty(LHHA.label).value()
+    final def getEscapedLabel = lhhaProperty(LHHA.label).escapedValue()
+    final def isHTMLLabel = lhhaProperty(LHHA.label).isHTML
+    final def getHelp = lhhaProperty(LHHA.help).value()
+    final def getEscapedHelp = lhhaProperty(LHHA.help).escapedValue()
+    final def isHTMLHelp = lhhaProperty(LHHA.help).isHTML
+    final def getHint = lhhaProperty(LHHA.hint).value()
+    final def getEscapedHint = lhhaProperty(LHHA.hint).escapedValue()
+    final def isHTMLHint = lhhaProperty(LHHA.hint).isHTML
+    final def getAlert = lhhaProperty(LHHA.alert).value()
+    final def isHTMLAlert = lhhaProperty(LHHA.alert).isHTML
+    final def getEscapedAlert = lhhaProperty(LHHA.alert).escapedValue()
 }
 
 // NOTE: Use name different from trait so that the Java compiler is happy
@@ -104,17 +132,41 @@ object LHHASupport {
 
     // Whether a given control has an associated xf:label element.
     def hasLabel(containingDocument: XFormsContainingDocument, prefixedId: String) =
-        containingDocument.getStaticOps.getLabel(prefixedId) ne null
+        containingDocument.getStaticOps.hasLHHA(prefixedId, "label")
 
-    // Whether a given control has an associated xf:hint element.
-    def hasHint(containingDocument: XFormsContainingDocument, prefixedId: String) =
-        containingDocument.getStaticOps.getHint(prefixedId) ne null
+    // Gather all active alerts for the given control following a selection algorithm
+    //
+    // - This depends on
+    //     - the control validity
+    //     - failed constraints
+    //     - alerts in the UI matching constraints or not
+    // - If no alert is active for the control, return None.
+    // - Only alerts for the highest ConstraintLevel are returned.
+    //
+    def gatherActiveAlerts(control: XFormsSingleNodeControl): Option[(ConstraintLevel, List[LHHAAnalysis])] =
+        if (control.isRelevant) {
 
-    // Whether a given control has an associated xf:help element.
-    def hasHelp(containingDocument: XFormsContainingDocument, prefixedId: String) =
-        containingDocument.getStaticOps.getHelp(prefixedId) ne null
+            val staticAlerts = control.staticControl.asInstanceOf[StaticLHHASupport].alerts
 
-    // Whether a given control has an associated xf:alert element.
-    def hasAlert(containingDocument: XFormsContainingDocument, prefixedId: String) =
-        containingDocument.getStaticOps.getAlert(prefixedId) ne null
+            def alertsMatchingConstraints = {
+                val failedConstraintIds = control.failedConstraints.map(_.id).to[Set]
+                staticAlerts.iterator filter (_.forConstraints intersect failedConstraintIds nonEmpty)
+            }
+
+            // Find all alerts which match the given level, if there are any failed constraints for that level
+            // NOTE: ErrorLevel is handled specially: in addition to failed constraints, the level matches if the
+            // control is not valid. This is because a control can also be invalid due to a non-matching datatype or due
+            // to the required-but-empty condition.
+            def alertsMatchingLevel(level: ConstraintLevel) =
+                staticAlerts.iterator filter (_.forLevels(level))
+
+            // For that given level, identify all matching alerts if any, whether they match by constraint or by level
+            control.constraintLevel flatMap { level ⇒
+                val matchingAlertIds = alertsMatchingConstraints ++ alertsMatchingLevel(level) map (_.staticId) toSet
+                val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))
+
+                matchingAlerts.nonEmpty option (level, matchingAlerts)
+            }
+        } else
+            None
 }

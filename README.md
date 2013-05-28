@@ -25,12 +25,13 @@ For more information about Orbeon Forms, please visit:
 Also check the Orbeon Forms [Frequently Asked Questions (FAQ)](http://wiki.orbeon.com/forms/orbeon-forms-faq).
 
 
-What's new in the latest release
---------------------------------
+What's new in the latest releases
+---------------------------------
 
 - [complete list of changes](http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40) for the latest release
-- [Orbeon Forms 4.0 announcement](http://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
+- [Orbeon Forms 4.1 announcement](http://blog.orbeon.com/2013/04/orbeon-forms-41.html)
 - [Orbeon Forms 4.0.1 announcement](http://blog.orbeon.com/2013/03/orbeon-forms-401.html)
+- [Orbeon Forms 4.0 announcement](http://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
 
 
 Downloading and installing

@@ -315,8 +315,8 @@
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
                 <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Précédent</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Suivant</wizard-prev>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Suivant</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Précédent</wizard-prev>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Effacer et fermer</submit-dialog-clear>
@@ -502,8 +502,8 @@
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
                 <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Anterior</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Siguiente</wizard-prev>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Borrar y cerrar</submit-dialog-clear>
@@ -688,8 +688,8 @@
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
                 <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Tilbake</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Neste</wizard-prev>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Neste</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Tilbake</wizard-prev>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Tøm og lukk</submit-dialog-clear>
@@ -871,8 +871,8 @@
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
                 <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Назад</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Вперед</wizard-prev>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Вперед</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Назад</wizard-prev>
 
                 <!-- Submit dialog -->
                 <submit-dialog-clear>Очистить и закрыть</submit-dialog-clear>

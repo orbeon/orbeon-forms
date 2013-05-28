@@ -11,7 +11,7 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.client.builder
+package org.orbeon.oxf.client.fb
 
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.client.FormBuilderOps

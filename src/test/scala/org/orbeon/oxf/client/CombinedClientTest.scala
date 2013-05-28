@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.client
 
-import org.orbeon.oxf.client.builder.{Permissions, LabelHintEditor}
+import org.orbeon.oxf.client.fb.{Permissions, LabelHintEditor}
 import org.junit.runners.MethodSorters
 import org.junit.FixMethodOrder
 

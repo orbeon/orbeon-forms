@@ -190,7 +190,7 @@
     <property as="xs:string"  name="oxf.fr.detail.process.review.*.*"                           value='require-uploads then require-valid then review'/>
     <property as="xs:string"  name="oxf.fr.detail.process.edit.*.*"                             value='edit'/>
     <property as="xs:string"  name="oxf.fr.detail.process.send.*.*"                             value='require-uploads then require-valid then send("oxf.fr.detail.send.success")'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.email.*.*"                            value='require-uploads then require-valid then email then success-message("email-success) recover email-error-dialog'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.email.*.*"                            value='require-uploads then require-valid then email then success-message("email-success")'/>
     <property as="xs:string"  name="oxf.fr.detail.process.collapse-all.*.*"                     value='collapse-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.expand-all.*.*"                       value='expand-all'/>
     <property as="xs:string"  name="oxf.fr.detail.process.refresh.*.*"                          value='visit-all'/>

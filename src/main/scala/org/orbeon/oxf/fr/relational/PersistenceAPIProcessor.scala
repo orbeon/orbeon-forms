@@ -103,14 +103,25 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                         summaryQueries map (_.attValue("name"))
                     }
                     val values = {
-                        val dataIds = documentsMetadata map (_.dataId.toString) mkString ", "
+
+                        // Build query
+                        val dataIdsPlaceholders = ("?" * documentsMetadata.length)  mkString ", "
+                        val controlsPlaceholders = ("?" * controls.length) mkString ","
                         val getValues = connection.prepareStatement(
                             s"""  select data_id, control, pos, val
                                |    from orbeon_i_control_text
-                               |   where data_id in ($dataIds)
-                               |     and control in (${controls map sqlString mkString ", "})
+                               |   where data_id in ($dataIdsPlaceholders)
+                               |     and control in ($controlsPlaceholders)
                                |order by data_id, control, pos;
                                |""".stripMargin)
+
+                        // Populate placeholders
+                        for ((documentMetadata, index) ← documentsMetadata.zipWithIndex)
+                            getValues.setInt(index + 1, documentMetadata.dataId)
+                        for ((control, index) ← controls.zipWithIndex)
+                            getValues.setString(documentsMetadata.length + index + 1, control)
+
+                        // Build tuples from result-set
                         val values = (getValues map (resultSet ⇒ Value(
                             resultSet.getInt   ("data_id"),
                             resultSet.getString("control"),

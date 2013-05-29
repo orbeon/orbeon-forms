@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api._
 import javax.servlet.ServletException
 import javax.servlet.http._
 import collection.JavaConverters._
-import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+import org.orbeon.oxf.webapp.{WebAppContext, ProcessorService, ServletPortlet}
 import org.orbeon.oxf.util.ScalaUtils._
 
 // For backward compatibility
@@ -53,7 +53,7 @@ class OrbeonServlet extends HttpServlet with ServletPortlet {
     // Servlet init
     override def init(): Unit =
         withRootException("initialization", new ServletException(_)) {
-            init(WebAppContext.instance(getServletContext), Some("oxf.servlet-initialized-processor." → "oxf.servlet-initialized-processor.input."))
+            init(WebAppContext(getServletContext), Some("oxf.servlet-initialized-processor." → "oxf.servlet-initialized-processor.input."))
         }
 
     // Servlet destroy

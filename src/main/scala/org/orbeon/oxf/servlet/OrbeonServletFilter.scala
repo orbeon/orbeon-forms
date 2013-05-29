@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import collection.JavaConverters._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+import org.orbeon.oxf.webapp.{WebAppContext, ProcessorService, ServletPortlet}
 
 // For backward compatibility
 class OrbeonServletFilterDelegate extends OrbeonServletFilter
@@ -43,7 +43,7 @@ class OrbeonServletFilter extends Filter with ServletPortlet {
                 config.getInitParameterNames.asScala.asInstanceOf[Iterator[String]] map
                     (n ⇒ n → config.getInitParameter(n)) toMap
 
-            init(WebAppContext.instance(config.getServletContext), None)
+            init(WebAppContext(config.getServletContext), None)
         }
 
     // Filter destroy

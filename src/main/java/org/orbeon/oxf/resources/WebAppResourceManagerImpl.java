@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class WebAppResourceManagerImpl extends ResourceManagerBase {
 
-    public static final String SERVLET_CONTEXT_KEY = WebAppResourceManagerImpl.class.getName() + "WebAppContext";
+    public static final String WEB_APP_CONTEXT_KEY = WebAppResourceManagerImpl.class.getName() + "WebAppContext";
     public static final String ROOT_DIR = "oxf.resources.webapp.rootdir";
 
     private static Logger logger = LoggerFactory.createLogger(WebAppResourceManagerImpl.class);
@@ -38,9 +38,9 @@ public class WebAppResourceManagerImpl extends ResourceManagerBase {
 
     public WebAppResourceManagerImpl(Map props) {
         super(props);
-        WebAppContext ctx = (WebAppContext) props.get(SERVLET_CONTEXT_KEY);
+        WebAppContext ctx = (WebAppContext) props.get(WEB_APP_CONTEXT_KEY);
         if (ctx == null)
-            throw new OXFException("WebAppResourceManager needs a WebAppContext object in its map (key=" + SERVLET_CONTEXT_KEY + ")");
+            throw new OXFException("WebAppResourceManager needs a WebAppContext object in its map (key=" + WEB_APP_CONTEXT_KEY + ")");
         this.webAppContext = ctx;
 
         String root = (String) props.get(ROOT_DIR);

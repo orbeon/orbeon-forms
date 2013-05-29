@@ -106,8 +106,19 @@ trait ParametersAndAttributes {
     protected def removeAttribute(k: String)
 }
 
+trait OrbeonWebApp {
+
+    self: WebAppContext ⇒
+
+    // Run initialization only once per web app
+    WebAppContext.synchronized {
+        val WebAppInitialized = "oxf.webapp.initialized"
+        self.attributes.getOrElseUpdate(WebAppInitialized, { Orbeon.initialize(self); "true" })
+    }
+}
+
 // Servlet implementation
-class ServletWebAppContext(val servletContext: ServletContext) extends WebAppContext with ParametersAndAttributes {
+class ServletWebAppContext(val servletContext: ServletContext) extends WebAppContext with ParametersAndAttributes with OrbeonWebApp {
 
     def getResource(s: String) = servletContext.getResource(s)
     def getResourceAsStream(s: String) = servletContext.getResourceAsStream(s)
@@ -127,7 +138,7 @@ class ServletWebAppContext(val servletContext: ServletContext) extends WebAppCon
 }
 
 // Portlet implementation
-class PortletWebAppContext(val portletContext: PortletContext) extends WebAppContext with ParametersAndAttributes {
+class PortletWebAppContext(val portletContext: PortletContext) extends WebAppContext with ParametersAndAttributes with OrbeonWebApp {
 
     def getResource(s: String) = portletContext.getResource(s)
     def getResourceAsStream(s: String) = portletContext.getResourceAsStream(s)
@@ -146,34 +157,12 @@ class PortletWebAppContext(val portletContext: PortletContext) extends WebAppCon
     protected def removeAttribute(k: String) = portletContext.removeAttribute(k)
 }
 
-// To help legacy Java code
-object JWebAppContext {
-    def instance(servletContext: ServletContext): WebAppContext = WebAppContext.instance(servletContext)
-    def instance(portletContext: PortletContext): WebAppContext = WebAppContext.instance(portletContext)
-}
-
 /**
  * Return the singleton WebAppContext for the current web app. When WebAppContext is created, also initialize Orbeon.
  */
 object WebAppContext {
+    private val WebAppListeners = "oxf.webapp.listeners"
 
-    private val WebAppContext      = "oxf.webapp.context"
-    private val WebAppListeners    = "oxf.webapp.listeners"
-
-    // Get or create the instance of WebAppContext
-    def instance(servletContext: ServletContext): WebAppContext =
-        instanceOrCreate(servletContext.getAttribute(WebAppContext), new ServletWebAppContext(servletContext), servletContext.setAttribute(WebAppContext, _))
-
-    def instance(portletContext: PortletContext): WebAppContext =
-        instanceOrCreate(portletContext.getAttribute(WebAppContext), new PortletWebAppContext(portletContext), portletContext.setAttribute(WebAppContext, _))
-
-    // If `value` is not null, return it as a WebAppContext, otherwise create a new instance and store it in the context
-    // There is no need for synchronization here because servlets and portlets and won't be initialized concurrently.
-    private def instanceOrCreate(value: AnyRef, context: ⇒ WebAppContext, setAttribute: AnyRef ⇒ Unit) =
-        Option(value.asInstanceOf[WebAppContext]) getOrElse {
-            val newContext = context
-            Orbeon.initialize(newContext)
-            setAttribute(newContext)
-            newContext
-        }
+    def apply(servletContext: ServletContext): WebAppContext = new ServletWebAppContext(servletContext)
+    def apply(portletContext: PortletContext): WebAppContext = new PortletWebAppContext(portletContext)
 }

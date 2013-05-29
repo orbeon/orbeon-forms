@@ -153,7 +153,7 @@ object InitUtils {
         require(servletContext ne null)
 
         // Make sure the Web app context is initialized
-        WebAppContext.instance(servletContext)
+        val webAppContext = WebAppContext(servletContext)
 
         if (message != null)
             logger.info(logMessagePrefix + " - " + message)
@@ -165,7 +165,7 @@ object InitUtils {
         processorDefinitionOption foreach { processorDefinition ⇒
             logger.info(logMessagePrefix + " - About to run processor: " + processorDefinition)
             val processor = createProcessor(processorDefinition)
-            val externalContext = new WebAppExternalContext(WebAppContext.instance(servletContext), session)
+            val externalContext = new WebAppExternalContext(webAppContext, session)
 
             withPipelineContext { pipelineContext ⇒
                 runProcessor(processor, externalContext, pipelineContext, logger)

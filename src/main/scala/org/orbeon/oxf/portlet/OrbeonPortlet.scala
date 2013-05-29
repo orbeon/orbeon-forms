@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.util.ScalaUtils._
 import javax.portlet._
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
-import org.orbeon.oxf.webapp.{ProcessorService, ServletPortlet, WebAppContext}
+import org.orbeon.oxf.webapp.{WebAppContext, ProcessorService, ServletPortlet}
 import org.orbeon.oxf.externalcontext.{AsyncExternalContext, AsyncRequest}
 import org.orbeon.oxf.util.{URLRewriterUtils, DynamicVariable}
 import org.orbeon.oxf.pipeline.InitUtils.withPipelineContext
@@ -75,7 +75,7 @@ class OrbeonPortlet extends GenericPortlet with ServletPortlet with BufferedPort
         withRootException("initialization", new PortletException(_)) {
             // Obtain WebAppContext as that will initialize the resource manager if needed, which is required by
             // Version
-            val webAppContext = WebAppContext.instance(getPortletContext)
+            val webAppContext = WebAppContext(getPortletContext)
             Version.instance.requirePEFeature("Orbeon Forms portlet") // this is a PE feature
             init(webAppContext, Some("oxf.portlet-initialized-processor." → "oxf.portlet-initialized-processor.input."))
         }

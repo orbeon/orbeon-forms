@@ -36,51 +36,46 @@ object Orbeon {
     // - logger (based on properties)
     // - processor registry
     def initialize(context: WebAppContext) = {
-        try {
-            // Check whether logging initialization is disabled
-            val initializeLogging = context.initParameters.get(LoggingProperty) != Some("false")
-            if (initializeLogging)
-                LoggerFactory.initBasicLogger()
+        // Check whether logging initialization is disabled
+        val initializeLogging = context.initParameters.get(LoggingProperty) != Some("false")
+        if (initializeLogging)
+            LoggerFactory.initBasicLogger()
 
-            // 0. Say hello
-            logger.info("Starting " + Version.VersionString)
+        // 0. Say hello
+        logger.info("Starting " + Version.VersionString)
 
-            // 1. Initialize the Resource Manager
-            val properties = context.initParameters filter
-                { case (name, value) ⇒ name.startsWith("oxf.resources.")} updated
-                    (WebAppResourceManagerImpl.SERVLET_CONTEXT_KEY, context) asJava
+        // 1. Initialize the Resource Manager
+        val properties = context.initParameters filter
+            { case (name, value) ⇒ name.startsWith("oxf.resources.")} updated
+                (WebAppResourceManagerImpl.WEB_APP_CONTEXT_KEY, context) asJava
 
+        logger.info("Initializing Resource Manager with: " + properties)
+        ResourceManagerWrapper.init(properties)
 
-            logger.info("Initializing Resource Manager with: " + properties)
-            ResourceManagerWrapper.init(properties)
+        // 2. Initialize properties
+        val propertiesURL = {
 
-            // 2. Initialize properties
-            val propertiesURL = {
+            // Try to replace the run mode variable so we can write "oxf:/config/properties-${oxf.run-mode}.xml"
+            val rawPropertiesURL = StringUtils.trimToNull(context.initParameters.get(PropertiesProperty) getOrElse
+                (throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")))
 
-                // Try to replace the run mode variable so we can write "oxf:/config/properties-${oxf.run-mode}.xml"
-                val rawPropertiesURL = StringUtils.trimToNull(context.initParameters.get(PropertiesProperty) getOrElse
-                    (throw new OXFException("Properties file URL must be specified via oxf.properties in web.xml.")))
+            val runMode = RunMode.getRunMode(context.initParameters)
+            logger.info("Using run mode: " + runMode)
 
-                val runMode = RunMode.getRunMode(context.initParameters)
-                logger.info("Using run mode: " + runMode)
-
-                rawPropertiesURL.replaceAllLiterally("${" + RunMode.RunModeProperty + "}", runMode)
-            }
-            logger.info("Using properties file: " + propertiesURL)
-            Properties.init(propertiesURL)
-
-            // 3. Initialize Version object (depends on resource manager)
-            // Better to do it here so that log messages will go to the same place as the above logs
-            Version.instance
-
-            // 4. Initialize log4j with a DOMConfiguration
-            if (initializeLogging)
-                LoggerFactory.initLogger()
-
-            // 5. Register processor definitions with the default XML Processor Registry
-            InitUtils.processorDefinitions
-        } catch {
-            case e: Exception ⇒ throw new OXFException(e)
+            rawPropertiesURL.replaceAllLiterally("${" + RunMode.RunModeProperty + "}", runMode)
         }
+        logger.info("Using properties file: " + propertiesURL)
+        Properties.init(propertiesURL)
+
+        // 3. Initialize Version object (depends on resource manager)
+        // Better to do it here so that log messages will go to the same place as the above logs
+        Version.instance
+
+        // 4. Initialize log4j with a DOMConfiguration
+        if (initializeLogging)
+            LoggerFactory.initLogger()
+
+        // 5. Register processor definitions with the default XML Processor Registry
+        InitUtils.processorDefinitions
     }
 }

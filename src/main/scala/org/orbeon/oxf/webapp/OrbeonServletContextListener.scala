@@ -43,6 +43,7 @@ class OrbeonServletContextListener extends ServletContextListener {
     def contextDestroyed(event: ServletContextEvent): Unit =
         withRootException("context destruction", new ServletException(_)) {
             runWithServletContext(event.getServletContext, None, logger, logPrefix, "Context destroyed.", DestroyProcessorPrefix, DestroyInputPrefix)
-            WebAppContext.instance(event.getServletContext).webAppDestroyed
+            // NOTE: This calls all listeners, because the listeners are stored in the actual web app context's attributes
+            WebAppContext(event.getServletContext).webAppDestroyed()
         }
 }

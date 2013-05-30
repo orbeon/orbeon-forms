@@ -117,7 +117,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         if (doOutput) {
             // Ask the request generator first, as the body might have been read already
             // Q: Could this be handled automatically in ExternalContext?
-            val is = RequestGenerator.getRequestBody(request) match {
+            val is = RequestGenerator.getRequestBody(PipelineContext.get) match {
                 case bodyURL: String ⇒ NetUtils.uriToInputStream(bodyURL)
                 case _ ⇒ request.getInputStream
             }

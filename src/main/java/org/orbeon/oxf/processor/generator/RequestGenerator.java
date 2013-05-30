@@ -173,12 +173,17 @@ public class RequestGenerator extends ProcessorImpl {
                                     super.endPrefixMapping(XMLConstants.XSD_PREFIX);
                                     super.endPrefixMapping(XMLConstants.XSI_PREFIX);
 
-                                    // If the body is available as a URL, store it into the request. This is done so that
-                                    // native code can access the body even if it has been read already. Possibly, this
-                                    // could be handled more transparently by ExternalContext, so that
-                                    // Request.getInputStream() works even upon multiple reads.
+                                    // If the body is available as a URL, store it into the pipeline context.
+                                    // This is done so that native code can access the body even if it has been read
+                                    // already. Possibly, this could be handled more transparently by ExternalContext,
+                                    // so that Request.getInputStream() works even upon multiple reads.
+                                    // NOTE 2013-05-30: We used to store this into the request, but request attributes
+                                    // are forwarded by LocalRequest. This means that a forwarded-to request might get
+                                    // the wrong body! Instead, we now use PipelineContext, which is scoped to be per
+                                    // request. Again, if ExternalContext was handling this, we could just leave it to
+                                    // ExternalContext.
                                     if (uriOrNull != null)
-                                        request.getAttributesMap().put(BODY_REQUEST_ATTRIBUTE, uriOrNull);
+                                        pipelineContext.setAttribute(BODY_REQUEST_ATTRIBUTE, uriOrNull);
                                 }
                             } else {
                                 super.startElement(uri, localname, qName, attributes);
@@ -615,8 +620,8 @@ public class RequestGenerator extends ProcessorImpl {
         return (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
     }
 
-    public static String getRequestBody(ExternalContext.Request request) {
-        final Object result = request.getAttributesMap().get(BODY_REQUEST_ATTRIBUTE);
+    public static String getRequestBody(PipelineContext pipelineContext) {
+        final Object result = pipelineContext.getAttribute(BODY_REQUEST_ATTRIBUTE);
         return (result instanceof String) ? ((String) result) : null;
     }
 }

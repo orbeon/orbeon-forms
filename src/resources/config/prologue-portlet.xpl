@@ -18,21 +18,21 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Get request information -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config>
-                <include>/request/portlet-mode</include>
-                <include>/request/request-path</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
+    <!-- WARNING: Don't run oxf:request here so that uploads work! -->
 
     <!-- Handle different page flows depending on portlet mode -->
-    <p:choose href="#request">
+    <p:choose href="aggregate('null')"><!-- dummy test input -->
+        <!-- Don't run PFC for uploads as oxf:request cannot be called -->
+        <!-- NOTE: Avoid matching /xforms-server-submit here! -->
+        <p:when test="(p:get-request-path() = '/xforms-server' or starts-with(p:get-request-path(), '/xforms-server/'))
+                   and p:get-request-method() = 'POST'
+                   and starts-with(p:get-request-header('content-type'), 'multipart/form-data')">
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="oxf:/ops/xforms/xforms-server.xpl"/>
+            </p:processor>
+        </p:when>
         <!-- Page Flow for "edit" mode -->
-        <p:when test="/request/portlet-mode = 'edit'">
+        <p:when test="p:get-portlet-mode() = 'edit'">
             <p:processor name="oxf:page-flow">
                 <p:input name="controller" href="oxf:/page-flow-portlet-edit.xml"/>
             </p:processor>

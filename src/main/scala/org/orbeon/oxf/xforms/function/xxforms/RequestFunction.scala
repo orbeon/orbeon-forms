@@ -27,6 +27,18 @@ class XXFormsGetRequestMethod extends XFormsFunction with FunctionSupport {
         NetUtils.getExternalContext.getRequest.getMethod
 }
 
+// xxf:get-portlet-mode() as xs:string
+class XXFormsGetPortletMode extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+        NetUtils.getExternalContext.getRequest.getPortletMode
+}
+
+// xxf:get-window-state() as xs:string
+class XXFormsGetWindowState extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): StringValue =
+        NetUtils.getExternalContext.getRequest.getWindowState
+}
+
 // xxf:get-request-parameter($a as xs:string) as xs:string*
 class XXFormsGetRequestParameter extends RequestFunction {
 

@@ -32,6 +32,12 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
 
         // xxf:get-request-method()
         Fun("get-request-method", classOf[XXFormsGetRequestMethod], 0, 0, STRING, ALLOWS_ONE)
+
+        // xxf:get-portlet-mode()
+        Fun("get-portlet-mode", classOf[XXFormsGetPortletMode], 0, 0, STRING, ALLOWS_ONE)
+
+        // xxf:get-window-state()
+        Fun("get-window-state", classOf[XXFormsGetWindowState], 0, 0, STRING, ALLOWS_ONE)
     
         // xxf:get-request-path()
         Fun("get-request-path", classOf[XXFormsGetRequestPath], 0, 0, STRING, ALLOWS_ONE)

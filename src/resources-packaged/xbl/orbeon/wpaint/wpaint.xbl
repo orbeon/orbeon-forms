@@ -27,7 +27,13 @@
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/wPaint.js"/>
     <xbl:script src="/xbl/orbeon/wpaint/wpaint.js"/>
 
-    <xbl:binding id="fr-wpaint" element="fr|wpaint" xxbl:mode="lhha binding value">
+    <xbl:binding id="fr-wpaint" element="fr|wpaint" xxbl:mode="lhha binding" xxf:external-events="fr-update-annotation">
+
+        <xbl:resources>
+            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.css"/>
+            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/wPaint.css"/>
+            <xbl:style src="/xbl/orbeon/wpaint/wpaint.css"/>
+        </xbl:resources>
 
         <fb:metadata>
             <fb:display-name lang="en">Image annotation</fb:display-name>
@@ -51,8 +57,11 @@
 
         <xbl:handlers>
             <xbl:handler event="xforms-enabled"  ><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).enabled  ();</xxf:script></xbl:handler>
-            <xbl:handler event="xforms-readonly" ><xxf:script>YAHOO.xbl.fr.Button.instance(this).readonly ();</xxf:script></xbl:handler>
-            <xbl:handler event="xforms-readwrite"><xxf:script>YAHOO.xbl.fr.Button.instance(this).readwrite();</xxf:script></xbl:handler>
+            <xbl:handler event="xforms-readonly" ><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).readonly ();</xxf:script></xbl:handler>
+            <xbl:handler event="xforms-readwrite"><xxf:script>YAHOO.xbl.fr.WPaint.instance(this).readwrite();</xxf:script></xbl:handler>
+            <!-- Reset annotation when new image is uploaded -->
+            <xbl:handler event="xxforms-upload-done" observer="image"><xf:setvalue ref="annotation"/> </xbl:handler>
+            <xbl:handler event="fr-update-annotation"><xf:setvalue ref="annotation" value="event('value')"/></xbl:handler>
         </xbl:handlers>
 
         <xbl:implementation>
@@ -60,8 +69,8 @@
                 <xf:instance id="wpaint-instance" xxbl:mirror="true"><dummy/></xf:instance>
                 <xf:instance id="template">
                     <wpaint>
-                        <image/>
-                        <annotation>gaga</annotation>
+                        <image filename="" mediatype="" size=""/>
+                        <annotation/>
                     </wpaint>
                 </xf:instance>
                 <xf:insert event="xforms-model-construct-done" if="empty(instance()/*)"
@@ -69,16 +78,23 @@
             </xf:model>
         </xbl:implementation>
 
-        <xbl:resources>
-            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.css"/>
-            <xbl:style src="/xbl/orbeon/wpaint/1.13.1/wPaint.css"/>
-            <xbl:style src="/xbl/orbeon/wpaint/wpaint.css"/>
-        </xbl:resources>
-
         <xbl:template>
             <xf:group appearance="xxf:internal">
-                <xh:div class="wpaint-container"/>
-                <xf:input ref="annotation"/>
+
+                <!-- Allow access to annotation and image from JavaScript -->
+                <xf:output class="fr-wpaint-annotation" mediatype="image/*" ref="annotation" style="display: none"/>
+                <xf:output class="fr-wpaint-image"      mediatype="image/*" ref="image"/>
+
+                <!-- Block in which wPaint renders its canvas -->
+                <xh:div class="fr-wpaint-container"/>
+
+                <!-- Background image selection -->
+                <xf:upload ref="image" id="image">
+                    <xf:filename ref="@filename"/>
+                    <xf:mediatype ref="@mediatype"/>
+                    <xxf:size ref="@size"/>
+                </xf:upload>
+
             </xf:group>
         </xbl:template>
     </xbl:binding>

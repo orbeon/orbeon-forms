@@ -10,7 +10,7 @@
 #
 # The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
-OD = ORBEON.util.Dom
+OD = ORBEON.xforms.Document
 YD = YAHOO.util.Dom
 
 YAHOO.namespace('xbl.fr')
@@ -19,11 +19,38 @@ ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.WPaint, "xbl-fr-wpaint");
 YAHOO.xbl.fr.WPaint.prototype =
 
     init: ->
-        @wpaintEl = $(@container).children('.wpaint-container')
-        @wpaintEl.wPaint
-            drawUp: => console.log('image', @wpaintEl.wPaint('image'))
+        @wpaintEl     = $(@container).children('.fr-wpaint-container')
+        @annotationEl = $(@container).find('.fr-wpaint-annotation img')
+        @imageEl      = $(@container).find('.fr-wpaint-image img')
+        @imageEl.load(=> @imageUploaded())
 
     enabled: ->
+
+
+    imageUploaded: ->
+        imageSrc = @imageEl.attr('src')
+        if (isEmpty(imageSrc))
+            @wpaintEl.css('display', 'none')
+            @wpaintEl.wPaint('clear')
+        else
+            @wpaintEl.css('display', 'block')
+            @wpaintEl.css('width' , @imageEl.width()  + 'px')
+            @wpaintEl.css('height', @imageEl.height() + 'px')
+            annotationSrc = @annotationEl.attr('src')
+            @wpaintEl.wPaint
+                imageBg: @imageEl.attr('src')
+                image: if isEmpty(annotationSrc) then null else annotationSrc
+                drawUp: => @drawUp()
+
+    # When users draw something, send it to the server right away (incremental)
+    drawUp: ->
+        annotationImgData = @wpaintEl.wPaint('image')
+        OD.dispatchEvent
+            targetId:  @container.id
+            eventName: 'fr-update-annotation'
+            properties: value: annotationImgData
+
     readonly:  ->
     readwrite: ->
 
+isEmpty = (src) -> src.match(/spacer.gif$/)

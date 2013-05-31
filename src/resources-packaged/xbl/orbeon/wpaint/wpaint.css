@@ -1,7 +1,14 @@
-.wpaint-container {
+.xbl-fr-wpaint {
   position: relative;
-  width: 500px;
-  height: 300px;
-  background: #CACACA;
-  border: solid black 1px;
+}
+.xbl-fr-wpaint .fr-wpaint-container {
+  position: relative;
+  max-width: 100%;
+}
+.xbl-fr-wpaint .fr-wpaint-container canvas {
+  max-width: 100%;
+}
+.xbl-fr-wpaint .fr-wpaint-image {
+  position: absolute;
+  visibility: hidden;
 }

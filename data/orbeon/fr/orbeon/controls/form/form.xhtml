@@ -71,6 +71,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                     <attachment-controls>
                         <static-image filename="step.jpg" mediatype="image/jpeg" size="37401">oxf:/forms/orbeon/controls/form/step.jpg</static-image>
                         <image-attachment filename="crater.jpg" mediatype="image/jpeg" size="16952">oxf:/forms/orbeon/controls/form/crater.jpg</image-attachment>
+                        <image-annotation/>
                         <file-attachment filename="" mediatype="" size=""/>
                     </attachment-controls>
                     <buttons>
@@ -121,6 +122,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                 </xf:bind>
                 <xf:bind id="attachment-controls-bind" ref="attachment-controls" name="attachment-controls">
                     <xf:bind id="image-attachment-bind" ref="image-attachment" type="xs:anyURI" name="image-attachment"/>
+                    <xf:bind id="image-annotation-bind" ref="image-annotation" name="image-annotation"/>
                     <xf:bind id="file-attachment-bind" ref="file-attachment" type="xs:anyURI" name="file-attachment"/>
                     <xf:bind ref="static-image" id="static-image-bind" type="xf:anyURI" name="static-image"/>
                 </xf:bind>
@@ -206,6 +208,12 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </image-attachment>
+                        <image-annotation>
+                            <label>Image annotation</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </image-annotation>
                         <file-attachment>
                             <label>File Attachment</label>
                             <hint>Attach a file</hint>
@@ -495,6 +503,12 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                             <help/>
                             <alert/>
                         </image-attachment>
+                        <image-annotation>
+                            <label>Annotation d'image</label>
+                            <hint/>
+                            <help/>
+                            <alert/>
+                        </image-annotation>
                         <file-attachment>
                             <label>Fichier joint</label>
                             <hint>Joindre un fichier</hint>
@@ -896,7 +910,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                         <xf:action ev:event="xforms-model-construct-done">
                             <xf:action if="empty(instance()/*)">
                                 <xf:insert context="instance()" origin="instance('fr-form-template')/*"/>&gt;
-                            
+
                             <xf:rebuild/>
                                 <xf:recalculate xxf:defauls="true"/>
                                 <xf:revalidate/>
@@ -1262,7 +1276,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                 <fr:section id="attachment-controls-section" bind="attachment-controls-bind">
                     <xf:label ref="$form-resources/attachment-controls/label"/>
                     <xf:help ref="$form-resources/attachment-controls/help"/>
-                    <fr:grid columns="3">
+                    <fr:grid columns="2">
                         <xh:tr>
                             <xh:td>
                                 <xf:output mediatype="image/*" value="." bind="static-image-bind" id="static-image-control" class="fr-attachment">
@@ -1281,6 +1295,19 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                     <xf:mediatype ref="@mediatype"/>
                                     <xxf:size ref="@size"/>
                                 </fr:image-attachment>
+                            </xh:td>
+                        </xh:tr>
+                        <xh:tr>
+                            <xh:td>
+                                <fr:wpaint bind="image-annotation-bind" id="image-annotation-control" class="fr-attachment">
+                                    <xf:label ref="$form-resources/image-annotation/label"/>
+                                    <xf:hint ref="$form-resources/image-annotation/hint"/>
+                                    <xf:help ref="$form-resources/image-annotation/help"/>
+                                    <xf:alert ref="$fr-resources/detail/labels/alert"/>
+                                    <xf:filename ref="@filename"/>
+                                    <xf:mediatype ref="@mediatype"/>
+                                    <xxf:size ref="@size"/>
+                                </fr:wpaint>
                             </xh:td>
                             <xh:td>
                                 <fr:attachment bind="file-attachment-bind" id="file-attachment-control" class="fr-attachment">

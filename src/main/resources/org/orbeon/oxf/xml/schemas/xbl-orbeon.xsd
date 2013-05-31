@@ -80,6 +80,8 @@
             <xs:attribute name="event"/>
             <xs:attribute name="phase"/>
             <xs:attribute name="defaultAction"/>
+            <xs:attribute name="observer"/>
+            <xs:attribute name="target"/>
             <xs:anyAttribute namespace="##other" processContents="lax"/>
         </xs:complexType>
     </xs:element>

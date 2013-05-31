@@ -94,7 +94,7 @@ class EventHandlerImpl(
 
     // Observers and targets
 
-    // Temporarily mutable until after analyzeEventHandler() has run 
+    // Temporarily mutable until after analyzeEventHandler() has run
     private var _observersPrefixedIds: Set[String] = _
     private var _targetPrefixedIds: Set[String] = _
 
@@ -104,7 +104,7 @@ class EventHandlerImpl(
 
     // Analyze the handler
     def analyzeEventHandler() {
-        
+
         // This must run only once
         assert(_observersPrefixedIds eq null)
         assert(_targetPrefixedIds eq null)
@@ -204,7 +204,7 @@ class EventHandlerImpl(
      * Process the event on the given observer.
      */
     def handleEvent(eventObserver: XFormsEventObserver, event: XFormsEvent) {
-        
+
         assert(_observersPrefixedIds ne null)
         assert(_targetPrefixedIds ne null)
 
@@ -212,34 +212,32 @@ class EventHandlerImpl(
 
         // Find dynamic context within which the event handler runs
         val (container, handlerEffectiveId, xpathContext) =
-            if (isXBLHandler) {
+            eventObserver match {
+
                 // Observer is the XBL component itself but from the inside
-                eventObserver match {
-                    case componentControl: XFormsComponentControl ⇒
+                case componentControl: XFormsComponentControl if isXBLHandler ⇒
 
-                        val xblContainer = componentControl.nestedContainer
-                        xblContainer.getContextStack.resetBindingContext()
-                        val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
+                    val xblContainer = componentControl.nestedContainer
+                    xblContainer.getContextStack.resetBindingContext()
+                    val stack = new XFormsContextStack(xblContainer, xblContainer.getContextStack.getCurrentBindingContext)
 
-                        val handlerEffectiveId = xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
+                    val handlerEffectiveId = xblContainer.getFullPrefix + staticId + XFormsUtils.getEffectiveIdSuffixWithSeparator(componentControl.getEffectiveId)
 
-                        (xblContainer, handlerEffectiveId, stack)
-                    case _ ⇒
-                        throw new IllegalStateException
-                }
-            } else {
+                    (xblContainer, handlerEffectiveId, stack)
+
                 // Regular observer
+                case _ ⇒
 
-                // Resolve the concrete handler
-                EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
-                    case Some(concreteHandler) ⇒
-                        val handlerContainer = concreteHandler.container
-                        val handlerEffectiveId = concreteHandler.getEffectiveId
-                        val stack = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
+                    // Resolve the concrete handler
+                    EventHandlerImpl.resolveHandler(containingDocument, this, eventObserver, event.targetObject) match {
+                        case Some(concreteHandler) ⇒
+                            val handlerContainer = concreteHandler.container
+                            val handlerEffectiveId = concreteHandler.getEffectiveId
+                            val stack = new XFormsContextStack(handlerContainer, concreteHandler.bindingContext)
 
-                        (handlerContainer, handlerEffectiveId, stack)
-                    case None ⇒ return
-                }
+                            (handlerContainer, handlerEffectiveId, stack)
+                        case None ⇒ return
+                    }
             }
 
         // Run the action within the context

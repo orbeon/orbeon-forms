@@ -55,7 +55,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
                 // Output all extension attributes
                 if (isConcreteControl) {
                     // Output xxf:* extension attributes
-                    textareaControl.addExtensionAttributesExceptClassForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    textareaControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
                 if (isHTMLDisabled(textareaControl))

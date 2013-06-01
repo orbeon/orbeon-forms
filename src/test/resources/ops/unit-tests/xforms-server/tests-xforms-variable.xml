@@ -707,7 +707,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">en</xxf:attribute>
+                        <xxf:attribute for="xf-1" name="xml:lang">en</xxf:attribute>
                         <xxf:control id="o1">en</xxf:control>
                     </xxf:control-values>
                 </xxf:action>

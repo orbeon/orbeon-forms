@@ -22,6 +22,8 @@ trait ControlExtensionAttributesSupport {
 
     self: XFormsControl ⇒
 
+    import ControlExtensionAttributesSupport._
+
     // Optional extension attributes supported by the control
     private[ControlExtensionAttributesSupport] var _extensionAttributes: Option[Map[QName, String]] = None
 
@@ -52,24 +54,31 @@ trait ControlExtensionAttributesSupport {
     final def compareExtensionAttributes(other: XFormsControl) =
         evaluatedExtensionAttributes == other.evaluatedExtensionAttributes
 
-    def getExtensionAttributeValue(attributeName: QName) =
-        evaluatedExtensionAttributes.get(attributeName) orNull
+    // NOTE: Overridden by some tests
+    def extensionAttributeValue(attributeName: QName) =
+        evaluatedExtensionAttributes.get(attributeName)
+
+    final def jExtensionAttributeValue(attributeName: QName) =
+        evaluatedExtensionAttributes.get(attributeName).orNull
 
     // Add all non-null values to the given list of attributes, filtering by namespace URI
-    // NOTE: the class attribute is excluded because handled separately
-    final def addExtensionAttributesExceptClassForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
+    // NOTE: The `class` attribute is excluded because handled separately.
+    // NOTE: The `accept` attribute is also handled separately by the handler.
+    final def addExtensionAttributesExceptClassAndAcceptForHandler(attributesImpl: AttributesImpl, namespaceURI: String): Unit =
         for {
             (name, value) ← evaluatedExtensionAttributes
-            if name.getNamespaceURI == namespaceURI && name != CLASS_QNAME
+            if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
             if value ne null
             localName = name.getName
-        } yield
-            attributesImpl.addAttribute("", localName, localName, ContentHandlerHelper.CDATA, value)
+        } attributesImpl.addAttribute("", localName, localName, ContentHandlerHelper.CDATA, value)
 
-    final def addExtensionAttributesExceptClassForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: ContentHandlerHelper): Unit =
+    final def addExtensionAttributesExceptClassAndAcceptForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: ContentHandlerHelper): Unit =
         for {
             name ← staticControl.extensionAttributes.keys
-            if name.getNamespaceURI == namespaceURI && name != CLASS_QNAME
-        } yield
-            outputAttributeElement(originalControl, name.getName, _.getExtensionAttributeValue(name), isNewlyVisibleSubtree)(ch)
+            if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
+        } outputAttributeElement(originalControl, name.getName, _.extensionAttributeValue(name).orNull, isNewlyVisibleSubtree)(ch)
+}
+
+private object ControlExtensionAttributesSupport {
+    val StandardAttributesToFilterOnHandler = Set(CLASS_QNAME, ACCEPT_QNAME)
 }

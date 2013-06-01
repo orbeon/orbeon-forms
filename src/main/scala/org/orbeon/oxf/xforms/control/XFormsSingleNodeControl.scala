@@ -263,7 +263,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
         // Output attributes (like style) in no namespace which must be output via xxf:attribute
         // TODO: If only some attributes changed, then we also output xxf:control above, which is unnecessary
-        addExtensionAttributesExceptClassForAjax(control1, "", isNewlyVisibleSubtree)(ch)
+        addExtensionAttributesExceptClassAndAcceptForAjax(control1, "", isNewlyVisibleSubtree)(ch)
     }
 
     override def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl): Boolean = {

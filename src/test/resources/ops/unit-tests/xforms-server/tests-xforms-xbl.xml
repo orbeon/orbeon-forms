@@ -809,10 +809,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="fr-super-control-1$xf-6" for="fr-super-control-1$xf-5" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-2$xf-10" for="fr-super-control-2$xf-9" name="style">font-weight: bold</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-3$xf-14·1" for="fr-super-control-3$xf-13·1" name="style">color: red</xxf:attribute>
-                        <xxf:attribute id="fr-super-control-3$xf-14·2" for="fr-super-control-3$xf-13·2" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-1$xf-5" name="style">color: red</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-2$xf-9" name="style">font-weight: bold</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-3$xf-13·1" name="style">color: red</xxf:attribute>
+                        <xxf:attribute for="fr-super-control-3$xf-13·2" name="style">font-weight: bold</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

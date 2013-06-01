@@ -58,6 +58,10 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) {
                 // disable pasting in the file. See http://tinyurl.com/6dcd6a
                 reusableAttributes.addAttribute("", "unselectable", "unselectable", ContentHandlerHelper.CDATA, "on")
                 // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
+
+                // @accept
+                uploadControl flatMap (_.acceptValue) foreach
+                    (accept ⇒ reusableAttributes.addAttribute("", "accept", "accept", ContentHandlerHelper.CDATA, accept))
     
                 XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)
                 element(xhtmlPrefix, XHTML_NAMESPACE_URI, "input", reusableAttributes)

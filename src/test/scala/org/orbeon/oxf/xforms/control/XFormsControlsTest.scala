@@ -86,10 +86,10 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     @Test def testDiffClassAVT(): Unit = {
         val attributes = new AttributesImpl
         val control1 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-            override def getExtensionAttributeValue(attributeName: QName) = "foo bar gaga"
+            override def extensionAttributeValue(attributeName: QName) = Some("foo bar gaga")
         }
         val control2 = new XFormsInputControl(getContainingDocument("input-2"), null, null, "input-2") {
-            override def getExtensionAttributeValue(attributeName: QName) = "bar toto"
+            override def extensionAttributeValue(attributeName: QName) = Some("bar toto")
         }
         AjaxSupport.addAjaxClasses(attributes, false, control1, control2)
         assert("-foo -gaga +toto" === attributes.getValue("class"))
@@ -98,7 +98,7 @@ class XFormsControlsTest extends ResourceManagerTestBase with AssertionsForJUnit
     @Test def testDiffClassAVTNew(): Unit = {
         val attributes = new AttributesImpl
         val control2 = new XFormsInputControl(getContainingDocument("input-1"), null, null, "input-1") {
-            override def getExtensionAttributeValue(attributeName: QName) = "foo bar"
+            override def extensionAttributeValue(attributeName: QName) = Some("foo bar")
         }
         AjaxSupport.addAjaxClasses(attributes, false, null, control2)
         assert("foo bar" === attributes.getValue("class"))

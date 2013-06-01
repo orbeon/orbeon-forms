@@ -235,7 +235,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 // Possible AVT
                 if (control != null) {
                     // Ask the control if possible
-                    value = control.getExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
+                    value = control.jExtensionAttributeValue(XFormsConstants.CLASS_QNAME);
                 } else {
                     // Otherwise we can't compute it
                     value = null;

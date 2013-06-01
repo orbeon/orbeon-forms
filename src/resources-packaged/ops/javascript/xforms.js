@@ -1538,11 +1538,12 @@ ORBEON.xforms.Controls = {
      * @param attribute2        Optional
      * @param attribute3        Optional
      * @param attribute4        Optional
+     * @param attribute5        Optional
      */
     beforeValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     valueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
     afterValueChange: new YAHOO.util.CustomEvent(null, null, false, YAHOO.util.CustomEvent.FLAT),
-    setCurrentValue: function(control, newControlValue, attribute1, attribute2, attribute3, attribute4) {
+    setCurrentValue: function(control, newControlValue, attribute1, attribute2, attribute3, attribute4, attribute5) {
         var customEvent = { control: control, newValue: newControlValue };
         ORBEON.xforms.Controls.beforeValueChange.fire(customEvent);
         ORBEON.xforms.Controls.valueChange.fire(customEvent);
@@ -1613,6 +1614,8 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
             if (attribute4 != null)
                 ORBEON.util.Dom.setStringValue(sizeSpan, attribute4);
+            if (attribute5 != null)
+                $(control).find(".xforms-upload-select").attr("accept", attribute5);
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
             // Only update value if different from the one we have. This handle the case where the fields contain invalid
             // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how

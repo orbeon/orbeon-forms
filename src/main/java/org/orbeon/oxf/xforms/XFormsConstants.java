@@ -95,6 +95,7 @@ public class XFormsConstants {
 
     public static final QName APPEARANCE_QNAME = new QName("appearance");
     public static final QName MEDIATYPE_QNAME = new QName("mediatype");
+    public static final QName ACCEPT_QNAME = new QName("accept");
     public static final QName SRC_QNAME = new QName("src");
 
     public static final QName TARGETID_QNAME = new QName("targetid");

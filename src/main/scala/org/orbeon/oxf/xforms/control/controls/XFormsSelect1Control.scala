@@ -59,7 +59,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
 
     // Return the custom group name if present, otherwise return the effective id
     def getGroupName: String =
-        Option(getExtensionAttributeValue(XXFORMS_GROUP_QNAME)) getOrElse getEffectiveId
+        extensionAttributeValue(XXFORMS_GROUP_QNAME) getOrElse getEffectiveId
 
     override def getJavaScriptInitialization = {
         val hasInitialization = staticControl.appearances exists AppearancesWithInitialization

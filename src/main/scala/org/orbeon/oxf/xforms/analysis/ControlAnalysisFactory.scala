@@ -73,6 +73,8 @@ object ControlAnalysisFactory {
 
         override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
         override val externalEvents = externalEventsDef
+
+        override protected val allowedExtensionAttributes = Set(ACCEPT_QNAME, MEDIATYPE_QNAME)
     }
 
     class InputControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)

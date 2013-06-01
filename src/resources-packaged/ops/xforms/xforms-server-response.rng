@@ -100,6 +100,9 @@
                                                     <attribute name="filename"/>
                                                 </optional>
                                                 <optional>
+                                                    <attribute name="accept"/>
+                                                </optional>
+                                                <optional>
                                                     <attribute name="progress-received"/>
                                                 </optional>
                                                 <optional>
@@ -203,7 +206,6 @@
                                         </optional>
                                     </element>
                                     <element name="xxf:attribute">
-                                        <attribute name="id"/>
                                         <attribute name="name"/>
                                         <attribute name="for"/>
                                         <optional>

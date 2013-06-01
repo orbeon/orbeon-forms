@@ -24,7 +24,7 @@ import org.xml.sax.helpers.AttributesImpl
 import java.io.File
 import org.orbeon.oxf.xforms.event.events._
 import XFormsUploadControl._
-import org.orbeon.oxf.xml.Dom4j
+import org.orbeon.oxf.xml.{ContentHandlerHelper, Dom4j}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.util.{SecureUtils, NetUtils}
 import org.orbeon.oxf.util.Multipart._
@@ -44,6 +44,9 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
         with FileMetadata {
 
     def supportedFileMetadata = FileMetadata.AllMetadataNames
+
+    // NOTE: `mediatype` is deprecated as of XForms 2.0, use `accept` instead
+    def acceptValue = extensionAttributeValue(ACCEPT_QNAME) orElse extensionAttributeValue(MEDIATYPE_QNAME)
 
     override def evaluateImpl(relevant: Boolean, parentRelevant: Boolean): Unit = {
         super.evaluateImpl(relevant, parentRelevant)
@@ -208,8 +211,11 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             case _ ⇒ false
         }
 
-    override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) =
-        addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
+    override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
+        var added = super.addAjaxExtensionAttributes(attributesImpl, isNewRepeatIteration, other)
+        added |= addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
+        added
+    }
 
     override def getBackCopy: AnyRef = {
         val cloned = super.getBackCopy.asInstanceOf[XFormsUploadControl]

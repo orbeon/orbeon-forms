@@ -210,8 +210,11 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     // disallow this for now.
     override def setFocus(inputOnly: Boolean) = false
 
-    override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) =
-        addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
+    override def addAjaxExtensionAttributes(attributesImpl: AttributesImpl, isNewRepeatIteration: Boolean, other: XFormsControl) = {
+        var added = super.addAjaxExtensionAttributes(attributesImpl, isNewRepeatIteration, other)
+        added |= addFileMetadataAttributes(attributesImpl, isNewRepeatIteration, other.asInstanceOf[FileMetadata])
+        added
+    }
 
     override def equalsExternal(other: XFormsControl) =
         other match {

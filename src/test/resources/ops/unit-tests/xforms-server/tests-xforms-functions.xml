@@ -1501,7 +1501,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
+                        <xxf:attribute for="xf-1" name="xml:lang">it</xxf:attribute>
                         <xxf:control id="output1">it</xxf:control>
                         <xxf:control id="output2">zh</xxf:control>
                     </xxf:control-values>
@@ -1549,7 +1549,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">it</xxf:attribute>
+                        <xxf:attribute for="xf-1" name="xml:lang">it</xxf:attribute>
                         <xxf:control id="my-foo-1$output1">it</xxf:control>
                         <xxf:control id="my-foo-1$output2">it</xxf:control>
                         <xxf:control id="my-foo-1$output3">zh</xxf:control>
@@ -1664,7 +1664,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="xf-2" for="xf-1" name="xml:lang">zh</xxf:attribute>
+                        <xxf:attribute for="xf-1" name="xml:lang">zh</xxf:attribute>
                         <xxf:control id="output1">下午7:25 2010年7月23日</xxf:control>
                     </xxf:control-values>
                 </xxf:action>

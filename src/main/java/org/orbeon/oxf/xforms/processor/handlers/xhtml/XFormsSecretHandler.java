@@ -55,7 +55,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 // Output all extension attributes
                 if (isConcreteControl) {
                     // Output xxf:* extension attributes
-                    secretControl.addExtensionAttributesExceptClassForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    secretControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XFormsConstants.XXFORMS_NAMESPACE_URI);
                 }
 
                 if (isHTMLDisabled(secretControl))

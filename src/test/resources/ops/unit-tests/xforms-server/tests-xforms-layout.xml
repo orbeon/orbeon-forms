@@ -1263,7 +1263,7 @@
         </input>
         <input name="controls">
             <controls>
-                <xxf:attribute id="my-src-avt" for="my-image" name="src" value="{image}" for-name="img"/>
+                <xxf:attribute for="my-image" name="src" value="{image}" for-name="img"/>
                 <xf:trigger id="my-trigger">
                     <xf:setvalue ev:event="DOMActivate" ref="image" id="setvalue1">    </xf:setvalue>
                 </xf:trigger>
@@ -1300,7 +1300,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-src-avt" for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
+                        <xxf:attribute for="my-image" name="src">/orbeon/ops/images/xforms/spacer.gif</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2407,7 +2407,7 @@
         </input>
         <input name="controls">
             <controls>
-                <xxf:attribute id="my-href-avt" for="my-anchor" name="href" value="#{.}" for-name="a" ref=".[normalize-space()]"/>
+                <xxf:attribute for="my-anchor" name="href" value="#{.}" for-name="a" ref=".[normalize-space()]"/>
                 <xf:trigger id="my-trigger">
                     <xf:setvalue ev:event="DOMActivate" ref="." id="setvalue1">section1</xf:setvalue>
                 </xf:trigger>
@@ -2440,7 +2440,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:attribute id="my-href-avt" for="my-anchor" name="href">#section1</xxf:attribute>
+                        <xxf:attribute for="my-anchor" name="href">#section1</xxf:attribute>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

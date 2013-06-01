@@ -109,9 +109,6 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
             // Whether it is necessary to output information about this control
             var doOutputElement = false
 
-            // Control id
-            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, namespaceId(containingDocument, attributeControl2.getEffectiveId))
-
             // The client does not store an HTML representation of the xxf:attribute control, so we
             // have to output these attributes.
 

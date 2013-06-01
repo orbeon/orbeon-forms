@@ -1392,12 +1392,16 @@
                                             // Additional attributes for xf:upload
                                             // <xxf:control id="xforms-control-id"
                                             //    state="empty|file"
+                                            //    accept=".txt"
                                             //    filename="filename.txt" mediatype="text/plain" size="23kb"/>
-                                            var state = ORBEON.util.Dom.getAttribute(controlElement, "state");
-                                            var filename = ORBEON.util.Dom.getAttribute(controlElement, "filename");
-                                            var mediatype = ORBEON.util.Dom.getAttribute(controlElement, "mediatype");
-                                            var size = ORBEON.util.Dom.getAttribute(controlElement, "size");
-                                            ORBEON.xforms.Controls.setCurrentValue(documentElement, newControlValue, state, filename, mediatype, size);
+                                            ORBEON.xforms.Controls.setCurrentValue(
+                                                documentElement,
+                                                newControlValue,
+                                                ORBEON.util.Dom.getAttribute(controlElement, "state"),
+                                                ORBEON.util.Dom.getAttribute(controlElement, "filename"),
+                                                ORBEON.util.Dom.getAttribute(controlElement, "mediatype"),
+                                                ORBEON.util.Dom.getAttribute(controlElement, "size"),
+                                                ORBEON.util.Dom.getAttribute(controlElement, "accept"));
                                         } else if (YAHOO.util.Dom.hasClass(documentElement, "xforms-output")
                                                     || YAHOO.util.Dom.hasClass(documentElement, "xforms-static")) {
                                             // Output-only control, just set the value

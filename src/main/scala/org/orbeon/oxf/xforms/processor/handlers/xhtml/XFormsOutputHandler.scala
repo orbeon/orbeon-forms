@@ -175,7 +175,7 @@ class XFormsOutputDownloadHandler extends XFormsControlLifecyleHandler(false) wi
 
                 // Output xxf:* extension attributes
                 if (outputControl ne null)
-                    outputControl.addExtensionAttributesExceptClassForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
+                    outputControl.addExtensionAttributesExceptClassAndAcceptForHandler(containerAttributes, XXFORMS_NAMESPACE_URI)
 
                 containerAttributes
             }

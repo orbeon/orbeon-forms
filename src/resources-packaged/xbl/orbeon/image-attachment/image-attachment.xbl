@@ -54,7 +54,7 @@
         </metadata>
 
         <xbl:template>
-            <xf:upload ref="xxf:binding('fr-image-attachment')">
+            <xf:upload ref="xxf:binding('fr-image-attachment')" accept="image/*">
                 <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
             </xf:upload>
             <xf:output mediatype="image/*" ref="xxf:binding('fr-image-attachment')[normalize-space()]"/>

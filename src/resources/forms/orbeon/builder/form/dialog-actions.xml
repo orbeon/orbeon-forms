@@ -400,7 +400,7 @@
         </xf:bind>
 
         <!-- Template for a given binding -->
-        <xf:instance id="fb-binding-template" xxf:readonly="true" xxf:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
+        <xf:instance id="fb-binding-template" xxf:readonly="true" xxf:exclude-result-prefixes="xh exf xsi xi xxi fr fb saxon xbl exforms">
             <fb:action id="">
                 <!-- React to event... on control... -->
                 <xf:action fb:event="" ev:observer="" if="true()">
@@ -427,47 +427,30 @@
         </xf:instance>
 
         <!-- Template for actions -->
-        <xf:instance id="fb-binding-action-template" xxf:readonly="true" xxf:exclude-result-prefixes="pipeline xhtml xsi xi xxi fr fb saxon xbl exforms">
+        <!-- NOTE: The implementation of individual actions is now in actions.xsl. -->
+        <xf:instance id="fb-binding-action-template" xxf:readonly="true">
             <action>
                 <!-- Set service value -->
                 <xf:action class="fr-set-service-value-action">
-                    <!-- Parameters -->
-                    <xf:var name="control-name" value="" as="xs:string"/>
-                    <xf:var name="path" value="" as="xs:string"/>
-                    <!-- Set value -->
-                    <xf:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+                    <xf:var name="control-name" value=""/>
+                    <xf:var name="path" value=""/>
                 </xf:action>
                 <!-- Set database service value -->
-                <xf:action class="fr-set-database-service-value-action" xmlns:sql="http://orbeon.org/oxf/xml/sql">
-                    <!-- Parameters -->
-                    <xf:var name="control-name" value="" as="xs:string"/>
-                    <xf:var name="parameter" value="" as="xs:integer"/>
-                    <!-- Set value and escape single quotes -->
-                    <xf:setvalue ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                                     value="concat('''', replace(instance('fr-form-instance')/*/*[name() = $control-name], '''', ''''''), '''')"/>
+                <xf:action class="fr-set-database-service-value-action">
+                    <xf:var name="control-name" value=""/>
+                    <xf:var name="parameter" value=""/>
                 </xf:action>
                 <!-- Set control value -->
                 <xf:action class="fr-set-control-value-action">
-                    <!-- Parameters -->
-                    <xf:var name="control-name" value="" as="xs:string"/>
-                    <xf:var name="control-value" value="" as="xs:string"/>
-                    <!-- Set value -->
-                    <xf:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]" value="$control-value"/>
+                    <xf:var name="control-name" value=""/>
+                    <xf:var name="control-value" value=""/>
                 </xf:action>
                 <!-- Set control itemset -->
                 <xf:action class="fr-itemset-action">
-                    <!-- Parameters -->
-                    <xf:var name="control-name" value="" as="xs:string"/>
-                    <xf:var name="response-items" value="" as="node()*"/>
-                    <!-- Set itemset -->
-                    <xf:var name="control-resources" model="fr-resources-model" value="$fr-form-resources/*[name() = $control-name]"/>
-                    <xf:delete ref="$control-resources/item"/>
-                    <xf:action iterate="$response-items">
-                        <xf:var name="item-label" value="" as="xs:string"/>
-                        <xf:var name="item-value" value="" as="xs:string"/>
-                        <xf:insert ref="$control-resources/*"
-                                   origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
-                    </xf:action>
+                    <xf:var name="control-name" value=""/>
+                    <xf:var name="response-items" value=""/>
+                    <xf:var name="item-label" value=""/>
+                    <xf:var name="item-value" value=""/>
                 </xf:action>
             </action>
         </xf:instance>

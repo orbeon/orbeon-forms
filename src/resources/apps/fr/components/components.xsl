@@ -27,6 +27,7 @@
         xmlns:version="java:org.orbeon.oxf.common.Version">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+    <xsl:import href="actions.xsl"/>
 
     <!-- Import components -->
     <xsl:import href="view.xsl"/>

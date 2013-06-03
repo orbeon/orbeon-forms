@@ -82,14 +82,18 @@
             <xf:group appearance="xxf:internal">
 
                 <!-- Allow access to annotation and image from JavaScript -->
-                <xf:output class="fr-wpaint-annotation" mediatype="image/*" ref="annotation" style="display: none"/>
-                <xf:output class="fr-wpaint-image"      mediatype="image/*" ref="image"/>
+                <xf:output class="fr-wpaint-image"      ref="image" mediatype="image/*"/>
+                <xf:output class="fr-wpaint-annotation" ref="annotation" />
 
                 <!-- Block in which wPaint renders its canvas -->
-                <xh:div class="fr-wpaint-container"/>
+                <xh:div class="fr-wpaint-container-a">
+                    <xh:div class="fr-wpaint-container-b">
+                        <xh:div class="fr-wpaint-container-c"/>
+                    </xh:div>
+                </xh:div>
 
                 <!-- Background image selection -->
-                <xf:upload ref="image" id="image">
+                <xf:upload ref="image" id="image" accept="image/*">
                     <xf:filename ref="@filename"/>
                     <xf:mediatype ref="@mediatype"/>
                     <xxf:size ref="@size"/>

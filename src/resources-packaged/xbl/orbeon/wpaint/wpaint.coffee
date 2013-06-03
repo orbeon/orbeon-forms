@@ -19,32 +19,36 @@ ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.WPaint, "xbl-fr-wpaint");
 YAHOO.xbl.fr.WPaint.prototype =
 
     init: ->
-        @wpaintEl     = $(@container).children('.fr-wpaint-container')
-        @annotationEl = $(@container).find('.fr-wpaint-annotation img')
+        @wpaintElA    = $(@container).find('.fr-wpaint-container-a')
+        @wpaintElB    = $(@container).find('.fr-wpaint-container-b')
+        @wpaintElC    = $(@container).find('.fr-wpaint-container-c')
+        @annotationEl = $(@container).find('.fr-wpaint-annotation .xforms-output-output')
         @imageEl      = $(@container).find('.fr-wpaint-image img')
-        @imageEl.load(=> @imageUploaded())
+        @imageEl.load(=> @imageLoaded())
 
     enabled: ->
 
-
-    imageUploaded: ->
+    imageLoaded: ->
         imageSrc = @imageEl.attr('src')
-        if (isEmpty(imageSrc))
-            @wpaintEl.css('display', 'none')
-            @wpaintEl.wPaint('clear')
+        imageIsEmpty = imageSrc.match(/spacer.gif$/)
+        if (imageIsEmpty)
+            @wpaintElA.css('display', 'none')
+            @wpaintElC.wPaint('clear')
         else
-            @wpaintEl.css('display', 'block')
-            @wpaintEl.css('width' , @imageEl.width()  + 'px')
-            @wpaintEl.css('height', @imageEl.height() + 'px')
-            annotationSrc = @annotationEl.attr('src')
-            @wpaintEl.wPaint
+            @wpaintElA.css('display', 'block')
+            @wpaintElA.css('width' , @imageEl.width()  + 'px')
+            @wpaintElB.css('padding-top', (@imageEl.height() / @imageEl.width() * 100) + '%')
+            @wpaintElC.css('width',  @imageEl.width()  + 'px')
+            @wpaintElC.css('height', @imageEl.height() + 'px')
+            annotation = @annotationEl.text()
+            @wpaintElC.wPaint
                 imageBg: @imageEl.attr('src')
-                image: if isEmpty(annotationSrc) then null else annotationSrc
                 drawUp: => @drawUp()
+                image: if annotation == "" then null else annotation
 
     # When users draw something, send it to the server right away (incremental)
     drawUp: ->
-        annotationImgData = @wpaintEl.wPaint('image')
+        annotationImgData = @wpaintElC.wPaint('image')
         OD.dispatchEvent
             targetId:  @container.id
             eventName: 'fr-update-annotation'
@@ -52,5 +56,3 @@ YAHOO.xbl.fr.WPaint.prototype =
 
     readonly:  ->
     readwrite: ->
-
-isEmpty = (src) -> src.match(/spacer.gif$/)

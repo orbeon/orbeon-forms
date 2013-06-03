@@ -1,12 +1,16 @@
 .xbl-fr-wpaint {
+
     position: relative;
-    .fr-wpaint-container {
-        position: relative; // required by wPaint
-        max-width: 100%;
-        canvas { max-width: 100%; }
-    }
-    .fr-wpaint-image {
-        position: absolute;
-        visibility: hidden;
-    }
+
+    .fr-wpaint-container-a { max-width: 100%; }
+    .fr-wpaint-container-b { width: 100%;
+                             position: relative; }
+    .fr-wpaint-container-c { position: absolute;
+                             top: 0;
+                             max-width: 100%;
+                             max-height: 100%;
+                             canvas { max-width: 100%; }}
+    .fr-wpaint-image       { visibility: hidden;            // Hide, and don't use display: none so we know the height/width
+                             position: absolute; }          // So the image shows "below" the canvas, and doesn't take space
+    .fr-wpaint-annotation  { display: none }
 }

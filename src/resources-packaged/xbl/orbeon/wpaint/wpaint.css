@@ -1,14 +1,26 @@
 .xbl-fr-wpaint {
   position: relative;
 }
-.xbl-fr-wpaint .fr-wpaint-container {
-  position: relative;
+.xbl-fr-wpaint .fr-wpaint-container-a {
   max-width: 100%;
 }
-.xbl-fr-wpaint .fr-wpaint-container canvas {
+.xbl-fr-wpaint .fr-wpaint-container-b {
+  width: 100%;
+  position: relative;
+}
+.xbl-fr-wpaint .fr-wpaint-container-c {
+  position: absolute;
+  top: 0;
+  max-width: 100%;
+  max-height: 100%;
+}
+.xbl-fr-wpaint .fr-wpaint-container-c canvas {
   max-width: 100%;
 }
 .xbl-fr-wpaint .fr-wpaint-image {
-  position: absolute;
   visibility: hidden;
+  position: absolute;
+}
+.xbl-fr-wpaint .fr-wpaint-annotation {
+  display: none;
 }

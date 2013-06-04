@@ -24,27 +24,35 @@ YAHOO.xbl.fr.WPaint.prototype =
         @wpaintElC    = $(@container).find('.fr-wpaint-container-c')
         @annotationEl = $(@container).find('.fr-wpaint-annotation .xforms-output-output')
         @imageEl      = $(@container).find('.fr-wpaint-image img')
-        @imageEl.load(=> @imageLoaded())
+        @imageEl.imagesLoaded(=> @imageLoaded())
+
+        # Test canvas support, see http://stackoverflow.com/a/2746983/5295
+        testCanvasEl = document.createElement('canvas');
+        @canvasSupported = !!(testCanvasEl.getContext && testCanvasEl.getContext('2d'))
+        if @canvasSupported
+            $(@container).find('.fr-wpaint-no-canvas').detach()
+            $(@container).find('.xforms-upload').css('display', 'inline')
 
     enabled: ->
 
     imageLoaded: ->
-        imageSrc = @imageEl.attr('src')
-        imageIsEmpty = imageSrc.match(/spacer.gif$/)
-        if (imageIsEmpty)
-            @wpaintElA.css('display', 'none')
-            @wpaintElC.wPaint('clear')
-        else
-            @wpaintElA.css('display', 'block')
-            @wpaintElA.css('width' , @imageEl.width()  + 'px')
-            @wpaintElB.css('padding-top', (@imageEl.height() / @imageEl.width() * 100) + '%')
-            @wpaintElC.css('width',  @imageEl.width()  + 'px')
-            @wpaintElC.css('height', @imageEl.height() + 'px')
-            annotation = @annotationEl.text()
-            @wpaintElC.wPaint
-                imageBg: @imageEl.attr('src')
-                drawUp: => @drawUp()
-                image: if annotation == "" then null else annotation
+        if @canvasSupported
+            imageSrc = @imageEl.attr('src')
+            imageIsEmpty = imageSrc.match(/spacer.gif$/)
+            if (imageIsEmpty)
+                @wpaintElA.css('display', 'none')
+                @wpaintElC.wPaint('clear')
+            else
+                @wpaintElA.css('display', 'block')
+                @wpaintElA.css('width' , @imageEl.width()  + 'px')
+                @wpaintElB.css('padding-top', (@imageEl.height() / @imageEl.width() * 100) + '%')
+                @wpaintElC.css('width',  @imageEl.width()  + 'px')
+                @wpaintElC.css('height', @imageEl.height() + 'px')
+                annotation = @annotationEl.text()
+                @wpaintElC.wPaint
+                    imageBg: @imageEl.attr('src')
+                    drawUp: => @drawUp()
+                    image: if annotation == "" then null else annotation
 
     # When users draw something, send it to the server right away (incremental)
     drawUp: ->

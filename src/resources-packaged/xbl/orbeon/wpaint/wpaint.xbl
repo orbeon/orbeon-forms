@@ -25,6 +25,7 @@
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.draggable.min.js"/>
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/wColorPicker.js"/>
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/wPaint.js"/>
+    <xbl:script src="/ops/javascript/imagesloaded/imagesloaded.pkgd.min.js"/>
     <xbl:script src="/xbl/orbeon/wpaint/wpaint.js"/>
 
     <xbl:binding id="fr-wpaint" element="fr|wpaint" xxbl:mode="lhha binding" xxf:external-events="fr-update-annotation">
@@ -73,6 +74,12 @@
                         <annotation/>
                     </wpaint>
                 </xf:instance>
+                <xf:instance id="orbeon-resources" xxf:readonly="true">
+                    <resources>
+                        <resource xml:lang="en"><canvas-not-supported>Do do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported></resource>
+                        <resource xml:lang="fr"><canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported></resource>
+                    </resources>
+                </xf:instance>
                 <xf:insert event="xforms-model-construct-done" if="empty(instance()/*)"
                            context="instance()" origin="instance('template')/*"/>
             </xf:model>
@@ -82,8 +89,11 @@
             <xf:group appearance="xxf:internal">
 
                 <!-- Allow access to annotation and image from JavaScript -->
-                <xf:output class="fr-wpaint-image"      ref="image" mediatype="image/*"/>
+                <xf:output class="fr-wpaint-image" ref="image" mediatype="image/*"/>
                 <xf:output class="fr-wpaint-annotation" ref="annotation" />
+
+                <!-- Message in case the canvas is not supported -->
+                <xh:canvas class="fr-wpaint-no-canvas"><xf:output value="xxf:r('canvas-not-supported')"/></xh:canvas>
 
                 <!-- Block in which wPaint renders its canvas -->
                 <xh:div class="fr-wpaint-container-a">

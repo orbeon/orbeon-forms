@@ -9,7 +9,8 @@
                              top: 0;
                              max-width: 100%;
                              max-height: 100%;
-                             canvas { max-width: 100%; }}
+                             canvas { max-width: 100%;
+                                      max-height: 100% }}   // For IE, which doesn't scale canvas like images (max-width not enough)
     .fr-wpaint-image       { visibility: hidden;            // Hide, and don't use display: none so we know the height/width
                              position: absolute; }          // So the image shows "below" the canvas, and doesn't take space
     .fr-wpaint-annotation  { display: none }

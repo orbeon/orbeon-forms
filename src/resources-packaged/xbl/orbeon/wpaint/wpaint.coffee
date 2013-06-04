@@ -53,6 +53,8 @@ YAHOO.xbl.fr.WPaint.prototype =
                     imageBg: @imageEl.attr('src')
                     drawUp: => @drawUp()
                     image: if annotation == "" then null else annotation
+            # Re-register listener, as imagesLoaded() calls listener only once
+            @imageEl.one('load', => @imageLoaded())
 
     # When users draw something, send it to the server right away (incremental)
     drawUp: ->

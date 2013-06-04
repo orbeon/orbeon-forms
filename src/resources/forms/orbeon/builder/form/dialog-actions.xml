@@ -185,6 +185,7 @@
                     </fr:grid>
                 </xf:group>
                 <!-- Only show this section if there are selection controls -->
+                <!-- Q: Should be consistent with actions.xsl to identify selection controls based on name? -->
                 <xf:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]" as="element()*"/>
                 <xf:group ref="xf:action[@fb:event = 'xforms-submit-done' and exists($controls-with-itemset)]">
                     <xf:label ref="$form-resources/dialog-actions/response-itemset/label"/>
@@ -194,7 +195,6 @@
                                 <!-- Only list selection controls -->
                                 <xf:select1 ref="(*:variable | *:var)[@name = 'control-name']/(@value | @select)[1]">
                                     <xf:label ref="$form-resources/dialog-actions/destination-selection-control/label"/>
-                                    <!--<xf:hint ref="$form-resources/dialog-actions/destination-selection-control/hint"/>-->
                                     <xf:item>
                                         <xf:label ref="$form-resources/select/label"/>
                                         <xf:value/>

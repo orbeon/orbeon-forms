@@ -82,11 +82,26 @@
                 <xf:insert ref="$control-resources/*"
                            origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
             </xf:action>
-            <!-- Clear item values that are out of range -->
+            <!-- Filter item values that are out of range -->
             <!-- See: https://github.com/orbeon/orbeon-forms/issues/1019 -->
-            <xf:action iterate="xxf:bind(concat($control-name, '-bind'))" class="fr-itemset-action-clear">
-                <xf:var name="bind" value="."/>
-                <xf:setvalue if="not(string($bind) = $control-resources/item/value)" ref="$bind"/>
+            <!-- NOTE: We guess whether the control is a select or select1 based on the element name. One exception is
+                 autocomplete, which is also a single selection control. -->
+            <xf:var name="element-name" value="local-name(xxf:control-element(concat($control-name, '-control')))"/>
+            <xf:action if="$element-name = 'select' or ends-with($element-name, '-select')">
+                <xf:action iterate="xxf:bind(concat($control-name, '-bind'))">
+                    <xf:var name="bind" value="."/>
+                    <xf:setvalue
+                        ref="$bind"
+                        value="string-join(tokenize($bind, '\s+')[. = $control-resources/item/value/string()], ' ')"/>
+                </xf:action>
+            </xf:action>
+            <xf:action if="$element-name = ('select1', 'autocomplete') or ends-with($element-name, '-select1')">
+                <xf:action iterate="xxf:bind(concat($control-name, '-bind'))">
+                    <xf:var name="bind" value="."/>
+                    <xf:setvalue
+                        if="not(string($bind) = $control-resources/item/value)"
+                        ref="$bind"/>
+                </xf:action>
             </xf:action>
         </xsl:copy>
     </xsl:template>

@@ -41,6 +41,13 @@
     <!-- XPath analysis (PE) -->
     <property as="xs:boolean" name="oxf.xforms.xpath-analysis"                          value="false"/>
 
+    <!-- XForms cache configuration -->
+    <property as="xs:string"  name="oxf.xforms.state-handling"                          value="server"/>
+    <property as="xs:boolean" name="oxf.xforms.cache.document"                          value="true"/>
+    <property as="xs:integer" name="oxf.xforms.cache.documents.size"                    value="50"/>
+    <property as="xs:integer" name="oxf.xforms.cache.static-state.size"                 value="50"/>
+    <property as="xs:integer" name="oxf.xforms.cache.shared-instances.size"             value="50"/>
+
     <!-- Formats -->
     <property as="xs:string"  name="oxf.xforms.format.output.date"                      value="if (. castable as xs:date) then format-date(xs:date(.), '[FNn] [MNn] [D], [Y]', xxf:lang(), (), ()) else ."/>
     <property as="xs:string"  name="oxf.xforms.format.output.dateTime"                  value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[FNn] [MNn] [D], [Y] [H01]:[m01]:[s01] [ZN]', xxf:lang(), (), ()) else ."/>

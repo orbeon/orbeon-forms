@@ -27,13 +27,6 @@
     <service path="/fr/service/exist/search/([^/^.]+)/([^/^.]+)"
              view="persistence/exist/search.xpl"/>
 
-    <!-- List deployed forms for a given application -->
-    <service path="/fr/service/exist/list/([^/^.]+)"
-             default-submission="persistence/exist/list-submission.xml"
-             view="persistence/exist/list.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-    </service>
-
     <!-- Deployed forms services -->
     <service path="/fr/service/exist/form" view="persistence/exist/form.xpl"/>
 
@@ -47,13 +40,6 @@
     <service path="/fr/service/oracle/search/([^/^.]+)/([^/^.]+)"
              view="persistence/oracle/search.xpl"/>
 
-    <!-- List deployed forms for a given application -->
-    <service path="/fr/service/oracle/list/([^/^.]+)"
-             default-submission="persistence/oracle/list-submission.xml"
-             view="persistence/oracle/list.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-    </service>
-
     <!-- Deployed forms services -->
     <service path="/fr/service/oracle/form" view="persistence/oracle/form.xpl"/>
 
@@ -66,13 +52,6 @@
     <!-- Search -->
     <service path="/fr/service/mysql/search/([^/^.]+)/([^/^.]+)"
              view="persistence/mysql/search.xpl"/>
-
-    <!-- List deployed forms for a given application -->
-    <service path="/fr/service/mysql/list/([^/^.]+)"
-             default-submission="persistence/mysql/list-submission.xml"
-          view="persistence/mysql/list.xpl">
-        <setvalue ref="/*/app" matcher-group="1"/>
-    </service>
 
     <!-- Deployed forms services -->
     <service path="/fr/service/mysql/form" view="persistence/mysql/form.xpl"/>

@@ -4,8 +4,10 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="Scala 2.9.2" />
-        <option name="fsc" value="true" />
+        <option name="compilerLibraryName" value="Orbeon Forms" />
+        <option name="compilerOptions" value="-feature -language:postfixOps -language:reflectiveCalls -language:implicitConversions -language:higherKinds -language:existentials" />
+        <option name="deprecationWarnings" value="true" />
+        <option name="uncheckedWarnings" value="true" />
       </configuration>
     </facet>
   </component>

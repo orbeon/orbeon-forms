@@ -98,7 +98,7 @@
                 <!-- Block in which wPaint renders its canvas -->
                 <xh:div class="fr-wpaint-container-a">
                     <xh:div class="fr-wpaint-container-b">
-                        <xh:div class="fr-wpaint-container-c"/>
+                        <xh:div class="fr-wpaint-container-c" tabindex="-1"/>
                     </xh:div>
                 </xh:div>
 

@@ -24,14 +24,17 @@ YAHOO.xbl.fr.WPaint.prototype =
         @wpaintElC    = $(@container).find('.fr-wpaint-container-c')
         @annotationEl = $(@container).find('.fr-wpaint-annotation .xforms-output-output')
         @imageEl      = $(@container).find('.fr-wpaint-image img')
-        @imageEl.imagesLoaded(=> @imageLoaded())
 
         # Test canvas support, see http://stackoverflow.com/a/2746983/5295
         testCanvasEl = document.createElement('canvas');
         @canvasSupported = !!(testCanvasEl.getContext && testCanvasEl.getContext('2d'))
         if @canvasSupported
+            # Remove the canvas used just to show the canvas isn't supported and show the image selector
             $(@container).find('.fr-wpaint-no-canvas').detach()
             $(@container).find('.xforms-upload').css('display', 'inline')
+            # Register events
+            @imageEl.imagesLoaded(=> @imageLoaded())
+            @wpaintElC.blur      (=> @blur())
 
     enabled: ->
 
@@ -50,14 +53,17 @@ YAHOO.xbl.fr.WPaint.prototype =
                 @wpaintElC.css('height', @imageEl.height() + 'px')
                 annotation = @annotationEl.text()
                 @wpaintElC.wPaint
-                    imageBg: @imageEl.attr('src')
-                    drawUp: => @drawUp()
-                    image: if annotation == "" then null else annotation
+                    imageBg  : @imageEl.attr('src')
+                    drawDown : => @drawDown()
+                    image    : if annotation == "" then null else annotation
             # Re-register listener, as imagesLoaded() calls listener only once
             @imageEl.one('load', => @imageLoaded())
 
-    # When users draw something, send it to the server right away (incremental)
-    drawUp: ->
+    drawDown: ->
+        @wpaintElC.focus()
+
+    # When looses focus, send drawing to the server right away (incremental)
+    blur: ->
         annotationImgData = @wpaintElC.wPaint('image')
         OD.dispatchEvent
             targetId:  @container.id

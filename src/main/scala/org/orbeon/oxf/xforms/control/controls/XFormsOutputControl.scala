@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.submission.{SubmissionUtils, Headers}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.exception.OrbeonFormatter
+import scala.util.control.NonFatal
 
 /**
  * Represents an xf:output control.
@@ -115,8 +116,8 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         val headersToForward = SubmissionUtils.clientHeadersToForward(containingDocument.getRequestHeaders, forwardClientHeaders = true)
         try Headers.evaluateHeaders(container, getContextStack, getEffectiveId, staticControl.element, headersToForward)
         catch {
-            case e: Exception ⇒
-                XFormsError.handleNonFatalXPathError(container, e)
+            case NonFatal(t) ⇒
+                XFormsError.handleNonFatalXPathError(container, t)
                 Map()
         }
     }
@@ -162,12 +163,12 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
                 // Dummy image
                 defaultValue
         } catch {
-            case e: Exception ⇒
+            case NonFatal(t) ⇒
                 // We don't want to fail if there is an issue proxying, for example if the resource is not found.
                 // Ideally, this would indicate some condition on the control (not found? out of range?).
                 warn("exception while proxing value", Seq(
                     "value"     → internalValue,
-                    "throwable" → OrbeonFormatter.format(e)))
+                    "throwable" → OrbeonFormatter.format(t)))
 
                 defaultValue
         }

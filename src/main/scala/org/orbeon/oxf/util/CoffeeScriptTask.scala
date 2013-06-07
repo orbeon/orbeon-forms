@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.script.CoffeeScriptCompiler
 import beans.BeanProperty
 import ScalaUtils._
 import java.io._
+import scala.util.control.NonFatal
 
 class CoffeeScriptTask extends MatchingTask {
     
@@ -51,14 +52,14 @@ class CoffeeScriptTask extends MatchingTask {
                     try {
                         copyReader(new StringReader(jsString), new OutputStreamWriter(new FileOutputStream(oFile), Charset.forName("UTF-8")))
                     } catch {
-                        case t: Throwable ⇒
+                        case NonFatal(t) ⇒
                             runQuietly(oFile.delete()) // remove output file if something happened while producing the file
                             throw t
                     }
                 }
             }
         } catch {
-            case t: Throwable ⇒ throw new BuildException(t)
+            case NonFatal(t) ⇒ throw new BuildException(t)
         }
     }
 }

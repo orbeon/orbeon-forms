@@ -24,6 +24,7 @@ import org.xml.sax.Attributes
 import java.lang.{StringBuilder ⇒ JStringBuilder}
 import org.orbeon.oxf.xforms.processor.handlers.OutputInterceptor
 import org.orbeon.oxf.xforms.analysis.controls.RepeatControl
+import scala.util.control.NonFatal
 
 /**
  * Handle xf:repeat.
@@ -112,8 +113,8 @@ class XFormsRepeatHandler extends XFormsControlLifecyleHandler(true, true) { // 
                 if (isMustGenerateDelimiters)
                     outputInterceptor.flushCharacters(true, true)
             } catch {
-                case e: Exception ⇒
-                    throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element))
+                case NonFatal(t) ⇒
+                    throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(repeatControl.getLocationData, "unrolling xf:repeat control", repeatControl.element))
             }
             handlerContext.popRepeatContext()
 

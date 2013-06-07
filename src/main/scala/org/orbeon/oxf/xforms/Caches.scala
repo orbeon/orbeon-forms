@@ -17,6 +17,7 @@ package org.orbeon.oxf.xforms;
 import net.sf.ehcache._
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.common.OXFException
+import scala.util.control.NonFatal
 
 /**
  * All Ehcache-based caches.
@@ -35,7 +36,7 @@ object Caches {
             val manager = new CacheManager(URLFactory.createURL(ehcachePath))
             withMessage(manager, "initialized cache manager from " + ehcachePath)
         } catch {
-            case t: Throwable ⇒
+            case NonFatal(t) ⇒
                 throw new OXFException("unable to read cache manager configuration from " + ehcachePath, t)
         }
 

@@ -33,6 +33,7 @@ import java.io.{FileInputStream, File}
 import org.orbeon.oxf.xml.XMLUtils
 import util.Try
 import java.security.SignatureException
+import scala.util.control.NonFatal
 
 class PEVersion extends Version {
 
@@ -52,14 +53,14 @@ class PEVersion extends Version {
         val licenseInfo =
             try tryReadLicense flatMap tryGetSignedData flatMap LicenseInfo.tryApply get
             catch {
-                case t: Exception ⇒
+                case NonFatal(t) ⇒
                     Exceptions.getRootThrowable(t) match {
-                        case e: ResourceNotFoundException ⇒
+                        case _: ResourceNotFoundException ⇒
                             licenseError("License file not found")
                         case _: SignatureException ⇒
                             licenseError("Invalid license file signature")
-                        case e: Exception ⇒
-                            licenseError("Error loading license file", Some(e))
+                        case NonFatal(t) ⇒
+                            licenseError("Error loading license file", Some(t))
                     }
             }
 

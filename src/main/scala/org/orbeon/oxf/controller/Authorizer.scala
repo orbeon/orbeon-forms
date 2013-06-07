@@ -25,6 +25,7 @@ import org.orbeon.oxf.externalcontext.URLRewriter
 import java.lang.{Boolean ⇒ JBoolean}
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.pipeline.api.ExternalContext
+import scala.util.control.NonFatal
 
 object Authorizer extends Logging {
 
@@ -114,7 +115,7 @@ object Authorizer extends Logging {
                 // TODO: state must be saved in session, not anywhere else; why is this configurable globally?
                 try useAndClose(connection.connect(saveState = true))(isAuthorized)
                 catch {
-                    case t: Throwable ⇒
+                    case NonFatal(t) ⇒
                         error("Could not connect to authorizer", Seq("url" → newURL))
                         error(OrbeonFormatter.format(t))
                         false

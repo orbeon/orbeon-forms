@@ -19,6 +19,7 @@ import org.orbeon.oxf.xml.NamespaceMapping
 import java.util.{Map ⇒ JMap}
 import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import collection.JavaConverters._
+import scala.util.control.NonFatal
 
 trait ControlXPathSupport {
 
@@ -58,9 +59,8 @@ trait ControlXPathSupport {
                         bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
                         containingDocument.getRequestStats.addXPathStat)
                 catch {
-                    case e: Exception ⇒
-                        // Don't consider this as fatal
-                        XFormsError.handleNonFatalXPathError(container, e)
+                    case NonFatal(t) ⇒
+                        XFormsError.handleNonFatalXPathError(container, t)
                         null
                 } finally
                     // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -87,9 +87,8 @@ trait ControlXPathSupport {
                     bc.getInScopeVariables, XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
                     containingDocument.getRequestStats.addXPathStat))
             catch {
-                case e: Exception ⇒
-                    // Don't consider this as fatal
-                    XFormsError.handleNonFatalXPathError(container, e)
+                case NonFatal(t) ⇒
+                    XFormsError.handleNonFatalXPathError(container, t)
                     None
             } finally
                 // Restore function context to prevent leaks caused by context pointing to removed controls
@@ -110,9 +109,8 @@ trait ControlXPathSupport {
                         XFormsContainingDocument.getFunctionLibrary, getFunctionContext, null, getLocationData,
                         containingDocument.getRequestStats.addXPathStat _))
                 catch {
-                    case e: Exception ⇒
-                        // Don't consider this as fatal
-                        XFormsError.handleNonFatalXPathError(container, e)
+                    case NonFatal(t) ⇒
+                        XFormsError.handleNonFatalXPathError(container, t)
                         None
                 } finally
                     // Restore function context to prevent leaks caused by context pointing to removed controls

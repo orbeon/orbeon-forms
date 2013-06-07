@@ -20,6 +20,7 @@ import org.orbeon.saxon.om.{StructuredQName, NamespaceConstant}
 import org.orbeon.saxon.expr.{StaticContext, Expression}
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.saxon.functions.{FunctionLibrary, SystemFunction}
+import scala.util.control.NonFatal
 
 /**
  * Base class for Orbeon XPath function libraries.
@@ -108,7 +109,7 @@ abstract class OrbeonFunctionLibrary extends FunctionLibrary {
                 val f =
                     try functionClass.newInstance.asInstanceOf[SystemFunction]
                     catch {
-                        case e: Exception ⇒ throw new OXFException("Failed to load function: " + e.getMessage, e)
+                        case NonFatal(t) ⇒ throw new OXFException("Failed to load function: " + t.getMessage, t)
                     }
                 f setDetails entry
                 f setFunctionName functionName

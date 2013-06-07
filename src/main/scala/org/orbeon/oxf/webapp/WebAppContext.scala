@@ -18,6 +18,7 @@ import javax.portlet.PortletContext
 import java.net.URL
 import java.io.InputStream
 import collection.JavaConverters._
+import scala.util.control.NonFatal
 
 // Abstraction for ServletContext and PortletContext
 trait WebAppContext {
@@ -54,7 +55,7 @@ trait WebAppContext {
     // Call all webAppDestroyed listeners
     def webAppDestroyed() = webAppListenersOption.toList flatMap (_.iterator) foreach {
         // Run listener and ignore exceptions so we can continue running the remaining listeners
-        listener ⇒ try listener.webAppDestroyed() catch { case t: Throwable ⇒ log("Throwable caught when calling listener", t) }
+        listener ⇒ try listener.webAppDestroyed() catch { case NonFatal(t) ⇒ log("Throwable caught when calling listener", t) }
     }
 
     private def webAppListenersOption = attributes.get(WebAppContext.WebAppListeners) map (_.asInstanceOf[WebAppListeners])

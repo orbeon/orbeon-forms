@@ -38,6 +38,7 @@ import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 import org.orbeon.oxf.webapp.{WebAppContext, HttpStatusCodeException, WebAppExternalContext}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.NodeInfo
+import scala.util.control.NonFatal
 
 object InitUtils {
 
@@ -81,7 +82,7 @@ object InitUtils {
             processor.start(pipelineContext)
             success = true
         } catch {
-            case t: Throwable ⇒
+            case NonFatal(t) ⇒
                 def locationData    = getRootLocationData(t)
                 def locationMessage = locationData map ("at " + _) getOrElse "with no location data"
 
@@ -105,8 +106,8 @@ object InitUtils {
             }
             try pipelineContext.destroy(success)
             catch {
-                case f: Throwable ⇒
-                    logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(f))
+                case NonFatal(t) ⇒
+                    logger.debug("Exception while destroying context after exception" + OrbeonFormatter.format(t))
             }
         }
     }

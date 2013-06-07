@@ -27,6 +27,7 @@ import org.orbeon.saxon.om.{Item, ValueRepresentation}
 import org.orbeon.saxon.sxpath._
 import org.orbeon.saxon.trans.XPathException
 import org.orbeon.saxon.value.SequenceExtent
+import scala.util.control.NonFatal
 
 /**
  * XPath expressions cache.
@@ -412,7 +413,7 @@ object XPathCache {
 
             pooledXPathExpression
         } catch {
-            case e: Exception ⇒ throw handleXPathException(e, xpathString, "preparing XPath expression", locationData)
+            case NonFatal(t) ⇒ throw handleXPathException(t, xpathString, "preparing XPath expression", locationData)
         }
     }
 
@@ -514,8 +515,8 @@ object XPathCache {
             } else
                 body
         } catch {
-            case e: Exception ⇒
-                throw handleXPathException(e, xpathString, "evaluating XPath expression", locationData)
+            case NonFatal(t) ⇒
+                throw handleXPathException(t, xpathString, "evaluating XPath expression", locationData)
         } finally
             xpathExpression.returnToPool()
 }

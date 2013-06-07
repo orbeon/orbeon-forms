@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xforms.InstanceData
 import org.orbeon.oxf.xforms.XFormsModelBinds.BindNode
 import org.orbeon.oxf.util.XPath
+import scala.util.control.NonFatal
 
 object DataModel {
 
@@ -157,7 +158,7 @@ object DataModel {
                 (bind ⇒ evaluateBoundItem(bind.namespaceMapping)) map
                     (XFormsControl.isAllowedBoundItem(control, _)) getOrElse
                         false
-        } catch { case _: Throwable ⇒ false }
+        } catch { case NonFatal(_) ⇒ false }
     }
 
     // For a given value control name and XPath sequence, whether the resulting bound item is acceptable

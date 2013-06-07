@@ -33,6 +33,7 @@ import java.net.{URLEncoder, URI}
 import org.orbeon.oxf.xforms.event.{Dispatch, XFormsEvent}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.util.control.NonFatal
 
 /**
  * Represents an xf:upload control.
@@ -136,7 +137,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
                             warn("could not delete temporary file upon upload", Seq("path" → file.getCanonicalPath))
                     }
                 } catch {
-                    case e: Exception ⇒
+                    case NonFatal(_) ⇒
                         error("could not delete temporary file upon upload", Seq("path" → url))
                 }
 
@@ -197,7 +198,7 @@ class XFormsUploadControl(container: XBLContainer, parent: XFormsControl, elemen
             setFileSize(size)
 
         } catch {
-            case e: Exception ⇒ throw new ValidationException(e, getLocationData)
+            case NonFatal(t) ⇒ throw new ValidationException(t, getLocationData)
         }
     }
 

@@ -25,6 +25,7 @@ import collection.JavaConverters._
 import collection.breakOut
 import com.liferay.portal.util.PortalUtil
 import java.util.{Enumeration ⇒ JEnumeration}
+import scala.util.control.NonFatal
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -255,7 +256,7 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
             connection
         } catch{
-            case t: Throwable ⇒
+            case NonFatal(t) ⇒
                 val is = connection.getInputStream
                 if (is ne null)
                     runQuietly(is.close())

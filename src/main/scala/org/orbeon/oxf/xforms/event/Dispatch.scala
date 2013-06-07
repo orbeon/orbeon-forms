@@ -18,6 +18,7 @@ import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.util.control.NonFatal
 
 object Dispatch extends Logging {
 
@@ -139,10 +140,10 @@ object Dispatch extends Logging {
                 }
             }
         } catch {
-            case e: Exception ⇒
+            case NonFatal(t) ⇒
                 // Add location information if possible
                 val locationData = Option(target.getLocationData).orNull
-                throw OrbeonLocationException.wrapException(e,
+                throw OrbeonLocationException.wrapException(t,
                     new ExtendedLocationData(
                         locationData,
                         Some("dispatching XForms event"),

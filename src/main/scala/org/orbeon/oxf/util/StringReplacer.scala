@@ -15,6 +15,7 @@ package org.orbeon.oxf.util
 
 import spray.json._
 import ScalaUtils.nonEmptyOrNone
+import scala.util.control.NonFatal
 
 // Factory for a string replacement function configured by a JSON map.
 //
@@ -37,7 +38,7 @@ object StringReplacer extends Logging {
                         case other ⇒ throw new RuntimeException
                     }
                 catch {
-                    case e: Exception ⇒
+                    case NonFatal(t) ⇒
                         warn("configuration must be a JSON map of String → String", Seq("JSON" → json))
                         Map()
                 }

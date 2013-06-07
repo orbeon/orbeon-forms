@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction, XFormsA
 import org.orbeon.oxf.xforms.event.events.XXFormsSetindexEvent
 import org.orbeon.oxf.xforms.control.{Focus, XFormsControl}
 import org.orbeon.oxf.xforms.event.Dispatch
+import scala.util.control.NonFatal
 
 /**
  * 9.3.7 The setindex Element
@@ -44,7 +45,7 @@ class XFormsSetindexAction extends XFormsAction {
             val indexString = interpreter.evaluateAsString(element, contextStack.getCurrentNodeset, contextStack.getCurrentPosition, "number(" + indexXPath + ")")
 
             try indexString.toInt
-            catch { case _: Throwable ⇒ return } // "If the index evaluates to NaN the action has no effect."
+            catch { case NonFatal(_) ⇒ return } // "If the index evaluates to NaN the action has no effect."
         }
 
         // Execute

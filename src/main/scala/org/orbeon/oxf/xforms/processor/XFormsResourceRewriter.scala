@@ -30,6 +30,7 @@ import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.processor.XFormsFeatures.ResourceConfig
 import collection.JavaConverters._
 import util.{Failure, Try}
+import scala.util.control.NonFatal
 
 object XFormsResourceRewriter extends Logging {
     /**
@@ -52,7 +53,7 @@ object XFormsResourceRewriter extends Logging {
         }
 
     private def logFailure[T](path: String)(implicit logger: IndentedLogger): PartialFunction[Throwable, Any] = {
-        case e: Exception ⇒
+        case NonFatal(t) ⇒
             error("could not read resource to aggregate", Seq("resource" → path))
     }
 
@@ -138,7 +139,7 @@ object XFormsResourceRewriter extends Logging {
                 val rewrittenURI = response.rewriteResourceURL(resolvedURI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE)
                 "url(" + rewrittenURI + ")"
             } recover {
-                case e: Exception ⇒
+                case NonFatal(t) ⇒
                     warn("found invalid URI in CSS file", Seq("uri" → url))
                     "url(" + url + ")"
             }

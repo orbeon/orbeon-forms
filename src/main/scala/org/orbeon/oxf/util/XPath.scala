@@ -33,6 +33,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import util.Try
+import scala.util.control.NonFatal
 
 object XPath {
 
@@ -166,12 +167,12 @@ object XPath {
             } else
                 body(expression.expression)
         } catch {
-            case e: Exception ⇒ throw handleXPathException(e, expression.string, "evaluating XPath expression", expression.locationData)
+            case NonFatal(t) ⇒ throw handleXPathException(t, expression.string, "evaluating XPath expression", expression.locationData)
         }
 
-    def handleXPathException(e: Exception, xpathString: String, description: String, locationData: LocationData) = {
+    def handleXPathException(t: Throwable, xpathString: String, description: String, locationData: LocationData) = {
         val validationException =
-            OrbeonLocationException.wrapException(e, new ExtendedLocationData(locationData, Option(description), List("expression" → xpathString)))
+            OrbeonLocationException.wrapException(t, new ExtendedLocationData(locationData, Option(description), List("expression" → xpathString)))
 
         // Details of ExtendedLocationData passed are discarded by the constructor for ExtendedLocationData above,
         // so we need to explicitly add them.
@@ -189,7 +190,7 @@ object XPath {
                 val url = URLFactory.createURL(if (base == "") null else base, href)
                 new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(url.openStream))
             } catch {
-                case e: Exception ⇒ throw new TransformerException(e)
+                case NonFatal(t) ⇒ throw new TransformerException(t)
             }
     }
 

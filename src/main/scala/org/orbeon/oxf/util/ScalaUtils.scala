@@ -111,16 +111,16 @@ object ScalaUtils {
     def runQuietly(block: ⇒ Unit) =
         try block
         catch {
-            case _: Throwable ⇒ // NOP
+            case NonFatal(_) ⇒ // NOP
         }
 
     // Run the body and log/rethrow the root cause of any Exception caught
     def withRootException[T](action: String, newException: Throwable ⇒ Exception)(body: ⇒ T)(implicit logger: Logger): T =
         try body
         catch {
-            case e: Exception ⇒
-                logger.error("Exception when running " + action + '\n' + OrbeonFormatter.format(e))
-                throw newException(Exceptions.getRootThrowable(e))
+            case NonFatal(t) ⇒
+                logger.error("Exception when running " + action + '\n' + OrbeonFormatter.format(t))
+                throw newException(Exceptions.getRootThrowable(t))
         }
 
     def dropTrailingSlash(s: String) = if (s.size == 0 || s.last != '/') s else s.init
@@ -280,7 +280,7 @@ object ScalaUtils {
         }
     }
 
-    private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = { case t: Throwable ⇒ Failure(Exceptions.getRootThrowable(t)) }
+    private val RootThrowablePF: PartialFunction[Throwable, Try[Nothing]] = { case NonFatal(t) ⇒ Failure(Exceptions.getRootThrowable(t)) }
 
     // Operations on Try
     implicit class TryOps[U](val t: Try[U]) extends AnyVal {

@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.control.{XFormsValueControl, AjaxSupport, XFormsCon
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.control.controls.FileMetadata._
 import org.apache.commons.io.FileUtils
+import scala.util.control.NonFatal
 
 // This trait is used by controls that support nested file metadata such as "filename"
 trait FileMetadata extends XFormsValueControl {
@@ -182,5 +183,5 @@ object FileMetadata {
     // If the input string doesn't represent a Long, return the string unchanged
     def humanReadableBytes(size: String) =
         try FileUtils.byteCountToDisplaySize(size.toLong)
-        catch { case _: Exception ⇒ size }
+        catch { case NonFatal(_) ⇒ size }
 }

@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.oxf.properties.PropertySet
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
 import org.orbeon.oxf.util.ScalaUtils._
+import scala.util.control.NonFatal
 
 // Orbeon Forms application controller
 class PageFlowControllerProcessor extends ProcessorImpl with Logging {
@@ -130,7 +131,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                     // Run the not found route
                     ec.getResponse.setStatus(404)
                     try notFoundRoute.process(pc, ec, MatchResult(matches = false), mustAuthorize = false)
-                    catch { case t: Throwable ⇒ runErrorRoute(t) }
+                    catch { case NonFatal(t) ⇒ runErrorRoute(t) }
                 case None ⇒
                     // We don't have a not found route so try the error route instead
                     // Don't log because we already logged above
@@ -163,7 +164,7 @@ class PageFlowControllerProcessor extends ProcessorImpl with Logging {
                 debug("processing page/service", logParams)
                 // Run the given route and handle "not found" and error conditions
                 try route.process(pc, ec, matchResult)
-                catch { case t: Throwable ⇒
+                catch { case NonFatal(t) ⇒
                     getRootThrowable(t) match {
                         case e: HttpRedirectException                            ⇒ ec.getResponse.sendRedirect(e.path, e.jParameters.orNull, e.serverSide, e.exitPortal)
                         case e: HttpStatusCodeException if Set(404)(e.code)      ⇒ if (route.isPage) runNotFoundRoute(Some(t)) else sendNotFound(Some(t))

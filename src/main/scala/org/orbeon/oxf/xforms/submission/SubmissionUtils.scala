@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsModel, XFormsPrope
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.DocumentInfo
 import collection.JavaConverters._
+import scala.util.control.NonFatal
 
 // The plan is to move stuff from XFormsSubmissionUtils to here as needed
 object SubmissionUtils {
@@ -45,7 +46,7 @@ object SubmissionUtils {
         useAndClose(openGETConnection(model, resolvedURL)) { result ⇒
             if (NetUtils.isSuccessCode(result.statusCode))
                 try body(result)
-                catch { case e: Exception ⇒ throw new OXFException("Got exception while while reading URL: " + resolvedURL, e) }
+                catch { case NonFatal(t) ⇒ throw new OXFException("Got exception while while reading URL: " + resolvedURL, t) }
             else
                 throw new OXFException("Got invalid return code while reading URL: " + resolvedURL + ", " + result.statusCode)
         }

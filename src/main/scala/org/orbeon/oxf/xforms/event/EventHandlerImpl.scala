@@ -29,6 +29,7 @@ import org.dom4j.{QName, Element}
 import xbl.Scope
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import scala.util.control.NonFatal
 
 /**
  * XForms (or just plain XML Events) event handler implementation.
@@ -247,14 +248,14 @@ class EventHandlerImpl(
                 actionInterpreter.runAction(self)
             }
         } catch {
-            case e: Exception ⇒
+            case NonFatal(t) ⇒
                 // Something bad happened while running the action: dispatch error event to the root of the current scope
                 // NOTE: We used to dispatch the event to XFormsContainingDocument, but that is no longer a event
                 // target. We thought about dispatching to the root control of the current scope, BUT in case the action
                 // is running within a model before controls are created, that won't be available. SO the answer is to
                 // dispatch to what we know exists, and that is the current observer or the target. The observer is
                 // "closer" from the action, so we dispatch to that.
-                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, e))
+                Dispatch.dispatchEvent(new XXFormsActionErrorEvent(eventObserver, t))
         }
     }
 

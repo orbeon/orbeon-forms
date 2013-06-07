@@ -32,6 +32,7 @@ import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.resources.URLFactory
 import collection.JavaConverters._
+import scala.util.control.NonFatal
 
 object FormRunner {
 
@@ -85,7 +86,7 @@ object FormRunner {
                     // Wrap exceptions as Liferay throws if the role is not available instead of returning false
                     def isUserInRole(role: String) =
                         try userRoles.isUserInRole(role)
-                        catch { case e: Exception ⇒ false}
+                        catch { case NonFatal(_) ⇒ false}
 
                     val rolesArray = (
                         for {

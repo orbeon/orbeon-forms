@@ -43,6 +43,7 @@ import scala.collection.JavaConverters._
 import ScalaUtils._
 import java.net.URLDecoder.{decode ⇒ decodeURL}
 import org.orbeon.exception.OrbeonFormatter
+import scala.util.control.NonFatal
 
 /**
  * The PDF Template processor reads a PDF template and performs textual annotations on it.
@@ -106,11 +107,11 @@ class PDFTemplateProcessor extends HttpBinarySerializer with Logging {// TODO: H
 
                 try initialContext.acroFields.addSubstitutionFont(createFont(fontFamilyOrPath, embed))
                 catch {
-                    case e: Exception ⇒
+                    case NonFatal(t) ⇒
                         warn("could not load font", Seq(
                             "font-family" → fontFamilyOrPath,
                             "embed"       → embed.toString,
-                            "throwable"   → OrbeonFormatter.format(e)))(initialContext.logger)
+                            "throwable"   → OrbeonFormatter.format(t)))(initialContext.logger)
                 }
             }
 

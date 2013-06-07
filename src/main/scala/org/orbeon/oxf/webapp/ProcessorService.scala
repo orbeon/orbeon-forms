@@ -24,6 +24,7 @@ import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.LoggerFactory
 import java.io.PrintWriter
 import org.orbeon.oxf.util.task.TaskScheduler
+import scala.util.control.NonFatal
 
 class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProcessorDefinition: Option[ProcessorDefinition]) {
 
@@ -39,17 +40,17 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
 
         try InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext, Logger)
         catch {
-            case e: Throwable ⇒
+            case NonFatal(t) ⇒
                 // Log first
-                Logger.error(OrbeonFormatter.format(e))
+                Logger.error(OrbeonFormatter.format(t))
 
                 // Try to start the error pipeline if the response has not been committed yet
                 Option(externalContext.getResponse) foreach  { response ⇒
                     if (! response.isCommitted) {
                         response.reset()
-                        serviceError(externalContext, e)
+                        serviceError(externalContext, t)
                     } else
-                        serviceStaticError(externalContext, e)
+                        serviceStaticError(externalContext, t)
                 }
         }
     }
@@ -67,8 +68,8 @@ class ProcessorService(mainProcessorDefinition: ProcessorDefinition, errorProces
 
             try InitUtils.runProcessor(processor, externalContext, pipelineContext, Logger)
             catch {
-                case e: Throwable ⇒
-                    Logger.error(OrbeonFormatter.format(e))
+                case NonFatal(t) ⇒
+                    Logger.error(OrbeonFormatter.format(t))
                     serviceStaticError(externalContext, throwable)
             }
         case None ⇒

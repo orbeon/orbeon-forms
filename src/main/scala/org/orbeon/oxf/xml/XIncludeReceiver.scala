@@ -27,6 +27,7 @@ import org.orbeon.saxon.om.ValueRepresentation
 import org.xml.sax._
 import org.orbeon.oxf.processor.URIProcessorOutputImpl.URIReferences
 import XIncludeReceiver._
+import scala.util.control.NonFatal
 
 // Streaming XInclude processing
 // NOTE: Does not support: <xi:fallback>, encoding, accept, or accept-language attributes.
@@ -183,12 +184,12 @@ class XIncludeReceiver(
                         xmlReader.parse(new InputSource(systemId)) // Yeah, the SAX API doesn't make much sense
                 }
             } catch {
-                case e: Exception ⇒
+                case NonFatal(t) ⇒
                     // Resource error, must go to fallback if possible
                     if (systemId != null)
-                        throw new OXFException("Error while handling: " + systemId, e)
+                        throw new OXFException("Error while handling: " + systemId, t)
                     else
-                        throw new OXFException(e)
+                        throw new OXFException(t)
             }
         } else if (isXIURI) {
             // NOTE: Should support xi:fallback

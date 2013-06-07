@@ -27,6 +27,7 @@ import java.net.URL
 import org.orbeon.oxf.xforms.XFormsProperties
 import java.io.InputStreamReader
 import org.orbeon.oxf.xforms.event.XFormsEvent._
+import scala.util.control.NonFatal
 
 // Helper trait for xforms-submit-done/xforms-submit-error
 trait SubmitResponseEvent extends XFormsEvent {
@@ -100,8 +101,8 @@ private object SubmitResponseEvent {
             // as a string. Otherwise, an empty string is returned."
 
             def warn[T](message: String): PartialFunction[Throwable, Option[T]] = {
-                case e: Exception ⇒
-                    logger.logWarning("xforms-submit-error", message, e)
+                case NonFatal(t) ⇒
+                    logger.logWarning("xforms-submit-error", message, t)
                     None
             }
 

@@ -24,7 +24,7 @@ import annotation.tailrec
 import collection.breakOut
 import collection.mutable.ListBuffer
 import util.{Success, Try}
-import util.control.{ControlThrowable, Breaks}
+import scala.util.control.{NonFatal, ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.common.OXFException
 import org.apache.commons.lang3.StringUtils
@@ -199,7 +199,7 @@ object SimpleProcess extends Actions with Logging {
                                     case t: ControlThrowable ⇒
                                         debug("rethrowing ControlThrowable")
                                         throw t
-                                    case t ⇒
+                                    case NonFatal(t) ⇒
                                         debug("recovering", Seq("throwable" → OrbeonFormatter.format(t)))
                                         runAction(nextAction)
                                 }

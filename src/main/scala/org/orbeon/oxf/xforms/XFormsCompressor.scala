@@ -21,6 +21,7 @@ import java.io.OutputStream
 import java.util.zip.Deflater
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import scala.util.control.NonFatal
 
 object XFormsCompressor {
 
@@ -105,7 +106,7 @@ object XFormsCompressor {
         override def passivateObject(o: Deflater): Unit =
             try o.reset()
             catch {
-                case t: Throwable ⇒ XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", t)
+                case NonFatal(t) ⇒ XFormsUtils.indentedLogger.logError("compressor", "exception while passivating Deflater", t)
             }
     }
 

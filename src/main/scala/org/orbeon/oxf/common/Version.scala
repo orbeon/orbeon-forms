@@ -16,6 +16,7 @@ package org.orbeon.oxf.common
 import org.orbeon.oxf.util.LoggerFactory
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import org.orbeon.oxf.xforms.analysis.XPathDependencies
+import scala.util.control.NonFatal
 
 // Product version information
 abstract class Version {
@@ -48,8 +49,8 @@ object Version {
         val versionClassName = "org.orbeon.oxf.common." + Edition + "Version"
 
         def logContextClassLoaderIssue[T](message: String): PartialFunction[Throwable, Option[T]] = {
-            case throwable ⇒
-                logger.info(message, throwable)
+            case NonFatal(t) ⇒
+                logger.info(message, t)
                 None
         }
 

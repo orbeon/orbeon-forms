@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.control.XFormsValueControl
 import collection.{immutable ⇒ i, mutable ⇒ m}
 import org.apache.commons.fileupload.FileUploadBase.SizeLimitExceededException
 import org.orbeon.errorified.Exceptions
+import scala.util.control.NonFatal
 
 
 /**
@@ -224,7 +225,7 @@ object Multipart {
                             result += fileItem.getFieldName → fileItem
                         } catch {
                             // Clean-up FileItem right away in case of failure
-                            case t: Throwable ⇒
+                            case NonFatal(t) ⇒
                                 runQuietly(fileItem.delete())
                                 throw t
                         }
@@ -238,7 +239,7 @@ object Multipart {
                                 copyAndAdd(uploadProgress.receivedSize += _)
                                 uploadProgress.state = Completed
                             } catch {
-                                case t: Throwable ⇒
+                                case NonFatal(t) ⇒
                                     uploadProgress.state = Interrupted(
                                        Option(Exceptions.getRootThrowable(t))
                                        collect { case root: SizeLimitExceededException ⇒ SizeReason(root.getPermittedSize, root.getActualSize) }
@@ -298,7 +299,7 @@ object Multipart {
 
             (result.toList, None)
         } catch {
-            case t: Throwable ⇒
+            case NonFatal(t) ⇒
                 // - don't remove UploadProgress objects from the session
                 // - instead mark all entries added so far as being in state Interrupted if not already the case
                 // - return all completed values up to the point of failure alongside the throwable

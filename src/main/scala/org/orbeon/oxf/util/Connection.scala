@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.apache.commons.lang3.StringUtils
 import Connection._
+import scala.util.control.NonFatal
 
 /**
  * Connection to a URL.
@@ -187,7 +188,7 @@ class Connection(
                 throw new OXFException("submission URL scheme not supported: " + scheme)
             }
         } catch {
-            case e: Exception ⇒ throw new ValidationException(e, new LocationData(connectionURL.toExternalForm, -1, -1))
+            case NonFatal(t) ⇒ throw new ValidationException(t, new LocationData(connectionURL.toExternalForm, -1, -1))
         }
     }
 }

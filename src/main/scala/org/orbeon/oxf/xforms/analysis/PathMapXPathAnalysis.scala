@@ -33,6 +33,7 @@ import collection.JavaConversions._
 import org.orbeon.oxf.xforms._
 import xbl.Scope
 import org.orbeon.oxf.util.XPath.CompiledExpression
+import scala.util.control.NonFatal
 
 class PathMapXPathAnalysis(val xpathString: String,
                            var pathmap: Option[PathMap], // this is used when used as variables and context and can be freed afterwards
@@ -287,8 +288,8 @@ object PathMapXPathAnalysis {
             }
 
         } catch {
-            case e: Exception ⇒
-                throw OrbeonLocationException.wrapException(e,
+            case NonFatal(t) ⇒
+                throw OrbeonLocationException.wrapException(t,
                     new ExtendedLocationData(
                         compiledExpression.locationData,
                         Some("analysing XPath expression"),

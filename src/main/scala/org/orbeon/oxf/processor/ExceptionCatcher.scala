@@ -21,6 +21,7 @@ import org.orbeon.oxf.xml.{ContentHandlerHelper, SAXStore}
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.scaxon.XML
 import org.orbeon.saxon.value.BooleanValue
+import scala.util.control.NonFatal
 
 /**
  * This processor has a data input and data output and behaves like the identity processor except if an exception is
@@ -56,7 +57,7 @@ class ExceptionCatcher extends ProcessorImpl {
                     // No exception: output what was read
                     dataInput.replay(xmlReceiver)
                 } catch {
-                    case t: Throwable ⇒
+                    case NonFatal(t) ⇒
                         // Exception was thrown while reading input: generate a document with that exception
                         val helper = new ContentHandlerHelper(xmlReceiver)
 

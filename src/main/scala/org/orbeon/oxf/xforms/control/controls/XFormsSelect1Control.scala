@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.helpers.AttributesImpl
 import collection.mutable
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.SelectionControl
+import scala.util.control.NonFatal
 
 /**
  * Represents an xf:select1 control.
@@ -90,8 +91,8 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
                 // Items are stored in the control
                 itemsetProperty.value()
         } catch {
-            case e: Exception ⇒
-                throw OrbeonLocationException.wrapException(e, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
+            case NonFatal(t) ⇒
+                throw OrbeonLocationException.wrapException(t, new ExtendedLocationData(getLocationData, "evaluating itemset", element))
         }
 
     override def evaluateExternalValue(): Unit = {

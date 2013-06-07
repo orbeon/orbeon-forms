@@ -18,6 +18,7 @@ import javax.xml.transform.TransformerException
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.xml.sax.SAXParseException
+import scala.util.control.NonFatal
 
 object OrbeonLocationException {
     /**
@@ -41,7 +42,7 @@ object OrbeonLocationException {
                 t.allLocationData
             case te: TransformerException ⇒
                 te.getException match {
-                    case null | _: Exception ⇒ // unclear logic
+                    case null | NonFatal(_) ⇒ // unclear logic
                         Option(te.getLocator) map
                         { l ⇒ new LocationData(l.getSystemId, l.getLineNumber, l.getColumnNumber) } toList
                     case _ ⇒

@@ -29,6 +29,7 @@ import ExternalContext.Session.APPLICATION_SCOPE
 import ExternalContext._
 import ScalaUtils._
 import org.orbeon.exception.OrbeonFormatter
+import scala.util.control.NonFatal
 
 /**
  * Serve XForms engine JavaScript and CSS resources by combining them.
@@ -97,7 +98,7 @@ class XFormsResourceServer extends ProcessorImpl with Logging {
 
                     copyStream(connection.getInputStream, response.getOutputStream)
                 } catch {
-                    case e: Exception ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(e)))
+                    case NonFatal(t) ⇒ warn("exception copying stream", Seq("throwable" → OrbeonFormatter.format(t)))
                 }
             } else {
                 // Not found

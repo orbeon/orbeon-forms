@@ -788,8 +788,8 @@ body {
   -moz-border-radius: 6px 6px 0 0;
   border-radius: 6px 6px 0 0;
 }
-.orbeon .fb-main .navbar .fb-form-settings-trigger {
-  padding-left: 20px;
+.orbeon .fb-main .navbar .fb-navbar-trigger {
+  padding-left: 10px;
 }
 .orbeon .fb-main .navbar .icon-white {
   opacity: 0.7;

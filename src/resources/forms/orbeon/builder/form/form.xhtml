@@ -169,7 +169,7 @@
                             <fr:title ref="xxf:bind('title-bind')"/>
 
                             <!-- Form settings -->
-                            <xf:trigger appearance="minimal" class="fb-form-settings-trigger pull-right">
+                            <xf:trigger appearance="minimal" class="fb-navbar-trigger pull-right">
                                 <xf:label><xh:i class="icon-wrench icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Open the dialog in "edit" mode -->
@@ -182,6 +182,12 @@
                                         <xf:property name="mode" value="'edit'"/>
                                     </xf:dispatch>
                                 </xf:action>
+                            </xf:trigger>
+
+                            <!-- Edit Source -->
+                            <xf:trigger appearance="minimal" class="fb-navbar-trigger pull-right" ref="instance('fb-metadata-instance')/toolbox/edit-source">
+                                <xf:label><xh:i class="icon-edit icon-white" title="{$form-resources/edit-source/label}"/></xf:label>
+                                <xxf:show ev:event="DOMActivate" dialog="fb-source-editor-dialog"/>
                             </xf:trigger>
 
                             <!-- Add/remove language -->

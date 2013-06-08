@@ -44,14 +44,12 @@
                 <xf:var name="fb-resources" value="xxf:get-variable('fr-resources-model', 'fr-form-resources')" as="element(resource)?" class="fb-annotation"/>
                 <fr:section edit-ref="" xxf:update="full" id="section-1-control" bind="section-1-bind">
                     <xf:label ref="$form-resources/section-1/label"/>
-                    <xf:help ref="$form-resources/section-1/help"/>
                     <fr:grid edit-ref="">
                         <xh:tr>
                             <xh:td>
                                 <xf:input id="control-1-control" bind="control-1-bind">
                                     <xf:label ref="$form-resources/control-1/label"/>
                                     <xf:hint ref="$form-resources/control-1/hint"/>
-                                    <xf:help ref="$form-resources/control-1/help"/>
                                     <xf:alert ref="$fr-resources/detail/labels/alert"/>
                                 </xf:input>
                             </xh:td>

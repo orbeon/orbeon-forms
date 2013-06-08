@@ -40,7 +40,15 @@
                               select="$model/xf:instance[@id = 'fr-form-metadata']/*/form-instance-mode = 'custom'"/>
 
                 <!-- Whether we have "many" controls -->
-                <xsl:variable name="many-controls" select="count(/*/xh:body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
+                <xsl:variable name="many-controls"
+                              select="count(/*/xh:body//*:td[exists(*)]) ge p:property('oxf.fb.section.close')"/>
+
+                <!-- All unneeded help elements -->
+                <xsl:variable xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+                              name="unneeded-elements"
+                              select="controlOps:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
+
+                <xsl:template match="*[generate-id() = $unneeded-elements]"/>
 
                 <!-- Custom instance: add dataModel namespace binding to top-level bind -->
                 <xsl:template match="xf:bind[@id = 'fr-form-binds']">

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.fb
 
-import java.util.{List ⇒ JList}
 import collection.JavaConverters._
 import annotation.tailrec
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
@@ -35,6 +34,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.mutable
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.value.StringValue
+import org.apache.commons.lang3.StringUtils._
 
 /*
  * Form Builder: operations on controls.
@@ -51,10 +51,11 @@ object ControlOps {
                      xmlns:xf="http://www.w3.org/2002/xforms"/>
 
     // Get the control name based on the control, bind, grid, section or template id
-    def controlName(controlOrBindId: String) = controlOrBindId match {
-        case ControlName(name, _) ⇒ name
-        case _ ⇒ null
-    }
+    def controlName(controlOrBindId: String) =
+        XFormsUtils.getStaticIdFromId(controlOrBindId) match {
+            case ControlName(name, _) ⇒ name
+            case _ ⇒ null
+        }
 
     // Whether the given id is for a control (given its reserved suffix)
     def isIdForControl(controlOrBindId: String) = controlName(controlOrBindId) ne null
@@ -129,10 +130,13 @@ object ControlOps {
 
     // Find control resource holders with their language
     def findResourceHoldersWithLang(controlName: String): Seq[(String, NodeInfo)] =
+        findResourceHoldersWithLang(formResourcesRoot, controlName)
+
+    def findResourceHoldersWithLang(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
         for {
-            resource ← formResourcesRoot \ "resource"
-            lang = (resource \@ "*:lang").stringValue
-            holder ← resource \ * filter (name(_) == controlName) headOption
+            resource ← resourcesInstanceRoot(inDoc) \ "resource"
+            lang     = (resource \@ "*:lang").stringValue
+            holder   ← resource child controlName headOption
         } yield
             (lang, holder)
 
@@ -140,7 +144,8 @@ object ControlOps {
     def currentResources = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("current-resources"))
 
     // Find the current resource holder for the given name
-    def findCurrentResourceHolder(controlName: String) = currentResources \ * filter (name(_) == controlName) headOption
+    def findCurrentResourceHolder(controlName: String) =
+        currentResources child controlName headOption
 
     // Ensure that a tree of bind exists
     def ensureBindsByName(inDoc: NodeInfo, name: String) =
@@ -246,13 +251,13 @@ object ControlOps {
                     val ref = e._1.stringValue
                     ref.isEmpty || ref.startsWith("$form-resources")
                 } foreach { e ⇒
-                    setvalue(e._1, "$form-resources/" + newName + '/' + e._2)
+                    setvalue(e._1, s"$$form-resources/$newName/${e._2}")
                 }
 
         // If using a static itemset editor, set xf:itemset/@ref xf:itemset/@nodeset value
         if (hasEditor(controlElement, "static-itemset"))
             for (attName ← Seq("ref", "nodeset"))
-                setvalue(controlElement \ "*:itemset" \@ attName, "$form-resources/" + newName + "/item")
+                setvalue(controlElement \ "*:itemset" \@ attName, s"$$form-resources/$newName/item")
     }
 
     // Rename a bind
@@ -449,14 +454,13 @@ object ControlOps {
             (e ⇒ isIdForControl(e attValue "id"))
 
     // Get the control's resource holder
-    def getControlResourceOrEmpty(controlId: String, resourceName: String) = {
-        val controlName = XFormsUtils.getStaticIdFromId(controlId)  // Support effective id, to make it easier to use from XForms
+    def getControlResourceOrEmpty(controlName: String, resourceName: String) = {
         findCurrentResourceHolder(controlName) flatMap
-            (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse("")
+            (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse ""
     }
 
-    def getControlHelpOrEmpty(controlId: String)  = getControlResourceOrEmpty(controlId, "help")
-    def getControlAlertOrEmpty(controlId: String) = getControlResourceOrEmpty(controlId, "alert")
+    def getControlHelpOrEmpty(controlName: String)  = getControlResourceOrEmpty(controlName, "help")
+    def getControlAlertOrEmpty(controlName: String) = getControlResourceOrEmpty(controlName, "alert")
 
     // Get the control's <item> for the current language
     def getControlItems(controlId: String) =
@@ -483,16 +487,37 @@ object ControlOps {
         }
     }
 
-    // Set a control's current resource
-    def setControlResource(controlId: String, resourceName: String, value: String) = {
-        val controlName = XFormsUtils.getStaticIdFromId(controlId)  // Support effective id, to make it easier to use from XForms
-        findCurrentResourceHolder(controlName) flatMap
-            (n ⇒ n \ resourceName headOption) foreach
-                (setvalue(_, value))
+    // Set a control's current resource for the current language
+    def setControlResource(controlName: String, resourceName: String, value: String) = {
+        val resourceHolder = ensureResourceHolder(controlName, resourceName)
+        setvalue(resourceHolder, value)
     }
 
-    def setControlHelp(controlId: String,  value: String) = setControlResource(controlId, "help",  value)
-    def setControlAlert(controlId: String, value: String) = setControlResource(controlId, "alert", value)
+    // Ensure the existence of the resource holder for the current language
+    // NOTE: Assume enclosing control resource holder already exists
+    private def ensureResourceHolder(controlName: String, resourceName: String) = {
+        val controlHolder = findCurrentResourceHolder(controlName).get
+        controlHolder child resourceName headOption match {
+            case Some(existing) ⇒ existing
+            case None           ⇒ insert(into = controlHolder, after = controlHolder child *, origin = elementInfo(resourceName)).head
+        }
+    }
+
+    // Set the control help and add/remove help element and placeholders as needed
+    def setControlHelp(controlName: String,  value: String) = {
+
+        setControlResource(controlName, "help", trimToEmpty(value))
+
+        val inDoc = getFormDoc
+
+        if (hasBlankOrMissingLHHAForAllLangs(inDoc, controlName, "help"))
+            removeLHHAElementAndResources(inDoc, controlName, "help")
+        else
+            ensureLHHAElement(inDoc, controlName, "help")
+    }
+
+    def setControlAlert(controlName: String, value: String) =
+        setControlResource(controlName, "alert", value)
 
     // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
     def viewTemplate(binding: NodeInfo) = {
@@ -657,4 +682,56 @@ object ControlOps {
             else
                 delete(lhhaElement \@ "mediatype")
         }
+
+    private val HelpMatcher = """\$form-resources/([^/]+)/help""".r
+
+    // Find all resource holders and elements which are unneeded because the resources are blank
+    def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String) = {
+
+        val allHelpElements =
+            inDoc.root \\ (XF → lhha) map
+            (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
+            { case (lhhaElement, HelpMatcher(controlName)) ⇒ lhhaElement → controlName }
+
+        val allUnneededHolders =
+            allHelpElements collect {
+                case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangs(inDoc, controlName, lhha) ⇒
+                   lhhaHoldersForAllLangs(inDoc, controlName, lhha) :+ lhhaElement
+            }
+
+        allUnneededHolders.flatten.asJava
+    }
+
+    private def ensureLHHAElement(inDoc: NodeInfo, controlName: String, lhha: String) = {
+        val control = findControlByName(inDoc, controlName).get
+
+        val template: NodeInfo =
+            <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
+                     ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
+
+         control child lhha headOption match {
+             case None           ⇒ insert(into = control, after = control \ *, origin = template).head
+             case Some(existing) ⇒ existing
+         }
+    }
+
+    private def removeLHHAElementAndResources(inDoc: NodeInfo, controlName: String, lhha: String) = {
+        val control = findControlByName(inDoc, controlName).get
+
+        val removedHolders = delete(lhhaHoldersForAllLangs(inDoc, controlName, lhha))
+        val removedLHHA    = delete(control child (XF → lhha))
+
+        removedHolders ++ removedLHHA
+    }
+
+    private def lhhaHoldersForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
+        for {
+            (_, controlHolder) ← findResourceHoldersWithLang(inDoc, controlName)
+            lhhaHolder         ← controlHolder child lhha
+        } yield
+            lhhaHolder
+
+    private def hasBlankOrMissingLHHAForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
+        findResourceHoldersWithLang(inDoc, controlName) forall
+        { case (_, holder) ⇒ isBlank(holder child lhha stringValue) }
 }

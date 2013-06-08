@@ -27,11 +27,11 @@ import org.orbeon.oxf.xml.XMLConstants.XML_URI
  */
 object ToolboxOps {
 
+    // NOTE: Help is added when needed
     private val lhhaTemplate: NodeInfo =
         <template xmlns:xf="http://www.w3.org/2002/xforms">
             <xf:label ref=""/>
             <xf:hint ref=""/>
-            <xf:help ref=""/>
             <xf:alert ref=""/>
         </template>
 
@@ -212,8 +212,7 @@ object ToolboxOps {
                         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
                         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
                         xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
-                <xf:label ref={"$form-resources/" + newSectionName + "/label"}/>
-                <xf:help ref={"$form-resources/" + newSectionName + "/help"}/>{
+                <xf:label ref={s"$$form-resources/$newSectionName/label"}/>{
                 if (withGrid)
                     <fr:grid edit-ref="" id={ids.next()}>
                         <xh:tr>
@@ -340,7 +339,7 @@ object ToolboxOps {
         findControlByName(doc, name) foreach { controlElement ⇒
 
             // Create <resource xml:lang="..."> containers
-            val resourcesWithLang = findResourceHoldersWithLang(name) map {
+            val resourcesWithLang = findResourceHoldersWithLang(td, name) map {
                 case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
             }
 

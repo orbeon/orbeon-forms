@@ -19,6 +19,20 @@
                     <xf:bind id="control-1-bind" name="control-1" ref="control-1"/>
                 </xf:bind>
             </xf:bind>
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
+                <resources>
+                    <resource xml:lang="">
+                        <section-1>
+                            <label/>
+                        </section-1>
+                        <control-1>
+                            <label/>
+                            <hint/>
+                            <alert/>
+                        </control-1>
+                    </resource>
+                </resources>
+            </xf:instance>
             <xf:action ev:event="xforms-model-construct" ev:target="#observer" class="fb-annotation">
                 <xf:dispatch name="fb-xforms-model-construct" targetid="|fr-form-model|"/>
             </xf:action>

@@ -39,6 +39,13 @@
                 <xsl:variable name="is-custom-instance"
                               select="$metadata/form-instance-mode = 'custom'"/>
 
+                <!-- All unneeded help elements -->
+                <xsl:variable xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+                              name="unneeded-elements"
+                              select="controlOps:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
+
+                <xsl:template match="*[generate-id() = $unneeded-elements]"/>
+
                 <!-- HTML title -->
                 <xsl:template match="xh:head/xh:title">
                     <xsl:copy>

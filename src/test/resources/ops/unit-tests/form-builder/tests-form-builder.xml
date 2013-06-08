@@ -39,7 +39,7 @@
     <test description="Deannotate" name="oxf:pipeline">
         <input name="config" href="/forms/orbeon/builder/form/deannotate.xpl"/>
         <input name="data" href="annotated.xml"/>
-        <output name="data" href="template.xml"/>
+        <output name="data" href="deannotated.xml"/>
     </test>
 
 </group>

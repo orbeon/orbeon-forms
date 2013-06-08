@@ -48,7 +48,10 @@ object ToolboxOps {
                     viewTemplate(binding) match {
                         case Some(viewTemplate) ⇒
                             // There is a specific template available
-                            insert(into = gridTd, origin = viewTemplate).head
+                            val controlElement = insert(into = gridTd, origin = viewTemplate).head
+                            // xf:help might be in the template, but we don't need it as it is created on demand
+                            delete(controlElement \ "help")
+                            controlElement
                         case _ ⇒
                             // No specific, create simple element with LHHA
 
@@ -77,7 +80,7 @@ object ToolboxOps {
                     else
                         elementInfo(newControlName)
 
-                val lhhaNames = newControlElement \ * filter (e ⇒ Set("label", "help", "hint", "alert")(localname(e))) map (localname(_))
+                val lhhaNames = newControlElement \ * filter (e ⇒ LHHANames(localname(e))) map (localname(_))
                 val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
 
                 // Insert data and resource holders

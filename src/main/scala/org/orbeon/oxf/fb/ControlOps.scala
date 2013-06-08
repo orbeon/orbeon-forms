@@ -46,6 +46,9 @@ object ControlOps {
     private val MIPsToRewrite = AllMIPs - Type
     private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
 
+    val LHHAInOrder = Seq("label", "hint", "help", "alert")
+    val LHHANames   = LHHAInOrder.to[Set]
+
     private val topLevelBindTemplate: NodeInfo =
         <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
                      xmlns:xf="http://www.w3.org/2002/xforms"/>
@@ -245,7 +248,7 @@ object ControlOps {
 
         // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
         // FIXME: This code is particularly ugly!
-        controlElement \ * filter (e ⇒ Set("label", "help", "hint", "alert")(localname(e))) map
+        controlElement \ * filter (e ⇒ LHHANames(localname(e))) map
             (e ⇒ (e \@ "ref", localname(e))) filter
                 (_._1 nonEmpty) filter { e ⇒
                     val ref = e._1.stringValue
@@ -705,14 +708,21 @@ object ControlOps {
     private def ensureLHHAElement(inDoc: NodeInfo, controlName: String, lhha: String) = {
         val control = findControlByName(inDoc, controlName).get
 
-        val template: NodeInfo =
-            <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
-                     ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
+        control child lhha headOption match {
+            case None ⇒
+                // Try to insert in the right position wrt other LHHA elements. If none, will be inserted as first
+                // element.
+                val namesBefore = LHHAInOrder takeWhile (_ != lhha) toSet
+                val lhhaBefore = control child * filter (e ⇒ namesBefore(localname(e)))
 
-         control child lhha headOption match {
-             case None           ⇒ insert(into = control, after = control \ *, origin = template).head
-             case Some(existing) ⇒ existing
-         }
+                val template: NodeInfo =
+                    <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
+                             ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
+
+                insert(into = control, after = lhhaBefore, origin = template).head
+            case Some(existing) ⇒
+                existing
+        }
     }
 
     private def removeLHHAElementAndResources(inDoc: NodeInfo, controlName: String, lhha: String) = {

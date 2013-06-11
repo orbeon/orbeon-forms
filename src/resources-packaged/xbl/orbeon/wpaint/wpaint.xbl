@@ -78,7 +78,7 @@
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
                         <resource xml:lang="en">
-                            <canvas-not-supported>Do do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+                            <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
                             <annotated-image>Annotated image</annotated-image>
                         </resource>
                         <resource xml:lang="fr">

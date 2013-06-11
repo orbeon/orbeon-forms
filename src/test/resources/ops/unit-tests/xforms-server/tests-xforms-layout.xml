@@ -2877,8 +2877,32 @@
                     <xh:input id="my-input-3$xforms-input-1" type="text" name="my-input-3$xforms-input-1" value="" class="xforms-input-input"/>
                 </xh:span>
             </controls>
-
         </output>
     </test>
 
+    <test description="#1061: @xxf:maxlength on initially non-relevant xf:input" name="oxf:pipeline">
+        <!-- See: https://github.com/orbeon/orbeon-forms/issues/1061 -->
+        <input name="config" href="wrap-xforms-controls.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="items">
+                            <value/>
+                        </xf:instance>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="my-input-1" ref="()" xxf:maxlength="42"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <controls>
+                <xh:span id="my-input-1" class="xforms-control xforms-input xforms-disabled">
+                    <xh:input id="my-input-1$xforms-input-1" type="text" name="my-input-1$xforms-input-1" value="" maxlength="42" class="xforms-input-input"/>
+                </xh:span>
+            </controls>
+        </output>
+    </test>
 </group>

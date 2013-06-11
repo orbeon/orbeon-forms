@@ -53,7 +53,8 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
     protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
         val inputControl = control.asInstanceOf[XFormsInputControl]
         val contentHandler = handlerContext.getController.getOutput
-        val isConcreteControl = ! isNonRelevant(inputControl)
+        val isRelevantControl = ! isNonRelevant(inputControl)
+        val isConcreteControl = inputControl ne null
         if (isBoolean) {
             // Produce a boolean output
             if (! isStaticReadonly(inputControl)) {
@@ -80,7 +81,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                 select1Handler.outputContent(uri, localname, attributes, effectiveId, inputControl, itemset, isMultiple, true, true)
             } else {
                 // Output static read-only value
-                if (isConcreteControl) {
+                if (isRelevantControl) {
                     val xhtmlPrefix = handlerContext.findXHTMLPrefix
                     val enclosingElementLocalname = "span"
                     val enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname)
@@ -114,7 +115,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                     // Use effective id for name of first field
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName)
                     val inputClasses = new java.lang.StringBuilder("xforms-input-input")
-                    if (isConcreteControl) {
+                    if (isRelevantControl) {
                         // Output value only for concrete control
                         val formattedValue = inputControl.getFirstValueUseFormat
                         if (!isDateMinimal) {
@@ -132,12 +133,13 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                         // Q: Not sure why we duplicate the appearances here. As of 2011-10-27, removing this
                         // makes the minimal date picker fail on the client. We should be able to remove this.
                         appendAppearances(elementAnalysis, inputClasses)
-
-                        // Output xxf:* extension attributes
-                        inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
                     } else {
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "")
                     }
+
+                    // Output xxf:* extension attributes
+                    if (isConcreteControl)
+                        inputControl.addExtensionAttributesExceptClassAndAcceptForHandler(reusableAttributes, XXFORMS_NAMESPACE_URI)
 
                     // Add attribute even if the control is not concrete
                     if ((placeHolderInfo ne null) && (placeHolderInfo.placeholder ne null))
@@ -171,8 +173,8 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                     reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "")
                     // TODO: Is this an appropriate name? Noscript must be able to find this
                     reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName)
-                    val inputClasses: StringBuilder = new StringBuilder("xforms-input-input")
-                    if (isConcreteControl) {
+                    val inputClasses = new StringBuilder("xforms-input-input")
+                    if (isRelevantControl) {
                         // Output value only for concrete control
                         val inputValue = inputControl.getSecondValueUseFormat
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue)
@@ -197,7 +199,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                 }
             } else {
                 // Read-only mode
-                if (isConcreteControl) {
+                if (isRelevantControl) {
                     val outputValue = inputControl.getReadonlyValue
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes)
                     if (outputValue ne null)

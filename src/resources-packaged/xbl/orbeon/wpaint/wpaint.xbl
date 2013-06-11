@@ -17,7 +17,8 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:fb="http://orbeon.org/oxf/xml/form-builder">
+         xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
 
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.core.min.js"/>
     <xbl:script src="/xbl/orbeon/wpaint/1.13.1/inc/jquery.ui.widget.min.js"/>
@@ -76,8 +77,14 @@
                 </xf:instance>
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
-                        <resource xml:lang="en"><canvas-not-supported>Do do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported></resource>
-                        <resource xml:lang="fr"><canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported></resource>
+                        <resource xml:lang="en">
+                            <canvas-not-supported>Do do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
+                            <annotated-image>Annotated image</annotated-image>
+                        </resource>
+                        <resource xml:lang="fr">
+                            <canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported>
+                            <annotated-image>Image annotée</annotated-image>
+                        </resource>
                     </resources>
                 </xf:instance>
                 <xf:insert event="xforms-model-construct-done" if="empty(instance()/*)"
@@ -89,21 +96,22 @@
             <xf:group appearance="xxf:internal">
 
                 <!-- Allow access to annotation and image from JavaScript -->
-                <xf:output class="fr-wpaint-image" ref="image" mediatype="image/*"/>
-                <xf:output class="fr-wpaint-annotation" ref="annotation" />
+                <xf:output class="fr-wpaint-image" ref="image[not(exf:readonly(xxf:binding('fr-wpaint')))]" mediatype="image/*"/>
+                <xh:img class="fr-wpaint-annotation" src="{annotation}" alt="{xxf:r('annotated-image')}"/>
 
-                <!-- Message in case the canvas is not supported -->
+                <!-- Message in case the canvas is not supported
+                     - completely static, so it is shown even without JavaScript
+                     - this canvas is removed by JS, once it determines canvas is supported -->
                 <xh:canvas class="fr-wpaint-no-canvas"><xf:output value="xxf:r('canvas-not-supported')"/></xh:canvas>
 
                 <!-- Block in which wPaint renders its canvas -->
                 <xh:div class="fr-wpaint-container-a">
-                    <xh:div class="fr-wpaint-container-b">
-                        <xh:div class="fr-wpaint-container-c" tabindex="-1"/>
-                    </xh:div>
+                    <xh:div class="fr-wpaint-container-b"/>
                 </xh:div>
 
-                <!-- Background image selection -->
-                <xf:upload ref="image" id="image" accept="image/*">
+                <!-- Background image selection
+                     - has xforms-hidden class, as it will be shown by JS once it determined canvas is supported -->
+                <xf:upload ref="image" id="image" accept="image/*" class="xforms-hidden">
                     <xf:filename ref="@filename"/>
                     <xf:mediatype ref="@mediatype"/>
                     <xxf:size ref="@size"/>

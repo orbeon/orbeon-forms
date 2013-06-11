@@ -25,6 +25,10 @@
 .xbl-fr-wpaint .fr-wpaint-annotation {
   display: none;
 }
-.xbl-fr-wpaint .xforms-upload {
+.xbl-fr-wpaint.xforms-readonly .fr-wpaint-annotation {
+  display: inline;
+}
+.xbl-fr-wpaint.xforms-readonly .fr-wpaint-container-a,
+.xbl-fr-wpaint.xforms-readonly .xforms-upload {
   display: none;
 }

@@ -14,5 +14,9 @@
     .fr-wpaint-image       { visibility: hidden;            // Hide, and don't use display: none so we know the height/width
                              position: absolute; }          // So the image shows "below" the canvas, and doesn't take space
     .fr-wpaint-annotation  { display: none }
-    .xforms-upload         { display: none }                // Upload hidden at start, shown if HTML5 canvas is supported
+
+    &.xforms-readonly {
+        .fr-wpaint-annotation { display: inline }
+        .fr-wpaint-container-a, .xforms-upload { display: none }
+    }
 }

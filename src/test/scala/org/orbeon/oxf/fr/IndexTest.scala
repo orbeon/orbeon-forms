@@ -5,8 +5,9 @@ import org.junit.Test
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.relational.Index
 import org.orbeon.oxf.fr.relational.Index.IndexedControl
+import org.orbeon.oxf.test.DocumentTestBase
 
-class IndexTest extends AssertionsForJUnit {
+class IndexTest extends DocumentTestBase with AssertionsForJUnit {
 
     @Test def formBuilderPermissions(): Unit = {
 

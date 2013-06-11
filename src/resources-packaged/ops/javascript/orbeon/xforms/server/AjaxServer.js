@@ -395,7 +395,9 @@
                                 //      if we were unable to process the response (i.e. JS error). Doing this here, before the
                                 //      response is processed, we incur the risk of incrementing the counter while the response is
                                 //      garbage and in fact maybe wasn't even sent back by the server, but by a front-end.
-                                ORBEON.xforms.Document.storeInClientState(formID, "sequence", parseInt(currentSequenceNumber) + 1);
+                                var newSeq = parseInt(currentSequenceNumber) + 1;
+                                ORBEON.xforms.Document.storeInClientState(formID, "sequence", newSeq);
+                                AjaxServer.ajaxResponseReceived.remove(incrementSequenceNumber);
                             })
                         }
                         requestDocumentString.push('</xxf:sequence>\n');
@@ -709,7 +711,7 @@
                     ORBEON.util.Utils.hideModalProgressPanel();
                 }
 
-                AjaxServer.handleResponseDom(responseXML, formID);
+                AjaxServer.handleResponseDom(responseXML, isResponseToBackgroundUpload, formID);
                 // Reset changes, as changes are included in this bach of events
                 ORBEON.xforms.Globals.changedIdsRequest = {};
                 // Notify listeners that we are done processing this request
@@ -733,7 +735,7 @@
      *
      * @param responseXML       DOM containing events to process
      */
-    AjaxServer.handleResponseDom = function(responseXML, formID) {
+    AjaxServer.handleResponseDom = function(responseXML, isResponseToBackgroundUpload, formID) {
 
         try {
             var responseRoot = responseXML.documentElement;
@@ -1912,7 +1914,8 @@
             // Don't rethrow exception: we want to code that runs after the Ajax response is handled to run, so we have a chance to recover from this error
         } finally {
             // We can safely set this to false here, as if there is a request executed right after this, requestInProgress is set again to true by executeNextRequest().
-            ORBEON.xforms.Globals.requestInProgress = false;
+            if (! isResponseToBackgroundUpload)
+                ORBEON.xforms.Globals.requestInProgress = false;
         }
     };
 

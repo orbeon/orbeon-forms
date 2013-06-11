@@ -40,6 +40,7 @@
 .orbeon .xbl-fr-wpaint.xforms-readonly .fr-wpaint-annotation {
   display: inline;
 }
+.orbeon .xbl-fr-wpaint.xforms-readonly .fr-wpaint-no-canvas,
 .orbeon .xbl-fr-wpaint.xforms-readonly .fr-wpaint-container-a,
 .orbeon .xbl-fr-wpaint.xforms-readonly .xforms-upload {
   display: none;

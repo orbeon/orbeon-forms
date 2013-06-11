@@ -22,8 +22,10 @@
         .xforms-upload-size         { display: none }         // Don't show file name/type/size
     }
 
-    &.xforms-readonly {
-        .fr-wpaint-annotation { display: inline }
-        .fr-wpaint-container-a, .xforms-upload { display: none }
+    &.xforms-readonly {                                       // In read-only:
+        .fr-wpaint-annotation       { display: inline }       // Do diplay annotation
+        .fr-wpaint-no-canvas,
+        .fr-wpaint-container-a,
+        .xforms-upload              { display: none }         // Hide everything else
     }
 }

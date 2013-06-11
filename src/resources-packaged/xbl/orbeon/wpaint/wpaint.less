@@ -1,19 +1,26 @@
-.xbl-fr-wpaint {
+.orbeon .xbl-fr-wpaint {
 
     position: relative;
 
-    .fr-wpaint-container-a { max-width: 100%; }
-    .fr-wpaint-container-b { width: 100%;
-                             position: relative; }
-    .fr-wpaint-container-c { position: absolute;
-                             top: 0;
-                             max-width: 100%;
-                             max-height: 100%;
-                             canvas { max-width: 100%;
-                                      max-height: 100% }}   // For IE, which doesn't scale canvas like images (max-width not enough)
-    .fr-wpaint-image       { visibility: hidden;            // Hide, and don't use display: none so we know the height/width
-                             position: absolute; }          // So the image shows "below" the canvas, and doesn't take space
-    .fr-wpaint-annotation  { display: none }
+    .fr-wpaint-container-a          { max-width: 100%; }
+    .fr-wpaint-container-b          { width: 100%;
+                                      position: relative; }
+    .fr-wpaint-container-c          { position: absolute;
+                                      top: 0;
+                                      max-width: 100%;
+                                      max-height: 100%;
+        canvas                      { max-width: 100%;
+                                      max-height: 100% }}     // For IE, which doesn't scale canvas like images (max-width not enough)
+    .fr-wpaint-image                { visibility: hidden;     // Hide, and don't use display: none so we know the height/width
+                                      position: absolute; }   // So the image shows "below" the canvas, and doesn't take space
+    .fr-wpaint-annotation           { display: none }
+    .xforms-upload-info             { background: none;       // Don't show paperclip background
+                                      padding: 0;             // Remove default padding for upload control
+        .xforms-upload-remove       { padding: 0 }            // ditto
+        .xforms-upload-filename,
+        .xforms-upload-mediatype,
+        .xforms-upload-size         { display: none }         // Don't show file name/type/size
+    }
 
     &.xforms-readonly {
         .fr-wpaint-annotation { display: inline }

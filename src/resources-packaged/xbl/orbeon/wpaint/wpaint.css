@@ -1,34 +1,46 @@
-.xbl-fr-wpaint {
+.orbeon .xbl-fr-wpaint {
   position: relative;
 }
-.xbl-fr-wpaint .fr-wpaint-container-a {
+.orbeon .xbl-fr-wpaint .fr-wpaint-container-a {
   max-width: 100%;
 }
-.xbl-fr-wpaint .fr-wpaint-container-b {
+.orbeon .xbl-fr-wpaint .fr-wpaint-container-b {
   width: 100%;
   position: relative;
 }
-.xbl-fr-wpaint .fr-wpaint-container-c {
+.orbeon .xbl-fr-wpaint .fr-wpaint-container-c {
   position: absolute;
   top: 0;
   max-width: 100%;
   max-height: 100%;
 }
-.xbl-fr-wpaint .fr-wpaint-container-c canvas {
+.orbeon .xbl-fr-wpaint .fr-wpaint-container-c canvas {
   max-width: 100%;
   max-height: 100%;
 }
-.xbl-fr-wpaint .fr-wpaint-image {
+.orbeon .xbl-fr-wpaint .fr-wpaint-image {
   visibility: hidden;
   position: absolute;
 }
-.xbl-fr-wpaint .fr-wpaint-annotation {
+.orbeon .xbl-fr-wpaint .fr-wpaint-annotation {
   display: none;
 }
-.xbl-fr-wpaint.xforms-readonly .fr-wpaint-annotation {
+.orbeon .xbl-fr-wpaint .xforms-upload-info {
+  background: none;
+  padding: 0;
+}
+.orbeon .xbl-fr-wpaint .xforms-upload-info .xforms-upload-remove {
+  padding: 0;
+}
+.orbeon .xbl-fr-wpaint .xforms-upload-info .xforms-upload-filename,
+.orbeon .xbl-fr-wpaint .xforms-upload-info .xforms-upload-mediatype,
+.orbeon .xbl-fr-wpaint .xforms-upload-info .xforms-upload-size {
+  display: none;
+}
+.orbeon .xbl-fr-wpaint.xforms-readonly .fr-wpaint-annotation {
   display: inline;
 }
-.xbl-fr-wpaint.xforms-readonly .fr-wpaint-container-a,
-.xbl-fr-wpaint.xforms-readonly .xforms-upload {
+.orbeon .xbl-fr-wpaint.xforms-readonly .fr-wpaint-container-a,
+.orbeon .xbl-fr-wpaint.xforms-readonly .xforms-upload {
   display: none;
 }

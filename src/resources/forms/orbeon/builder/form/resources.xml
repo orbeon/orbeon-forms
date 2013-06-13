@@ -816,6 +816,8 @@
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
+            <owner>Owner</owner>
+            <group-members>Group members</group-members>
             <create>Create</create>
             <read>Read</read>
             <update>Update</update>

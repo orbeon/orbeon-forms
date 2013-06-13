@@ -42,11 +42,7 @@
                         <apply-trigger/>
                         <has-permissions/>
                         <readonly-checked>create read update delete</readonly-checked>
-                        <permissions>
-                            <permission>
-                                <operations/>
-                            </permission>
-                        </permissions>
+                        <permissions/>
                     </ui>
                 </xf:instance>
                 <!-- Maintain validity flag -->
@@ -64,7 +60,6 @@
                 </xf:bind>
                 <xf:instance id="permission-template">
                     <permission>
-                        <role/>
                         <operations/>
                     </permission>
                 </xf:instance>
@@ -86,7 +81,12 @@
                     <!-- Clean UI permissions -->
                     <xf:delete ref="$ui/permissions/*"/>
                     <xf:insert context="$ui/permissions" origin="instance('permission-template')"/>
-                    <xf:delete ref="$ui/permissions/permission/role"/>
+                    <xf:action if="xxf:property('oxf.fr.support-owner-group')">
+                        <xf:insert context="$ui/permissions" nodeset="*" origin="instance('permission-template')"/>
+                        <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:attribute('for', 'owner')"/>
+                        <xf:insert context="$ui/permissions" nodeset="*" origin="instance('permission-template')"/>
+                        <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:attribute('for', 'group-members')"/>
+                    </xf:action>
 
                     <!-- Populate UI permissions based metadata -->
                     <xf:action if="$has-permissions">
@@ -101,32 +101,42 @@
                             <xf:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
                             <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xf:setvalue if="$role != ''"  ref="$new-permission/role" value="replace($role, '%20', ' ')"/>
+                            <xf:insert if="$role != ''"  context="$new-permission" origin="xxf:element('role', replace($role, '%20', ' '))"/>
                             <xf:setvalue ref="$new-permission/operations" value="string-join($permissions/@operations, ' ')"/>
                         </xf:action>
                     </xf:action>
                 </xf:action>
 
                 <!-- On save, copy permissions from UI representation to metadata -->
-                <xf:action ev:event="DOMActivate" ev:observer="save-trigger">
+                <xf:action ev:event="DOMActivate fr-test" ev:observer="save-trigger">
                     <!-- Reset permissions element -->
                     <xf:delete ref="$metadata/permissions"/>
                     <xf:action if="$ui/has-permissions = 'true'">
                         <xf:insert context="$metadata" ref="*" origin="xxf:element('permissions')"/>
+
                         <!-- In UI replace space in role by %20 -->
                         <xf:setvalue iterate="$ui/permissions/permission/role" ref="." value="replace(normalize-space(.), ' ', '%20')"/>
+
                         <!-- Add "anyone" permission -->
                         <xf:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>
                         <xf:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', xxf:attribute('operations', $anyone-operations))"/>
-                        <!-- For each permission, get the roles that can access it, and store in metadata as a separate permission element -->
-                        <xf:var name="permissions" value="$ui/permissions/permission[position() > 1]"/>
-                        <xf:action iterate="distinct-values($permissions/operations/tokenize(., '\s'))">
+                        <!-- Add owner permission -->
+                        <xf:var name="owner-operations" value="$ui/permissions/permission[@for = 'owner']/operations"/>
+                        <xf:insert if="$owner-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', (xxf:attribute('operations', $owner-operations), xxf:element('owner')))"/>
+                        <!-- Add group members permission -->
+                        <xf:var name="group-members-operations" value="$ui/permissions/permission[@for = 'group-members']/operations"/>
+                        <xf:insert if="$group-members-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', (xxf:attribute('operations', $group-members-operations), xxf:element('group-member')))"/>
+
+                        <!-- For each role-based permission, get the roles that can access it, and store in metadata as a separate permission element -->
+                        <xf:var name="role-permissions" value="$ui/permissions/permission[exists(role)]"/>
+                        <xf:action iterate="distinct-values($role-permissions/operations/tokenize(., '\s'))">
                             <xf:var name="operation" value="."/>
-                            <xf:var name="roles" value="string-join(saxon:sort($permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
+                            <xf:var name="roles" value="string-join(saxon:sort($role-permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
                             <xf:insert context="$metadata/permissions" ref="*" origin="xxf:element('permission', (
                                 xxf:attribute('operations', $operation),
                                 xxf:element('user-role', xxf:attribute('any-of', $roles))))"/>
                         </xf:action>
+
                         <!-- Optional code to consolidate multiple permission for the same roles -->
                         <xf:var name="any-ofs" value="distinct-values($metadata/permissions/permission/user-role/@any-of)"/>
                         <xf:var name="operations" value="for $ao in $any-ofs return string-join($metadata/permissions/permission[user-role/@any-of = $ao]/@operations, ' ')"/>
@@ -137,6 +147,10 @@
                                 xxf:attribute('operations', saxon:item-at($operations, $i)),
                                 xxf:element('user-role', xxf:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
                         </xf:action>
+
+                        <!-- Log -->
+                        <xf:load if="event('xxf:type') = 'fr-test'" resource="javascript:console.log($.parseXML(unescape('{encode-for-uri(saxon:serialize($metadata/permissions, 'xml'))}')))"/>
+
                     </xf:action>
                 </xf:action>
 
@@ -166,20 +180,26 @@
                             </xh:tr>
                             <xf:var name="anyone-operations" value="tokenize($ui/permissions/permission[1]/operations, '\s')"/>
                             <xf:repeat ref="$ui/permissions/permission">
-                                <xf:var name="is-first" value="position() = 1"/>
+                                <xf:var name="is-anyone" value="empty(role) and empty(@for)"/>
+                                <xf:var name="is-owner-group" value="exists(@for)"/>
                                 <xh:tr>
                                     <!-- Role name or "anyone" -->
                                     <xh:td class="fb-role">
-                                        <xf:group ref=".[$is-first]">
-                                            <xf:output value="$resources/dialog-permissions/anyone"/>
+                                        <xf:group ref=".[$is-anyone or $is-owner-group]">
+                                            <xf:output value="$resources/dialog-permissions/(
+                                                     if (context()/@for = 'owner') then owner
+                                                else if (context()/@for = 'group-members') then group-members
+                                                else anyone)"/>
                                         </xf:group>
-                                        <xf:group ref=".[not($is-first)]">
+                                        <xf:group ref=".[exists(role)]">
                                             <xf:input ref="role" incremental="true" class="fb-role-name"/>
                                         </xf:group>
                                     </xh:td>
                                     <!-- Checkboxes for operations -->
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'create') then $ui/readonly-checked else operations"
+                                        <xf:select ref="if ($is-owner-group) then ()
+                                                        else if (not($is-anyone) and $anyone-operations = 'create')
+                                                           then $ui/readonly-checked else operations"
                                                    appearance="full" class="fb-create-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/create"/>
@@ -189,8 +209,8 @@
                                     </xh:td>
                                     <xh:td>
                                         <!-- If this role has the 'update' permission, make the 'read' checkbox read-only -->
-                                        <xf:select ref="if ((not($is-first) and $anyone-operations = 'read')
-                                                            or (tokenize(operations, '\s') = 'update'))
+                                        <xf:select ref="if ((not($is-anyone) and $anyone-operations = 'read')
+                                                           or (tokenize(operations, '\s') = 'update'))
                                                         then $ui/readonly-checked else operations"
                                                    appearance="full" class="fb-read-permission">
                                             <xf:item>
@@ -200,7 +220,7 @@
                                         </xf:select>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'update') then $ui/readonly-checked else operations"
+                                        <xf:select ref="if (not($is-anyone) and $anyone-operations = 'update') then $ui/readonly-checked else operations"
                                                    appearance="full" class="fb-update-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/update"/>
@@ -209,7 +229,7 @@
                                         </xf:select>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:select ref="if (not($is-first) and $anyone-operations = 'delete') then $ui/readonly-checked else operations"
+                                        <xf:select ref="if (not($is-anyone) and $anyone-operations = 'delete') then $ui/readonly-checked else operations"
                                                    appearance="full" class="fb-delete-permission">
                                             <xf:item>
                                                 <xf:label ref="$resources/dialog-permissions/delete"/>
@@ -219,11 +239,11 @@
                                     </xh:td>
                                     <!-- Remove -->
                                     <xh:td>
-                                        <xf:trigger appearance="minimal" ref=".[not($is-first)]" class="fb-remove-permission">
+                                        <xf:trigger appearance="minimal" ref=".[not($is-anyone)]" class="fb-remove-permission">
                                             <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                             <xf:delete ev:event="DOMActivate" ref="."/>
                                         </xf:trigger>
-                                        <xf:group ref=".[$is-first]"><xh:i class="icon-minus-sign disabled"/></xf:group>
+                                        <xf:group ref=".[$is-anyone]"><xh:i class="icon-minus-sign disabled"/></xf:group>
                                     </xh:td>
                                 </xh:tr>
                             </xf:repeat>
@@ -233,7 +253,10 @@
                                     <!-- Add -->
                                     <xf:trigger appearance="minimal" class="fb-add-permission">
                                         <xf:label><xh:i class="icon-plus-sign"/></xf:label>
-                                        <xf:insert ev:event="DOMActivate" ref="$ui/permissions/permission" origin="instance('permission-template')"/>
+                                        <xf:action event="DOMActivate">
+                                            <xf:insert ref="$ui/permissions/permission" origin="instance('permission-template')"/>
+                                            <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:element('role')"/>
+                                        </xf:action>
                                     </xf:trigger>
                                 </xh:td>
                             </xh:tr>
@@ -244,7 +267,7 @@
                     <xh:div class="fr-dialog-buttons">
                         <xf:group appearance="xxf:internal" id="triggers">
                             <xh:span>
-                                <xf:trigger ref="$ui/apply-trigger" id="save-trigger" appearance="xxf:primary">
+                                <xf:trigger ref="$ui/apply-trigger" id="save-trigger" appearance="xxf:primary" xxf:external-events="fr-test">
                                     <xf:label ref="$resources/apply/label"/>
                                 </xf:trigger>
                                 <xf:output value="$resources/or/label"/>

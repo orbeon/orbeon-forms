@@ -254,19 +254,10 @@
                                                                         <xsl:for-each select="$control">
                                                                             <xsl:copy>
                                                                                 <!-- So the client-side code can populate populate the checkbox when editing the label -->
-                                                                                <xsl:choose>
-                                                                                    <xsl:when test="$is-editable">
-                                                                                        <xsl:variable name="label-mediatype-class" select="if (xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
-                                                                                        <xsl:variable name="hint-mediatype-class"  select="if (xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
-                                                                                        <xsl:attribute name="class" select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
-                                                                                    </xsl:when>
-                                                                                    <xsl:otherwise>
-                                                                                        <xsl:copy-of select="@class"/>
-                                                                                    </xsl:otherwise>
-                                                                                </xsl:choose>
-                                                                                <xsl:variable name="lhh" select="xf:label | xf:help | xf:hint"/>
-                                                                                <xsl:variable name="nodes" select="@* except @class| node()"/>
-                                                                                <xsl:copy-of select="if ($lhh-in-header and empty($control/self::xf:trigger)) then ($nodes except $lhh) else $nodes"/>
+                                                                                <xsl:variable name="label-mediatype-class" select="if ($is-editable and xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
+                                                                                <xsl:variable name="hint-mediatype-class"  select="if ($is-editable and xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
+                                                                                <xsl:attribute name="class" select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
+                                                                                <xsl:copy-of select="@* except @class | node()"/>
                                                                             </xsl:copy>
                                                                         </xsl:for-each>
                                                                     </xf:group>

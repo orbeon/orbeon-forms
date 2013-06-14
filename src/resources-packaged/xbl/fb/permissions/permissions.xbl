@@ -95,24 +95,36 @@
 
                     <!-- Populate UI permissions based metadata -->
                     <xf:action if="$has-permissions">
+
+                        <!-- Add permission for anyone, owner, and group -->
+                        <xf:setvalue ref="$ui/permissions/permission[1]/operations"
+                                     value="$metadata/permissions/permission[empty(*)]/@operations"/>
+                        <xf:setvalue ref="$ui/permissions/permission[@for = 'owner']/operations"
+                                     value="$metadata/permissions/permission[exists(owner)]/@operations"/>
+                        <xf:setvalue ref="$ui/permissions/permission[@for = 'group-members']/operations"
+                                     value="$metadata/permissions/permission[exists(group-member)]/@operations"/>
+
                         <!-- Add permissions attached to a role -->
-                        <xf:var name="roles" value="('', distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s')))"/>
+                        <xf:var name="roles" value="distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s'))"/>
                         <xf:action iterate="$roles">
                             <!-- Current role -->
                             <xf:var name="role" value="."/>
                             <!-- Permissions for the current role -->
-                            <xf:var name="permissions" value="$metadata/permissions/permission[empty(user-role[not(@any-of/tokenize(., '\s') = $role)])]"/>
+                            <xf:var name="permissions" value="$metadata/permissions/permission[tokenize(user-role/@any-of, '\s') = $role]"/>
                             <!-- Insert new permission in UI, and populate it -->
-                            <xf:insert if="$role != ''" context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
+                            <xf:insert context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
                             <!-- NOTE: Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain spaces -->
-                            <xf:insert if="$role != ''"  context="$new-permission" origin="xxf:element('role', replace($role, '%20', ' '))"/>
+                            <xf:insert context="$new-permission" origin="xxf:element('role', replace($role, '%20', ' '))"/>
                             <xf:setvalue ref="$new-permission/operations" value="string-join($permissions/@operations, ' ')"/>
                         </xf:action>
                     </xf:action>
+
                 </xf:action>
 
-                <!-- On save, copy permissions from UI representation to metadata -->
+                <!-- On save, copy permissions from UI representation to metadata
+                     - to test from the browser, after opening the dialog, run:
+                       ORBEON.xforms.Document.dispatchEvent({targetId: 'fb-permissions$save-trigger', eventName: 'fr-test'}) -->
                 <xf:action ev:event="DOMActivate fr-test" ev:observer="save-trigger">
                     <!-- Reset permissions element -->
                     <xf:delete ref="$metadata/permissions"/>
@@ -154,7 +166,7 @@
                                 xxf:element('user-role', xxf:attribute('any-of', saxon:item-at($any-ofs, $i)))))"/>
                         </xf:action>
 
-                        <!-- Log -->
+                        <!-- Log metadata permissions -->
                         <xf:load if="event('xxf:type') = 'fr-test'" resource="javascript:console.log($.parseXML(unescape('{encode-for-uri(saxon:serialize($metadata/permissions, 'xml'))}')))"/>
 
                     </xf:action>

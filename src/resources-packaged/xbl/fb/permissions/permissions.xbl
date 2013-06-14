@@ -51,11 +51,16 @@
                 <xf:bind ref="instance('ui')">
                     <xf:bind ref="apply-trigger" readonly="instance()/@valid = 'false'"/>
                     <xf:bind ref="readonly-checked" readonly="true()"/>
-                    <xf:bind ref="permissions/permission">
-                        <xf:bind ref="role" constraint="normalize-space()" required="true()"/>
-                        <!-- If operations contains 'update', automatically add 'read' -->
-                        <xf:bind ref="operations" readonly="false()" calculate="if (tokenize(., '\s') = 'update')
-                            then string-join(distinct-values((tokenize(., '\s'), 'read')), ' ') else ."/>
+                    <xf:bind ref="permissions">
+                        <!-- If a permission is assigned to anyone, remove it from other "rows", as it would be redundant -->
+                        <xf:bind ref="permission[position() > 1]/operations" readonly="false()"
+                                 calculate="string-join(tokenize(., '\s')[not (. = tokenize(instance('ui')/permissions/permission[1]/operations, '\s'))], ' ')"/>
+                        <xf:bind ref="permission">
+                            <xf:bind ref="role" constraint="normalize-space()" required="true()"/>
+                            <!-- If operations contains 'update', automatically add 'read' -->
+                            <xf:bind ref="operations" readonly="false()" calculate="if (tokenize(., '\s') = 'update')
+                                then string-join(distinct-values((tokenize(., '\s'), 'read')), ' ') else ."/>
+                        </xf:bind>
                     </xf:bind>
                 </xf:bind>
                 <xf:instance id="permission-template">
@@ -120,6 +125,7 @@
                         <!-- Add "anyone" permission -->
                         <xf:var name="anyone-operations" value="$ui/permissions/permission[1]/operations"/>
                         <xf:insert if="$anyone-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', xxf:attribute('operations', $anyone-operations))"/>
+
                         <!-- Add owner permission -->
                         <xf:var name="owner-operations" value="$ui/permissions/permission[@for = 'owner']/operations"/>
                         <xf:insert if="$owner-operations != ''" context="$metadata/permissions" origin="xxf:element('permission', (xxf:attribute('operations', $owner-operations), xxf:element('owner')))"/>

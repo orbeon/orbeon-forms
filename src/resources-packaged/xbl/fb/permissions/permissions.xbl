@@ -245,11 +245,12 @@
                                     </xh:td>
                                     <!-- Remove -->
                                     <xh:td>
-                                        <xf:trigger appearance="minimal" ref=".[not($is-anyone)]" class="fb-remove-permission">
+                                        <xf:var name="can-remove" value="not($is-anyone or $is-owner-group)"/>
+                                        <xf:trigger appearance="minimal" ref=".[$can-remove]" class="fb-remove-permission">
                                             <xf:label><xh:i class="icon-minus-sign"/></xf:label>
                                             <xf:delete ev:event="DOMActivate" ref="."/>
                                         </xf:trigger>
-                                        <xf:group ref=".[$is-anyone]"><xh:i class="icon-minus-sign disabled"/></xf:group>
+                                        <xf:group ref=".[not($can-remove)]"><xh:i class="icon-minus-sign disabled"/></xf:group>
                                     </xh:td>
                                 </xh:tr>
                             </xf:repeat>

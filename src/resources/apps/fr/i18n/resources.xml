@@ -390,21 +390,23 @@
     <resource xml:lang="es">
         <components>
             <labels>
-                <open-section>Mostrar sección</open-section>
-                <close-section>Cerrar sección</close-section>
-                <section-name>Nombre de la sección</section-name>
+                <open-section>Mostrar Sección</open-section>
+                <close-section>Ocultar Sección</close-section>
+                <section-name>Nombre de Sección</section-name>
             </labels>
         </components>
         <errors>
+            <!-- Used by error summary -->
             <summary-title>Su formulario contiene los siguientes errores</summary-title>
             <some>Errores en el formulario</some>
             <none>No hay errores en el formulario</none>
-            <unsaved>[Unsaved Changes]</unsaved>
+            <unsaved>Cambios sin salvar</unsaved>
         </errors>
         <email>
-            <subject>[Orbeon Forms Confirmation]</subject>
-            <body>[Please find attached the form in PDF and XML format.]</body>
+            <subject>Confirmación de formulario Orbeon</subject>
+            <body>Por favor encuentre los formatos PDF y XML adjuntos al mail</body>
         </email>
+        <!-- Formats used for PDF template -->
         <print>
             <formats>
                 <date>[MNn] [D], [Y]</date>
@@ -414,31 +416,31 @@
         </print>
         <summary>
             <buttons>
-                <home>&lt;i class="icon-home"/&gt; [Home]</home>
-                <review>&lt;i class="icon-eye-open"/&gt; [Review]</review>
+                <home>&lt;i class="icon-home"/&gt; Inicio</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Ver</review>
                 <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete><!-- Formulario -->
-                <import>Importar</import>
-                <new>Nuevo</new><!-- Formulario -->
-                <edit>Editar</edit><!-- Formulario -->
+                <delete>&lt;i class="icon-remove-sign"/&gt; Eliminar</delete>
+                <import>&lt;i class="icon-upload"/&gt; Importar</import>
+                <new>&lt;i class="icon-plus"/&gt; Nuevo</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Editar</edit><!-- unused as of 2013-04-05 -->
             </buttons>
             <titles>
-                <summary-title>Síntesis</summary-title>
-                <delete-confirmation>[Confirm Deletion]</delete-confirmation>
-                <row-number>Número</row-number>
+                <summary-title>Resumen</summary-title>
+                <delete-confirmation>Confirma Eliminación</delete-confirmation>
+                <row-number>No.</row-number>
                 <created>Creado</created>
                 <last-modified>Fecha de modificación</last-modified>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
-                <description>[Description]</description>
+                <description>Descripción</description>
                 <help>Ayuda</help>
                 <error-count>Errores en su formulario</error-count>
                 <errors-count>Errores en su formulario</errors-count>
             </titles>
             <search>
                 <search>Buscar</search>
-                <search-forms>Buscar formulario</search-forms>
+                <search-forms>&lt;i class="icon-search"/&gt; Buscar formulario</search-forms>
                 <show-options>Mostrar opciones de búsqueda</show-options>
                 <close-options>Cerrar opciones de búsqueda</close-options>
                 <returned-1>Resultado de la búsqueda</returned-1>
@@ -450,21 +452,21 @@
             </paging>
             <messages>
                 <no-form-found><i>No se encontró el formulario.</i></no-form-found>
-                <delete-confirmation>[Are you sure you want to delete one or more forms?]</delete-confirmation>
+                <delete-confirmation>Esta seguro que desea borrar uno o más formularios?</delete-confirmation>
             </messages>
             <labels>
-                <language-choice>Elegir idioma</language-choice>
-                <form-choice>Eligir un Formulario</form-choice>
+                <language-choice>Seleccione Idioma</language-choice>
+                <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
-                <any>Alguna</any>
-                <previous>Anterior</previous>
-                <next>Siguiente</next>
-                <script>Versión Completa</script>
-                <noscript>Versión accesible</noscript>
+                <any>[Cualquiera]</any>
+                <previous>Previo</previous>
+                <next>Próximo</next>
+                <script>Versión Complete</script>
+                <noscript>Version Accesible</noscript>
                 <refresh>Actualizar</refresh>
-                <close-box>Cerrrar</close-box>
-                <help-back>Atrás</help-back>
-                <goto-content>[Go to Content]</goto-content>
+                <close-box>[cerrar]</close-box>
+                <help-back>Anterior</help-back>
+                <goto-content>Ir al Contenido</goto-content>
             </labels>
             <formats>
                 <date>[MNn] [D], [Y]</date>
@@ -479,96 +481,97 @@
                 <save>&lt;i class="icon-hdd"/&gt; Guardar</save>
                 <save-final>&lt;i class="icon-hdd"/&gt; Guardar</save-final>
                 <save-draft>&lt;i class="icon-inbox"/&gt; Guardar</save-draft>
-                <review>&lt;i class="icon-arrow-right"/&gt; [Review]</review>
-                <edit>&lt;i class="icon-arrow-left"/&gt; [Edit]</edit>
-                <send>&lt;i class="icon-arrow-right"/&gt; [Send]</send>
-                <email>&lt;i class="icon-envelope"/&gt; Correo Electrónico</email>
-                <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
-                
+                <review>&lt;i class="icon-arrow-right"/&gt; Ver</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Editar</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Enviar</send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                <validate>&lt;i class="icon-ok"/&gt; Validar</validate>
+
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Enviar</submit>
-                <workflow-review>&lt;i class="icon-arrow-right"/&gt; [Review]</workflow-review>
-                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; [Edit]</workflow-edit>
-                <workflow-send>&lt;i class="icon-arrow-right"/&gt; [Send]</workflow-send>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Ver</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editar</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Enviar</workflow-send>
 
                 <!-- Other standard buttons -->
-                <home>&lt;i class="icon-home"/&gt; [Home]</home>
-                <summary>&lt;i class="icon-list"/&gt; [Summary]</summary>
+                <home>&lt;i class="icon-home"/&gt; Inicio</home>
+                <summary>&lt;i class="icon-list"/&gt; Resumen</summary>
                 <close>&lt;i class="icon-remove"/&gt; Cerrar</close>
                 <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
-                <clear>&lt;i class="icon-remove-sign"/&gt; Borrar</clear>
-                <cancel>Cancelar</cancel>
-                <save-locally>Guardar en su computador</save-locally>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Limpiar</clear>
+                <cancel>Cancel</cancel>
+                <save-locally>Save Locally</save-locally>
                 <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
                 <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
                 <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
-                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Siguiente</wizard-next>
-                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Anterior</wizard-prev>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Próximo</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Previo</wizard-prev>
 
                 <!-- Submit dialog -->
-                <submit-dialog-clear>Borrar y cerrar</submit-dialog-clear>
-                <submit-dialog-keep>Mantener los datos y cerrar</submit-dialog-keep>
-                <submit-dialog-go>Aceptar</submit-dialog-go>
+                <submit-dialog-clear>Limpiar y Cerrar</submit-dialog-clear>
+                <submit-dialog-keep>Mantener valores y cerrar</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
             </buttons>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
-                <save-draft-success>[Draft saved successfully!]</save-draft-success>
-                <email-success>[Email sent successfully!]</email-success>
-                <form-validation-error>Documento no guardado. Por favor, compruebe si existen errores en su formulario antes de grabar de nuevo.</form-validation-error>
-                <database-error>Documento no guardado. Por favor, contacte al administrador del sistema.</database-error>
-                <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
-                <clear-confirm-message>¿Está seguro de que desea borrar todos los campos de esta página? Sus datos se perderán si no ha guardado.</clear-confirm-message>
-                <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
-                <submit-dialog-title>Su formulario ha sido enviado</submit-dialog-title>
-                <submit-dialog-message>Su información ha sido enviada. Gracias</submit-dialog-message>
-                <buttons-message/>
-                <saved-locally-open>Haga clic aquí para abrir el documento. La herramienta recuperará automáticamente la información que usted ingresó al momento de guardar su documento.</saved-locally-open>
-                <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
-                <upload-start>[Upload started]</upload-start>
-                <upload-cancel>[Upload canceled by the user]</upload-cancel>
-                <upload-done>[Upload complete]</upload-done>
-                <upload-error>[There was an error during the upload. Please try again.]</upload-error>
-                <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
+                <save-draft-success>Borrador guardado correctamente!</save-draft-success>
+                <email-success>Email enviado correctamente!</email-success>
+                <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente</form-validation-error>
+                <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
+                <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
+                <clear-confirm-message>Esta seguro de limpiar todos los campos de la página ? Los datos se perderán sino guarda los datos.</clear-confirm-message>
+                <error-dialog-title>Imposible completar la acción</error-dialog-title>
+                <submit-dialog-title>Formulario Enviado</submit-dialog-title>
+                <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
+                <buttons-message></buttons-message>
+                <saved-locally-open>Haga clic aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
+                <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
+                <upload-start>Subidad de archivos ha comenzado</upload-start>
+                <upload-cancel>Subidad de archivos cancelada por el usuario</upload-cancel>
+                <upload-done>Subidad de archivos completada</upload-done>
+                <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
+                <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
             </messages>
             <labels>
                 <language-choice>Idioma</language-choice>
                 <errors>Resumen de errores</errors>
-                <check-errors-in-form>Este formulario contiene errores</check-errors-in-form>
-                <error-details>Ver detalles de error</error-details>
+                <check-errors-in-form>Este formulario tiene errores</check-errors-in-form>
+                <error-details>Ver detalle de los errores</error-details>
                 <confirm>Confirmar</confirm>
-                <alert>Valor no especificado o incorrecto</alert>
+                <alert>Valor ausente o incorrecto</alert>
 
-                <captcha-label>[Captcha]</captcha-label>
-                <captcha-alert>[The value you entered didn't match the image, please try again]</captcha-alert>
+                <captcha-label>Captcha</captcha-label>
+                <captcha-alert>El valor ingresado es diferente a la imagen, intentelo nuevamente</captcha-alert>
             </labels>
             <view>
                 <explanation>
-                    [This is a read-only view of your data.]
+                    Vista de lectura solamente.
                 </explanation>
             </view>
         </detail>
         <save-locally>
-            <dialog-title>Guardar</dialog-title>
+            <dialog-title>Guardar Localmente</dialog-title>
             <dialog-body>
                 <div>
                     <p>
-                        Para guardar la información que usted ha ingresado haga clic en el siguiente enlace y guarde el
-                        documento en su computador.
+                        Haga clic en el botón Guardar para guardar los datos en su computadora como un archivo HTML.
                     </p>
                     <p>
-                        Para recuperar la información, haga doble clic sobre documento guardado y se abrirá
-                        automáticamente la aplicación con la información ingresada anteriormente.
+                        Para re abrir el formulario:
                     </p>
+                    <ul>
+                        <li>Abra el archivo HTML de su computadora (cliqueando en el archivo, o soltandolo en un ventana del Browser).</li>
+                        <li>Haga clic en botón Abrir que será mostrado para confirmar.</li>
+                    </ul>
                     <p>
-                        <b>Nota:</b> La información no será almacenada en el sistema. Si usted elimina el archivo
-                        perderá su información.
+                        <b>ADVERTENCIA:</b> Ningún dato esta guardado en el servidor y si elimina el archivo los datos guardados se perderán.
                     </p>
                 </div>
             </dialog-body>
         </save-locally>
         <home>
-            <title>[Form Runner Home]</title>
+            <title>Incio Form Runner</title>
         </home>
     </resource>
     <resource xml:lang="no">

@@ -1661,6 +1661,8 @@
             <permissions>Permissions</permissions>
             <operations>Opérations</operations>
             <anyone>Toute personne</anyone>
+            <owner>Propriétaire</owner>
+            <group-members>Membres du groupe</group-members>
             <create>Créer</create>
             <read>Lire</read>
             <update>Mettre à jour</update>
@@ -2506,6 +2508,8 @@
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
             <anyone>Anyone</anyone>
+            <owner>[Owner]</owner>
+            <group-members>[Group members]</group-members>
             <create>Create</create>
             <read>Read</read>
             <update>Update</update>
@@ -3350,6 +3354,8 @@
             <permissions>Права</permissions>
             <operations>Действия</operations>
             <anyone>Любой пользователь</anyone>
+            <owner>[Owner]</owner>
+            <group-members>[Group members]</group-members>
             <create>Заполнять форму</create>
             <read>Просматривать</read>
             <update>редактировать</update>

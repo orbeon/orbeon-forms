@@ -3086,7 +3086,7 @@ ORBEON.xforms.Events = {
             if (message != "") {
                 // We have a hint, initialize YUI tooltip
                 var yuiTooltip = new YAHOO.widget.Tooltip(control.id + toolTipSuffix, {
-                    context: target.id,
+                    context: target,
                     text: message,
                     showDelay: delay,
                     effect: {effect: YAHOO.widget.ContainerEffect.FADE, duration: 0.2},
@@ -3095,13 +3095,12 @@ ORBEON.xforms.Events = {
                     zIndex: 10000
                 });
                 yuiTooltip.orbeonControl = control;
-                var context = ORBEON.util.Dom.get(target.id);
                 // Send the mouse move event, because the tooltip gets positioned when receiving a mouse move.
                 // Without this, sometimes the first time the tooltip is shows at the top left of the screen
-                yuiTooltip.onContextMouseMove.call(context, event, yuiTooltip);
+                yuiTooltip.onContextMouseMove.call(target, event, yuiTooltip);
                 // Send the mouse over event to the tooltip, since the YUI tooltip didn't receive it as it didn't
                 // exist yet when the event was dispatched by the browser
-                yuiTooltip.onContextMouseOver.call(context, event, yuiTooltip);
+                yuiTooltip.onContextMouseOver.call(target, event, yuiTooltip);
                 // Save reference to YUI tooltip
                 tooltipForControl[control.id] = yuiTooltip;
             } else {
@@ -3138,7 +3137,6 @@ ORBEON.xforms.Events = {
                         control = YAHOO.util.Dom.getAncestorByClassName(control, "xforms-control");
                     if (control) {
                         var message = ORBEON.xforms.Controls.getAlertMessage(control);
-                        YAHOO.util.Dom.generateId(target);
                         ORBEON.xforms.Events._showToolTip(ORBEON.xforms.Globals.alertTooltipForControl, control, target, "-orbeon-alert-tooltip", message, 10, event);
                     }
                 }

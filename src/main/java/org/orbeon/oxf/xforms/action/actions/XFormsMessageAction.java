@@ -61,14 +61,14 @@ public class XFormsMessageAction extends XFormsAction {
             final String levelAttribute;
             final QName levelQName;
             {
-                final String tempLevelAttribute = actionElement.attributeValue("level");
+                final String tempLevelAttribute = actionElement.attributeValue(XFormsConstants.LEVEL_QNAME);
                 if (tempLevelAttribute == null) {
                     // "The default is "modal" if the attribute is not specified."
                     levelQName = XFormsConstants.XFORMS_MODAL_LEVEL_QNAME;
                     levelAttribute = levelQName.getName();
                 } else {
                     levelAttribute = tempLevelAttribute;
-                    levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, "level");
+                    levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, XFormsConstants.LEVEL_QNAME);
                 }
             }
 

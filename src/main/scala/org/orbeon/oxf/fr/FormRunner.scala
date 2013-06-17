@@ -45,6 +45,7 @@ object FormRunner {
     val ContainerRolesPropertyName          = PropertyPrefix + "container.roles" // NOTE: this could be inferred from form-builder-permissions.xml, right?
     val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
     val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
+    val HeaderGroupPropertyName             = PropertyPrefix + "header.group"
     val HeaderRolesPropertyNamePropertyName = PropertyPrefix + "header.roles.property-name"
 
     val NameValueMatch = "([^=]+)=([^=]+)".r
@@ -70,7 +71,7 @@ object FormRunner {
     /**
      * Get the username and roles from the request, based on the Form Runner configuration.
      */
-    def getUserRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[Array[String]]) = {
+    def getUserGroupRoles(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): (Option[String], Option[String], Option[Array[String]]) = {
 
         val propertySet = properties
         propertySet.getString(MethodPropertyName, "container") match {
@@ -80,7 +81,7 @@ object FormRunner {
                 val rolesString = propertySet.getString(ContainerRolesPropertyName)
 
                 if (rolesString eq null) {
-                    (username, None)
+                    (username, None, None)
                 } else {
 
                     // Wrap exceptions as Liferay throws if the role is not available instead of returning false
@@ -100,7 +101,7 @@ object FormRunner {
                         case array   ⇒ Some(array)
                     }
 
-                    (username, roles)
+                    (username, rolesArray.headOption, roles)
                 }
 
             case "header" ⇒
@@ -125,24 +126,23 @@ object FormRunner {
                 }
 
                 val username = headerOption(HeaderUsernamePropertyName) map (_.head)
-                val roles = headerOption(HeaderRolesPropertyName) map (_ flatMap split1 flatMap (split2(_)))
+                val group    = headerOption(HeaderGroupPropertyName) map (_.head)
+                val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap split1 flatMap (split2(_)))
 
-                (username, roles)
+                (username, group, roles)
 
             case other ⇒ throw new OXFException("Unsupported authentication method, check the '" + MethodPropertyName + "' property:" + other)
         }
     }
 
-    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]) = {
+    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): Map[String, Array[String]] = {
 
-        val (username, roles) = getUserRoles(userRoles, getHeader)
-
-        val result = collection.mutable.Map[String, Array[String]]()
-
-        username foreach (u ⇒ result += "orbeon-username" → Array(u))
-        roles foreach (r ⇒ result += "orbeon-roles" → r)
-
-        result.toMap
+        val (username, group, roles) = getUserGroupRoles(userRoles, getHeader)
+        Seq(
+            username map ("orbeon-username" → Array(_)),
+            group    map ("orbeon-group"    → Array(_)),
+            roles    map ("orbeon-roles"    → _)
+        ).flatten.toMap
     }
 
     def getPersistenceURLHeaders(app: String, form: String, formOrData: String) = {

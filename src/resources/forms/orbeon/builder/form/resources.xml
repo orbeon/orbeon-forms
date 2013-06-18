@@ -811,7 +811,7 @@
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
-            <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
+            <enable-permissions>Enable permissions for this form</enable-permissions>
             <role>Role</role>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
@@ -1656,7 +1656,7 @@
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
-            <role-based-permissions>Activer les permissions basées sur les rôles pour ce formulaire</role-based-permissions>
+            <enable-permissions>Activer les permissions pour ce formulaire</enable-permissions>
             <role>Rôle</role>
             <permissions>Permissions</permissions>
             <operations>Opérations</operations>
@@ -2503,7 +2503,7 @@
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Permissions</label>
-            <role-based-permissions>Enable role-based permissions for this form</role-based-permissions>
+            <enable-permissions>[Enable permissions for this form]</enable-permissions>
             <role>Role</role>
             <permissions>Permissions</permissions>
             <operations>Operations</operations>
@@ -3349,7 +3349,7 @@
         </dialog-custom-xml>
         <dialog-permissions>
             <label>Настройка прав</label>
-            <role-based-permissions>Включить для этой формы ролевое управление доступом</role-based-permissions>
+            <enable-permissions>Включить для этой формы управление доступом</enable-permissions>
             <role>Роль</role>
             <permissions>Права</permissions>
             <operations>Действия</operations>

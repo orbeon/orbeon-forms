@@ -182,7 +182,7 @@
                     <!-- Choose mode -->
                     <xf:select ref="$ui/has-permissions" appearance="full" class="fb-has-permissions">
                         <xf:item>
-                            <xf:label ref="$resources/dialog-permissions/role-based-permissions"/>
+                            <xf:label ref="$resources/dialog-permissions/enable-permissions"/>
                             <xf:value>true</xf:value>
                         </xf:item>
                         <xf:action ev:event="xforms-value-changed" if=". = 'true' and empty($ui/permissions/permission)">

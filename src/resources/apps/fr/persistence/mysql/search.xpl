@@ -102,6 +102,7 @@
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
+                <xsl:include href="../common-owner-group.xsl"/>
                 <xsl:template match="/">
                     <sql:config>
                         <documents>
@@ -110,14 +111,14 @@
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
-                                        data.created, data.last_modified, data.document_id
+                                        data.created, data.<xsl:value-of select="$last-modified-time"/>, data.document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
                                             , extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
                                     from orbeon_form_data data,
                                         (
-                                            select max(last_modified) last_modified, app, form, document_id
+                                            select max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>, app, form, document_id
                                             from orbeon_form_data
                                             where
                                                 app = <sql:param type="xs:string" select="/search/app"/>
@@ -126,7 +127,7 @@
                                         ) latest
                                     where
                                         <!-- Merge with 'latest', to make sure we only consider the document with the most recent last_date -->
-                                        data.last_modified = latest.last_modified
+                                        data.<xsl:value-of select="$last-modified-time"/> = latest.<xsl:value-of select="$last-modified-time"/>
                                         and data.app = latest.app
                                         and data.form = latest.form
                                         and data.document_id = latest.document_id
@@ -161,8 +162,8 @@
                                             (
                                                 select count(*) from orbeon_form_data
                                                 where
-                                                    (app, form, document_id, last_modified) in (
-                                                        select app, form, document_id, max(last_modified) last_modified
+                                                    (app, form, document_id, <xsl:value-of select="$last-modified-time"/>) in (
+                                                        select app, form, document_id, max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
                                                         from orbeon_form_data
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
@@ -195,7 +196,7 @@
                                         <sql:row-iterator>
                                             <document>
                                                 <created><sql:get-column-value column="created"/></created>
-                                                <last-modified><sql:get-column-value column="last_modified"/></last-modified>
+                                                <last-modified><sql:get-column-value column="{$last-modified-time}"/></last-modified>
                                                 <document-id><sql:get-column-value column="document_id"/></document-id>
                                                 <xsl:for-each select="/search/query[@path]">
                                                     <detail><sql:get-column-value column="detail_{position()}"/></detail>

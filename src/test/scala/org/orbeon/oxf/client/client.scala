@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.client
 
-import org.junit.{AfterClass, BeforeClass}
+import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium.firefox.{FirefoxProfile, FirefoxDriver}
-import org.openqa.selenium.{Keys, WebDriver}
+import org.openqa.selenium.{NoAlertPresentException, Keys, WebDriver}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.selenium.WebBrowser
@@ -39,6 +39,19 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
         go to "http://localhost:8080/orbeon/" + dropStartingSlash(path)
 
     def loadHomePage() = loadOrbeonPage("/")
+
+    // After each tests, make sure to clear window.onbeforeunload so that navigation to the next test can happen without
+    // showing the browser's confirmation dialog. There doesn't seem to be an easy way to accept the modal dialog at the
+    // right time.
+    @After def doAfterTest(): Unit =
+        executeScript("window.onbeforeunload = null;")
+
+    def closeModalAlertIfAny() =
+        // Try to close any modal alert
+        try webDriver.switchTo.alert.accept()
+        catch {
+            case _: NoAlertPresentException ⇒ // NOP
+        }
 
     def waitForAjaxResponse() = eventually {
         assert(true == executeScript("return ! ORBEON.xforms.Globals.requestInProgress && ORBEON.xforms.Globals.eventQueue.length == 0"))

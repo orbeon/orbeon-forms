@@ -44,7 +44,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private val DataPath           = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+))""".r
     private val DataCollectionPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
     private val SearchPath         = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
-    private val FormDefinitionPath = """/fr/service/persistence/form""".r
+    private val FormDefinitionPath = """/fr/service/persistence/form(/([^/]+)(/([^/]+))?)?""".r
 
     private val ParametersToForward = Set("document")
 
@@ -58,11 +58,11 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     def proxyRequest(request: Request, response: Response) {
         val incomingPath = request.getRequestPath
         incomingPath match {
-            case FormPath(path, app, form, _)        ⇒ proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, _, _)     ⇒ proxyRequest(request, response, app, form, "data", path)
-            case DataCollectionPath(path, app, form) ⇒ proxyRequest(request, response, app, form, "data", path)
-            case SearchPath(path, app, form)         ⇒ proxyRequest(request, response, app, form, "data", path)
-            case FormDefinitionPath()                ⇒ proxyFormDefinition(request, response)
+            case FormPath(path, app, form, _)           ⇒ proxyRequest(request, response, app, form, "form", path)
+            case DataPath(path, app, form, _, _)        ⇒ proxyRequest(request, response, app, form, "data", path)
+            case DataCollectionPath(path, app, form)    ⇒ proxyRequest(request, response, app, form, "data", path)
+            case SearchPath(path, app, form)            ⇒ proxyRequest(request, response, app, form, "data", path)
+            case FormDefinitionPath(path, _, _, _)      ⇒ proxyFormDefinition(request, response, path)
             case _ ⇒ throw new OXFException("Unsupported path: " + incomingPath)
         }
     }
@@ -133,7 +133,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
      * Proxies the request to every configured persistence layer to get the list of the forms,
      * and aggregates the results.
      */
-    private def proxyFormDefinition(request: Request, response: Response): Unit = {
+    private def proxyFormDefinition(request: Request, response: Response, path: String): Unit = {
         val propertySet = Properties.instance.getPropertySet
         val providers = {
             // All the oxf.fr.persistence.provider.*.*.form properties, removing the data-only mappings
@@ -144,7 +144,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
 
         val formElements = providers map (FormRunner getPersistenceURLHeadersFromProvider _) flatMap { case (baseURI, headers) ⇒
             // Read all the forms for the current service
-            val serviceURI = baseURI + "/form"
+            val serviceURI = baseURI + "/form" + Option(path).getOrElse("")
             val inputStream = proxyEstablishConnection(request, serviceURI, headers) getInputStream
             // TODO: handle connection.getResponseCode
             val forms = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, serviceURI, false, false)

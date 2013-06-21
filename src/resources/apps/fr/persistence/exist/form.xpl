@@ -24,6 +24,7 @@
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
         xmlns:exist="http://exist.sourceforge.net/NS/exist">
 
+    <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
     <p:processor name="oxf:xforms-submission">
@@ -36,9 +37,11 @@
                 (: The beginning of the path, /db/orbeon/fr, is part of the eXist URI we get from the orbeon-exist-uri header :)
 
                 declare variable $fr-path := request:get-path-info();
+                declare variable $request-app := request:get-parameter('app', '');
+                declare variable $request-form := request:get-parameter('form', '');
                 if (xmldb:collection-available($fr-path)) then
-                    for $app in xmldb:get-child-collections($fr-path),
-                        $form in xmldb:get-child-collections(concat($fr-path, '/', $app))
+                    for $app  in xmldb:get-child-collections($fr-path)[$request-app = '' or . = $request-app],
+                        $form in xmldb:get-child-collections(concat($fr-path, '/', $app))[$request-form = '' or . = $request-form]
                     return
                         element form {
                             doc(concat($fr-path, '/', $app, '/', $form, '/form/form.xhtml'))
@@ -47,10 +50,10 @@
                 else ()
             </exist:text></exist:query>
         </p:input>
-        <p:input name="submission">
-            <xf:submission method="post" replace="instance"
-                               resource="{xxf:get-request-header('orbeon-exist-uri')}">
-                <xf:insert ev:event="xforms-submit-done" ref="/*" origin="xxf:element('forms', *)"/>
+        <p:input name="submission" transform="oxf:xslt" href="#instance">
+            <xf:submission xsl:version="2.0" method="post" replace="instance"
+                               resource="{{xxf:get-request-header('orbeon-exist-uri')}}?app={encode-for-uri(/request/app)}&amp;form={encode-for-uri(/request/form)}">
+                <xf:insert event="xforms-submit-done" ref="/*" origin="xxf:element('forms', *)"/>
                 <xi:include href="propagate-exist-error.xml" xpointer="xpath(/root/*)"/>
             </xf:submission>
         </p:input>

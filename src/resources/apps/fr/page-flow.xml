@@ -28,7 +28,12 @@
              view="persistence/exist/search.xpl"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/exist/form" view="persistence/exist/form.xpl"/>
+    <service path="/fr/service/exist/form(/([^/]+)(/([^/]+))?)?"
+             default-submission="persistence/form-instance.xml"
+             view="persistence/exist/form.xpl">
+        <setvalue ref="/*/app" matcher-group="2"/>
+        <setvalue ref="/*/form" matcher-group="4"/>
+    </service>
 
     <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
 
@@ -54,7 +59,12 @@
              view="persistence/mysql/search.xpl"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/mysql/form" view="persistence/mysql/form.xpl"/>
+    <service path="/fr/service/mysql/form(/([^/]+)(/([^/]+))?)?"
+             default-submission="persistence/form-instance.xml"
+             view="persistence/mysql/form.xpl">
+        <setvalue ref="/*/app" matcher-group="2"/>
+        <setvalue ref="/*/form" matcher-group="4"/>
+    </service>
 
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->
 
@@ -64,7 +74,7 @@
     </service>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/resource/form" view="persistence/resource/form.xpl"/>
+    <service path="/fr/service/resource/form(/([^/]+)(/([^/]+))?)?" view="persistence/resource/form.xpl"/>
     <service path="/fr/service/([^/]+)/reindex" model="persistence/reindex.xpl"/>
 
     <!-- ==== Internationalization ================================================================================= -->

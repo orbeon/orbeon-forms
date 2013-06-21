@@ -83,10 +83,6 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     if (sb.length() > 0)
                         sb.append(' ');
                     sb.append("xforms-invalid");
-                    // Combined class for IE6
-                    if (control.visited()) {
-                        sb.append(" xforms-invalid-visited");
-                    }
                 }
                 if (singleNodeControl.isReadonly()) {
                     if (sb.length() > 0)

@@ -164,10 +164,10 @@
 
             var requiredFilledControl = YAHOO.util.Dom.get("required-filled");
 
-            function checkClasses(group, invalid, required, invalidVisited, requiredFilled, situation) {
+            function checkClasses(group, invalid, required, visited, requiredFilled, situation) {
                 YAHOO.util.Assert.areEqual(invalid, YAHOO.util.Dom.hasClass(group, "xforms-invalid"), situation + " for xforms-invalid");
                 YAHOO.util.Assert.areEqual(required, YAHOO.util.Dom.hasClass(group, "xforms-required"), situation + " for xforms-required");
-                YAHOO.util.Assert.areEqual(invalidVisited, YAHOO.util.Dom.hasClass(group, "xforms-invalid-visited"), situation + " for xforms-invalid-visited");
+                YAHOO.util.Assert.areEqual(visited, YAHOO.util.Dom.hasClass(group, "xforms-visited"), situation + " for xforms-visited");
                 YAHOO.util.Assert.areEqual(requiredFilled, YAHOO.util.Dom.hasClass(group, "xforms-required-filled"), situation + " for xforms-required-filled");
             }
 
@@ -179,7 +179,7 @@
                 input('required-empty').blur();
                 input('empty').focus();
             }, function() {
-                //  Check we now have the class xforms-invalid-visited
+                //  Check we now have the class xforms-visited
                 checkClasses(requiredEmptyControl, true, true, true, false, "after visited empty");
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     input('required-empty').focus();

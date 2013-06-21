@@ -131,7 +131,7 @@
                             </xf:input>
 
                             <!-- The visible HTML input -->
-                            <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid-visited -->
+                            <!-- .xforms-input-input is added so the border gets highlighted when the container gets .xforms-invalid.xforms-visited -->
                             <xh:span class="fr-width-10em {{(if ($prefix) then 'input-prepend' else (), if ($suffix) then 'input-append' else ())}}">
                                 <xf:group class="add-on" ref=".[$prefix]"><xf:output value="$prefix"/></xf:group>
                                 <xh:input

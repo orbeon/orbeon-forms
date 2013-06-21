@@ -223,8 +223,8 @@ body.orbeon {
   background-repeat: no-repeat;
   padding-left: 12px;
 }
-.orbeon .xforms-invalid-visited .xforms-input-input,
-.orbeon textarea.xforms-invalid-visited {
+.orbeon .xforms-invalid.xforms-visited .xforms-input-input,
+.orbeon textarea.xforms-invalid.xforms-visited {
   border-color: #b94a48;
 }
 .orbeon .xforms-upload-info {

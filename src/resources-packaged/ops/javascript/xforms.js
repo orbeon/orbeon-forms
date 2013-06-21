@@ -1902,15 +1902,12 @@ ORBEON.xforms.Controls = {
         // Update class xforms-invalid on the control
         var isValid;
         var isVisited = YAHOO.util.Dom.hasClass(control, "xforms-visited");
-        if (newValid != null) {
+        if (newValid != null) { // NOTE: only one caller and doesn't pass null!
             isValid = newValid != "false";
-            if (isValid) {
+            if (isValid)
                 YAHOO.util.Dom.removeClass(control, "xforms-invalid");
-                YAHOO.util.Dom.removeClass(control, "xforms-invalid-visited");
-            } else {
+            else
                 YAHOO.util.Dom.addClass(control, "xforms-invalid");
-                if (isVisited) YAHOO.util.Dom.addClass(control, "xforms-invalid-visited");
-            }
         } else {
             isValid = ORBEON.xforms.Controls.isValid(control);
         }
@@ -2255,15 +2252,12 @@ ORBEON.xforms.Controls = {
     updateVisited: function(control, newVisited) {
         if (newVisited) {
             YAHOO.util.Dom.addClass(control, "xforms-visited");
-            if (YAHOO.util.Dom.hasClass(control, "xforms-invalid"))
-                YAHOO.util.Dom.addClass(control, "xforms-invalid-visited");
 
             var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
             if (alertElement && YAHOO.util.Dom.hasClass(alertElement, "xforms-alert-active"))
                 YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
         } else {
             YAHOO.util.Dom.removeClass(control, "xforms-visited");
-            YAHOO.util.Dom.removeClass(control, "xforms-invalid-visited");
             var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
             if (alertElement)
                 YAHOO.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");

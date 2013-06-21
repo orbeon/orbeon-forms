@@ -353,7 +353,7 @@ ORBEON.testcases = {
         name: "XForms Output",
 
         // Check that an invalid field has the class xforms-invalid right away and then receives
-        // the class xforms-invalid-visited once its value changed.
+        // the class xforms-visited once its value changed.
         testValidVisited: function() {
             ORBEON.testing.executeWithInitialInstance(this, function() {
                 var field = ORBEON.util.Dom.get("output-field");
@@ -365,7 +365,6 @@ ORBEON.testcases = {
                 }, function() {
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(field, "xforms-invalid"));
                     YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(field, "xforms-visited"));
-                    YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(field, "xforms-invalid-visited"));
                 });
             });
         },

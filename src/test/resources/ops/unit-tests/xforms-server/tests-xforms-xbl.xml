@@ -4131,7 +4131,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-dynamic$my-output" valid="false">42</xxf:control>
+                        <xxf:control id="my-dynamic$my-output" level="error">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

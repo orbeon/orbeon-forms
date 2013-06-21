@@ -83,7 +83,7 @@
                     <xh:input id="my-new-input$xforms-input-1·1" type="text" name="my-new-input$xforms-input-1·1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -94,7 +94,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -110,7 +110,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-input-2$$p·1">My help</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert-active xforms-alert xforms-repeat-selected-item-1" id="my-new-input-2$$a·1">My alert</xh:span>
+                <xh:span class="xforms-active xforms-invalid xforms-alert xforms-repeat-selected-item-1" id="my-new-input-2$$a·1">My alert</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:label class="xforms-label xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$l·1" for="my-new-boolean-input-2$$e0·1">My label</xh:label>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -126,7 +126,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$p·1">My help</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$a·1"/>
+                <xh:span class="xforms-alert xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$a·1"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-template"/>
@@ -135,7 +135,7 @@
                     <xh:input id="my-new-input$xforms-input-1" type="text" name="my-new-input$xforms-input-1" value="" class="xforms-input-input"/>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -144,7 +144,7 @@
                     <xh:input id="my-new-boolean-input$xforms-input-1" type="text" name="my-new-boolean-input$xforms-input-1" value="" class="xforms-input-input"/>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -160,7 +160,7 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-input-2$$p"/>
                 <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-input-2$$a"/>
+                <xh:span class="xforms-alert xforms-repeat-template" id="my-new-input-2$$a"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:label class="xforms-label xforms-repeat-template" id="my-new-boolean-input-2$$l" for="my-new-boolean-input-2$xforms-input-1"/>
                 <xh:span class="xforms-repeat-template"/>
@@ -174,7 +174,7 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-boolean-input-2$$p"/>
                 <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-boolean-input-2$$a"/>
+                <xh:span class="xforms-alert xforms-repeat-template" id="my-new-boolean-input-2$$a"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="repeat-end-my-repeat" class="xforms-repeat-begin-end"/>
             </controls>
@@ -226,7 +226,7 @@
                     </xh:select>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -240,7 +240,7 @@
                     </xh:select>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -283,7 +283,7 @@
                     <xh:span id="my-new-output$$c·1" class="xforms-output-output">Hello!</xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -294,7 +294,7 @@
                     <xh:span id="my-new-output$$c" class="xforms-output-output"/>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -365,7 +365,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -380,7 +380,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:fieldset>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -405,7 +405,7 @@
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -420,7 +420,7 @@
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:fieldset>
                 <xh:span class="xforms-repeat-template"/>
@@ -580,7 +580,7 @@
                     </xh:div>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:div>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -593,7 +593,7 @@
                     </xh:div>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:div>
                 <xh:span class="xforms-repeat-template"/>
@@ -661,7 +661,7 @@
                     </xh:select>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -673,7 +673,7 @@
                     </xh:select>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -687,7 +687,7 @@
                     </xh:select>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -699,7 +699,7 @@
                     </xh:select>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -769,7 +769,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -793,7 +793,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-help xforms-repeat-selected-item-1" id="my-new-upload-2$$p·1">My help</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-selected-item-1" id="my-new-upload-2$$a·1"/>
+                <xh:span class="xforms-alert xforms-repeat-selected-item-1" id="my-new-upload-2$$a·1"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span id="my-new-upload-file·1" class="xforms-control xforms-upload xforms-type-anyURI xforms-upload-state-file xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-upload-file$xforms-input·1">My label</xh:label>
@@ -808,7 +808,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -827,7 +827,7 @@
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -851,7 +851,7 @@
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span class="xforms-disabled xforms-help xforms-repeat-template" id="my-new-upload-2$$p"/>
                 <xh:span class="xforms-repeat-template"/>
-                <xh:span class="xforms-alert-inactive xforms-alert xforms-repeat-template" id="my-new-upload-2$$a"/>
+                <xh:span class="xforms-alert xforms-repeat-template" id="my-new-upload-2$$a"/>
                 <xh:span class="xforms-repeat-template"/>
                 <xh:span id="my-new-upload-file" class="xforms-control xforms-upload xforms-upload-state-empty xforms-repeat-template">
                     <xh:label class="xforms-label" for="my-new-upload-file$xforms-input"/>
@@ -866,7 +866,7 @@
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>
@@ -1029,7 +1029,7 @@
                     <xh:textarea id="my-new-textarea$$c" name="my-new-textarea" disabled="disabled">Hello!</xh:textarea>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-active xforms-alert">My alert</xh:span>
+                    <xh:span class="xforms-active xforms-alert">My alert</xh:span>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
             </controls>
@@ -1413,7 +1413,7 @@
                     </xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-help">My help</xh:span>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -1435,7 +1435,7 @@
                     </xh:span>
                     <xh:span class="xforms-disabled xforms-help-image" title="" alt=""/>
                     <xh:span class="xforms-disabled xforms-help"/>
-                    <xh:span class="xforms-alert-inactive xforms-alert"/>
+                    <xh:span class="xforms-alert"/>
                     <xh:span class="xforms-hint"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-template"/>

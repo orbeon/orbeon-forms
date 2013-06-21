@@ -28,7 +28,6 @@
         .xforms-disabled-subsequent,
         .xforms-case-begin-end,
         .xforms-case-deselected-subsequent,
-        .xforms-alert-inactive,
         .xforms-hidden {
             display: none;
         }
@@ -130,7 +129,11 @@
         background-position: left bottom;
     }
 
-    .xforms-alert-inactive, .xforms-alert-active {
+    .xforms-alert {
+        display: none;
+    }
+
+    .xforms-alert.xforms-active {
         display: -moz-inline-box;
         display: inline-block;
         white-space: nowrap;
@@ -143,9 +146,7 @@
         font-size: 0;
         margin-left: .25em;
         vertical-align: middle;
-    }
 
-    .xforms-alert-active {
         background-image: url(../../ops/images/xforms/exclamation.png);
         background-repeat: no-repeat;
         background-position: left center;

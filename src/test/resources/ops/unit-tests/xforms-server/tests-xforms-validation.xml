@@ -71,7 +71,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="xf-1">One</xxf:control>
-                        <xxf:control id="xf-2" valid="false"/>
+                        <xxf:control id="xf-2" level="error"/>
                         <xxf:control id="xf-3">Five</xxf:control>
                         <xxf:control id="xf-4">Seven</xxf:control>
                     </xxf:control-values>
@@ -124,8 +124,8 @@
                         <xxf:control id="xf-2" type="uwdcdate">2009</xxf:control>
                         <xxf:control id="xf-3" type="uwdcdate">2009-03</xxf:control>
                         <xxf:control id="xf-4" type="uwdcdate">2009-03-09</xxf:control>
-                        <xxf:control id="xf-5" valid="false" type="uwdcdate">2009-13</xxf:control>
-                        <xxf:control id="xf-6" valid="false" type="uwdcdate">2009-03-32</xxf:control>
+                        <xxf:control id="xf-5" level="error" type="uwdcdate">2009-13</xxf:control>
+                        <xxf:control id="xf-6" level="error" type="uwdcdate">2009-03-32</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

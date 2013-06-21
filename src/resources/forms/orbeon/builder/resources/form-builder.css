@@ -458,8 +458,8 @@ body {
   font-size: 12px;
   height: 100%;
 }
-.orbeon #fb-source-editor-dialog .xforms-alert-active,
-.orbeon .fb-custom-xml-dialog .xforms-alert-active {
+.orbeon #fb-source-editor-dialog .xforms-alert.xforms-active,
+.orbeon .fb-custom-xml-dialog .xforms-alert.xforms-active {
   display: block;
 }
 .orbeon #fb-publish-dialog {

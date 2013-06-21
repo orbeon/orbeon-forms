@@ -1508,9 +1508,9 @@
                                     if (newAlert != null)
                                         ORBEON.xforms.Controls.setAlertMessage(documentElement, newAlert);
                                     // Store validity, label, hint, help in element
-                                    var newValid = ORBEON.util.Dom.getAttribute(controlElement, "valid");
-                                    if (newValid != null)
-                                        ORBEON.xforms.Controls.setValid(documentElement, newValid);
+                                    var newLevel = ORBEON.util.Dom.getAttribute(controlElement, "level");
+                                    if (newLevel != null)
+                                        ORBEON.xforms.Controls.setConstraintLevel(documentElement, newLevel);
 
                                     // Handle progress for upload controls
                                     if (progressState != null && progressState != "")

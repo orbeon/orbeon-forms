@@ -465,10 +465,10 @@
                         <xxf:control id="output-readonly-1">I am readonly</xxf:control>
                         <xxf:control id="output-readonly-2" readonly="true">I am readonly</xxf:control>
                         <xxf:control id="output-required-1">I am required</xxf:control>
-                        <xxf:control id="output-required-2" required="true" valid="false">I am required</xxf:control>
+                        <xxf:control id="output-required-2" required="true" level="error">I am required</xxf:control>
                         <xxf:control id="output-relevant">I am not relevant</xxf:control>
                         <xxf:control id="output-valid-1">I am not valid</xxf:control>
-                        <xxf:control id="output-valid-2" valid="false">I am not valid</xxf:control>
+                        <xxf:control id="output-valid-2" level="error">I am not valid</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -554,7 +554,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="first-name-control" label="First name" valid="false"/>
+                        <xxf:control id="first-name-control" label="First name" level="error"/>
                         <xxf:control id="submit-trigger" label="Submit" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
@@ -1755,7 +1755,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" alert="All levels - Error level - Error and warning level - Length constraint - Both constraints" valid="false"/>
+                        <xxf:control id="my-input" alert="All levels - Error level - Error and warning level - Length constraint - Both constraints" level="error"/>
                     </xxf:control-values>
                     <xxf:message level="modal">added-errors: length-constraint | alert: All levels - Error level - Error and warning level - Length constraint - Both constraints</xxf:message>
                     <xxf:message level="modal">removed-errors: length-constraint | added-warnings: uppercase-constraint | alert: All levels - Warning level - Error and warning level - Uppercase constraint - Both constraints</xxf:message>

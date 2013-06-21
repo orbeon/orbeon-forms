@@ -47,7 +47,6 @@
 .orbeon #xforms-form .xforms-disabled-subsequent,
 .orbeon #xforms-form .xforms-case-begin-end,
 .orbeon #xforms-form .xforms-case-deselected-subsequent,
-.orbeon #xforms-form .xforms-alert-inactive,
 .orbeon #xforms-form .xforms-hidden {
   display: none;
 }
@@ -126,8 +125,10 @@
   background-repeat: no-repeat;
   background-position: left bottom;
 }
-.orbeon .xforms-alert-inactive,
-.orbeon .xforms-alert-active {
+.orbeon .xforms-alert {
+  display: none;
+}
+.orbeon .xforms-alert.xforms-active {
   display: -moz-inline-box;
   display: inline-block;
   white-space: nowrap;
@@ -138,8 +139,6 @@
   font-size: 0;
   margin-left: .25em;
   vertical-align: middle;
-}
-.orbeon .xforms-alert-active {
   background-image: url(../../ops/images/xforms/exclamation.png);
   background-repeat: no-repeat;
   background-position: left center;

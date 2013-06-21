@@ -428,10 +428,12 @@
             </attribute>
         </optional>
         <optional>
-            <attribute name="valid">
+            <attribute name="level">
                 <choice>
-                    <value>true</value>
-                    <value>false</value>
+                    <value/>
+                    <value>error</value>
+                    <value>warning</value>
+                    <value>info</value>
                 </choice>
             </attribute>
         </optional>

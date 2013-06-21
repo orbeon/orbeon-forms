@@ -154,24 +154,24 @@
 .orbeon .xforms-noscript .fr-mode-email .xforms-help-image {
   display: none;
 }
-.orbeon .xforms-alert-active {
+.orbeon .xforms-alert,
+.orbeon .xforms-alert.xforms-active {
   display: none;
+}
+.orbeon .xforms-visited > .xforms-alert.xforms-active,
+.orbeon .xforms-visited.xforms-alert.xforms-active {
+  display: block;
+  clear: both;
   margin-top: .2em;
   margin-left: 0;
   height: auto;
   width: auto;
   padding: 1px;
+  font-weight: normal;
   font-size: inherit;
   text-indent: 0;
   background-image: none;
   white-space: normal;
-}
-.orbeon .xforms-alert-active-visited {
-  display: block;
-  clear: both;
-}
-.orbeon .xforms-alert-inactive {
-  display: none;
 }
 .orbeon .xforms-hint {
   display: block;

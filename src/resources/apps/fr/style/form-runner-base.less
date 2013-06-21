@@ -88,27 +88,30 @@
         .fr-mode-view .xforms-help-image, .fr-mode-pdf .xforms-help-image, .fr-mode-email .xforms-help-image { display: none }
     }
 
-    // Display alerts under each control
-    .xforms-alert-active {
+    // Hide alerts by default
+    // NOTE: Include active alerts because Form Runner only shows active alerts for visited controls
+    .xforms-alert, .xforms-alert.xforms-active {
         display: none;
+    }
+
+    // Show active alerts for visited controls only
+    // Cover case of nested alert and case of external alert
+    .xforms-visited > .xforms-alert.xforms-active, .xforms-visited.xforms-alert.xforms-active {
+        display: block;
+        clear: both;
+
         margin-top: .2em;
         margin-left: 0;// used to have margin here but with new colors no margin seems better
         height: auto;
         width: auto;// width: 100%;
         padding: 1px;
-        font-size: inherit;// override xforms.css
-        text-indent: 0;// override xforms.css
-        background-image: none;// override xforms.css
-        white-space: normal;// override xforms.css to allow for multiline alert messages
-    }
 
-    .xforms-alert-active-visited {
-        display: block;
-        clear: both;
-    }
-
-    .xforms-alert-inactive {
-        display: none;// Otherwise inactive alerts take vertical space because of defaults in xforms.css
+        // override xforms.css
+        font-weight: normal;
+        font-size: inherit;
+        text-indent: 0;
+        background-image: none;
+        white-space: normal;// allow for multiline alert messages
     }
 
     // Display hints under each control

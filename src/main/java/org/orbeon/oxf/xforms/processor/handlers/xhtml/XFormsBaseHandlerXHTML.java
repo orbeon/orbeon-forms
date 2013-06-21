@@ -20,6 +20,7 @@ import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.model.StaticBind;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
@@ -51,6 +52,16 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
     }
 
+    private void addConstraintClasses(StringBuilder sb, scala.Option<StaticBind.ConstraintLevel> constraintLevel) {
+        if (constraintLevel.isDefined()) {
+            final String levelName = constraintLevel.get().name();
+            if (sb.length() > 0)
+                sb.append(' ');
+            sb.append("xforms-");
+            sb.append(levelName.equals("error") ? "invalid" : levelName);// level is called "error" but we use "invalid" on the client
+        }
+    }
+
     public void handleMIPClasses(StringBuilder sb, String controlPrefixedId, XFormsControl control) {
 
         // Output MIP classes
@@ -79,11 +90,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             if (control instanceof XFormsSingleNodeControl) {
                 // TODO: inherit from this method instead rather than using instanceof
                 final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                if (!singleNodeControl.isValid()) {
-                    if (sb.length() > 0)
-                        sb.append(' ');
-                    sb.append("xforms-invalid");
-                }
+                addConstraintClasses(sb, singleNodeControl.constraintLevel());
+
                 if (singleNodeControl.isReadonly()) {
                     if (sb.length() > 0)
                         sb.append(' ');
@@ -247,7 +255,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected void handleLabelHintHelpAlert(Attributes attributes, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean addIds) throws SAXException {
+    protected void handleLabelHintHelpAlert(Attributes attributes, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
 
         // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
         final boolean isLabel = lhhaType == LHHAC.LABEL;
@@ -309,19 +317,21 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     classes.append(userClass);
             }
 
-            // Handle alert state
-            // TODO: Once we have the new HTML layout, this won't be needed anymore
+            // Mark alert as active if needed
             if (isAlert) {
-                if (classes.length() > 0)
-                    classes.append(' ');
-                if (control instanceof XFormsSingleNodeControl && !((XFormsSingleNodeControl) control).isValid()) {
-                    classes.append("xforms-alert-active");
-                    // Combined class for IE6
-                    if (control.visited()) {
-                        classes.append(" xforms-alert-active-visited");
+                if (control instanceof XFormsSingleNodeControl) {
+                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                    final scala.Option<StaticBind.ConstraintLevel> constraintLevel = singleNodeControl.constraintLevel();
+
+                    if (constraintLevel.isDefined()) {
+                        if (classes.length() > 0)
+                            classes.append(' ');
+                        classes.append("xforms-active");
                     }
-                } else {
-                    classes.append("xforms-alert-inactive");
+
+                    // Constraint classes are placed on the control if the alert is not external
+                    if (isExternal)
+                        addConstraintClasses(classes, constraintLevel);
                 }
             }
 
@@ -351,6 +361,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 classes.append("xforms-disabled");
             }
 
+            // LHHA name
+            // NOTE: At the end for now because of help -image hack below
             if (classes.length() > 0)
                 classes.append(' ');
             classes.append("xforms-");
@@ -381,7 +393,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 final String helpClasses = classes.toString();
 
                 final AttributesImpl helpAttributes = new AttributesImpl();
-                if (addIds)
+                if (isExternal)
                     helpAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, targetControlEffectiveId, "i"));
                 helpAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpClasses);
                 // Q: Do we need a title and/or alt for screen readers?
@@ -405,7 +417,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
                 final Attributes newAttributes = (attributes != null) ? attributes : new AttributesImpl();
                 outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), targetControlEffectiveId,
-                        forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, addIds);
+                        forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, isExternal);
             }
         }
     }

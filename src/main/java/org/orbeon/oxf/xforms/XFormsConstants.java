@@ -220,7 +220,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_ELEMENT_QNAME = new QName("element", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXTERNAL_EVENTS_QNAME = new QName(XFormsProperties.EXTERNAL_EVENTS_PROPERTY, XXFORMS_NAMESPACE);
 
-    public static final String VALID_ATTRIBUTE_NAME = "valid";
+    public static final String CONSTRAINT_LEVEL_ATTRIBUTE_NAME = "level";
     public static final String RELEVANT_ATTRIBUTE_NAME = "relevant";
     public static final String REQUIRED_ATTRIBUTE_NAME = "required";
     public static final String READONLY_ATTRIBUTE_NAME = "readonly";

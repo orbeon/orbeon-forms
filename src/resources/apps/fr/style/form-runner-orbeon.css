@@ -159,13 +159,23 @@ body.orbeon {
   padding: 1em;
   background-color: #f8f8f8;
 }
-.orbeon .xforms-alert-active {
-  font-weight: bold;
-  font-size: smaller;
-  color: #b94a48;
+.orbeon .xforms-alert.xforms-active {
+  font-size: 13px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
+}
+.orbeon .xforms-invalid > .xforms-alert.xforms-active,
+.orbeon .xforms-alert.xforms-active.xforms-invalid {
+  color: #b94a48;
+}
+.orbeon .xforms-warning > .xforms-alert.xforms-active,
+.orbeon .xforms-alert.xforms-active.xforms-warning {
+  color: #fbb450;
+}
+.orbeon .xforms-info > .xforms-alert.xforms-active,
+.orbeon .xforms-alert.xforms-active.xforms-info {
+  color: #333333;
 }
 .orbeon .xforms-hint {
   display: block;

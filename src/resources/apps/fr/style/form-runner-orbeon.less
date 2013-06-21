@@ -11,6 +11,8 @@
 // The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 
 @error: #B94A48;
+@warning: lighten(@orange, 15%);
+@info: @textColor;
 
 @import "bootstrap-src/less/variables";
 @import "bootstrap-src/less/mixins";
@@ -88,11 +90,21 @@ body.orbeon { background-color: @frBackground }
         background-color: #f8f8f8
     }
 
-    .xforms-alert-active {
-        font-weight: bold;
-        font-size: smaller;
-        color: @error;
+    .xforms-alert.xforms-active {
+        font-size: 13px;
         .border-radius(3px);
+    }
+
+    .xforms-invalid > .xforms-alert.xforms-active, .xforms-alert.xforms-active.xforms-invalid {
+        color: @error;
+    }
+
+    .xforms-warning > .xforms-alert.xforms-active, .xforms-alert.xforms-active.xforms-warning {
+        color: @warning;
+    }
+
+    .xforms-info > .xforms-alert.xforms-active, .xforms-alert.xforms-active.xforms-info {
+        color: @info;
     }
 
     .xforms-hint {

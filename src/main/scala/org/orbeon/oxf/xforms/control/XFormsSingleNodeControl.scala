@@ -71,8 +71,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     private var _wasReadonly = false
     private var _wasRequired = false
     private var _wasValid = true
-    private var _wasWarning = true
-
+    private var _wasConstraintLevel: Option[ConstraintLevel] = None
     private var _wasFailedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
 
     // Type
@@ -99,7 +98,6 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         _wasReadonly = false
         _wasRequired = false
         _wasValid = true
-        _wasWarning = true
     }
 
     override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
@@ -207,6 +205,12 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         result
     }
 
+    final def wasConstraintLevelCommit() = {
+        val result = _wasConstraintLevel
+        _wasConstraintLevel = _constraintLevel
+        result
+    }
+
     final def wasFailedConstraintsCommit() = {
         val result = _wasFailedConstraints
         _wasFailedConstraints = _failedConstraints
@@ -263,10 +267,11 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         other match {
             case other if this eq other ⇒ true
             case other: XFormsSingleNodeControl ⇒
-                isReadonly == other.isReadonly &&
-                isRequired == other.isRequired &&
-                isValid    == other.isValid &&
-                customMIPs == other.customMIPs &&
+                isReadonly      == other.isReadonly &&
+                isRequired      == other.isRequired &&
+                isValid         == other.isValid &&
+                constraintLevel == other.constraintLevel &&
+                customMIPs      == other.customMIPs &&
                 super.equalsExternal(other)
             case _ ⇒ false
         }
@@ -325,27 +330,26 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     }
 
     private def addAjaxMIPs(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, control1: XFormsSingleNodeControl, control2: XFormsSingleNodeControl): Boolean = {
+
         var added = false
-        if (isNewlyVisibleSubtree && control2.isReadonly || control1 != null && control1.isReadonly != control2.isReadonly) {
-            attributesImpl.addAttribute("", READONLY_ATTRIBUTE_NAME, READONLY_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA, control2.isReadonly.toString)
-            added = true
-        }
-        if (isNewlyVisibleSubtree && control2.isRequired || control1 != null && control1.isRequired != control2.isRequired) {
-            attributesImpl.addAttribute("", REQUIRED_ATTRIBUTE_NAME, REQUIRED_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA, control2.isRequired.toString)
+
+        def addAttribute(name: String, value: String) = {
+            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value)
             added = true
         }
 
-        // NOTE: We used to have a configurable default for the relevance. Not sure why this was needed. Here consider the default is true.
-        if (isNewlyVisibleSubtree && !control2.isRelevant || control1 != null && control1.isRelevant != control2.isRelevant) {
-            attributesImpl.addAttribute("", RELEVANT_ATTRIBUTE_NAME, RELEVANT_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA, control2.isRelevant.toString)
-            added = true
-        }
-        if (isNewlyVisibleSubtree && !control2.isValid || control1 != null && control1.isValid != control2.isValid) {
-            attributesImpl.addAttribute("", VALID_ATTRIBUTE_NAME, VALID_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA, control2.isValid.toString)
-            added = true
-        }
+        if (isNewlyVisibleSubtree && control2.isReadonly || control1 != null && control1.isReadonly != control2.isReadonly)
+            addAttribute(READONLY_ATTRIBUTE_NAME, control2.isReadonly.toString)
 
-        // Custom MIPs
+        if (isNewlyVisibleSubtree && control2.isRequired || control1 != null && control1.isRequired != control2.isRequired)
+            addAttribute(REQUIRED_ATTRIBUTE_NAME, control2.isRequired.toString)
+
+        if (isNewlyVisibleSubtree && ! control2.isRelevant || control1 != null && control1.isRelevant != control2.isRelevant)
+            addAttribute(RELEVANT_ATTRIBUTE_NAME, control2.isRelevant.toString)
+
+        if (isNewlyVisibleSubtree && control2.constraintLevel.isDefined || control1 != null && control1.constraintLevel != control2.constraintLevel)
+            addAttribute(CONSTRAINT_LEVEL_ATTRIBUTE_NAME, control2.constraintLevel map (_.name) getOrElse "")
+
         added |= addAjaxCustomMIPs(attributesImpl, isNewlyVisibleSubtree, control1, control2)
 
         added
@@ -395,21 +399,14 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     override def dispatchCreationEvents() = {
         super.dispatchCreationEvents()
 
-        // Dispatch events only if the MIP value is different from the default
-
-        // Dispatch xforms-required if needed
-        // TODO: must reacquire control and test for relevance again
+        // MIP events
         if (isRequired)
             Dispatch.dispatchEvent(new XFormsRequiredEvent(this))
 
-        // Dispatch xforms-readonly if needed
-        // TODO: must reacquire control and test for relevance again
         if (isReadonly)
             Dispatch.dispatchEvent(new XFormsReadonlyEvent(this))
 
-        // Dispatch xforms-invalid if needed
-        // TODO: must reacquire control and test for relevance again
-        if (!isValid)
+        if (! isValid)
             Dispatch.dispatchEvent(new XFormsInvalidEvent(this))
     }
 

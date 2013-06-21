@@ -199,8 +199,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="group2" valid="false"/>
-                        <xxf:control id="1" valid="false">0</xxf:control>
+                        <xxf:control id="group2" level="error"/>
+                        <xxf:control id="1" level="error">0</xxf:control>
                         <xxf:control id="2" label="M:">12</xxf:control>
                         <xxf:control id="3" label="Clear"/>
                     </xxf:control-values>

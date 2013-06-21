@@ -5576,7 +5576,7 @@
             <controls xmlns:xh="http://www.w3.org/1999/xhtml">
                 <xh:span xmlns:xh="http://www.w3.org/1999/xhtml" id="my-input" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-empty">
                     <xh:input id="my-input$xforms-input-1" type="text" name="my-input$xforms-input-1" value="" class="xforms-input-input"/>
-                    <xh:span class="xforms-alert-active xforms-alert">First name is mandatory</xh:span>
+                    <xh:span class="xforms-active xforms-alert">First name is mandatory</xh:span>
                 </xh:span>
             </controls>
         </output>

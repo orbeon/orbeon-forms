@@ -1898,38 +1898,33 @@ ORBEON.xforms.Controls = {
         ORBEON.xforms.Controls._setTooltipMessage(control, message, ORBEON.xforms.Globals.helpTooltipForControl);
     },
 
-    setValid: function(control, newValid) {
-        // Update class xforms-invalid on the control
-        var isValid;
-        var isVisited = YAHOO.util.Dom.hasClass(control, "xforms-visited");
-        if (newValid != null) { // NOTE: only one caller and doesn't pass null!
-            isValid = newValid != "false";
-            if (isValid)
-                YAHOO.util.Dom.removeClass(control, "xforms-invalid");
-            else
-                YAHOO.util.Dom.addClass(control, "xforms-invalid");
-        } else {
-            isValid = ORBEON.xforms.Controls.isValid(control);
+    setConstraintLevel: function(control, newLevel) {
+
+        var alertActive = newLevel != "";
+
+        function toggleCommonClasses(element) {
+            $(element).toggleClass("xforms-invalid", newLevel == "error");
+            $(element).toggleClass("xforms-warning", newLevel == "warning");
+            $(element).toggleClass("xforms-info",    newLevel == "info");
         }
 
-        // Update class on alert element
+        // Classes on control
+        toggleCommonClasses(control);
+
+        // Classes on alert if any
         var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
-        if (alertElement != null) { // Some controls don't have an alert
-            if (isValid) {
-                YAHOO.util.Dom.removeClass(alertElement, "xforms-alert-active");
-                YAHOO.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
-                YAHOO.util.Dom.addClass(alertElement, "xforms-alert-inactive");
-            } else {
-                YAHOO.util.Dom.removeClass(alertElement, "xforms-alert-inactive");
-                YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active");
-                if (isVisited) YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
-            }
+        if (alertElement) {
+
+            $(alertElement).toggleClass("xforms-active", alertActive);
+
+            if (! YAHOO.lang.isUndefined($(alertElement).attr("id")))
+                toggleCommonClasses(alertElement);
         }
 
         // If the control is now valid and there is an alert tooltip for this control, get rid of it
         var alertTooltip = ORBEON.xforms.Globals.alertTooltipForControl[control.id];
         if (alertTooltip != null && alertTooltip != true) {
-            if (isValid) {
+            if (! alertActive) {
                 // Prevent the tooltip from becoming visible on mouseover
                 alertTooltip.cfg.setProperty("disabled", true);
                 // If visible, hide the tooltip right away, otherwise it will only be hidden a few seconds later
@@ -2246,22 +2241,18 @@ ORBEON.xforms.Controls = {
     },
 
     /**
-     * Update the visited state of a control. The code also tried to find the label for this control and add the class
-     * xforms-alert-active-visited when necessary.
+     * Update the visited state of a control, including its external alert if any.
      */
     updateVisited: function(control, newVisited) {
-        if (newVisited) {
-            YAHOO.util.Dom.addClass(control, "xforms-visited");
 
-            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
-            if (alertElement && YAHOO.util.Dom.hasClass(alertElement, "xforms-alert-active"))
-                YAHOO.util.Dom.addClass(alertElement, "xforms-alert-active-visited");
-        } else {
-            YAHOO.util.Dom.removeClass(control, "xforms-visited");
-            var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
-            if (alertElement)
-                YAHOO.util.Dom.removeClass(alertElement, "xforms-alert-active-visited");
-        }
+        // Classes on control
+        $(control).toggleClass("xforms-visited", newVisited);
+
+        // Classes on external alert if any
+        // Q: Is this 100% reliable to determine if the alert is external?
+        var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
+        if (alertElement && ! YAHOO.lang.isUndefined($(alertElement).attr("id")))
+            $(alertElement).toggleClass("xforms-visited", newVisited);
     },
 
     /**
@@ -3120,7 +3111,7 @@ ORBEON.xforms.Events = {
             }
 
             // Alert tooltip
-            if (YAHOO.util.Dom.hasClass(target, "xforms-alert-active") && ! $(target).closest(".xforms-disable-alert-as-tooltip").is("*")) {
+            if ($(target).is(".xforms-alert.xforms-active") && ! $(target).closest(".xforms-disable-alert-as-tooltip").is("*")) {
                 // NOTE: control may be null if we have <div for="">. Using target.getAttribute("for") returns a proper
                 // for, but then tooltips sometimes fail later with Ajax portlets in particular. So for now, just don't
                 // do anything if there is no control found.

@@ -28,7 +28,7 @@ class XXFormsItemset extends XFormsFunction with FunctionSupport {
             case Some(select1Control: XFormsSelect1Control) ⇒
 
                 val format   = stringArgument(1)
-                val selected = argument.lift(2) map (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))) getOrElse false
+                val selected = argument.lift(2) exists (e ⇒ ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext)))
 
                 val itemset = select1Control.getItemset
                 val controlValueForSelection = if (selected) select1Control.getValue else null

@@ -285,7 +285,7 @@ object FormRunner {
 
     private def isAuthorized(appForms: Map[String, Set[String]], app: String, form: String) = {
         // Authorized if access to all apps OR if access to current app AND (access to all forms in app OR to specific form in app)
-        (appForms contains "*") || (appForms.get(app) map (_ & Set("*", form) nonEmpty) getOrElse false)
+        (appForms contains "*") || (appForms.get(app) exists (_ & Set("*", form) nonEmpty))
     }
 
     // Interrupt current processing and send an error code to the client.

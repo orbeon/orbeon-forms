@@ -52,7 +52,7 @@ trait ControlAjaxSupport {
         added |= addAjaxLHHA(other, attributesImpl, isNewlyVisibleSubtree)
 
         // Visited
-        if ((Option(other) map (_.visited) getOrElse false) != visited) {
+        if ((Option(other) exists (_.visited)) != visited) {
             XMLUtils.addOrAppendToAttribute(attributesImpl, "visited", visited.toString)
             added |= true
         }

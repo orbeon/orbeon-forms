@@ -144,7 +144,7 @@ object DataModel {
     // For a given value control name and XPath expression, whether the resulting bound item is acceptable
     // Called from control details dialog
     def isAllowedValueBindingExpression(controlName: String, expr: String): Boolean =
-        findConcreteControlByName(controlName) map (isAllowedBindingExpression(_, expr)) getOrElse false
+        findConcreteControlByName(controlName) exists (isAllowedBindingExpression(_, expr))
 
     // Leave public for unit tests
     def isAllowedBindingExpression(control: XFormsControl, expr: String): Boolean = {
@@ -154,10 +154,11 @@ object DataModel {
 
         try {
             control.bind flatMap
-                (bind ⇒ evaluateBoundItem(bind.namespaceMapping)) map
-                    (XFormsControl.isAllowedBoundItem(control, _)) getOrElse
-                        false
-        } catch { case NonFatal(_) ⇒ false }
+                (bind ⇒ evaluateBoundItem(bind.namespaceMapping)) exists
+                    (XFormsControl.isAllowedBoundItem(control, _))
+        } catch {
+            case NonFatal(_) ⇒ false
+        }
     }
 
     // For a given value control name and XPath sequence, whether the resulting bound item is acceptable

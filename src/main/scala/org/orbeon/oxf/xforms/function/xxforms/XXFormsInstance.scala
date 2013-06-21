@@ -33,7 +33,7 @@ class XXFormsInstance extends XFormsFunction with FunctionSupport {
 
         val instanceId     = stringArgument(0)(xpathContext)
         // TODO: Argument is undocumented. Is it ever used at all? We now have a syntax for absolute ids so don't really need it.
-        val useEffectiveId = argument.lift(1) map (_.effectiveBooleanValue(xpathContext)) getOrElse false
+        val useEffectiveId = argument.lift(1) exists (_.effectiveBooleanValue(xpathContext))
 
         val rootElementOpt =
             if (useEffectiveId) {

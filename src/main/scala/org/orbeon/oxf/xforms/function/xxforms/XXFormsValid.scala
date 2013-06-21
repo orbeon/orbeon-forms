@@ -36,10 +36,10 @@ class XXFormsValid extends XXFormsMIPFunction {
         val item = argument.lift(0) map (e ⇒ Option(e.iterate(xpathContext).next())) getOrElse Option(xpathContext.getContextItem)
         
         // Whether to recursively test the subtree
-        val recurse = argument.lift(1) map effectiveBooleanValue getOrElse false
+        val recurse = argument.lift(1) exists effectiveBooleanValue
 
         // Whether to ignore non-relevant nodes
-        val ignoreNonRelevant = argument.lift(2) map effectiveBooleanValue getOrElse false
+        val ignoreNonRelevant = argument.lift(2) exists effectiveBooleanValue
 
         // Item is valid unless it is a relevant (unless relevance is ignored) element/attribute and marked as invalid
         def isItemValid(item: Item) = item match {

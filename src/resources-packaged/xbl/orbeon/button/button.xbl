@@ -34,7 +34,6 @@
             <xbl:style>
                 .xbl-fr-button { display: inline }
                 .xbl-fr-button .yui-button {
-                    display: -moz-inline-box;
                     display: inline-block;
                     *zoom: 1;
                     *display: inline;

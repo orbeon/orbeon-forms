@@ -11,7 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-.xbl-fr-dialog-select .fr-component-group { display: inline-block; display: -moz-inline-box }
+.xbl-fr-dialog-select .fr-component-group { display: inline-block }
 
 #doc .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label,
         #doc4 .fr-grid .xbl-fr-dialog-select .xforms-select-appearance-full span label {

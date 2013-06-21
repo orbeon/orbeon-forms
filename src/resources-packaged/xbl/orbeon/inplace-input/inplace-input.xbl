@@ -51,7 +51,7 @@
 
         <xbl:resources>
             <xbl:style>
-                .xbl-fr-inplace-input { display: -moz-inline-box; display: inline-block; *zoom: 1; *display: inline } /* IE 7 hacks */
+                .xbl-fr-inplace-input { display: inline-block; *zoom: 1; *display: inline } /* IE 7 hacks */
                 .xbl-fr-inplace-input .fr-inplace-content:hover .xforms-output { background-color: #FFFF88 }
                 .xbl-fr-inplace-input .xforms-input input { background-color: #FFFF88; background-image: none; border: none }
                 .xbl-fr-inplace-input .fr-inplace-buttons { display: block; margin-top:0.5em }

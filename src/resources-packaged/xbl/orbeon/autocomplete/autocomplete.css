@@ -26,7 +26,6 @@
   box-sizing: border-box;
 }
 .xbl-fr-autocomplete .yui-ac {
-  display: -moz-inline-box;
   display: inline-block;
   *zoom: 1;
   *display: inline;

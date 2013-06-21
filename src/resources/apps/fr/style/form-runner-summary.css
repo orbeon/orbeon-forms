@@ -62,7 +62,6 @@
 }
 .orbeon .fr-summary-table-div td a {
   width: 100%;
-  display: -moz-inline-box;
   display: inline-block;
   *zoom: 1;
   *display: inline;

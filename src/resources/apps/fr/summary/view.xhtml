@@ -209,7 +209,7 @@
             <xf:action ev:event="xforms-model-construct-done">
 
                 <xf:var name="ops"
-                        value="formRunner:authorizedOperationsOnForm($source-form-metadata/permissions)"/>
+                        value="formRunner:authorizedOperationsBasedOnRole($source-form-metadata/permissions)"/>
 
                 <xf:setvalue
                     ref="xxf:instance('fr-authorized-operations')"

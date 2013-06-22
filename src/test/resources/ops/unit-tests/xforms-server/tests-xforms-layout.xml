@@ -78,7 +78,7 @@
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-input·1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-input·1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-input$xforms-input-1·1">My label</xh:label>
                     <xh:input id="my-new-input$xforms-input-1·1" type="text" name="my-new-input$xforms-input-1·1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
                     <xh:span class="xforms-help-image" title="" alt=""/>
@@ -87,7 +87,7 @@
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-boolean-input·1" class="xforms-control xforms-input xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
+                <xh:span id="my-new-boolean-input·1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-boolean-input$$e0·1">My label</xh:label>
                     <xh:span class="xforms-selected">
                         <xh:input id="my-new-boolean-input$$e0·1" type="checkbox" name="my-new-boolean-input·1" value="true" checked="checked"/>
@@ -102,7 +102,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-input-2$$t·1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-input-2·1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-input-2·1" class="xforms-control xforms-input xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:input id="my-new-input-2$xforms-input-1·1" type="text" name="my-new-input-2$xforms-input-1·1" value="Hello!" class="xforms-input-input xforms-type-NCName"/>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
@@ -116,7 +116,7 @@
                 <xh:span class="xforms-repeat-selected-item-1"/>
                 <xh:span class="xforms-hint xforms-repeat-selected-item-1" id="my-new-boolean-input-2$$t·1">My hint</xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-boolean-input-2·1" class="xforms-control xforms-input xforms-required xforms-required-filled xforms-type-boolean xforms-repeat-selected-item-1">
+                <xh:span id="my-new-boolean-input-2·1" class="xforms-control xforms-input xforms-required xforms-filled xforms-type-boolean xforms-repeat-selected-item-1">
                     <xh:span class="xforms-selected">
                         <xh:input id="my-new-boolean-input-2$$e0·1" type="checkbox" name="my-new-boolean-input-2·1" value="true" checked="checked"/>
                     </xh:span>
@@ -218,7 +218,7 @@
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-minimal xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-select1$$c·1">My label</xh:label>
                     <xh:select id="my-new-select1$$c·1" name="my-new-select1·1">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
@@ -278,7 +278,7 @@
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-output·1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-output·1" class="xforms-control xforms-output xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label">My label</xh:label>
                     <xh:span id="my-new-output$$c·1" class="xforms-output-output">Hello!</xh:span>
                     <xh:span class="xforms-help-image" title="" alt=""/>
@@ -573,7 +573,7 @@
                 <xh:div id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:div class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:div id="my-new-range·1" class="xforms-control xforms-range xforms-invalid xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:div id="my-new-range·1" class="xforms-control xforms-range xforms-invalid xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-range$$c·1">My label</xh:label>
                     <xh:div id="my-new-range$$c·1" class="xforms-range-background">
                         <xh:div class="xforms-range-thumb"/>
@@ -653,7 +653,7 @@
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-select·1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-select·1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-select$$c·1">My label</xh:label>
                     <xh:select id="my-new-select$$c·1" name="my-new-select·1" multiple="multiple">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
@@ -665,7 +665,7 @@
                     <xh:span class="xforms-hint">My hint</xh:span>
                 </xh:span>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-compact-select·1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-compact-select·1" class="xforms-control xforms-select xforms-incremental xforms-select-appearance-compact xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label" for="my-new-compact-select$$c·1">My label</xh:label>
                     <xh:select id="my-new-compact-select$$c·1" name="my-new-compact-select·1" multiple="multiple">
                         <xh:option value="apple" selected="selected">Apple</xh:option>
@@ -1024,7 +1024,7 @@
         </input>
         <output name="response">
             <controls xmlns:xh="http://www.w3.org/1999/xhtml">
-                <xh:span id="my-new-textarea" class="xforms-control xforms-textarea xforms-invalid xforms-readonly xforms-required xforms-required-filled xforms-type-NCName">
+                <xh:span id="my-new-textarea" class="xforms-control xforms-textarea xforms-invalid xforms-readonly xforms-required xforms-filled xforms-type-NCName">
                     <xh:label class="xforms-label" for="my-new-textarea$$c">My label</xh:label>
                     <xh:textarea id="my-new-textarea$$c" name="my-new-textarea" disabled="disabled">Hello!</xh:textarea>
                     <xh:span class="xforms-help-image" title="" alt=""/>
@@ -1397,7 +1397,7 @@
                 <xh:span id="repeat-begin-my-repeat" class="xforms-repeat-begin-end"/>
                 <xh:span class="xforms-repeat-delimiter"/>
                 <xh:span class="xforms-repeat-selected-item-1"/>
-                <xh:span id="my-new-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-required-filled xforms-type-NCName xforms-repeat-selected-item-1">
+                <xh:span id="my-new-select1·1" class="xforms-control xforms-select1 xforms-incremental xforms-select1-appearance-full xforms-required xforms-filled xforms-type-NCName xforms-repeat-selected-item-1">
                     <xh:label class="xforms-label">My label</xh:label>
                     <xh:span class="xforms-items">
                         <xh:span class="xforms-selected">

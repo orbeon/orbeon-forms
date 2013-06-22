@@ -168,7 +168,7 @@
                 YAHOO.util.Assert.areEqual(invalid, YAHOO.util.Dom.hasClass(group, "xforms-invalid"), situation + " for xforms-invalid");
                 YAHOO.util.Assert.areEqual(required, YAHOO.util.Dom.hasClass(group, "xforms-required"), situation + " for xforms-required");
                 YAHOO.util.Assert.areEqual(visited, YAHOO.util.Dom.hasClass(group, "xforms-visited"), situation + " for xforms-visited");
-                YAHOO.util.Assert.areEqual(requiredFilled, YAHOO.util.Dom.hasClass(group, "xforms-required-filled"), situation + " for xforms-required-filled");
+                YAHOO.util.Assert.areEqual(requiredFilled, YAHOO.util.Dom.hasClass(group, "xforms-filled"), situation + " for xforms-filled");
             }
 
             // Check classes with no change

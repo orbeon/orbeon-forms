@@ -103,11 +103,10 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     sb.append("xforms-required");
                     if (control instanceof XFormsValueControl) {
                         // NOTE: Test above excludes xf:group
-                        // Combined class for IE6
                         if (((XFormsValueControl) control).isEmpty())
-                            sb.append(" xforms-required-empty");
+                            sb.append(" xforms-empty");
                         else
-                            sb.append(" xforms-required-filled");
+                            sb.append(" xforms-filled");
                     }
                 }
 

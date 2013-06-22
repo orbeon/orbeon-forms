@@ -240,10 +240,10 @@ body.orbeon {
 .orbeon .xforms-dialog .xforms-required .xforms-label {
   background-image: url(asterisk-bw.png);
 }
-.orbeon .fr-mode-new .xforms-required-empty .xforms-label,
-.orbeon .fr-mode-edit .xforms-required-empty .xforms-label,
-.orbeon .fr-mode-test .xforms-required-empty .xforms-label,
-.orbeon .xforms-dialog .xforms-required-empty .xforms-label,
+.orbeon .fr-mode-new .xforms-required.xforms-empty .xforms-label,
+.orbeon .fr-mode-edit .xforms-required.xforms-empty .xforms-label,
+.orbeon .fr-mode-test .xforms-required.xforms-empty .xforms-label,
+.orbeon .xforms-dialog .xforms-required.xforms-empty .xforms-label,
 .orbeon .fr-mode-new .fb-required-true .xforms-label,
 .orbeon .fr-mode-edit .fb-required-true .xforms-label,
 .orbeon .fr-mode-test .fb-required-true .xforms-label,

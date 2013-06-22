@@ -2256,24 +2256,14 @@ ORBEON.xforms.Controls = {
     },
 
     /**
-     * Update the xforms-required-empty class as necessary.
+     * Update the xforms-empty/filled classes as necessary.
      */
     updateRequiredEmpty: function(control, newValue) {
-        if (YAHOO.util.Dom.hasClass(control, "xforms-required")) {
-            if (newValue == "") {
-                YAHOO.util.Dom.addClass(control, "xforms-required-empty");
-                YAHOO.util.Dom.removeClass(control, "xforms-required-filled");
-                return true;
-            } else {
-                YAHOO.util.Dom.addClass(control, "xforms-required-filled");
-                YAHOO.util.Dom.removeClass(control, "xforms-required-empty");
-                return false;
-            }
-        } else {
-            YAHOO.util.Dom.removeClass(control, "xforms-required-filled");
-            YAHOO.util.Dom.removeClass(control, "xforms-required-empty");
-            return false;
-        }
+        var isRequired = $(control).hasClass("xforms-required");
+        var isEmpty    = newValue == "";
+
+        $(control).toggleClass("xforms-empty", isRequired && isEmpty);
+        $(control).toggleClass("xforms-filled", isRequired && ! isEmpty);
     },
 
     autosizeTextarea: function(textarea) {

@@ -217,11 +217,28 @@ body.orbeon {
 .orbeon .fr-mode-test .xforms-required .xforms-label,
 .orbeon .xforms-dialog .xforms-required .xforms-label,
 .orbeon .fr-mode-new .fb-required-true .xforms-label,
-.orbeon .fr-mode-edit .fb-required-true .xforms-label {
-  background-image: url(asterisk.png);
+.orbeon .fr-mode-edit .fb-required-true .xforms-label,
+.orbeon .fr-mode-test .fb-required-true .xforms-label,
+.orbeon .xforms-dialog .fb-required-true .xforms-label {
   background-position: 0 2px;
   background-repeat: no-repeat;
   padding-left: 12px;
+}
+.orbeon .fr-mode-new .xforms-required .xforms-label,
+.orbeon .fr-mode-edit .xforms-required .xforms-label,
+.orbeon .fr-mode-test .xforms-required .xforms-label,
+.orbeon .xforms-dialog .xforms-required .xforms-label {
+  background-image: url(asterisk-bw.png);
+}
+.orbeon .fr-mode-new .xforms-required-empty .xforms-label,
+.orbeon .fr-mode-edit .xforms-required-empty .xforms-label,
+.orbeon .fr-mode-test .xforms-required-empty .xforms-label,
+.orbeon .xforms-dialog .xforms-required-empty .xforms-label,
+.orbeon .fr-mode-new .fb-required-true .xforms-label,
+.orbeon .fr-mode-edit .fb-required-true .xforms-label,
+.orbeon .fr-mode-test .fb-required-true .xforms-label,
+.orbeon .xforms-dialog .fb-required-true .xforms-label {
+  background-image: url(asterisk.png);
 }
 .orbeon .xforms-invalid.xforms-visited .xforms-input-input,
 .orbeon textarea.xforms-invalid.xforms-visited {

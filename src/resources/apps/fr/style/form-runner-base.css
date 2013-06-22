@@ -173,6 +173,11 @@
   background-image: none;
   white-space: normal;
 }
+.orbeon .xforms-visited > .xforms-alert.xforms-active > ul,
+.orbeon .xforms-visited.xforms-alert.xforms-active > ul {
+  margin-bottom: 0;
+  list-style-type: square;
+}
 .orbeon .xforms-hint {
   display: block;
   margin-top: .2em;

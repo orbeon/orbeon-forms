@@ -368,7 +368,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             classes.append("xforms-");
             classes.append(lhhaType.name().toLowerCase());
 
-            final String labelClasses = classes.toString();
+            final String lhhaClasses = classes.toString();
 
             final boolean isNoscript = handlerContext.isNoScript();
             if (isHelp) {
@@ -416,7 +416,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
                 final Attributes newAttributes = (attributes != null) ? attributes : new AttributesImpl();
-                outputLabelFor(handlerContext, getAttributes(newAttributes, labelClasses, null), targetControlEffectiveId,
+                outputLabelFor(handlerContext, getAttributes(newAttributes, lhhaClasses, null), targetControlEffectiveId,
                         forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, isExternal);
             }
         }

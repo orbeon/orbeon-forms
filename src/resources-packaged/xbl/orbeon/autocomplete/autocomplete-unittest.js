@@ -98,7 +98,7 @@
                 if (doAssert) {
                     var value = ORBEON.xforms.Document.getValue(staticDynamicResource + "-output-" + key);
                     YAHOO.util.Assert.areEqual(expected[key], value, staticDynamicResource + " " + key + " " +
-                        (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
+                        (_.isUndefined(message) ? "" : " - " + message));
                 }
             });
         },
@@ -109,7 +109,7 @@
         checkSearchValue: function(staticDynamicResource, expectedValue, message) {
             var searchValue = ORBEON.xforms.Document.getValue(staticDynamicResource + "-autocomplete$search");
             YAHOO.util.Assert.areEqual(expectedValue, searchValue, staticDynamicResource +
-                (YAHOO.lang.isUndefined(message) ? "" : " - " + message));
+                (_.isUndefined(message) ? "" : " - " + message));
         },
 
         /**

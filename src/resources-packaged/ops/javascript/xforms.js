@@ -466,7 +466,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             isAncestorOrSelfHidden: function(element) {
                 while (true) {
                     if (element == null) return false;
-                    if (! YAHOO.lang.isUndefined(element.style) && YAHOO.util.Dom.getStyle(element, "display") == "none") return true;
+                    if (! _.isUndefined(element.style) && YAHOO.util.Dom.getStyle(element, "display") == "none") return true;
                     element = element.parentNode;
                 }
             },
@@ -645,7 +645,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     handler: function(bits) {
                         var d = new Date();
                         var h = parseInt(bits[1], 10);
-                        if (! YAHOO.lang.isUndefined(bits[4]) && bits[4] != "") h = h % 12;
+                        if (! _.isUndefined(bits[4]) && bits[4] != "") h = h % 12;
                         d.setHours(h);
                         d.setMinutes(parseInt(bits[2], 10));
                         d.setSeconds(parseInt(bits[3], 10));
@@ -657,7 +657,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     handler: function(bits) {
                         var d = new Date();
                         var h = parseInt(bits[1], 10);
-                        if (! YAHOO.lang.isUndefined(bits[3]) && bits[3] != "") h = h % 12;
+                        if (! _.isUndefined(bits[3]) && bits[3] != "") h = h % 12;
                         d.setHours(h);
                         d.setMinutes(parseInt(bits[2], 10));
                         d.setSeconds(0);
@@ -669,7 +669,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     handler: function(bits) {
                         var d = new Date();
                         var h = parseInt(bits[1], 10);
-                        if (! YAHOO.lang.isUndefined(bits[2]) && bits[2] != "") h = h % 12;
+                        if (! _.isUndefined(bits[2]) && bits[2] != "") h = h % 12;
                         d.setHours(h);
                         d.setMinutes(0);
                         d.setSeconds(0);
@@ -886,7 +886,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             };
 
             Property.prototype.get = function() {
-                return YAHOO.lang.isUndefined(opsXFormsProperties) || YAHOO.lang.isUndefined(opsXFormsProperties[this.name])
+                return _.isUndefined(opsXFormsProperties) || _.isUndefined(opsXFormsProperties[this.name])
                     ? this.defaultValue : opsXFormsProperties[this.name];
             };
 
@@ -1917,7 +1917,7 @@ ORBEON.xforms.Controls = {
 
             $(alertElement).toggleClass("xforms-active", alertActive);
 
-            if (! YAHOO.lang.isUndefined($(alertElement).attr("id")))
+            if (! _.isUndefined($(alertElement).attr("id")))
                 toggleCommonClasses(alertElement);
         }
 
@@ -2251,7 +2251,7 @@ ORBEON.xforms.Controls = {
         // Classes on external alert if any
         // Q: Is this 100% reliable to determine if the alert is external?
         var alertElement = ORBEON.xforms.Controls.getControlLHHA(control, "alert");
-        if (alertElement && ! YAHOO.lang.isUndefined($(alertElement).attr("id")))
+        if (alertElement && ! _.isUndefined($(alertElement).attr("id")))
             $(alertElement).toggleClass("xforms-visited", newVisited);
     },
 
@@ -2798,10 +2798,10 @@ ORBEON.xforms.Events = {
     focus: function(event) {
         var eventTarget = YAHOO.util.Event.getTarget(event);
         // If the browser does not support capture, register listener for change on capture
-        if (YAHOO.lang.isUndefined(document.addEventListener)) {
+        if (_.isUndefined(document.addEventListener)) {
             YAHOO.util.Dom.generateId(eventTarget);
             var changeListenerElement = ORBEON.xforms.Globals.changeListeners[eventTarget.id];
-            var needToRegisterChangeListener = YAHOO.lang.isUndefined(changeListenerElement) || changeListenerElement != eventTarget;
+            var needToRegisterChangeListener = _.isUndefined(changeListenerElement) || changeListenerElement != eventTarget;
             if (needToRegisterChangeListener) {
                 YAHOO.util.Event.addListener(eventTarget, "change", ORBEON.xforms.Events.change);
                 ORBEON.xforms.Globals.changeListeners[eventTarget.id] = eventTarget;
@@ -2968,7 +2968,7 @@ ORBEON.xforms.Events = {
      *      control with a new value coming from the server.
      */
     _isChangingKey: function(control, keyCode) {
-        return ! YAHOO.lang.isUndefined(keyCode) &&
+        return ! _.isUndefined(keyCode) &&
             keyCode != 9 && keyCode != 16 && keyCode != 17 && keyCode != 18 &&
             (YAHOO.util.Dom.hasClass(control, "xforms-input") || YAHOO.util.Dom.hasClass(control, "xforms-secret")
                     || YAHOO.util.Dom.hasClass(control, "xforms-textarea"));
@@ -3481,7 +3481,7 @@ ORBEON.xforms.Events = {
 
         // Depending who calls this listeners, we either get the node directly (for the enterKeyPressed
         // and labelClick events) or we get an object which contains the node (for clickEvent).
-        var node = ! YAHOO.lang.isUndefined(object._type) && (object._type == "TextNode" || object._type == "TaskNode")
+        var node = ! _.isUndefined(object._type) && (object._type == "TextNode" || object._type == "TaskNode")
             ? object : object.node;
 
         var yuiTree = this;
@@ -3751,7 +3751,7 @@ ORBEON.xforms.XBL = {
 
         // Define factory function for this class
         xblClass.instance = function(target) {
-            var hasInit = ! YAHOO.lang.isUndefined(xblClass.prototype.init);
+            var hasInit = ! _.isUndefined(xblClass.prototype.init);
 
             // Get the top-level element in the HTML DOM corresponding to this control
             var container = target == null || ! YAHOO.util.Dom.inDocument(target, document)
@@ -3777,7 +3777,7 @@ ORBEON.xforms.XBL = {
                 // Inject destroy
                 var originalDestroy = this.prototype.destroy;
                 this.prototype.destroy = function() {
-                    if (! YAHOO.lang.isUndefined(originalDestroy))
+                    if (! _.isUndefined(originalDestroy))
                         originalDestroy.call(this);
                     xblClass._instances[this.container.id] = null;
                 }
@@ -3794,11 +3794,11 @@ ORBEON.xforms.XBL = {
                 return doNothingSingleton;
             } else {
                 // Create object holding instances
-                if (YAHOO.lang.isUndefined(this._instances))
+                if (_.isUndefined(this._instances))
                     this._instances = {};
                 // Get or create instance
                 var instance = this._instances[container.id];
-                if (YAHOO.lang.isUndefined(instance) || YAHOO.lang.isNull(instance) || instance.container != container) {
+                if (_.isUndefined(instance) || YAHOO.lang.isNull(instance) || instance.container != container) {
                     instance = new xblClass(container);
                     instance.xblClass = xblClass;
                     instance.container = container;
@@ -4229,7 +4229,7 @@ ORBEON.xforms.Init = {
                                     // YUI doesn't give us the target of the event, so we provide the observer as the target to the server
                                     var targetId = keyListener.observer;
                                     var additionalAttributes = ["text", keyListener.text];
-                                    if (! YAHOO.lang.isUndefined(keyListener.modifier)) {
+                                    if (! _.isUndefined(keyListener.modifier)) {
                                         additionalAttributes.push("modifiers");
                                         additionalAttributes.push(keyListener.modifier);
                                     }
@@ -4243,7 +4243,7 @@ ORBEON.xforms.Init = {
                             if (keyListener.isDialogListener) {
                                 var yuiDialog = ORBEON.xforms.Globals.dialogs[keyListener.observer];
                                 var dialogKeyListeners = yuiDialog.cfg.getProperty("keylisteners");
-                                if (YAHOO.lang.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
+                                if (_.isUndefined(dialogKeyListeners)) dialogKeyListeners = [];
                                 dialogKeyListeners.push(yuiKeyListener);
                                 yuiDialog.cfg.setProperty("keylisteners", dialogKeyListeners);
                             } else {
@@ -4258,7 +4258,7 @@ ORBEON.xforms.Init = {
                         // For now just take the id of the first XForms form; this will need to be changed to support multiple forms
                         for (var serverEventIndex = 0; serverEventIndex < serverEvents.length; serverEventIndex++) {
                             var serverEvent = serverEvents[serverEventIndex];
-                            var discardable = ! YAHOO.lang.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
+                            var discardable = ! _.isUndefined(serverEvent["discardable"]) && serverEvent["discardable"];
                             ORBEON.xforms.server.AjaxServer.createDelayedServerEvent(serverEvent["event"], serverEvent["delay"],
                                 serverEvent["show-progress"], serverEvent["progress-message"], discardable, formElement.id);
                         }

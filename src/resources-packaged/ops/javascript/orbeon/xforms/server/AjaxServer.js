@@ -577,7 +577,7 @@
     AjaxServer.handleResponseAjax = function(o) {
 
         var responseXML = o.responseXML;
-        if (!YAHOO.lang.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
+        if (! _.isUndefined(o.getResponseHeader) && YAHOO.lang.trim(o.getResponseHeader["Content-Type"]) == "text/html") {
 
             if (window.dojox && dojox.html && dojox.html.set) {
                 // Parse content we receive into a new div we create just for that purpose
@@ -996,11 +996,11 @@
                                         var inOptgroup = false;
                                         function generateItem(itemElement) {
                                             var clazz = null;
-                                            if (! YAHOO.lang.isUndefined(itemElement.attributes) && ! YAHOO.lang.isUndefined(itemElement.attributes["class"])) {
+                                            if (! _.isUndefined(itemElement.attributes) && ! _.isUndefined(itemElement.attributes["class"])) {
                                                 // We have a class property
                                                 clazz = itemElement.attributes["class"];
                                             }
-                                            if (YAHOO.lang.isUndefined(itemElement.children)) { // a normal value
+                                            if (_.isUndefined(itemElement.children)) { // a normal value
                                                 sb[sb.length] =  generateOption(itemElement.label, itemElement.value, clazz, selectedValues);
                                             }
                                             else { // containing sub-items
@@ -1088,7 +1088,7 @@
                                             var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, "$$e" + itemIndex);
                                             ORBEON.util.Utils.stringReplace(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-name$", controlId);
-                                            if (! YAHOO.lang.isUndefined(itemElement.attributes) && ! YAHOO.lang.isUndefined(itemElement.attributes["class"])) {
+                                            if (! _.isUndefined(itemElement.attributes) && ! _.isUndefined(itemElement.attributes["class"])) {
                                                 templateClone.className += " " + itemElement.attributes["class"];
                                             }
 

@@ -443,12 +443,12 @@ ORBEON.testing = {
         // Go through test cases
         for (var testcaseID in ORBEON.testcases) {
             var addThisTestCase = true;
-            if (!YAHOO.lang.isUndefined(onlyRunTestCase)) {
+            if (! _.isUndefined(onlyRunTestCase)) {
                 var currentTestCase = ORBEON.testcases[testcaseID];
                 // Make sure the test case defined _should.ignore
-                if (YAHOO.lang.isUndefined(currentTestCase._should))
+                if (_.isUndefined(currentTestCase._should))
                     currentTestCase._should = {};
-                if (YAHOO.lang.isUndefined(currentTestCase._should.ignore))
+                if (_.isUndefined(currentTestCase._should.ignore))
                     currentTestCase._should.ignore = {};
 
                 // Go through test functions
@@ -456,7 +456,7 @@ ORBEON.testing = {
                     // Test function start with "test"
                     if (testFunctionID.indexOf("test") == 0) {
                         if (onlyRunTestCase != testcaseID ||
-                                (!YAHOO.lang.isUndefined(onlyRunTestFunction) && onlyRunTestFunction != testFunctionID)) {
+                                (! _.isUndefined(onlyRunTestFunction) && onlyRunTestFunction != testFunctionID)) {
                             currentTestCase._should.ignore[testFunctionID] = true;
                         }
                     }

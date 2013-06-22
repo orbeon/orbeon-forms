@@ -541,7 +541,7 @@ YAHOO.xbl.fr.Datatable.prototype = {
         // The "real" init of the column resizers is done after the header dimensioning so that the dimensions are reliable
         for (var iResizer = 0; iResizer < this.colResizers.length; iResizer++) {
             var colResizer = this.colResizers[iResizer];
-            if (! YAHOO.lang.isUndefined(colResizer)) colResizer.initResizer();
+            if (! _.isUndefined(colResizer)) colResizer.initResizer();
         }
     },
 

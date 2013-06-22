@@ -52,7 +52,7 @@
         var yuiTree = new YAHOO.widget.TreeView(container.id);
         ORBEON.xforms.Globals.treeYui[controlId] = yuiTree;
         // Build the tree if there is something to build (JSON is not an empty string)
-        if (! YAHOO.lang.isUndefined(treeArray))
+        if (! _.isUndefined(treeArray))
             this.initTreeDivFromArray(container, yuiTree, treeArray);
         // Save value in tree
         ORBEON.xforms.ServerValueStore.set(controlId, container.value);
@@ -97,9 +97,9 @@
             var nodeInfo = nodeInfoArray[nodeIndex];
 
             // Normalize nodeInfo
-            if (YAHOO.lang.isUndefined(nodeInfo.attributes)) nodeInfo.attributes = {};
-            if (YAHOO.lang.isUndefined(nodeInfo.selected)) nodeInfo.selected = false;
-            if (YAHOO.lang.isUndefined(nodeInfo.children)) nodeInfo.children = [];
+            if (_.isUndefined(nodeInfo.attributes)) nodeInfo.attributes = {};
+            if (_.isUndefined(nodeInfo.selected)) nodeInfo.selected = false;
+            if (_.isUndefined(nodeInfo.children)) nodeInfo.children = [];
 
             // Create node and add to tree
             var nodeInformation = {
@@ -109,7 +109,7 @@
                 renderHidden: true
             };
             // Remember we have seen information about open nodes
-            if (! YAHOO.lang.isUndefined(nodeInfo.attributes["xxforms-open"])) this.itemsetHasOpenAnnotation = true;
+            if (! _.isUndefined(nodeInfo.attributes["xxforms-open"])) this.itemsetHasOpenAnnotation = true;
             var expanded = nodeInfo.attributes["xxforms-open"] == "true";
             /** @type {YAHOO.widget.Node} */ var childNode;
             if (treeDiv.xformsAllowMultipleSelection) {

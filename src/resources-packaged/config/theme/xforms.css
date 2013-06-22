@@ -110,15 +110,13 @@
   display: none;
 }
 .orbeon .xforms-help {
-  display: none;
-}
-.orbeon .xforms-help-image {
-  display: -moz-inline-box;
   display: inline-block;
   margin-left: 0;
   vertical-align: middle;
   width: 16px;
   height: 16px;
+  text-indent: 16px;
+  overflow: hidden;
   cursor: pointer;
   border: none;
   background-image: url(../../ops/images/xforms/help.png);
@@ -129,16 +127,12 @@
   display: none;
 }
 .orbeon .xforms-alert.xforms-active {
-  display: -moz-inline-box;
   display: inline-block;
   white-space: nowrap;
   width: 16px;
   height: 16px;
   overflow: hidden;
   text-indent: 16px;
-  font-size: 0;
-  margin-left: .25em;
-  vertical-align: middle;
   background-image: url(../../ops/images/xforms/exclamation.png);
   background-repeat: no-repeat;
   background-position: left center;

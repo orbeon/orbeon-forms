@@ -1241,8 +1241,7 @@
                                                         if (! YAHOO.util.Dom.hasClass(childElement, "xforms-label")
                                                                 && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help")
                                                                 && ! YAHOO.util.Dom.hasClass(childElement, "xforms-hint")
-                                                                && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")
-                                                                && ! YAHOO.util.Dom.hasClass(childElement, "xforms-help-image")) {
+                                                                && ! YAHOO.util.Dom.hasClass(childElement, "xforms-alert")) {
                                                             documentElement.removeChild(childElement);
                                                             if (lastLabelPosition == null)
                                                                 lastLabelPosition = childIndex - 1;

@@ -112,16 +112,13 @@
     }
 
     .xforms-help {
-        display: none;
-    }
-
-    .xforms-help-image {
-        display: -moz-inline-box;
         display: inline-block;
         margin-left: 0;
         vertical-align: middle;
         width: 16px;
         height: 16px;
+        text-indent: 16px;
+        overflow: hidden;
         cursor: pointer;
         border: none;
         background-image: url(../../ops/images/xforms/help.png);
@@ -134,7 +131,6 @@
     }
 
     .xforms-alert.xforms-active {
-        display: -moz-inline-box;
         display: inline-block;
         white-space: nowrap;
         width: 16px;
@@ -142,10 +138,6 @@
         overflow: hidden;
         // This is needed to hide the text of the alert!
         text-indent: 16px;
-        // text-indent doesn't work on Firefox 2 (but does in 3), but the following does the trick
-        font-size: 0;
-        margin-left: .25em;
-        vertical-align: middle;
 
         background-image: url(../../ops/images/xforms/exclamation.png);
         background-repeat: no-repeat;

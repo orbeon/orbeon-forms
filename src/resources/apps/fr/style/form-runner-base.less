@@ -51,7 +51,7 @@
 
     .xforms-noscript {
         // NOTE: In noscript mode, help appears last in a control for accessibility reasons
-        .xforms-help-image {
+        .xforms-help {
             display: block;
             margin: 0 0 0 .5em;
         }
@@ -64,12 +64,13 @@
                 *font-size: @baseLineHeight; // actual font size for IE7
             }
 
-            .xforms-help-image {
+            .xforms-help {
                 display: inline;
             }
 
-            .xforms-help { display: inline }
-            .xforms-help-anchor { display: none }
+            .xforms-help-anchor {
+                display: none;
+            }
         }
 
         // Noscript help section
@@ -80,12 +81,16 @@
 
             .xforms-help-group { margin: 0 0 .5em }
             .xforms-label { display: inline }
-            .xforms-help-image { display: none }
+            .xforms-help { display: none }
         }
 
         .fr-help-back { margin-left: .5em }
 
-        .fr-mode-view .xforms-help-image, .fr-mode-pdf .xforms-help-image, .fr-mode-email .xforms-help-image { display: none }
+        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+            .xforms-help {
+                display: none;
+            }
+        }
     }
 
     // Hide alerts by default
@@ -235,7 +240,6 @@
         &.fr-repeat-single-row {
             td {
                 .xforms-label { display: none }
-                .xforms-help-image { display: none }
                 .xforms-help { display: none }
                 .xforms-hint { display: none }
             }
@@ -244,7 +248,7 @@
         // But if there is a nested table, show those in the label in the column header of that table
         tr th {
             .xforms-label { display: block }         // Label in repeat table header is block so yellow background in FB takes the whole width
-            .xforms-help-image { margin-top: 4px }
+            .xforms-help { margin-top: 4px }
         }
 
         .fr-repeat-column-trigger {
@@ -298,7 +302,7 @@
         display: block;
 
         .fr-section-title {
-            .xforms-help-image {
+            .xforms-help {
                 float: left;                       // Help on the same line as section title in display: block
                 margin-top: (@frSectionTitleLineHeight - @frGridPlusMinusIconWidth) / 2;    // To make it vertically centered
                 margin-right: 5px;                 // Space between help icon and section title
@@ -369,7 +373,7 @@
                                                                        absolute positioning of the cell editors, this crops overlays, in particular the date picker */
         }
 
-        .xforms-help-image {
+        .xforms-help {
             float: left;
             margin-top: (@baseLineHeight - 14)/2 + 1;      // Vertically center help image on first line
             margin-right: 3px;
@@ -523,9 +527,9 @@
         .fr-section-title img,
           .fr-mode-pdf .fr-section-title img,
           .fr-mode-email .fr-section-title img { display: none }
-        .xforms-help-image,
-          .fr-mode-pdf .xforms-help-image,
-          .fr-mode-email .xforms-help-image { display: none }
+        .xforms-help,
+          .fr-mode-pdf .xforms-help,
+          .fr-mode-email .xforms-help { display: none }
 
         // For those controls that still have a display: block in view mode, make sure there is no top margin
         .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
@@ -552,7 +556,7 @@
         .xforms-loading-loading,                                       // no loading icon
         .xforms-upload-remove,                                         // upload remove button
         .xbl-fr-attachment .xforms-output-appearance-xxforms-download, // no download link
-        .xforms-help-image, .fr-section-title .xforms-help-image,      // no help
+        .xforms-help, .fr-section-title .xforms-help,                  // no help
         .xforms-hint,                                                  // no hints
         .fr-buttons                                                    // no buttons at bottom
         { display: none }

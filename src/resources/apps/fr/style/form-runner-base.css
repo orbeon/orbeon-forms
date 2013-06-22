@@ -114,7 +114,7 @@
   *font-size: small;
   *font: x-small;
 }
-.orbeon .xforms-noscript .xforms-help-image {
+.orbeon .xforms-noscript .xforms-help {
   display: block;
   margin: 0 0 0 .5em;
 }
@@ -122,9 +122,6 @@
   color: #555555;
   font-size: inherit;
   *font-size: 20px;
-}
-.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help-image {
-  display: inline;
 }
 .orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help {
   display: inline;
@@ -143,15 +140,15 @@
 .orbeon .xforms-noscript .xforms-help-panel .xforms-label {
   display: inline;
 }
-.orbeon .xforms-noscript .xforms-help-panel .xforms-help-image {
+.orbeon .xforms-noscript .xforms-help-panel .xforms-help {
   display: none;
 }
 .orbeon .xforms-noscript .fr-help-back {
   margin-left: 0.5em;
 }
-.orbeon .xforms-noscript .fr-mode-view .xforms-help-image,
-.orbeon .xforms-noscript .fr-mode-pdf .xforms-help-image,
-.orbeon .xforms-noscript .fr-mode-email .xforms-help-image {
+.orbeon .xforms-noscript .fr-mode-view .xforms-help,
+.orbeon .xforms-noscript .fr-mode-pdf .xforms-help,
+.orbeon .xforms-noscript .fr-mode-email .xforms-help {
   display: none;
 }
 .orbeon .xforms-alert,
@@ -295,9 +292,6 @@
 .orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-label {
   display: none;
 }
-.orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-help-image {
-  display: none;
-}
 .orbeon .fr-repeat-table.fr-repeat-single-row td .xforms-help {
   display: none;
 }
@@ -307,7 +301,7 @@
 .orbeon .fr-repeat-table tr th .xforms-label {
   display: block;
 }
-.orbeon .fr-repeat-table tr th .xforms-help-image {
+.orbeon .fr-repeat-table tr th .xforms-help {
   margin-top: 4px;
 }
 .orbeon .fr-repeat-table .fr-repeat-column-trigger {
@@ -355,7 +349,7 @@
 .orbeon .xbl-fr-section {
   display: block;
 }
-.orbeon .xbl-fr-section .fr-section-title .xforms-help-image {
+.orbeon .xbl-fr-section .fr-section-title .xforms-help {
   float: left;
   margin-top: 11px;
   margin-right: 5px;
@@ -434,7 +428,7 @@
                                                                        absolute positioning of the cell editors, this crops overlays, in particular the date picker */
 
 }
-.orbeon .fr-grid .xforms-help-image {
+.orbeon .fr-grid .xforms-help {
   float: left;
   margin-top: 4px;
   margin-right: 3px;
@@ -613,9 +607,9 @@
 .orbeon .fr-mode-view .fr-mode-email .fr-section-title img {
   display: none;
 }
-.orbeon .fr-mode-view .xforms-help-image,
-.orbeon .fr-mode-view .fr-mode-pdf .xforms-help-image,
-.orbeon .fr-mode-view .fr-mode-email .xforms-help-image {
+.orbeon .fr-mode-view .xforms-help,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-help,
+.orbeon .fr-mode-view .fr-mode-email .xforms-help {
   display: none;
 }
 .orbeon .fr-mode-view .fr-grid-content .xforms-control,
@@ -642,8 +636,8 @@
   .orbeon #xforms-form .xforms-loading-loading,
   .orbeon #xforms-form .xforms-upload-remove,
   .orbeon #xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
-  .orbeon #xforms-form .xforms-help-image,
-  .orbeon #xforms-form .fr-section-title .xforms-help-image,
+  .orbeon #xforms-form .xforms-help,
+  .orbeon #xforms-form .fr-section-title .xforms-help,
   .orbeon #xforms-form .xforms-hint,
   .orbeon #xforms-form .fr-buttons {
     display: none;

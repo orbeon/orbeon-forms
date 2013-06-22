@@ -361,7 +361,6 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             }
 
             // LHHA name
-            // NOTE: At the end for now because of help -image hack below
             if (classes.length() > 0)
                 classes.append(' ');
             classes.append("xforms-");
@@ -370,15 +369,13 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             final String lhhaClasses = classes.toString();
 
             final boolean isNoscript = handlerContext.isNoScript();
-            if (isHelp) {
-                // HACK: For help, output XHTML image natively in order to help with the IE bug whereby IE reloads
-                // background images way too often.
+            if (isNoscript && isHelp) {
+                if (control != null) {
 
-                final ContentHandler contentHandler = handlerContext.getController().getOutput();
-                final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
+                    final ContentHandler contentHandler = handlerContext.getController().getOutput();
+                    final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
-                if (isNoscript && control != null) {
-                    // Start <a href="#my-control-id-help">
+                    // <a href="#my-control-id-help">
 
                     final AttributesImpl aAttributes = new AttributesImpl();
                     aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#" + getLHHACId(containingDocument, targetControlEffectiveId, LHHAC_CODES.get(LHHAC.HELP)));
@@ -386,33 +383,9 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
-                }
-
-                classes.append("-image"); // xforms-help-image class
-                final String helpClasses = classes.toString();
-
-                final AttributesImpl helpAttributes = new AttributesImpl();
-                if (isExternal)
-                    helpAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, targetControlEffectiveId, "i"));
-                helpAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, helpClasses);
-                // Q: Do we need a title and/or alt for screen readers?
-                helpAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "");
-                helpAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "");
-
-                final String helpQName = XMLUtils.buildQName(xhtmlPrefix, "span");
-                contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", helpQName, helpAttributes);
-                contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "span", helpQName);
-
-                if (isNoscript && control != null) {
-                    // End </a>
-                    final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
                 }
-            }
-
-            // Output label, except help in noscript mode since in that case help is displayed separately
-            if (!(isNoscript && isHelp)) {
-
+            } else {
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
                 final Attributes newAttributes = (attributes != null) ? attributes : new AttributesImpl();
                 outputLabelFor(handlerContext, getAttributes(newAttributes, lhhaClasses, null), targetControlEffectiveId,

@@ -1769,7 +1769,6 @@ ORBEON.xforms.Controls = {
         "label": "$$l",
         "hint": "$$t",
         "help": "$$p",
-        "help-image": "$$i",
         "alert": "$$a",
         "control": "$$c"
     },
@@ -1778,7 +1777,6 @@ ORBEON.xforms.Controls = {
         "label": "\\$\\$l",
         "hint": "\\$\\$t",
         "help": "\\$\\$p",
-        "help-image": "\\$\\$i",
         "alert": "\\$\\$a"
     },
 
@@ -1820,8 +1818,8 @@ ORBEON.xforms.Controls = {
                     // Hide help with empty content
                     YAHOO.util.Dom.addClass(lhhaElement, "xforms-disabled-subsequent");
                     // If this is the help element, also disable help image
-                    var helpImage = ORBEON.xforms.Controls.getControlLHHA(control, "help-image");
-                    YAHOO.util.Dom.addClass(helpImage, "xforms-disabled-subsequent");
+                    var help = ORBEON.xforms.Controls.getControlLHHA(control, "help");
+                    YAHOO.util.Dom.addClass(help, "xforms-disabled-subsequent");
                 }
             } else {
                 // We show LHHA with non-empty content, but ONLY if the control is relevant
@@ -1830,7 +1828,7 @@ ORBEON.xforms.Controls = {
                     YAHOO.util.Dom.removeClass(lhhaElement, "xforms-disabled-subsequent");
                     // If this is the help element, also enable the help image
                     if (lhhaType == "help") {
-                        var helpImage = ORBEON.xforms.Controls.getControlLHHA(control, "help-image");
+                        var help = ORBEON.xforms.Controls.getControlLHHA(control, "help");
                         YAHOO.util.Dom.removeClass(helpImage, "xforms-disabled");
                         YAHOO.util.Dom.removeClass(helpImage, "xforms-disabled-subsequent");
                     }
@@ -1959,7 +1957,6 @@ ORBEON.xforms.Controls = {
             // Also show help if message is not empty
             if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHelpMessage(control) != "")) {
                 elementsToUpdate.push(ORBEON.xforms.Controls.getControlLHHA(control, "help"));
-                elementsToUpdate.push(ORBEON.xforms.Controls.getControlLHHA(control, "help-image"));
             }
             // Also show hint if message is not empty
             if (!isRelevant || (isRelevant && ORBEON.xforms.Controls.getHintMessage(control) != ""))
@@ -2407,7 +2404,7 @@ ORBEON.xforms.Controls = {
         // Show and reposition dialog when needed
         if (showAndRepositionPanel) {
             var controlContainer = control;
-            var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help-image");
+            var helpImage = ORBEON.util.Dom.getChildElementByClass(controlContainer, "xforms-help");
             ORBEON.xforms.Globals.formHelpPanel[form.id].element.style.display = "block";
             ORBEON.xforms.Globals.formHelpPanel[form.id].cfg.setProperty("context", [helpImage, "bl", "tl"]);
             ORBEON.xforms.Globals.formHelpPanel[form.id].show();
@@ -2785,7 +2782,7 @@ ORBEON.xforms.Events = {
                 } else if ($(element).is('.xforms-control, .xbl-component')) {
                     return element;
                 } else if (YAHOO.util.Dom.hasClass(element, "xforms-dialog")
-                        || YAHOO.util.Dom.hasClass(element, "xforms-help-image")
+                        || YAHOO.util.Dom.hasClass(element, "xforms-help")
                         || YAHOO.util.Dom.hasClass(element, "xforms-alert")) {
                     return element;
                 }
@@ -3121,15 +3118,9 @@ ORBEON.xforms.Events = {
             }
 
             // Help tooltip
-            if (ORBEON.util.Properties.helpTooltip.get()
-                    && YAHOO.util.Dom.hasClass(target, "xforms-help-image")) {
-                // Get help element which is right after the image; there might be a text node between the two elements
-
-                var helpElement = target.nextSibling;
-                if (!ORBEON.util.Dom.isElement(helpElement))
-                    helpElement = helpElement.nextSibling;
+            if (ORBEON.util.Properties.helpTooltip.get() && YAHOO.util.Dom.hasClass(target, "xforms-help")) {
                 // Get control
-                var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help-image");
+                var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
                 if (control) {
                     // The xf:input is a unique case where the 'for' points to the input field, not the element representing the control
                     if (YAHOO.util.Dom.hasClass(control, "xforms-input-input"))
@@ -3258,11 +3249,11 @@ ORBEON.xforms.Events = {
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, target.id, nodeInfo.value, "xxforms-value");
                 ORBEON.xforms.server.AjaxServer.fireEvents([event], false);
             }
-        } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help-image")) {
+        } else if (target != null && YAHOO.util.Dom.hasClass(target, "xforms-help")) {
             // Help image
 
             // Get control for this help image
-            var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help-image");
+            var control = ORBEON.xforms.Controls.getControlForLHHA(target, "help");
             if (ORBEON.util.Properties.helpHandler.get()) {
                 // We are sending the xforms-help event to the server and the server will tell us what do to
                 var event = new ORBEON.xforms.server.AjaxServer.Event(null, control.id, null, "xforms-help");

@@ -41,7 +41,7 @@
         <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
 
         <xf:var name="ops"
-                value="formRunner:authorizedOperationsBasedOnRole($metadata/permissions)"/>
+                value="formRunner:javaAuthorizedOperationsBasedOnRoles($metadata/permissions)"/>
 
         <xf:setvalue
             ref="instance('fr-authorized-operations')"

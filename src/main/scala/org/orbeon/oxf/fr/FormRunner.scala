@@ -202,30 +202,66 @@ object FormRunner {
     }
 
     /**
+     * Given a permission element, e.g. <permission operations="read update delete">, returns the tokenized value of
+     * the operations attribute.
+     */
+    private def permissionOperations(permission: NodeInfo): Seq[String] = (permission \@ "operations").stringValue.split("\\s+")
+
+    /**
      * Given the metadata for a form, returns the sequence of operations that the current user is authorized to perform,
      * just based on the user's roles. Users might be able to perform additional operations on specific data, which
-     * can be tested with authorizedOperationsBasedOnRole().
+     * can be tested with allAuthorizedOperations().
      * The sequence can contain just the "*" string to denote that the user is allowed to perform any operation.
      */
-    def authorizedOperationsBasedOnRole(permissionsElement: NodeInfo): java.util.List[String] = {
-        val permissions =
-            if (permissionsElement eq null)
-                Seq("*")                                                         // No permissions defined for this form, authorize any operation
-            else
-                (permissionsElement \ "permission")
-                    .filter (p ⇒
-                        (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
-                        (p \ * forall (localname(_) == "user-role")))            // … or with only `user-role` constraints
-                    .filter (p ⇒
-                        p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
-                            (r \@ "any-of").stringValue.split("\\s+")            // Constraint is satisfied if user has at least one of the roles
-                            .map(_.replace("%20", " "))                          // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
-                            .intersect(orbeonRoles.toSeq).nonEmpty))
-                    .flatMap (p ⇒ (p \@ "operations" stringValue) split "\\s+")  // For the permissions that passed, return the list operations
-                    .distinct                                                    // Remove duplicate operations
-
-        permissions.asJava
+    def authorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): Seq[String] = {
+        if (permissionsElement eq null)
+            Seq("*")                                                         // No permissions defined for this form, authorize any operation
+        else
+            (permissionsElement \ "permission")
+                .filter(p ⇒
+                    (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
+                    (p \ * forall (localname(_) == "user-role")))            // … or with only `user-role` constraints
+                .filter(p ⇒
+                    p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
+                        ScalaUtils.split((r \@ "any-of").stringValue)        // Constraint is satisfied if user has at least one of the roles
+                        .map(_.replace("%20", " "))                          // Unescape internal spaces as the roles used in Liferay are user-facing labels that can contain space (see also permissions.xbl)
+                        .intersect(orbeonRoles.toSeq).nonEmpty))
+                .flatMap(permissionOperations)                               // For the permissions that passed, return the list operations
+                .distinct                                                    // Remove duplicate operations
     }
+
+    def javaAuthorizedOperationsBasedOnRoles(permissionsElement: NodeInfo): java.util.List[String] =
+        authorizedOperationsBasedOnRoles(permissionsElement).asJava
+
+    def allAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Seq[String] = {
+
+        def operations(header: String, dataUserInfo: String, condition: String): Seq[String] = {
+            val request = NetUtils.getExternalContext.getRequest
+            val headerValue = request.getHeaderValuesMap.get("orbeon-username").headOption
+            headerValue
+                // Does the user info from the header match the user info on the data
+                .filter(_ == dataUserInfo)
+                // If it does, return the operation the owner or group-member can perform
+                .map(_ ⇒ (permissionsElement \ "permission")
+                    .filter(p ⇒ p \ * forall (localname(_) == condition))
+                    .flatMap(permissionOperations))
+                .getOrElse(Seq.empty)
+        }
+
+        val rolesOperations = authorizedOperationsBasedOnRoles(permissionsElement)
+        rolesOperations match {
+            case Seq("*") ⇒ rolesOperations
+            case _ ⇒
+                val dataOperations =
+                    Seq(("orbeon-username", dataUsername,  "owner"),
+                        ("orbeon-group",    dataGroupname, "group-member"))
+                        .flatMap(Function.tupled(operations _)(_))
+                (rolesOperations ++ dataOperations).distinct
+        }
+    }
+
+    def javaAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): java.util.List[String] =
+        allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname).asJava
 
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest

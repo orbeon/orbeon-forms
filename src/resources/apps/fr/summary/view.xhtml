@@ -86,26 +86,12 @@
             <!-- Instance to control the triggers' appearance -->
             <xf:instance id="fr-summary-triggers-instance">
                 <triggers xmlns="">
-                    <new/>
-                    <view/>
-                    <pdf/>
-                    <delete/>
-                    <import/>
+                    <enabled/>
+                    <disabled/>
                 </triggers>
             </xf:instance>
 
-            <xf:var name="documents-selected" value="count(tokenize(instance('fr-selection-instance'), '\s+'))"/>
-            <xf:var name="global-operations" value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
-            <xf:var name="document-operations" value="if ($documents-selected != 1) then '' else
-                tokenize(instance('fr-summary-instance')/document[@name = instance('fr-selection-instance')]/@operations, '\s')"/>
-
-            <xf:bind ref="instance('fr-summary-triggers-instance')">
-                <!-- Operations on entries are disabled if no entry is selected -->
-                <xf:bind ref="new" relevant="$global-operations = ('*', 'create')"/>
-                <xf:bind ref="view | pdf" readonly="not(property('xxf:noscript')) and $documents-selected != 1" relevant="$document-operations = ('*', 'read')"/>
-                <xf:bind ref="delete"     readonly="not(property('xxf:noscript')) and $documents-selected = 0"  relevant="$document-operations = ('*', 'delete')"/>
-                <xf:bind ref="import" relevant="$global-operations = ('*', 'create')"/>
-            </xf:bind>
+            <xf:bind ref="instance('fr-summary-triggers-instance')/disabled" readonly="true()"/>
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
 
@@ -511,6 +497,8 @@
 
                                             <!-- Document name and href for edition -->
                                             <xf:var name="current-document-name" value="@name" as="xs:string"/>
+                                            <!-- TODO: remove this once we can assume that all the persistence API implementations return @operations -->
+                                            <xf:var name="global-operations" value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
                                             <xf:var name="current-document-operations" value="if (exists(@operations)) then tokenize(@operations, '\s+') else $global-operations" as="xs:string*"/>
                                             <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
                                             <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
@@ -707,11 +695,25 @@
                 </div>
 
                 <xf:group model="fr-form-model" class="fr-buttons">
+
+                    <xf:var name="global-operations"    value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
+                    <xf:var name="documents-selected"   value="tokenize(instance('fr-selection-instance'), '\s')"/>
+                    <xf:var name="documents-operations" value="instance('fr-summary-instance')/document[@name = $documents-selected]/@operations"/>
+                    <xf:var name="documents-can-view"   value="empty($documents-operations[not(tokenize(., '\s') = ('*', 'read'))])"/>
+                    <xf:var name="documents-can-delete" value="empty($documents-operations[not(tokenize(., '\s') = ('*', 'delete'))])"/>
+
+                    <xf:var name="new-visible"          value="$global-operations = ('*', 'create')"/>
+                    <xf:var name="view-enabled"         value="property('xxf:noscript') or (count($documents-selected)  = 1 and $documents-can-view)"/>
+                    <xf:var name="delete-enabled"       value="property('xxf:noscript') or (count($documents-selected) != 0 and $documents-can-delete)"/>
+
+                    <xf:var name="enabled"              value="instance('fr-summary-triggers-instance')/enabled"/>
+                    <xf:var name="disabled"             value="instance('fr-summary-triggers-instance')/disabled"/>
+
                     <!-- Directly iterate over the tokenized property -->
                     <xf:repeat ref="tokenize(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')">
                         <xh:span class="fr-button">
                             <!-- Print/review button -->
-                            <xf:group ref="if (. = ('print', 'review')) then instance('fr-summary-triggers-instance')/view else ()">
+                            <xf:group ref="if (. = ('print', 'review')) then if ($view-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref=".">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/review"/>
                                     <xf:action ev:event="DOMActivate">
@@ -722,7 +724,7 @@
                             </xf:group>
                             <!-- PDF button -->
                             <!-- Don't show the PDF template button in CE (also on detail page) -->
-                            <xf:group ref="if (. = 'pdf' and not($has-pdf-template and not(version:isPE()))) then instance('fr-summary-triggers-instance')/pdf else ()"
+                            <xf:group ref="if (. = 'pdf' and not($has-pdf-template and not(version:isPE()))) then if ($view-enabled) then $enabled else $disabled else ()"
                                     xmlns:version="java:org.orbeon.oxf.common.Version">
                                 <fr:href-button
                                         ref="."
@@ -731,7 +733,7 @@
                                 </fr:href-button>
                             </xf:group>
                             <!-- Test button -->
-                            <xf:group ref="if (. = 'test') then instance('fr-summary-triggers-instance')/view else ()">
+                            <xf:group ref="if (. = 'test') then if ($view-enabled) then $enabled else $disabled else ()">
                                 <fr:href-button
                                         ref="."
                                         href="/fr/{$app}/{$form}/test/{normalize-space(instance('fr-selection-instance'))}{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}">
@@ -739,7 +741,7 @@
                                 </fr:href-button>
                             </xf:group>
                             <!-- Delete button -->
-                            <xf:group ref="if (. = 'delete') then instance('fr-summary-triggers-instance')/delete else ()">
+                            <xf:group ref="if (. = 'delete') then if ($delete-enabled) then $enabled else $disabled else ()">
                                 <xf:trigger ref=".">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/delete"/>
                                     <!-- Open delete confirmation dialog -->
@@ -747,14 +749,14 @@
                                 </xf:trigger>
                             </xf:group>
                             <!-- Import button -->
-                            <xf:group ref="if (. = 'import') then instance('fr-summary-triggers-instance')/import else ()">
+                            <xf:group ref="if (. = 'import' and $new-visible) then $enabled else ()">
                                 <xf:trigger ref=".">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/import"/>
                                     <xf:load ev:event="DOMActivate" resource="/fr/{$app}/{$form}/import"/>
                                 </xf:trigger>
                             </xf:group>
                             <!-- New button -->
-                            <xf:group ref="if (. = 'new') then instance('fr-summary-triggers-instance')/new else ()">
+                            <xf:group ref="if (. = 'new' and $new-visible) then $enabled else ()">
                                 <xf:trigger ref="." appearance="xxf:primary">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/new"/>
                                     <xf:dispatch ev:event="DOMActivate" targetid="fr-form-model" name="fr-summary-create"/>

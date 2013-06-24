@@ -136,7 +136,7 @@
                     <xsl:variable name="search-permissions" select="$permissions/permission[tokenize(@operations, '\s')  = $search-operations]"/>
 
                     <!-- Are we authorized to see all the data based because of our role? -->
-                    <xsl:variable name="operations-from-role" select="formRunner:authorizedOperationsBasedOnRole($permissions)"/>
+                    <xsl:variable name="operations-from-role" select="formRunner:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
                     <xsl:message select="$operations-from-role"/>
                     <xsl:variable name="authorized-based-on-role" select="$operations-from-role = $search-operations"/>
 
@@ -148,6 +148,18 @@
                         <documents>
                             <sql:connection>
                                 <sql:datasource><xsl:value-of select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+
+                                <!-- Condition on owner / group -->
+                                <xsl:variable name="owner-group-condition">
+                                    <xsl:if test="$owner-group and not($authorized-based-on-role)">
+                                        and (
+                                            <xsl:if test="$authorized-if-owner">data.username = <sql:param type="xs:string" select="/search/@orbeon-username"/></xsl:if>
+                                            <xsl:if test="$authorized-if-owner and $authorized-if-group-member"> or </xsl:if>
+                                            <xsl:if test="$authorized-if-group-member">data.groupname = <sql:param type="xs:string" select="/search/@orbeon-group"/></xsl:if>
+                                        )
+                                    </xsl:if>
+                                </xsl:variable>
+
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
@@ -156,6 +168,7 @@
                                         <xsl:for-each select="/search/query[@path]">
                                             , extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
+                                        <xsl:if test="$owner-group">, username, groupname</xsl:if>
                                     from orbeon_form_data data,
                                         (
                                             select max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>, app, form, document_id
@@ -192,15 +205,7 @@
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
                                              and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
                                         </xsl:if>
-                                        <!-- Condition on owner / group -->
-                                        <xsl:if test="$owner-group and not($authorized-based-on-role)">
-                                            and (
-                                                <xsl:if test="$authorized-if-owner">data.username = <sql:param type="xs:string" select="/search/@orbeon-username"/></xsl:if>
-                                                <xsl:if test="$authorized-if-owner and $authorized-if-group-member"> or </xsl:if>
-                                                <xsl:if test="$authorized-if-group-member">data.groupname = <sql:param type="xs:string" select="/search/@orbeon-group"/></xsl:if>
-                                            )
-                                        </xsl:if>
-
+                                        <xsl:copy-of select="$owner-group-condition"/>
                                     order by created desc
                                 </xsl:variable>
 
@@ -209,7 +214,7 @@
                                     <sql:query>
                                         select
                                             (
-                                                select count(*) from orbeon_form_data
+                                                select count(*) from orbeon_form_data data
                                                 where
                                                     (app, form, document_id, <xsl:value-of select="$last-modified-time"/>) in (
                                                         select app, form, document_id, max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
@@ -219,6 +224,7 @@
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
                                                         group by app, form, document_id)
                                                     and deleted = 'N'
+                                                    <xsl:copy-of select="$owner-group-condition"/>
                                             ) total,
                                             (
                                                 select count(*) from (<xsl:copy-of select="$query"/>)a
@@ -247,6 +253,8 @@
                                                 <created><sql:get-column-value column="created"/></created>
                                                 <last-modified><sql:get-column-value column="{$last-modified-time}"/></last-modified>
                                                 <document-id><sql:get-column-value column="document_id"/></document-id>
+                                                <username><sql:get-column-value column="username"/></username>
+                                                <groupname><sql:get-column-value column="groupname"/></groupname>
                                                 <xsl:for-each select="/search/query[@path]">
                                                     <detail><sql:get-column-value column="detail_{position()}"/></detail>
                                                 </xsl:for-each>
@@ -288,11 +296,14 @@
     </p:processor>
 
     <!-- Transform output from SQL processor into the XML form the caller expects -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#sql-output"/>
+        <p:input name="form" href="#form"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+
+                <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
 
                 <!-- Move total and search-total as attribute -->
                 <xsl:template match="documents">
@@ -304,7 +315,7 @@
                 <!-- Move created, last-modified, and name as attributes -->
                 <!-- Add wrapping details element -->
                 <xsl:template match="document">
-                    <document created="{created}" last-modified="{last-modified}" name="{document-id}">
+                    <document created="{created}" last-modified="{last-modified}" name="{document-id}" operations="{formRunner:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

@@ -94,13 +94,17 @@
                 </triggers>
             </xf:instance>
 
-            <xf:var name="operations" value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
+            <xf:var name="documents-selected" value="count(tokenize(instance('fr-selection-instance'), '\s+'))"/>
+            <xf:var name="global-operations" value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
+            <xf:var name="document-operations" value="if ($documents-selected != 1) then '' else
+                tokenize(instance('fr-summary-instance')/document[@name = instance('fr-selection-instance')]/@operations, '\s')"/>
+
             <xf:bind ref="instance('fr-summary-triggers-instance')">
                 <!-- Operations on entries are disabled if no entry is selected -->
-                <xf:bind ref="new" relevant="$operations = ('*', 'create')"/>
-                <xf:bind ref="view | pdf" readonly="not(property('xxf:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) != 1" relevant="$operations = ('*', 'read')"/>
-                <xf:bind ref="delete" readonly="not(property('xxf:noscript')) and count(tokenize(instance('fr-selection-instance'), '\s+')) = 0" relevant="$operations = ('*', 'delete')"/>
-                <xf:bind ref="import" relevant="$operations = ('*', 'create')"/>
+                <xf:bind ref="new" relevant="$global-operations = ('*', 'create')"/>
+                <xf:bind ref="view | pdf" readonly="not(property('xxf:noscript')) and $documents-selected != 1" relevant="$document-operations = ('*', 'read')"/>
+                <xf:bind ref="delete"     readonly="not(property('xxf:noscript')) and $documents-selected = 0"  relevant="$document-operations = ('*', 'delete')"/>
+                <xf:bind ref="import" relevant="$global-operations = ('*', 'create')"/>
             </xf:bind>
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
@@ -207,22 +211,10 @@
 
             <!-- 2. Check for authorized operations -->
             <xf:action ev:event="xforms-model-construct-done">
-
-                <xf:var name="ops"
-                        value="formRunner:authorizedOperationsBasedOnRole($source-form-metadata/permissions)"/>
-
-                <xf:setvalue
-                    ref="xxf:instance('fr-authorized-operations')"
-                    value="string-join($ops, ' ')"/>
-
-                <xf:message level="xxf:log-debug">
-                    AUTHORIZED OPERATIONS ON FORM (SUMMARY PAGE): <xf:output value="$ops"/>
-                </xf:message>
-
+                <xf:var name="ops" value="formRunner:javaAuthorizedOperationsBasedOnRoles($source-form-metadata/permissions)"/>
+                <xf:setvalue ref="xxf:instance('fr-authorized-operations')" value="string-join($ops, ' ')"/>
                 <!-- Send an "Unauthorized" error if the user is unauthorized -->
-                <xf:action if="not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">
-                    formRunner:sendError(403)
-                </xf:action>
+                <xf:action if="not(xxf:property('oxf.fr.support-owner-group')) and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">formRunner:sendError(403)</xf:action>
             </xf:action>
 
             <!-- 3. Rest of initialization -->
@@ -518,22 +510,23 @@
                                             <xf:var name="document" value="."/>
 
                                             <!-- Document name and href for edition -->
-                                            <xf:var name="document-name" value="@name" as="xs:string"/>
-                                            <xf:var name="edit-view" value="if ($operations = ('*', 'update')) then 'edit' else if ($operations = 'read') then 'view' else ''"/>
-                                            <xf:var name="document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
-                                                    $document-name, if (property('xxf:noscript')) then '?fr-noscript=true' else '')"/>
-                                            <xh:tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
+                                            <xf:var name="current-document-name" value="@name" as="xs:string"/>
+                                            <xf:var name="current-document-operations" value="if (exists(@operations)) then tokenize(@operations, '\s+') else $global-operations" as="xs:string*"/>
+                                            <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
+                                            <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
+                                                    $current-document-name, if (property('xxf:noscript')) then '?fr-noscript=true' else '')"/>
+                                            <xh:tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                                 <xh:td class="fr-summary-repeat-selection-checkbox">
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
                                                             <xf:label/>
-                                                            <xf:value value="$document-name"/>
+                                                            <xf:value value="$current-document-name"/>
                                                         </xf:item>
                                                     </xf:select>
                                                 </xh:td>
                                                 <xh:td class="fr-summary-repeat-column-number">
                                                     <xf:group ref=".[$edit-view != '']">
-                                                        <xh:a href="{$document-href}" target="_blank">
+                                                        <xh:a href="{$current-document-href}" target="_blank">
                                                             <xf:output value="$document-number"/>
                                                         </xh:a>
                                                     </xf:group>
@@ -549,7 +542,7 @@
                                                                        else ."/>
                                                     <xh:td>
                                                         <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$document-href}" target="_blank">
+                                                            <xh:a href="{$current-document-href}" target="_blank">
                                                                 <xf:output value="$created"/>
                                                             </xh:a>
                                                         </xf:group>
@@ -566,7 +559,7 @@
                                                                        else ."/>
                                                     <xh:td>
                                                         <xf:group ref=".[$edit-view != '']">
-                                                            <xh:a href="{$document-href}" target="_blank">
+                                                            <xh:a href="{$current-document-href}" target="_blank">
                                                                 <xf:output value="$last-modified"/>
                                                             </xh:a>
                                                         </xf:group>
@@ -618,7 +611,7 @@
                                                                                         )
                                                                                     else ."/>
                                                             <xf:group ref=".[$edit-view != '']">
-                                                                <xh:a href="{$document-href}" target="_blank">
+                                                                <xh:a href="{$current-document-href}" target="_blank">
                                                                     <xf:output value="$detail"/>
                                                                 </xh:a>
                                                             </xf:group>

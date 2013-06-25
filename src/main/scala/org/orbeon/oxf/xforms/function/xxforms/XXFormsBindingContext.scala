@@ -13,17 +13,13 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.saxon.om._
-import collection.JavaConverters._
 import org.orbeon.oxf.xforms.function.FunctionSupport
+import org.orbeon.saxon.expr.XPathContext
 
 class XXFormsBindingContext extends FunctionSupport {
 
-    override def iterate(xpathContext: XPathContext): SequenceIterator =
-        relevantControl(0)(xpathContext) map
-            (control ⇒ new ListIterator(control.contextForBinding.asJava)) getOrElse
-                EmptyIterator.getInstance
+    override def iterate(xpathContext: XPathContext) =
+        relevantControl(0)(xpathContext) map (_.contextForBinding)
 
     // TODO: PathMap
 }

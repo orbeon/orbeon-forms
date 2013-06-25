@@ -61,8 +61,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
     // mixing of constraints among levels, like error and warning.
-    private var _constraintLevel: Option[ConstraintLevel] = None
-    def constraintLevel = _constraintLevel
+    private var _alertLevel: Option[ConstraintLevel] = None
+    def alertLevel = _alertLevel
 
     private var _failedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
     def failedConstraints = _failedConstraints
@@ -71,7 +71,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     private var _wasReadonly = false
     private var _wasRequired = false
     private var _wasValid = true
-    private var _wasConstraintLevel: Option[ConstraintLevel] = None
+    private var _wasAlertLevel: Option[ConstraintLevel] = None
     private var _wasFailedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
 
     // Type
@@ -128,17 +128,17 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 // First identify the highest level. This means that e.g. if a control is on error, but doesn't have any
                 // matching alerts for the error level, then no alert shown. Alerts for lower levels, in particular, such as
                 // warnings, don't show. There may be no matching level.
-                val constraintLevel = {
+                val alertLevel = {
                     def controlHasLevel(level: ConstraintLevel) =
                         level == ErrorLevel && ! isValid || allFailedConstraints.contains(level)
 
                     LevelsByPriority find controlHasLevel
                 }
 
-                this._constraintLevel = constraintLevel
+                this._alertLevel = alertLevel
 
                 if (allFailedConstraints.nonEmpty)
-                    this._failedConstraints = constraintLevel flatMap allFailedConstraints.get getOrElse Nil
+                    this._failedConstraints = alertLevel flatMap allFailedConstraints.get getOrElse Nil
                 else
                     this._failedConstraints = Nil
 
@@ -169,7 +169,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         this._valueType         = null
         this._customMIPs        = Map.empty[String, String]
 
-        this._constraintLevel   = None
+        this._alertLevel   = None
         this._failedConstraints = Nil
     }
 
@@ -205,9 +205,9 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         result
     }
 
-    final def wasConstraintLevelCommit() = {
-        val result = _wasConstraintLevel
-        _wasConstraintLevel = _constraintLevel
+    final def wasAlertLevelCommit() = {
+        val result = _wasAlertLevel
+        _wasAlertLevel = _alertLevel
         result
     }
 
@@ -270,7 +270,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 isReadonly      == other.isReadonly &&
                 isRequired      == other.isRequired &&
                 isValid         == other.isValid &&
-                constraintLevel == other.constraintLevel &&
+                alertLevel == other.alertLevel &&
                 customMIPs      == other.customMIPs &&
                 super.equalsExternal(other)
             case _ ⇒ false
@@ -347,8 +347,8 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         if (isNewlyVisibleSubtree && ! control2.isRelevant || control1 != null && control1.isRelevant != control2.isRelevant)
             addAttribute(RELEVANT_ATTRIBUTE_NAME, control2.isRelevant.toString)
 
-        if (isNewlyVisibleSubtree && control2.constraintLevel.isDefined || control1 != null && control1.constraintLevel != control2.constraintLevel)
-            addAttribute(CONSTRAINT_LEVEL_ATTRIBUTE_NAME, control2.constraintLevel map (_.name) getOrElse "")
+        if (isNewlyVisibleSubtree && control2.alertLevel.isDefined || control1 != null && control1.alertLevel != control2.alertLevel)
+            addAttribute(CONSTRAINT_LEVEL_ATTRIBUTE_NAME, control2.alertLevel map (_.name) getOrElse "")
 
         added |= addAjaxCustomMIPs(attributesImpl, isNewlyVisibleSubtree, control1, control2)
 
@@ -456,7 +456,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
             Dispatch.dispatchEvent(if (isReadonly) new XFormsReadonlyEvent(this) else new XFormsReadwriteEvent(this))
 
         if (isRelevant && constraintsChanged)
-            Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, previousConstraints, failedConstraints))
+            Dispatch.dispatchEvent(new XXFormsConstraintsChangedEvent(this, alertLevel, previousConstraints, failedConstraints))
     }
 }
 

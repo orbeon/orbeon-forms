@@ -90,7 +90,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             if (control instanceof XFormsSingleNodeControl) {
                 // TODO: inherit from this method instead rather than using instanceof
                 final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                addConstraintClasses(sb, singleNodeControl.constraintLevel());
+                addConstraintClasses(sb, singleNodeControl.alertLevel());
 
                 if (singleNodeControl.isReadonly()) {
                     if (sb.length() > 0)
@@ -320,7 +320,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             if (isAlert) {
                 if (control instanceof XFormsSingleNodeControl) {
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    final scala.Option<StaticBind.ConstraintLevel> constraintLevel = singleNodeControl.constraintLevel();
+                    final scala.Option<StaticBind.ConstraintLevel> constraintLevel = singleNodeControl.alertLevel();
 
                     if (constraintLevel.isDefined()) {
                         if (classes.length() > 0)

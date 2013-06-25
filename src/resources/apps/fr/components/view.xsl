@@ -364,7 +364,7 @@
             <!-- Group to scope variables -->
             <xf:group appearance="xxf:internal" model="fr-error-summary-model">
                 <!-- Link to form content or to errors if any -->
-                <xh:a class="fr-goto-content" href="#{{if (errors-count > 0) then 'fr-errors' else 'fr-form'}}">
+                <xh:a class="fr-goto-content" href="#{{if (counts/@error gt 0) then 'fr-errors' else 'fr-form'}}">
                     <xf:output value="$fr-resources/summary/labels/goto-content"/>
                 </xh:a>
             </xf:group>
@@ -493,8 +493,19 @@
         <!-- For form builder we disable the error summary and say that the form is always valid -->
         <xsl:if test="not($is-form-builder)">
             <fr:row>
-                <fr:error-summary id="error-summary-control-{$position}" observer="fr-form-group fr-captcha-group" model="fr-error-summary-model"
-                    errors-count-ref="errors-count" visible-errors-count-ref="visible-errors-count" valid-ref="valid">
+                <fr:error-summary
+                        id="error-summary-control-{$position}"
+                        observer="fr-form-group fr-captcha-group"
+                        model="fr-error-summary-model"
+                        alerts-count-ref="counts/@alert"
+                        errors-count-ref="counts/@error"
+                        warnings-count-ref="counts/@warning"
+                        infos-count-ref="counts/@info"
+                        visible-alerts-count-ref="visible-counts/@alert"
+                        visible-errors-count-ref="visible-counts/@error"
+                        visible-warnings-count-ref="visible-counts/@warning"
+                        visible-infos-count-ref="visible-counts/@info"
+                        valid-ref="valid">
                     <fr:label>
                         <xf:output value="$fr-resources/errors/summary-title"/>
                     </fr:label>
@@ -523,20 +534,14 @@
         <!-- Status icons for detail page -->
         <xsl:if test="$is-detail">
             <xh:span class="fr-status-icons">
-                <xf:group model="fr-error-summary-model" ref=".[valid = false() and visible-errors-count gt 0]">
-                    <!-- Form is invalid -->
-
-                    <!-- Display localized errors count -->
-                    <!--<xf:var name="message" as="xs:string" model="fr-error-summary-model"-->
-                        <!--select="for $c in errors-count return-->
-                                      <!--if ($c castable as xs:integer and xs:integer($c) > 0)-->
-                                      <!--then concat($c, ' ', $fr-resources/summary/titles/(if (xs:integer($c) = 1) then error-count else errors-count))-->
-                                      <!--else ''"/>-->
-
-                    <xh:span class="badge badge-important"><xf:output value="visible-errors-count"/></xh:span>
+                <xf:group model="fr-error-summary-model" ref=".[visible-counts/(@error + @warning) gt 0]">
+                    <!-- Form has error or warning messages -->
+                    <xh:span class="badge badge-{{if (visible-counts/@error gt 0) then 'important' else if (visible-counts/@warning gt 0) then 'warning' else 'info'}}">
+                        <xf:output value="visible-counts/(@error, @warning, @info)[. gt 0]"/>
+                    </xh:span>
                 </xf:group>
-                <xf:group model="fr-error-summary-model" ref=".[valid = true()]" class="fr-validity-icon">
-                    <!-- Form is valid -->
+                <xf:group model="fr-error-summary-model" ref=".[visible-counts/(@error + @warning) = 0]" class="fr-validity-icon">
+                    <!-- Form has no error or warning messages -->
                     <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
                 </xf:group>
                 <xf:group model="fr-persistence-model" ref="instance('fr-persistence-instance')[data-status = 'dirty']" class="fr-data-icon">

@@ -161,7 +161,7 @@ object LHHASupport {
                 staticAlerts.iterator filter (_.forLevels(level))
 
             // For that given level, identify all matching alerts if any, whether they match by constraint or by level
-            control.constraintLevel flatMap { level ⇒
+            control.alertLevel flatMap { level ⇒
                 val matchingAlertIds = alertsMatchingConstraints ++ alertsMatchingLevel(level) map (_.staticId) toSet
                 val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))
 

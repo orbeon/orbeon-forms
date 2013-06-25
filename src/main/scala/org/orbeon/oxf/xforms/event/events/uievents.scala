@@ -110,18 +110,26 @@ class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGett
 
 class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget, previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]) =
-        this(target, XXFormsConstraintsChangedEvent.properties(previous, current))
+    def this(target: XFormsEventTarget, level: Option[ConstraintLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]) =
+        this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
 }
 
 object XXFormsConstraintsChangedEvent {
 
+    private def constraintsForLevel(current: List[StaticBind#ConstraintXPathMIP], level: ConstraintLevel) =
+        current filter (_.level == level) map (_.id)
+
     private def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ConstraintLevel) = {
         val previousIds = previous.map(_.id).toSet
-        current filter (_.level == level) map (_.id) filterNot previousIds
+        constraintsForLevel(current, level) filterNot previousIds
     }
 
-    def properties(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]): PropertyGetter = {
+    def properties(level: Option[ConstraintLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]): PropertyGetter = {
+        case "level"            ⇒ level map (_.name)
+        case "constraints"      ⇒ Option(current map (_.id))
+        case "errors"           ⇒ Some(constraintsForLevel(current, ErrorLevel))
+        case "warnings"         ⇒ Some(constraintsForLevel(current, WarningLevel))
+        case "infos"            ⇒ Some(constraintsForLevel(current, InfoLevel))
         case "added-errors"     ⇒ Some(diffConstraints(previous, current, ErrorLevel))
         case "removed-errors"   ⇒ Some(diffConstraints(current, previous, ErrorLevel))
         case "added-warnings"   ⇒ Some(diffConstraints(previous, current, WarningLevel))

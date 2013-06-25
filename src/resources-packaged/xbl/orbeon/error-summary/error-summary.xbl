@@ -220,7 +220,7 @@ Inserting error information into error list:
                         </xf:action>
 
                         <!-- Control becomes invalid or its value is updated -->
-                        <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-constraints-changed xforms-value-changed xforms-disabled xforms-invalid xforms-valid" xxf:phantom="true">
+                        <xf:action xbl:attr="ev:observer=observer" ev:event="xxforms-constraints-changed xforms-disabled xforms-invalid xforms-valid" xxf:phantom="true">
 
                             <xf:action xxbl:scope="inner">
 
@@ -233,10 +233,16 @@ Inserting error information into error list:
                                 <xf:var name="current-error" value="error[@id = $prefixed-id and @indexes = string-join($repeat-indexes, ' ')]" as="element(error)*"/>
 
                                 <!-- xforms-invalid indicates an error level, but doesn't always have constraints associated -->
-                                <xf:var name="event-level"   value="if (event('xxf:type') = 'xxforms-constraints-changed') then event('level') else if (event('xxf:type') = 'xforms-invalid') then 'error' else ()"/>
+                                <xf:var
+                                    name="event-level"
+                                    value="if (event('xxf:type') = 'xxforms-constraints-changed')
+                                           then event('level')
+                                           else if (event('xxf:type') = 'xforms-invalid')
+                                           then 'error'
+                                           else ()"/>
 
-                                <xf:var name="must-remove" value="exists($current-error) and not(exists($event-level) or event('xxf:type') = 'xforms-value-changed')"/>
-                                <xf:var name="must-update" value="exists($current-error) and    (exists($event-level) or event('xxf:type') = 'xforms-value-changed')"/>
+                                <xf:var name="must-remove" value="exists($current-error) and not(exists($event-level))"/>
+                                <xf:var name="must-update" value="exists($current-error) and     exists($event-level)"/>
                                 <xf:var name="must-insert" value="empty($current-error)  and     exists($event-level)"/>
 
                                 <!-- Remove error -->

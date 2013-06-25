@@ -94,7 +94,7 @@
                 <xf:var name="xml-indent"   value="instance('inspector-instance')/xsl:output[1]"/>
                 <xf:var name="xml-noindent" value="instance('inspector-instance')/xsl:output[2]"/>
                 <xf:bind ref="instance('inspector-instance')">
-                    <xf:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset') /model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
+                    <xf:bind ref="current-instance" readonly="false()" calculate="if (. = '') then instance('inspector-itemset')/model[@id = instance('inspector-instance')/current-model]/instance[1]/@id else ."/>
                     <xf:bind ref="xpath" readonly="../function != 'evaluate-xpath'"/>
                     <xf:bind ref="input" readonly="../function != 'view-console'"/>
                     <xf:bind ref="shown-output" readonly="true()"/>

@@ -21,7 +21,7 @@ import org.orbeon.oxf.util.{IndentedLogger, XPath}
 import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import java.util.{Map ⇒ JMap}
-import org.orbeon.oxf.common.{OrbeonLocationException, OXFException, ValidationException}
+import org.orbeon.oxf.common.{OrbeonLocationException, OXFException}
 import collection.mutable.{LinkedHashSet, Stack}
 import org.orbeon.saxon.trace.ExpressionPresenter
 import java.io.ByteArrayOutputStream
@@ -302,7 +302,7 @@ object PathMapXPathAnalysis {
                                           defaultInstancePrefixedId: Option[String]): String Either Option[String] = {
 
         // Local class used as marker for a rewritten StringLiteral in an expression
-        class PrefixedIdStringLiteral(value: CharSequence) extends StringLiteral(value)
+        class PrefixedIdStringLiteral(value: CharSequence, val prefixedValue: String) extends StringLiteral(value)
 
         expression match {
             case instanceExpression: FunctionCall
@@ -314,7 +314,7 @@ object PathMapXPathAnalysis {
                     defaultInstancePrefixedId match {
                         case Some(defaultInstancePrefixedId) ⇒
                             // Rewrite expression to add/replace its argument with a prefixed instance id
-                            instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(defaultInstancePrefixedId)))
+                            instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(XFormsUtils.getStaticIdFromId(defaultInstancePrefixedId), defaultInstancePrefixedId)))
 
                             Right(Some(defaultInstancePrefixedId))
                         case None ⇒
@@ -334,8 +334,8 @@ object PathMapXPathAnalysis {
 
                             val prefixedInstanceId =
                                 if (alreadyRewritten)
-                                    // Parameter is already a prefixed id
-                                    originalInstanceId
+                                    // Parameter associates a prefixed id
+                                    stringLiteral.asInstanceOf[PrefixedIdStringLiteral].prefixedValue
                                 else if (searchAncestors)
                                     // xxf:instance()
                                     partAnalysis.findInstancePrefixedId(scope, originalInstanceId) // can return null
@@ -351,7 +351,7 @@ object PathMapXPathAnalysis {
 
                                 // If needed, rewrite expression to replace its argument with a prefixed instance id
                                 if (! alreadyRewritten)
-                                    instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(prefixedInstanceId)))
+                                    instanceExpression.setArguments(Array(new PrefixedIdStringLiteral(originalInstanceId, prefixedInstanceId)))
 
                                 Right(Some(prefixedInstanceId))
                             } else {

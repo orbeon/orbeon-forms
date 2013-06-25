@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.function
 import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.expr.{Expression, XPathContext}
-import org.orbeon.saxon.om.{ListIterator, ArrayIterator}
+import org.orbeon.saxon.om.{Item, EmptyIterator, ListIterator, ArrayIterator}
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import collection.JavaConverters._
 
@@ -27,6 +27,15 @@ protected trait FunctionSupport extends XFormsFunction {
 
     def stringArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
         arguments.lift(i) map (_.evaluateAsString(xpathContext).toString)
+
+    def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+        stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))
+
+    def itemArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+        arguments.lift(i) map (_.evaluateItem(xpathContext))
+
+    def itemArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+        itemArgumentOpt(i) orElse Option(xpathContext.getContextItem)
 
     // Resolve the relevant control by argument expression
     def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
@@ -57,6 +66,9 @@ protected trait FunctionSupport extends XFormsFunction {
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)
     def asItem(v: Option[String])    = v map stringToStringValue orNull
+
+    implicit def itemSeqOptToIterator(v: Option[Seq[Item]])     = v map (s ⇒ new ListIterator(s.asJava)) getOrElse EmptyIterator.getInstance
+    implicit def stringSeqOptToIterator(v: Option[Seq[String]]) = v map asIterator getOrElse EmptyIterator.getInstance
 
     implicit def stringToStringValue(v: String)     = StringValue.makeStringValue(v)
     implicit def booleanToBooleanValue(v: Boolean)  = BooleanValue.get(v)

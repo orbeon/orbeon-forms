@@ -51,5 +51,5 @@ class XXFormsInvalidBinds extends XFormsFunction with FunctionSupport {// don't 
 
     // Needed otherwise xpathContext.getContextItem doesn't return the correct value
     override def getIntrinsicDependencies =
-        if (argument.size == 0) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
+        if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012 Orbeon, Inc.
+ * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,30 +13,18 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
-import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.ScalaUtils
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.{StaticProperty, XPathContext}
-import org.orbeon.saxon.om.NodeInfo
-import org.w3c.dom.Node._
 
-class XXFormsClasses extends XFormsFunction with FunctionSupport with ClassSupport {
-    override def iterate(xpathContext: XPathContext) =
-        asIterator(classes(0)(xpathContext).toList)
+class XXFormsSplit extends XFormsFunction with FunctionSupport {
+
+    override def iterate(xpathContext: XPathContext) = {
+        val separator = stringArgumentOpt(1)(xpathContext)
+        stringArgumentOrContextOpt(0)(xpathContext) map (ScalaUtils.split(_, separator.orNull))
+    }
 
     // Needed otherwise xpathContext.getContextItem doesn't return the correct value
     override def getIntrinsicDependencies =
         if (argument.isEmpty) StaticProperty.DEPENDS_ON_CONTEXT_ITEM else 0
-}
-
-protected trait ClassSupport extends FunctionSupport {
-    def classes(i: Int)(implicit xpathContext: XPathContext): Set[String] =
-        itemArgumentOrContextOpt(i) match {
-            case Some(node: NodeInfo) if node.getNodeKind == ELEMENT_NODE ⇒
-                val classCode = xpathContext.getNamePool.allocate("", "", "class")
-                val value     = node.getAttributeValue(classCode)
-
-                stringToSet(value)
-            case _ ⇒
-                Set()
-        }
 }

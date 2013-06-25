@@ -165,5 +165,11 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
         Fun("classes", classOf[XXFormsClasses], 0, 0, STRING, ALLOWS_ZERO_OR_MORE,
             Arg(NODE_TYPE, ALLOWS_ZERO_OR_MORE)
         )
+
+        // xxf:split
+        Fun("split", classOf[XXFormsSplit], 0, 0, STRING, ALLOWS_ZERO_OR_MORE,
+            Arg(STRING, ALLOWS_ZERO_OR_MORE),
+            Arg(STRING, EXACTLY_ONE)
+        )
     }
 }

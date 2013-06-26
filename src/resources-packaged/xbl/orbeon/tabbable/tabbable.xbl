@@ -1,0 +1,88 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:ev="http://www.w3.org/2001/xml-events"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:xbl="http://www.w3.org/ns/xbl"
+         xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+         xmlns:oxf="http://www.orbeon.com/oxf/processors"
+         xmlns:exf="http://www.exforms.org/exf/1-0">
+
+    <xbl:script src="/xbl/orbeon/tabbable/tabbable.js"/>
+    <xbl:binding id="fr-tabbable" element="fr|tabbable" xxbl:mode="binding">
+        <xbl:handlers>
+            <xbl:handler event="xforms-enabled" target="#observer">
+                <xxf:script>YAHOO.xbl.fr.Tabbable.instance(this).init();</xxf:script>
+            </xbl:handler>
+        </xbl:handlers>
+        <xbl:template xxbl:transform="oxf:unsafe-xslt">
+            <xsl:transform version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+
+                <xsl:template match="/*">
+                    <xf:group>
+                        <!-- TODO: This should not be necessary, but we need it until this bug is fixed:
+                             https://github.com/orbeon/orbeon-forms/issues/339 -->
+                        <xsl:copy-of select="namespace::*"/>
+                        <xsl:copy-of select="@class"/>
+
+                        <!-- Tab labels -->
+                        <xh:ul class="nav nav-tabs">
+                            <xsl:for-each select="fr:tab">
+                                <xsl:variable name="pos" select="position()"/>
+                                <xsl:variable name="label" select="fr:label[1]"/>
+                                <xh:li class="{if (position() = 1) then 'active' else ''}">
+                                    <!-- Transform xf:label into xf:output -->
+                                    <xh:a href="#{{xxf:client-id('tab-pane-{$pos}')}}" data-toggle="tab">
+                                        <xsl:choose>
+                                            <!-- Static label, just copy content -->
+                                            <xsl:when test="empty($label/(@ref | @bind | @value))">
+                                                <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                                    <xsl:copy-of select="$label/node()"/>
+                                                </xf:group>
+                                            </xsl:when>
+                                            <!-- Dynamic label, generate xf:output -->
+                                            <xsl:otherwise>
+                                                <!-- Put content in outer scope -->
+                                                <xf:output xxbl:scope="outer">
+                                                    <xsl:copy-of select="$label/(@model | @context | @ref | @bind | @value | node())"/>
+                                                </xf:output>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xh:a>
+                                </xh:li>
+                            </xsl:for-each>
+                        </xh:ul>
+                        <!-- Tab content -->
+                        <xh:div class="tab-content">
+                            <xsl:for-each select="fr:tab">
+                                <!-- NOTE: Use xxf:control so that xxf:client-id() can resolve, as it needs a concrete control to work. -->
+                                <xh:div class="tab-pane{if (position() = 1) then ' active' else ''}" id="tab-pane-{position()}" xxf:control="true">
+                                    <xf:group xxbl:scope="outer" appearance="xxf:internal">
+                                        <xsl:apply-templates select="node() except fr:label"/>
+                                    </xf:group>
+                                </xh:div>
+                            </xsl:for-each>
+                        </xh:div>
+                    </xf:group>
+                </xsl:template>
+            </xsl:transform>
+        </xbl:template>
+    </xbl:binding>
+</xbl:xbl>

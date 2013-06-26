@@ -19,8 +19,5 @@ import org.orbeon.saxon.expr.XPathContext
 
 class XXFormsAbsoluteId extends XFormsFunction with FunctionSupport {
     override def evaluateItem(xpathContext: XPathContext) =
-        resolveEffectiveId(argument.lift(0))(xpathContext) match {
-            case Some(effectiveId) ⇒ XFormsUtils.effectiveIdToAbsoluteId(effectiveId)
-            case None              ⇒ null
-        }
+        resolveEffectiveId(argument.lift(0))(xpathContext) map XFormsUtils.effectiveIdToAbsoluteId
 }

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 
 class XXFormsDialogOpenEvent(target: XFormsEventTarget, properties: PropertyGetter)
-        extends XFormsEvent(XXFORMS_DIALOG_OPEN, target, properties, true, false) {
+        extends XFormsEvent(XXFORMS_DIALOG_OPEN, target, properties, bubbles = true, cancelable = false) {
 
     def this(properties: PropertyGetter, target: XFormsEventTarget, neighbor: String, constrainToViewport: Boolean) =
         this(target, properties orElse Map("neighbor" → Option(neighbor), "constrain-to-viewport" → Option(constrainToViewport)))

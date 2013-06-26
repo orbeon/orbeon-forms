@@ -34,7 +34,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
     // Find in all parts
     private def findInParts[T <: AnyRef](get: PartAnalysis ⇒ T) =
-        parts map (part ⇒ get(part)) filter (_ ne null) headOption
+        parts map get find (_ ne null)
 
     private def findInPartsOpt[T <: AnyRef](get: PartAnalysis ⇒ Option[T]) =
         parts flatMap (part ⇒ get(part)) headOption
@@ -127,7 +127,7 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
 
         // Starting from the root, find the couples of repeats with identical ids
         val longestPrefix = getAncestorRepeats(prefixedId1).reverse zip
-            (getAncestorRepeats(prefixedId2).reverse) takeWhile
+            getAncestorRepeats(prefixedId2).reverse takeWhile
                 { case (left, right) ⇒ left == right }
 
         // Return the id of the last element found

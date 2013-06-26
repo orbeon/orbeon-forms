@@ -174,7 +174,7 @@ object InstanceMirror {
                     innerNode match {
                         case document: DocumentInfo ⇒
                             // Root element replaced
-                            Some(outerInstance, instanceWrapper) ensuring (into)
+                            Some(outerInstance, instanceWrapper) ensuring into
                         case _ ⇒
                             // All other cases
                             // NOTE: Namespace handling makes assumption that all namespaces are visible at the level of

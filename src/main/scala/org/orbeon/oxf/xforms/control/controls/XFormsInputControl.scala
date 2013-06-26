@@ -334,10 +334,10 @@ object XFormsInputControl {
 
     private abstract class ParsePattern(val regex: Regex) extends Function1[MatchResult, String] {
         def stringsToDate(year: String, month: String, day: String) =
-            (new DateValue(year.toInt, month.toByte, day.toByte)).getStringValue
+            new DateValue(year.toInt, month.toByte, day.toByte).getStringValue
 
         def stringsToTime(hours: String, minutes: String, seconds: String) =
-            (new TimeValue(hours.toByte, minutes.toByte, seconds.toByte, 0, CalendarValue.NO_TIMEZONE)).getStringValue
+            new TimeValue(hours.toByte, minutes.toByte, seconds.toByte, 0, CalendarValue.NO_TIMEZONE).getStringValue
 
         def adjustHoursPM(hours: String) = {
             val hoursInt = hours.toInt

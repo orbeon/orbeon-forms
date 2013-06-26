@@ -387,7 +387,7 @@ object EmailProcessor {
                     val urlGenerator =
                         Option(contentType) map
                         (new URLGenerator(URLFactory.createURL(base, href), _, true)) getOrElse
-                        (new URLGenerator(URLFactory.createURL(base, href)))
+                         new URLGenerator(URLFactory.createURL(base, href))
 
                     urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA)
             }

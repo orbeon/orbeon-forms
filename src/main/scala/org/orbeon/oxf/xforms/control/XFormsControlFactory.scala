@@ -62,7 +62,7 @@ object XFormsControlFactory {
 
     private type ControlFactory = (XBLContainer, XFormsControl, Element, String) ⇒ XFormsControl
 
-    private val variableFactory: ControlFactory = (new XFormsVariableControl(_, _, _, _))
+    private val variableFactory: ControlFactory = new XFormsVariableControl(_, _, _, _)
 
     private val ControlFactory = Map[QName, ControlFactory](
         // Root control
@@ -97,7 +97,7 @@ object XFormsControlFactory {
     )
 
     private val ActionFactory: PartialFunction[QName, ControlFactory] =
-        { case qName if XFormsActions.isAction(qName) ⇒ (new XFormsActionControl(_, _, _, _)) }
+        { case qName if XFormsActions.isAction(qName) ⇒ new XFormsActionControl(_, _, _, _) }
 
     private val ControlOrActionFactory = ControlFactory orElse ActionFactory lift
 

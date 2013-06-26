@@ -84,7 +84,7 @@ trait PartEventHandlerAnalysis {
         val distinctNames = scriptMappings collect
             { case script if script.isClient ⇒ script.clientName → script.digest } distinct
 
-        val scriptBodiesByDigest = (scriptMappings map { case script ⇒ script.digest → script.body } toMap)
+        val scriptBodiesByDigest = scriptMappings map { case script ⇒ script.digest → script.body } toMap
 
         _uniqueClientScripts ++= distinctNames map
             { case (clientName, digest) ⇒ clientName → scriptBodiesByDigest(digest) }

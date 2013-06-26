@@ -85,7 +85,7 @@ object RegexpMatcher {
         def apply(pattern: Pattern, s: String): MatchResult = {
             val matcher = pattern.matcher(s)
             val matches = matcher.matches
-            MatchResult(matches, if (matches) (1 to matcher.groupCount) map matcher.group else Seq())
+            MatchResult(matches, if (matches) 1 to matcher.groupCount map matcher.group else Seq())
         }
     }
 

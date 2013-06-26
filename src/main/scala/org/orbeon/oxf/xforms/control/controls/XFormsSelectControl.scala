@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms.control.controls
 
 import org.dom4j.Element
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xforms.analysis.XPathDependencies
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
@@ -119,7 +118,7 @@ object XFormsSelectControl {
     def updateSelection(existingValues: CSet[String], itemsetValues: CSet[String], incomingValuesFiltered: CSet[String]) = {
 
         val newlySelectedValues   = incomingValuesFiltered -- existingValues
-        val newlyDeselectedValues = (itemsetValues -- incomingValuesFiltered) intersect existingValues
+        val newlyDeselectedValues = itemsetValues -- incomingValuesFiltered intersect existingValues
 
         val newInstanceValue = existingValues ++ newlySelectedValues -- newlyDeselectedValues
 

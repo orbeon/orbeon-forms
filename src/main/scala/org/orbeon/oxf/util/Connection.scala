@@ -407,7 +407,7 @@ object Connection extends Logging {
             Option(externalContext.getRequest) match {
                 case Some(request) ⇒
 
-                    val forwardHeaderNamesLowercase = (stringOptionToSet(headersToForward) map (_.toLowerCase))
+                    val forwardHeaderNamesLowercase = stringOptionToSet(headersToForward) map (_.toLowerCase)
 
                     // NOTE: Forwarding the "Cookie" header may yield unpredictable results because of the above work done w/ session cookies
                     val requestHeaderValuesMap = request.getHeaderValuesMap.asScala

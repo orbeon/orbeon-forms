@@ -77,10 +77,10 @@ object SectionOps {
         findAncestorContainers(container).size >= 2
 
     private val DirectionCheck = List(
-        "up"    → (canMoveUp _),
-        "right" → (canMoveRight _),
-        "down"  → (canMoveDown _),
-        "left"  → (canMoveLeft _)
+        "up"    → canMoveUp _,
+        "right" → canMoveRight _,
+        "down"  → canMoveDown _,
+        "left"  → canMoveLeft _
     )
 
     // Return all classes that need to be added to an editable section

@@ -89,12 +89,12 @@ object FormRunner {
                         try userRoles.isUserInRole(role)
                         catch { case NonFatal(_) ⇒ false}
 
-                    val rolesArray = (
+                    val rolesArray =
                         for {
                             role ← rolesString.split(""",|\s+""")
                             if isUserInRole(role)
                         } yield
-                            role)
+                            role
 
                     val roles = rolesArray match {
                         case Array() ⇒ None
@@ -443,7 +443,7 @@ object FormRunner {
     def isAllowedLang(app: String, form: String): String ⇒ Boolean = {
         val set = stringOptionToSet(Option(properties.getString(Seq("oxf.fr.available-languages", app, form) mkString ".")))
         // If none specified via property or property contains a wildcard, all languages are considered available
-        if (set.isEmpty || set("*")) (_ ⇒ true) else set
+        if (set.isEmpty || set("*")) _ ⇒ true else set
     }
 
     // The requested language, trying a few things in order (given parameter, request, session, default)
@@ -529,7 +529,7 @@ object FormRunner {
         // Libraries are typically not present. In that case, the persistence layer should return a 404 (thus the first test),
         // but the MySQL persistence layer returns a [200 with an empty body][1] (thus the second test).
         //   [1]: https://github.com/orbeon/orbeon-forms/issues/771
-        (connectionResult.statusCode == 200 && connectionResult.hasContent) option
+        connectionResult.statusCode == 200 && connectionResult.hasContent option
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
                 // do process XInclude, so FB's model gets included
                 TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, inputStream, url.toString, true, false)

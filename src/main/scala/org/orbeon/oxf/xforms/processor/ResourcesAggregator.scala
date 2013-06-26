@@ -128,7 +128,7 @@ class ResourcesAggregator extends ProcessorImpl {
                                         currentInlineElement = InlineElement(localname, new AttributesImpl(attributes))
                                         preservedCSS += currentInlineElement
                                         filter = true
-                                    case "script" if (src eq null) ⇒
+                                    case "script" if src eq null ⇒
                                         currentInlineElement = InlineElement(localname, new AttributesImpl(attributes))
                                         preservedJS += currentInlineElement
                                         filter = true

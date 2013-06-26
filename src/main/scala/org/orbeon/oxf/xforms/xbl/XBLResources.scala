@@ -50,9 +50,9 @@ object XBLResources {
                     ReferenceElement(src)
                 case "script" if (src ne null) && ((resType eq null) || resType == "text/javascript") ⇒
                     ReferenceElement(src)
-                case "style" if (src eq null)  ⇒
+                case "style" if src eq null  ⇒
                     InlineElement(e.getStringValue)
-                case "script" if (src eq null) ⇒
+                case "script" if src eq null ⇒
                     InlineElement(e.getStringValue)
                 case _ ⇒
                     throw new IllegalArgumentException("Invalid element passed to HeadElement(): " + Dom4jUtils.elementToDebugString(e))

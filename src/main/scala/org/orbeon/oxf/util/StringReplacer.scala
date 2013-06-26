@@ -46,6 +46,6 @@ object StringReplacer extends Logging {
         }
 
         // Do the replacement of all mappings one after the other
-        (s ⇒ mapping.foldLeft(s){ case (prev, (k, v)) ⇒ prev.replaceAllLiterally(k, v) })
+        s ⇒ mapping.foldLeft(s){ case (prev, (k, v)) ⇒ prev.replaceAllLiterally(k, v) }
     }
 }

@@ -18,7 +18,7 @@ import org.orbeon.saxon.expr._
 import org.orbeon.oxf.xforms.function.XFormsFunction
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.saxon.value.Int64Value
-import org.orbeon.oxf.xforms.{XFormsUtils, BindingContext, XFormsContextStack}
+import org.orbeon.oxf.xforms.{BindingContext, XFormsContextStack}
 
 /**
  * Return the current node of one of the enclosing xf:repeat iteration, either the closest
@@ -44,7 +44,7 @@ object XXFormsRepeatFunctions {
         var currentBindingContext = initialBindingContext
         do {
             if (contextStack.isRepeatIterationBindingContext(currentBindingContext)
-                && (repeatId.isEmpty || (currentBindingContext.parent.elementId == repeatId.get))) {
+                && (repeatId.isEmpty || currentBindingContext.parent.elementId == repeatId.get)) {
                 return currentBindingContext
             }
             currentBindingContext = currentBindingContext.parent

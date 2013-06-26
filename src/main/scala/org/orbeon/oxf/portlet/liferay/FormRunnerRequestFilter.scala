@@ -53,10 +53,10 @@ class FormRunnerRequestFilter extends RequestFilter {
                     if value != null
                 } yield {
                     // Return header tuple with header name in lowercase and with the "dash" convention
-                    (mkHeaderName(name) → (value match {
+                    mkHeaderName(name) → (value match {
                         case array: Array[String] ⇒ array
                         case value: String ⇒ Array(value)
-                    }))
+                    })
                 }
 
             // 2. Get Orbeon-* headers

@@ -119,7 +119,7 @@ abstract class XFormsFunction extends SystemFunction {
     protected def prepareExpression(initialXPathContext: XPathContext, parameterExpression: Expression, isAVT: Boolean): PooledXPathExpression = {
 
         // Evaluate parameter into an XPath string
-        val xpathString = (parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue]).getStringValue
+        val xpathString = parameterExpression.evaluateItem(initialXPathContext).asInstanceOf[AtomicValue].getStringValue
 
         // Copy static context information
         val staticContext = this.staticContext.copy

@@ -38,7 +38,7 @@ object CSSParser {
                     if (Set(":root", "*:root")(pathElement))
                         sb append "."
                     else
-                        sb append (pathElement.replace('|', ':').trim)
+                        sb append pathElement.replace('|', ':').trim
                     false
                 }
 

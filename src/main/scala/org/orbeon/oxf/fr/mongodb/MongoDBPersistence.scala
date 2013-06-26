@@ -247,7 +247,7 @@ class MongoDBPersistence extends HttpServlet {
                     coll.find(MongoDBObject(KeywordsKey → fullQuery))
                 } else {
                     // Structured search: gather all non-empty <query name="$NAME">$VALUE</query>
-                    coll.find(MongoDBObject(searchElem.tail filter (elemValue(_) nonEmpty) map (e ⇒ (attValue(e, "name") → elemValue(e))) toList))
+                    coll.find(MongoDBObject(searchElem.tail filter (elemValue(_) nonEmpty) map (e ⇒ attValue(e, "name") → elemValue(e)) toList))
                 }
 
             // Run search with sorting/paging

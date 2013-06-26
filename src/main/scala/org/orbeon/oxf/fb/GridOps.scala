@@ -159,7 +159,7 @@ object GridOps {
         val ids = nextIds(grid, "tmp", size).toIterator
 
         <xh:tr xmlns:xh="http://www.w3.org/1999/xhtml">{
-            (1 to size) map (_ ⇒ <xh:td id={ids.next()}/>)
+            1 to size map (_ ⇒ <xh:td id={ids.next()}/>)
         }</xh:tr>
     }
 
@@ -512,9 +512,9 @@ object GridOps {
     def canDeleteCol(grid: NodeInfo): Boolean = ((grid \ "*:tr").head \ "*:td").length > 1
 
     private val DeleteTests = List(
-        "grid" → (canDeleteGrid _),
-        "row"  → (canDeleteRow  _),
-        "col"  → (canDeleteCol  _)
+        "grid" → canDeleteGrid _,
+        "row"  → canDeleteRow  _,
+        "col"  → canDeleteCol  _
     )
 
     // Return all classes that need to be added to an editable grid

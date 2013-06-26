@@ -73,14 +73,14 @@ object XFormsCompressor {
     def compressBytesMeasurePerformance(bytesToEncode: Array[Byte]): Array[Byte] = {
 
         val settings = Map(
-            (Deflater.BEST_SPEED → "BEST_SPEED"),
-            (Deflater.DEFAULT_COMPRESSION → "DEFAULT_COMPRESSION"),
-            (Deflater.BEST_COMPRESSION → "BEST_COMPRESSION")
+            Deflater.BEST_SPEED          → "BEST_SPEED",
+            Deflater.DEFAULT_COMPRESSION → "DEFAULT_COMPRESSION",
+            Deflater.BEST_COMPRESSION    → "BEST_COMPRESSION"
         )
 
         for ((level, description) ← settings) {
             XFormsUtils.indentedLogger.startHandleOperation("compressor", description)
-            for (v ← (1 to 100))
+            for (v ← 1 to 100)
                 compressBytes(bytesToEncode, level)
             XFormsUtils.indentedLogger.endHandleOperation()
         }

@@ -71,7 +71,7 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
     }
 
     override def equalsExternal(other: XFormsControl): Boolean = {
-        if (other == null || ! (other.isInstanceOf[XFormsRepeatIterationControl]))
+        if (other == null || ! other.isInstanceOf[XFormsRepeatIterationControl])
             return false
 
         if (this eq other)

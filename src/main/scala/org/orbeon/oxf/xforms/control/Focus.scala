@@ -161,7 +161,7 @@ object Focus {
 
         // Dispatch DOMFocusOut events to the given control and to its container ancestors
         def dispatchFocusOuts(control: XFormsControl) =
-            (containersAndSelf(control) takeWhile (isNotBoundary(_, boundary))) foreach focusOut
+            containersAndSelf(control) takeWhile (isNotBoundary(_, boundary)) foreach focusOut
 
         // Dispatch focus out events if needed
         Option(doc.getControls.getFocusedControl) foreach { focused ⇒

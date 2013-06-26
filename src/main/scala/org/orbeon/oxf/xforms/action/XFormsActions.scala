@@ -67,10 +67,10 @@ object XFormsActions {
         def isEventHandler(e: Element) = EventHandlerImpl.isEventHandler(e)
 
         val actionFactory: PartialFunction[Element, ControlFactory] = {
-            case e if isContainerAction(e.getQName) && isEventHandler(e) ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ChildrenActionsAndVariablesTrait)
-            case e if isContainerAction(e.getQName)                      ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ChildrenActionsAndVariablesTrait)
-            case e if isAction(e.getQName) && isEventHandler(e)          ⇒ (new EventHandlerImpl(_, _, _, _, _)      with ActionTrait)
-            case e if isAction(e.getQName)                               ⇒ (new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait)
+            case e if isContainerAction(e.getQName) && isEventHandler(e) ⇒ new EventHandlerImpl(_, _, _, _, _)      with ActionTrait with ChildrenActionsAndVariablesTrait
+            case e if isContainerAction(e.getQName)                      ⇒ new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait with ChildrenActionsAndVariablesTrait
+            case e if isAction(e.getQName) && isEventHandler(e)          ⇒ new EventHandlerImpl(_, _, _, _, _)      with ActionTrait
+            case e if isAction(e.getQName)                               ⇒ new SimpleElementAnalysis(_, _, _, _, _) with ActionTrait
         }
 
         actionFactory

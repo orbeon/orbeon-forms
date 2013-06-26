@@ -241,7 +241,7 @@
                                                                 <!-- TODO: This list of columns only works for the data (not form definition) table -->
                                                                 created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>,
                                                                 app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml
-                                                                <xsl:if test="$owner-group">, username, groupname</xsl:if>
+                                                                <xsl:if test="$is-data and $owner-group">, username, groupname</xsl:if>
                                                             )
                                                         select
                                                             d.created,
@@ -249,7 +249,7 @@
                                                             <sql:param type="xs:string" select="/request/username"/>,
                                                             d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
                                                             'Y', d.xml
-                                                            <xsl:if test="$owner-group">, d.username, d.groupname</xsl:if>
+                                                            <xsl:if test="$is-data and $owner-group">, d.username, d.groupname</xsl:if>
                                                         from
                                                             orbeon_form_data d,
                                                             (
@@ -305,7 +305,7 @@
                                                                     created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
                                                                     <xsl:if test="$is-attachment">file_name, file_content</xsl:if>
                                                                     <xsl:if test="not($is-attachment)">xml</xsl:if>
-                                                                    <xsl:if test="$owner-group">, username, groupname</xsl:if>
+                                                                    <xsl:if test="$is-data and $owner-group">, username, groupname</xsl:if>
                                                                 )
                                                                 select
                                                                     case when <xsl:value-of select="$last-modified-time"/> is null
@@ -325,7 +325,7 @@
                                                                     <xsl:if test="not($is-attachment)">
         																<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*" />
                                                                     </xsl:if>
-                                                                    <xsl:if test="$owner-group">
+                                                                    <xsl:if test="$is-data and $owner-group">
                                                                         , case when <xsl:value-of select="$last-modified-time"/> is null
                                                                             then <sql:param type="xs:string" select="/request/username"/>
                                                                             else username end as username
@@ -337,13 +337,13 @@
                                                                 (
                                                                     select
                                                                         max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>, created
-                                                                        <xsl:if test="$owner-group">, username , groupname</xsl:if>
+                                                                        <xsl:if test="$is-data and $owner-group">, username , groupname</xsl:if>
                                                                     from
                                                                     (
                                                                         (
                                                                             select
                                                                                 t.<xsl:value-of select="$last-modified-time"/>, t.created
-                                                                                <xsl:if test="$owner-group">, t.username , t.groupname</xsl:if>
+                                                                                <xsl:if test="$is-data and $owner-group">, t.username , t.groupname</xsl:if>
                                                                             from
                                                                                 <xsl:value-of select="$table-name"/> t,
                                                                                 (
@@ -368,7 +368,7 @@
                                                                         (
                                                                             select
                                                                                 null <xsl:value-of select="$last-modified-time"/>, null created
-                                                                                <xsl:if test="$owner-group">, null username, null groupname</xsl:if>
+                                                                                <xsl:if test="$is-data and $owner-group">, null username, null groupname</xsl:if>
                                                                             from dual
                                                                         )
                                                                     ) t2

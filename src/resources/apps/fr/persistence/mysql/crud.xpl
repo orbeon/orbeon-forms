@@ -237,14 +237,19 @@
                                                         <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
                                                         insert into <xsl:value-of select="$table-name"/>
-                                                            <!-- TODO: This list of columns only works for the data (not form definition) table -->
-                                                            (created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
+                                                            (
+                                                                <!-- TODO: This list of columns only works for the data (not form definition) table -->
+                                                                created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>,
+                                                                app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml
+                                                                <xsl:if test="$owner-group">, username, groupname</xsl:if>
+                                                            )
                                                         select
                                                             d.created,
                                                             <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                             <sql:param type="xs:string" select="/request/username"/>,
                                                             d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
                                                             'Y', d.xml
+                                                            <xsl:if test="$owner-group">, d.username, d.groupname</xsl:if>
                                                         from
                                                             orbeon_form_data d,
                                                             (

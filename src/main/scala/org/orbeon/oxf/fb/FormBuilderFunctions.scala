@@ -76,7 +76,7 @@ object FormBuilderFunctions extends Logging {
 
     // Find an xf:instance element
     def instanceElement(inDoc: NodeInfo, id: String) =
-        findModelElement(inDoc) \ "*:instance" filter (hasIdValue(_, id)) headOption
+        findModelElement(inDoc) \ "*:instance" find (hasIdValue(_, id))
 
     // Find an inline instance's root element
     def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =

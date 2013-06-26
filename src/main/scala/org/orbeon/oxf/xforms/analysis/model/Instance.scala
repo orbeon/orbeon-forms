@@ -23,7 +23,7 @@ import XFormsConstants._
 import org.dom4j.{Document, QName, Element}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData}
 import org.orbeon.oxf.common.{ValidationException, Version}
-import org.orbeon.oxf.xml.{TransformerUtils, ContentHandlerHelper, Dom4j}
+import org.orbeon.oxf.xml.{TransformerUtils, Dom4j}
 import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 import org.orbeon.saxon.om.DocumentInfo
 import collection.JavaConverters._
@@ -61,8 +61,8 @@ class Instance(staticStateContext: StaticStateContext, element: Element, parent:
 
         componentForConstantInstances map { component ⇒
 
-            val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) filter (_.localName == "model") size
-            val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       filter (_.localName == "instance") size
+            val modelIndex    = ElementAnalysis.precedingSiblingIterator(parent.get) count (_.localName == "model")
+            val instanceIndex = ElementAnalysis.precedingSiblingIterator(this)       count (_.localName == "instance")
 
             debug("getting readonly inline instance from abstract binding", Seq(
                 "model id"       → parent.get.staticId,

@@ -170,7 +170,7 @@ class XFormsToSchema extends XFormsToSomething {
         val (childBinds, newResolve) = bind \ * match {
             case Nil ⇒
                 val section = control(bind, "*:section")
-                val component = section.toSeq \ * filter (e ⇒ matchesComponent(e.getURI)) headOption
+                val component = section.toSeq \ * find (e ⇒ matchesComponent(e.getURI))
                 val binds = {
                     val library = component map (_.getURI) flatMap {
                         case ComponentNS("orbeon") ⇒ libraries.orbeon

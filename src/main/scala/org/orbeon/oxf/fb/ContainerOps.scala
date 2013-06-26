@@ -201,23 +201,15 @@ object ContainerOps {
     def getAllContainerControls(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsContainer
 
     // Various counts
-    def countSections(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsSection size
+    def countSections(inDoc: NodeInfo)         = getAllControlsWithIds(inDoc)          count IsSection
+    def countAllGrids(inDoc: NodeInfo)         = findFRBodyElement(inDoc) descendant * count IsGrid
+    def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count IsRepeat // includes repeated grids
+    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count IsSectionTemplateContent // non-repeated grids
 
-    def countAllGrids(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsGrid size
-
-    // includes repeated grids
-    def countRepeats(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsRepeat size
-
-    def countGrids(inDoc: NodeInfo) = countAllGrids(inDoc) - countRepeats(inDoc)
-
-    // non-repeated grids
-    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsSectionTemplateContent size
-
+    def countGrids(inDoc: NodeInfo)            = countAllGrids(inDoc) - countRepeats(inDoc)
     def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
-
-    def countAllContainers(inDoc: NodeInfo) = getAllContainerControls(inDoc).size
-
-    def countAllControls(inDoc: NodeInfo) = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
+    def countAllContainers(inDoc: NodeInfo)    = getAllContainerControls(inDoc).size
+    def countAllControls(inDoc: NodeInfo)      = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
     // Whether it is possible to move an item into the given container
     // Currently: must be a section without section template content

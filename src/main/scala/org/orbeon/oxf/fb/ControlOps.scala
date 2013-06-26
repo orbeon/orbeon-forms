@@ -88,7 +88,7 @@ object ControlOps {
 
     // Find a bind by predicate
     def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
-        findTopLevelBind(inDoc).toSeq \\ "*:bind" filter p headOption
+        findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
 
     def isBindForName(bind: NodeInfo, name: String) =
         hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
@@ -158,11 +158,11 @@ object ControlOps {
 
     // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
     def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
-        findModelElement(inDoc) \ "*:bind" filter {
+        findModelElement(inDoc) \ "*:bind" find {
             // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
             bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.attValue("id")) ||
                     bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
-        } headOption
+        }
 
     // Ensure that a tree of bind exists
     def ensureBinds(inDoc: NodeInfo, names: Seq[String]): NodeInfo = {
@@ -541,14 +541,13 @@ object ControlOps {
     }
 
     // From a control element (say <fr:autocomplete>), returns the corresponding <xbl:binding>
-    def binding(controlElement: NodeInfo) = {
-        (asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo filter (b ⇒
+    def binding(controlElement: NodeInfo) =
+        asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo find (b ⇒
             viewTemplate(b) match {
                 case Some(viewTemplate) ⇒ qname(viewTemplate) == qname(controlElement)
                 case _ ⇒ false
-            }
-        )).headOption
-    }
+            })
+
     // Version returning a list, for called from XForms
     // TODO: Is there a better way, so we don't have to keep defining alternate functions? Maybe define a Option -> List function?
     def bindingOrEmpty(controlElement: NodeInfo) = binding(controlElement).orNull
@@ -646,7 +645,7 @@ object ControlOps {
             val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse.tail
 
             val containerIds = ancestorContainers map (_ attValue "id")
-            val repeatDepth = ancestorContainers filter IsRepeat size
+            val repeatDepth = ancestorContainers count IsRepeat
 
             def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString "-"
             val prefixedId = containerIds :+ staticId mkString "$"

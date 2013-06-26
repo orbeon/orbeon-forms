@@ -41,7 +41,7 @@ object GridOps {
 
     // Find the first enclosing repeated grid or legacy repeat if any
     def findContainingRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
-        findAncestorContainers(descendantOrSelf, includeSelf) filter (IsRepeat(_)) headOption
+        findAncestorContainers(descendantOrSelf, includeSelf) find IsRepeat
 
     // Get the first enclosing repeated grid or legacy repeat
     def getContainingGrid(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
@@ -308,7 +308,7 @@ object GridOps {
 
         val (x, _) = tdCoordinates(firstRowTd: NodeInfo, allRowCells: Seq[Seq[Cell]])
 
-        allRowCells map (_(x)) filterNot (_.missing) filter (cell ⇒ hasChildren(cell.td)) size
+        allRowCells map (_(x)) filterNot (_.missing) count (cell ⇒ hasChildren(cell.td))
     }
 
     def controlsInRow(gridId: String, rowPos: Int): Int = {
@@ -407,10 +407,10 @@ object GridOps {
     // Find template holder
     def findTemplateHolder(descendantOrSelf: NodeInfo, controlName: String) =
         for {
-            grid ← findContainingRepeat(descendantOrSelf, includeSelf = true)
+            grid     ← findContainingRepeat(descendantOrSelf, includeSelf = true)
             gridName ← getControlNameOption(grid)
-            root ← templateRoot(descendantOrSelf, gridName)
-            holder ← root descendantOrSelf * filter (name(_) == controlName) headOption
+            root     ← templateRoot(descendantOrSelf, gridName)
+            holder   ← root descendantOrSelf * find (name(_) == controlName)
         } yield
             holder
 

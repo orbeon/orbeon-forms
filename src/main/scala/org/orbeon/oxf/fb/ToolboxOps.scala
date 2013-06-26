@@ -259,7 +259,7 @@ object ToolboxOps {
 
         // Handle data template
         val modelElement = findModelElement(inDoc)
-        modelElement \ "*:instance" filter (hasIdValue(_, templateInstanceId)) headOption match {
+        modelElement \ "*:instance" find (hasIdValue(_, templateInstanceId)) match {
             case Some(templateInstance) ⇒
                 // clear existing template instance content
                 delete(templateInstance \ *)

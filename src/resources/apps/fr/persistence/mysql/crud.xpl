@@ -21,7 +21,8 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+        xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <p:param type="input" name="instance"/>
 
@@ -109,6 +110,7 @@
                                                     <xsl:value-of select="$last-modified-time"/>,
                                                     <xsl:if test="not($is-attachment)">t.xml xml</xsl:if>
                                                     <xsl:if test="$is-attachment">file_content</xsl:if>
+                                                    <xsl:if test="$is-data and $owner-group">, username, groupname</xsl:if>
                                                 from <xsl:value-of select="$table-name"/> t
                                                     where app = <sql:param type="xs:string" select="/request/app"/>
                                                     and form = <sql:param type="xs:string" select="/request/form"/>
@@ -126,9 +128,11 @@
                                             </sql:query>
                                             <sql:result-set>
                                                 <sql:row-iterator>
-                                                    <last-modified>
-                                                        <sql:get-column-value column="{$last-modified-time}" type="xs:dateTime"/>
-                                                    </last-modified>
+                                                    <last-modified><sql:get-column-value column="{$last-modified-time}" type="xs:dateTime"/></last-modified>
+                                                    <xsl:if test="$is-data and $owner-group">
+                                                        <username><sql:get-column-value column="username" type="xs:string"/></username>
+                                                        <groupname><sql:get-column-value column="groupname" type="xs:string"/></groupname>
+                                                    </xsl:if>
                                                     <data>
                                                         <xsl:choose>
                                                             <xsl:when test="$is-attachment">
@@ -154,8 +158,43 @@
             <p:processor name="oxf:sql">
                 <p:input name="data" href="#request-description"/>
                 <p:input name="config" href="#sql-config"/>
-                <p:output name="data" id="sql-out"/>
+                <p:output name="data" id="sql-out" debug="sql-out"/>
             </p:processor>
+
+            <!-- Set Orbeon-Operations header -->
+            <p:choose href="aggregate('dummy')">
+                <p:when test="p:property('oxf.fr.support-owner-group')">
+
+                    <p:processor name="oxf:xforms-submission">
+                        <p:input name="request" href="#request-description"/>
+                        <p:input name="submission">
+                            <xf:submission xsl:version="2.0" method="get" replace="instance" serialization="none"
+                                               resource="/fr/service/persistence/form/{encode-for-uri(/request/app)}/{encode-for-uri(/request/form)}"/>
+                        </p:input>
+                        <p:output name="response" id="form"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data"><dummy/></p:input>
+                        <p:input name="form" href="#form"/>
+                        <p:input name="sql-out" href="#sql-out"/>
+                        <p:input name="request-description" href="#request-description"/>
+                        <p:input name="config">
+                            <operations xsl:version="2.0">
+                                <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
+                                <xsl:variable name="sql-out" select="doc('input:sql-out')/sql-out"/>
+                                <xsl:value-of select="form-runner:setAllAuthorizedOperationsHeader($permissions, $sql-out/username/string(), $sql-out/groupname/string())"/>
+                            </operations>
+                        </p:input>
+                        <p:output name="data" id="send-operations"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:null-serializer">
+                        <p:input name="data" href="#send-operations"/>
+                    </p:processor>
+
+                </p:when>
+            </p:choose>
 
             <p:choose href="aggregate('root', #request-description, #sql-out)">
                 <!-- Test whether we got data as well as the extension type before trying to parse as XML -->

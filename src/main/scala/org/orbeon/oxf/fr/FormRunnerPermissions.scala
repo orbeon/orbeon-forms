@@ -179,6 +179,12 @@ trait FormRunnerPermissions {
     def javaAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): java.util.List[String] =
         allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname).asJava
 
+    def setAllAuthorizedOperationsHeader(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): Unit = {
+        val operations = allAuthorizedOperations(permissionsElement, dataUsername, dataGroupname)
+        val response = NetUtils.getExternalContext.getResponse
+        response.setHeader("Orbeon-Operations", operations.mkString(" "))
+    }
+
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest
         Option(request.getHeaderValuesMap.get("orbeon-roles")) getOrElse Array[String]() toSet

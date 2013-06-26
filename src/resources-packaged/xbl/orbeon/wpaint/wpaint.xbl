@@ -38,9 +38,9 @@
         </xbl:resources>
 
         <fb:metadata>
-            <fb:display-name lang="en">Image annotation</fb:display-name>
+            <fb:display-name lang="en">Image Annotation</fb:display-name>
             <fb:display-name lang="fr">Annotation d'image</fb:display-name>
-            <fb:display-name lang="ru">[Image annotation]</fb:display-name>
+            <fb:display-name lang="ru">[Image Annotation]</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/apps/fr/style/images/silk/paintbrush.png</fb:small-icon>
                 <fb:large-icon>/apps/fr/style/images/silk/paintbrush.png</fb:large-icon>

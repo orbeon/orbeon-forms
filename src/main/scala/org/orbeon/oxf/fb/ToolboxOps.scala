@@ -62,7 +62,7 @@ object ToolboxOps {
                     }
 
                 // Set default pointer to resources if there is an xf:alert
-                setvalue(newControlElement \ "*:alert" \@ "ref", "$fr-resources/detail/labels/alert")
+                setvalue(newControlElement \ "*:alert" \@ "ref", OldStandardAlertRef)
 
                 // Adjust bindings on newly inserted control
                 renameControlByElement(newControlElement, newControlName)
@@ -98,7 +98,7 @@ object ToolboxOps {
                 // Set bind attributes if any
                 insert(into = bind, origin = bindAttributesTemplate(binding))
 
-                debugDumpDocument("insert new control", doc)
+                debugDumpDocumentForGrids("insert new control", doc)
 
                 Some(newControlName)
 
@@ -190,7 +190,7 @@ object ToolboxOps {
         // Select first grid cell
         selectTd(newGrid \\ "*:td" head)
 
-        debugDumpDocument("insert new grid", inDoc)
+        debugDumpDocumentForGrids("insert new grid", inDoc)
     }
 
     // Insert a new section with optionally a nested grid
@@ -241,7 +241,7 @@ object ToolboxOps {
 
         // TODO: Open label editor for newly inserted section
 
-        debugDumpDocument("insert new section", inDoc)
+        debugDumpDocumentForGrids("insert new section", inDoc)
 
         Some(newSectionElement)
     }
@@ -303,7 +303,7 @@ object ToolboxOps {
         // Select new td
         selectTd(newGridElement \\ "*:td" head)
 
-        debugDumpDocument("insert new repeat", inDoc)
+        debugDumpDocumentForGrids("insert new repeat", inDoc)
 
         Some(newGridName)
     }
@@ -339,7 +339,7 @@ object ToolboxOps {
         findControlByName(doc, name) foreach { controlElement ⇒
 
             // Create <resource xml:lang="..."> containers
-            val resourcesWithLang = findResourceHoldersWithLang(td, name) map {
+            val resourcesWithLang = findResourceHoldersWithLang(name) map {
                 case (lang, holder) ⇒ elementInfo("resource", attributeInfo(XML_URI → "lang", lang) ++ holder)
             }
 

@@ -160,9 +160,14 @@ object LHHASupport {
             def alertsMatchingLevel(level: ConstraintLevel) =
                 staticAlerts.iterator filter (_.forLevels(level))
 
+            // Alerts that specify neither a constraint nor a level
+            def alertsMatchingAny =
+                staticAlerts.iterator filter (a ⇒ a.forConstraints.isEmpty && a.forLevels.isEmpty)
+
             // For that given level, identify all matching alerts if any, whether they match by constraint or by level
+            // Alerts are returned in document order
             control.alertLevel flatMap { level ⇒
-                val matchingAlertIds = alertsMatchingConstraints ++ alertsMatchingLevel(level) map (_.staticId) toSet
+                val matchingAlertIds = alertsMatchingConstraints ++ alertsMatchingLevel(level) ++ alertsMatchingAny map (_.staticId) toSet
                 val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))
 
                 matchingAlerts.nonEmpty option (level, matchingAlerts)

@@ -36,9 +36,9 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 /*
  * Form Builder: operations on controls.
  */
-trait ControlOps extends BaseOps {
+trait ControlOps extends ResourcesOps {
 
-    self: GridOps ⇒ // funky dependency
+    self: GridOps ⇒ // funky dependency, to resolve at some point
 
     val FB = "http://orbeon.org/oxf/xml/form-builder"
 
@@ -48,6 +48,8 @@ trait ControlOps extends BaseOps {
     private val topLevelBindTemplate: NodeInfo =
         <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
                      xmlns:xf="http://www.w3.org/2002/xforms"/>
+
+    private val HelpRefMatcher = """\$form-resources/([^/]+)/help""".r
 
     // Find control holders (there can be more than one with repeats)
     // Don't return anything if isCustomInstance is true
@@ -68,13 +70,6 @@ trait ControlOps extends BaseOps {
             } getOrElse Seq()
         else
             Seq()
-
-    // Current resources
-    def currentResources = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("current-resources"))
-
-    // Find the current resource holder for the given name
-    def findCurrentResourceHolder(controlName: String) =
-        currentResources child controlName headOption
 
     def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
 
@@ -360,72 +355,6 @@ trait ControlOps extends BaseOps {
         findFRBodyElement(inDoc) \\ * filter
             (e ⇒ isIdForControl(e attValue "id"))
 
-    // Get the control's resource holder
-    def getControlResourceOrEmpty(controlName: String, resourceName: String) = {
-        findCurrentResourceHolder(controlName) flatMap
-            (n ⇒ n \ resourceName map (_.stringValue) headOption) getOrElse ""
-    }
-
-    def getControlHelpOrEmpty(controlName: String)  = getControlResourceOrEmpty(controlName, "help")
-    def getControlAlertOrEmpty(controlName: String) = getControlResourceOrEmpty(controlName, "alert")
-
-    // Get the control's <item> for the current language
-    def getControlItems(controlId: String) =
-        findCurrentResourceHolder(controlName(controlId)).toSeq flatMap (n ⇒ n \ "item") asJava
-
-    // Set the control's <item> for the current language and keep other languages in sync
-    def setControlItems(controlId: String, items: NodeInfo): Unit = {
-        val currentLang = (currentResources \@ "*:lang").stringValue
-        val newItems = items \ "item"
-        // Iterate over resources for each language
-        for ((lang, holder) ← findResourceHoldersWithLang(controlName(controlId))) {
-            // Remove items we had and insert the new one
-            val oldItems = holder \ "item"
-            delete(oldItems)
-            insert(into = holder, after = holder \ *, origin = newItems)
-            // If this is not the current language, copy over labels we used to have
-            if (lang != currentLang)
-                for (newItem ← holder \ "item") {
-                    // If we can find an oldItem corresponding to the newItem, copy over the label
-                    for (oldItem ← oldItems)
-                        if (oldItem \ "value" === (newItem \ "value"))
-                            setvalue(newItem \ "label", oldItem \ "label")
-                }
-        }
-    }
-
-    // Set a control's current resource for the current language
-    def setControlResource(controlName: String, resourceName: String, value: String) = {
-        val resourceHolder = ensureResourceHolder(controlName, resourceName)
-        setvalue(resourceHolder, value)
-    }
-
-    // Ensure the existence of the resource holder for the current language
-    // NOTE: Assume enclosing control resource holder already exists
-    private def ensureResourceHolder(controlName: String, resourceName: String) = {
-        val controlHolder = findCurrentResourceHolder(controlName).get
-        controlHolder child resourceName headOption match {
-            case Some(existing) ⇒ existing
-            case None           ⇒ insert(into = controlHolder, after = controlHolder child *, origin = elementInfo(resourceName)).head
-        }
-    }
-
-    // Set the control help and add/remove help element and placeholders as needed
-    def setControlHelp(controlName: String,  value: String) = {
-
-        setControlResource(controlName, "help", trimToEmpty(value))
-
-        val inDoc = getFormDoc
-
-        if (hasBlankOrMissingLHHAForAllLangs(inDoc, controlName, "help"))
-            removeLHHAElementAndResources(inDoc, controlName, "help")
-        else
-            ensureLHHAElement(inDoc, controlName, "help")
-    }
-
-    def setControlAlert(controlName: String, value: String) =
-        setControlResource(controlName, "alert", value)
-
     // From an <xbl:binding>, return the view template (say <fr:autocomplete>)
     def viewTemplate(binding: NodeInfo) = {
         val metadata = binding \ "*:metadata"
@@ -527,14 +456,31 @@ trait ControlOps extends BaseOps {
             control
     }
 
+    // Find a control's LHHA (there can be more than one for alerts)
+    def getControlLHHA(inDoc: NodeInfo, controlName: String, lhha: String) =
+        findControlByName(inDoc, controlName).toList child (XF → lhha)
+
+    // Set the control help and add/remove help element and placeholders as needed
+    def setControlHelp(controlName: String,  value: String) = {
+
+        setControlResource(controlName, "help", trimToEmpty(value))
+
+        val inDoc = getFormDoc
+
+        if (hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc, controlName, "help"))
+            removeLHHAElementAndResources(inDoc, controlName, "help")
+        else
+            ensureCleanLHHAElement(inDoc, controlName, "help")
+    }
+
     // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
     def isControlLHHAHTMLMediatype(inDoc: NodeInfo, controlName: String, lhha: String) =
-        hasHTMLMediatype(findControlByName(inDoc, controlName).toList child lhha)
+        hasHTMLMediatype(getControlLHHA(inDoc, controlName, lhha))
 
     // For a given control and LHHA type, set the mediatype on the LHHA to be HTML or plain text
     def setControlLHHAMediatype(inDoc: NodeInfo, controlName: String, lhha: String, isHTML: Boolean): Unit =
         if (isHTML != isControlLHHAHTMLMediatype(inDoc, controlName, lhha))
-            setHTMLMediatype(findControlByName(inDoc, controlName).toList child lhha, isHTML)
+            setHTMLMediatype(getControlLHHA(inDoc, controlName, lhha), isHTML)
 
     // For a given control, whether the mediatype on itemset labels is HTML
     def isItemsetHTMLMediatype(inDoc: NodeInfo, controlName: String) =
@@ -556,30 +502,41 @@ trait ControlOps extends BaseOps {
                 delete(lhhaElement \@ "mediatype")
         }
 
-    private def ensureLHHAElement(inDoc: NodeInfo, controlName: String, lhha: String) = {
-        val control = findControlByName(inDoc, controlName).get
+    private def ensureCleanLHHAElement(inDoc: NodeInfo, controlName: String, lhha: String) =
+        ensureCleanLHHAElements(inDoc, controlName, lhha, 1).head
 
-        control child lhha headOption match {
-            case None ⇒
-                // Try to insert in the right position wrt other LHHA elements. If none, will be inserted as first
-                // element.
-                val namesBefore = LHHAInOrder takeWhile (_ != lhha) toSet
-                val lhhaBefore = control child * filter (e ⇒ namesBefore(localname(e)))
+    def ensureCleanLHHAElements(inDoc: NodeInfo, controlName: String, lhha: String, count: Int) = {
+        val control  = findControlByName(inDoc, controlName).get
+        val existing = getControlLHHA(inDoc, controlName, lhha)
 
-                val template: NodeInfo =
+        // For simplicity and consistency, delete and recreate
+        delete(existing)
+
+        // Try to insert in the right position wrt other LHHA elements. If none, will be inserted as first
+        // element.
+
+        val newTemplates =
+            if (count == 1) {
+                def newTemplate: NodeInfo =
                     <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
                              ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
 
-                insert(into = control, after = lhhaBefore, origin = template).head
-            case Some(existing) ⇒
-                existing
-        }
+                Seq(newTemplate)
+            } else {
+                def newTemplate(index: Int): NodeInfo =
+                    <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
+                             ref={s"$$form-resources/$controlName/$lhha[$index]"}/>.copy(label = lhha)
+
+                1 to count map newTemplate
+            }
+
+        insertElementsImposeOrder(into = control, origin = newTemplates, LHHAInOrder)
     }
 
     private def removeLHHAElementAndResources(inDoc: NodeInfo, controlName: String, lhha: String) = {
         val control = findControlByName(inDoc, controlName).get
 
-        val removedHolders = delete(lhhaHoldersForAllLangs(inDoc, controlName, lhha))
+        val removedHolders = delete(lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha))
         val removedLHHA    = delete(control child (XF → lhha))
 
         removedHolders ++ removedLHHA
@@ -618,49 +575,20 @@ trait ControlOps extends BaseOps {
         prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
     }
 
-    private val HelpMatcher = """\$form-resources/([^/]+)/help""".r
-
     // Find all resource holders and elements which are unneeded because the resources are blank
     def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String) = {
 
         val allHelpElements =
             inDoc.root \\ (XF → lhha) map
             (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
-            { case (lhhaElement, HelpMatcher(controlName)) ⇒ lhhaElement → controlName }
+            { case (lhhaElement, HelpRefMatcher(controlName)) ⇒ lhhaElement → controlName }
 
         val allUnneededHolders =
             allHelpElements collect {
-                case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangs(inDoc, controlName, lhha) ⇒
-                   lhhaHoldersForAllLangs(inDoc, controlName, lhha) :+ lhhaElement
+                case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc, controlName, lhha) ⇒
+                   lhhaHoldersForAllLangsUseDoc(inDoc, controlName, lhha) :+ lhhaElement
             }
 
         allUnneededHolders.flatten.asJava
     }
-
-    private def hasBlankOrMissingLHHAForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
-        findResourceHoldersWithLang(inDoc, controlName) forall
-        { case (_, holder) ⇒ isBlank(holder child lhha stringValue) }
-
-    private def lhhaHoldersForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
-        for {
-            (_, controlHolder) ← findResourceHoldersWithLang(inDoc, controlName)
-            lhhaHolder         ← controlHolder child lhha
-        } yield
-            lhhaHolder
-
-    // Find control resource holders
-    def findResourceHolders(controlName: String): Seq[NodeInfo] =
-        findResourceHoldersWithLang(controlName) map (_._2)
-
-    // Find control resource holders with their language
-    def findResourceHoldersWithLang(controlName: String): Seq[(String, NodeInfo)] =
-        findResourceHoldersWithLang(formResourcesRoot, controlName)
-
-    def findResourceHoldersWithLang(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
-        for {
-            resource ← resourcesInstanceRoot(inDoc) \ "resource"
-            lang     = (resource \@ "*:lang").stringValue
-            holder   ← resource child controlName headOption
-        } yield
-            (lang, holder)
 }

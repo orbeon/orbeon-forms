@@ -100,7 +100,18 @@ trait BaseOps extends Logging {
         ! UserAgent.isUserAgentIE(request) || UserAgent.getMSIEVersion(request) >= MinimalIEVersion
     }
 
-    def debugDumpDocument(message: String, inDoc: NodeInfo) =
+    def debugDumpDocumentForGrids(message: String, inDoc: NodeInfo) =
         if (XFormsProperties.getDebugLogging.contains("form-builder-grid"))
-            debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
+            debugDumpDocument(message, inDoc)
+
+    def debugDumpDocument(message: String, inDoc: NodeInfo) =
+        debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
+
+    def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
+        val name            = localname(origin(0))
+        val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
+        val elementsBefore  = into child * filter (e ⇒ namesUntil(localname(e)))
+
+        insert(into = into, after = elementsBefore, origin = origin)
+    }
 }

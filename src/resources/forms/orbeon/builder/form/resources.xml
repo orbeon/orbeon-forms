@@ -473,12 +473,16 @@
             </calculate>
             <help>
                 <label>Help Message</label>
-                <hint>Message displayed when users click on the help icon next to the label</hint>
+                <hint>Displayed when help is activated</hint>
             </help>
             <alert>
-                <label>Error Message</label>
-                <hint>Message to display when the control data is incorrect or missing</hint>
+                <label>Alert Message</label>
+                <hint>Displayed when the alert is active</hint>
             </alert>
+            <tab-type><label>Data Type</label></tab-type>
+            <tab-calculations><label>Formulas</label></tab-calculations>
+            <tab-alerts><label>Constraints and Alerts</label></tab-alerts>
+            <tab-help><label>Help</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
             <label>Confirm</label>
@@ -1318,12 +1322,16 @@
             </calculate>
             <help>
                 <label>Message d'aide</label>
-                <hint>Message affiché lorsque les utilisateurs cliquent sur l'icône d'aide à coté du contrôle</hint>
+                <hint>Affiché lorsque l'aide est activée</hint>
             </help>
             <alert>
-                <label>Message d'erreur</label>
-                <hint>Message à afficher lorsque la donnée est incorrecte ou manquante</hint>
+                <label>Message d'alerte</label>
+                <hint>Affiché lorsque l'alerte est active</hint>
             </alert>
+            <tab-type><label>Type de donnée</label></tab-type>
+            <tab-calculations><label>Formules</label></tab-calculations>
+            <tab-alerts><label>Contraintes et alertes</label></tab-alerts>
+            <tab-help><label>Aide</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
             <label>Confirmation</label>
@@ -2168,9 +2176,13 @@
                 <hint>[Message displayed when users click on the help icon next to the label]</hint>
             </help>
             <alert>
-                <label>Feilmelding</label>
-                <hint>Melding som skal vises når kontrolldata mangler eller er galt</hint>
+                <label>[Feilmelding]</label>
+                <hint>[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
             </alert>
+            <tab-type><label>[Data Type]</label></tab-type>
+            <tab-calculations><label>[Formulas]</label></tab-calculations>
+            <tab-alerts><label>[Constraints and Alerts]</label></tab-alerts>
+            <tab-help><label>[Help]</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
             <label>Bekreft</label>
@@ -3014,9 +3026,13 @@
                 <hint>[Message displayed when users click on the help icon next to the label]</hint>
             </help>
             <alert>
-                <label>Сообщение об ошибке</label>
-                <hint>Сообщение, которое будет показано, если введенное значение некорректно</hint>
+                <label>[Сообщение об ошибке]</label>
+                <hint>[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
             </alert>
+            <tab-type><label>[Data Type]</label></tab-type>
+            <tab-calculations><label>[Formulas]</label></tab-calculations>
+            <tab-alerts><label>[Constraints and Alerts]</label></tab-alerts>
+            <tab-help><label>[Help]</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
             <label>Подтвердить</label>

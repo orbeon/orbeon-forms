@@ -324,6 +324,7 @@ object XML {
         def descendant(test: Test) = \\(test)
 
         def attValue(attName: String) = \@(attName).stringValue
+        def attValue(attName: QName)  = \@(attName).stringValue
         def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
 

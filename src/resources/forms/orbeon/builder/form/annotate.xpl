@@ -145,10 +145,15 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Convert MIP names -->
+                <!-- Convert MIP names (attributes and nested elements) -->
                 <xsl:template match="xf:bind/@relevant | xf:bind/@readonly | xf:bind/@required | xf:bind/@constraint | xf:bind/@calculate | xf:bind/@xxf:default">
                     <!-- Below we only allow fb:required to be interpreted as a custom MIP -->
                     <xsl:attribute name="fb:{local-name()}" select="."/>
+                </xsl:template>
+                <xsl:template match="xf:bind/xf:relevant | xf:bind/xf:readonly | xf:bind/xf:required | xf:bind/xf:constraint | xf:bind/xf:calculate | xf:bind/xxf:default">
+                    <xsl:element name="fb:{local-name()}">
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:element>
                 </xsl:template>
 
                 <!-- Add model actions -->

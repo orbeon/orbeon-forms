@@ -31,28 +31,34 @@ class LHHAAnalysis(staticStateContext: StaticStateContext, element: Element, par
 
     self ⇒
 
+    import LHHAAnalysis._
+
     require(parent.isDefined)
 
     val forStaticIdOption = Option(element.attributeValue(FOR_QNAME))
     val isLocal           = forStaticIdOption.isEmpty
     val defaultToHTML     = LHHAAnalysis.isHTML(element)
 
+    // What we support for alert level/constraint:
+    //
+    // - <xf:alert>                                             → alert applies to all alert levels
+    // - <xf:alert level="foo">                                 → same, unknown level is ignored [SHOULD WARN]
+    // - <xf:alert level="warning info">                        → alert only applies to warning and info levels
+    // - <xf:alert level="warning" constraint="">               → same, blank attribute is same as missing attribute [SHOULD WARN]
+    // - <xf:alert constraint="c1 c2">                          → alert only applies if either constraint c1 or c2 fails
+    // - <xf:alert level="" constraint="c1 c2">                 → same, blank attribute is same as missing attribute [SHOULD WARN]
+    // - <xf:alert level="error" constraint="c1 c2">            → same, level is ignored when a constraint is present [SHOULD WARN]
+
     val forConstraints =
         if (localName == "alert")
-            stringToSet(element.attributeValue(CONSTRAINT_QNAME))
+            gatherAlertConstraints(Option(element.attributeValue(CONSTRAINT_QNAME)))
         else
             Set.empty[String]
 
     val forLevels =
-        if (localName == "alert") {
-            val att = element.attributeValue(LEVEL_QNAME)
-            if (att ne null)
-                stringToSet(att) collect LevelByName
-            else if (element.attribute(CONSTRAINT_QNAME) ne null)
-                Set.empty[ConstraintLevel] // consider that the constraints prime over the levels
-            else
-                LevelSet                   // match all levels because we take it as "no level constraint was specified"
-        } else
+        if (localName == "alert")
+            gatherAlertLevels(Option(element.attributeValue(LEVEL_QNAME)))
+        else
             Set.empty[ConstraintLevel]
 
     // Find the target control if any
@@ -176,4 +182,10 @@ object LHHAAnalysis {
             case _ ⇒
                 false
         }
+
+    def gatherAlertConstraints(constraintAtt: Option[String]) =
+        stringOptionToSet(constraintAtt)
+
+    def gatherAlertLevels(levelAtt: Option[String]) =
+        stringOptionToSet(levelAtt) collect LevelByName
 }

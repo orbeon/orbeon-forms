@@ -21,7 +21,7 @@ import org.orbeon.oxf.fr.FormRunner._
 
 trait ContainerOps extends ControlOps {
 
-    self: GridOps ⇒ // funky dependency
+    self: GridOps ⇒ // funky dependency, to resolve at some point
 
     def containerById(containerId: String): NodeInfo = {
         // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)

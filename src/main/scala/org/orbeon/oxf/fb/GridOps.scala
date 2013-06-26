@@ -128,7 +128,7 @@ trait GridOps extends ContainerOps {
 
         // Insert the new row
         val result = insert(into = grid, after = tr, origin = newRow(grid, newCellCount)).headOption
-        debugDumpDocument("insert row below", grid)
+        debugDumpDocumentForGrids("insert row below", grid)
         result orNull // bad, but insert() is not always able to return the inserted item at this time
     }
 
@@ -144,7 +144,7 @@ trait GridOps extends ContainerOps {
                 // Insert as first row of the table
                 val grid = getContainingGrid(tr)
                 val result = insert(into = grid, before = tr, origin = newRow(grid, getGridSize(grid))).head
-                debugDumpDocument("insert row above", grid)
+                debugDumpDocumentForGrids("insert row above", grid)
                 result
         }
 
@@ -197,7 +197,7 @@ trait GridOps extends ContainerOps {
         // Adjust selected td if needed
         newTdToSelect foreach (selectTd(_))
 
-        debugDumpDocument("delete row", tr)
+        debugDumpDocumentForGrids("delete row", tr)
     }
 
     // Whether this is the last grid in the section
@@ -232,7 +232,7 @@ trait GridOps extends ContainerOps {
                 }
             }
 
-            debugDumpDocument("insert col right", grid)
+            debugDumpDocumentForGrids("insert col right", grid)
         }
     }
 
@@ -256,7 +256,7 @@ trait GridOps extends ContainerOps {
                     insert(into = tr, origin = newTdElement(grid, ids.next()))
                 }
 
-                debugDumpDocument("insert col left", grid)
+                debugDumpDocumentForGrids("insert col left", grid)
             }
         }
     }
@@ -292,7 +292,7 @@ trait GridOps extends ContainerOps {
         // Adjust selected td if needed
         newTdToSelect foreach (selectTd(_))
 
-        debugDumpDocument("delete col", grid)
+        debugDumpDocumentForGrids("delete col", grid)
     }
 
     def controlsInCol(gridId: String, colPos: Int): Int = controlsInCol(tdAtColPos(gridId, colPos))

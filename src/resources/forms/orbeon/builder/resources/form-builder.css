@@ -429,6 +429,9 @@ body {
 .orbeon .fb-dialog-validation-details .xforms-label {
   margin-top: 5px;
 }
+.orbeon .fb-dialog-validation-details .fr-grid-constraints .fr-grid-col-2 {
+  width: 150px;
+}
 .orbeon #fb-schema-upload-dialog {
   width: 400px;
 }

@@ -25,3 +25,4 @@ object FormBuilder
     with ControlOps
     with GridOps
     with SectionOps
+    with AlertsAndConstraintsOps

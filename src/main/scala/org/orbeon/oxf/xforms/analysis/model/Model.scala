@@ -309,14 +309,15 @@ object Model {
     case object Readonly     extends { val name = "readonly" }   with StdMIP with BooleanMIP with ComputedMIP
     case object Required     extends { val name = "required" }   with StdMIP with BooleanMIP with ComputedMIP with ValidateMIP
     case object Constraint   extends { val name = "constraint" } with StdMIP with BooleanMIP with ValidateMIP
-    case object Warning      extends { val name = "warning" }    with ExtMIP with BooleanMIP with ValidateMIP
     case object Calculate    extends { val name = "calculate" }  with StdMIP with StringMIP  with ComputedMIP
     case object Default      extends { val name = "default" }    with ExtMIP with StringMIP  with ComputedMIP
     case object Type         extends { val name = "type" }       with StdMIP with ValidateMIP
 
     //case class Custom(n: String) extends { val name = n }        with StdMIP with XPathMIP
 
-    val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Warning, Calculate, Default, Type)
+    val AllMIPs                  = Set[MIP](Relevant, Readonly, Required, Constraint, Calculate, Default, Type)
+    val AllMIPsInOrder           = AllMIPs.toList.sortBy(_.name)
+    val AllMIPNamesInOrder       = AllMIPsInOrder map (_.name)
     val AllMIPsByName            = AllMIPs map (mip ⇒ mip.name → mip) toMap
     val AllMIPNames              = AllMIPs map (_.name)
     val MIPNameToAttributeQName  = AllMIPs map (m ⇒ m.name → m.aName) toMap
@@ -340,7 +341,6 @@ object Model {
     val READONLY   = Readonly.name
     val REQUIRED   = Required.name
     val CONSTRAINT = Constraint.name
-    val WARNING    = Warning.name
     val CALCULATE  = Calculate.name
     val DEFAULT    = Default.name
     val TYPE       = Type.name

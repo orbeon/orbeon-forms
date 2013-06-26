@@ -23,7 +23,7 @@ import org.orbeon.scaxon.XML._
 
 trait SectionOps extends ContainerOps {
 
-    self: GridOps ⇒ // funky dependency
+    self: GridOps ⇒ // funky dependency, to resolve at some point
 
     def canDeleteSection(section: NodeInfo): Boolean = {
         val isSubSection = (section ancestor "*:section").nonEmpty        // We can always delete a sub-section

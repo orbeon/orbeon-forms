@@ -43,11 +43,11 @@ protected trait FunctionSupport extends XFormsFunction {
 
     // Resolve a relevant control by id
     def relevantControl(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsControl] =
-        resolveOrFindByEffectiveId(staticOrAbsoluteId) collect
+        resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId) collect
             { case control: XFormsControl if control.isRelevant ⇒ control }
 
     // Resolve an object by id
-    def resolveOrFindByEffectiveId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
+    def resolveOrFindByStaticOrAbsoluteId(staticOrAbsoluteId: String)(implicit xpathContext: XPathContext): Option[XFormsObject] =
         Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId, null))
 
     def resolveEffectiveId(staticIdExpr: Option[Expression])(implicit xpathContext: XPathContext): Option[String] =

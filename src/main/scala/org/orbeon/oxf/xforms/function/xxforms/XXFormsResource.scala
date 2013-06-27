@@ -31,8 +31,8 @@ class XXFormsResource extends XFormsFunction with FunctionSupport {
         implicit val ctx = xpathContext
 
         def findInstance = stringArgumentOpt(1) match {
-            case Some(instanceName) ⇒ resolveOrFindByEffectiveId(instanceName)
-            case None               ⇒ resolveOrFindByEffectiveId("orbeon-resources") orElse resolveOrFindByEffectiveId("fr-form-resources")
+            case Some(instanceName) ⇒ resolveOrFindByStaticOrAbsoluteId(instanceName)
+            case None               ⇒ resolveOrFindByStaticOrAbsoluteId("orbeon-resources") orElse resolveOrFindByStaticOrAbsoluteId("fr-form-resources")
         }
 
         def findResourcesElement = findInstance collect { case instance: XFormsInstance ⇒ instance.rootElement }

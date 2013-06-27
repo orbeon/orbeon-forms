@@ -58,9 +58,8 @@ protected trait FunctionSupport extends XFormsFunction {
             case Some(expr) ⇒
                 // Otherwise resolve the static id passed against the source id
                 val staticId = expr.evaluateAsString(xpathContext).toString
-                Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticId, null)) collect {
-                    case target: XFormsObject ⇒ target.getEffectiveId
-                }
+                Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticId, null)) map
+                    (_.getEffectiveId)
         }
 
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)

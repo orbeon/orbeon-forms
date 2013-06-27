@@ -213,6 +213,11 @@ trait XXFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("absolute-id", classOf[XXFormsAbsoluteId], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
             Arg(STRING, EXACTLY_ONE)
         )
+
+        // xxf:client-id
+        Fun("client-id", classOf[XXFormsClientId], 0, 1, STRING, ALLOWS_ZERO_OR_ONE,
+            Arg(STRING, EXACTLY_ONE)
+        )
     
         // xxf:control-element
         Fun("control-element", classOf[XXFormsControlElement], 0, 1, Type.NODE_TYPE, ALLOWS_ZERO_OR_ONE,

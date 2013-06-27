@@ -60,10 +60,10 @@ object XFormsAPI {
     }
 
     // Return the action interpreter
-    def actionInterpreter = { assert(actionInterpreterDyn.value.isDefined); actionInterpreterDyn.value.get }
+    def actionInterpreter = actionInterpreterDyn.value.get
 
     // Return the containing document
-    def containingDocument = { assert(containingDocumentDyn.value.isDefined); containingDocumentDyn.value.get }
+    def containingDocument = containingDocumentDyn.value.get
 
     // xf:setvalue
     // @return the node whose value was set, if any

@@ -51,7 +51,7 @@
 
                     <!-- Get precomputed list of invalid rows from session -->
                     <xf:var name="invalid-rows"  as="xs:integer*"
-                             value="for $t in tokenize(xxf:get-session-attribute('org.orbeon.fr.import.invalid-rows'), '\s+') return xs:integer($t)"/>
+                             value="for $t in xxf:split(xxf:get-session-attribute('org.orbeon.fr.import.invalid-rows')) return xs:integer($t)"/>
 
                     <!--<xf:message level="xxf:log-info">xxx <xf:output value="$invalid-rows"/></xf:message>-->
                     <!--<xf:message level="xxf:log-info">xxx <xf:output value="xxf:serialize(instance(), 'xml')"/></xf:message>-->

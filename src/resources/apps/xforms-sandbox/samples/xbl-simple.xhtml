@@ -73,7 +73,7 @@
                             </xf:group>
                         </xf:group>
                         <xh:br/>
-                        <xf:output value="string-join(tokenize($foobar, '\s'), ' - ')">
+                        <xf:output value="string-join(xxf:split($foobar), ' - ')">
                             <xf:label>Languages:</xf:label>
                         </xf:output>
                     </xh:div>

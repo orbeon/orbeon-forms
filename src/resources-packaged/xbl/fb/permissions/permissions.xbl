@@ -54,12 +54,12 @@
                     <xf:bind ref="permissions">
                         <!-- If a permission is assigned to anyone, remove it from other "rows", as it would be redundant -->
                         <xf:bind ref="permission[position() > 1]/operations" readonly="false()"
-                                 calculate="string-join(tokenize(., '\s')[not (. = tokenize(instance('ui')/permissions/permission[1]/operations, '\s'))], ' ')"/>
+                                 calculate="string-join(xxf:split()[not (. = xxf:split(instance('ui')/permissions/permission[1]/operations))], ' ')"/>
                         <xf:bind ref="permission">
                             <xf:bind ref="role" constraint="normalize-space()" required="true()"/>
                             <!-- If operations contains 'update', automatically add 'read' -->
-                            <xf:bind ref="operations" readonly="false()" calculate="if (tokenize(., '\s') = 'update')
-                                then string-join(distinct-values((tokenize(., '\s'), 'read')), ' ') else ."/>
+                            <xf:bind ref="operations" readonly="false()" calculate="if (xxf:split() = 'update')
+                                then string-join(distinct-values((xxf:split(), 'read')), ' ') else ."/>
                         </xf:bind>
                     </xf:bind>
                 </xf:bind>
@@ -105,12 +105,12 @@
                                      value="$metadata/permissions/permission[exists(group-member)]/@operations"/>
 
                         <!-- Add permissions attached to a role -->
-                        <xf:var name="roles" value="distinct-values($metadata/permissions/permission/user-role/@any-of/tokenize(., '\s'))"/>
+                        <xf:var name="roles" value="distinct-values($metadata/permissions/permission/user-role/@any-of/xxf:split())"/>
                         <xf:action iterate="$roles">
                             <!-- Current role -->
                             <xf:var name="role" value="."/>
                             <!-- Permissions for the current role -->
-                            <xf:var name="permissions" value="$metadata/permissions/permission[tokenize(user-role/@any-of, '\s') = $role]"/>
+                            <xf:var name="permissions" value="$metadata/permissions/permission[xxf:split(user-role/@any-of) = $role]"/>
                             <!-- Insert new permission in UI, and populate it -->
                             <xf:insert context="$ui/permissions" ref="permission" origin="instance('permission-template')"/>
                             <xf:var name="new-permission" value="$ui/permissions/permission[last()]"/>
@@ -147,9 +147,9 @@
 
                         <!-- For each role-based permission, get the roles that can access it, and store in metadata as a separate permission element -->
                         <xf:var name="role-permissions" value="$ui/permissions/permission[exists(role)]"/>
-                        <xf:action iterate="distinct-values($role-permissions/operations/tokenize(., '\s'))">
+                        <xf:action iterate="distinct-values($role-permissions/operations/xxf:split())">
                             <xf:var name="operation" value="."/>
-                            <xf:var name="roles" value="string-join(saxon:sort($role-permissions[tokenize(operations, '\s') = $operation]/role), ' ')"/>
+                            <xf:var name="roles" value="string-join(saxon:sort($role-permissions[xxf:split(operations) = $operation]/role), ' ')"/>
                             <xf:insert context="$metadata/permissions" ref="*" origin="xxf:element('permission', (
                                 xxf:attribute('operations', $operation),
                                 xxf:element('user-role', xxf:attribute('any-of', $roles))))"/>
@@ -196,7 +196,7 @@
                                 <xh:th><xf:output value="$resources/dialog-permissions/role"/></xh:th>
                                 <xh:th colspan="3"><xf:output value="$resources/dialog-permissions/operations"/></xh:th>
                             </xh:tr>
-                            <xf:var name="anyone-operations" value="tokenize($ui/permissions/permission[1]/operations, '\s')"/>
+                            <xf:var name="anyone-operations" value="xxf:split($ui/permissions/permission[1]/operations)"/>
                             <xf:repeat ref="$ui/permissions/permission">
                                 <xf:var name="is-anyone" value="empty(role) and empty(@for)"/>
                                 <xf:var name="is-owner-group" value="exists(@for)"/>
@@ -228,7 +228,7 @@
                                     <xh:td>
                                         <!-- If this role has the 'update' permission, make the 'read' checkbox read-only -->
                                         <xf:select ref="if ((not($is-anyone) and $anyone-operations = 'read')
-                                                           or (tokenize(operations, '\s') = 'update'))
+                                                           or (xxf:split(operations) = 'update'))
                                                         then $ui/readonly-checked else operations"
                                                    appearance="full" class="fb-read-permission">
                                             <xf:item>

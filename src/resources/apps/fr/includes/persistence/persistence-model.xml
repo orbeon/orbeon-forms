@@ -39,7 +39,7 @@
 
         <!-- Initialize parameters to pass to "new" service -->
         <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
-        <xf:action iterate="tokenize($pass-request-parameters, '\s+')">
+        <xf:action iterate="xxf:split($pass-request-parameters)">
             <xf:var name="parameter-name" value="."/>
             <xf:var name="parameter-value" value="xxf:get-request-parameter($parameter-name)"/>
             <xf:insert context="instance('fr-service-parameters')" origin="xxf:element($parameter-name, $parameter-value)"/>
@@ -312,10 +312,10 @@
 
         <!-- Conditions for disabling workflow buttons -->
         <xf:bind ref="can-update"
-                 relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'update')"/>
+                 relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'update')"/>
 
         <xf:bind ref="can-read"
-                 relevant="tokenize(instance('fr-authorized-operations'), '\s') = ('*', 'read')"/>
+                 relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')"/>
 
         <xf:bind ref="pdf"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
@@ -342,7 +342,7 @@
         validate="false"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
-        ref="if (tokenize(instance('fr-send-submission-params')/@content, '\s+') = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="all">
         <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
         <xf:action ev:event="xforms-submit">
@@ -365,7 +365,7 @@
         validate="false"
         method="{event('method')}"
         serialization="{if (event('method') = 'get') then 'none' else 'application/xml'}"
-        ref="if (tokenize(instance('fr-send-submission-params')/@content, '\s+') = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="none"/>
 
     <!-- Call email service -->

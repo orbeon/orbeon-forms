@@ -55,7 +55,7 @@
 
             <xsl:variable name="pdfFormats" select="frf:getPDFFormats()"/>
 
-            <xsl:for-each select="tokenize(xpl:property('oxf.fr.pdf.template.font.paths'), '\s+')">
+            <xsl:for-each select="p:split(xpl:property('oxf.fr.pdf.template.font.paths'))">
                 <substitution-font font-family="{.}" embed="true"/>
             </xsl:for-each>
 

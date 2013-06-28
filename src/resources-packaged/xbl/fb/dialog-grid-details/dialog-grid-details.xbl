@@ -72,7 +72,7 @@
                          type="xs:NCName"
                          calculate="normalize-space()"
                          readonly="false()"
-                         constraint="string() = ../original-grid-name or not(string() = tokenize(../control-names, '\s+'))"/>
+                         constraint="string() = ../original-grid-name or not(string() = xxf:split(../control-names))"/>
 
                 <xf:bind ref="relevant | readonly" type="xxf:xpath2" required="false()"/>
 

@@ -631,7 +631,7 @@
                                         </xf:dispatch>
                                     </xf:action>
                                     <xf:action ev:event="fr-positive">
-                                        <xf:var name="grid-col" value="tokenize(event('context'), ' ')"/>
+                                        <xf:var name="grid-col" value="xxf:split(event('context'))"/>
                                         <xf:action type="xpath">fbf:deleteCol($grid-col[1], xs:integer($grid-col[2]))</xf:action>
                                     </xf:action>
                                 </xf:trigger>
@@ -667,7 +667,7 @@
                                         </xf:dispatch>
                                     </xf:action>
                                     <xf:action ev:event="fr-positive">
-                                        <xf:var name="grid-row" value="tokenize(event('context'), ' ')"/>
+                                        <xf:var name="grid-row" value="xxf:split(event('context'))"/>
                                         <xf:action type="xpath">fbf:deleteRow($grid-row[1], xs:integer($grid-row[2]))</xf:action>
                                     </xf:action>
                                 </xf:trigger>

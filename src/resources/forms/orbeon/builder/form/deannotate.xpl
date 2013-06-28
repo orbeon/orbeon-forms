@@ -118,7 +118,7 @@
 
                 <!-- Restore xxf:custom-mips -->
                 <xsl:template match="xh:head/xf:model[@id = 'fr-form-model']/@xxf:custom-mips">
-                    <xsl:variable name="tokens" select="tokenize(., '\s+')[. != 'fb:required']"/>
+                    <xsl:variable name="tokens" select="p:split()[. != 'fb:required']" xmlns:p="http://www.orbeon.com/oxf/pipeline"/>
                     <xsl:if test="exists($tokens)">
                         <xsl:attribute name="xxf:custom-mips" select="string-join($tokens, ' ')"/>
                     </xsl:if>

@@ -12,7 +12,8 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms">
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
     <head>
         <title>Dynamic dropdown depending on checkboxes</title>
         <xf:model>
@@ -50,7 +51,7 @@
                 <xf:label/>
                 <xf:value/>
             </xf:itemset>
-            <xf:itemset ref="instance('pets')/item[@value = tokenize(context()/../pets, '\s+')]">
+            <xf:itemset ref="instance('pets')/item[@value = xxf:split(context()/../pets)]">
                 <xf:label ref="@name"/>
                 <xf:value ref="@value"/>
             </xf:itemset>

@@ -368,9 +368,9 @@
                     <xf:bind name="submission-bind" ref="xf:send/@submission" required="true()"/>
                     <!-- The observer for the event triggering the action is either a control, or the model -->
                     <xf:bind ref="@ev:observer"
-                                 required="tokenize(../@fb:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 relevant="tokenize(../@fb:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
-                                 calculate="if (tokenize(../@fb:event, '\s+') = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
+                                 required="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 relevant="xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')"
+                                 calculate="if (xxf:split(../@fb:event) = ('DOMActivate', 'xforms-value-changed', 'xforms-enabled')) then . else 'fr-form-model'"
                                  readonly="false()"/>
                 </xf:bind>
                 <!-- xforms-submit -->

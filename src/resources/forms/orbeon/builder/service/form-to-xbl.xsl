@@ -54,7 +54,7 @@
     <!-- NOTE: Source can also be a model -->
     <xsl:function name="fr:action-sources" as="xs:string*">
         <xsl:param name="action" as="element(xf:action)"/>
-        <xsl:sequence select="distinct-values($action/xf:action[1]/@*:observer/tokenize(., '\s+'))"/>
+        <xsl:sequence select="distinct-values($action/xf:action[1]/@*:observer/p:split())"/>
     </xsl:function>
 
     <!-- Distinct destination ids for the given action -->
@@ -127,12 +127,12 @@
     </xsl:template>
 
     <!-- When copying actions, update references to xforms-ready and fr-form-model -->
-    <xsl:template match="@*:event[tokenize(., '\s+') = 'xforms-ready']" mode="filter-actions">
-        <xsl:attribute name="{name(.)}" select="(fr:value-except(tokenize(., '\s+'), 'xforms-ready'), 'xforms-model-construct-done')"/>
+    <xsl:template match="@*:event[p:split() = 'xforms-ready']" mode="filter-actions">
+        <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'xforms-ready'), 'xforms-model-construct-done')"/>
     </xsl:template>
-    <xsl:template match="@*:observer[tokenize(., '\s+') = 'fr-form-model']" mode="filter-actions">
+    <xsl:template match="@*:observer[p:split() = 'fr-form-model']" mode="filter-actions">
         <xsl:param name="component-id" tunnel="yes"/>
-        <xsl:attribute name="{name(.)}" select="(fr:value-except(tokenize(., '\s+'), 'fr-form-model'), concat($component-id, '-model'))"/>
+        <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'fr-form-model'), concat($component-id, '-model'))"/>
     </xsl:template>
 
     <!-- Generate one component per section -->

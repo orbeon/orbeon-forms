@@ -18,8 +18,8 @@
     xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <xsl:variable name="has-version"    select="p:property('oxf.fr.version.*.*')" as="xs:boolean?"/>
-    <xsl:variable name="css-uri"        select="tokenize(normalize-space(p:property('oxf.fr.css.uri.*.*')), '\s+')" as="xs:string*"/>
-    <xsl:variable name="custom-css-uri" select="tokenize(normalize-space(p:property('oxf.fr.css.custom.uri.*.*')), '\s+')" as="xs:string*"/>
+    <xsl:variable name="css-uri"        select="p:split(normalize-space(p:property('oxf.fr.css.uri.*.*')))" as="xs:string*"/>
+    <xsl:variable name="custom-css-uri" select="p:split(normalize-space(p:property('oxf.fr.css.custom.uri.*.*')))" as="xs:string*"/>
 
     <xsl:template match="/">
         <xsl:processing-instruction name="orbeon-serializer">status-code="404"</xsl:processing-instruction>

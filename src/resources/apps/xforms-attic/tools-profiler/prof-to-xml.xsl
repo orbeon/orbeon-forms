@@ -17,6 +17,7 @@
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
             xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:p="http://www.orbeon.com/oxf/pipeline"
             xsl:version="2.0">
 
     <!-- Parse text file in lines -->
@@ -42,7 +43,7 @@
 
     <xsl:variable name="samples" as="element(sample)*">
         <xsl:for-each select="$samples-lines">
-            <xsl:variable name="tokens" as="xs:string*" select="tokenize(., '\s+')"/>
+            <xsl:variable name="tokens" as="xs:string*" select="p:split()"/>
             <sample trace="{$tokens[5]}" count="{$tokens[4]}"/>
         </xsl:for-each>
     </xsl:variable>

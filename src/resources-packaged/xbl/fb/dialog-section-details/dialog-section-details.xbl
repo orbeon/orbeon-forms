@@ -70,7 +70,7 @@
                          type="xs:NCName"
                          calculate="normalize-space()"
                          readonly="false()"
-                         constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
+                         constraint=". = ../original-control-name or not(. = xxf:split(../control-names))"/>
                 <xf:bind ref="control-xpath"
                          relevant="../is-custom-instance = 'true'"
                          required="../is-custom-instance = 'true'"

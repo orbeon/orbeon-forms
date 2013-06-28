@@ -30,7 +30,7 @@
     <xsl:for-each select="$unique-groups">
 
         <xsl:variable name="resources-property" select="p:property(string-join(('oxf.fb.toolbox.group', ., 'uri', $app, $form), '.'))" as="xs:string"/>
-        <xsl:variable name="resources" select="for $uri in tokenize($resources-property, '\s+') return doc($uri)" as="document-node()*"/>
+        <xsl:variable name="resources" select="for $uri in p:split($resources-property) return doc($uri)" as="document-node()*"/>
 
         <xsl:if test="$resources">
             <xbl:xbl>

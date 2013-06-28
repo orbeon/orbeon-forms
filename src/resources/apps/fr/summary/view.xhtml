@@ -99,7 +99,7 @@
                 <xf:load resource="/fr/{$app}/{$form}/new{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"/>
             </xf:action>
 
-            <xf:action ev:event="fr-summary-view" if="count(tokenize(instance('fr-selection-instance'), '\s+')) = 1">
+            <xf:action ev:event="fr-summary-view" if="count(xxf:split(instance('fr-selection-instance'))) = 1">
                 <xf:load resource="/fr/{$app}/{$form}/view/{normalize-space(instance('fr-selection-instance'))}{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"/>
             </xf:action>
 
@@ -498,12 +498,12 @@
                                             <!-- Document name and href for edition -->
                                             <xf:var name="current-document-name" value="@name" as="xs:string"/>
                                             <!-- TODO: remove this once we can assume that all the persistence API implementations return @operations -->
-                                            <xf:var name="global-operations" value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
-                                            <xf:var name="current-document-operations" value="if (exists(@operations)) then tokenize(@operations, '\s+') else $global-operations" as="xs:string*"/>
+                                            <xf:var name="global-operations" value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
+                                            <xf:var name="current-document-operations" value="if (exists(@operations)) then xxf:split(@operations) else $global-operations" as="xs:string*"/>
                                             <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
                                             <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
                                                     $current-document-name, if (property('xxf:noscript')) then '?fr-noscript=true' else '')"/>
-                                            <xh:tr class="{if (tokenize(instance('fr-selection-instance'), '\s+') = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
+                                            <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                                 <xh:td class="fr-summary-repeat-selection-checkbox">
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
@@ -573,7 +573,7 @@
                                                                             if ($control = 'textarea') then
                                                                                 if (string-length(.) > 20) then concat(substring(., 1, 20), '...') else .
                                                                             else if ($control = 'select') then
-                                                                                string-join(for $v in tokenize(., '\s+') return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
+                                                                                string-join(for $v in xxf:split() return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label, ', ')
                                                                             else if ($control = 'select1') then
                                                                                 for $v in . return $form-resources/*[local-name() = $query/@name]/item[value = $v]/label
                                                                             else
@@ -696,11 +696,11 @@
 
                 <xf:group model="fr-form-model" class="fr-buttons">
 
-                    <xf:var name="global-operations"    value="tokenize(xxf:instance('fr-authorized-operations'), '\s')"/>
-                    <xf:var name="documents-selected"   value="tokenize(instance('fr-selection-instance'), '\s')"/>
+                    <xf:var name="global-operations"    value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
+                    <xf:var name="documents-selected"   value="xxf:split(instance('fr-selection-instance'))"/>
                     <xf:var name="documents-operations" value="instance('fr-summary-instance')/document[@name = $documents-selected]/@operations"/>
-                    <xf:var name="documents-can-view"   value="empty($documents-operations[not(tokenize(., '\s') = ('*', 'read'))])"/>
-                    <xf:var name="documents-can-delete" value="empty($documents-operations[not(tokenize(., '\s') = ('*', 'delete'))])"/>
+                    <xf:var name="documents-can-view"   value="empty($documents-operations[not(xxf:split() = ('*', 'read'))])"/>
+                    <xf:var name="documents-can-delete" value="empty($documents-operations[not(xxf:split() = ('*', 'delete'))])"/>
 
                     <xf:var name="new-visible"          value="$global-operations = ('*', 'create')"/>
                     <xf:var name="view-enabled"         value="property('xxf:noscript') or (count($documents-selected)  = 1 and $documents-can-view)"/>
@@ -710,7 +710,7 @@
                     <xf:var name="disabled"             value="instance('fr-summary-triggers-instance')/disabled"/>
 
                     <!-- Directly iterate over the tokenized property -->
-                    <xf:repeat ref="tokenize(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')), '\s+')">
+                    <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.summary.buttons', $app, $form), '.')))">
                         <xh:span class="fr-button">
                             <!-- Print/review button -->
                             <xf:group ref="if (. = ('print', 'review')) then if ($view-enabled) then $enabled else $disabled else ()">
@@ -728,7 +728,7 @@
                                     xmlns:version="java:org.orbeon.oxf.common.Version">
                                 <fr:href-button
                                         ref="."
-                                        href="/fr/{$app}/{$form}/pdf/{tokenize(normalize-space(instance('fr-selection-instance')), '\s+')[1]}?fr-language={xxf:instance('fr-language-instance')}">
+                                        href="/fr/{$app}/{$form}/pdf/{xxf:split(normalize-space(instance('fr-selection-instance')))[1]}?fr-language={xxf:instance('fr-language-instance')}">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/pdf"/>
                                 </fr:href-button>
                             </xf:group>
@@ -779,7 +779,7 @@
             <fr:positive-choice>
                 <xf:action ev:event="DOMActivate">
                     <!-- Parse the selected rows -->
-                    <xf:action iterate="tokenize(instance('fr-selection-instance'), '\s+')">
+                    <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
                         <xf:var name="document-name" value="." as="xs:string"/>
                         <xf:dispatch name="fr-delete-data" targetid="fr-persistence-model">
                             <xf:property name="document-id" value="$document-name"/>

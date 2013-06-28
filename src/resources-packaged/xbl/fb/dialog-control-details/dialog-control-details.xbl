@@ -63,7 +63,7 @@
                              type="xs:NCName"
                              calculate="normalize-space()"
                              readonly="false()"
-                             constraint=". = ../original-control-name or not(. = tokenize(../control-names, '\s+'))"/>
+                             constraint=". = ../original-control-name or not(. = xxf:split(../control-names))"/>
                 <xf:bind ref="control-xpath"
                              relevant="../is-custom-instance = 'true'"
                              required="../is-custom-instance = 'true'"
@@ -143,7 +143,7 @@
                         dataModel:setBindRef($form, $new-name, $local/control-xpath)
                     </xf:action>
                     <!-- Set proper classes -->
-                    <xf:var name="classes" value="tokenize($local/classes, '\s+')"/>
+                    <xf:var name="classes" value="xxf:split($local/classes)"/>
                     <xf:delete if="count($classes) = 0" ref="$control/@class"/>
                     <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', $local/classes)"/>
                     <!-- Update custom XBL properties -->

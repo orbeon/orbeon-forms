@@ -29,7 +29,7 @@
     <xsl:template match="/">
         <xh:div>
             <!-- Copy xforms-disable-hint-as-tooltip and xforms-disable-alert-as-tooltip from the body to the div -->
-            <xsl:variable name="classes-to-copy" select="tokenize(/xh:html/xh:body/@class, '\s+')[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
+            <xsl:variable name="classes-to-copy" select="p:split(/xh:html/xh:body/@class)[matches(., '^xforms-(dis|en)able-[^-]+-as-tooltip$')]"/>
             <xsl:attribute name="class" select="string-join(('orbeon orbeon-portlet-div', $classes-to-copy), ' ')"/>
             <!-- Styles -->
             <xh:link rel="stylesheet" href="/fr/style/bootstrap/css/bootstrap.css" type="text/css"/>

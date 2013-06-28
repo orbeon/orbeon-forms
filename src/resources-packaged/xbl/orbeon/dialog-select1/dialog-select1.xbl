@@ -92,7 +92,7 @@
                 <xf:action ev:event="fr-edit">
                     <!-- When dialog open, get list of available and selected items -->
                     <xf:setvalue ref="label" value="event('fr-label')"/>
-                    <xf:var name="binding" value="tokenize(event('fr-binding'), '\s+')"/>
+                    <xf:var name="binding" value="xxf:split(event('fr-binding'))"/>
                     <xf:var name="items" value="event('fr-items')"/>
                     <xf:delete ref="items/*"/>
                     <xf:insert context="items" origin="$items"/>
@@ -106,8 +106,8 @@
                 </xf:action>
 
                 <xf:var name="resources" value="instance('fr-dialog-select1-double-list-resources')/resource[@xml:lang = 'en']" as="element()?"/>
-                <xf:var name="available-values" value="tokenize(available-itemset, '\s+')" as="xs:string*"/>
-                <xf:var name="selected-values" value="tokenize(selected-itemset, '\s+')" as="xs:string*"/>
+                <xf:var name="available-values" value="xxf:split(available-itemset)" as="xs:string*"/>
+                <xf:var name="selected-values" value="xxf:split(selected-itemset)" as="xs:string*"/>
                 <xf:var name="items" value="items/item"/>
 
                 <xh:table>
@@ -130,11 +130,11 @@
                                     </xh:span>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
-                                    <xf:var name="selection" value="tokenize(../available, '\s+')" as="xs:string*"/>
+                                    <xf:var name="selection" value="xxf:split(../available)" as="xs:string*"/>
                                     <xf:setvalue ref="../selected-itemset"
-                                                     value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
+                                                     value="string-join((xxf:split(), $selection), ' ')"/>
                                     <xf:setvalue ref="../available-itemset"
-                                                     value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
+                                                     value="string-join(xxf:split()[not(. = $selection)], ' ')"/>
                                     <xf:setvalue ref="../available"/>
                                     <xf:setvalue ref="../selected"/>
                                 </xf:action>
@@ -147,11 +147,11 @@
                                     </xh:span>
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
-                                    <xf:var name="selection" value="tokenize(../selected, '\s+')" as="xs:string*"/>
+                                    <xf:var name="selection" value="xxf:split(../selected)" as="xs:string*"/>
                                     <xf:setvalue ref="../available-itemset"
-                                                     value="string-join((tokenize(., '\s+'), $selection), ' ')"/>
+                                                     value="string-join((xxf:split(), $selection), ' ')"/>
                                     <xf:setvalue ref="../selected-itemset"
-                                                     value="string-join(tokenize(., '\s+')[not(. = $selection)], ' ')"/>
+                                                     value="string-join(xxf:split()[not(. = $selection)], ' ')"/>
                                     <xf:setvalue ref="../available"/>
                                     <xf:setvalue ref="../selected"/>
                                 </xf:action>
@@ -181,7 +181,7 @@
                             <!-- Store values in itemset order -->
                             <xf:dispatch ev:event="DOMActivate" name="fr-edit-done" targetid="{callback-id}">
                                 <xf:property name="fr-new-values" value="for $selected-itemset in instance()/selected-itemset
-                                    return string-join($items/value/string()[. = tokenize($selected-itemset, '\s+')], ' ')"/>
+                                    return string-join($items/value/string()[. = xxf:split($selected-itemset)], ' ')"/>
                             </xf:dispatch>
                             <xxf:hide dialog="fr-dialog-select1-double-list-dialog"/>
                         </xf:action>
@@ -281,7 +281,7 @@
                         <xf:var name="items" value="xxf:itemset('hidden-select', 'xml')//item" as="element(item)*"/>
 
                         <!-- Represent selected value -->
-                        <xf:var name="selected" value="tokenize($binding, '\s+')" as="xs:string*"/>
+                        <xf:var name="selected" value="xxf:split($binding)" as="xs:string*"/>
 
                         <!-- If a separator is specified, output a string, otherwise output ul/li -->
                         <xsl:variable name="separator" select="/fr:dialog-select1/@separator"/>

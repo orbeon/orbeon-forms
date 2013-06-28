@@ -34,7 +34,7 @@
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:group>
-            <xf:repeat ref="tokenize(xxf:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')), '\s+')">
+            <xf:repeat ref="xxf:split(xxf:property(string-join(('oxf.fr.detail.submit.buttons', $app, $form), '.')))">
                 <!-- Clear button -->
                 <xf:trigger ref="instance()[context() = 'clear']">
                     <xf:label mediatype="text/html" value="$fr-resources/detail/buttons/submit-dialog-clear"/>

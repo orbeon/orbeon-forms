@@ -112,7 +112,7 @@
                     <!-- Update XPath on bind -->
                     <xf:setvalue if="$is-custom-mode" ref="$binds//xf:bind[@id = $bind-id]/(@ref, @nodeset)[1] treat as attribute()" value="$local/control-xpath"/>
                     <!-- Set proper classes -->
-                    <xf:var name="classes" value="tokenize($local/classes, '\s+')"/>
+                    <xf:var name="classes" value="xxf:split($local/classes)"/>
                     <xf:delete if="count($classes) = 0" ref="$control/@class"/>
                     <xf:insert if="count($classes) > 0" context="$control" origin="xxf:attribute('class', $local/classes)"/>
                     <!-- Update custom XBL properties -->

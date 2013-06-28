@@ -111,16 +111,16 @@
                     <!-- Copy -->
                     <xf:action if="instance('instance')/operation = 'copy'">
                         <xf:insert context="instance('items')//item[@value = instance('instance')/select1]"
-                            origin="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
+                            origin="instance('items')//item[@value = xxf:split(instance('instance')/select)]"/>
                     </xf:action>
                     <!-- Move to purgatory -->
                     <xf:action if="instance('instance')/operation = 'move'">
                         <xf:insert context="instance('instance')/purgatory"
-                            origin="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
+                            origin="instance('items')//item[@value = xxf:split(instance('instance')/select)]"/>
                     </xf:action>
                     <!-- Delete -->
                     <xf:action if="instance('instance')/operation = ('delete', 'move')">
-                        <xf:delete ref="instance('items')//item[@value = tokenize(instance('instance')/select, '\s+')]"/>
+                        <xf:delete ref="instance('items')//item[@value = xxf:split(instance('instance')/select)]"/>
                         <xf:setvalue ref="instance('instance')/select"/>
                     </xf:action>
                     <!-- Move from purgatory -->

@@ -92,7 +92,7 @@
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         ref="$bind"
-                        value="string-join(tokenize($bind, '\s+')[. = $control-resources/item/value/string()], ' ')"/>
+                        value="string-join(xxf:split($bind)[. = $control-resources/item/value/string()], ' ')"/>
                 </xf:action>
             </xf:action>
             <xf:action if="$element-name = ('select1', 'autocomplete') or ends-with($element-name, '-select1')">

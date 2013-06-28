@@ -199,7 +199,7 @@
                 <xsl:variable name="property-names"
                               select="p:properties-start-with('oxf.fb.toolbox.group')" as="xs:string*" />
                 <xsl:variable name="resources-names"
-                              select="distinct-values(for $n in $property-names return tokenize(p:property($n), '\s+'))" as="xs:string*"/>
+                              select="distinct-values(for $n in $property-names return xxf:split(p:property($n)))" as="xs:string*"/>
 
                 <xsl:variable name="resources"
                               select="for $uri in $resources-names return doc($uri)" as="document-node()*"/>

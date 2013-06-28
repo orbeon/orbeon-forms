@@ -109,7 +109,7 @@
                         <xf:var name="current-c" value="(instance('fr-spell-checker-result')/c[empty(@handled)])[1]"/>
                         <xf:action if="exists($current-c)">
                             <xf:setvalue ref="instance('fr-spell-checker-internal')/unknown-word" value="$current-c/@current"/>
-                            <xf:setvalue ref="instance('fr-spell-checker-internal')/correction" value="tokenize($current-c, '\s')[1]"/>
+                            <xf:setvalue ref="instance('fr-spell-checker-internal')/correction" value="xxf:split($current-c)[1]"/>
                             <xf:setvalue ref="instance('fr-spell-checker-internal')/context" value="concat(
                                 string-join($current-c/preceding-sibling::*/@current, ''),
                                 '&lt;span id=''fr-spell-checker-unknown-word'' class=''unknown-word''&gt;',
@@ -248,7 +248,7 @@
                             </xh:td>
                             <xh:td>
                                 <xf:select1 id="suggestions" appearance="compact" ref="instance('fr-spell-checker-internal')/correction">
-                                    <xf:itemset ref="tokenize(instance('fr-spell-checker-result')/c[1], '\s')">
+                                    <xf:itemset ref="xxf:split(instance('fr-spell-checker-result')/c[1])">
                                         <xf:label value="."/>
                                         <xf:value value="."/>
                                     </xf:itemset>

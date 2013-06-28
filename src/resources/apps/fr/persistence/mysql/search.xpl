@@ -133,7 +133,7 @@
 
                     <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
                     <xsl:variable name="search-operations" select="('*', 'read', 'update', 'delete')"/>
-                    <xsl:variable name="search-permissions" select="$permissions/permission[tokenize(@operations, '\s')  = $search-operations]"/>
+                    <xsl:variable name="search-permissions" select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
 
                     <!-- Are we authorized to see all the data based because of our role? -->
                     <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>

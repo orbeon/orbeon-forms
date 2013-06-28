@@ -80,9 +80,9 @@
 
     <!-- PDF template formatting -->
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->
-    <property as="xs:string"  name="oxf.fr.pdf.format.input-string"                             value=".//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string()"/>
-    <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime"                           value="string-join(.//*[tokenize(@class, '\s+') = 'xforms-input-input']/@value/string(), ' ')"/>
-    <property as="xs:string"  name="oxf.fr.pdf.format.output-string"                            value=".//*[tokenize(@class, '\s+') = 'xforms-output-output']/string()"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.input-string"                             value=".//*[xxf:split(@class) = 'xforms-input-input']/@value/string()"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.input-dateTime"                           value="string-join(.//*[xxf:split(@class) = 'xforms-input-input']/@value/string(), ' ')"/>
+    <property as="xs:string"  name="oxf.fr.pdf.format.output-string"                            value=".//*[xxf:split(@class) = 'xforms-output-output']/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.textarea"                                 value=".//textarea/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.select-label"                             value="(.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)[1]/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.select-value"                             value="(.//option[@selected = 'selected'], .//input[@checked = 'checked'])[1]/@value/string()"/>
@@ -91,8 +91,8 @@
     <property as="xs:string"  name="oxf.fr.pdf.format.select-labels"                            value="(.//option[@selected = 'selected'], .//input[@checked = 'checked']/parent::label)/string()"/>
     <property as="xs:string"  name="oxf.fr.pdf.format.select-values"                            value="(.//option[@selected = 'selected'], .//input[@checked = 'checked'])/@value/string()"/>
 
-    <property as="xs:string"  name="oxf.fr.pdf.format.attachment-url"                           value="(./descendant-or-self::*[tokenize(@class, '\s+') = 'xforms-output' and not(tokenize(@class, '\s+') = 'xforms-disabled')]/
-                                                                                                           img[not(tokenize(@class, '\s+') = ('xforms-help', 'xforms-disabled')) and (tokenize(@class, '\s+') = 'xforms-output-output' or not(@id))]/@src)[1]/
+    <property as="xs:string"  name="oxf.fr.pdf.format.attachment-url"                           value="(./descendant-or-self::*[xxf:split(@class) = 'xforms-output' and not(xxf:split(@class) = 'xforms-disabled')]/
+                                                                                                           img[not(xxf:split(@class) = ('xforms-help', 'xforms-disabled')) and (xxf:split(@class) = 'xforms-output-output' or not(@id))]/@src)[1]/
                                                                                                            string()[. != '/ops/images/xforms/spacer.gif']"/>
 
     <property as="xs:string"  name="oxf.fr.pdf.format.attachment-metadata"                      value="for $info in (.//*[@class = 'xforms-upload-info'])

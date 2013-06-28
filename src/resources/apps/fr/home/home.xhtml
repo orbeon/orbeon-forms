@@ -80,14 +80,14 @@
                                         <xf:output value="title"/>
                                     </xh:td>
                                     <xh:td class="fr-summary">
-                                        <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'update', 'read', 'delete')]">
+                                        <xf:group ref=".[xxf:split(@operations) = ('*', 'update', 'read', 'delete')]">
                                             <xh:a href="/fr/{application-name}/{form-name}/summary">
                                                 <xh:i class="icon-list"/>
                                             </xh:a>
                                         </xf:group>
                                     </xh:td>
                                     <xh:td class="fr-new">
-                                        <xf:group ref=".[tokenize(@operations, '\s') = ('*', 'create')]">
+                                        <xf:group ref=".[xxf:split(@operations) = ('*', 'create')]">
                                             <xh:a href="/fr/{application-name}/{form-name}/new">
                                                 <xh:i class="icon-plus"/>
                                             </xh:a>

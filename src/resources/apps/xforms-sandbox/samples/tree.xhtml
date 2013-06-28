@@ -164,7 +164,7 @@
             <xh:tr>
                 <xh:td>
                     <xf:var name="current-items"
-                        select="instance(instance('main-instance')/data-set)//item[@value = tokenize(instance('main-instance')/select, '\s')]"/>
+                        select="instance(instance('main-instance')/data-set)//item[@value = xxf:split(instance('main-instance')/select)]"/>
                     <xh:p>
                         <xf:output ref="select">
                             <xf:label>Multiple selection:</xf:label>

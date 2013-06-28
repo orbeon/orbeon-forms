@@ -75,7 +75,7 @@
     </xf:action>
 
     <!-- Respond to language change in the UI -->
-    <xf:action ev:observer="fr-language-selector" ev:event="xforms-value-changed DOMActivate">
+    <xf:action ev:observer="fr-language-selector" ev:event="xforms-value-changed">
         <xf:dispatch name="fr-update-language" targetid="fr-resources-model"/>
     </xf:action>
 

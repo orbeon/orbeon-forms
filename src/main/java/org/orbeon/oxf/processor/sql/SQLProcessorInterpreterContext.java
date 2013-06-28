@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorGenericDelegate;
+import org.orbeon.oxf.processor.sql.delegates.SQLProcessorStandardDelegate;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
 import org.orbeon.oxf.xml.XPathContentHandler;
@@ -202,17 +203,9 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                         clazz = SQLProcessorGenericDelegate.class;
                         SQLProcessor.logger.info("Could not load HSQLDB database delegate. Using generic delegate.");
                     }
-				} else if ("MySQL".equalsIgnoreCase(productName)) {
-                    // MySQL
-                    try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorMySQLDelegate");
-                        SQLProcessor.logger.info("Using MySQL delegate.");
-                    } catch (Throwable t) {
-                        clazz = SQLProcessorGenericDelegate.class;
-                        SQLProcessor.logger.info("Could not load MySQL database delegate. Using generic delegate.");
-                    }
-                } else {
-                    clazz = SQLProcessorGenericDelegate.class;
+				} else {
+                    // For JDBC drivers that properly implement the API
+                    clazz = SQLProcessorStandardDelegate.class;
                 }
                 databaseDelegate = (DatabaseDelegate) clazz.newInstance();
                 getContext(pipelineContext).delegates.put(delegateKey, databaseDelegate);

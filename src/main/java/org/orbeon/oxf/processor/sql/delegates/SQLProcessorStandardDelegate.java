@@ -21,10 +21,9 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- * Custom Delegate for MySQL DB to be used with SQL Processor.
- *
+ * Custom Delegate that uses the standard JDBC API which works fine with MySQL and DB2.
  */
-public class SQLProcessorMySQLDelegate extends SQLProcessorGenericDelegate {
+public class SQLProcessorStandardDelegate extends SQLProcessorGenericDelegate {
     public OutputStream getBlobOutputStream(final PreparedStatement stmt, final int index) throws SQLException {
         return new ByteArrayOutputStream() {
             public void close() {

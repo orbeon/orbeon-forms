@@ -18,7 +18,7 @@ import java.util.{List ⇒ JList}
 import org.orbeon.saxon.om.DocumentInfo
 import java.sql.Connection
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fb.ControlOps
+import org.orbeon.oxf.fr.FormRunner._
 
 object Index {
 
@@ -45,8 +45,8 @@ object Index {
         }
 
         indexedControlElements map { control ⇒
-            val controlName = ControlOps.getControlName(control)
-            val bindForControl = ControlOps.findBindByName(formDoc, controlName).get
+            val controlName = getControlName(control)
+            val bindForControl = findBindByName(formDoc, controlName).get
             val binds = (bindForControl ancestorOrSelf "*:bind").reverse.tail // skip root bind pointing to instance
             IndexedControl(
                 name        = controlName,

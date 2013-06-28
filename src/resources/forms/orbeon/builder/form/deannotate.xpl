@@ -40,9 +40,9 @@
                               select="$metadata/form-instance-mode = 'custom'"/>
 
                 <!-- All unneeded help elements -->
-                <xsl:variable xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+                <xsl:variable xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
                               name="unneeded-elements"
-                              select="controlOps:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
+                              select="fbf:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
 
                 <xsl:template match="*[generate-id() = $unneeded-elements]"/>
 

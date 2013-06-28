@@ -16,96 +16,38 @@ package org.orbeon.oxf.fb
 import collection.JavaConverters._
 import annotation.tailrec
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.oxf.fb.FormBuilderFunctions._
 import org.orbeon.oxf.xforms.analysis.model.Model
-import org.orbeon.oxf.fb.GridOps._
-import org.orbeon.oxf.fb.ContainerOps._
 import org.orbeon.oxf.fb.DataModel._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import Model._
-import org.orbeon.oxf.xml.{XMLConstants, NamespaceMapping}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants}
 
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.saxon.om.{NodeInfo, SequenceIterator}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.XFormsConstants._
-import org.orbeon.oxf.xforms.XFormsUtils.effectiveIdToAbsoluteId
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import collection.mutable
-import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.saxon.value.StringValue
 import org.apache.commons.lang3.StringUtils._
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.xforms.XFormsUtils._
 
 /*
  * Form Builder: operations on controls.
  */
-object ControlOps {
+trait ControlOps extends BaseOps {
 
-    private val ControlName = """(.+)-(control|bind|grid|section|template|repeat)""".r // repeat for legacy FB
+    self: GridOps ⇒ // funky dependency
+
+    val FB = "http://orbeon.org/oxf/xml/form-builder"
 
     private val MIPsToRewrite = AllMIPs - Type
     private val RewrittenMIPs = MIPsToRewrite map (mip ⇒ mip.name → toQName(FB → ("fb:" + mip.name))) toMap
 
-    val LHHAInOrder = Seq("label", "hint", "help", "alert")
-    val LHHANames   = LHHAInOrder.to[Set]
-
     private val topLevelBindTemplate: NodeInfo =
         <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')"
                      xmlns:xf="http://www.w3.org/2002/xforms"/>
-
-    // Get the control name based on the control, bind, grid, section or template id
-    def controlName(controlOrBindId: String) =
-        XFormsUtils.getStaticIdFromId(controlOrBindId) match {
-            case ControlName(name, _) ⇒ name
-            case _ ⇒ null
-        }
-
-    // Whether the given id is for a control (given its reserved suffix)
-    def isIdForControl(controlOrBindId: String) = controlName(controlOrBindId) ne null
-
-    // Whether the give node corresponds to a control
-    // TODO: should be more restrictive
-    val IsControl: NodeInfo ⇒ Boolean = hasName(_)
-
-    // Find a control by name (less efficient than searching by id)
-    def findControlByName(inDoc: NodeInfo, controlName: String) =
-        Stream("control", "grid", "section", "repeat") flatMap // repeat for legacy FB
-            (suffix ⇒ byId(inDoc, controlName + '-' + suffix)) headOption
-
-    // Find a control id by name
-    def findControlIdByName(inDoc: NodeInfo, controlName: String) =
-        findControlByName(inDoc, controlName) map (_ attValue "id")
-
-    // XForms callers: find a control element by name or null (the empty sequence)
-    def findControlByNameOrEmpty(inDoc: NodeInfo, controlName: String) =
-        findControlByName(inDoc, controlName).orNull
-
-    // Find a bind by name
-    def findBindByName(inDoc: NodeInfo, name: String): Option[NodeInfo] = findBind(inDoc, isBindForName(_, name))
-
-    // XForms callers: find a bind by name or null (the empty sequence)
-    def findBindByNameOrEmpty(inDoc: NodeInfo, name: String) = findBindByName(inDoc, name).orNull
-
-    // Find a bind by predicate
-    def findBind(inDoc: NodeInfo, p: NodeInfo ⇒ Boolean): Option[NodeInfo] =
-        findTopLevelBind(inDoc).toSeq \\ "*:bind" find p
-
-    def isBindForName(bind: NodeInfo, name: String) =
-        hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
-
-    // Get the control's name based on the control element
-    def getControlName(control: NodeInfo) = getControlNameOption(control).get
-
-    // Get the control's name based on the control element
-    def getControlNameOption(control: NodeInfo) =
-        (control \@ "id" headOption) flatMap
-            (id ⇒ Option(controlName(id.stringValue)))
-
-    def hasName(control: NodeInfo) = getControlNameOption(control).isDefined
-
-    // Return a bind ref or nodeset attribute value if present
-    def bindRefOrNodeset(bind: NodeInfo): Option[String] =
-        bind \@ ("ref" || "nodeset") map (_.stringValue) headOption
 
     // Find control holders (there can be more than one with repeats)
     // Don't return anything if isCustomInstance is true
@@ -127,22 +69,6 @@ object ControlOps {
         else
             Seq()
 
-    // Find control resource holders
-    def findResourceHolders(controlName: String): Seq[NodeInfo] =
-        findResourceHoldersWithLang(controlName) map (_._2)
-
-    // Find control resource holders with their language
-    def findResourceHoldersWithLang(controlName: String): Seq[(String, NodeInfo)] =
-        findResourceHoldersWithLang(formResourcesRoot, controlName)
-
-    def findResourceHoldersWithLang(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
-        for {
-            resource ← resourcesInstanceRoot(inDoc) \ "resource"
-            lang     = (resource \@ "*:lang").stringValue
-            holder   ← resource child controlName headOption
-        } yield
-            (lang, holder)
-
     // Current resources
     def currentResources = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("current-resources"))
 
@@ -150,18 +76,44 @@ object ControlOps {
     def findCurrentResourceHolder(controlName: String) =
         currentResources child controlName headOption
 
+    def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
+
+        val td = controlElement parent * head
+        val grid = findAncestorContainers(td).head
+        assert(localname(grid) == "grid")
+
+        // First check within the current grid as well as the grid itself
+        val preceding = td preceding "*:td"
+        val precedingInGrid = preceding intersect (grid descendant "*:td")
+
+        val nameInGridOption = precedingInGrid :+ grid flatMap
+            { case td if localname(td) == "td" ⇒ td \ *; case other ⇒ other } flatMap
+                (getControlNameOption(_).toSeq) headOption
+
+        // Return that if found, otherwise find before the current grid
+        nameInGridOption orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
+    }
+
+    def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
+
+        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq()) ++ (grid precedingSibling * filter IsContainer)
+
+        // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
+        // with a name (there might not be one).
+        val controlsWithName =
+            precedingOrSelfContainers flatMap {
+                case grid if getControlNameOption(grid).isEmpty ⇒ grid \\ "*:td" \ * filter (hasName(_)) lastOption
+                case other ⇒ Some(other)
+            }
+
+        // Take the first result
+        controlsWithName.headOption flatMap (getControlNameOption(_))
+    }
+
     // Ensure that a tree of bind exists
     def ensureBindsByName(inDoc: NodeInfo, name: String) =
         findControlByName(inDoc, name) foreach { control ⇒
             ensureBinds(inDoc, findContainerNames(control) :+ name)
-        }
-
-    // Find the top-level binds (marked with "fr-form-binds" or "fb-form-binds"), if any
-    def findTopLevelBind(inDoc: NodeInfo): Option[NodeInfo] =
-        findModelElement(inDoc) \ "*:bind" find {
-            // There should be an id, but for backward compatibility also support ref/nodeset pointing to fr-form-instance
-            bind ⇒ Set("fr-form-binds", "fb-form-binds")(bind.attValue("id")) ||
-                    bindRefOrNodeset(bind) == Some("instance('fr-form-instance')")
         }
 
     // Ensure that a tree of bind exists
@@ -281,20 +233,6 @@ object ControlOps {
         findHolders(inDoc, oldName) foreach
             (rename(_, oldName, newName))
 
-    // Find all data, resources, and template holders for the given name
-    def findHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] = {
-        val result = mutable.Buffer[NodeInfo]()
-        result ++=
-                findDataHolders(inDoc, holderName) ++=
-                findResourceHolders(holderName) ++=
-                (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName)))
-        result.toList
-    }
-
-    def findResourceAndTemplateHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
-        (findResourceHolders(holderName) map (Option(_))) :+
-            (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
-
     // Find or create a data holder for the given hierarchy of names
     private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
 
@@ -336,40 +274,6 @@ object ControlOps {
         // Create one holder per existing language
         val resourceHolders = (formResourcesRoot \ "resource" \@ "*:lang") map (_.stringValue → resourceHolder)
         insertHolders(controlElement, dataHolder, resourceHolders, precedingControlName)
-    }
-
-    def precedingControlNameInSectionForControl(controlElement: NodeInfo) = {
-
-        val td = controlElement parent * head
-        val grid = findAncestorContainers(td).head
-        assert(localname(grid) == "grid")
-
-        // First check within the current grid as well as the grid itself
-        val preceding = td preceding "*:td"
-        val precedingInGrid = preceding intersect (grid descendant "*:td")
-
-        val nameInGridOption = precedingInGrid :+ grid flatMap
-            { case td if localname(td) == "td" ⇒ td \ *; case other ⇒ other } flatMap
-                (getControlNameOption(_).toSeq) headOption
-
-        // Return that if found, otherwise find before the current grid
-        nameInGridOption orElse precedingControlNameInSectionForGrid(grid, includeSelf = false)
-    }
-
-    def precedingControlNameInSectionForGrid(grid: NodeInfo, includeSelf: Boolean) = {
-
-        val precedingOrSelfContainers = (if (includeSelf) Seq(grid) else Seq()) ++ (grid precedingSibling * filter IsContainer)
-
-        // If a container has a name, then use that name, otherwise it must be an unnamed grid so find its last control
-        // with a name (there might not be one).
-        val controlsWithName =
-            precedingOrSelfContainers flatMap {
-                case grid if getControlNameOption(grid).isEmpty ⇒ grid \\ "*:td" \ * filter (hasName(_)) lastOption
-                case other ⇒ Some(other)
-            }
-
-        // Take the first result
-        controlsWithName.headOption flatMap (getControlNameOption(_))
     }
 
     // Insert data and resource holders for all languages
@@ -623,39 +527,6 @@ object ControlOps {
             control
     }
 
-    // XForms callers: build an effective id for a given static id or return null (the empty sequence)
-    def buildControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String) =
-        buildControlAbsoluteId(inDoc, staticId).orNull
-
-    def buildControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String) =
-        buildControlEffectiveId(inDoc, staticId).orNull
-
-    // Build an effective id for a given static id
-    //
-    // This assumes a certain hierarchy:
-    //
-    // - top-level xxf:dynamic
-    // - zero or more *:section containers
-    // - zero or more fr:grid containers
-    // - the only repeats are containers
-    // - all containers must have stable ids
-    def buildControlEffectiveId(inDoc: NodeInfo, staticId: String) =
-        byId(inDoc, staticId) map { control ⇒
-            // Ancestors from root to leaf except the top-level
-            val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse.tail
-
-            val containerIds = ancestorContainers map (_ attValue "id")
-            val repeatDepth = ancestorContainers count IsRepeat
-
-            def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
-            val prefixedId = containerIds :+ staticId mkString COMPONENT_SEPARATOR_STRING
-
-            DynamicControlId + COMPONENT_SEPARATOR + prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
-        }
-
-    def buildControlAbsoluteId(inDoc: NodeInfo, staticId: String) =
-        buildControlEffectiveId(inDoc, staticId) map effectiveIdToAbsoluteId
-
     // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
     def isControlLHHAHTMLMediatype(inDoc: NodeInfo, controlName: String, lhha: String) =
         hasHTMLMediatype(findControlByName(inDoc, controlName).toList child lhha)
@@ -684,25 +555,6 @@ object ControlOps {
             else
                 delete(lhhaElement \@ "mediatype")
         }
-
-    private val HelpMatcher = """\$form-resources/([^/]+)/help""".r
-
-    // Find all resource holders and elements which are unneeded because the resources are blank
-    def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String) = {
-
-        val allHelpElements =
-            inDoc.root \\ (XF → lhha) map
-            (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
-            { case (lhhaElement, HelpMatcher(controlName)) ⇒ lhhaElement → controlName }
-
-        val allUnneededHolders =
-            allHelpElements collect {
-                case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangs(inDoc, controlName, lhha) ⇒
-                   lhhaHoldersForAllLangs(inDoc, controlName, lhha) :+ lhhaElement
-            }
-
-        allUnneededHolders.flatten.asJava
-    }
 
     private def ensureLHHAElement(inDoc: NodeInfo, controlName: String, lhha: String) = {
         val control = findControlByName(inDoc, controlName).get
@@ -733,6 +585,62 @@ object ControlOps {
         removedHolders ++ removedLHHA
     }
 
+    // XForms callers: build an effective id for a given static id or return null (the empty sequence)
+    def buildFormBuilderControlAbsoluteIdOrEmpty(inDoc: NodeInfo, staticId: String) =
+        buildFormBuilderControlEffectiveId(inDoc, staticId) map effectiveIdToAbsoluteId orNull
+
+    def buildFormBuilderControlEffectiveIdOrEmpty(inDoc: NodeInfo, staticId: String) =
+        buildFormBuilderControlEffectiveId(inDoc, staticId).orNull
+
+    private def buildFormBuilderControlEffectiveId(inDoc: NodeInfo, staticId: String) =
+        byId(inDoc, staticId) map (DynamicControlId + COMPONENT_SEPARATOR + buildControlEffectiveId(_))
+
+    // Build an effective id for a given static id
+    //
+    // This assumes a certain hierarchy:
+    //
+    // - zero or more *:section containers
+    // - zero or more fr:grid containers
+    // - the only repeats are containers
+    // - all containers must have stable (not automatically-generated by XForms) ids
+    def buildControlEffectiveId(control: NodeInfo) = {
+        val staticId = control attValue "id"
+
+        // Ancestors from root to leaf except fb-body group if present
+        val ancestorContainers = findAncestorContainers(control, includeSelf = false).reverse filterNot isFBBody
+
+        val containerIds = ancestorContainers map (_ attValue "id")
+        val repeatDepth  = ancestorContainers count IsRepeat
+
+        def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
+        val prefixedId = containerIds :+ staticId mkString COMPONENT_SEPARATOR_STRING
+
+        prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
+    }
+
+    private val HelpMatcher = """\$form-resources/([^/]+)/help""".r
+
+    // Find all resource holders and elements which are unneeded because the resources are blank
+    def findBlankLHHAHoldersAndElements(inDoc: NodeInfo, lhha: String) = {
+
+        val allHelpElements =
+            inDoc.root \\ (XF → lhha) map
+            (lhhaElement ⇒ lhhaElement → lhhaElement.attValue("ref")) collect
+            { case (lhhaElement, HelpMatcher(controlName)) ⇒ lhhaElement → controlName }
+
+        val allUnneededHolders =
+            allHelpElements collect {
+                case (lhhaElement, controlName) if hasBlankOrMissingLHHAForAllLangs(inDoc, controlName, lhha) ⇒
+                   lhhaHoldersForAllLangs(inDoc, controlName, lhha) :+ lhhaElement
+            }
+
+        allUnneededHolders.flatten.asJava
+    }
+
+    private def hasBlankOrMissingLHHAForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
+        findResourceHoldersWithLang(inDoc, controlName) forall
+        { case (_, holder) ⇒ isBlank(holder child lhha stringValue) }
+
     private def lhhaHoldersForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
         for {
             (_, controlHolder) ← findResourceHoldersWithLang(inDoc, controlName)
@@ -740,7 +648,19 @@ object ControlOps {
         } yield
             lhhaHolder
 
-    private def hasBlankOrMissingLHHAForAllLangs(inDoc: NodeInfo, controlName: String, lhha: String) =
-        findResourceHoldersWithLang(inDoc, controlName) forall
-        { case (_, holder) ⇒ isBlank(holder child lhha stringValue) }
+    // Find control resource holders
+    def findResourceHolders(controlName: String): Seq[NodeInfo] =
+        findResourceHoldersWithLang(controlName) map (_._2)
+
+    // Find control resource holders with their language
+    def findResourceHoldersWithLang(controlName: String): Seq[(String, NodeInfo)] =
+        findResourceHoldersWithLang(formResourcesRoot, controlName)
+
+    def findResourceHoldersWithLang(inDoc: NodeInfo, controlName: String): Seq[(String, NodeInfo)] =
+        for {
+            resource ← resourcesInstanceRoot(inDoc) \ "resource"
+            lang     = (resource \@ "*:lang").stringValue
+            holder   ← resource child controlName headOption
+        } yield
+            (lang, holder)
 }

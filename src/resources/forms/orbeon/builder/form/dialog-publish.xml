@@ -21,7 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
-      xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
 
       id="fb-publish-dialog" level="modal" close="true" draggable="true" model="fb-publish-model">
 
@@ -165,14 +165,14 @@
 
             <xf:var name="attachment-holders"
                         value="instance('fb-form-to-publish-instance')/root()//(*[not(*)] | @*)
-                                [formRunner:isDataAttachmentPath($fb-app, $fb-form, $fb-document, normalize-space(.))]"/>
+                                [frf:isDataAttachmentPath($fb-app, $fb-form, $fb-document, normalize-space(.))]"/>
 
             <xf:action iterate="$attachment-holders" if="instance('fb-publish-instance')/is-error = 'false'">
 
                 <xf:var name="p" value="position()"/>
                 <xf:var name="holder" value="."/>
-                <xf:var name="filename" value="formRunner:getAttachmentPathFilename(normalize-space($holder))"/>
-                <xf:var name="resource" value="formRunner:createFormDefinitionAttachmentPath(event('app'), event('form'), $filename)"/>
+                <xf:var name="filename" value="frf:getAttachmentPathFilename(normalize-space($holder))"/>
+                <xf:var name="resource" value="frf:createFormDefinitionAttachmentPath(event('app'), event('form'), $filename)"/>
 
                 <!-- Publish attachment -->
                 <xf:send submission="fr-publish-attachment-submission">

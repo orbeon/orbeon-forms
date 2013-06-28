@@ -25,8 +25,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:script src="/xbl/fb/dialog-itemsets/dialog-itemsets.js"/>
     <xbl:binding id="fb-dialog-itemsets" element="fb|dialog-itemsets">
@@ -35,11 +34,11 @@
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/>          <!-- Clear local values -->
                 <xf:delete ref="items/item"/>                       <!-- Clear local items -->
-                <xf:var name="control-name"     value="controlOps:controlName(event('control-element')/@id)"/>
+                <xf:var name="control-name"     value="fbf:controlName(event('control-element')/@id)"/>
                 <xf:setvalue ref="control-name" value="$control-name"/>
                 <xf:setvalue ref="control-type" value="event('control-element')/local-name()"/>
                 <xf:setvalue ref="appearance"   value="event('control-element')/@appearance"/>
-                <xf:setvalue ref="html"         value="controlOps:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
+                <xf:setvalue ref="html"         value="fbf:isItemsetHTMLMediatype(fbf:getFormDoc(), $control-name)"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
@@ -87,7 +86,7 @@
                 <xf:var name="local" value="instance('local')"/>
 
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <xf:insert context="$local/items" origin="controlOps:getControlItems(fbf:controlId($local/control-name))"/>     <!-- Get items in the current language -->
+                    <xf:insert context="$local/items" origin="fbf:getControlItems(fbf:controlId($local/control-name))"/>     <!-- Get items in the current language -->
                     <xf:insert if="empty($local/items/item)" context="$local/items" origin="$local/template/item"/>                 <!-- Insert new blank item if there were no items -->
                     <xf:action iterate="$local/items/item">                                                                         <!-- Fixup if missing label and value elements -->
                         <xf:insert context="." if="empty(label)" ref="*[1]"      position="before" origin="$local/template/item/label"/>
@@ -98,8 +97,8 @@
 
                 <xxf:hide ev:event="DOMActivate" ev:observer="save-trigger cancel-trigger" dialog="dialog"/>                        <!-- Close dialog upon click on save/cancel -->
                 <xf:action ev:event="DOMActivate" ev:observer="save-trigger" type="xpath">                                          <!-- Save on click on save -->
-                    controlOps:setControlItems(fbf:controlId($local/control-name), $local/items),
-                    controlOps:setItemsetHTMLMediatype(fbf:getFormDoc(), $local/control-name, $local/html)
+                    fbf:setControlItems(fbf:controlId($local/control-name), $local/items),
+                    fbf:setItemsetHTMLMediatype(fbf:getFormDoc(), $local/control-name, $local/html)
                 </xf:action>
 
                 <xf:action ev:event="DOMActivate" ev:observer="fb-itemset-label-input fb-itemset-value-input">                      <!-- Add line when users press enter -->

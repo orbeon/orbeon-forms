@@ -14,15 +14,16 @@
 package org.orbeon.oxf.fb
 
 import collection.JavaConverters._
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.fb.ContainerOps._
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.fb.ControlOps._
 import java.util.{List ⇒ JList}
+import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
-object SectionOps {
+trait SectionOps extends ContainerOps {
+
+    self: GridOps ⇒ // funky dependency
 
     def canDeleteSection(section: NodeInfo): Boolean = {
         val isSubSection = (section ancestor "*:section").nonEmpty        // We can always delete a sub-section
@@ -84,7 +85,7 @@ object SectionOps {
     )
 
     // Return all classes that need to be added to an editable section
-    def canDoClasses(container: NodeInfo): JList[String] = {
+    def sectionCanDoClasses(container: NodeInfo): JList[String] = {
         val directionClasses =
             DirectionCheck collect { case (direction, check) if check(container) ⇒ "fb-can-move-" + direction }
 

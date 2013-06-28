@@ -20,8 +20,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
     xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-
-    xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+    xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xh:head>
         <xh:title>Control Details Dialog</xh:title>
@@ -42,14 +41,14 @@
                 <xf:send submission="fb-load-components"/>
                 <!-- Get binding for xf:input -->
                 <xf:insert ref="*"
-                               origin="controlOps:findBindingsForControl(
+                               origin="fbf:findBindingsForControl(
                                            instance('fb-components-instance'),
                                            instance('instance')/xf:input,
                                            instance('instance')/xf:bind[@type = 'xf:string'])"/>
 
                 <!-- Getting binding for databound-select1 -->
                 <xf:insert ref="*"
-                               origin="controlOps:findBindingsForControl(
+                               origin="fbf:findBindingsForControl(
                                            instance('fb-components-instance'),
                                            instance('instance')/instance('instance')/fr:databound-select1,
                                            instance('instance')/xf:bind[@type = 'xf:string'])"/>

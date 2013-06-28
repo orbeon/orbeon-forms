@@ -15,18 +15,18 @@
 <root xmlns:ev="http://www.w3.org/2001/xml-events"
                xmlns:xf="http://www.w3.org/2002/xforms"
                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-               xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
+               xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- Tricky: eXist returns 202 when there is a syntax error in XQuery. But we do consider this an error of course! -->
     <xf:action ev:event="xforms-submit-done" if="event('response-status-code') = 202">
         <xf:message level="xxf:log-debug"><xf:output value="event('response-body')"/></xf:message>
-        <xf:action type="xpath">form-runner:sendError(500)</xf:action>
+        <xf:action type="xpath">frf:sendError(500)</xf:action>
     </xf:action>
 
     <!-- Log and propagate error to caller -->
     <xf:action ev:event="xforms-submit-error">
         <xf:message level="xxf:log-debug"><xf:output value="event('response-body')"/></xf:message>
-        <xf:action type="xpath">form-runner:sendError((event('response-status-code'), 500)[1])</xf:action>
+        <xf:action type="xpath">frf:sendError((event('response-status-code'), 500)[1])</xf:action>
     </xf:action>
 
 </root>

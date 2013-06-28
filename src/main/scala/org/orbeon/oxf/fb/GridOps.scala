@@ -14,30 +14,24 @@
 package org.orbeon.oxf.fb
 
 import collection.JavaConverters._
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fb.FormBuilderFunctions._
-import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fb.ContainerOps._
-import collection.mutable.Buffer
-import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.properties.Properties
+import collection.mutable
 import java.util.{List ⇒ JList}
+import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.properties.Properties
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.scaxon.XML._
 
 /*
  * Form Builder: operations on grids.
  */
-object GridOps {
+trait GridOps extends ContainerOps {
 
     case class Cell(td: NodeInfo, rowspan: Int, missing: Boolean) {
         def originalRowspan = getRowspan(td)
         def originalRowspan_= (newRowSpan: Int): Unit = ensureAttribute(td, "rowspan", newRowSpan.toString)
     }
-
-    // Predicates
-    val IsRepeat: NodeInfo ⇒ Boolean = node ⇒ IsGrid(node) && node.attValue("repeat") == "true"
-    def isRepeat(node: NodeInfo) = IsRepeat(node) // for Java callers
 
     // Find the first enclosing repeated grid or legacy repeat if any
     def findContainingRepeat(descendantOrSelf: NodeInfo, includeSelf: Boolean = false) =
@@ -88,7 +82,7 @@ object GridOps {
         val rows = trs map (_ \ "*:td")
 
         // Accumulate the result for each row as we go
-        val result = Buffer[Seq[Cell]]()
+        val result = mutable.Buffer[Seq[Cell]]()
 
         rows.foldLeft(Seq[Cell]()) { (previousRow, tds) ⇒
             val newRow = newCellsRow(previousRow, tds)
@@ -518,7 +512,7 @@ object GridOps {
     )
 
     // Return all classes that need to be added to an editable grid
-    def canDoClasses(gridId: String): JList[String] = {
+    def gridCanDoClasses(gridId: String): JList[String] = {
         val grid = containerById(gridId)
 
         val deleteClasses = DeleteTests collect { case (what, test) if test(grid) ⇒ "fb-can-delete-" + what }
@@ -526,4 +520,43 @@ object GridOps {
 
         ("fr-editable" :: deleteClasses ::: insertClasses) asJava
     }
+
+    // Find the new td to select if we are removing the currently selected td
+    def findNewTdToSelect(inDoc: NodeInfo, tdsToDelete: Seq[NodeInfo]) =
+        findSelectedTd(inDoc) match {
+            case Some(selectedTd) if tdsToDelete contains selectedTd ⇒
+                // Prefer trying following before preceding, as things move up and left when deleting
+                // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
+                // stay in section, etc.
+                (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
+                        (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
+            case _ ⇒
+                None
+        }
+
+    // Return a td's preceding tds in the hierarchy of containers
+    def precedingTds(td: NodeInfo) = {
+        val preceding = td preceding "*:td"
+        preceding intersect (findAncestorContainers(td).last descendant "*:td")
+    }
+
+    // Return a td's following tds in the hierarchy of containers
+    def followingTd(td: NodeInfo) = {
+        val following = td following "*:td"
+        following intersect (findAncestorContainers(td).last descendant "*:td")
+    }
+
+    // Find all data, resources, and template holders for the given name
+    def findHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] = {
+        val result = mutable.Buffer[NodeInfo]()
+        result ++=
+                findDataHolders(inDoc, holderName) ++=
+                findResourceHolders(holderName) ++=
+                (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName)))
+        result.toList
+    }
+
+    def findResourceAndTemplateHolders(inDoc: NodeInfo, holderName: String): Seq[NodeInfo] =
+        (findResourceHolders(holderName) map (Option(_))) :+
+            (findControlByName(inDoc, holderName) flatMap (findTemplateHolder(_, holderName))) flatten
 }

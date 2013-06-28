@@ -23,9 +23,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-validation-details" element="fb|dialog-validation-details">
         <xbl:handlers>
@@ -33,7 +31,7 @@
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
-                <xf:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>
+                <xf:setvalue ref="control-name" value="fbf:controlName(event('control-id'))"/>
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
@@ -94,13 +92,13 @@
                 <!-- When the dialog opens, get type information from the form -->
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <!-- Read help/alert -->
-                    <xf:setvalue ref="$local/help"  value="controlOps:getControlHelpOrEmpty($local/control-name)"/>
-                    <xf:setvalue ref="$local/alert" value="controlOps:getControlAlertOrEmpty($local/control-name)"/>
+                    <xf:setvalue ref="$local/help"  value="fbf:getControlHelpOrEmpty($local/control-name)"/>
+                    <xf:setvalue ref="$local/alert" value="fbf:getControlAlertOrEmpty($local/control-name)"/>
 
                     <!-- Read bind information -->
 
                     <!-- Set type information if there is a type specified -->
-                    <xf:var name="type-bind" value="controlOps:getMipOrEmpty($form, $local/control-name, 'type')"/>
+                    <xf:var name="type-bind" value="fbf:getMipOrEmpty($form, $local/control-name, 'type')"/>
 
                     <xf:setvalue if="empty($type-bind)" ref="$local/builtin-type">string</xf:setvalue>
                     <xf:setvalue ref="$local/schema-type"/>
@@ -117,30 +115,29 @@
                     </xf:action>
 
                     <!-- Read all other built-in MIPs -->
-                    <xf:setvalue ref="$local/required"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'required') = 'true()' or . = 'true'"/>
-                    <xf:setvalue ref="$local/constraint" value="controlOps:getMipOrEmpty($form, $local/control-name, 'constraint')"/>
-                    <xf:setvalue ref="$local/relevant"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly"   value="controlOps:getMipOrEmpty($form, $local/control-name, 'readonly')"/>
-                    <xf:setvalue ref="$local/calculate"  value="controlOps:getMipOrEmpty($form, $local/control-name, 'calculate')"/>
-                    <xf:setvalue ref="$local/default"    value="controlOps:getMipOrEmpty($form, $local/control-name, 'default')"/>
+                    <xf:setvalue ref="$local/required"   value="fbf:getMipOrEmpty($form, $local/control-name, 'required') = 'true()' or . = 'true'"/>
+                    <xf:setvalue ref="$local/constraint" value="fbf:getMipOrEmpty($form, $local/control-name, 'constraint')"/>
+                    <xf:setvalue ref="$local/relevant"   value="fbf:getMipOrEmpty($form, $local/control-name, 'relevant')"/>
+                    <xf:setvalue ref="$local/readonly"   value="fbf:getMipOrEmpty($form, $local/control-name, 'readonly')"/>
+                    <xf:setvalue ref="$local/calculate"  value="fbf:getMipOrEmpty($form, $local/control-name, 'calculate')"/>
+                    <xf:setvalue ref="$local/default"    value="fbf:getMipOrEmpty($form, $local/control-name, 'default')"/>
 
                     <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                          allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
                     <xf:delete ref="$local/namespace::node()"/>
-                    <xf:insert context="$local" origin="controlOps:findBindByNameOrEmpty($form, $local/control-name)/namespace::node()"/>
-
+                    <xf:insert context="$local" origin="fbf:findBindByNameOrEmpty($form, $local/control-name)/namespace::node()"/>
                 </xf:action>
 
                 <!-- Save data upon close unless the sub-form is not valid -->
                 <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
                      an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
                 <xf:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/@valid = 'true'" ev:observer="dialog">
-                    <xf:var name="current-control" value="if ($local/control-name != '') then controlOps:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
+                    <xf:var name="current-control" value="if ($local/control-name != '') then fbf:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
 
                     <!-- Copy back the help/alert -->
                     <xf:action type="xpath">
-                        controlOps:setControlHelp($local/control-name, $local/help),
-                        controlOps:setControlAlert($local/control-name, $local/alert)
+                        fbf:setControlHelp($local/control-name, $local/help),
+                        fbf:setControlAlert($local/control-name, $local/alert)
                     </xf:action>
 
                     <!-- Switch between default alert message and user-specified alert message as needed -->
@@ -152,7 +149,7 @@
                         for $control-name in string($local/control-name) return (
                             (: Set built-in type if needed :)
                             if ($local/builtin-type != '') then
-                                controlOps:updateMip($form, $control-name, 'type',
+                                fbf:updateMip($form, $control-name, 'type',
                                     concat(
                                         if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number')))
                                         then 'xs:' else 'xf:', $local/builtin-type
@@ -162,12 +159,12 @@
                             (: Set schema type if needed :)
                             (: TODO: Handle namespace and prefix for namespace :)
                             if ($local/schema-type != '') then
-                                controlOps:updateMip($form, $control-name, 'type', $local/schema-type) else (),
+                                fbf:updateMip($form, $control-name, 'type', $local/schema-type) else (),
                             (: "required" MIP :)
-                            controlOps:updateMip($form, $control-name, 'required', for $v in $local/required/string() return if ($v = 'true') then 'true()' else ''),
+                            fbf:updateMip($form, $control-name, 'required', for $v in $local/required/string() return if ($v = 'true') then 'true()' else ''),
                             (: All other MIPs :)
                             for $mip in ('constraint', 'relevant', 'readonly', 'calculate', 'default') return
-                                controlOps:updateMip($form, $control-name, $mip, $local/*[name() = $mip])
+                                fbf:updateMip($form, $control-name, $mip, $local/*[name() = $mip])
                         )
                     </xf:action>
                 </xf:action>

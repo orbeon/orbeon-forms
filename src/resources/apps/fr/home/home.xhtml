@@ -21,8 +21,7 @@
       xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:widget="http://orbeon.org/oxf/xml/widget"
-      xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xh:head>
         <xh:title>
@@ -42,7 +41,7 @@
             <xf:action ev:event="xforms-model-construct-done">
                 <xf:send submission="get-forms"/>
                 <xf:action iterate="instance('fr-forms')/form">
-                    <xf:insert context="." origin="xxf:attribute('operations', string-join(form-runner:javaAuthorizedOperationsBasedOnRoles(permissions), ' '))"/>
+                    <xf:insert context="." origin="xxf:attribute('operations', string-join(frf:javaAuthorizedOperationsBasedOnRoles(permissions), ' '))"/>
                 </xf:action>
             </xf:action>
         </xf:model>

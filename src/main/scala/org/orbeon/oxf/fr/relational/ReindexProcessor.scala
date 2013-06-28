@@ -21,7 +21,6 @@ import org.orbeon.oxf.fr.relational.RelationalUtils.ResultSetIterator
 import org.orbeon.oxf.util._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner
-import scala.Some
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.fr.relational.Index.IndexedControl
 import org.orbeon.oxf.xforms.XFormsConstants

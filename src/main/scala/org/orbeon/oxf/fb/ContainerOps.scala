@@ -16,31 +16,12 @@ package org.orbeon.oxf.fb
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fb.GridOps._
-import FormBuilderFunctions._
 import org.orbeon.oxf.xforms.XFormsUtils
+import org.orbeon.oxf.fr.FormRunner._
 
-object ContainerOps {
+trait ContainerOps extends ControlOps {
 
-    // Node tests
-    private val GridElementTest: Test    = FR → "grid"
-    private val SectionElementTest: Test = FR → "section"
-    private val GroupElementTest: Test   = XF → "group"
-    private val ContainerElementTest     = SectionElementTest || GridElementTest
-
-    // Predicates
-    val IsGrid: NodeInfo ⇒ Boolean = _ self GridElementTest
-    val IsSection: NodeInfo ⇒ Boolean = _ self SectionElementTest
-
-    val IsContainer: NodeInfo ⇒ Boolean =
-        node ⇒ (node self ContainerElementTest) || ((node self GroupElementTest) && node.attClasses("fb-body"))
-
-    // Namespace URL a section template component must match
-    private val ComponentURI = """^http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/([^/]+)$""".r
-
-    val IsSectionTemplateContent: NodeInfo ⇒ Boolean =
-        container ⇒ (container parent * exists IsSection) && ComponentURI.findFirstIn(namespaceURI(container)).nonEmpty
+    self: GridOps ⇒ // funky dependency
 
     def containerById(containerId: String): NodeInfo = {
         // Support effective id, to make it easier to use from XForms (i.e. no need to call XFormsUtils.getStaticIdFromId every time)
@@ -50,37 +31,27 @@ object ContainerOps {
 
     def controlsInContainer(containerId: String): Int = (containerById(containerId) \\ "*:td" \ *).length
 
-    // XForms callers: get the name for a section or grid element or null (the empty sequence)
-    def getContainerNameOrEmpty(elem: NodeInfo) = getControlNameOption(elem).orNull
+    // Find all siblings of the given element with the given name, excepting the given element
+    def findSiblingsWithName(element: NodeInfo, siblingName: String) =
+        element parent * child * filter
+                (name(_) == siblingName) filterNot
+                (_ == element)
 
-    // Find ancestor sections and grids (including non-repeated grids) from leaf to root
-    def findAncestorContainers(descendant: NodeInfo, includeSelf: Boolean = false) =
-        (if (includeSelf) descendant ancestorOrSelf * else descendant ancestor *) filter IsContainer
+    // Return all the container controls in the view
+    def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
 
-    // Find ancestor section and grid names from root to leaf
-    def findContainerNames(descendant: NodeInfo): Seq[String] =
-        findAncestorContainers(descendant).reverse map (getControlNameOption(_)) flatten
+    def getAllContainerControls(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsContainer
 
-    // Find the new td to select if we are removing the currently selected td
-    def findNewTdToSelect(inDoc: NodeInfo, tdsToDelete: Seq[NodeInfo]) =
-        findSelectedTd(inDoc) match {
-            case Some(selectedTd) if tdsToDelete contains selectedTd ⇒
-                // Prefer trying following before preceding, as things move up and left when deleting
-                // NOTE: Could improve this by favoring things "at same level", e.g. stay in grid if possible, then
-                // stay in section, etc.
-                (followingTd(selectedTd) filterNot (tdsToDelete contains _) headOption) orElse
-                        (precedingTds(selectedTd) filterNot (tdsToDelete contains _) headOption)
-            case _ ⇒
-                None
-        }
+    // Various counts
+    def countSections(inDoc: NodeInfo)         = getAllControlsWithIds(inDoc)          count IsSection
+    def countAllGrids(inDoc: NodeInfo)         = findFRBodyElement(inDoc) descendant * count IsGrid
+    def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count IsRepeat // includes repeated grids
+    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count IsSectionTemplateContent // non-repeated grids
 
-    // A container's children containers
-    def childrenContainers(container: NodeInfo) =
-        container \ * filter IsContainer
-
-    // A container's children grids (including repeated grids)
-    def childrenGrids(container: NodeInfo) =
-        container \ * filter IsGrid
+    def countGrids(inDoc: NodeInfo)            = countAllGrids(inDoc) - countRepeats(inDoc)
+    def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
+    def countAllContainers(inDoc: NodeInfo)    = getAllContainerControls(inDoc).size
+    def countAllControls(inDoc: NodeInfo)      = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
     // Delete the entire container and contained controls
     def deleteContainerById(canDelete: NodeInfo ⇒ Boolean, containerId: String): Unit = {
@@ -123,12 +94,6 @@ object ContainerOps {
         newTdToSelect foreach selectTd
     }
 
-    // Find all siblings of the given element with the given name, excepting the given element
-    def findSiblingsWithName(element: NodeInfo, siblingName: String) =
-        element parent * child * filter
-                (name(_) == siblingName) filterNot
-                (_ == element)
-
     // Move a container based on a move function (typically up or down)
     def moveContainer(container: NodeInfo, otherContainer: NodeInfo, move: (NodeInfo, NodeInfo) ⇒ NodeInfo) {
 
@@ -162,7 +127,7 @@ object ContainerOps {
                 // Try to move resource and template elements to a good place
                 // TODO: We move the container resource holder, but we should also move together the contained controls' resource holders
                 def firstControl(s: Seq[NodeInfo]) =
-                    s filter (getControlNameOption(_).isDefined) headOption
+                    s find (getControlNameOption(_).isDefined)
 
                 def tryToMoveHolders(siblingName: String, moveOp: (NodeInfo, NodeInfo) ⇒ NodeInfo) =
                     findResourceAndTemplateHolders(doc, name) foreach {
@@ -182,34 +147,6 @@ object ContainerOps {
             case _ ⇒
         }
     }
-
-    // Return a td's preceding tds in the hierarchy of containers
-    def precedingTds(td: NodeInfo) = {
-        val preceding = td preceding "*:td"
-        preceding intersect (findAncestorContainers(td).last descendant "*:td")
-    }
-
-    // Return a td's following tds in the hierarchy of containers
-    def followingTd(td: NodeInfo) = {
-        val following = td following "*:td"
-        following intersect (findAncestorContainers(td).last descendant "*:td")
-    }
-
-    // Return all the container controls in the view
-    def getAllContainerControlsWithIds(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filter IsContainer
-
-    def getAllContainerControls(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * filter IsContainer
-
-    // Various counts
-    def countSections(inDoc: NodeInfo)         = getAllControlsWithIds(inDoc)          count IsSection
-    def countAllGrids(inDoc: NodeInfo)         = findFRBodyElement(inDoc) descendant * count IsGrid
-    def countRepeats(inDoc: NodeInfo)          = getAllControlsWithIds(inDoc)          count IsRepeat // includes repeated grids
-    def countSectionTemplates(inDoc: NodeInfo) = findFRBodyElement(inDoc) descendant * count IsSectionTemplateContent // non-repeated grids
-
-    def countGrids(inDoc: NodeInfo)            = countAllGrids(inDoc) - countRepeats(inDoc)
-    def countAllNonContainers(inDoc: NodeInfo) = getAllControlsWithIds(inDoc) filterNot IsContainer size
-    def countAllContainers(inDoc: NodeInfo)    = getAllContainerControls(inDoc).size
-    def countAllControls(inDoc: NodeInfo)      = countAllContainers(inDoc) + countAllNonContainers(inDoc) + countSectionTemplates(inDoc)
 
     // Whether it is possible to move an item into the given container
     // Currently: must be a section without section template content

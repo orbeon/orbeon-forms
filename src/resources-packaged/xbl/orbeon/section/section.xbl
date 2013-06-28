@@ -24,7 +24,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fr-section" element="fr|section" xxf:external-events="fb-set-current-section fb-update-section-label" xxbl:mode="binding lhha custom-lhha">
 
@@ -58,7 +58,7 @@
                         <xsl:if test="$editable">
                             <!-- Variables for design time -->
                             <xf:var name="fb-section" value="for $src in xxf:instance('fb-form-instance') return id('{@id}', $src)"/>
-                            <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then sectionOps:canDoClasses($fb-section) else ()"/>
+                            <xf:var name="fb-can-do-classes" value="if (exists($fb-section)) then fbf:sectionCanDoClasses($fb-section) else ()"/>
                         </xsl:if>
 
                         <!-- It'd be nice if we could put the class attribute directly on xbl-fr-section -->

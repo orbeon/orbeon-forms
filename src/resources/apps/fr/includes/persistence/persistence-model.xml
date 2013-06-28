@@ -23,9 +23,8 @@
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
-        xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:secure="java:org.orbeon.oxf.util.SecureUtils">
 
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
     <xf:var name="app" value="$parameters/app" as="xs:string"/>
@@ -41,7 +40,7 @@
         <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
 
         <xf:var name="ops"
-                value="formRunner:javaAuthorizedOperationsBasedOnRoles($metadata/permissions)"/>
+                value="frf:javaAuthorizedOperationsBasedOnRoles($metadata/permissions)"/>
 
         <xf:setvalue
             ref="instance('fr-authorized-operations')"
@@ -61,7 +60,7 @@
 
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xf:action if="$unauthorized-access" type="xpath">
-            formRunner:sendError(403)
+            frf:sendError(403)
         </xf:action>
     </xf:action>
 
@@ -152,7 +151,7 @@
                  NOTE: 403 applies well to the first condition. For the second condition, a 404 could also be possible.
              -->
             <xf:action if="not($is-submit) and not($is-new-id and $mode = ('new', 'test') or not($mode = ('new', 'test')))" type="xpath">
-                formRunner:sendError(403)
+                frf:sendError(403)
             </xf:action>
         </xf:action>
 
@@ -378,7 +377,7 @@
 
     <!-- React to issue loading the document. We consider this fatal. -->
     <xf:action ev:event="xforms-submit-error" ev:target="fr-get-document-submission" type="xpath">
-        formRunner:sendError((event('response-status-code'), 500)[1])
+        frf:sendError((event('response-status-code'), 500)[1])
     </xf:action>
 
     <!-- Clear message -->

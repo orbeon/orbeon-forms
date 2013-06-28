@@ -23,7 +23,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
          xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
@@ -32,7 +32,7 @@
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
-                <xf:setvalue ref="original-control-name" value="controlOps:controlName(event('control-id'))"/>
+                <xf:setvalue ref="original-control-name" value="fbf:controlName(event('control-id'))"/>
                 <xf:setvalue ref="control-name" value="../original-control-name"/>
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
@@ -89,13 +89,13 @@
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
                     <xf:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
                     <xf:setvalue ref="$local/is-custom-instance" value="dataModel:isCustomInstance()"/>
-                    <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
-                    <xf:var name="control" value="controlOps:findControlByNameOrEmpty($form, $local/control-name)"/>
+                    <xf:setvalue ref="$local/control-names" value="string-join(fbf:getAllControlNamesXPath($body), ' ')"/>
+                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $local/control-name)"/>
                     <xf:setvalue ref="$local/classes" value="$control/@class"/>
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
                     <xf:delete ref="$local/fb:control-details"/>
-                    <xf:insert ref="$local/*" origin="controlOps:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
+                    <xf:insert ref="$local/*" origin="fbf:bindingOrEmpty($control)/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHA of each details control -->
                     <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
@@ -133,10 +133,10 @@
                     <xf:var name="new-name" value="$local/control-name/string()"/>
 
                     <!-- Find reference to control -->
-                    <xf:var name="control" value="controlOps:findControlByNameOrEmpty($form, $old-name)"/>
+                    <xf:var name="control" value="fbf:findControlByNameOrEmpty($form, $old-name)"/>
                     <!-- Rename if needed -->
                     <xf:action if="$old-name != $new-name" type="xpath">
-                        controlOps:findRenameControl($form, $old-name, $new-name)
+                        fbf:findRenameControl($form, $old-name, $new-name)
                     </xf:action>
                     <!-- Update XPath on bind -->
                     <xf:action if="dataModel:isCustomInstance()" type="xpath">

@@ -22,11 +22,7 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
-         xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps"
-         xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
          xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
     <xbl:binding id="fb-dialog-section-details" element="fb|dialog-section-details">
@@ -36,7 +32,7 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
-                <xf:setvalue ref="original-control-name" value="containerOps:getContainerNameOrEmpty(event('section'))"/>
+                <xf:setvalue ref="original-control-name" value="fbf:getContainerNameOrEmpty(event('section'))"/>
                 <xf:setvalue ref="control-name" value="../original-control-name"/>
 
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
@@ -102,10 +98,10 @@
                     <xf:setvalue ref="$local/control-xpath" value="dataModel:getBindRefOrEmpty($form, $local/control-name)"/>
                     <xf:setvalue ref="$local/is-custom-instance" value="dataModel:isCustomInstance()"/>
                     
-                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, $local/original-control-name, 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, $local/original-control-name, 'readonly')"/>
+                    <xf:setvalue ref="$local/relevant" value="fbf:getMipOrEmpty($form, $local/original-control-name, 'relevant')"/>
+                    <xf:setvalue ref="$local/readonly" value="fbf:getMipOrEmpty($form, $local/original-control-name, 'readonly')"/>
 
-                    <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
+                    <xf:setvalue ref="$local/control-names" value="string-join(fbf:getAllControlNamesXPath($body), ' ')"/>
 
                 </xf:action>
 
@@ -119,9 +115,9 @@
                     <xf:var name="new-name" value="$local/control-name/string()"/>
 
                     <xf:action type="xpath">
-                        controlOps:findRenameControl($form, $old-name, $new-name),
-                        controlOps:updateMip($form, $new-name, 'relevant', $local/relevant),
-                        controlOps:updateMip($form, $new-name, 'readonly', $local/readonly)
+                        fbf:findRenameControl($form, $old-name, $new-name),
+                        fbf:updateMip($form, $new-name, 'relevant', $local/relevant),
+                        fbf:updateMip($form, $new-name, 'readonly', $local/readonly)
                     </xf:action>
                     <!-- Update XPath on bind -->
                     <xf:action if="dataModel:isCustomInstance()" type="xpath">

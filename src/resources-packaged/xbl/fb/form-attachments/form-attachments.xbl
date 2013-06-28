@@ -25,8 +25,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-control-details" element="fb|dialog-control-details">
         <xbl:template>
@@ -55,7 +54,7 @@
 
                     <!-- Copy XBL control-details from xbl:binding in local instance -->
                     <xf:insert ref="$local/*"
-                                   origin="controlOps:findBindingsForControl($components, $control, $bind)/fb:metadata/fb:control-details"/>
+                               origin="fbf:findBindingsForControl($components, $control, $bind)/fb:metadata/fb:control-details"/>
 
                     <!-- Process the LHHA of each details control -->
                     <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>

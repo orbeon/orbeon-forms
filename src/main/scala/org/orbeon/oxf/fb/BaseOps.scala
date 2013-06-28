@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,52 +13,26 @@
  */
 package org.orbeon.oxf.fb
 
+import org.orbeon.oxf.fr.FormRunner._
+import org.orbeon.oxf.util.{Logging, UserAgent, NetUtils}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.{XFormsProperties, XFormsModel}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.xml.TransformerUtils
-import org.orbeon.oxf.fr.FormRunner
-import org.orbeon.oxf.xforms.XFormsConstants.{XFORMS_NAMESPACE_URI, XBL_NAMESPACE_URI}
-import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI, XSD_URI}
-import org.orbeon.oxf.util.Logging
-import org.orbeon.oxf.util.{UserAgent, NetUtils}
-import org.orbeon.oxf.xforms.{XFormsModel, XFormsProperties}
 
-/**
- * Form Builder functions.
- */
-object FormBuilderFunctions extends Logging {
+trait BaseOps extends Logging {
 
     implicit def logger = containingDocument.getIndentedLogger("form-builder")
 
     // Minimal version of IE supported
     val MinimalIEVersion = 9
 
-    val XH = XHTML_NAMESPACE_URI
-    val XF = XFORMS_NAMESPACE_URI
-    val XS = XSD_URI
-    val XBL = XBL_NAMESPACE_URI
-    val FR = FormRunner.NS
-    val FB = "http://orbeon.org/oxf/xml/form-builder"
-
     // Id of the xxf:dynamic control holding the edited form
     val DynamicControlId = "fb"
 
-    // Get an id based on a name
-    // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid
-    // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
-    // -control. OTOH we must have distinct ids for binds, controls and templates, so the -bind, -control and -template
-    // suffixes must remain.
-    def bindId(controlName: String)    = controlName + "-bind"
-    def gridId(gridName: String)       = gridName    + "-grid"
-    def controlId(controlName: String) = controlName + "-control"
-    def templateId(gridName: String)   = gridName    + "-template"
-
     // Find the form document being edited
     def getFormDoc = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("model")).getDocumentRoot
-
-    // Find an element by id
-    def byId(inDoc: NodeInfo, id: String) = Option(inDoc.getDocumentRoot.selectID(id))
 
     // Return fb-form-instance
     def fbFormInstance =
@@ -66,26 +40,6 @@ object FormBuilderFunctions extends Logging {
 
     // Find the top-level form model of the form being edited
     def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + "$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
-
-    // Get the body
-    // NOTE: annotate.xpl replaces fr:body with xf:group[@class = 'fb-body']
-    def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (XF → "group") filter (_.attClasses("fb-body")) head
-
-    // Get the form model
-    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, "fr-form-model")) head
-
-    // Find an xf:instance element
-    def instanceElement(inDoc: NodeInfo, id: String) =
-        findModelElement(inDoc) \ "*:instance" find (hasIdValue(_, id))
-
-    // Find an inline instance's root element
-    def inlineInstanceRootElement(inDoc: NodeInfo, id: String) =
-        instanceElement(inDoc, id).toSeq \ * headOption
-
-    // Get the root element of instances
-    def formInstanceRoot(inDoc: NodeInfo)      = inlineInstanceRootElement(inDoc, "fr-form-instance").get
-    def metadataInstanceRoot(inDoc: NodeInfo)  = inlineInstanceRootElement(inDoc, "fr-form-metadata").get
-    def resourcesInstanceRoot(inDoc: NodeInfo) = inlineInstanceRootElement(inDoc, "fr-form-resources").get
 
     def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
     def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))

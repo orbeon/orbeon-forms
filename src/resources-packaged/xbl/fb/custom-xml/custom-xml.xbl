@@ -26,7 +26,7 @@
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
 
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
          xmlns:dataModel="java:org.orbeon.oxf.fb.DataModel">
 
     <xbl:binding id="fb-custom-xml" element="fb|custom-xml">

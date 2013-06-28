@@ -23,11 +23,10 @@
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:xbl="http://www.w3.org/ns/xbl"
-      xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
-      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
-      xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
 
       xxf:external-events="show-fb-test-dialog fb-update-control-lhha"
       xxf:noscript-support="false"
@@ -70,9 +69,9 @@
                                             (event('data'), instance('fb-components-instance')),
                                             'data')"/>
 
-        <xf:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps" xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps">
-            gridOps:initializeGrids($temp),
-            containerOps:deleteSectionTemplateContentHolders($temp)
+        <xf:action type="xpath">
+            fbf:initializeGrids($temp),
+            fbf:deleteSectionTemplateContentHolders($temp)
         </xf:action>
 
         <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->
@@ -176,7 +175,7 @@
                 <!-- If roles don't match then access is unauthorized. See similar logic in FR. -->
                 <xf:action if="not(   exists($permissions/app[@name = '*'])
                                    or exists($permissions/app[@name = $app]/form[@name = ('*', $form)]))">
-                    formRunner:sendError(403)
+                    frf:sendError(403)
                 </xf:action>
             </xf:action>
         </xf:action>
@@ -337,11 +336,11 @@
     </xf:instance>
 
     <xf:action ev:observer="fb" ev:event="fb-update-section-label" xxf:phantom="true">
-        <xf:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxf:targetid'))]/label" value="event('label')"/>
+        <xf:setvalue ref="$current-resources/*[name() = fbf:controlName(event('xxf:targetid'))]/label" value="event('label')"/>
     </xf:action>
     <xf:action ev:observer="fb" ev:event="fb-update-control-lhha" xxf:phantom="true">
-        <xf:setvalue ref="$current-resources/*[name() = controlOps:controlName(event('xxf:targetid'))]/*[name() = event('lhha')]" value="event('value')"/>
-        <xf:action type="xpath">controlOps:setControlLHHAMediatype(instance('fb-form-instance'), controlOps:controlName(event('xxf:targetid')), event('lhha'), event('isHtml') = 'true')</xf:action>
+        <xf:setvalue ref="$current-resources/*[name() = fbf:controlName(event('xxf:targetid'))]/*[name() = event('lhha')]" value="event('value')"/>
+        <xf:action type="xpath">fbf:setControlLHHAMediatype(instance('fb-form-instance'), fbf:controlName(event('xxf:targetid')), event('lhha'), event('isHtml') = 'true')</xf:action>
     </xf:action>
     <xf:var name="variables" value="instance('fb-variables')"/>
     <xf:var name="selected-cell" value="$variables/selected-cell"/>

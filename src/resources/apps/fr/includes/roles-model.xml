@@ -22,7 +22,7 @@
               xmlns:xh="http://www.w3.org/1999/xhtml"
               xmlns:saxon="http://saxon.sf.net/"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
+              xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!-- Model initialization -->
     <xf:action ev:event="xforms-model-construct-done">
@@ -36,7 +36,7 @@
         <xf:action if="exists($fb-roles)">
 
             <!-- Process permissions -->
-            <xf:insert ref="instance('fr-permissions')" origin="form-runner:getFormBuilderPermissionsAsXML($fb-roles)"/>
+            <xf:insert ref="instance('fr-permissions')" origin="frf:getFormBuilderPermissionsAsXML($fb-roles)"/>
 
             <xf:message level="xxf:log-debug">
                 ORBEON ROLES DEBUG INFORMATION:

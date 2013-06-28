@@ -24,7 +24,7 @@
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xbl="http://www.w3.org/ns/xbl"
-        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]" as="element(fr:view)?"/>
     <xsl:variable name="body"           select="($view/fr:body, $view)[1]"           as="element()?"/>
@@ -304,7 +304,7 @@
             <xf:var
                 name="available-languages"
                 model="fr-resources-model"
-                value="formRunner:getFormLangSelection($app, $form, xxf:instance('fr-form-resources')/resource/@xml:lang/string())"/>
+                value="frf:getFormLangSelection($app, $form, xxf:instance('fr-form-resources')/resource/@xml:lang/string())"/>
 
             <!-- Don't display language selector if there is only one language -->
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
@@ -414,7 +414,7 @@
             ev:defaultAction="cancel"
             xxf:phantom="true">
             <xf:action type="xpath">
-                formRunner:errorMessage(if (event('error-type') = 'size-error')
+                frf:errorMessage(if (event('error-type') = 'size-error')
                                         then xxf:format-message(xxf:r('detail.messages.upload-error-size', 'fr-fr-resources'), (event('permitted'), event('actual')))
                                         else xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
             </xf:action>
@@ -426,7 +426,7 @@
             ev:defaultAction="cancel"
             xxf:phantom="true"
             type="xpath">
-            formRunner:successMessage(xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
+            frf:successMessage(xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
         </xf:action>
 
     </xsl:template>

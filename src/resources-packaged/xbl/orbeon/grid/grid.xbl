@@ -27,8 +27,7 @@
          xmlns:exf="http://www.exforms.org/exf/1-0"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
          xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils"
-         xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
 
          xmlns:xhtml="http://www.w3.org/1999/xhtml"
          xmlns:xforms="http://www.w3.org/2002/xforms"
@@ -99,13 +98,13 @@
                         <!-- Grid table -->
                         <xh:table class="{'fr-grid',
                                           @class,
-                                          concat('fr-grid-', controlOps:controlName(@id)),
+                                          concat('fr-grid-', fbf:controlName(@id)),
                                           if ($is-repeat)
                                                 then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
                                                       if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')
                                                 else 'fr-norepeat',
                                           if ($is-editable)
-                                                then gridOps:canDoClasses(@id)
+                                                then fbf:gridCanDoClasses(@id)
                                                 else ()}">
                             <!-- Colgroup to make column sizing with CSS easier -->
                             <xh:colgroup>
@@ -246,7 +245,7 @@
                                                             <xsl:copy-of select="@* except (@class, @xxf:control)"/>
                                                             <!-- NOTE: Add itemset or upload classes to allow the client to decide whether to place the itemset editor or the upload button -->
                                                             <xh:div class="{('fr-grid-content', if ($has-upload) then 'fb-upload' else ())}{
-                                                                    if ($is-editable) then '{if (exists($control) and controlOps:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}' else ''}">
+                                                                    if ($is-editable) then '{if (exists($control) and fbf:hasEditor($control, ''static-itemset'')) then '' fb-itemset'' else ''''}' else ''}">
                                                                 <!-- Optimization: don't generate a group for empty cells -->
                                                                 <xsl:if test="$has-control">
                                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">

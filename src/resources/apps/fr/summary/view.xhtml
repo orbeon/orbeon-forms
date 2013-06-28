@@ -23,7 +23,7 @@
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:saxon="http://saxon.sf.net/"
-      xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:index="org.orbeon.oxf.fr.relational.Index"
       xmlns:indexedControl="org.orbeon.oxf.fr.relational.Index$IndexedControl"
       xmlns="http://www.w3.org/1999/xhtml">
@@ -191,16 +191,16 @@
 
                 <!-- Send a "Not Found" error if the form definition is not found -->
                 <xf:action if="empty(instance('fr-source-form-instance')/xh:head/xf:model)" type="xpath">
-                    formRunner:sendError(404)
+                    frf:sendError(404)
                 </xf:action>
             </xf:action>
 
             <!-- 2. Check for authorized operations -->
             <xf:action ev:event="xforms-model-construct-done">
-                <xf:var name="ops" value="formRunner:javaAuthorizedOperationsBasedOnRoles($source-form-metadata/permissions)"/>
+                <xf:var name="ops" value="frf:javaAuthorizedOperationsBasedOnRoles($source-form-metadata/permissions)"/>
                 <xf:setvalue ref="xxf:instance('fr-authorized-operations')" value="string-join($ops, ' ')"/>
                 <!-- Send an "Unauthorized" error if the user is unauthorized -->
-                <xf:action if="not(xxf:property('oxf.fr.support-owner-group')) and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">formRunner:sendError(403)</xf:action>
+                <xf:action if="not(xxf:property('oxf.fr.support-owner-group')) and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">frf:sendError(403)</xf:action>
             </xf:action>
 
             <!-- 3. Rest of initialization -->
@@ -329,7 +329,7 @@
 
                                     <!-- Application -->
                                     <xf:group ref="$app-query[$is-form-builder and $has-roles]" class="fr-summary-search-item">
-                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources)"/>
+                                        <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
                                         <!-- Use an input if app name is a wildcard -->
                                         <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
                                         <xf:input ref=".[$is-input]">
@@ -361,7 +361,7 @@
                                     </xf:group>
                                     <!-- Form -->
                                     <xf:group ref="$form-query" class="fr-summary-search-item">
-                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources)"/>
+                                        <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
                                         <xf:var name="current-app" value="xxf:instance('fr-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
                                         <xf:var name="is-input" value="xxf:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
@@ -393,7 +393,7 @@
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
                                     <xf:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                         <xf:var name="control-name" value="@name"/>
-                                        <xf:var name="label" value="formRunner:summaryLanguage(@name, $form-resources)"/>
+                                        <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
 
                                         <xf:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
@@ -480,7 +480,7 @@
                                         <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
-                                                <xf:output value="formRunner:summaryLanguage(@name, $form-resources)"/>
+                                                <xf:output value="frf:summaryLanguage(@name, $form-resources)"/>
                                             </xh:th>
                                         </xf:repeat>
                                     </xh:tr>

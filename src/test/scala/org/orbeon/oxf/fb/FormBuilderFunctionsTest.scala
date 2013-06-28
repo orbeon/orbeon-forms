@@ -15,11 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.junit.Test
 import org.mockito.Mockito
-import org.orbeon.oxf.fb.ContainerOps._
-import org.orbeon.oxf.fb.ControlOps._
-import org.orbeon.oxf.fb.FormBuilderFunctions._
-import org.orbeon.oxf.fb.GridOps._
-import org.orbeon.oxf.fb.SectionOps._
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.util.IndentedLogger
@@ -85,8 +81,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
                                                                 (instance(), instance('fb-components-instance')),
                                                                 'data')"/>
 
-                            <xf:action type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                gridOps:initializeGrids($temp)
+                            <xf:action type="xpath" xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+                                fbf:initializeGrids($temp)
                             </xf:action>
 
                             <!--<xf:message level="xxf:log-info" value="saxon:serialize($temp, 'xml')"/>-->
@@ -570,7 +566,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with AssertionsForJUnit 
             )
 
             for ((expected, id) ← expected)
-                assert(Some(expected) === buildControlAbsoluteId(doc, id))
+                assert(expected === buildFormBuilderControlAbsoluteIdOrEmpty(doc, id))
         }
 
 //    @Test def insertHolders() {

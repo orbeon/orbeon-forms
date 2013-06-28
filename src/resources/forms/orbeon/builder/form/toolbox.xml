@@ -22,7 +22,7 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:toolboxOps="java:org.orbeon.oxf.fb.ToolboxOps"
-      xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
 
       class="fb-toolbox">
 
@@ -136,7 +136,7 @@
                                 <xf:action if="$is-section-component" type="xpath">toolboxOps:insertNewSectionTemplate($model, $binding)</xf:action>
                                 <xf:action if="not($is-section-component)">
                                     <xf:action type="xpath">toolboxOps:insertNewControl($model, $binding)</xf:action>
-                                    <xf:var name="effective-id" value="controlOps:buildControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
+                                    <xf:var name="effective-id" value="fbf:buildFormBuilderControlEffectiveIdOrEmpty(instance('fb-form-instance'), $selected-cell)"/>
                                     <xf:load resource="javascript:ORBEON.Builder.controlAdded.fire('{$effective-id}')"/>
                                 </xf:action>
                             </xf:action>

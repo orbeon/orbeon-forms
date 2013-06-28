@@ -24,7 +24,7 @@
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
-        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!--
         Search instance, e.g.:
@@ -136,7 +136,7 @@
                     <xsl:variable name="search-permissions" select="$permissions/permission[tokenize(@operations, '\s')  = $search-operations]"/>
 
                     <!-- Are we authorized to see all the data based because of our role? -->
-                    <xsl:variable name="operations-from-role" select="formRunner:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                    <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
                     <xsl:message select="$operations-from-role"/>
                     <xsl:variable name="authorized-based-on-role" select="$operations-from-role = $search-operations"/>
 
@@ -315,7 +315,7 @@
                 <!-- Move created, last-modified, and name as attributes -->
                 <!-- Add wrapping details element -->
                 <xsl:template match="document">
-                    <document created="{created}" last-modified="{last-modified}" name="{document-id}" operations="{formRunner:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
+                    <document created="{created}" last-modified="{last-modified}" name="{document-id}" operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

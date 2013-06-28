@@ -16,7 +16,7 @@
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
     <xf:var name="app"  value="$parameters/app"/>
@@ -55,7 +55,7 @@
         <!-- Find form language -->
         <xf:setvalue
             ref="$lang"
-            value="formRunner:selectFormLang(
+            value="frf:selectFormLang(
                         $app,
                         $form,
                         $lang,
@@ -64,7 +64,7 @@
         <!-- Find Form Runner language -->
         <xf:setvalue
             ref="$fr-lang"
-            value="formRunner:selectFormRunnerLang(
+            value="frf:selectFormRunnerLang(
                         $app,
                         $form,
                         $lang,

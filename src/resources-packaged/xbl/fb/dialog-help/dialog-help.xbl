@@ -25,8 +25,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-help" element="fb|dialog-help">
         <xbl:handlers>
@@ -35,8 +34,8 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
-                <xf:setvalue ref="control-name" value="controlOps:controlName(event('control-id'))"/>
-                <xf:setvalue ref="help" value="controlOps:getControlHelpOrEmpty(../control-name)"/>
+                <xf:setvalue ref="control-name" value="fbf:controlName(event('control-id'))"/>
+                <xf:setvalue ref="help" value="fbf:getControlHelpOrEmpty(../control-name)"/>
 
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
@@ -79,7 +78,7 @@
                 <xf:action ev:event="DOMActivate" ev:observer="dialog" if="event('xxf:targetid') != 'cancel-trigger' and $local/@valid = 'true'">
 
                     <xf:action type="xpath">    
-                        controlOps:setControlHelp($local/control-name, $local/help)
+                        fbf:setControlHelp($local/control-name, $local/help)
                     </xf:action>
 
                     <xxf:hide dialog="dialog"/>

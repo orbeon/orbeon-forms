@@ -23,7 +23,7 @@
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-         xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-form-settings" element="fb|dialog-form-settings">
         <xbl:handlers>
@@ -179,12 +179,12 @@
                                 <xf:var name="labels"
                                         value="$resources/dialog-form-settings/(sections, repeats, grids, section-templates, controls, all)"/>
                                 <xf:var name="counts"
-                                        value="(containerOps:countSections($body),
-                                                containerOps:countRepeats($body),
-                                                containerOps:countGrids($body),
-                                                containerOps:countSectionTemplates($body),
-                                                containerOps:countAllNonContainers($body),
-                                                containerOps:countAllControls($body))"/>
+                                        value="(fbf:countSections($body),
+                                                fbf:countRepeats($body),
+                                                fbf:countGrids($body),
+                                                fbf:countSectionTemplates($body),
+                                                fbf:countAllNonContainers($body),
+                                                fbf:countAllControls($body))"/>
                                 <xh:table>
                                     <xf:repeat ref="1 to count($labels)">
                                         <xf:var name="i" value="position()"/>

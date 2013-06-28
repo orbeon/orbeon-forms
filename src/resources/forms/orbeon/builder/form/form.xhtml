@@ -21,10 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
-      xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
-      xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps"
-      xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps"
-      xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
     <xh:head>
         <!-- CSS -->
         <xh:link rel="stylesheet" type="text/css" href="/ops/yui/assets/skins/sam/resize.css"/>
@@ -277,17 +274,17 @@
                             <!--<xf:dispatch if="$dialogs-closed" ev:observer="#document" ev:event="keypress" xxf:modifiers="alt" xxf:text="v" name="DOMActivate" targetid="fb-edit-validation-trigger"/>-->
 
                             <!-- Move section -->
-                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#39;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
-                                <!--sectionOps:moveSectionRight($current-td/ancestor::*:section[1])-->
+                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#39;" type="xpath">-->
+                                <!--fbf:moveSectionRight($current-td/ancestor::*:section[1])-->
                             <!--</xf:action>-->
-                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#37;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
-                                <!--sectionOps:moveSectionLeft($current-td/ancestor::*:section[1])-->
+                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#37;" type="xpath">-->
+                                <!--fbf:moveSectionLeft($current-td/ancestor::*:section[1])-->
                             <!--</xf:action>-->
-                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#38;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
-                                <!--sectionOps:moveSectionUp($current-td/ancestor::*:section[1])-->
+                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#38;" type="xpath">-->
+                                <!--fbf:moveSectionUp($current-td/ancestor::*:section[1])-->
                             <!--</xf:action>-->
-                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#40;" type="xpath" xmlns:sectionOps="java:org.orbeon.oxf.fb.SectionOps">-->
-                                <!--sectionOps:moveSectionDown($current-td/ancestor::*:section[1])-->
+                            <!--<xf:action ev:observer="#document" ev:event="keypress" xxf:modifiers="control alt" xxf:text="&#40;" type="xpath">-->
+                                <!--fbf:moveSectionDown($current-td/ancestor::*:section[1])-->
                             <!--</xf:action>-->
 
                             <!-- Insert controls shortcuts -->
@@ -423,7 +420,7 @@
                                         <!-- TODO: can we move these handlers up so that they are not duplicated? -->
                                         <xf:action ev:event="DOMActivate">
 
-                                            <xf:var name="confirm" value="gridOps:expandCellTouchesControl($td)" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"/>
+                                            <xf:var name="confirm" value="fbf:expandCellTouchesControl($td)"/>
 
                                             <!-- Ask confirmation -->
                                             <xf:dispatch if="$confirm" name="fr-show" targetid="dialog-confirmation">
@@ -435,22 +432,22 @@
                                                 <xf:dispatch name="fr-positive" targetid="fb-expand-trigger"/>
                                             </xf:action>
                                         </xf:action>
-                                        <xf:action ev:event="fr-positive" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                            gridOps:expandCell($td)
+                                        <xf:action ev:event="fr-positive" type="xpath">
+                                            fbf:expandCell($td)
                                         </xf:action>
                                     </xf:trigger>
                                     <!-- Shrink -->
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-shrink-trigger">
                                         <xf:label><xh:img src="/apps/fr/style/images/silk/arrow_up.png" alt="{$fb-resources/shrink-icon/label}" title="{$fb-resources/shrink-icon/label}"/></xf:label>
-                                        <xf:action ev:event="DOMActivate" type="xpath" xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps">
-                                            gridOps:shrinkCell($td)
+                                        <xf:action ev:event="DOMActivate" type="xpath">
+                                            fbf:shrinkCell($td)
                                         </xf:action>
                                     </xf:trigger>
                                     <!-- Delete control -->
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-delete-trigger">
                                         <xf:label><xh:img src="/apps/fr/style/images/silk/bin.png" alt="{$fb-resources/delete-control-icon/label}" title="{$fb-resources/delete-control-icon/label}"/></xf:label>
                                         <xf:action ev:event="DOMActivate" type="xpath">
-                                            controlOps:deleteCellContent($td)
+                                            fbf:deleteCellContent($td)
                                         </xf:action>
                                     </xf:trigger>
                                 </xh:span>
@@ -483,7 +480,7 @@
                                 <xf:output class="fb-lhha-checkbox-message" ref="$form-resources/messages/lhha-checkbox"/>
                                 <xf:output class="fb-label-placeholder" ref="$form-resources/type-label/label"/>
                                 <xf:group ref=".[exists($control/xf:label/@ref)]" appearance="xxf:internal">
-                                    <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/label">
+                                    <xf:input xxf:autocomplete="off" id="fb-edit-label" class="fb-edit-label" ref="$current-resources/*[name() = fbf:controlName($control-id)]/label">
                                         <xf:label appearance="minimal" ref="$form-resources/type-label/label"/>
                                     </xf:input>
                                 </xf:group>
@@ -492,7 +489,7 @@
                                 <xf:output id="fb-placeholder-hint" ref="$form-resources/enter-hint/label"/> <!--Will be removed when button/link edited with new editor-->
                                 <xf:output class="fb-hint-placeholder" ref="$form-resources/type-hint/label"/>
                                 <xf:group ref=".[exists($control/xf:hint/@ref)]" appearance="xxf:internal">
-                                    <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = controlOps:controlName($control-id)]/hint">
+                                    <xf:input xxf:autocomplete="off" id="fb-edit-hint" class="fb-edit-hint" ref="$current-resources/*[name() = fbf:controlName($control-id)]/hint">
                                         <xf:label appearance="minimal" ref="$form-resources/type-hint/label"/>
                                     </xf:input>
                                 </xf:group>
@@ -513,7 +510,7 @@
                                             current node when user interact with it, but we also need to be able to show empty/non-empty
                                             versions of the upload when user mouse over other cells.
                                 -->
-                                <xf:var name="control-absolute-id" value="controlOps:buildControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
+                                <xf:var name="control-absolute-id" value="fbf:buildFormBuilderControlAbsoluteIdOrEmpty(instance('fb-form-instance'), $control-id)"/>
                                 <xf:var name="bound-item" value="if ($control-absolute-id) then xxf:binding($control-absolute-id) else ()"/>
                                 <xf:upload class="fb-static-upload" id="fb-static-upload-empty" ref="$bound-item[string(.) = ''], instance('fb-static-upload')/empty"/>
                                 <xf:upload class="fb-static-upload" id="fb-static-upload-non-empty" ref="$bound-item[string(.) != ''], instance('fb-static-upload')/non-empty"/>
@@ -531,18 +528,18 @@
                                         <xf:property name="message"
                                              value="concat($fb-resources/messages/delete-section, ' ',
                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted,
-                                                                              containerOps:controlsInContainer(event('section-id'))))"/>
+                                                                              fbf:controlsInContainer(event('section-id'))))"/>
                                         <xf:property name="positive-targetid" value="xxf:absolute-id('delete-section-trigger')"/>
                                         <xf:property name="context" value="event('section-id')"/>
                                     </xf:dispatch>
-                                    <xf:action ev:event="fr-positive" type="xpath">sectionOps:deleteSectionById(event('context'))</xf:action>
+                                    <xf:action ev:event="fr-positive" type="xpath">fbf:deleteSectionById(event('context'))</xf:action>
                                 </xf:trigger>
                                 <!-- Edit details -->
                                 <xf:trigger tabindex="-1" appearance="minimal">
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/section-details-icon/label}" title="{$fb-resources/section-details-icon/label}"/></xf:label>
                                     <!-- Show section details dialog -->
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-section-details">
-                                        <xf:property name="section" value="containerOps:containerById(event('section-id'))"/>
+                                        <xf:property name="section" value="fbf:containerById(event('section-id'))"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Edit help for section -->
@@ -557,7 +554,7 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_up.png" alt="{$fb-resources/move-up-icon/label}" title="{$fb-resources/move-up-icon/label}"/></xf:label>
                                     <!-- Move section up -->
                                     <xf:action ev:event="DOMActivate" type="xpath">
-                                        sectionOps:moveSectionUp(containerOps:containerById(event('section-id')))
+                                        fbf:moveSectionUp(fbf:containerById(event('section-id')))
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Move down -->
@@ -565,7 +562,7 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_down.png" alt="{$fb-resources/move-down-icon/label}" title="{$fb-resources/move-down-icon/label}"/></xf:label>
                                     <!-- Move section down -->
                                     <xf:action ev:event="DOMActivate" type="xpath">
-                                        sectionOps:moveSectionDown(containerOps:containerById(event('section-id')))
+                                        fbf:moveSectionDown(fbf:containerById(event('section-id')))
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Move right -->
@@ -573,7 +570,7 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_right.png" alt="{$fb-resources/move-right-icon/label}" title="{$fb-resources/move-right-icon/label}"/></xf:label>
                                     <!-- Move section right -->
                                     <xf:action ev:event="DOMActivate" type="xpath">
-                                        sectionOps:moveSectionRight(containerOps:containerById(event('section-id')))
+                                        fbf:moveSectionRight(fbf:containerById(event('section-id')))
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Move left -->
@@ -581,7 +578,7 @@
                                     <xf:label><xh:img width="16" height="16" src="/apps/fr/style/images/silk/arrow_left.png" alt="{$fb-resources/move-left-icon/label}" title="{$fb-resources/move-left-icon/label}"/></xf:label>
                                     <!-- Move section left -->
                                     <xf:action ev:event="DOMActivate" type="xpath">
-                                        sectionOps:moveSectionLeft(containerOps:containerById(event('section-id')))
+                                        fbf:moveSectionLeft(fbf:containerById(event('section-id')))
                                     </xf:action>
                                 </xf:trigger>
                             </xh:div>
@@ -594,23 +591,23 @@
                                         <xf:property name="message"
                                              value="concat($fb-resources/messages/delete-grid, ' ',
                                                            xxf:format-message($fb-resources/messages/controls-will-be-deleted,
-                                                                              containerOps:controlsInContainer(event('grid-id'))))"/>
+                                                                              fbf:controlsInContainer(event('grid-id'))))"/>
                                         <xf:property name="positive-targetid" value="xxf:absolute-id('delete-grid-trigger')"/>
                                         <xf:property name="context" value="event('grid-id')"/>
                                     </xf:dispatch>
-                                    <xf:action ev:event="fr-positive" type="xpath">gridOps:deleteGridById(event('context'))</xf:action>
+                                    <xf:action ev:event="fr-positive" type="xpath">fbf:deleteGridById(event('context'))</xf:action>
                                 </xf:trigger>
                                 <!-- Grid details -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="grid-details-trigger" class="fb-grid-details-trigger">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/cog.png" alt="{$fb-resources/grid-details-icon/label}" title="{$fb-resources/grid-details-icon/label}"/></xf:label>
                                     <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-grid-details">
-                                        <xf:property name="grid" value="containerOps:containerById(event('grid-id'))"/>
+                                        <xf:property name="grid" value="fbf:containerById(event('grid-id'))"/>
                                     </xf:dispatch>
                                 </xf:trigger>
                                 <!-- Insert column to the left -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-col-left">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_left.png" alt="{$fb-resources/insert-column-left-icon/label}" title="{$fb-resources/insert-column-left-icon/label}"/></xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertColLeft(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
+                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertColLeft(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
                                 </xf:trigger>
                                 <!-- Delete column -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="delete-col-trigger" class="fb-delete-col">
@@ -618,7 +615,7 @@
                                     <xf:action ev:event="DOMActivate">
 
                                         <xf:var name="context" value="concat(event('grid-id'), ' ', event('col-pos'))"/>
-                                        <xf:var name="count" value="gridOps:controlsInCol(event('grid-id'), xs:integer(event('col-pos')))"/>
+                                        <xf:var name="count" value="fbf:controlsInCol(event('grid-id'), xs:integer(event('col-pos')))"/>
 
                                         <!-- Ask confirmation -->
                                         <xf:dispatch if="$count > 0" name="fr-show" targetid="dialog-confirmation">
@@ -635,18 +632,18 @@
                                     </xf:action>
                                     <xf:action ev:event="fr-positive">
                                         <xf:var name="grid-col" value="tokenize(event('context'), ' ')"/>
-                                        <xf:action type="xpath">gridOps:deleteCol($grid-col[1], xs:integer($grid-col[2]))</xf:action>
+                                        <xf:action type="xpath">fbf:deleteCol($grid-col[1], xs:integer($grid-col[2]))</xf:action>
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Insert column to the right -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-col-right">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_right.png" alt="{$fb-resources/insert-column-right-icon/label}" title="{$fb-resources/insert-column-right-icon/label}"/></xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertColRight(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
+                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertColRight(event('grid-id'), xs:integer(event('col-pos')))</xf:action>
                                 </xf:trigger>
                                 <!-- Insert row above -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-row-above">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_top.png" alt="{$fb-resources/insert-row-above-icon/label}" title="{$fb-resources/insert-row-above-icon/label}"/></xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertRowAbove(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
+                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowAbove(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                                 </xf:trigger>
                                 <!-- Delete row -->
                                 <xf:trigger tabindex="-1" appearance="minimal" id="delete-row-trigger" class="fb-delete-row">
@@ -654,7 +651,7 @@
                                     <xf:action ev:event="DOMActivate">
 
                                         <xf:var name="context" value="concat(event('grid-id'), ' ', event('row-pos'))"/>
-                                        <xf:var name="count" value="gridOps:controlsInRow(event('grid-id'), xs:integer(event('row-pos')))"/>
+                                        <xf:var name="count" value="fbf:controlsInRow(event('grid-id'), xs:integer(event('row-pos')))"/>
 
                                         <!-- Ask confirmation -->
                                         <xf:dispatch if="$count > 0" name="fr-show" targetid="dialog-confirmation">
@@ -671,13 +668,13 @@
                                     </xf:action>
                                     <xf:action ev:event="fr-positive">
                                         <xf:var name="grid-row" value="tokenize(event('context'), ' ')"/>
-                                        <xf:action type="xpath">gridOps:deleteRow($grid-row[1], xs:integer($grid-row[2]))</xf:action>
+                                        <xf:action type="xpath">fbf:deleteRow($grid-row[1], xs:integer($grid-row[2]))</xf:action>
                                     </xf:action>
                                 </xf:trigger>
                                 <!-- Insert row below -->
                                 <xf:trigger tabindex="-1" appearance="minimal" class="fb-insert-row-below">
                                     <xf:label><xh:img src="/apps/fr/style/images/silk/bullet_arrow_bottom.png" alt="{$fb-resources/insert-row-below-icon/label}" title="{$fb-resources/insert-row-below-icon/label}"/></xf:label>
-                                    <xf:action ev:event="DOMActivate" type="xpath">gridOps:insertRowBelow(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
+                                    <xf:action ev:event="DOMActivate" type="xpath">fbf:insertRowBelow(event('grid-id'), xs:integer(event('row-pos')))</xf:action>
                                 </xf:trigger>
                             </xh:div>
                         </xf:group>

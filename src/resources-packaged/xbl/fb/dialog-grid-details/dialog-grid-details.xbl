@@ -25,11 +25,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
-
-         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilderFunctions"
-         xmlns:containerOps="java:org.orbeon.oxf.fb.ContainerOps"
-         xmlns:gridOps="java:org.orbeon.oxf.fb.GridOps"
-         xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps">
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xbl:binding id="fb-dialog-grid-details" element="fb|dialog-grid-details">
         <xbl:handlers>
@@ -38,7 +34,7 @@
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
                 <xf:setvalue ref="@relevant" value="'true'"/>
 
-                <xf:setvalue ref="original-grid-name" value="containerOps:getContainerNameOrEmpty(event('grid'))"/>
+                <xf:setvalue ref="original-grid-name" value="fbf:getContainerNameOrEmpty(event('grid'))"/>
                 <xf:setvalue ref="grid-name" value="../original-grid-name"/>
 
                 <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
@@ -105,13 +101,13 @@
                 <!-- Show dialog -->
                 <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
 
-                    <xf:setvalue ref="$local/min-repeat" value="gridOps:getMin($form, $local/grid-name)"/>
-                    <xf:setvalue ref="$local/max-repeat" value="gridOps:getMaxOrEmpty($form, $local/grid-name)"/>
+                    <xf:setvalue ref="$local/min-repeat" value="fbf:getMin($form, $local/grid-name)"/>
+                    <xf:setvalue ref="$local/max-repeat" value="fbf:getMaxOrEmpty($form, $local/grid-name)"/>
 
-                    <xf:setvalue ref="$local/relevant" value="controlOps:getMipOrEmpty($form, $local/grid-name, 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly" value="controlOps:getMipOrEmpty($form, $local/grid-name, 'readonly')"/>
+                    <xf:setvalue ref="$local/relevant" value="fbf:getMipOrEmpty($form, $local/grid-name, 'relevant')"/>
+                    <xf:setvalue ref="$local/readonly" value="fbf:getMipOrEmpty($form, $local/grid-name, 'readonly')"/>
 
-                    <xf:setvalue ref="$local/control-names" value="string-join(controlOps:getAllControlNamesXPath($body), ' ')"/>
+                    <xf:setvalue ref="$local/control-names" value="string-join(fbf:getAllControlNamesXPath($body), ' ')"/>
 
                     <!-- Focus on the dialog, as min-input and max-input might have asked for focus first and we don't
                          want them to win -->
@@ -129,10 +125,10 @@
                     <xf:var name="new-name" value="$local/grid-name/string()"/>
 
                     <xf:action type="xpath">
-                        controlOps:findRenameControl($form, $old-name, $new-name),
-                        controlOps:updateMip($form, $new-name, 'relevant', $local/relevant),
-                        controlOps:updateMip($form, $new-name, 'readonly', $local/readonly),
-                        gridOps:setMinMax($form, $new-name, xs:integer($local/min-repeat),
+                        fbf:findRenameControl($form, $old-name, $new-name),
+                        fbf:updateMip($form, $new-name, 'relevant', $local/relevant),
+                        fbf:updateMip($form, $new-name, 'readonly', $local/readonly),
+                        fbf:setMinMax($form, $new-name, xs:integer($local/min-repeat),
                                           if (string($local/max-repeat) castable as xs:integer) then xs:integer($local/max-repeat) else -1)
                     </xf:action>
                     <!-- No classes for sections for now -->

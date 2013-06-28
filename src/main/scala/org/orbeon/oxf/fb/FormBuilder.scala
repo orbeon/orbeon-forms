@@ -11,14 +11,17 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr
+package org.orbeon.oxf.fb
 
-object FormRunner
-    extends FormRunnerPersistence
-    with FormRunnerPermissions
-    with FormRunnerPDF
-    with FormRunnerLang
-    with FormRunnerErrorSummary
-    with FormRunnerBaseOps
-    with FormRunnerControlOps
-    with FormRunnerContainerOps
+import org.orbeon.oxf.fr.FormRunnerContainerOps
+
+/**
+ * Form Builder functions.
+ */
+object FormBuilder
+    extends FormRunnerContainerOps // temporary, remove once no longer needed (check XForms/XSLT clients)
+    with BaseOps
+    with ContainerOps
+    with ControlOps
+    with GridOps
+    with SectionOps

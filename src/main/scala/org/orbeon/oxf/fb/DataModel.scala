@@ -15,8 +15,7 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fb.FormBuilderFunctions._
-import org.orbeon.oxf.fb.ControlOps._
+import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.saxon.om._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
@@ -27,7 +26,6 @@ import org.orbeon.oxf.util.XPath
 import scala.util.control.NonFatal
 
 object DataModel {
-
 
     // Whether the current form has a custom instance
     def isCustomInstance = {

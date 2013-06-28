@@ -27,60 +27,17 @@
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
         xmlns:map="java:java.util.Map"
-        xmlns:formRunner="java:org.orbeon.oxf.fr.FormRunner"
-        xmlns:controlOps="java:org.orbeon.oxf.fb.ControlOps"
-        xmlns:xformsUtils="java:org.orbeon.oxf.xforms.XFormsUtils">
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="data" select="/*" as="element()"/>
     <xsl:variable name="parameters" select="doc('input:parameters')/*" as="element()"/>
 
-    <xsl:function name="fr:is-container-xbl" as="xs:boolean">
-        <xsl:param name="e" as="element()"/>
-        <xsl:variable name="classes" select="p:classes($e)"/>
-        <xsl:copy-of select="$classes = 'xbl-fr-section' or ($classes = 'xbl-fr-grid' and $e//table[p:classes(.) = 'fr-repeat'])"/>
-    </xsl:function>
-
-    <xsl:function name="fr:is-container-legacy" as="xs:boolean">
-        <xsl:param name="e" as="element()"/>
-        <xsl:variable name="classes" select="p:classes($e)"/>
-        <xsl:copy-of select="($classes = 'fr-section-container' and not($e/ancestor::*[p:classes(.) = 'xbl-fr-section']))
-                                or ($e/self::table and $classes = 'fr-repeat' and not($e/ancestor::*[p:classes(.) = 'xbl-fr-grid']))"/>
-    </xsl:function>
-
-    <xsl:function name="fr:is-container" as="xs:boolean">
-        <xsl:param name="e" as="element()"/>
-        <!-- This is more complicated than it should be cause we want to address XBL versions of fr:section/fr:grid as well as legacy versions of those and fr:repeat -->
-        <!-- NOTE: Non-repeated grids are not considered "containers" for this purpose for now -->
-        <xsl:copy-of select="fr:is-container-xbl($e) or fr:is-container-legacy($e)"/>
-    </xsl:function>
-
-    <xsl:function name="fr:container-static-id" as="xs:string">
-        <xsl:param name="e" as="element()"/>
-
-        <xsl:variable name="classes" select="p:classes($e)"/>
-        <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId($e/@id)"/>
-
-        <xsl:choose>
-            <xsl:when test="fr:is-container-xbl($e)">
-                <!-- Normal case -->
-                <xsl:value-of select="$static-id"/>
-            </xsl:when>
-            <xsl:when test="ends-with($static-id, '-section-group')">
-                <!-- Case of a legacy section -->
-                <xsl:value-of select="substring-before($static-id, '-group')"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- Case of a legacy repeat -->
-                <xsl:value-of select="replace(($e//tr[p:classes(.) = 'xforms-repeat-begin-end'])[1]/@id, 'repeat-begin-(.*)', '$1')"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:function>
-
-    <xsl:variable name="is-a-control-classes"     select="('xforms-control', 'xbl-component')" as="xs:string*"/>
     <xsl:variable name="is-not-a-control-classes" select="('xforms-trigger', 'xforms-disabled', 'xforms-group', 'xforms-case', 'xforms-switch', 'xforms-repeat')" as="xs:string*"/>
     <xsl:variable name="control-classes"          select="('xforms-input', 'xforms-textarea', 'xforms-select', 'xforms-select1', 'fr-attachment', 'xforms-output')" as="xs:string*"/>
     <xsl:variable name="image-attachment-classes" select="('xbl-fr-image-attachment')" as="xs:string*"/>
     <xsl:variable name="attachment-classes"       select="('fr-attachment', $image-attachment-classes)" as="xs:string*"/>
+
+    <xsl:variable name="ids" select="//*"/>
 
     <xsl:template match="/">
         <config>
@@ -96,21 +53,19 @@
                 </group>
             </xsl:if>
 
-            <xsl:variable name="pdfFormats" select="formRunner:getPDFFormats()"/>
+            <xsl:variable name="pdfFormats" select="frf:getPDFFormats()"/>
 
             <xsl:for-each select="tokenize(xpl:property('oxf.fr.pdf.template.font.paths'), '\s+')">
                 <substitution-font font-family="{.}" embed="true"/>
             </xsl:for-each>
 
-            <xsl:for-each select="//*[@id = 'fr-form-group']//*[p:classes(.) = $is-a-control-classes and not(p:classes(.) = $is-not-a-control-classes)]">
+            <xsl:for-each select="//*[@id = 'fr-form-group']//*[p:classes(.) = ($control-classes, 'xbl-component') and not(p:classes(.) = $is-not-a-control-classes)]">
 
                 <xsl:variable name="control" select="."/>
-                <xsl:variable name="static-id" select="xformsUtils:getStaticIdFromId(@id)"/>
-                <xsl:variable name="iterations" select="tokenize(xformsUtils:getEffectiveIdSuffix(@id), '-')"/>
 
-                <xsl:variable name="ancestor-static-ids" select="ancestor::*[fr:is-container(.)]/fr:container-static-id(.)"/>
-                xxxxx ids
-                <xsl:variable name="effective-id" select="replace(string-join((for $id in ($ancestor-static-ids, $static-id) return controlOps:controlName($id), $iterations), '$'), '·', '\$')"/>
+                <xsl:variable
+                    name="pdf-field-name"
+                    select="frf:buildPDFFieldNameFromHTML($control)"/>
 
                 <xsl:variable name="classes" select="p:classes(.)"/>
 
@@ -121,13 +76,13 @@
                             <!-- XBL component -->
                             <xsl:variable name="component-name" select="for $c in $classes return if (starts-with($c, 'xbl-') and $c != 'xbl-component') then substring-after($c, 'xbl-') else ()"/>
                             <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
-                            <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                            <xsl:copy-of select="frf:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
                         </xsl:when>
                         <xsl:when test="$classes = $control-classes">
                             <!-- Built-in controls -->
                             <xsl:variable name="component-name" select="$control-classes[. = $classes][1]"/>
                             <xsl:variable name="type" select="(for $c in $classes return if (starts-with($c, 'xforms-type-')) then substring-after($c, 'xforms-type-') else (), 'string')[1]"/>
-                            <xsl:copy-of select="formRunner:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
+                            <xsl:copy-of select="frf:getPDFFormatExpression($pdfFormats, $parameters/app, $parameters/form, $component-name, $type)"/>
                         </xsl:when>
                     </xsl:choose>
                 </xsl:variable>
@@ -139,10 +94,10 @@
                         <xsl:choose>
                             <xsl:when test="$classes = $image-attachment-classes">
                                 <!-- Handle URL rewriting for image attachments -->
-                                <image acro-field-name="'{$effective-id}'" href="{xpl:rewriteResourceURI($value, true())}"/>
+                                <image acro-field-name="'{$pdf-field-name}'" href="{xpl:rewriteResourceURI($value, true())}"/>
                             </xsl:when>
                             <xsl:otherwise>
-                                <field acro-field-name="'{$effective-id}'" value="'{replace($value, '''', '''''')}'"/>
+                                <field acro-field-name="'{$pdf-field-name}'" value="'{replace($value, '''', '''''')}'"/>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:if>
@@ -155,7 +110,7 @@
                         <xsl:for-each select="$control/saxon:evaluate(string($expression))">
                             <xsl:variable name="item-value" as="xs:string" select="."/>
                             <xsl:if test="$item-value">
-                                <field acro-field-name="'{$effective-id}${$item-value}'" value="'true'"/>
+                                <field acro-field-name="'{$pdf-field-name}${$item-value}'" value="'true'"/>
                             </xsl:if>
                         </xsl:for-each>
                     </xsl:if>

@@ -15,11 +15,11 @@ package org.orbeon.oxf.fr
 
 import collection.JavaConverters._
 import java.util.{Map ⇒ JMap}
-import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.function.xxforms.{XXFormsProperty, XXFormsPropertiesStartsWith}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.util.ScalaUtils.nonEmptyOrNone
 
 trait FormRunnerPDF {
 
@@ -54,8 +54,8 @@ trait FormRunnerPDF {
         expressionOption.orNull
     }
 
-    // Guess the effective id from the HTML control
-    def buildControlEffectiveIdFromHTML(control: NodeInfo) = {
+    // Build a PDF control id from the given HTML control
+    def buildPDFFieldNameFromHTML(control: NodeInfo) = {
 
         def isContainer(e: NodeInfo) = {
             val classes = e.attClasses
@@ -66,10 +66,15 @@ trait FormRunnerPDF {
             getStaticIdFromId(e attValue "id")
 
         def ancestorContainers(e: NodeInfo) =
-            control ancestor * filter isContainer
+            control ancestor * filter isContainer reverse
 
-        val prefixedId = ancestorContainers(control) :+ control map getStaticId mkString XFormsConstants.COMPONENT_SEPARATOR_STRING
+        def nameParts(e: NodeInfo) =
+            ancestorContainers(e) :+ e map getStaticId map FormRunner.controlName
 
-        buildEffectiveId(prefixedId, getEffectiveIdSuffix(control attValue "id"))
+        def suffixAsSeq(e: NodeInfo) =
+            nonEmptyOrNone(getEffectiveIdSuffix(e attValue "id")).toList
+
+        // Join everything with "$" for PDF
+        nameParts(control) ++ suffixAsSeq(control) mkString "$"
     }
 }

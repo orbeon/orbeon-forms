@@ -158,7 +158,7 @@
             <p:processor name="oxf:sql">
                 <p:input name="data" href="#request-description"/>
                 <p:input name="config" href="#sql-config"/>
-                <p:output name="data" id="sql-out" debug="sql-out"/>
+                <p:output name="data" id="sql-out"/>
             </p:processor>
 
             <!-- Set Orbeon-Operations header -->
@@ -362,7 +362,7 @@
                                                                         <sql:param type="xs:anyURI" sql-type="blob" select="/request/body" />
                                                                     </xsl:if>
                                                                     <xsl:if test="not($is-attachment)">
-        																<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*" />
+                                                                        <sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*" />
                                                                     </xsl:if>
                                                                     <xsl:if test="$is-data and $owner-group">
                                                                         , case when <xsl:value-of select="$last-modified-time"/> is null

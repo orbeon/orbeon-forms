@@ -101,7 +101,7 @@ class Upload extends Control
         parentElement = inputElement.parentNode;
         newInputElement = document.createElement "input"
         YAHOO.util.Dom.addClass newInputElement, inputElement.className
-        newInputElement.id = ORBEON.util.Utils.appendToEffectiveId this.container.id, "$xforms-input"
+        newInputElement.id = ORBEON.util.Utils.appendToEffectiveId this.container.id, XFORMS_SEPARATOR_3 + "xforms-input"
         newInputElement.setAttribute "type", inputElement.type
         newInputElement.setAttribute "name", inputElement.name
         newInputElement.setAttribute "size", inputElement.size

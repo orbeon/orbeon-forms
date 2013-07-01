@@ -100,7 +100,7 @@
             // Keep in form post the $uuid element and input for this upload
             // NOTE: Don't compare element id but name, as id might be prefixed in portlet environment
             var keep = element.name == "$uuid" || (YD.hasClass(element, "xforms-upload-select")
-                    && element.id == ORBEON.util.Utils.appendToEffectiveId(this.processingEvent.upload.container.id, "$xforms-input"));
+                    && element.id == ORBEON.util.Utils.appendToEffectiveId(this.processingEvent.upload.container.id,  XFORMS_SEPARATOR_3 + "xforms-input"));
             // Disable elements we don't keep and that are not disabled already
             // NOTE: Skip fieldsets, as disabling them disables all the elements inside the fieldset
             if (element.tagName.toLowerCase() != "fieldset" && ! keep && ! element.disabled) { element.disabled = true; return true; }

@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4" />
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" hash="2630862306">
+    <data-source source="LOCAL" name="DB2" product="" version="" jdbc-version="" driver-name="" driver-version="" uuid="f7a43955-4398-4a1a-aee5-165b8a7b3645">
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.ibm.db2.jcc.DB2Driver</jdbc-driver>
+      <jdbc-url>jdbc:db2://localhost:50000/sample</jdbc-url>
+      <user-name>db2admin</user-name>
+      <user-password>dfcedfc8df98dfcbdfcedfc7dfc3dfc4</user-password>
+      <libraries>
+        <library>
+          <url>file://$PROJECT_DIR$/../Components/apache-tomcat-6.0.29/lib/db2jcc4.jar</url>
+        </library>
+      </libraries>
+    </data-source>
+  </component>
+</project>
 

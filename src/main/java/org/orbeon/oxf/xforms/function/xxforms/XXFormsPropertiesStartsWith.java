@@ -47,7 +47,7 @@ public class XXFormsPropertiesStartsWith extends XFormsFunction {
         final List<String> stringList = Properties.instance().getPropertySet().getPropertiesStartsWith(propertyName);
         final List<AtomicValue> atomicValueList = new ArrayList<AtomicValue>();
         for (String property: stringList) {
-            if (property.toLowerCase().indexOf("password") == -1)
+            if (! property.toLowerCase().contains("password"))
                 atomicValueList.add((AtomicValue) XFormsUtils.convertJavaObjectToSaxonObject(property));
         }
         return atomicValueList;

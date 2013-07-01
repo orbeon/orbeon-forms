@@ -941,7 +941,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                         // For now, we will probably have many false positive but we just test on "doc". The exact match
                         // is done by parsing the expression below anyway.
-                        final boolean containsDocString = xpathString.indexOf("doc") != -1;
+                        final boolean containsDocString = xpathString.contains("doc");
                         if (containsDocString) {
                             // The following will call our FunctionLibrary.bind() method, which we use to test for the
                             // presence of the functions.

@@ -213,7 +213,7 @@ public class ResourceServer extends ProcessorImpl {
                 return true;
             } else if (pattern.startsWith("*") && pattern.endsWith("*")) {
                 String middle = pattern.substring(1, pattern.length() - 1);
-                return path.indexOf(middle) != -1;
+                return path.contains(middle);
             } else if (pattern.startsWith("*")) {
                 return path.endsWith(pattern.substring(1));
             } else if (pattern.endsWith("*")) {

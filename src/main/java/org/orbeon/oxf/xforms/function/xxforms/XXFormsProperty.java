@@ -40,7 +40,7 @@ public class XXFormsProperty extends XFormsFunction {
 
     public static AtomicValue property(String propertyName) {
         // Never return any property containing the string "password" as a first line of defense
-        if (propertyName.toLowerCase().indexOf("password") != -1) {
+        if (propertyName.toLowerCase().contains("password")) {
             return null;
         }
 

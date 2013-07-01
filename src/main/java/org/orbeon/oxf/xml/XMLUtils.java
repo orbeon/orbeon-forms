@@ -868,7 +868,7 @@ public class XMLUtils {
     }
 
     public static void parseDocumentFragment(String fragment, XMLReceiver xmlReceiver) throws SAXException {
-        if (fragment.indexOf("<") != -1 || fragment.indexOf("&") != -1) {
+        if (fragment.contains("<") || fragment.contains("&")) {
             try {
                 final XMLReader xmlReader = newSAXParser(XMLUtils.ParserConfiguration.PLAIN).getXMLReader();
                 xmlReader.setContentHandler(new XMLFragmentReceiver(xmlReceiver));

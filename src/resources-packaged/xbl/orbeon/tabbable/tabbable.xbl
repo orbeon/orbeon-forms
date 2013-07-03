@@ -26,6 +26,11 @@
 
     <xbl:script src="/xbl/orbeon/tabbable/tabbable.js"/>
     <xbl:binding id="fr-tabbable" element="fr|tabbable" xxbl:mode="binding">
+        <xbl:resources>
+            <xbl:style>
+                .xbl-fr-tabbable .nav-tabs > li > a { text-decoration: none }
+            </xbl:style>
+        </xbl:resources>
         <xbl:handlers>
             <xbl:handler event="xforms-enabled" target="#observer">
                 <xxf:script>YAHOO.xbl.fr.Tabbable.instance(this).init();</xxf:script>

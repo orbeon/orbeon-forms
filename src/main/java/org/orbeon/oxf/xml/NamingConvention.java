@@ -57,8 +57,4 @@ public class NamingConvention {
         }
         return result.toString();
     }
-
-    public static String javaToSQLName(String javaName) {
-        return javaToXMLName(javaName).replace('-', '_').toUpperCase();
-    }
 }

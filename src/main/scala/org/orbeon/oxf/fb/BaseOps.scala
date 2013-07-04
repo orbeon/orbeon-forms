@@ -20,6 +20,7 @@ import org.orbeon.oxf.xforms.{XFormsProperties, XFormsModel}
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
 
 trait BaseOps extends Logging {
 
@@ -39,7 +40,7 @@ trait BaseOps extends Logging {
         topLevelInstance("fr-form-model", "fb-form-instance").get
 
     // Find the top-level form model of the form being edited
-    def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + "$fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
+    def getFormModel = containingDocument.getObjectByEffectiveId(DynamicControlId + COMPONENT_SEPARATOR + "fr-form-model").asInstanceOf[XFormsModel] ensuring (_ ne null, "did not find fb$fr-form-model")
 
     def formResourcesRoot = asNodeInfo(topLevelModel("fr-form-model").get.getVariable("resources"))
     def templateRoot(inDoc: NodeInfo, templateName: String) = inlineInstanceRootElement(inDoc, templateId(templateName))

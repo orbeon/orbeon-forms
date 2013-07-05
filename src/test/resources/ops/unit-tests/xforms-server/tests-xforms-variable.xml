@@ -749,54 +749,51 @@
             </xxf:event-response>
         </output>
     </test>
-    
-    <!--<test description="xxx " name="oxf:pipeline" only="true">-->
-        <!--<input name="config" href="wrap-xforms-state.xpl"/>-->
-        <!--<input name="document">-->
-            <!--<xh:html>-->
-                <!--<xh:head>-->
-                    <!--<xf:model id="model" xxf:xpath-analysis="true"/>-->
-                <!--</xh:head>-->
-                <!--<xh:body>-->
-                    <!--<xf:group id="my-group">-->
-                        <!--<xf:var name="foo">foo</xf:var>-->
-                        <!--<xf:model id="nested-model"/>-->
-                        <!--<xf:output id="my-output" value="$foo"/>-->
-                    <!--</xf:group>-->
-                <!--</xh:body>-->
-            <!--</xh:html>-->
-        <!--</input>-->
-        <!--<output name="response">-->
-            <!--<xxf:event-response>-->
-                <!--<xxf:dynamic-state>-->
-                    <!--<dynamic-state>-->
-                        <!--<instances>-->
-                            <!--<instance id="instance1" model-id="model1">-->
-                                <!--<instance>42</instance>-->
-                            <!--</instance>-->
-                            <!--<instance id="instance2" model-id="model2">-->
-                                <!--<instance>43</instance>-->
-                            <!--</instance>-->
-                        <!--</instances>-->
-                    <!--</dynamic-state>-->
-                <!--</xxf:dynamic-state>-->
-                <!--<xxf:action>-->
-                    <!--<xxf:control-values>-->
-                        <!--<xxf:control id="output1">42</xxf:control>-->
-                        <!--<xxf:control id="output2a">43</xxf:control>-->
-                        <!--<xxf:control id="output2b">43</xxf:control>-->
-                        <!--<xxf:control id="output3a">42</xxf:control>-->
-                        <!--<xxf:control id="output3b">42</xxf:control>-->
-                        <!--<xxf:control id="output3c">43</xxf:control>-->
-                        <!--<xxf:control id="output4a">42</xxf:control>-->
-                        <!--<xxf:control id="output4b">42</xxf:control>-->
-                        <!--<xxf:control id="output4c">43</xxf:control>-->
-                        <!--<xxf:control id="output5a">42</xxf:control>-->
-                        <!--<xxf:control id="output5b">43</xxf:control>-->
-                    <!--</xxf:control-values>-->
-                <!--</xxf:action>-->
-            <!--</xxf:event-response>-->
-        <!--</output>-->
-    <!--</test>-->
+
+    <test description="#1104: Model variable uses older value of preceding model variable" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">><value/></xf:instance>
+
+                        <xf:var name="foo" value="foo"/>
+                        <xf:var name="foo-count" value="count($foo)"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:insert context="instance()" origin="xf:element('foo')"/>
+                            <!-- This causes a single re-evaluation of the variables. This is necessary to reproduce the
+                                 issue, because if then you do e.g. a recalculate afterwards, which also causes a
+                                 re-evaluation of the variables, the correct value of $foo propagates to $foo-count! -->
+                            <xf:rebuild/>
+                            <xf:message value="$foo-count"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance id="instance" model-id="model">
+                                <value>
+                                    <foo/>
+                                </value>
+                            </instance>
+                        </instances>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values/>
+                    <xxf:message level="modal">1</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 
 </group>

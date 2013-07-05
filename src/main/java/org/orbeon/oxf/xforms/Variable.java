@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysis;
 import org.orbeon.oxf.xforms.analysis.VariableAnalysisTrait;
+import org.orbeon.oxf.xforms.analysis.controls.ViewTrait;
 import org.orbeon.oxf.xforms.function.XFormsFunction;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -95,10 +96,11 @@ public class Variable {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
 
                     final XFormsFunction.Context functionContext = contextStack.getFunctionContext(sourceEffectiveId);
+                    final boolean scopeModelVariables = staticVariable instanceof ViewTrait; // see https://github.com/orbeon/orbeon-forms/issues/1104
                     try {
                         variableValue = XPathCache.evaluateAsExtent(
                                 currentNodeset, bindingContext.getPosition(),
-                                expression, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(),
+                                expression, staticVariable.valueNamespaceMapping(), bindingContext.getInScopeVariables(scopeModelVariables),
                                 XFormsContainingDocument.getFunctionLibrary(), functionContext, null, getLocationData(),
                                 containingDocument.getRequestStats().getReporter());
                     } catch (Exception e) {

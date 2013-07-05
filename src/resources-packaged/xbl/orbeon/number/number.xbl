@@ -86,7 +86,7 @@
 
                         <xf:var name="picture-string"
                                 value="concat(
-                                        '#,###',
+                                        '#,##0',
                                         if (xs:integer($digits-after-decimal) gt 0) then '.' else '',
                                         substring('0000000000', 1, xs:integer($digits-after-decimal)))"/>
 

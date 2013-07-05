@@ -23,7 +23,7 @@ import org.dom4j.Element
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
 
-    @Test def noscriptEventReordering() {
+    @Test def noscriptEventReordering(): Unit = {
 
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
@@ -60,7 +60,7 @@ class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
             assert(Dom4j.compareElementsIgnoreNamespacesInScopeCollapse(left, right))
     }
 
-    @Test def adjustIdForRepeatIteration() {
+    @Test def adjustIdForRepeatIteration(): Unit = {
 
         this setupDocument
             <xh:html xmlns:xf="http://www.w3.org/2002/xforms"
@@ -93,10 +93,10 @@ class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
                 </xh:body>
             </xh:html>
 
-        assert("my-outer-repeat" === ClientEvents.adjustIdForRepeatIteration(document, "my-outer-repeat"))
-        assert("my-outer-repeat~iteration·2" === ClientEvents.adjustIdForRepeatIteration(document, "my-outer-repeat·2"))
-        assert("my-inner-repeat·2" === ClientEvents.adjustIdForRepeatIteration(document, "my-inner-repeat·2"))
+        assert("my-outer-repeat"               === ClientEvents.adjustIdForRepeatIteration(document, "my-outer-repeat"))
+        assert("my-outer-repeat~iteration·2"   === ClientEvents.adjustIdForRepeatIteration(document, "my-outer-repeat·2"))
+        assert("my-inner-repeat·2"             === ClientEvents.adjustIdForRepeatIteration(document, "my-inner-repeat·2"))
         assert("my-inner-repeat~iteration·2-3" === ClientEvents.adjustIdForRepeatIteration(document, "my-inner-repeat·2-3"))
-        assert("my-input·2-3" === ClientEvents.adjustIdForRepeatIteration(document, "my-input·2-3"))
+        assert("my-input·2-3"                  === ClientEvents.adjustIdForRepeatIteration(document, "my-input·2-3"))
     }
 }

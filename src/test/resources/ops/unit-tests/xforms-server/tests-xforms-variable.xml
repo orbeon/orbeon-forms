@@ -756,7 +756,7 @@
             <xh:html>
                 <xh:head>
                     <xf:model id="model">
-                        <xf:instance id="instance">><value/></xf:instance>
+                        <xf:instance id="instance"><value/></xf:instance>
 
                         <xf:var name="foo" value="foo"/>
                         <xf:var name="foo-count" value="count($foo)"/>
@@ -795,5 +795,56 @@
         </output>
     </test>
 
+    <test description="#698: Model variables shadow action and view variables" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html>
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance"><value/></xf:instance>
+
+                        <xf:var name="foo" value="42"/>
+
+                        <xf:action event="xforms-ready">
+                            <xf:var name="foo" value="43"/>
+                            <xf:message value="$foo"/>
+                        </xf:action>
+
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="output1" value="$foo"/>
+
+                    <xf:message event="xforms-enabled" observer="output1" value="$foo"/>
+
+                    <xf:var name="foo" value="44"/>
+                    <xf:output id="output2" value="$foo"/>
+
+                    <xf:message event="xforms-enabled" observer="output2" value="$foo"/>
+                    <xf:action event="xforms-enabled" observer="output2">
+                        <xf:var name="foo" value="45"/>
+                        <xf:message value="$foo"/>
+                    </xf:action>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response>
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">42</xxf:control>
+                        <xxf:control id="output2">44</xxf:control>
+                    </xxf:control-values>
+                    <xxf:message level="modal">42</xxf:message>
+                    <xxf:message level="modal">44</xxf:message>
+                    <xxf:message level="modal">45</xxf:message>
+                    <xxf:message level="modal">43</xxf:message>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
 
 </group>

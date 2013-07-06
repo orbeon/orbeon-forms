@@ -118,6 +118,7 @@ public class XFormsContextStack {
         this.functionContext = new XFormsFunction.Context(containingModel, this);
     }
 
+    // For XBL/xxf:dynamic
     public void setParentBindingContext(BindingContext parentBindingContext) {
         this.parentBindingContext = parentBindingContext;
     }
@@ -161,7 +162,7 @@ public class XFormsContextStack {
 
         // Add model variables for default model
         if (model != null)
-            scopeModelVariables(model);
+            model.setTopLevelVariables(evaluateModelVariables(model));
     }
 
     /**
@@ -173,35 +174,32 @@ public class XFormsContextStack {
                 (model != null) ? model.getLocationData() : null, false, null, container.innerScope());
     }
 
-    private void scopeModelVariables(XFormsModel model) {
+    // NOTE: This only scopes top-level model variables, but not binds-as-variables.
+    private Map<String, ValueRepresentation> evaluateModelVariables(XFormsModel model) {
         // TODO: Check dirty flag to prevent needless re-evaluation
-
-        // TODO: This only scopes top-level model variables, but not binds-as-variables.
-
         // All variables in the model are in scope for the nested binds and actions.
         final List<VariableAnalysisTrait> variables = model.getStaticModel().jVariablesSeq();
         if (! variables.isEmpty()) {
 
-            final List<BindingContext.VariableInfo> variableInfos = new ArrayList<BindingContext.VariableInfo>();
+            final Map<String, ValueRepresentation> variableInfos = new HashMap<String, ValueRepresentation>();
 
             for (final VariableAnalysisTrait variable : variables)
-                variableInfos.add(scopeVariable(variable, model.getEffectiveId(), true));
+                variableInfos.put(variable.name(), scopeVariable(variable, model.getEffectiveId(), true).value());
 
             final IndentedLogger indentedLogger = containingDocument.getIndentedLogger(XFormsModel.LOGGING_CATEGORY);
-            if (indentedLogger.isDebugEnabled()) {
+            if (indentedLogger.isDebugEnabled())
                 indentedLogger.logDebug("", "evaluated model variables", "count", Integer.toString(variableInfos.size()));
-            }
 
             // Remove extra bindings added and set all variables on the current binding context so that things are cleaner
-            for (int i = 0; i < variableInfos.size(); i++) {
+            for (int i = 0; i < variableInfos.size(); i++)
                 popBinding();
-            }
 
-            this.head.setVariables(variableInfos);
-        }
+            return variableInfos;
+        } else
+            return Collections.emptyMap();
     }
 
-    public BindingContext.VariableInfo scopeVariable(VariableAnalysisTrait staticVariable, String sourceEffectiveId, boolean handleNonFatal) {
+    public VariableNameValue scopeVariable(VariableAnalysisTrait staticVariable, String sourceEffectiveId, boolean handleNonFatal) {
         
         // Create variable object
         final Variable variable = new Variable(staticVariable, containingDocument);
@@ -224,8 +222,7 @@ public class XFormsContextStack {
         this.head = this.head.pushVariable(((ElementAnalysis) staticVariable).element(), variable.getVariableName(), variable.getVariableValue(this, sourceEffectiveId, true, handleNonFatal), newScope);
         returnFunctionContext();
 
-        assert this.head.variables().size() == 1;
-        return this.head.variables().head();
+        return this.head.variable().get();
     }
 
     public BindingContext setBinding(BindingContext bindingContext) {

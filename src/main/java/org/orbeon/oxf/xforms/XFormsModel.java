@@ -175,7 +175,6 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
         // Remember context and variables
         defaultEvaluationContext = contextStack.getCurrentBindingContext();
-        topLevelVariables = contextStack.getCurrentBindingContext().getInScopeVariables(false);
     }
 
     // Return the value of the given model variable
@@ -979,6 +978,10 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
     public Map<String, ValueRepresentation> getTopLevelVariables() {
         return topLevelVariables;
+    }
+
+    public void setTopLevelVariables(Map<String, ValueRepresentation> topLevelVariables) {
+        this.topLevelVariables = topLevelVariables;
     }
 
     // Don't allow any external events

@@ -40,13 +40,11 @@ case class BindingContext(
     require(scope ne null)
     require(nodeset ne null)
 
-    // Hold a variable name/value
-    case class VariableInfo(name: String, value: ValueRepresentation)
-
     // Location data associated with the XForms element (typically, a control) associated with the binding. If location
     // data was passed during construction, pass that, otherwise try to get location data from passed element.
     val locationData = Option(_locationData) orElse (Option(controlElement) map (_.getData.asInstanceOf[LocationData])) orNull
-    private var _variables: List[VariableInfo] = Nil
+    private var _variable: Option[VariableNameValue] = None
+    def variable = _variable
 
     // Constructor for scoping a variable
     def this(
@@ -61,7 +59,7 @@ case class BindingContext(
         this(parent, base.model, null, base.nodeset, base.position, base.elementId, false,
              controlElement, locationData, false, base.contextItem, scope)
 
-        _variables ::= new VariableInfo(variableName, variableValue)
+        _variable = Some(new VariableNameValue(variableName, variableValue))
     }
 
     // Create a copy with a new variable in scope
@@ -79,16 +77,12 @@ case class BindingContext(
     def getPosition = position
     def isNewBind = newBind
     def getControlElement = controlElement
-    def variables = _variables
 
     def getSingleItem =
         if (nodeset.isEmpty)
             null
         else
             nodeset.get(position - 1)
-
-    def setVariables(variables: JList[VariableInfo]) =
-        this._variables = variables.asScala.toList
 
     def getInScopeVariables: JMap[String, ValueRepresentation] = getInScopeVariables(scopeModelVariables = true)
 
@@ -98,12 +92,10 @@ case class BindingContext(
 
         // Scope view variables in the same scope only
         for {
-            bindingContext ← new AncestorIterator(includeSelf = true).toList
+            bindingContext ← new AncestorIterator(includeSelf = true)
             if bindingContext.scope == scope
-            currentInfo = bindingContext._variables
-            if currentInfo ne null
-            VariableInfo(name: String, value) ← currentInfo
-        } yield {
+            VariableNameValue(name, value) ← bindingContext.variable
+        } locally {
             // The binding defines a variable and there is not already a variable with that name
             // NOTE: Put condition here to make sure we take previous variables into account
             if (! tempVariablesMap.containsKey(name))
@@ -112,8 +104,9 @@ case class BindingContext(
 
         // Scope model variables at the bottom if needed
         if (scopeModelVariables && (model ne null))
-            for ((key, value) ← model.getTopLevelVariables.asScala)
-                tempVariablesMap.put(key, value)
+            for ((name, value) ← model.getTopLevelVariables.asScala)
+                if (! tempVariablesMap.containsKey(name))
+                    tempVariablesMap.put(name, value)
 
         tempVariablesMap
     }
@@ -175,6 +168,9 @@ case class BindingContext(
         }
     }
 }
+
+// Hold a variable name/value
+case class VariableNameValue(name: String, value: ValueRepresentation)
 
 object BindingContext {
     // NOTE: Ideally, we would like the empty context to be a constant, as nobody should use it! Or, the binding context

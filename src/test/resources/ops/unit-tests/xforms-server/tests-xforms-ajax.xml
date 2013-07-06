@@ -765,6 +765,7 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
+                            <xxf:control id="output1">42</xxf:control>
                             <xxf:control id="input2">42</xxf:control>
                         </xxf:control-values>
                     </xxf:action>
@@ -772,7 +773,6 @@
                 <xxf:event-response>
                     <xxf:action>
                         <xxf:control-values>
-                            <xxf:control id="output1">42</xxf:control>
                             <xxf:control id="input1">cat</xxf:control>
                         </xxf:control-values>
                     </xxf:action>

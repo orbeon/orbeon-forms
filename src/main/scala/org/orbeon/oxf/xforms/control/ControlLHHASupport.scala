@@ -164,10 +164,17 @@ object LHHASupport {
             def alertsMatchingAny =
                 staticAlerts.iterator filter (a ⇒ a.forConstraints.isEmpty && a.forLevels.isEmpty)
 
-            // For that given level, identify all matching alerts if any, whether they match by constraint or by level
+            // For that given level, identify all matching alerts if any, whether they match by constraint or by level.
+            // Alerts that specify neither a constraint nor a level are considered a default, that is they are not added
+            // if other alerts have already been matched.
+            // Q: Should the same logic apply to levels? That is, an alert only for a level should show only if there is
+            // no more specific alert for that given level?
             // Alerts are returned in document order
             control.alertLevel flatMap { level ⇒
-                val matchingAlertIds = alertsMatchingConstraints ++ alertsMatchingLevel(level) ++ alertsMatchingAny map (_.staticId) toSet
+                val matchingAlertsNoDefault = alertsMatchingConstraints ++ alertsMatchingLevel(level) toList
+                val matchingAlertsOrDefault = if (matchingAlertsNoDefault.nonEmpty) matchingAlertsNoDefault else alertsMatchingAny
+
+                val matchingAlertIds = matchingAlertsOrDefault map (_.staticId) toSet
                 val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))
 
                 matchingAlerts.nonEmpty option (level, matchingAlerts)

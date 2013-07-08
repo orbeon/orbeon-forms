@@ -50,6 +50,7 @@
                 <xsl:variable name="is-editable"        select="exists($edit-ref)"/>
 
                 <xsl:variable name="is-repeat"          select="$root/@repeat = 'true' or exists($root/@minOccurs | $root/@maxOccurs | $root/@min | $root/@max)"/>
+                <xsl:variable name="freeze"             select="(xs:integer($root/@freeze[. castable as xs:integer]), 0)[1]"/>
                 <xsl:variable name="grid-rows"          select="($root/*:body, $root/self::*)[1]/*:tr"/>
 
                 <xsl:variable name="static-row-count"   select="count($grid-rows)"/>
@@ -131,7 +132,7 @@
                                                                context="$repeat-context"
                                                                ref="$repeat-sequence"
                                                                origin="$repeat-origin"
-                                                               at="$repeat-index"/>
+                                                               at="max(($repeat-index, {$freeze}))"/>
                                                 </xf:trigger>
                                                 <xf:group ref="$repeat-context[not($can-add)]">
                                                     <xh:i class="icon-plus-sign disabled"/>
@@ -198,10 +199,10 @@
                                                                             <!-- Evaluate the constraint in the context of the iteration -->
                                                                             <xxf:sequence value="{$remove-constraint}" xxbl:scope="outer"/>
                                                                         </xf:var>
-                                                                        <xf:var name="can-remove" value="$remove-constraint and count($repeat-sequence) gt {$min-occurs}"/>
+                                                                        <xf:var name="can-remove" value="$remove-constraint and count($repeat-sequence) gt {$min-occurs} and xxf:repeat-position() gt {$freeze}"/>
                                                                     </xsl:when>
                                                                     <xsl:otherwise>
-                                                                        <xf:var name="can-remove" value="count($repeat-sequence) gt {$min-occurs}"/>
+                                                                        <xf:var name="can-remove" value="count($repeat-sequence) gt {$min-occurs} and xxf:repeat-position() gt {$freeze}"/>
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                                 <xf:trigger appearance="minimal" ref="$repeat-context[$can-remove]" tabindex="-1">

@@ -103,7 +103,7 @@
                                 <sql:execute>
                                     <sql:query>
                                         select
-                                            last_modified,
+                                            last_modified_time,
                                             <xsl:if test="not($is-attachment)">t.xml xml</xsl:if>
                                             <xsl:if test="$is-attachment">file_content</xsl:if>
                                         from <xsl:value-of select="$table-name"/> t
@@ -111,8 +111,8 @@
                                             and form = <sql:param type="xs:string" select="/request/form"/>
                                             <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
                                             <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
-                                            and last_modified = (
-                                                select max(last_modified) from <xsl:value-of select="$table-name"/>
+                                            and last_modified_time = (
+                                                select max(last_modified_time) from <xsl:value-of select="$table-name"/>
                                                 where app = <sql:param type="xs:string" select="/request/app"/>
                                                 and form = <sql:param type="xs:string" select="/request/form"/>
                                                 <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
@@ -124,7 +124,7 @@
                                     <sql:result-set>
                                         <sql:row-iterator>
                                             <last-modified>
-                                                <sql:get-column-value column="last_modified" type="xs:dateTime"/>
+                                                <sql:get-column-value column="last_modified_time" type="xs:dateTime"/>
                                             </last-modified>
                                             <data>
                                                 <xsl:choose>
@@ -230,10 +230,10 @@
 
                                                 insert into <xsl:value-of select="$table-name"/>
                                                     <!-- TODO: This list of columns only works for the data (not form definition) table -->
-                                                    (created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
+                                                    (created, last_modified_time, last_modified_by, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
                                                 select
                                                     d.created,
-                     				    current_timestamp,
+                     				                current_timestamp,
                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                     d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
                                                     'Y', d.xml
@@ -241,7 +241,7 @@
                                                     orbeon_form_data d,
                                                     (
                                                         select
-                                                            app, form, document_id, max(last_modified) last_modified
+                                                            app, form, document_id, max(last_modified_time) last_modified_time
                                                         from orbeon_form_data
                                                         where
                                                             app =  <sql:param type="xs:string" select="/request/app"/>
@@ -252,7 +252,7 @@
                                                     ) m
                                                 where
                                                     d.document_id = m.document_id
-                                                    and d.last_modified = m.last_modified
+                                                    and d.last_modified_time = m.last_modified_time
                                                     and d.deleted = 'N'
                                             </sql:update>
                                         </sql:execute>
@@ -284,7 +284,7 @@
                                                     insert
                                                         into <xsl:value-of select="$table-name"/>
                                                         (
-                                                            created, last_modified, username, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
+                                                            created, last_modified_time, last_modified_by, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
                                                             <xsl:if test="$is-attachment">file_name, file_content</xsl:if>
                                                             <xsl:if test="not($is-attachment)">xml</xsl:if>
                                                         )
@@ -323,15 +323,15 @@
                                                                         <xsl:if test="$is-attachment">
                                                                             and file_name = <sql:param type="xs:string" select="/request/filename"/>
                                                                         </xsl:if>
-                                                                        and last_modified = v1.last_last_modified
+                                                                        and last_modified_time = v1.last_last_modified_time
                                                                 ) last_deleted
                                                             from
                                                                 (
                                                                     select
-                                                                        max(last_modified) last_last_modified , max(created) last_created
+                                                                        max(last_modified_time) last_last_modified_time , max(created) last_created
                                                                     from
                                                                     (
-                                                                        select max(last_modified) last_modified, max(created) created
+                                                                        select max(last_modified_time) last_modified_time, max(created) created
                                                                         from <xsl:value-of select="$table-name"/>
                                                                         where
                                                                         app = <sql:param type="xs:string" select="/request/app"/>
@@ -342,7 +342,7 @@
                                                                         <xsl:if test="$is-attachment">
                                                                             and file_name = <sql:param type="xs:string" select="/request/filename"/>
                                                                         </xsl:if>
-                                                                        union all select null last_modified, null created from sysibm.sysdummy1
+                                                                        union all select null last_modified_time, null created from sysibm.sysdummy1
                                                                     ) v2
                                                                 ) v1
                                                         ) v

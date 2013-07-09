@@ -49,13 +49,13 @@
                                 select  d.xml xml
                                 from    orbeon_form_definition d,
                                         (
-                                            select      app, form, max(last_modified) last_modified
+                                            select      app, form, max(last_modified_time) last_modified_time
                                             from        orbeon_form_definition
                                             group by    app, form
                                         ) m
                                 where   d.app = m.app
                                         and d.form = m.form
-                                        and d.last_modified = m.last_modified
+                                        and d.last_modified_time = m.last_modified_time
                                         and d.deleted = 'N'
                             </sql:query>
                             <sql:result-set>

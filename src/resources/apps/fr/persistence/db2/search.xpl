@@ -77,7 +77,7 @@
     </p:processor>
 
     <!-- Hacky rewrite of the XPath to support both short (xh, xf) and long (xhtml, xforms) prefixes
-         See: https://github.com/orbeon/orbeon-forms/issues/598 --> 
+         See: https://github.com/orbeon/orbeon-forms/issues/598 -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#search-input"/>
         <p:input name="config">
@@ -90,7 +90,7 @@
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="search"/>
-    </p:processor>    
+    </p:processor>
 
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
@@ -106,14 +106,14 @@
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
-                                        data.created, data.last_modified, data.document_id
+                                        data.created, data.last_modified_time, data.document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
 					   ,XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
                                     from orbeon_form_data data,
                                         (
-                                            select max(last_modified) last_modified, app, form, document_id
+                                            select max(last_modified_time) last_modified_time, app, form, document_id
                                             from orbeon_form_data
                                             where
                                                 app = <sql:param type="xs:string" select="/search/app"/>
@@ -122,7 +122,7 @@
                                         ) latest
                                     where
                                         <!-- Merge with 'latest', to make sure we only consider the document with the most recent last_date -->
-                                        data.last_modified = latest.last_modified
+                                        data.last_modified_time = latest.last_modified_time
                                         and data.app = latest.app
                                         and data.form = latest.form
                                         and data.document_id = latest.document_id
@@ -133,7 +133,7 @@
                                             <xsl:choose>
                                                 <xsl:when test="@match = 'exact'">
                                                     <!-- Exact match -->
-						    and 
+						    and
                                                     XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/> = "<xsl:value-of select="f:escape-sql(.)"/>"]')
                                                 </xsl:when>
                                                 <xsl:otherwise>
@@ -145,7 +145,7 @@
                                         </xsl:for-each>
                                         <!-- Condition for free text search -->
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
-                                              and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")  
+                                              and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
                                         </xsl:if>
                                     order by created desc
                                 </xsl:variable>
@@ -157,8 +157,8 @@
                                             (
                                                 select count(*) from orbeon_form_data
                                                 where
-                                                    (app, form, document_id, last_modified) in (
-                                                        select app, form, document_id, max(last_modified) last_modified
+                                                    (app, form, document_id, last_modified_time) in (
+                                                        select app, form, document_id, max(last_modified_time) last_modified_time
                                                         from orbeon_form_data
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
@@ -191,7 +191,7 @@
                                         <sql:row-iterator>
                                             <document>
                                                 <created><sql:get-column-value column="created"/></created>
-                                                <last-modified><sql:get-column-value column="last_modified"/></last-modified>
+                                                <last-modified><sql:get-column-value column="last_modified_time"/></last-modified>
                                                 <document-id><sql:get-column-value column="document_id"/></document-id>
                                                 <xsl:for-each select="/search/query[@path]">
                                                     <detail><sql:get-column-value column="detail_{position()}"/></detail>

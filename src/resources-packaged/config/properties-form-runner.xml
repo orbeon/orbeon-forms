@@ -28,6 +28,8 @@
     <property as="xs:boolean" name="oxf.fr.persistence.oracle.create-flat-view"                 value="false"/>
     <property as="xs:anyURI"  name="oxf.fr.persistence.mysql.uri"                               value="/fr/service/mysql"/>
     <property as="xs:string"  name="oxf.fr.persistence.mysql.datasource"                        value="mysql"/>
+    <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                 value="/fr/service/db2"/>
+    <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
 
     <!-- Properties to enable experimental MongoDB persistence -->
     <!--<property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mongo"/>-->

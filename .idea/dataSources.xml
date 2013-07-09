@@ -1,34 +1,3 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourceManagerImpl" format="xml" hash="437440967">
-    <data-source source="LOCAL" name="DB2" product="DB2/LINUXX8664" version="SQL10050" jdbc-version="4.0" driver-name="IBM Data Server Driver for JDBC and SQLJ" driver-version="4.15.82" uuid="f7a43955-4398-4a1a-aee5-165b8a7b3645">
-      <extra-name-characters>@#</extra-name-characters>
-      <identifier-quote-string>&quot;</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.ibm.db2.jcc.DB2Driver</jdbc-driver>
-      <jdbc-url>jdbc:db2://ec2-54-224-143-215.compute-1.amazonaws.com:50000/sample</jdbc-url>
-      <user-name>db2inst1</user-name>
-      <user-password>dfcedfc8df98dfc3dfc4dfd9dfdedfc6</user-password>
-      <libraries>
-        <library>
-          <url>file://$PROJECT_DIR$/../Components/apache-tomcat-6.0.29/lib/db2jcc4.jar</url>
-        </library>
-      </libraries>
-    </data-source>
-    <data-source source="LOCAL" name="MySQL" product="MySQL" version="5.6.11" jdbc-version="3.0" driver-name="MySQL-AB JDBC Driver" driver-version="mysql-connector-java-5.1.12 ( Revision: ${bzr.revision-id} )" uuid="0dde50f8-db23-491f-9a4c-ad9dbb290002">
-      <extra-name-characters>#@</extra-name-characters>
-      <identifier-quote-string>`</identifier-quote-string>
-      <synchronize>true</synchronize>
-      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://localhost:3306/orbeon?useUnicode=true&amp;amp;characterEncoding=UTF8</jdbc-url>
-      <user-name>orbeon</user-name>
-      <user-password>dfc5dfd8dfc8dfcfdfc5dfc4</user-password>
-      <libraries>
-        <library>
-          <url>file://$PROJECT_DIR$/../Components/apache-tomcat-6.0.29/lib/mysql-connector-java-5.1.12-bin.jar</url>
-        </library>
-      </libraries>
-    </data-source>
-  </component>
-</project>
+<project version="4" />
 

@@ -1828,8 +1828,8 @@ ORBEON.xforms.Controls = {
                     // If this is the help element, also enable the help image
                     if (lhhaType == "help") {
                         var help = ORBEON.xforms.Controls.getControlLHHA(control, "help");
-                        YAHOO.util.Dom.removeClass(helpImage, "xforms-disabled");
-                        YAHOO.util.Dom.removeClass(helpImage, "xforms-disabled-subsequent");
+                        YAHOO.util.Dom.removeClass(help, "xforms-disabled");
+                        YAHOO.util.Dom.removeClass(help, "xforms-disabled-subsequent");
                     }
                 }
             }

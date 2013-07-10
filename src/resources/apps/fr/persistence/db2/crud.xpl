@@ -357,7 +357,7 @@
                                                         from
                                                         (
                                                             select
-                                                                max(last_modified_time) last_modified_time, created
+                                                                max(last_modified_time) last_modified_time, max(created) created
                                                                 <xsl:if test="$is-data">, username , groupname</xsl:if>
                                                             from
                                                             (
@@ -393,7 +393,7 @@
                                                                     from sysibm.sysdummy1
                                                                 )
                                                             ) t2
-                                                            group by created <xsl:if test="$is-data">, username , groupname</xsl:if>
+                                                            <xsl:if test="$is-data">group by username, groupname</xsl:if>
                                                         ) t3
                                             </sql:update>
                                         </sql:execute>

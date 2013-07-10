@@ -22,7 +22,8 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
+        xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
 
     <p:param type="input" name="instance"/>
 
@@ -34,7 +35,7 @@
                 <include>/request/request-path</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
-                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource']</include>
+                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource' or name = 'orbeon-group']</include>
                 <include>/request/body</include>
             </config>
         </p:input>
@@ -60,6 +61,7 @@
                 <document><xsl:copy-of select="doc('input:instance')"/></document>
                 <timestamp><xsl:value-of select="current-dateTime()"/></timestamp>
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
+                <groupname><xsl:value-of select="$request/headers/header[name = 'orbeon-group']/value"/></groupname>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
                 <app><xsl:value-of select="$matcher-groups[1]"/></app>
                 <form><xsl:value-of select="$matcher-groups[2]"/></form>
@@ -106,6 +108,7 @@
                                             last_modified_time,
                                             <xsl:if test="not($is-attachment)">t.xml xml</xsl:if>
                                             <xsl:if test="$is-attachment">file_content</xsl:if>
+                                            <xsl:if test="$is-data">, username, groupname</xsl:if>
                                         from <xsl:value-of select="$table-name"/> t
                                             where app = <sql:param type="xs:string" select="/request/app"/>
                                             and form = <sql:param type="xs:string" select="/request/form"/>
@@ -123,9 +126,11 @@
                                     </sql:query>
                                     <sql:result-set>
                                         <sql:row-iterator>
-                                            <last-modified>
-                                                <sql:get-column-value column="last_modified_time" type="xs:dateTime"/>
-                                            </last-modified>
+                                            <last-modified><sql:get-column-value column="last_modified_time" type="xs:dateTime"/></last-modified>
+                                            <xsl:if test="$is-data">
+                                                <username><sql:get-column-value column="username" type="xs:string"/></username>
+                                                <groupname><sql:get-column-value column="groupname" type="xs:string"/></groupname>
+                                            </xsl:if>
                                             <data>
                                                 <xsl:choose>
                                                     <xsl:when test="$is-attachment">
@@ -150,6 +155,35 @@
                 <p:input name="data" href="#request-description"/>
                 <p:input name="config" href="#sql-config"/>
                 <p:output name="data" id="sql-out"/>
+            </p:processor>
+
+            <!-- Set Orbeon-Operations header -->
+            <p:processor name="oxf:xforms-submission">
+                <p:input name="request" href="#request-description"/>
+                <p:input name="submission">
+                    <xf:submission xsl:version="2.0" method="get" replace="instance" serialization="none"
+                                       resource="/fr/service/persistence/form/{encode-for-uri(/request/app)}/{encode-for-uri(/request/form)}"/>
+                </p:input>
+                <p:output name="response" id="form"/>
+            </p:processor>
+
+            <p:processor name="oxf:unsafe-xslt">
+                <p:input name="data"><dummy/></p:input>
+                <p:input name="form" href="#form"/>
+                <p:input name="sql-out" href="#sql-out"/>
+                <p:input name="request-description" href="#request-description"/>
+                <p:input name="config">
+                    <operations xsl:version="2.0">
+                        <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
+                        <xsl:variable name="sql-out" select="doc('input:sql-out')/sql-out"/>
+                        <xsl:value-of select="form-runner:setAllAuthorizedOperationsHeader($permissions, $sql-out/username/string(), $sql-out/groupname/string())"/>
+                    </operations>
+                </p:input>
+                <p:output name="data" id="send-operations"/>
+            </p:processor>
+
+            <p:processor name="oxf:null-serializer">
+                <p:input name="data" href="#send-operations"/>
             </p:processor>
 
             <p:choose href="aggregate('root', #request-description, #sql-out)">
@@ -229,14 +263,19 @@
                                                 <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
                                                 insert into <xsl:value-of select="$table-name"/>
-                                                    <!-- TODO: This list of columns only works for the data (not form definition) table -->
-                                                    (created, last_modified_time, last_modified_by, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml)
+                                                    (
+                                                        <!-- TODO: This list of columns only works for the data (not form definition) table -->
+                                                        created, last_modified_time, last_modified_by,
+                                                        app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml
+                                                        <xsl:if test="$is-data">, username, groupname</xsl:if>
+                                                    )
                                                 select
                                                     d.created,
                      				                current_timestamp,
                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                     d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
                                                     'Y', d.xml
+                                                    <xsl:if test="$is-data">, d.username, d.groupname</xsl:if>
                                                 from
                                                     orbeon_form_data d,
                                                     (
@@ -287,13 +326,13 @@
                                                             created, last_modified_time, last_modified_by, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
                                                             <xsl:if test="$is-attachment">file_name, file_content</xsl:if>
                                                             <xsl:if test="not($is-attachment)">xml</xsl:if>
+                                                            <xsl:if test="$is-data">, username, groupname</xsl:if>
                                                         )
-							    select case last_deleted
-                     					    when 'N' then last_created
-                     					    when 'Y' then current_timestamp
-                     					    else current_timestamp
-              						    end as lc,
-                     					    current_timestamp,
+                                                        select
+                                                            case when last_modified_time is null
+                                                                then current_timestamp
+                                                                else created end as created,
+                                                            current_timestamp,
                                                             <sql:param type="xs:string" select="/request/username"/>,
                                                             <sql:param type="xs:string" select="/request/app"/>,
                                                             <sql:param type="xs:string" select="/request/form"/>,
@@ -307,45 +346,55 @@
                                                             <xsl:if test="not($is-attachment)">
 																<sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*" />
                                                             </xsl:if>
+                                                            <xsl:if test="$is-data">
+                                                                , case when last_modified_time is null
+                                                                    then <sql:param type="xs:string" select="/request/username"/>
+                                                                    else username end as username
+                                                                , case when last_modified_time is null
+                                                                    then <sql:param type="xs:string" select="/request/groupname"/>
+                                                                    else groupname end as groupname
+                                                            </xsl:if>
                                                         from
                                                         (
                                                             select
-                                                                v1.*,
-                                                                (
-                                                                    select deleted
-                                                                    from <xsl:value-of select="$table-name"/>
-                                                                    where
-                                                                        app = <sql:param type="xs:string" select="/request/app"/>
-                                                                        and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                        <xsl:if test="$is-data">
-                                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                                        </xsl:if>
-                                                                        <xsl:if test="$is-attachment">
-                                                                            and file_name = <sql:param type="xs:string" select="/request/filename"/>
-                                                                        </xsl:if>
-                                                                        and last_modified_time = v1.last_last_modified_time
-                                                                ) last_deleted
+                                                                max(last_modified_time) last_modified_time, created
+                                                                <xsl:if test="$is-data">, username , groupname</xsl:if>
                                                             from
+                                                            (
                                                                 (
                                                                     select
-                                                                        max(last_modified_time) last_last_modified_time , max(created) last_created
+                                                                        t.last_modified_time, t.created
+                                                                        <xsl:if test="$is-data">, t.username , t.groupname</xsl:if>
                                                                     from
-                                                                    (
-                                                                        select max(last_modified_time) last_modified_time, max(created) created
-                                                                        from <xsl:value-of select="$table-name"/>
-                                                                        where
-                                                                        app = <sql:param type="xs:string" select="/request/app"/>
-                                                                        and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                        <xsl:if test="$is-data">
-                                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                                        </xsl:if>
-                                                                        <xsl:if test="$is-attachment">
-                                                                            and file_name = <sql:param type="xs:string" select="/request/filename"/>
-                                                                        </xsl:if>
-                                                                        union all select null last_modified_time, null created from sysibm.sysdummy1
-                                                                    ) v2
-                                                                ) v1
-                                                        ) v
+                                                                        <xsl:value-of select="$table-name"/> t,
+                                                                        (
+                                                                            select max(last_modified_time) last_modified_time
+                                                                            from <xsl:value-of select="$table-name"/>
+                                                                            where
+                                                                                app = <sql:param type="xs:string" select="/request/app"/>
+                                                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                                <xsl:if test="$is-data"> and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                                                <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                                                        ) l
+                                                                    where
+                                                                        t.last_modified_time = l.last_modified_time
+                                                                        and t.app = <sql:param type="xs:string" select="/request/app"/>
+                                                                        and t.form = <sql:param type="xs:string" select="/request/form"/>
+                                                                        <xsl:if test="$is-data"> and t.document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                                        <xsl:if test="$is-attachment"> and t.file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                                                        and t.last_modified_time = l.last_modified_time
+                                                                        and t.deleted = 'N'
+                                                                )
+                                                                union all
+                                                                (
+                                                                    select
+                                                                        null last_modified_time, null created
+                                                                        <xsl:if test="$is-data">, null username, null groupname</xsl:if>
+                                                                    from sysibm.sysdummy1
+                                                                )
+                                                            ) t2
+                                                            group by created <xsl:if test="$is-data">, username , groupname</xsl:if>
+                                                        ) t3
                                             </sql:update>
                                         </sql:execute>
                                     </sql:connection>

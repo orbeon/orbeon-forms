@@ -19,10 +19,12 @@
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
-        xmlns:f="http//www.orbeon.com/function">
+        xmlns:f="http//www.orbeon.com/function"
+        xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <!--
         Search instance, e.g.:
@@ -71,46 +73,101 @@
         <p:input name="config">
             <config stream-type="xs:anyURI">
                 <include>/request/headers/header[name = 'orbeon-datasource']</include>
+                <include>/request/headers/header[name = 'orbeon-username']</include>
+                <include>/request/headers/header[name = 'orbeon-group']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <!-- Hacky rewrite of the XPath to support both short (xh, xf) and long (xhtml, xforms) prefixes
-         See: https://github.com/orbeon/orbeon-forms/issues/598 -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#search-input"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+
+                <!-- Annotate with username/group, so this info is available to SQL processor -->
+                <xsl:template match="/search">
+                    <xsl:variable name="headers" select="doc('input:request')/request/headers/header"/>
+                    <xsl:copy>
+                        <xsl:attribute name="orbeon-username" select="$headers[name = 'orbeon-username']/value/string()"/>
+                        <xsl:attribute name="orbeon-group"    select="$headers[name = 'orbeon-group']/value/string()"/>
+                        <xsl:apply-templates select="@* | node()"/>
+                    </xsl:copy>
+                </xsl:template>
+
+                <!-- Hacky rewrite of the XPath to support both short (xh, xf) and long (xhtml, xforms) prefixes
+                     See: https://github.com/orbeon/orbeon-forms/issues/598 -->
                 <xsl:template match="query/@path">
                     <xsl:attribute name="path" select="
-                    	concat('', .)"/>
+                        if (starts-with(., 'xh:')) then
+                            concat('/*/', ., ' | /*/', replace(replace(., 'xh:', 'xhtml:'), 'xf:', 'xforms:'))
+                        else if (starts-with(., 'xhtml:')) then
+                            concat('/*/', ., ' | /*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
+                        else concat('/*/', .)"/>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="search"/>
     </p:processor>
 
+    <p:processor name="oxf:xforms-submission">
+        <p:input name="request"><dummy/></p:input>
+        <p:input name="submission" transform="oxf:xslt" href="#search-input">
+            <xf:submission xsl:version="2.0" method="get" replace="instance"
+                               resource="/fr/service/persistence/form/{encode-for-uri(/search/app)}/{encode-for-uri(/search/form)}"/>
+        </p:input>
+        <p:output name="response" id="form"/>
+    </p:processor>
+
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
+        <p:input name="form" href="#form"/>
         <p:input name="data" href="#search"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
+
+                    <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
+                    <xsl:variable name="search-operations" select="('*', 'read', 'update', 'delete')"/>
+                    <xsl:variable name="search-permissions" select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
+
+                    <!-- Are we authorized to see all the data based because of our role? -->
+                    <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                    <xsl:message select="$operations-from-role"/>
+                    <xsl:variable name="authorized-based-on-role" select="$operations-from-role = $search-operations"/>
+
+                    <!-- Are we authorized to see data if we are the owner / group member? -->
+                    <xsl:variable name="authorized-if-owner" select="exists($search-permissions[owner])"/>
+                    <xsl:variable name="authorized-if-group-member" select="exists($search-permissions[group-member])"/>
+
                     <sql:config>
                         <documents>
                             <sql:connection>
                                 <sql:datasource><xsl:value-of select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+
+                                <!-- Condition on owner / group -->
+                                <xsl:variable name="owner-group-condition">
+                                    <xsl:if test="not($authorized-based-on-role)">
+                                        and (
+                                            <xsl:if test="$authorized-if-owner">data.username = <sql:param type="xs:string" select="/search/@orbeon-username"/></xsl:if>
+                                            <xsl:if test="$authorized-if-owner and $authorized-if-group-member"> or </xsl:if>
+                                            <xsl:if test="$authorized-if-group-member">data.groupname = <sql:param type="xs:string" select="/search/@orbeon-group"/></xsl:if>
+                                        )
+                                    </xsl:if>
+                                </xsl:variable>
+
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
                                         data.created, data.last_modified_time, data.document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
-					   ,XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
+					                        , XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
+                                        , username, groupname
                                     from orbeon_form_data data,
                                         (
                                             select max(last_modified_time) last_modified_time, app, form, document_id
@@ -133,19 +190,18 @@
                                             <xsl:choose>
                                                 <xsl:when test="@match = 'exact'">
                                                     <!-- Exact match -->
-						    and
-                                                    XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/> = "<xsl:value-of select="f:escape-sql(.)"/>"]')
+						                            and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>
+						                            = "<xsl:value-of select="f:escape-sql(.)"/>"]')
                                                 </xsl:when>
                                                 <xsl:otherwise>
-                                                    <!-- Substring, case-insensitive match -->
-						    and
-  						    XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>,"<xsl:value-of select="lower-case(f:escape-sql(.))"/>")]')
+                                                    <!-- Substring -->
+						                            and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
                                                 </xsl:otherwise>
                                             </xsl:choose>
                                         </xsl:for-each>
                                         <!-- Condition for free text search -->
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
-                                              and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
+                                            and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
                                         </xsl:if>
                                     order by created desc
                                 </xsl:variable>
@@ -165,6 +221,7 @@
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
                                                         group by app, form, document_id)
                                                     and deleted = 'N'
+                                                    <xsl:copy-of select="$owner-group-condition"/>
                                             ) total,
                                             (
                                                 select count(*) from (<xsl:copy-of select="$query"/>)a
@@ -193,6 +250,8 @@
                                                 <created><sql:get-column-value column="created"/></created>
                                                 <last-modified><sql:get-column-value column="last_modified_time"/></last-modified>
                                                 <document-id><sql:get-column-value column="document_id"/></document-id>
+                                                <username><sql:get-column-value column="username"/></username>
+                                                <groupname><sql:get-column-value column="groupname"/></groupname>
                                                 <xsl:for-each select="/search/query[@path]">
                                                     <detail><sql:get-column-value column="detail_{position()}"/></detail>
                                                 </xsl:for-each>
@@ -234,11 +293,14 @@
     </p:processor>
 
     <!-- Transform output from SQL processor into the XML form the caller expects -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#sql-output"/>
+        <p:input name="form" href="#form"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+
+                <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
 
                 <!-- Move total and search-total as attribute -->
                 <xsl:template match="documents">
@@ -250,7 +312,7 @@
                 <!-- Move created, last-modified, and name as attributes -->
                 <!-- Add wrapping details element -->
                 <xsl:template match="document">
-                    <document created="{created}" last-modified="{last-modified}" name="{document-id}">
+                    <document created="{created}" last-modified="{last-modified}" name="{document-id}" operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

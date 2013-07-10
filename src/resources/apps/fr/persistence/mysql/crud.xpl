@@ -411,7 +411,7 @@
                                                                             from dual
                                                                         )
                                                                     ) t2
-                                                                ) t3;
+                                                                ) t3
                                                     </sql:update>
                                                 </sql:execute>
                                             </sql:connection>

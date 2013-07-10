@@ -227,7 +227,7 @@
                                                     <xsl:copy-of select="$owner-group-condition"/>
                                             ) total,
                                             (
-                                                select count(*) from (<xsl:copy-of select="$query"/>)a
+                                                select count(*) from (<xsl:copy-of select="$query"/>) a
                                             ) search_total
                                     </sql:query>
                                     <sql:result-set>

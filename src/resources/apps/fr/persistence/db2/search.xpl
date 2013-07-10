@@ -101,10 +101,8 @@
                      See: https://github.com/orbeon/orbeon-forms/issues/598 -->
                 <xsl:template match="query/@path">
                     <xsl:attribute name="path" select="
-                        if (starts-with(., 'xh:')) then
-                            concat('/*/', ., ' | /*/', replace(replace(., 'xh:', 'xhtml:'), 'xf:', 'xforms:'))
-                        else if (starts-with(., 'xhtml:')) then
-                            concat('/*/', ., ' | /*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
+                        if (starts-with(., 'xhtml:')) then
+                            concat('/*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
                         else concat('/*/', .)"/>
                 </xsl:template>
             </xsl:stylesheet>

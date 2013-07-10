@@ -153,7 +153,7 @@ trait FormRunnerPermissions {
 
         def operations(header: String, dataUserInfo: String, condition: String): Seq[String] = {
             val request = NetUtils.getExternalContext.getRequest
-            val headerValue = request.getHeaderValuesMap.get("orbeon-username").headOption
+            val headerValue = request.getHeaderValuesMap.get(header).headOption
             headerValue
                 // Does the user info from the header match the user info on the data
                 .filter(_ == dataUserInfo)
@@ -174,6 +174,20 @@ trait FormRunnerPermissions {
                         .flatMap(Function.tupled(operations _)(_))
                 (rolesOperations ++ dataOperations).distinct
         }
+    }
+
+    /**
+     * This is an "optimistic" version of allAuthorizedOperations, asking what operation you can do on data assuming
+     * you are the owner and a group member. It is used in the Form Runner home page to determine if it is even
+     * worth linking to the summary page for a given form.
+     */
+    def javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): java.util.List[String] =
+        allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).asJava
+    def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
+        val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap
+        val username = headers.get("orbeon-username").headOption.getOrElse("")
+        val group    = headers.get("orbeon-group"   ).headOption.getOrElse("")
+        allAuthorizedOperations(permissionsElement, username, group)
     }
 
     def javaAllAuthorizedOperations(permissionsElement: NodeInfo, dataUsername: String, dataGroupname: String): java.util.List[String] =

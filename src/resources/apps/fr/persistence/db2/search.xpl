@@ -201,6 +201,7 @@
                                         <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
                                             and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
                                         </xsl:if>
+                                        <xsl:copy-of select="$owner-group-condition"/>
                                     order by created desc
                                 </xsl:variable>
 
@@ -209,7 +210,7 @@
                                     <sql:query>
                                         select
                                             (
-                                                select count(*) from orbeon_form_data
+                                                select count(*) from orbeon_form_data data
                                                 where
                                                     (app, form, document_id, last_modified_time) in (
                                                         select app, form, document_id, max(last_modified_time) last_modified_time
@@ -222,7 +223,7 @@
                                                     <xsl:copy-of select="$owner-group-condition"/>
                                             ) total,
                                             (
-                                                select count(*) from (<xsl:copy-of select="$query"/>)a
+                                                select count(*) from (<xsl:copy-of select="$query"/>) a
                                             ) search_total from sysibm.sysdummy1
                                     </sql:query>
                                     <sql:result-set>

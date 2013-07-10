@@ -23,27 +23,44 @@
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http//www.orbeon.com/function"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        xmlns:xh="http://www.w3.org/1999/xhtml">
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary">
 
+    <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
+                <include>/request/request-path</include>
                 <include>/request/headers/header[name = 'orbeon-datasource']</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
 
+    <p:processor name="oxf:xslt">
+        <p:input name="instance" href="#instance"/>
+        <p:input name="request" href="#request"/>
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="config">
+            <request xsl:version="2.0">
+                <xsl:variable name="request" as="element(request)" select="doc('input:request')/request"/>
+                <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+                <xsl:copy-of select="doc('input:instance')/request/*"/>
+            </request>
+        </p:input>
+        <p:output name="data" id="request-description"/>
+    </p:processor>
+
     <!-- Get the metadata section of each form -->
     <p:processor name="oxf:sql">
-        <p:input name="data"><dummy/></p:input>
-        <p:input name="config" transform="oxf:xslt" href="#request">
+        <p:input name="data" href="#request-description"/>
+        <p:input name="config" transform="oxf:unsafe-xslt" href="#request-description">
             <sql:config xsl:version="2.0">
                 <sql-out>
                     <sql:connection>
-                        <sql:datasource><xsl:value-of select="/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+                        <xsl:copy-of select="/request/sql:datasource"/>
                         <sql:execute>
                             <sql:query>
                                 select  d.xml xml
@@ -51,6 +68,15 @@
                                         (
                                             select      app, form, max(last_modified_time) last_modified_time
                                             from        orbeon_form_definition
+                                            <xsl:if test="/request/app != ''">
+                                                where
+                                                    <xsl:if test="/request/app != ''">
+                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                    </xsl:if>
+                                                    <xsl:if test="/request/form != ''">
+                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                    </xsl:if>
+                                            </xsl:if>
                                             group by    app, form
                                         ) m
                                 where   d.app = m.app
@@ -74,16 +100,19 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#sql-out"/>
         <p:input name="config">
-            <forms xsl:version="2.0">
-                <xsl:for-each select="/sql-out/xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata">
-                    <form>
-                        <xsl:copy-of select="*"/>
-                    </form>
-                </xsl:for-each>
-            </forms>
+            <xsl:stylesheet version="2.0" exclude-result-prefixes="#all">
+                <xsl:template match="/">
+                    <forms>
+                        <xsl:for-each select="/sql-out/xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata">
+                            <form>
+                                <xsl:copy-of select="*" copy-namespaces="no"/>
+                            </form>
+                        </xsl:for-each>
+                    </forms>
+                </xsl:template>
+            </xsl:stylesheet>
         </p:input>
         <p:output name="data" ref="data"/>
     </p:processor>
-
 
 </p:config>

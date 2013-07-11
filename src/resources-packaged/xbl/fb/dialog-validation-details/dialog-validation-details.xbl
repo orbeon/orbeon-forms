@@ -202,7 +202,7 @@
 
                     <fr:tab id="validations-tab">
                         <fr:label ref="$resources/dialog-validation-details/tab-validations/label"/>
-                        <xf:group appearance="xxf:internal" context="validations">
+                        <xf:group context="validations" class="fb-validation-grids" xxf:element="div">
 
                             <fr:grid>
                                 <xh:tr>
@@ -249,7 +249,6 @@
                                             
                                             <xf:select1 ref=".[@type = 'required']/required" appearance="full">
                                                 <xf:label ref="$resources/dialog-validation-details/required/label"/>
-                                                <xf:hint  ref="$resources/dialog-validation-details/required/hint"/>
                                                 <xf:itemset ref="$resources/dialog-validation-details/required//item">
                                                     <xf:label ref="label"/>
                                                     <xf:value ref="value"/>
@@ -288,7 +287,7 @@
                                             <xf:textarea ref=".[@type = 'constraint']/constraint/@expression">
                                                 <xf:label ref="$resources/dialog-validation-details/constraint/label"/>
                                                 <xf:alert ref="$resources/dialog-validation-details/constraint/alert"/>
-                                                <xf:hint  ref="$resources/dialog-validation-details/constraint/hint" appearance="minimal"/>
+                                                <!--<xf:hint  ref="$resources/dialog-validation-details/constraint/hint" appearance="minimal"/>-->
                                             </xf:textarea>
                                         </xf:group>
 

@@ -23,6 +23,14 @@
 @fbGridIconsGutter: 22px;
 @fbIconsHeight: 16px;
 
+// Mixin to create a scrollable area in a dialog
+.dialog-scrollable(@height) {
+    max-height: @height;
+    overflow-y: auto;
+    padding: 0;
+    table { background-color: white; }
+}
+
 // Overwrite definition in form-runner-orbeon.css if any
 html {
     overflow-y: scroll;
@@ -260,10 +268,7 @@ body {
         width: 400px;
 
         .xbl-fr-grid {
-            height: 30em;
-            overflow-y: auto;
-            padding: 0;
-            table { background-color: white; }
+            .dialog-scrollable(450px);
         }
 
         .fr-grid-2-columns .xforms-input input { width: 13em }
@@ -347,6 +352,10 @@ body {
     .fb-dialog-validation-details {
         width: 800px;
         .xforms-label { margin-top: 5px; }
+
+        .fb-validation-grids {
+            .dialog-scrollable(450px);
+        }
 
         // Narrower columns
         .fr-grid-validations .fr-grid-col-1 { width: 110px }

@@ -26,3 +26,4 @@ object FormBuilder
     with GridOps
     with SectionOps
     with AlertsAndConstraintsOps
+    with SchemaOps

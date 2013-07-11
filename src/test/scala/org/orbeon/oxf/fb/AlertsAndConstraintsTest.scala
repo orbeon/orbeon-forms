@@ -26,6 +26,7 @@ import scala.xml.Elem
 class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
     val AlertsDoc = "oxf:/org/orbeon/oxf/fb/template-with-alerts.xhtml"
+    val SchemaDoc = "oxf:/org/orbeon/oxf/fb/template-with-schema.xhtml"
     
     private val Control1 = "control-1"
 
@@ -313,18 +314,17 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def schemaType() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndDoc(SchemaDoc) { doc ⇒
 
             val bind = findBindByName(doc, Control1).toList
 
-            // See https://github.com/orbeon/orbeon-forms/issues/1113
             val newValidations = Array(
                 <validation type="required" level="error">
                     <required>true</required>
                 </validation>,
                 <validation type="datatype" level="error">
                     <builtin-type/>
-                    <schema-type>fr:bar</schema-type>
+                    <schema-type>foo:email</schema-type>
                     <required>false</required>
                 </validation>
             )
@@ -332,8 +332,13 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
             assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
 
-            assert("true()"  === (bind att "required" stringValue))
-            assert("fr:bar" === (bind att "type" stringValue))
+            assert("true()"    === (bind att "required" stringValue))
+            assert("foo:email" === (bind att "type" stringValue))
+        }
+
+    @Test def schemaPrefix() =
+        withActionAndDoc(SchemaDoc) { doc ⇒
+            assert(Some("foo") === findSchemaPrefix(doc))
         }
     
     private def globalAlert      = AlertDetails(None, List(currentLang → ""), global = true)

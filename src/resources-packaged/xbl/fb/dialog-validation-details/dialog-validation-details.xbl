@@ -193,19 +193,10 @@
                 <xf:label ref="$resources/dialog-validation-details/label"/>
 
                 <xf:var name="form" value="xxf:binding('fb-dialog-validation-details')"/>
-                <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model'] treat as element()"/>
 
                 <!-- Figure out schema prefix if any -->
-                <xf:var name="schema"
-                        value="$model/xs:schema[1]" as="element(xs:schema)?"/>
-                <xf:var name="schema-namespace"
-                        value="$schema/@targetNamespace" as="xs:string?"/>
-                <xf:var name="schema-prefixes"
-                        value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
-                <xf:var name="schema-namespaces"
-                        value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
-                <xf:var name="schema-prefix"
-                        value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
+                <xf:var name="schema"        value="fbf:findSchemaOrEmpty($form)"       as="xs:string?"/>
+                <xf:var name="schema-prefix" value="fbf:findSchemaPrefixOrEmpty($form)" as="xs:string?"/>
 
                 <fr:tabbable>
 
@@ -268,7 +259,6 @@
                                             <!-- Built-in type -->
                                             <xf:select1 ref=".[@type = 'datatype']/builtin-type">
                                                 <xf:label ref="$resources/dialog-validation-details/builtin-type/label"/>
-                                                <xf:hint  ref="$resources/dialog-validation-details/builtin-type/hint"/>
                                                 <!-- Add placeholder if there is a schema type -->
                                                 <xf:itemset ref=".[../schema-type != '']">
                                                     <xf:label ref="$resources/dialog-validation-details/builtin-type/use-schema-type"/>
@@ -283,7 +273,6 @@
                                             <!-- Schema type selection if applicable -->
                                             <xf:select1 ref=".[@type = 'datatype']/schema-type[exists($schema)]">
                                                 <xf:label ref="$resources/dialog-validation-details/schema-type/label"/>
-                                                <xf:hint  ref="$resources/dialog-validation-details/types/hint"/>
                                                 <xf:item>
                                                     <xf:label ref="$resources/select/label"/>
                                                     <xf:value/>

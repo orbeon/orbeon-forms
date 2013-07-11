@@ -220,8 +220,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                                 XS
 
                         val bind   = findBindByName(inDoc, controlName).get // require the bind
-                        val ns     = bind.namespaceMappings
-                        val prefix = ns collectFirst { case (prefix, `nsURI`) ⇒ prefix } get // mapping must be in scope
+                        val prefix = bind.prefixesForURI(nsURI).head        // mapping must be in scope
 
                         prefix + ':' + builtinType
                     case DatatypeValidation(_, _, Some(schemaType), _)  ⇒

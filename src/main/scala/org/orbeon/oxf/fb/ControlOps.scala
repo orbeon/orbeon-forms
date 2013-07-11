@@ -37,7 +37,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 /*
  * Form Builder: operations on controls.
  */
-trait ControlOps extends ResourcesOps {
+trait ControlOps extends SchemaOps with ResourcesOps {
 
     self: GridOps ⇒ // funky dependency, to resolve at some point
 
@@ -98,12 +98,12 @@ trait ControlOps extends ResourcesOps {
         // with a name (there might not be one).
         val controlsWithName =
             precedingOrSelfContainers flatMap {
-                case grid if getControlNameOption(grid).isEmpty ⇒ grid \\ "*:td" \ * filter (hasName(_)) lastOption
+                case grid if getControlNameOption(grid).isEmpty ⇒ grid \\ "*:td" \ * filter hasName lastOption
                 case other ⇒ Some(other)
             }
 
         // Take the first result
-        controlsWithName.headOption flatMap (getControlNameOption(_))
+        controlsWithName.headOption flatMap getControlNameOption
     }
 
     // Ensure that a tree of bind exists
@@ -315,10 +315,25 @@ trait ControlOps extends ResourcesOps {
             // Get or create the bind element
             val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
-            // We don't want to add a type="xs:string|xf:string"
-            def isTypeString =
-                mipName == "type" &&
-                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(resolveQName(bind, mipValue))
+            val isTypeString =
+                if (mipName == "type") {
+
+                    val (prefix, _)       = parseQName(mipValue)
+                    val existingNSMapping = bind.namespaceMappings.toMap.get(prefix) map (prefix → _)
+
+                    // If there is no mapping and the schema prefix matches the prefix and a uri is found for the
+                    // schema, then insert a new mapping. We place it on the top-level bind so we don't have to insert
+                    // it repeatedly.
+                    if (existingNSMapping.isEmpty && findSchemaPrefix(inDoc) == Some(prefix))
+                        findSchemaNamespace(inDoc) foreach
+                            (uri ⇒ insert(into = findTopLevelBind(inDoc).toList, origin = namespaceInfo(prefix, uri)))
+
+                    // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
+                    // expressions and types could use it. So for now the mapping is never collected.
+
+                    existingNSMapping.isDefined && Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(resolveQName(bind, mipValue))
+                } else
+                    false
 
             // Create/update or remove attribute
             nonEmptyOrNone(mipValue) match {

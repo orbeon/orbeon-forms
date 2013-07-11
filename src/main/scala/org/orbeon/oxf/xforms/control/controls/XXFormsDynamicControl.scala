@@ -36,6 +36,7 @@ import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.saxon.om.{VirtualNode, NodeInfo}
 import InstanceMirror._
 import org.orbeon.oxf.xforms.state.InstancesControls
+import org.orbeon.saxon.`type`.{Type ⇒ SaxonType}
 
 /**
  * xxf:dynamic control
@@ -367,20 +368,24 @@ object XXFormsDynamicControl {
     // Find whether a change occurred in a descendant of a top-level XBL binding
     def findXBLChange(partAnalysis: PartAnalysis, node: NodeInfo): Option[(String, Element)] = {
 
-        // Go from root to leaf
-        val ancestorsFromRoot = node ancestor * reverse
+        if (node.getNodeKind == SaxonType.NAMESPACE)
+            None // can't find ancestors of namespace nodes with dom4j
+        else {
+            // Go from root to leaf
+            val ancestorsFromRoot = node ancestor * reverse
 
-        // Find first element whose prefixed id has a binding and return the mapping prefixedId → element
-        val all =
-            for {
-                ancestor ← ancestorsFromRoot
-                id = ancestor.attValue("id")
-                if id.nonEmpty
-                prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
-                binding ← partAnalysis.getBinding(prefixedId)
-            } yield
-                prefixedId → unwrapElement(ancestor)
+            // Find first element whose prefixed id has a binding and return the mapping prefixedId → element
+            val all =
+                for {
+                    ancestor ← ancestorsFromRoot
+                    id = ancestor.attValue("id")
+                    if id.nonEmpty
+                    prefixedId = partAnalysis.startScope.prefixedIdForStaticId(id)
+                    binding ← partAnalysis.getBinding(prefixedId)
+                } yield
+                    prefixedId → unwrapElement(ancestor)
 
-        all.headOption
+            all.headOption
+        }
     }
 }

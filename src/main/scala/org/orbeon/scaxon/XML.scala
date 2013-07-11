@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils, NamespaceMapping}
 import org.orbeon.saxon.dom4j.DocumentWrapper
-import org.dom4j.{Document, Attribute, QName, Element}
+import org.dom4j._
 import org.orbeon.saxon.pattern._
 import org.orbeon.saxon.expr.{Token, ExpressionTool}
 import org.orbeon.saxon.om._
@@ -85,6 +85,9 @@ object XML {
 
     def attribute(name: QName, value: String = ""): Attribute = Dom4jUtils.createAttribute(name, value)
     def attributeInfo(name: QName, value: String = ""): NodeInfo = wrapper.wrap(attribute(name, value))
+
+    def namespace(prefix: String, uri: String): Namespace = Dom4jUtils.createNamespace(prefix, uri)
+    def namespaceInfo(prefix: String, uri: String): NodeInfo = wrapper.wrap(namespace(prefix, uri))
 
     // Like XPath resolve-QName()
     def resolveQName(elementInfo: NodeInfo, lexicalQName: String): QName = {
@@ -351,6 +354,8 @@ object XML {
         def namespaces        = find(Axis.NAMESPACE, AnyTest)
         def namespaceMappings = namespaces map (n ⇒ n.getLocalPart → n.getStringValue)
 
+        def prefixesForURI(uri: String) = prefixesForURIImpl(uri, this)
+
         def precedingElement = nodeInfo precedingSibling * headOption
         def followingElement = nodeInfo followingSibling * headOption
 
@@ -365,6 +370,12 @@ object XML {
             iterator.toStream
         }
     }
+
+    // HACK because of compiler limitation:
+    // "implementation restriction: nested class is not allowed in value class
+    //  This restriction is planned to be removed in subsequent releases."
+    private def prefixesForURIImpl(uri: String, ops: NodeInfoOps) =
+        ops.namespaceMappings collect { case (prefix, `uri`) ⇒ prefix }
 
     // Operations on sequences of NodeInfo
     implicit class NodeInfoSeqOps(val seq: Seq[NodeInfo]) extends AnyVal {

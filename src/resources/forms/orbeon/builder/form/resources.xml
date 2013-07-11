@@ -87,7 +87,7 @@
             <label>Change Schema</label>
         </change-schema>
         <upload-schema>
-            <label>Upload Schema</label>
+            <label>Attach Schema</label>
         </upload-schema>
         <change-pdf>
             <label>Change PDF</label>
@@ -555,7 +555,7 @@
                 <label>Replace XML Schema</label>
             </replace-schema>
             <upload-schema>
-                <label>Upload XML Schema</label>
+                <label>Attach XML Schema</label>
             </upload-schema>
             <messages>
                 <no-simple-types>Your schema does not seem to contain simple types. You won't be able to select types from this schema for validation.</no-simple-types>
@@ -953,7 +953,7 @@
             <label>Changer schéma</label>
         </change-schema>
         <upload-schema>
-            <label>Importer schéma</label>
+            <label>Joindre schéma</label>
         </upload-schema>
         <change-pdf>
             <label>Changer PDF</label>
@@ -1416,7 +1416,7 @@
                 <label>Remplacer le schéma XML existant</label>
             </replace-schema>
             <upload-schema>
-                <label>Insérer un schéma XML</label>
+                <label>Joindre un schéma XML</label>
             </upload-schema>
             <messages>
                 <no-simple-types>Votre schéma ne semble pas contenir de types simples. Vous ne pourrez pas sélectionner des types provenant de ce schéma pour la validation.</no-simple-types>

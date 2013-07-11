@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.fr.FormRunner._
 import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.oxf.util.ScalaUtils._
 
 /*
  * Form Builder: operations on controls.
@@ -315,14 +316,13 @@ trait ControlOps extends ResourcesOps {
             val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
             // We don't want to add a type="xs:string|xf:string"
-            def isTypeString = mipName == "type" && {
-                val typeValue = resolveQName(bind, mipValue)
-                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(typeValue)
-            }
+            def isTypeString =
+                mipName == "type" &&
+                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(resolveQName(bind, mipValue))
 
             // Create/update or remove attribute
-            Option(mipValue) map (_.trim) match {
-                case Some(value) if value.length > 0 && ! isTypeString ⇒ ensureAttribute(bind, mipQName, value)
+            nonEmptyOrNone(mipValue) match {
+                case Some(value) if ! isTypeString ⇒ ensureAttribute(bind, mipQName, value)
                 case _ ⇒ delete(bind \@ mipQName)
             }
         }
@@ -470,7 +470,7 @@ trait ControlOps extends ResourcesOps {
         if (hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc, controlName, "help"))
             removeLHHAElementAndResources(inDoc, controlName, "help")
         else
-            ensureCleanLHHAElement(inDoc, controlName, "help")
+            ensureCleanLHHAElements(inDoc, controlName, "help")
     }
 
     // For a given control and LHHA type, whether the mediatype on the LHHA is HTML
@@ -502,35 +502,35 @@ trait ControlOps extends ResourcesOps {
                 delete(lhhaElement \@ "mediatype")
         }
 
-    private def ensureCleanLHHAElement(inDoc: NodeInfo, controlName: String, lhha: String) =
-        ensureCleanLHHAElements(inDoc, controlName, lhha, 1).head
-
-    def ensureCleanLHHAElements(inDoc: NodeInfo, controlName: String, lhha: String, count: Int) = {
+    def ensureCleanLHHAElements(inDoc: NodeInfo, controlName: String, lhha: String, count: Int = 1, replace: Boolean = true): Seq[NodeInfo] = {
         val control  = findControlByName(inDoc, controlName).get
         val existing = getControlLHHA(inDoc, controlName, lhha)
 
-        // For simplicity and consistency, delete and recreate
-        delete(existing)
+        if (replace)
+            delete(existing)
 
         // Try to insert in the right position wrt other LHHA elements. If none, will be inserted as first
         // element.
 
-        val newTemplates =
-            if (count == 1) {
-                def newTemplate: NodeInfo =
-                    <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
-                             ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
+        if (count > 0) {
+            val newTemplates =
+                if (count == 1) {
+                    def newTemplate: NodeInfo =
+                        <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
+                                 ref={s"$$form-resources/$controlName/$lhha"}/>.copy(label = lhha)
 
-                Seq(newTemplate)
-            } else {
-                def newTemplate(index: Int): NodeInfo =
-                    <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
-                             ref={s"$$form-resources/$controlName/$lhha[$index]"}/>.copy(label = lhha)
+                    Seq(newTemplate)
+                } else {
+                    def newTemplate(index: Int): NodeInfo =
+                        <xf:lhha xmlns:xf="http://www.w3.org/2002/xforms"
+                                 ref={s"$$form-resources/$controlName/$lhha[$index]"}/>.copy(label = lhha)
 
-                1 to count map newTemplate
-            }
+                    1 to count map newTemplate
+                }
 
-        insertElementsImposeOrder(into = control, origin = newTemplates, LHHAInOrder)
+            insertElementsImposeOrder(into = control, origin = newTemplates, LHHAInOrder)
+        } else
+            Seq.empty
     }
 
     private def removeLHHAElementAndResources(inDoc: NodeInfo, controlName: String, lhha: String) = {

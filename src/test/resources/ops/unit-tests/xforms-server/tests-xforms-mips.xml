@@ -1755,12 +1755,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;All levels&lt;/li&gt;&lt;li&gt;Error level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/>
+                        <xxf:control id="my-input" alert="&lt;ul&gt;&lt;li&gt;Error level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;" level="error"/>
                     </xxf:control-values>
-                    <xxf:message level="modal">added-errors: length-constraint | alert: &lt;ul&gt;&lt;li&gt;All levels&lt;/li&gt;&lt;li&gt;Error level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
-                    <xxf:message level="modal">removed-errors: length-constraint | added-warnings: uppercase-constraint | alert: &lt;ul&gt;&lt;li&gt;All levels&lt;/li&gt;&lt;li&gt;Warning level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Uppercase constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
+                    <xxf:message level="modal">added-errors: length-constraint | alert: &lt;ul&gt;&lt;li&gt;Error level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
+                    <xxf:message level="modal">removed-errors: length-constraint | added-warnings: uppercase-constraint | alert: &lt;ul&gt;&lt;li&gt;Warning level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Uppercase constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
                     <xxf:message level="modal">removed-warnings: uppercase-constraint</xxf:message>
-                    <xxf:message level="modal">added-errors: length-constraint | alert: &lt;ul&gt;&lt;li&gt;All levels&lt;/li&gt;&lt;li&gt;Error level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
+                    <xxf:message level="modal">added-errors: length-constraint | alert: &lt;ul&gt;&lt;li&gt;Error level&lt;/li&gt;&lt;li&gt;Error and warning level&lt;/li&gt;&lt;li&gt;Length constraint&lt;/li&gt;&lt;li&gt;Both constraints&lt;/li&gt;&lt;/ul&gt;</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>

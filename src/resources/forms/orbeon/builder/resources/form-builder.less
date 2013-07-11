@@ -348,8 +348,11 @@ body {
         width: 800px;
         .xforms-label { margin-top: 5px; }
 
-        // Narrower "level" column
-        .fr-grid-constraints .fr-grid-col-2 { width: 150px }
+        // Narrower columns
+        .fr-grid-validations .fr-grid-col-1 { width: 110px }
+        .fr-grid-validations .fr-grid-col-3 { width: 110px }
+
+        .fr-grid-help .xforms-textarea textarea { height: @baseLineHeight * 5 + 8px; }
     }
 
     #fb-schema-upload-dialog {

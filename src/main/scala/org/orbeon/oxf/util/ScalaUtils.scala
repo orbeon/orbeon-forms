@@ -24,6 +24,7 @@ import collection.generic.CanBuildFrom
 import reflect.ClassTag
 import scala.util.{Success, Failure, Try}
 import scala.util.control.NonFatal
+import java.io.{Writer, Reader, OutputStream, InputStream}
 
 object ScalaUtils {
 
@@ -58,7 +59,7 @@ object ScalaUtils {
         }
     }
 
-    def copyStream(in: Readable[Byte], out: Writable[Byte], progress: Long ⇒ Unit = _ ⇒ ()) = {
+    def copyStream(in: InputStream, out: OutputStream, progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)
         require(out ne null)
@@ -75,7 +76,7 @@ object ScalaUtils {
         }
     }
 
-    def copyReader(in: Readable[Char], out: Writable[Char], progress: Long ⇒ Unit = _ ⇒ ()) = {
+    def copyReader(in: Reader, out: Writer, progress: Long ⇒ Unit = _ ⇒ ()) = {
 
         require(in ne null)
         require(out ne null)

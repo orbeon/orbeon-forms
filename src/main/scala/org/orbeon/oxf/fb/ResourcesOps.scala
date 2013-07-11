@@ -55,20 +55,22 @@ trait ResourcesOps extends BaseOps {
     // - simplicity and consistency, all existing resources are first deleted
     // - the maximum number of values across langs is determined to create a consistent number of resources
     // - if values are missing for a given lang, the remaining resources will exist bug be empty
-    def setControlResourcesWithLang(controlName: String, resourceName: String, langValues: Seq[(String, Seq[String])]) = {
+    def setControlResourcesWithLang(controlName: String, resourceName: String, langValues: Seq[(String, Seq[String])]): Unit = {
 
-        val maxResources = langValues map (_._2.size) max
+        val maxResources = if (langValues.nonEmpty) langValues map (_._2.size) max else 0
         val langs        = langValues map (_._1)
-        val valuesMap    = langValues.toMap
 
         delete(getControlResourcesWithLang(controlName, resourceName, langs) flatMap (_._2))
 
-        for {
-            (lang, holders) ← ensureResourceHoldersForLangs(controlName, resourceName, maxResources, langs)
-            valuesForLang   ← valuesMap.get(lang)
-            (holder, value) ← holders zip valuesForLang
-        } locally {
-            setvalue(holder, value)
+        if (maxResources > 0) {
+            val valuesMap = langValues.toMap
+            for {
+                (lang, holders) ← ensureResourceHoldersForLangs(controlName, resourceName, maxResources, langs)
+                valuesForLang   ← valuesMap.get(lang)
+                (holder, value) ← holders zip valuesForLang
+            } locally {
+                setvalue(holder, value)
+            }
         }
     }
 

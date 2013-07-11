@@ -13,16 +13,15 @@
  */
 package org.orbeon.oxf.fb
 
+import org.dom4j.Document
 import org.junit.Test
 import org.orbeon.oxf.fb.FormBuilder._
 import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import org.scalatest.junit.AssertionsForJUnit
 import scala.xml.Elem
-import org.dom4j.Document
 
 class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
@@ -34,77 +33,101 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndDoc(AlertsDoc) { doc ⇒
 
             // Read initial alert
-            assert(List(AlertDetails(None, None, List("en" → "Alert for en", "fr" → "Alert for fr"))) === readAlertsAndConstraints(doc, Control1))
+            val alertDetails = AlertDetails.fromForm(doc, Control1)
+            assert(List(AlertDetails(None, List("en" → "Alert for en", "fr" → "Alert for fr"), global = false)) === alertDetails)
 
             // Read initial alert as XML
             val expected =
-                <alert message="Alert for en" level="any" constraint-expression="" constraint-id="">
+                <alert message="Alert for en" global="false">
                     <message lang="fr" value="Alert for fr"/>
                 </alert>
 
-            assertAlertsXML(Array(expected), readAlertsAndConstraintsAsXML(doc, Control1))
+            assertAlertsXML(Array(expected), alertDetails map (a ⇒ a.toXML(currentLang): NodeInfo) toArray)
         }
 
     @Test def warningConstraintAutomaticId() =
         withActionAndDoc(AlertsDoc) { doc ⇒
-            val newAlert =
-                <alert message="Length must be greater than 10" level="warning" constraint-expression="string-length() gt 10" constraint-id="">
-                    <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                </alert>
-
-            writeAlertsAndConstraints(doc, Control1, Array(newAlert))
+            val newValidation =
+                <validation type="constraint" id="" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10"/>
+                    <alert message="Length must be greater than 10" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
+                    </alert>
+                </validation>
+                
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
 
             val expected =
-                <alert message="Length must be greater than 10" level="warning" constraint-expression="string-length() gt 10" constraint-id="constraint-3-constraint">
-                    <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                </alert>
+                <validation type="constraint" id="constraint-3-constraint" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10"/>
+                    <alert message="Length must be greater than 10" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
+                    </alert>
+                </validation>
 
-            assertAlertsXML(Array(expected), readAlertsAndConstraintsAsXML(doc, Control1))
+            assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
         }
 
     @Test def warningConstraintSpecifyId() =
         withActionAndDoc(AlertsDoc) { doc ⇒
-            val newAlert =
-                <alert message="Length must be greater than 10" level="warning" constraint-expression="string-length() gt 10" constraint-id="length-constraint">
-                    <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                </alert>
+            val newValidation =
+                <validation type="constraint" id="length-constraint" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10"/>
+                    <alert message="Length must be greater than 10" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
+                    </alert>
+                </validation>
 
-            writeAlertsAndConstraints(doc, Control1, Array(newAlert))
-            assertAlertsXML(Array(newAlert), readAlertsAndConstraintsAsXML(doc, Control1))
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
+            assertAlertsXML(Array(newValidation), readConstraintValidationsAsXML(doc, Control1))
         }
 
-    @Test def multipleAlerts() =
+    @Test def multipleValidations() =
         withActionAndDoc(AlertsDoc) { doc ⇒
-            val newAlerts = Array(
-                <alert message="Alert for en" level="any" constraint-expression="" constraint-id="">
-                    <message lang="fr" value="Alert for fr"/>
-                </alert>,
-                <alert message="Length must be greater than 10" level="warning" constraint-expression="string-length() gt 10" constraint-id="length-constraint">
-                    <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                </alert>
+                
+            val newValidations = Array(
+                <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
+                    <constraint expression="string-length() gt 5"/>
+                    <alert message="Length must be greater than 5" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 5"/>
+                    </alert>
+                </validation>,
+                <validation type="constraint" id="length10-constraint" level="warning" default-alert="false">
+                    <constraint expression="string-length() gt 10"/>
+                    <alert message="Length must be greater than 10" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
+                    </alert>
+                </validation>
             )
 
-            writeAlertsAndConstraints(doc, Control1, newAlerts map elemToNodeInfo)
-            assertAlertsXML(newAlerts, readAlertsAndConstraintsAsXML(doc, Control1))
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+            assertAlertsXML(newValidations, readConstraintValidationsAsXML(doc, Control1))
         }
 
     @Test def removeAlertInMiddle() =
         withActionAndDoc(AlertsDoc) { doc ⇒
+
+            val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
+
             locally {
-                val threeAlerts = Array(
-                    <alert message="Alert for en" level="any" constraint-expression="" constraint-id="">
-                        <message lang="fr" value="Alert for fr"/>
-                    </alert>,
-                    <alert message="Length must be greater than 5" level="error" constraint-expression="string-length() gt 5" constraint-id="length5-constraint">
-                        <message lang="fr" value="Longueur doit être plus grande que 5"/>
-                    </alert>,
-                    <alert message="Length must be greater than 10" level="warning" constraint-expression="string-length() gt 10" constraint-id="length10-constraint">
-                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                    </alert>
+
+                val twoValidations = Array(
+                    <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
+                        <constraint expression="string-length() gt 5"/>
+                        <alert message="Length must be greater than 5" global="false">
+                            <message lang="fr" value="Longueur doit être plus grande que 5"/>
+                        </alert>
+                    </validation>,
+                    <validation type="constraint" id="length10-constraint" level="warning" default-alert="false">
+                        <constraint expression="string-length() gt 10"/>
+                        <alert message="Length must be greater than 10" global="false">
+                            <message lang="fr" value="Longueur doit être plus grande que 10"/>
+                        </alert>
+                    </validation>
                 )
 
-                writeAlertsAndConstraints(doc, Control1, threeAlerts map elemToNodeInfo)
-                assertAlertsXML(threeAlerts, readAlertsAndConstraintsAsXML(doc, Control1))
+                writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, twoValidations map elemToNodeInfo)
+                assertAlertsXML(twoValidations, readConstraintValidationsAsXML(doc, Control1))
 
                 val expectedResources: Document =
                     <resources>
@@ -115,9 +138,9 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                             <control-1>
                                 <label/>
                                 <hint/>
-                                <alert>Alert for en</alert>
                                 <alert>Length must be greater than 5</alert>
                                 <alert>Length must be greater than 10</alert>
+                                <alert>Alert for en</alert>
                             </control-1>
                         </resource>
                         <resource xml:lang="fr">
@@ -127,9 +150,9 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                             <control-1>
                                 <label/>
                                 <hint/>
-                                <alert>Alert for fr</alert>
                                 <alert>Longueur doit être plus grande que 5</alert>
                                 <alert>Longueur doit être plus grande que 10</alert>
+                                <alert>Alert for fr</alert>
                             </control-1>
                         </resource>
                     </resources>
@@ -138,17 +161,17 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             }
 
             locally {
-                val twoAlerts = Array(
-                    <alert message="Alert for en" level="any" constraint-expression="" constraint-id="">
-                        <message lang="fr" value="Alert for fr"/>
-                    </alert>,
-                    <alert message="Length must be greater than 10" level="warning" constraint-expression="string-length() gt 10" constraint-id="length10-constraint">
-                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                    </alert>
+                val oneValidation = Array(
+                    <validation type="constraint" id="length10-constraint" level="warning" default-alert="false">
+                        <constraint expression="string-length() gt 10"/>
+                        <alert message="Length must be greater than 10" global="false">
+                            <message lang="fr" value="Longueur doit être plus grande que 10"/>
+                        </alert>
+                    </validation>
                 )
 
-                writeAlertsAndConstraints(doc, Control1, twoAlerts map elemToNodeInfo)
-                assertAlertsXML(twoAlerts, readAlertsAndConstraintsAsXML(doc, Control1))
+                writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, oneValidation map elemToNodeInfo)
+                assertAlertsXML(oneValidation, readConstraintValidationsAsXML(doc, Control1))
 
                 val expectedResources: Document =
                     <resources>
@@ -159,8 +182,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                             <control-1>
                                 <label/>
                                 <hint/>
-                                <alert>Alert for en</alert>
                                 <alert>Length must be greater than 10</alert>
+                                <alert>Alert for en</alert>
                             </control-1>
                         </resource>
                         <resource xml:lang="fr">
@@ -170,8 +193,8 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                             <control-1>
                                 <label/>
                                 <hint/>
-                                <alert>Alert for fr</alert>
                                 <alert>Longueur doit être plus grande que 10</alert>
+                                <alert>Alert for fr</alert>
                             </control-1>
                         </resource>
                     </resources>
@@ -180,88 +203,152 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
             }
         }
 
-    @Test def setSingleAllBlankAlert() =
+    @Test def defaultAlert() =
         withActionAndDoc(AlertsDoc) { doc ⇒
-            // Empty alert but not in all languages: must point to form resources
+
+            val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
+
+            // Local default alert
             locally {
-                val newAlert =
-                    <alert message="" level="warning" constraint-expression="string-length() gt 10" constraint-id="length-constraint">
-                        <message lang="fr" value="Longueur doit être plus grande que 10"/>
-                    </alert>
-
-                writeAlertsAndConstraints(doc, Control1, Array(newAlert: NodeInfo))
-
-                assertAlertsXML(Array(newAlert), readAlertsAndConstraintsAsXML(doc, Control1))
+                writeAlertsAndValidationsAsXML(doc, Control1, defaultAlertAsXML, Array())
                 assert("$form-resources/control-1/alert" === (getControlLHHA(doc, Control1, "alert") att "ref" stringValue))
             }
 
-            // Empty alert in all languages: must point to global resources
+            // Global default alert
             locally {
-                val newAlert =
-                    <alert message="" level="warning" constraint-expression="string-length() gt 10" constraint-id="length-constraint">
-                        <message lang="fr" value=""/>
-                    </alert>
-
-                writeAlertsAndConstraints(doc, Control1, Array(newAlert))
-
-                assertAlertsXML(Array(newAlert), readAlertsAndConstraintsAsXML(doc, Control1))
+                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array())
                 assert("$fr-resources/detail/labels/alert" === (getControlLHHA(doc, Control1, "alert") att "ref" stringValue))
-            }
-
-            // Empty alert in all languages but more than one alert: must point to form resources
-            locally {
-                val newAlerts = Array(
-                    <alert message="" level="error" constraint-expression="string-length() gt 5" constraint-id="length5-constraint">
-                        <message lang="fr" value=""/>
-                    </alert>,
-                    <alert message="" level="warning" constraint-expression="string-length() gt 10" constraint-id="length10-constraint">
-                        <message lang="fr" value=""/>
-                    </alert>
-                )
-
-                writeAlertsAndConstraints(doc, Control1, newAlerts map elemToNodeInfo)
-
-                assertAlertsXML(newAlerts, readAlertsAndConstraintsAsXML(doc, Control1))
-                assert(List("$form-resources/control-1/alert[1]", "$form-resources/control-1/alert[2]") === (getControlLHHA(doc, Control1, "alert") att "ref" map (_.stringValue)))
             }
         }
 
     @Test def singleConstraintHasBindId() =
         withActionAndDoc(AlertsDoc) { doc ⇒
 
-            val newAlert =
-                <alert message="Length must be greater than 5" level="error" constraint-expression="string-length() gt 5" constraint-id="length5-constraint">
-                    <message lang="fr" value="Longueur doit être plus grande que 5"/>
-                </alert>
+            val newValidation =
+                <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
+                    <constraint expression="string-length() gt 5"/>
+                    <alert message="Length must be greater than 5" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 5"/>
+                    </alert>
+                </validation>
 
-            writeAlertsAndConstraints(doc, Control1, Array(newAlert))
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, Array(newValidation))
 
             val expected =
-                <alert message="Length must be greater than 5" level="error" constraint-expression="string-length() gt 5" constraint-id="control-1-bind">
-                    <message lang="fr" value="Longueur doit être plus grande que 5"/>
-                </alert>
+                <validation type="constraint" id="" level="error" default-alert="false">
+                    <constraint expression="string-length() gt 5"/>
+                    <alert message="Length must be greater than 5" global="false">
+                        <message lang="fr" value="Longueur doit être plus grande que 5"/>
+                    </alert>
+                </validation>
 
-            assertAlertsXML(Array(expected), readAlertsAndConstraintsAsXML(doc, Control1))
+            assertAlertsXML(Array(expected), readConstraintValidationsAsXML(doc, Control1))
 
             // No elements inserted under the bind
             val bind = findBindByName(doc, Control1).toList
             assert(bind child * isEmpty)
         }
 
-    private def assertAlertsXML(left: Array[Elem], right: Array[NodeInfo]) {
+    @Test def requiredAndDatatypeValidations() =
+        withActionAndDoc(AlertsDoc) { doc ⇒
+
+            val bind = findBindByName(doc, Control1).toList
+
+            locally {
+                val newValidations = Array(
+                    <validation type="required" level="error">
+                        <required>true</required>
+                    </validation>,
+                    <validation type="datatype" level="error">
+                        <builtin-type>string</builtin-type>
+                        <schema-type/>
+                        <required>false</required>
+                    </validation>
+                )
+
+                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+
+                assert("true()" === (bind att "required" stringValue))
+                assert(bind att "type" isEmpty)
+            }
+
+            locally {
+                val newValidations = Array(
+                    <validation type="required" level="error">
+                        <required>false</required>
+                    </validation>,
+                    <validation type="datatype" level="error">
+                        <builtin-type>decimal</builtin-type>
+                        <schema-type/>
+                        <required>false</required>
+                    </validation>
+                )
+
+                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+
+                assert(bind att "required" isEmpty)
+                assert("xf:decimal" === (bind att "type" stringValue))
+            }
+
+            locally {
+                val newValidations = Array(
+                    <validation type="required" level="error">
+                        <required>true</required>
+                    </validation>,
+                    <validation type="datatype" level="error">
+                        <builtin-type>decimal</builtin-type>
+                        <schema-type/>
+                        <required>true</required>
+                    </validation>
+                )
+
+                writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+                assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+
+                assert("true()"     === (bind att "required" stringValue))
+                assert("xs:decimal" === (bind att "type" stringValue))
+            }
+        }
+
+    @Test def schemaType() =
+        withActionAndDoc(AlertsDoc) { doc ⇒
+
+            val bind = findBindByName(doc, Control1).toList
+
+            // See https://github.com/orbeon/orbeon-forms/issues/1113
+            val newValidations = Array(
+                <validation type="required" level="error">
+                    <required>true</required>
+                </validation>,
+                <validation type="datatype" level="error">
+                    <builtin-type/>
+                    <schema-type>fr:bar</schema-type>
+                    <required>false</required>
+                </validation>
+            )
+
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+            assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+
+            assert("true()"  === (bind att "required" stringValue))
+            assert("fr:bar" === (bind att "type" stringValue))
+        }
+    
+    private def globalAlert      = AlertDetails(None, List(currentLang → ""), global = true)
+    private def globalAlertAsXML = globalAlert.toXML(currentLang)
+
+    private def readConstraintValidationsAsXML(inDoc: NodeInfo, controlName: String) =
+        ConstraintValidation.fromForm(inDoc, controlName) map
+        (a ⇒ a.toXML(currentLang): NodeInfo) toArray
+
+    private def assertAlertsXML(left: Array[Elem], right: Array[NodeInfo]): Unit = {
 
         left zip right foreach {
             case (l, r) ⇒ assertXMLDocuments(elemToDocument(l), TransformerUtils.tinyTreeToDom4j2(r))
         }
 
         assert(left.size === right.size)
-    }
-
-    private def assertXMLDocuments(left: Document, right: Document) = {
-        val result = Dom4j.compareDocumentsIgnoreNamespacesInScope(left, right)
-
-        // So that we get a nicer message
-        if (! result)
-            assert(Dom4jUtils.domToPrettyString(left) === Dom4jUtils.domToPrettyString(right))
     }
 }

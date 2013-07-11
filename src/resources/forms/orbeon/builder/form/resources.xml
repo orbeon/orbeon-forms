@@ -479,9 +479,21 @@
                 <label>Alert Message</label>
                 <hint>Displayed when the alert is active</hint>
             </alert>
-            <tab-type><label>Data Type</label></tab-type>
-            <tab-calculations><label>Formulas</label></tab-calculations>
-            <tab-alerts><label>Constraints and Alerts</label></tab-alerts>
+            <default-alert>
+                <label>Default alert message</label>
+                <hint>Active when there is not a more specific alert message</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>Use global default alert message</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>Use default alert message</label>
+            </use-default-alert>
+            <validation-type><label>Validation Type</label></validation-type>
+            <validation-details><label>Validation Details</label></validation-details>
+            <level><label>Level</label></level>
+            <tab-formulas><label>Formulas</label></tab-formulas>
+            <tab-validations><label>Constraints and Alerts</label></tab-validations>
             <tab-help><label>Help</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
@@ -1328,9 +1340,21 @@
                 <label>Message d'alerte</label>
                 <hint>Affiché lorsque l'alerte est active</hint>
             </alert>
-            <tab-type><label>Type de donnée</label></tab-type>
-            <tab-calculations><label>Formules</label></tab-calculations>
-            <tab-alerts><label>Contraintes et alertes</label></tab-alerts>
+            <default-alert>
+                <label>Message d'alerte par défaut</label>
+                <hint>Actif lorsqu'il n'y a pas de message d'alerte plus spécifique</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>Utilise le message d'alerte global</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>Utilise le message d'alerte par défaut</label>
+            </use-default-alert>
+            <validation-type><label>Type de validation</label></validation-type>
+            <validation-details><label>Détails de validation</label></validation-details>
+            <level><label>Niveau</label></level>
+            <tab-formulas><label>Formules</label></tab-formulas>
+            <tab-validations><label>Contraintes et alertes</label></tab-validations>
             <tab-help><label>Aide</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
@@ -2179,9 +2203,21 @@
                 <label>[Feilmelding]</label>
                 <hint>[Melding som skal vises når kontrolldata mangler eller er galt]</hint>
             </alert>
-            <tab-type><label>[Data Type]</label></tab-type>
-            <tab-calculations><label>[Formulas]</label></tab-calculations>
-            <tab-alerts><label>[Constraints and Alerts]</label></tab-alerts>
+            <default-alert>
+                <label>[Default alert message]</label>
+                <hint>[Active when there is not a more specific alert message]</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>[Use global default alert message]</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>[Use default alert message]</label>
+            </use-default-alert>
+            <validation-type><label>[Validation Type]</label></validation-type>
+            <validation-details><label>[Validation Details]</label></validation-details>
+            <level><label>[Level]</label></level>
+            <tab-formulas><label>[Formulas]</label></tab-formulas>
+            <tab-validations><label>[Constraints and Alerts]</label></tab-validations>
             <tab-help><label>[Help]</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>
@@ -3029,9 +3065,21 @@
                 <label>[Сообщение об ошибке]</label>
                 <hint>[Сообщение, которое будет показано, если введенное значение некорректно]</hint>
             </alert>
-            <tab-type><label>[Data Type]</label></tab-type>
-            <tab-calculations><label>[Formulas]</label></tab-calculations>
-            <tab-alerts><label>[Constraints and Alerts]</label></tab-alerts>
+            <default-alert>
+                <label>[Default alert message]</label>
+                <hint>[Active when there is not a more specific alert message]</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>[Use global default alert message]</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>[Use default alert message]</label>
+            </use-default-alert>
+            <validation-type><label>[Validation Type]</label></validation-type>
+            <validation-details><label>[Validation Details]</label></validation-details>
+            <level><label>[Level]</label></level>
+            <tab-formulas><label>[Formulas]</label></tab-formulas>
+            <tab-validations><label>[Constraints and Alerts]</label></tab-validations>
             <tab-help><label>[Help]</label></tab-help>
         </dialog-validation-details>
         <dialog-confirmation>

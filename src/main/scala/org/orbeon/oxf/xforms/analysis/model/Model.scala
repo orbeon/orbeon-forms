@@ -405,5 +405,15 @@ object Model {
         "positiveInteger"
     )
 
+    val XFormsTypeNames = Set(
+        "listItem",
+        "listItems",
+        "dayTimeDuration",
+        "yearMonthDuration",
+        "email",
+        "card-number",
+        "HTMLFragment" // XForms 2.0
+    )
+
     val jXFormsVariationTypeNames = XFormsVariationTypeNames.asJava
 }

@@ -219,7 +219,8 @@
                                                     <!-- Iterate over table cells -->
                                                     <xsl:for-each select="*:td">
                                                         <xsl:variable name="static-col-pos" select="position()"/>
-                                                        <xsl:variable name="control" select="*[1]" as="element()?"/>
+                                                        <xsl:variable name="controls" select="*" as="element()*"/>
+                                                        <xsl:variable name="control" select="$controls[1]" as="element()?"/>
                                                         <xsl:variable name="has-control" select="exists($control)"/>
                                                         <!-- NOTE: Not all controls with fr-attachment require a separate upload button.
                                                              For example, fr:attachment and fr:image-attachment already provide an upload
@@ -250,16 +251,24 @@
                                                                 <!-- Optimization: don't generate a group for empty cells -->
                                                                 <xsl:if test="$has-control">
                                                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                                                        <!-- If the label, help, and hint are shown in the table header, don't put them in the cell -->
-                                                                        <xsl:for-each select="$control">
-                                                                            <xsl:copy>
-                                                                                <!-- So the client-side code can populate populate the checkbox when editing the label -->
-                                                                                <xsl:variable name="label-mediatype-class" select="if ($is-editable and xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
-                                                                                <xsl:variable name="hint-mediatype-class"  select="if ($is-editable and xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
-                                                                                <xsl:attribute name="class" select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
-                                                                                <xsl:copy-of select="@* except @class | node()"/>
-                                                                            </xsl:copy>
-                                                                        </xsl:for-each>
+                                                                        <xsl:choose>
+                                                                            <xsl:when test="$is-editable">
+                                                                                <!-- Limitation of the editable mode: only handle the first control -->
+                                                                                <xsl:for-each select="$control">
+                                                                                    <xsl:copy>
+                                                                                        <!-- So the client-side code can populate populate the checkbox when editing the label -->
+                                                                                        <xsl:variable name="label-mediatype-class" select="if (xf:label/@mediatype = 'text/html') then 'fb-label-is-html' else ()"/>
+                                                                                        <xsl:variable name="hint-mediatype-class"  select="if (xf:hint /@mediatype = 'text/html') then 'fb-hint-is-html'  else ()"/>
+                                                                                        <xsl:attribute name="class" select="string-join((@class, $label-mediatype-class, $hint-mediatype-class), ' ')"/>
+                                                                                        <xsl:copy-of select="@* except @class | node()"/>
+                                                                                    </xsl:copy>
+                                                                                </xsl:for-each>
+                                                                            </xsl:when>
+                                                                            <xsl:otherwise>
+                                                                                <!-- In non-editable mode (which means we are in a repeat), apply all controls -->
+                                                                                <xsl:apply-templates select="$controls"/>
+                                                                            </xsl:otherwise>
+                                                                        </xsl:choose>
                                                                     </xf:group>
                                                                 </xsl:if>
                                                             </xh:div>

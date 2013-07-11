@@ -18,392 +18,399 @@
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
-         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
          xmlns:saxon="http://saxon.sf.net/"
-         xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:xbl="http://www.w3.org/ns/xbl"
          xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
          xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
-    <xbl:binding id="fb-dialog-validation-details" element="fb|dialog-validation-details">
+    <xbl:binding id="fb-dialog-validation-details" element="fb|dialog-validation-details" xxbl:mode="binding">
         <xbl:handlers>
             <!-- Handler to open dialog -->
             <xbl:handler event="fb-show-dialog" phase="target" defaultAction="cancel">
                 <xf:setvalue iterate="*[not(*)]" ref="."/> <!-- Clear all local values -->
-                <xf:setvalue ref="@relevant" value="'true'"/>
                 <xf:setvalue ref="control-name" value="fbf:controlName(event('control-id'))"/>
-                <xf:refresh/> <!-- The view needs to be relevant before it gets the event for action to run in a proper context -->
                 <xxf:show dialog="dialog"/>
+            </xbl:handler>
+            <!-- When the dialog opens, get type information from the form -->
+            <xbl:handler ev:event="xxforms-dialog-open" ev:observer="dialog">
+                <xf:var name="form" value="xxf:binding('fb-dialog-validation-details')"/>
+
+                <!-- Clear default alert -->
+                <xf:var name="default-alert" value="$i/default-alert"/>
+                <xf:delete ref="$default-alert/node()"/>
+
+                <xf:insert
+                    context="$default-alert"
+                    origin="fbf:readDefaultAlert($form, $i/control-name)"/>
+
+                <!-- Clear validations -->
+                <xf:var name="validations" value="$i/validations"/>
+                <xf:delete ref="$validations/node()"/>
+
+                <!-- Read required, datatype, and constraint validations -->
+                <xf:insert
+                    context="$validations"
+                    origin="fbf:readValidationsAsXML($form, $i/control-name)"/>
+
+                <!-- Force required if the datatype implies it -->
+                <xf:setvalue
+                    if="$validations/validation[@type = 'datatype']/required = 'true'"
+                    ref="$validations/validation[@type = 'required']/required"
+                    value="'true'"/>
+
+                <!-- Read MIPs -->
+                <xf:setvalue ref="$i/relevant"   value="fbf:getMipOrEmpty($form, $i/control-name, 'relevant')"/>
+                <xf:setvalue ref="$i/readonly"   value="fbf:getMipOrEmpty($form, $i/control-name, 'readonly')"/>
+                <xf:setvalue ref="$i/calculate"  value="fbf:getMipOrEmpty($form, $i/control-name, 'calculate')"/>
+                <xf:setvalue ref="$i/default"    value="fbf:getMipOrEmpty($form, $i/control-name, 'default')"/>
+
+                <!-- Read help -->
+                <xf:setvalue ref="$i/help"  value="fbf:getControlHelpOrEmpty($i/control-name)"/>
+
+                <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
+                     allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
+                <xf:delete ref="$i/namespace::node()"/>
+                <xf:insert context="$i" origin="fbf:findBindByNameOrEmpty($form, $i/control-name)/namespace::node()"/>
+            </xbl:handler>
+            <!-- Save data upon close unless the sub-form is not valid -->
+            <!-- NOTE: We used to have not(event('fb-save') = false()), but we prefer explicit now because we may get
+                 an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
+            <xbl:handler ev:event="xxforms-dialog-close" if="event('fb-save') and $i/@valid = 'true'" ev:observer="dialog">
+                <xf:var name="form" value="xxf:binding('fb-dialog-validation-details')"/>
+                <xf:action type="xpath">
+                    (: Write alerts and constraints :)
+                    fbf:writeAlertsAndValidationsAsXML($form, $i/control-name, $i/default-alert/alert, $i/validations/validation),
+                    (: Write MIPs :)
+                    for $mip in ('relevant', 'readonly', 'calculate', 'default') return
+                        fbf:updateMip($form, $i/control-name, $mip, $i/*[name() = $mip]),
+                    (: Write help :)
+                    fbf:setControlHelp($i/control-name, $i/help)
+                </xf:action>
             </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="model">
 
-                <xf:instance id="local">
-                    <!-- TODO: Relevance must be handled automatically by the XForms engine! -->
-                    <local relevant="" valid="true">
+                <xf:instance id="i" xxf:exclude-result-prefixes="#all">
+                    <local valid="true">
 
                         <control-name/>
 
-                        <builtin-type/>
-                        <required/>     <!-- TODO: currently a plain boolean; allow for XPath expression as well? -->
+                        <default-alert
+                            global-default-alert-message=""
+                            readonly-alert-message=""/>
+
+                        <validations/>
 
                         <relevant/>
                         <readonly/>
-
-                        <default/>
                         <calculate/>
-                        <schema-type/>
-                        <help/>
-                        <alert/>
+                        <default/>
 
-                        <alerts/>
+                        <help/>
 
                         <save-trigger/>
                     </local>
                 </xf:instance>
 
-                <xf:instance id="alert-template">
-                    <alert message="" level="error" constraint-expression="" constraint-id=""/>
+                <xf:var name="i" value="instance()"/>
+
+                <xf:instance id="validation-constraint-template" xxf:exclude-result-prefixes="#all">
+                    <validation id="" type="constraint" level="error" default-alert="true">
+                        <constraint expression=""/>
+                        <alert message=""/>
+                    </validation>
                 </xf:instance>
 
                 <!-- Enable/disable trigger -->
-                <xf:setvalue ev:event="xxforms-invalid" ev:observer="local" ref="@valid">false</xf:setvalue>
-                <xf:setvalue ev:event="xxforms-valid"   ev:observer="local" ref="@valid">true</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-invalid" ev:observer="i" ref="@valid">false</xf:setvalue>
+                <xf:setvalue ev:event="xxforms-valid"   ev:observer="i" ref="@valid">true</xf:setvalue>
 
-                <xf:bind ref="required" readonly="../schema-type != ''"/>
+                <xf:bind ref="default-alert">
+                    <xf:bind
+                        ref="alert/@global"
+                        type="xs:boolean"/>
+                    <xf:bind
+                        ref="alert/@message"
+                        readonly="../@global = true()"/>
+                    <xf:bind
+                        ref="@global-default-alert-message"
+                        calculate="xxf:r('detail.labels.alert', '|fr-fr-resources|')"/><!-- FIXME: This uses FB's current language, not the edited form's -->
+                    <xf:bind
+                        id="default-alert"
+                        ref="if (alert/@global = true())
+                             then @global-default-alert-message
+                             else alert/@message"/>
+                    <!-- Keep copy of default alert, whether default for control or global default -->
+                    <xf:bind
+                        ref="@readonly-alert-message"
+                        calculate="xxf:bind('default-alert')"/>
+                </xf:bind>
+
+                <xf:bind ref="validations/validation">
+                    <xf:bind
+                        ref="@type"
+                        readonly="true()"/>
+
+                    <xf:bind
+                        ref="@level"
+                        readonly="../@type = ('required', 'datatype')"/>
+
+                    <xf:bind
+                        ref="@default-alert"
+                        type="xs:boolean"
+                        readonly="false()"
+                        calculate="if (../@type = 'constraint' and ../@level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
+
+                    <!-- We had this, but we should still be able to make the value required for a schema type (optional then depends on the type itself) -->
+                    <!--<xf:bind ref=".[@type = 'required']" name="required-validation">-->
+                        <!--<xf:bind-->
+                            <!--ref="required"-->
+                            <!--readonly="../../validation[@type = 'datatype']/schema-type != ''"/> &lt;!&ndash; readonly="$datatype-validation/schema-type != ''" &ndash;&gt;-->
+                    <!--</xf:bind>-->
+
+                    <!-- Keep required in sync -->
+                    <xf:bind ref=".[@type = 'datatype']" name="datatype-validation">
+                        <xf:bind
+                            ref="required"
+                            calculate="../../validation[@type = 'required']/required"/> <!-- calculate="$required-validation/required -->
+                    </xf:bind>
+
+                    <xf:bind
+                        ref="constraint/@expression"
+                        type="xxf:xpath2"
+                        required="false()"/>
+                </xf:bind>
+
                 <xf:bind
                     ref="relevant | readonly | default | calculate"
                     type="xxf:xpath2"
                     required="false()"/>
-                <xf:bind ref="alerts/alert">
-                    <xf:bind
-                        ref="@constraint-expression"
-                        type="xxf:xpath2"
-                        required="false()"
-                        relevant="../@level != 'any'"/>
-                    <!--<xf:bind-->
-                        <!--ref="@constraint-id"-->
-                        <!--type="xs:NCName"-->
-                        <!--required="false()"-->
-                        <!--relevant="../@level != 'any'"/>-->
-                </xf:bind>
+
                 <xf:bind ref="save-trigger" readonly="instance()/@valid = 'false'"/>
 
             </xf:model>
         </xbl:implementation>
         <xbl:template>
-            <xf:group id="container" ref=".[@relevant = 'true']" appearance="xxf:internal">
+            <!-- Bindings specified on control -->
+            <!-- LATER: Use xxf:r(). Need to find solution for itemset resources. -->
+            <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
 
-                <!-- Bindings specified on control -->
-                <xf:var name="form"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=form-ref"/></xf:var>
-                <xf:var name="resources"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=resources-ref"/></xf:var>
-                <xf:var name="components"><xxf:sequence value=". treat as element()" xxbl:scope="outer" xbl:attr="model context ref=components-ref"/></xf:var>
+            <xxf:dialog id="dialog" level="modal" class="fb-dialog-validation-details">
+                <xf:label ref="$resources/dialog-validation-details/label"/>
 
-                <xf:var name="local" value="instance('local')"/>
-                <xf:var name="form-resources" value="$form/xh:head/xf:model/xf:instance[@id = 'fr-form-resources']/* treat as element()"/>
+                <xf:var name="form" value="xxf:binding('fb-dialog-validation-details')"/>
+                <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model'] treat as element()"/>
 
-                <xf:var name="current-language" value="$resources/@xml:lang/string() treat as xs:string"/>
-                <xf:var name="current-resources" value="$form-resources/resource[@xml:lang = $current-language]"/>
+                <!-- Figure out schema prefix if any -->
+                <xf:var name="schema"
+                        value="$model/xs:schema[1]" as="element(xs:schema)?"/>
+                <xf:var name="schema-namespace"
+                        value="$schema/@targetNamespace" as="xs:string?"/>
+                <xf:var name="schema-prefixes"
+                        value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
+                <xf:var name="schema-namespaces"
+                        value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
+                <xf:var name="schema-prefix"
+                        value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
 
-                <!-- When the dialog opens, get type information from the form -->
-                <xf:action ev:event="xxforms-dialog-open" ev:observer="dialog">
-                    <!-- Read help -->
-                    <xf:setvalue ref="$local/help"  value="fbf:getControlHelpOrEmpty($local/control-name)"/>
+                <fr:tabbable>
 
-                    <!-- Read bind information -->
+                    <fr:tab id="validations-tab">
+                        <fr:label ref="$resources/dialog-validation-details/tab-validations/label"/>
+                        <xf:group appearance="xxf:internal" context="validations">
 
-                    <!-- Set type information if there is a type specified -->
-                    <xf:var name="type-bind" value="fbf:getMipOrEmpty($form, $local/control-name, 'type')"/>
-
-                    <xf:setvalue if="empty($type-bind)" ref="$local/builtin-type">string</xf:setvalue>
-                    <xf:setvalue ref="$local/schema-type"/>
-                    <xf:setvalue ref="$local/required">false</xf:setvalue>
-
-                    <!-- TODO: more in Scala here -->
-                    <xf:action if="exists($type-bind)">
-                        <!-- TODO: must not use hardcoded prefixes for xs: and xf: -->
-                        <xf:var name="is-builtin-type" value="starts-with($type-bind, 'xs:') or starts-with($type-bind, 'xf:')"/>
-                        <xf:setvalue if="$is-builtin-type" ref="$local/builtin-type" value="substring-after($type-bind, ':')"/>
-                        <!-- TODO: Handle namespace and prefix for namespace -->
-                        <xf:setvalue if="not($is-builtin-type)" ref="$local/schema-type" value="$type-bind"/>
-                        <xf:setvalue ref="$local/required" value="starts-with($type-bind, 'xs:')"/>
-                    </xf:action>
-
-                    <!-- Read all other built-in MIPs -->
-                    <xf:setvalue ref="$local/required"   value="fbf:getMipOrEmpty($form, $local/control-name, 'required') = 'true()' or . = 'true'"/>
-                    <xf:setvalue ref="$local/relevant"   value="fbf:getMipOrEmpty($form, $local/control-name, 'relevant')"/>
-                    <xf:setvalue ref="$local/readonly"   value="fbf:getMipOrEmpty($form, $local/control-name, 'readonly')"/>
-                    <xf:setvalue ref="$local/calculate"  value="fbf:getMipOrEmpty($form, $local/control-name, 'calculate')"/>
-                    <xf:setvalue ref="$local/default"    value="fbf:getMipOrEmpty($form, $local/control-name, 'default')"/>
-
-                    <!-- Read alerts and constraints -->
-                    <xf:delete ref="$local/alerts/node()"/>
-                    <xf:insert context="$local/alerts" origin="fbf:readAlertsAndConstraintsAsXML($form, $local/control-name)"/>
-
-                    <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
-                         allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
-                    <xf:delete ref="$local/namespace::node()"/>
-                    <xf:insert context="$local" origin="fbf:findBindByNameOrEmpty($form, $local/control-name)/namespace::node()"/>
-                </xf:action>
-
-                <!-- Save data upon close unless the sub-form is not valid -->
-                <!-- NOTE: We used to have not(event('fb:save') = false()), but we prefer explicit now because we may get
-                     an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
-                <xf:action ev:event="xxforms-dialog-close" if="event('fb:save') and $local/@valid = 'true'" ev:observer="dialog">
-                    <xf:var name="current-control" value="if ($local/control-name != '') then fbf:findControlByNameOrEmpty($form, $local/control-name) else ()"/>
-
-                    <!-- Copy back the help -->
-                    <xf:action type="xpath">
-                        fbf:setControlHelp($local/control-name, $local/help)
-                    </xf:action>
-
-                    <!-- Switch between default alert message and user-specified alert message as needed -->
-                    <xf:setvalue if="normalize-space($local/alert) != ''" ref="$current-control/xf:alert/@ref" value="concat('$form-resources/', $local/control-name, '/alert')"/>
-                    <xf:setvalue if="normalize-space($local/alert) = ''" ref="$current-control/xf:alert/@ref" value="'$fr-resources/detail/labels/alert'"/>
-
-                    <!-- Insert bind if needed -->
-                    <xf:action type="xpath">
-                        for $control-name in string($local/control-name) return (
-                            (: Set built-in type if needed :)
-                            if ($local/builtin-type != '') then
-                                fbf:updateMip($form, $control-name, 'type',
-                                    concat(
-                                        if ($local/required = 'true' and not($local/builtin-type = ('listItem', 'listItems', 'dayTimeDuration', 'yearMonthDuration', 'email', 'card-number')))
-                                        then 'xs:' else 'xf:', $local/builtin-type
-                                    )
-                                )
-                            else (),
-                            (: Set schema type if needed :)
-                            (: TODO: Handle namespace and prefix for namespace :)
-                            if ($local/schema-type != '') then
-                                fbf:updateMip($form, $control-name, 'type', $local/schema-type) else (),
-                            (: "required" MIP :)
-                            fbf:updateMip($form, $control-name, 'required', for $v in $local/required/string() return if ($v = 'true') then 'true()' else ''),
-                            (: All other MIPs :)
-                            for $mip in ('relevant', 'readonly', 'calculate', 'default') return
-                                fbf:updateMip($form, $control-name, $mip, $local/*[name() = $mip]),
-
-                            (: Write alerts and constraints :)
-                            fbf:writeAlertsAndConstraints($form, $local/control-name, $local/alerts/alert)
-                        )
-                    </xf:action>
-                </xf:action>
-
-                <!-- Make ourselves non-relevant when the dialog closes -->
-                <xf:setvalue ev:event="xxforms-dialog-close" ev:observer="dialog" ref="$local/@relevant">false</xf:setvalue>
-
-                <xxf:dialog id="dialog" level="modal" class="fb-dialog-validation-details">
-                    <xf:label ref="$resources/dialog-validation-details/label"/>
-
-                    <xf:var name="model" value="$form/xh:head/xf:model[@id = 'fr-form-model'] treat as element()"/>
-
-                    <xf:var name="schema"
-                            value="$model/xs:schema[1]" as="element(xs:schema)?"/>
-                    <xf:var name="schema-namespace"
-                            value="$schema/@targetNamespace" as="xs:string?"/>
-                    <xf:var name="schema-prefixes"
-                            value="if (exists($schema)) then in-scope-prefixes($schema) else ()" as="xs:string*"/>
-                    <xf:var name="schema-namespaces"
-                            value="if (exists($schema)) then for $p in in-scope-prefixes($schema) return namespace-uri-for-prefix($p, $schema) else ()" as="xs:string*"/>
-                    <xf:var name="schema-prefix"
-                            value="if (exists($schema) and exists($schema-namespace)) then $schema-prefixes[index-of($schema-namespaces, $schema-namespace)[1]] else ()" as="xs:string?"/>
-
-                    <fr:tabbable>
-
-                        <fr:tab id="type-tab">
-                            <fr:label ref="$resources/dialog-validation-details/tab-type/label"/>
                             <fr:grid>
                                 <xh:tr>
                                     <xh:td>
-                                        <!-- Built-in type -->
-                                        <xf:select1 ref="$local/builtin-type">
-                                            <xf:label ref="$resources/dialog-validation-details/builtin-type/label"/>
-                                            <xf:hint ref="$resources/dialog-validation-details/builtin-type/hint"/>
-                                            <!-- Add placeholder if there is a schema type -->
-                                            <xf:itemset ref=".[../schema-type != '']">
-                                                <xf:label value="$resources/dialog-validation-details/builtin-type/use-schema-type"/>
-                                                <xf:value/>
-                                            </xf:itemset>
-                                            <xf:itemset ref="$resources/dialog-validation-details/builtin-type/choices//(choices | type)">
-                                                <xf:label value="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
-                                                <xf:value ref="if (self::choices) then () else if (value) then value else ."/>
-                                            </xf:itemset>
-                                            <xf:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                                        </xf:select1>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:select1 ref="required" appearance="full">
-                                            <xf:label ref="$resources/dialog-validation-details/required/label"/>
-                                            <xf:hint ref="$resources/dialog-validation-details/required/hint"/>
-                                            <xf:itemset ref="$resources/dialog-validation-details/required//item">
-                                                <xf:label ref="label"/>
-                                                <xf:value ref="value"/>
-                                            </xf:itemset>
-                                        </xf:select1>
-                                    </xh:td>
-                                </xh:tr>
-                                <xh:tr>
-                                    <xh:td>
-                                        <!-- Schema type selection if applicable -->
-                                        <xf:select1 ref="$local/schema-type[exists($schema)]">
-                                            <xf:label>
-                                                <xh:img src="/forms/orbeon/builder/images/schema.gif" alt="" title=""/>
-                                                <xf:output value="$resources/dialog-validation-details/schema-type/label"/>
-                                            </xf:label>
-                                            <xf:hint ref="$resources/dialog-validation-details/types/hint"/>
-                                            <xf:item>
-                                                <xf:label ref="$resources/select/label"/>
-                                                <xf:value/>
-                                            </xf:item>
-                                            <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                                            <xf:itemset ref="$schema/xs:simpleType">
-                                                <xf:label value="string-join(($schema-prefix, @name), ':')"/>
-                                                <xf:value value="string-join(($schema-prefix, @name), ':')"/>
-                                            </xf:itemset>
-                                            <xf:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                                        </xf:select1>
-                                    </xh:td>
-                                </xh:tr>
-                            </fr:grid>
-                        </fr:tab>
-
-                        <fr:tab id="calculations-tab">
-                            <fr:label ref="$resources/dialog-validation-details/tab-calculations/label"/>
-                            <fr:grid>
-                                <xh:tr>
-                                    <xh:td>
-                                        <xf:input ref="calculate">
-                                            <xf:label>
-                                                <xh:img src="/apps/fr/style/images/silk/calculator_edit.png" alt="" title=""/>
-                                                <xf:output value="$resources/dialog-validation-details/calculate/label"/></xf:label>
-                                            <xf:alert ref="$resources/dialog-validation-details/calculate/alert"/>
-                                            <xf:hint ref="$resources/dialog-validation-details/calculate/hint"/>
-                                        </xf:input>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:input ref="default">
-                                            <xf:label>
-                                                <xh:img src="/apps/fr/style/images/silk/flag_yellow.png" alt="" title=""/>
-                                                <xf:output value="$resources/dialog-validation-details/default/label"/></xf:label>
-                                            <xf:alert ref="$resources/dialog-validation-details/default/alert"/>
-                                            <xf:hint ref="$resources/dialog-validation-details/default/hint"/>
-                                        </xf:input>
-                                    </xh:td>
-                                </xh:tr>
-                                <xh:tr>
-                                    <xh:td>
-                                        <xf:input ref="relevant">
-                                            <xf:label>
-                                                <xh:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                                                <xf:output value="$resources/dialog-validation-details/visibility/label"/></xf:label>
-                                            <xf:alert ref="$resources/dialog-validation-details/visibility/alert"/>
-                                            <xf:hint ref="$resources/dialog-validation-details/visibility/hint"/>
-                                        </xf:input>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:input ref="readonly">
-                                            <xf:label>
-                                                <xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                                                <xf:output value="$resources/dialog-validation-details/readonly/label"/></xf:label>
-                                            <xf:alert ref="$resources/dialog-validation-details/readonly/alert"/>
-                                            <xf:hint ref="$resources/dialog-validation-details/readonly/hint"/>
-                                        </xf:input>
-                                    </xh:td>
-                                </xh:tr>
-                            </fr:grid>
-                        </fr:tab>
-
-                        <fr:tab id="constraints-tab">
-                            <fr:label ref="$resources/dialog-validation-details/tab-alerts/label"/>
-                            <xf:group appearance="xxf:internal" context="alerts">
-                                <fr:grid id="constraints-grid" ref="alert" origin="instance('alert-template')" repeat="true">
-                                    <xh:tr>
-                                        <xh:td>
-                                            <xf:textarea ref="@message">
-                                                <xf:label value="$resources/dialog-validation-details/alert/label"/>
-                                                <xf:hint ref="$resources/dialog-validation-details/alert/hint"/>
-                                            </xf:textarea>
-                                        </xh:td>
-                                        <xh:td>
-                                            <xf:select1 ref="@level">
-                                                <xf:label>Level</xf:label>
-                                                <xf:hint>Alert level</xf:hint>
-                                                <xf:item>
-                                                    <xf:label>Any</xf:label>
-                                                    <xf:value>any</xf:value>
-                                                </xf:item>
-                                                <xf:item>
-                                                    <xf:label>Error</xf:label>
-                                                    <xf:value>error</xf:value>
-                                                </xf:item>
-                                                <xf:item>
-                                                    <xf:label>Warning</xf:label>
-                                                    <xf:value>warning</xf:value>
-                                                </xf:item>
-                                                <xf:item>
-                                                    <xf:label>Info</xf:label>
-                                                    <xf:value>info</xf:value>
-                                                </xf:item>
-                                            </xf:select1>
-                                        </xh:td>
-                                        <xh:td>
-                                            <!-- TODO: expression for @constraint + figure out how to deal w/ max length etc. -->
-                                            <!-- TODO: expression for @required -->
-                                            <xf:textarea ref="@constraint-expression">
-                                                <xf:label value="$resources/dialog-validation-details/constraint/label"/>
-                                                <xf:alert ref="$resources/dialog-validation-details/constraint/alert"/>
-                                                <xf:hint ref="$resources/dialog-validation-details/constraint/hint"/>
-                                            </xf:textarea>
-                                        </xh:td>
-                                        <!-- For now don't allow editing the constraint id, we need to figure out the logic -->
-                                        <!--<xh:td>-->
-                                            <!--<xf:input ref="@constraint-id">-->
-                                                <!--<xf:label value="$resources/dialog-validation-details/constraint-id/label"/>-->
-                                                <!--<xf:alert ref="$resources/dialog-validation-details/constraint-id/alert"/>-->
-                                                <!--<xf:hint ref="$resources/dialog-validation-details/constraint-id/hint"/>-->
-                                            <!--</xf:input>-->
-                                        <!--</xh:td>-->
-                                    </xh:tr>
-                                </fr:grid>
-                            </xf:group>
-                        </fr:tab>
-                        <fr:tab id="help-tab">
-                            <fr:label ref="$resources/dialog-validation-details/tab-help/label"/>
-                            <fr:grid id="help-grid">
-                                <xh:tr>
-                                    <xh:td>
-                                        <!-- Help message -->
-                                        <xf:textarea ref="help">
-                                            <xf:label>
-                                                <xf:output value="$resources/dialog-validation-details/help/label"/></xf:label>
-                                            <xf:hint ref="$resources/dialog-validation-details/help/hint"/>
+                                        <xf:textarea bind="default-alert">
+                                            <xf:label ref="$resources/dialog-validation-details/default-alert/label"/>
+                                            <xf:hint  ref="$resources/dialog-validation-details/default-hint/label"/>
                                         </xf:textarea>
                                     </xh:td>
+                                    <xh:td>
+                                        <xf:input ref="$i/default-alert/alert/@global">
+                                            <xf:label ref="$resources/dialog-validation-details/use-global-alert/label"/>
+                                            <!-- Dynamic bind depends on this value, we must do an explicit RRR -->
+                                            <xf:action event="xforms-value-changed">
+                                                <xf:rebuild/><xf:recalculate/><xf:revalidate/>
+                                            </xf:action>
+                                        </xf:input>
+                                    </xh:td>
                                 </xh:tr>
                             </fr:grid>
-                        </fr:tab>
-                    </fr:tabbable>
 
-                    <xh:div class="fr-dialog-buttons">
-                        <xf:trigger ref="save-trigger" appearance="xxf:primary">
-                            <xf:label ref="$resources/apply/label"/>
-                            <!-- Close and save upon DOMActivate -->
-                            <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
-                                <xf:property name="fb:save" value="true()"/>
-                            </xf:dispatch>
-                        </xf:trigger>
-                        <xf:output value="$resources/or/label"/>
-                        <xf:trigger appearance="minimal">
-                            <xf:label ref="$resources/cancel/label"/>
-                            <!-- Close and cancel upon DOMActivate -->
-                            <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
-                                <xf:property name="fb:save" value="false()"/>
-                            </xf:dispatch>
-                        </xf:trigger>
-                    </xh:div>
-                </xxf:dialog>
-            </xf:group>
+                            <fr:grid id="validations-grid" ref="validation" origin="instance('validation-constraint-template')" repeat="true" freeze="2">
+                                <xh:tr>
+                                    <xh:td>
+                                        <xf:select1 ref="@type" appearance="full">
+                                            <xf:label ref="$resources/dialog-validation-details/validation-type/label"/>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-validation-details/required/label"/>
+                                                <xf:value>required</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-validation-details/types/label"/>
+                                                <xf:value>datatype</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label ref="$resources/dialog-validation-details/constraint/label"/>
+                                                <xf:value>constraint</xf:value>
+                                            </xf:item>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:group>
+                                            <xf:label ref="$resources/dialog-validation-details/validation-details/label"/>
+                                            
+                                            <xf:select1 ref=".[@type = 'required']/required" appearance="full">
+                                                <xf:label ref="$resources/dialog-validation-details/required/label"/>
+                                                <xf:hint  ref="$resources/dialog-validation-details/required/hint"/>
+                                                <xf:itemset ref="$resources/dialog-validation-details/required//item">
+                                                    <xf:label ref="label"/>
+                                                    <xf:value ref="value"/>
+                                                </xf:itemset>
+                                            </xf:select1>
+
+                                            <!-- Built-in type -->
+                                            <xf:select1 ref=".[@type = 'datatype']/builtin-type">
+                                                <xf:label ref="$resources/dialog-validation-details/builtin-type/label"/>
+                                                <xf:hint  ref="$resources/dialog-validation-details/builtin-type/hint"/>
+                                                <!-- Add placeholder if there is a schema type -->
+                                                <xf:itemset ref=".[../schema-type != '']">
+                                                    <xf:label ref="$resources/dialog-validation-details/builtin-type/use-schema-type"/>
+                                                    <xf:value/>
+                                                </xf:itemset>
+                                                <xf:itemset ref="$resources/dialog-validation-details/builtin-type/choices//(choices | type)">
+                                                    <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
+                                                    <xf:value ref="if (self::choices) then () else if (value) then value else ."/>
+                                                </xf:itemset>
+                                                <xf:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                            </xf:select1>
+                                            <!-- Schema type selection if applicable -->
+                                            <xf:select1 ref=".[@type = 'datatype']/schema-type[exists($schema)]">
+                                                <xf:label ref="$resources/dialog-validation-details/schema-type/label"/>
+                                                <xf:hint  ref="$resources/dialog-validation-details/types/hint"/>
+                                                <xf:item>
+                                                    <xf:label ref="$resources/select/label"/>
+                                                    <xf:value/>
+                                                </xf:item>
+                                                <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
+                                                <xf:itemset ref="$schema/xs:simpleType">
+                                                    <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
+                                                    <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
+                                                </xf:itemset>
+                                                <xf:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                            </xf:select1>
+
+                                            <xf:textarea ref=".[@type = 'constraint']/constraint/@expression">
+                                                <xf:label ref="$resources/dialog-validation-details/constraint/label"/>
+                                                <xf:alert ref="$resources/dialog-validation-details/constraint/alert"/>
+                                                <xf:hint  ref="$resources/dialog-validation-details/constraint/hint" appearance="minimal"/>
+                                            </xf:textarea>
+                                        </xf:group>
+
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:select1 ref="@level">
+                                            <xf:label ref="$resources/dialog-validation-details/level/label"/>
+                                            <xf:item>
+                                                <xf:label>Error</xf:label>
+                                                <xf:value>error</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>Warning</xf:label>
+                                                <xf:value>warning</xf:value>
+                                            </xf:item>
+                                            <xf:item>
+                                                <xf:label>Info</xf:label>
+                                                <xf:value>info</xf:value>
+                                            </xf:item>
+                                        </xf:select1>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:textarea ref="if (@type = 'constraint' and @default-alert = false() or @level != 'error') then alert/@message else $i/default-alert/@readonly-alert-message">
+                                            <xf:label ref="$resources/dialog-validation-details/alert/label"/>
+                                        </xf:textarea>
+                                        <xf:input ref=".[@type = 'constraint' and @level = 'error']/@default-alert">
+                                            <xf:label ref="$resources/dialog-validation-details/use-default-alert/label"/>
+                                        </xf:input>
+                                    </xh:td>
+                                </xh:tr>
+                            </fr:grid>
+                        </xf:group>
+                    </fr:tab>
+                    <fr:tab id="formulas-tab">
+                        <fr:label ref="$resources/dialog-validation-details/tab-formulas/label"/>
+                        <fr:grid>
+                            <xh:tr>
+                                <xh:td>
+                                    <xf:textarea ref="calculate">
+                                        <xf:label ref="$resources/dialog-validation-details/calculate/label"/>
+                                        <xf:alert ref="$resources/dialog-validation-details/calculate/alert"/>
+                                        <xf:hint  ref="$resources/dialog-validation-details/calculate/hint" appearance="minimal"/>
+                                    </xf:textarea>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:textarea ref="default">
+                                        <xf:label ref="$resources/dialog-validation-details/default/label"/>
+                                        <xf:alert ref="$resources/dialog-validation-details/default/alert"/>
+                                        <xf:hint  ref="$resources/dialog-validation-details/default/hint" appearance="minimal"/>
+                                    </xf:textarea>
+                                </xh:td>
+                            </xh:tr>
+                            <xh:tr>
+                                <xh:td>
+                                    <xf:textarea ref="relevant">
+                                        <xf:label ref="$resources/dialog-validation-details/visibility/label"/>
+                                        <xf:alert ref="$resources/dialog-validation-details/visibility/alert"/>
+                                        <xf:hint  ref="$resources/dialog-validation-details/visibility/hint" appearance="minimal"/>
+                                    </xf:textarea>
+                                </xh:td>
+                                <xh:td>
+                                    <xf:textarea ref="readonly">
+                                        <xf:label ref="$resources/dialog-validation-details/readonly/label"/>
+                                        <xf:alert ref="$resources/dialog-validation-details/readonly/alert"/>
+                                        <xf:hint  ref="$resources/dialog-validation-details/readonly/hint" appearance="minimal"/>
+                                    </xf:textarea>
+                                </xh:td>
+                            </xh:tr>
+                        </fr:grid>
+                    </fr:tab>
+                    <fr:tab id="help-tab">
+                        <fr:label ref="$resources/dialog-validation-details/tab-help/label"/>
+                        <fr:grid id="help-grid">
+                            <xh:tr>
+                                <xh:td>
+                                    <!-- Help message -->
+                                    <xf:textarea ref="help">
+                                        <xf:label ref="$resources/dialog-validation-details/help/label"/>
+                                        <xf:hint  ref="$resources/dialog-validation-details/help/hint"/>
+                                    </xf:textarea>
+                                </xh:td>
+                            </xh:tr>
+                        </fr:grid>
+                    </fr:tab>
+                </fr:tabbable>
+
+                <xh:div class="fr-dialog-buttons">
+                    <xf:trigger ref="save-trigger" appearance="xxf:primary">
+                        <xf:label ref="$resources/apply/label"/>
+                        <!-- Close and save upon DOMActivate -->
+                        <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
+                            <xf:property name="fb-save" value="true()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                    <xf:output value="$resources/or/label"/>
+                    <xf:trigger appearance="minimal">
+                        <xf:label ref="$resources/cancel/label"/>
+                        <!-- Close and cancel upon DOMActivate -->
+                        <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
+                            <xf:property name="fb-save" value="false()"/>
+                        </xf:dispatch>
+                    </xf:trigger>
+                </xh:div>
+            </xxf:dialog>
         </xbl:template>
     </xbl:binding>
 </xbl:xbl>

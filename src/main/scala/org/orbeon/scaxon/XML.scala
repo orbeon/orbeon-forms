@@ -190,6 +190,10 @@ object XML {
         def getDefaultPriority = -0.25 // probably not used right now
     }
 
+    object AnyTest extends Test {
+        def test(nodeInfo: NodeInfo) = AnyNodeTest.getInstance
+    }
+
     class NodeLocalNameTest(name: String, nodeKind: Option[Int] = None) extends Test {
         override def test(nodeInfo: NodeInfo) = {
 
@@ -344,6 +348,9 @@ object XML {
         def followingSibling(test: Test): Seq[NodeInfo] = find(Axis.FOLLOWING_SIBLING, test) // TODO: use Type/NODE?
         def sibling(test: Test): Seq[NodeInfo] = precedingSibling(test) ++ followingSibling(test)
 
+        def namespaces        = find(Axis.NAMESPACE, AnyTest)
+        def namespaceMappings = namespaces map (n ⇒ n.getLocalPart → n.getStringValue)
+
         def precedingElement = nodeInfo precedingSibling * headOption
         def followingElement = nodeInfo followingSibling * headOption
 
@@ -383,6 +390,9 @@ object XML {
         def att(attName: String) = \@(attName)
         def child(test: Test) = \(test)
         def descendant(test: Test) = \\(test)
+
+        def attValue(attName: String) = \@(attName) map (_.stringValue)
+        def attValue(attName: QName)  = \@(attName) map (_.stringValue)
 
         def self(test: Test) = seq flatMap (_ self test)
         def parent(test: Test) = seq flatMap (_ parent test)

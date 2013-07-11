@@ -23,186 +23,337 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, delete, setvalue}
 import org.orbeon.oxf.xforms.analysis.model.Model._
+import scala.xml.Elem
 
 trait AlertsAndConstraintsOps extends ControlOps {
 
     self: GridOps ⇒ // funky dependency, to resolve at some point
 
-    private val FBConstraintQName: QName = FB → "constraint"
+    private val FBConstraintQName: QName = FB → Constraint.name
 
     private val OldAlertRefMatcher = """\$form-resources/([^/]+)/alert(\[(\d+)\])?""".r
     private val NewAlertRefMatcher = """xxf:r\('([^.]+)\.alert(\.(\d+))?'\)""".r
 
     val OldStandardAlertRef = """$fr-resources/detail/labels/alert"""
 
-    def readAlertsAndConstraints(inDoc: NodeInfo, controlName: String): List[AlertDetails] = {
+    // Return the first default alert for the given control, or a blank template if none exists
+    def readDefaultAlert(inDoc: NodeInfo, controlName: String): NodeInfo = (
+        AlertDetails.fromForm(inDoc, controlName)
+        find   (_.default)
+        getOrElse AlertDetails(None, List(currentLang → ""), global = true)
+    ).toXML(currentLang)
 
-        val control                    = findControlByName(inDoc, controlName).get
-        val bind                       = findBindByName(inDoc, controlName).toList
-        val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert")
-
-        // NOTE: There is some duplication of extraction logic here with StaticBind: StaticBind works on dom4j, and here
-        // we work on NodeInfo.
-        def constraintFromAttribute(a: NodeInfo) =
-            ConstraintDetails(a parent * att "id", a.stringValue, ErrorLevel)
-
-        def constraintFromElement(e: NodeInfo) =
-            ConstraintDetails(e att "id", e att "value", nonEmptyOrNone(e attValue LEVEL_QNAME) map LevelByName getOrElse ErrorLevel)
-
-        // Gather all constraints (in fb:*)
-        val attributeConstraints = bind \@ FBConstraintQName map constraintFromAttribute
-        val elementConstraints   = bind \  FBConstraintQName map constraintFromElement
-
-        // Gather all alerts and join with constraints
-        val allConstraints = attributeConstraints ++ elementConstraints
-
-        // Return alert details for the element when possible
-        // Return None if the alert message can't be found or if the alert/constraint combination cannot be handled by FB
-        def alertFromElement(e: NodeInfo, constraints: Seq[ConstraintDetails]): Option[AlertDetails] = {
-
-            def attValueOrNone(name: QName) = e att name map (_.stringValue) headOption
-
-            val constraintAtt = attValueOrNone(CONSTRAINT_QNAME)
-            val levelAtt      = attValueOrNone(LEVEL_QNAME)
-            val refAtt        = attValueOrNone(REF_QNAME)
-
-            // Try to find the alert index from xf:alert/@ref
-            def alertIndexOpt =
-                refAtt collect {
-                    case OldAlertRefMatcher(`controlName`, _, index) ⇒ Option(index)
-                    case NewAlertRefMatcher(`controlName`, _, index) ⇒ Option(index)
-                } map {
-                    _  map (_.toInt - 1) getOrElse 0
-                }
-
-            // Try to find an existing resource for the given index if present, otherwise assume a blank value for the language
-            val alertsByLang = alertResourcesForAllLangs.to[List] map {
-                case (lang, alerts) ⇒ lang → (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
-            }
-
-            val forConstraints = gatherAlertConstraints(constraintAtt)
-            val forLevels      = gatherAlertLevels(levelAtt)
-
-            val constraintIds  = constraints.map(_.id).to[Set]
-
-            // Form Builder only handles a subset of the allowed XForms mappings for now
-            def isGlobal         = forConstraints.isEmpty && forLevels.isEmpty
-            def specifiesOne     = forConstraints.size == 1 && forLevels.isEmpty || forConstraints.isEmpty && forLevels.size == 1
-            def constraintsExist = forConstraints forall constraintIds // NOTE: true if forConstraints.isEmpty
-
-            def canHandle        = (isGlobal || specifiesOne) && constraintsExist
-
-            def forConstraint    = forConstraints.headOption flatMap (id ⇒ constraints find (_.id == id))
-
-            canHandle option AlertDetails(forConstraint, forLevels.headOption, alertsByLang)
-        }
-
-        control child "alert" flatMap (alertFromElement(_, allConstraints)) toList
-    }
-
-    def readAlertsAndConstraintsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
-        readAlertsAndConstraints(inDoc, controlName) map (_.toXML(currentLang)) toArray
-
-    def writeAlertsAndConstraints(inDoc: NodeInfo, controlName: String, allAlertNodes: Array[NodeInfo]): Unit = {
+    def writeAlertsAndValidationsAsXML(inDoc: NodeInfo, controlName: String, defaultAlertElem: NodeInfo, validationElems: Array[NodeInfo]) = {
 
         // Current resolutions, which could be lifted in the future:
         //
         // - writes are destructive: they remove all xf:alert, alert resources, and constraints for the control
-        // - we don't allow editing the constraint id
+        // - we don't allow editing the constraint id, but we preserve it when possible
 
-        // Reserve enough constraint ids in advance
-        val idsIterator = nextIds(inDoc, Constraint.name, allAlertNodes.size) toIterator
+        val validationElemsSeq = validationElems.to[List]
 
-        val allAlerts = allAlertNodes.to[List] map (AlertDetails.fromXML(_, idsIterator))
-
-        // Write all resources
-
-        def messagesForAllLangs(a: AlertDetails) = {
-            val messagesMap = a.messages.toMap
-            allLangs map { lang ⇒ lang → messagesMap.getOrElse(lang, "") }
+        // Extract from XML
+        val allValidations = {
+            val idsIterator = nextIds(inDoc, Constraint.name, validationElemsSeq.size).toIterator
+            validationElemsSeq map (v ⇒ v → (v attValue "type")) flatMap {
+                case (e, Required.name)   ⇒ RequiredValidation.fromXML(e)
+                case (e, "datatype")      ⇒ DatatypeValidation.fromXML(e)
+                case (e, Constraint.name) ⇒ ConstraintValidation.fromXML(e, idsIterator)
+            }
         }
 
-        val messagesByLang = (
-            allAlerts
-            flatMap messagesForAllLangs
-            groupBy (_._1)
-            map     { case (lang, values) ⇒ lang → (values map (_._2)) }
-            toList
-        )
+        val defaultAlert = AlertDetails.fromXML(defaultAlertElem, None)
 
-        setControlResourcesWithLang(controlName, "alert", messagesByLang)
+        // Write type="required" and type="datatype"
+        allValidations collectFirst { case v: RequiredValidation ⇒ v } foreach (writeRequiredValidation(inDoc, controlName, _))
+        allValidations collectFirst { case v: DatatypeValidation ⇒ v } foreach (writeDatatypeValidation(inDoc, controlName, _))
 
-        // Write alerts
-        val alertElements = ensureCleanLHHAElements(inDoc, controlName, "alert", allAlerts.size)
+        // Write type="constraint"
+        writeConstraintValidations(inDoc, controlName, defaultAlert, allValidations collect { case v: ConstraintValidation ⇒ v })
+    }
 
-        // Point to the default alert if there is a single alert blank in all languages
-        if (allAlerts.size == 1 && hasBlankOrMissingLHHAForAllLangsUseDoc(inDoc, controlName, "alert"))
-            alertElements foreach (alert ⇒ setvalue(alert \@ "ref", OldStandardAlertRef))
+    def writeRequiredValidation(inDoc: NodeInfo, controlName: String, validation: RequiredValidation): Unit = {
+        updateMip(inDoc, controlName, "required", if (validation.required) "true()" else "")
+    }
+
+    def writeDatatypeValidation(inDoc: NodeInfo, controlName: String, validation: DatatypeValidation): Unit = {
+        val datatype =
+            validation match {
+                case DatatypeValidation(_, Some(builtinType), _, required) ⇒
+                    // If a builtin type, we just have a local name
+                    val nsURI =
+                        if (XFormsTypeNames(builtinType) || ! required && XFormsVariationTypeNames(builtinType))
+                            XF
+                        else
+                            XS
+
+                    val bind   = findBindByName(inDoc, controlName).get // require the bind
+                    val ns     = bind.namespaceMappings
+                    val prefix = ns collectFirst { case (prefix, `nsURI`) ⇒ prefix } get // mapping must be in scope
+
+                    prefix + ':' + builtinType
+                case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
+                    // Schema type OTOH comes with a prefix if needed
+                    schemaType
+                case _ ⇒
+                    // No type specified, should not happen, but if it does we remove the type MIP
+                    ""
+            }
+
+        updateMip(inDoc, controlName, "type", datatype)
+    }
+
+    def writeConstraintValidations(inDoc: NodeInfo, controlName: String, defaultAlert: AlertDetails, validations: List[ConstraintValidation]): Unit = {
+
+        val bind = findBindByName(inDoc, controlName).toList
+        val existingAttributeConstraints = bind \@ FBConstraintQName
+        val existingElementConstraints   = bind \  FBConstraintQName
 
         // Write constraints
-        val bind = findBindByName(inDoc, controlName).toList
-        val attributeConstraints = bind \@ FBConstraintQName
-        val elementConstraints   = bind \  FBConstraintQName
-
-        val allConstraints = allAlerts flatMap (_.forConstraint)
-
         val hasSingleErrorConstraint =
-            allConstraints match {
-                case List(ConstraintDetails(_, expression, ErrorLevel)) ⇒
+            validations match {
+                case List() ⇒
+                    delete(existingAttributeConstraints ++ existingElementConstraints)
+                    false
+                case List(ConstraintValidation(_, ErrorLevel, expression, _)) ⇒
                     // Single error constraint, set @fb:constraint and remove all nested elements
                     updateMip(inDoc, controlName, Constraint.name, expression)
-                    delete(elementConstraints)
+                    delete(existingElementConstraints)
                     true
-                case List() ⇒
-                    false
                 case _ ⇒
                     // More than one constraint or not an error constraint, create nested fb:constraint and remove attribute
                     val nestedConstraints =
-                        allConstraints map { constraint ⇒
-                            <fb:constraint id={constraint.id} value={constraint.expression} level={constraint.level.name} xmlns:fb={FB}/>: NodeInfo
+                        validations map { constraint ⇒
+                            <fb:constraint id={constraint.id.get} value={constraint.expression} level={constraint.level.name} xmlns:fb={FB}/>: NodeInfo
                         }
 
-                    delete(attributeConstraints ++ elementConstraints)
+                    delete(existingAttributeConstraints ++ existingElementConstraints)
                     insertElementsImposeOrder(into = bind, origin = nestedConstraints, AllMIPNamesInOrder)
                     false
             }
 
-        // Insert level or constraint attribute as needed
-        alertElements zip allAlerts foreach {
-            case (e, AlertDetails(Some(constraint), _, _)) ⇒
-                val constraintId = if (hasSingleErrorConstraint) bind \@ "id" stringValue else constraint.id
-                insert(into = e, origin = attributeInfo("constraint", constraintId))
-            case (e, AlertDetails(_, Some(level), _)) ⇒
-                insert(into = e, origin = attributeInfo("level", level.name))
-            case _ ⇒ // no attributes to insert
+        // Write resources and alerts for those that have resources
+        // If the default alert has resources, write it as well
+        locally {
+
+            val alertsWithResources = {
+
+                val alertsForConstraints =
+                    validations collect
+                        { case ConstraintValidation(_, _, _, Some(alert)) ⇒ alert }
+
+                val nonGlobalDefaultAlert =
+                    ! defaultAlert.global list defaultAlert
+
+                alertsForConstraints ::: nonGlobalDefaultAlert
+            }
+
+            val messagesByLangForAllLangs = {
+
+                def messagesForAllLangs(a: AlertDetails) = {
+                    val messagesMap = a.messages.toMap
+                    allLangs map { lang ⇒ lang → messagesMap.getOrElse(lang, "") }
+                }
+
+                val messagesByLang = (
+                    alertsWithResources
+                    flatMap messagesForAllLangs
+                    groupBy (_._1)
+                    map     { case (lang, values) ⇒ lang → (values map (_._2)) }
+                )
+
+                // Make sure we have a default for all languages if there are no alerts or if some languages are missing
+                // from the alerts. We do want to update all languages on write, including removing unneeded <alert>
+                // elements.
+                val defaultMessages = allLangs map (_ → Nil)
+
+                defaultMessages.toMap ++ messagesByLang toList
+            }
+
+            setControlResourcesWithLang(controlName, "alert", messagesByLangForAllLangs)
+
+            // Write alerts
+            val newAlertElements = ensureCleanLHHAElements(inDoc, controlName, "alert", count = alertsWithResources.size, replace = true)
+
+            // Insert constraint attribute as needed
+            newAlertElements zip alertsWithResources foreach {
+                case (e, AlertDetails(Some(forConstraintId), _, _)) ⇒
+                    def bindId       = bind \@ "id" stringValue
+                    val constraintId = if (hasSingleErrorConstraint) bindId else forConstraintId
+                    insert(into = e, origin = attributeInfo(Constraint.name, constraintId))
+                case _ ⇒ // no attributes to insert if this is not an alert linked to a constraint
+            }
+        }
+
+        // Write global default alert if needed
+        if (defaultAlert.global) {
+            val newGlobalAlert = ensureCleanLHHAElements(inDoc, controlName, "alert", count = 1, replace = false).head
+            setvalue(newGlobalAlert \@ "ref", OldStandardAlertRef)
         }
     }
 
-    case class ConstraintDetails(id: String, expression: String, level: ConstraintLevel)
+    // Return all validations as XML for the given control
+    def readValidationsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
+        RequiredValidation.fromForm(inDoc, controlName) ::
+        DatatypeValidation.fromForm(inDoc, controlName) ::
+        ConstraintValidation.fromForm(inDoc, controlName) map
+        (v ⇒ elemToNodeInfo(v.toXML(currentLang))) toArray
 
-    case class AlertDetails(forConstraint: Option[ConstraintDetails], forLevel: Option[ConstraintLevel], messages: List[(String, String)]) {
+    sealed trait Validation {
+        def level: ConstraintLevel
+        def toXML(forLang: String): Elem
+    }
+
+    object Validation {
+        def fromXML(validationElem: NodeInfo) =
+            LevelByName(validationElem attValue "level")
+    }
+
+    case class RequiredValidation(level: ConstraintLevel, required: Boolean) extends Validation {
+        def toXML(forLang: String): Elem =
+            <validation type={Required.name} level={level.name}><required>{required.toString}</required></validation>
+    }
+
+    object RequiredValidation {
+        def fromForm(inDoc: NodeInfo, controlName: String): RequiredValidation = {
+            // FB only handles true() and false() at this time and other values are overwritten
+            val required = getMip(inDoc, controlName, Required.name) exists (_ == "true()")
+            // NOTE: Set a blank id because we don't want that attribute to roundtrip
+            RequiredValidation(ErrorLevel, required)
+        }
+
+        def fromXML(validationElem: NodeInfo): Option[RequiredValidation] = {
+            require(validationElem \@ "type" === Required.name)
+
+            val level    = Validation.fromXML(validationElem)
+            val required = validationElem \ Required.name === "true"
+            Some(RequiredValidation(level, required))
+        }
+    }
+
+    case class DatatypeValidation(level: ConstraintLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
+        def toXML(forLang: String): Elem =
+            <validation type="datatype" level={level.name}>
+                <builtin-type>{builtinType.getOrElse("")}</builtin-type>
+                <schema-type>{schemaType.getOrElse("")}</schema-type>
+                <required>{required.toString}</required>
+            </validation>
+    }
+
+    object DatatypeValidation {
+
+        // Create from a control name
+        def fromForm(inDoc: NodeInfo, controlName: String): DatatypeValidation = {
+            val bind    = findBindByName(inDoc, controlName).get // require the bind
+            val typeMIP = getMip(inDoc, controlName, "type")
+
+            val (builtinType, schemaType, required) =
+                typeMIP match {
+                    case Some(typ) ⇒
+
+                        val qName = resolveQName(bind, typ)
+
+                        val isBuiltinType   = Set(XF, XS)(qName.getNamespaceURI)
+                        val isRequired      = qName.getNamespaceURI == XS
+
+                        if (isBuiltinType)
+                            (Some(qName.getName), None, isRequired)
+                        else // FIXME: Handle namespace and prefix for schema type
+                            (None, Some(typ), isRequired)
+                    case None ⇒
+                        // No specific type means we are a string
+                        (Some("string"), None, false)
+                }
+
+            DatatypeValidation(ErrorLevel, builtinType, schemaType, required)
+        }
+
+        def fromXML(validationElem: NodeInfo): Option[DatatypeValidation] = {
+            require(validationElem \@ "type" === "datatype")
+
+            val level       = Validation.fromXML(validationElem)
+            val builtinType = nonEmptyOrNone(validationElem \ "builtin-type" stringValue)
+            val schemaType  = nonEmptyOrNone(validationElem \ "schema-type"  stringValue)
+            val required    = validationElem \ Required.name === "true"
+
+            Some(DatatypeValidation(level, builtinType, schemaType, required))
+        }
+    }
+
+    case class ConstraintValidation(id: Option[String], level: ConstraintLevel, expression: String, alert: Option[AlertDetails]) extends Validation {
+
+        private def alertOrPlaceholder(forLang: String) =
+            alert orElse Some(AlertDetails(None, List(currentLang → ""), global = false)) map (_.toXML(forLang)) get
+
+        def toXML(forLang: String): Elem =
+            <validation type="constraint" id={id getOrElse ""} level={level.name} default-alert={alert.isEmpty.toString}><constraint expression={expression}/>{
+                alertOrPlaceholder(forLang)
+            }</validation>
+    }
+
+    object ConstraintValidation {
+
+        def fromForm(inDoc: NodeInfo, controlName: String): List[ConstraintValidation] = {
+
+            val supportedAlerts = AlertDetails.fromForm(inDoc, controlName)
+
+            val bind = findBindByName(inDoc, controlName).toList
+
+            def findAlertForId(id: String) =
+                supportedAlerts find (_.forConstraintId == Some(id))
+
+            def constraintFromAttribute(a: NodeInfo) = {
+                val bindId = (a parent * att "id").stringValue
+                // NOTE: No id because we don't want that attribute to roundtrip
+                ConstraintValidation(None, ErrorLevel, a.stringValue, findAlertForId(bindId))
+            }
+
+            def constraintFromElement(e: NodeInfo) = {
+                val id = e attValue "id"
+                ConstraintValidation(nonEmptyOrNone(id), nonEmptyOrNone(e attValue LEVEL_QNAME) map LevelByName getOrElse ErrorLevel, e att "value", findAlertForId(id))
+            }
+
+            // Gather all constraints (in fb:*)
+            def attributeConstraints = bind \@ FBConstraintQName map constraintFromAttribute
+            def elementConstraints   = bind \  FBConstraintQName map constraintFromElement
+
+            attributeConstraints ++ elementConstraints toList
+        }
+
+        def fromXML(validationElem: NodeInfo, newIds: Iterator[String]) = {
+            require(validationElem \@ "type" === Constraint.name)
+
+            val constraintExpressionOpt = (validationElem child Constraint.name attValue "expression" headOption) flatMap nonEmptyOrNone
+
+            constraintExpressionOpt map { expression ⇒
+
+                val level           = Validation.fromXML(validationElem)
+                val constraintIdOpt = nonEmptyOrNone(validationElem attValue "id") orElse Some(newIds.next())
+                val useDefaultAlert = validationElem \@ "default-alert" === "true"
+
+                def alertOpt = {
+                    val alertElem = validationElem child "alert" headOption
+
+                    alertElem map (AlertDetails.fromXML(_, constraintIdOpt))
+                }
+
+                ConstraintValidation(constraintIdOpt, level, expression, if (useDefaultAlert) None else alertOpt)
+            }
+        }
+    }
+
+    case class AlertDetails(forConstraintId: Option[String], messages: List[(String, String)], global: Boolean) {
+
+        require(! (global && forConstraintId.isDefined))
+        require(messages.nonEmpty)
+
+        def default = forConstraintId.isEmpty
+
         // XML representation used by Form Builder
-        def toXML(forLang: String): NodeInfo = {
-
-            def levelAtt =
-                if (forConstraint.isEmpty && forLevel.isEmpty)
-                    "any"
-                else if (forConstraint.isDefined)
-                    forConstraint map (_.level.name) head
-                else if (forLevel.isDefined)
-                    forLevel map (_.name) head
-                else
-                    throw new IllegalStateException()
-
-            def constraintExpressionAtt =
-                forConstraint map (_.expression) getOrElse ""
-
-            def constraintIdAtt =
-                forConstraint map (_.id) getOrElse ""
-
+        def toXML(forLang: String): Elem = {
             // The alert contains the message for the main language as an attribute, and the languages for the other
             // languages so we can write them back.
-            <alert message={messages.toMap getOrElse (forLang, "")} level={levelAtt} constraint-expression={constraintExpressionAtt} constraint-id={constraintIdAtt}>{
+            <alert message={messages.toMap getOrElse (forLang, "")} global={global.toString}>{
                 messages collect {
                     case (lang, message) if lang != forLang ⇒
                         <message lang={lang} value={message}/>
@@ -212,25 +363,68 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
 
     object AlertDetails {
-        def fromXML(node: NodeInfo, newIds: Iterator[String]) = {
 
-            val messageAtt              = node attValue "message"
-            val levelAtt                = node attValue "level"
-            val constraintExpressionAtt = nonEmptyOrNone(node attValue "constraint-expression")
+        // Return supported alert details for the control
+        //
+        // - return None if the alert message can't be found or if the alert/constraint combination cannot be handled by FB
+        // - alerts returned are either global (no constraint/level specified) or for a single specific constraint
+        def fromForm(inDoc: NodeInfo, controlName: String): Seq[AlertDetails] = {
 
-            val messagesElems = (node child "message" toList) map {
+            val control                    = findControlByName(inDoc, controlName).get
+            val alertResourcesForAllLangs  = getControlResourcesWithLang(controlName, "alert")
+
+            def alertFromElement(e: NodeInfo) = {
+
+                def attValueOrNone(name: QName) = e att name map (_.stringValue) headOption
+
+                val constraintAtt = attValueOrNone(CONSTRAINT_QNAME)
+                val levelAtt      = attValueOrNone(LEVEL_QNAME)
+                val refAtt        = attValueOrNone(REF_QNAME)
+
+                val isGlobal = refAtt exists (_ == OldStandardAlertRef)
+
+                // Try to find the alert index from xf:alert/@ref
+                val alertIndexOpt =
+                    if (isGlobal)
+                        None
+                    else
+                        refAtt collect {
+                            case OldAlertRefMatcher(`controlName`, _, index) ⇒ Option(index)
+                            case NewAlertRefMatcher(`controlName`, _, index) ⇒ Option(index)
+                        } map {
+                            _  map (_.toInt - 1) getOrElse 0
+                        }
+
+                // Try to find an existing resource for the given index if present, otherwise assume a blank value for the language
+                val alertsByLang = alertResourcesForAllLangs.to[List] map {
+                    case (lang, alerts) ⇒ lang → (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
+                }
+
+                val forConstraints = gatherAlertConstraints(constraintAtt)
+                val forLevels      = gatherAlertLevels(levelAtt)
+
+                // Form Builder only handles a subset of the allowed XForms mappings for now
+                def isDefault           = forConstraints.isEmpty && forLevels.isEmpty
+                def hasSingleConstraint = forConstraints.size == 1 && forLevels.isEmpty
+                def canHandle           = isDefault || hasSingleConstraint
+
+                canHandle option AlertDetails(forConstraints.headOption, alertsByLang, isGlobal)
+            }
+
+            control child "alert" flatMap alertFromElement toList
+        }
+
+        def fromXML(alertElem: NodeInfo, forConstraintId: Option[String]) = {
+
+            val messageAtt = alertElem attValue "message"
+
+            val messagesElems = (alertElem child "message" toList) map {
                 message ⇒ (message attValue "lang", message attValue "value")
             }
 
-            val hasConstraint = constraintExpressionAtt.isDefined && levelAtt != "any"
+            val isGlobal = (alertElem attValue "global") == "true"
 
-            // Generate a new id if it doesn't have one (new constraint created by the user)
-            def constraintId  = nonEmptyOrNone(node attValue "constraint-id") getOrElse newIds.next()
-
-            val constraintOpt = hasConstraint option ConstraintDetails(constraintId, constraintExpressionAtt.get, LevelByName(levelAtt))
-            val levelOpt      = levelAtt != "any" && ! hasConstraint option levelAtt map LevelByName
-
-            AlertDetails(constraintOpt, levelOpt, (currentLang, messageAtt) :: messagesElems)
+            AlertDetails(forConstraintId, (currentLang, messageAtt) :: messagesElems, isGlobal)
         }
     }
 }

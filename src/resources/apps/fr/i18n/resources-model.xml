@@ -50,7 +50,6 @@
     <!-- Instance containing all the ISO 639-1 languages -->
     <xf:instance id="fr-languages-instance" src="oxf:/apps/fr/i18n/languages.xml" xxf:readonly="true" xxf:cache="true"/>
 
-    <!-- Copy resources of the selected language, using the first language declared if the no matching language is found -->
     <xf:action ev:event="fr-update-language">
         <!-- Find form language -->
         <xf:setvalue

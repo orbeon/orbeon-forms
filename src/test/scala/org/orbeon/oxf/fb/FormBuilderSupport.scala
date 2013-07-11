@@ -13,18 +13,20 @@
  */
 package org.orbeon.oxf.fb
 
-import org.orbeon.scaxon.XML._
+import org.mockito.Mockito
 import org.orbeon.oxf.test.DocumentTestBase
+import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
-import org.mockito.Mockito
-import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.saxon.dom4j.DocumentWrapper
+import org.orbeon.scaxon.XML._
 import org.scalatest.mock.MockitoSugar
 
-trait FormBuilderSupport extends DocumentTestBase with MockitoSugar {
+trait FormBuilderSupport extends MockitoSugar {
+
+    self: DocumentTestBase ⇒
 
     val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
 

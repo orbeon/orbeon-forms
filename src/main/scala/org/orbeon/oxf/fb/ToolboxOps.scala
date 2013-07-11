@@ -24,6 +24,8 @@ import org.orbeon.oxf.xml.XMLConstants.XML_URI
  */
 object ToolboxOps {
 
+    val LHHAResourceNamesToInsert = LHHANames - "alert"
+
     // NOTE: Help is added when needed
     private val lhhaTemplate: NodeInfo =
         <template xmlns:xf="http://www.w3.org/2002/xforms">
@@ -77,7 +79,7 @@ object ToolboxOps {
                     else
                         elementInfo(newControlName)
 
-                val lhhaNames = newControlElement \ * filter (e ⇒ LHHANames(localname(e))) map (localname(_))
+                val lhhaNames = newControlElement \ * map localname filter LHHAResourceNamesToInsert
                 val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
 
                 // Insert data and resource holders
@@ -199,7 +201,7 @@ object ToolboxOps {
         val (into, after) = findSectionInsertionPoint(inDoc)
 
         val newSectionName = controlName(nextId(inDoc, "section"))
-        val precedingSectionName = after flatMap (getControlNameOption(_))
+        val precedingSectionName = after flatMap getControlNameOption
 
         // Obtain ids first
         val ids = nextIds(inDoc, "tmp", 2).toIterator

@@ -377,13 +377,13 @@
                                 </fb:dialog-form-settings>
 
                                 <!-- Other dialogs -->
-                                <xf:var name="binding" value="."/>
+                                <xf:var name="form" value="."/>
 
-                                <fb:dialog-control-details     id="dialog-control-details"    form-ref="$binding" resources-ref="$form-resources"/>
-                                <fb:dialog-validation-details  id="dialog-validation-details" form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                                <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                                <fb:dialog-section-details     id="dialog-section-details"    form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                                <fb:dialog-help                id="dialog-help"               form-ref="$binding" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                                <fb:dialog-control-details     id="dialog-control-details"    form-ref="$form" resources-ref="$form-resources"/>
+                                <fb:dialog-validation-details  id="dialog-validation-details" ref="$form" resources-ref="$form-resources"/>
+                                <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                                <fb:dialog-section-details     id="dialog-section-details"    form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                                <fb:dialog-help                id="dialog-help"               form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
                                 <fb:dialog-itemsets            id="dialog-itemsets"           resources-ref="$form-resources"/>
 
                                 <fr:alert-dialog id="dialog-confirmation">

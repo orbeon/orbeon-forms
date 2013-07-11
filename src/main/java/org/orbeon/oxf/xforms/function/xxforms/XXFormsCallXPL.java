@@ -139,7 +139,7 @@ public class XXFormsCallXPL extends XFormsFunction {
 //                            final DocumentInfo inputDocumentInfo = TransformerUtils.readTinyTree(inputNodeInfo);
 //                            processorDefinition.addInput(inputName, inputDocumentInfo);
 
-                            final Document inputDocument = TransformerUtils.tinyTreeToDom4j2(inputNodeInfo);
+                            final Document inputDocument = TransformerUtils.tinyTreeToDom4j(inputNodeInfo);
                             processorDefinition.addInput(inputName, inputDocument.getRootElement());
                         }
                     }

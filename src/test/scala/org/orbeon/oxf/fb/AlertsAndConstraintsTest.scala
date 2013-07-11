@@ -157,7 +157,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                         </resource>
                     </resources>
 
-                assertXMLDocuments(expectedResources, TransformerUtils.tinyTreeToDom4j2(currentResources parent * head))
+                assertXMLDocuments(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
             }
 
             locally {
@@ -199,7 +199,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
                         </resource>
                     </resources>
 
-                assertXMLDocuments(expectedResources, TransformerUtils.tinyTreeToDom4j2(currentResources parent * head))
+                assertXMLDocuments(expectedResources, TransformerUtils.tinyTreeToDom4j(currentResources parent * head))
             }
         }
 
@@ -346,7 +346,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     private def assertAlertsXML(left: Array[Elem], right: Array[NodeInfo]): Unit = {
 
         left zip right foreach {
-            case (l, r) ⇒ assertXMLDocuments(elemToDocument(l), TransformerUtils.tinyTreeToDom4j2(r))
+            case (l, r) ⇒ assertXMLDocuments(elemToDocument(l), TransformerUtils.tinyTreeToDom4j(r))
         }
 
         assert(left.size === right.size)

@@ -40,7 +40,7 @@ class XXFormsExtractDocument extends XFormsFunction {
                 case virtualNode: VirtualNode ⇒
                     virtualNode.getUnderlyingNode.asInstanceOf[Element]
                 case nodeInfo: NodeInfo ⇒
-                    TransformerUtils.tinyTreeToDom4j2(nodeInfo).getRootElement
+                    TransformerUtils.tinyTreeToDom4j(nodeInfo).getRootElement
                 case _ ⇒ return null
             }
 

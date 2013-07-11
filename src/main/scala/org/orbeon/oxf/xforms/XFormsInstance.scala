@@ -511,7 +511,7 @@ object XFormsInstance extends Logging {
         if (readonly)
             documentInfo // the optimal case: no copy of the cached document is needed
         else
-            wrapDocument(TransformerUtils.tinyTreeToDom4j2(documentInfo), exposeXPathTypes)
+            wrapDocument(TransformerUtils.tinyTreeToDom4j(documentInfo), exposeXPathTypes)
     }
 
     // Restore an instance on the model, given InstanceState

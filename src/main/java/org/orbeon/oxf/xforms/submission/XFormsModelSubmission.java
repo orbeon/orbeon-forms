@@ -1272,9 +1272,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         } else {
             // Submitting read-only instance backed by TinyTree (no MIPs to check)
             if (currentNodeInfo.getNodeKind() == org.w3c.dom.Node.ELEMENT_NODE) {
-                documentToSubmit = TransformerUtils.tinyTreeToDom4j2(currentNodeInfo);
+                documentToSubmit = TransformerUtils.tinyTreeToDom4j(currentNodeInfo);
             } else {
-                documentToSubmit = TransformerUtils.tinyTreeToDom4j2(currentNodeInfo.getRoot());
+                documentToSubmit = TransformerUtils.tinyTreeToDom4j(currentNodeInfo.getRoot());
             }
         }
         return documentToSubmit;

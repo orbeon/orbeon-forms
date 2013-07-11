@@ -19,7 +19,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.processor.xinclude.XIncludeProcessor;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.Configuration;
@@ -471,7 +470,7 @@ public class TransformerUtils {
      *
      * This version uses a temporary string as we are having issues with converting directly from TinyTree to dom4j.
      */
-    public static Document tinyTreeToDom4j2(NodeInfo nodeInfo) {
+    public static Document tinyTreeToDom4j(NodeInfo nodeInfo) {
         try {
             final String xmlString = tinyTreeToString(nodeInfo);
             return Dom4jUtils.readDom4j(xmlString);

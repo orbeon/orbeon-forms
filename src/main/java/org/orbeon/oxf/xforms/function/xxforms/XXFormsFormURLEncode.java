@@ -42,7 +42,7 @@ public class XXFormsFormURLEncode extends XFormsFunction {
 
         // Convert and return
         final NodeInfo nodeInfo = (NodeInfo) item;
-        final Document document = TransformerUtils.tinyTreeToDom4j2(nodeInfo);
+        final Document document = TransformerUtils.tinyTreeToDom4j(nodeInfo);
 
         return new StringValue(XFormsSubmissionUtils.createWwwFormUrlEncoded(document, "&"));
     }

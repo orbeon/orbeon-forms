@@ -162,13 +162,6 @@
                         readonly="false()"
                         calculate="if (../@type = 'constraint' and ../@level != 'error') then false() else ."/> <!-- no default alert for warning/info constraints -->
 
-                    <!-- We had this, but we should still be able to make the value required for a schema type (optional then depends on the type itself) -->
-                    <!--<xf:bind ref=".[@type = 'required']" name="required-validation">-->
-                        <!--<xf:bind-->
-                            <!--ref="required"-->
-                            <!--readonly="../../validation[@type = 'datatype']/schema-type != ''"/> &lt;!&ndash; readonly="$datatype-validation/schema-type != ''" &ndash;&gt;-->
-                    <!--</xf:bind>-->
-
                     <!-- Keep required in sync -->
                     <xf:bind ref=".[@type = 'datatype']" name="datatype-validation">
                         <xf:bind

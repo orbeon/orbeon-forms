@@ -80,9 +80,9 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
     def patientlyClick(css: CssSelectorQuery): Unit = eventually { click on css.element }
     def patientlySendKeys(css: CssSelectorQuery, keys: CharSequence): Unit = eventually { css.element.underlying.sendKeys(keys) }
 
-    implicit class EventuallyMonad[A](operation: => A) {
-        def map[B](continuation: A => B): B                                        = continuation(eventually(operation))
-        def flatMap[B](continuation: A => EventuallyMonad[B]): EventuallyMonad[B]  = continuation(eventually(operation))
+    implicit class EventuallyMonad[A](operation: ⇒ A) {
+        def map[B](continuation: A ⇒ B): B                                        = continuation(eventually(operation))
+        def flatMap[B](continuation: A ⇒ EventuallyMonad[B]): EventuallyMonad[B]  = continuation(eventually(operation))
         def foreach[B](continuation: A ⇒ Unit): Unit                              = continuation(eventually(operation))
     }
 
@@ -208,11 +208,11 @@ object OrbeonClientBase {
     @BeforeClass
     def createAndStartService(): Unit = {
         System.getProperty("oxf.test.driver") match {
-            case "chromedriver" =>
+            case "chromedriver" ⇒
                 _service = Some(ChromeDriverService.createDefaultService())
                 _service.get.start()
                 _driver = new RemoteWebDriver(_service.get.getUrl, DesiredCapabilities.chrome())
-            case _ =>
+            case _ ⇒
                 _service = None
                 val profile = new FirefoxProfile()
                 if (System.getProperty("oxf.test.firefox.firebug") == "true") {

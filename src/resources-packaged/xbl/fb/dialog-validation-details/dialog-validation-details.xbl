@@ -14,7 +14,6 @@
 <xbl:xbl xmlns:xh="http://www.w3.org/1999/xhtml"
          xmlns:xf="http://www.w3.org/2002/xforms"
          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-         xmlns:ev="http://www.w3.org/2001/xml-events"
          xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
          xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
@@ -32,7 +31,7 @@
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
             <!-- When the dialog opens, get type information from the form -->
-            <xbl:handler ev:event="xxforms-dialog-open" ev:observer="dialog">
+            <xbl:handler event="xxforms-dialog-open" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-validation-details')"/>
 
                 <!-- Clear default alert -->
@@ -75,7 +74,7 @@
             <!-- Save data upon close unless the sub-form is not valid -->
             <!-- NOTE: We used to have not(event('fb-save') = false()), but we prefer explicit now because we may get
                  an extra xxforms-dialog-close event sent by the client, in which case we don't want to do the processing -->
-            <xbl:handler ev:event="xxforms-dialog-close" if="event('fb-save') and $i/@valid = 'true'" ev:observer="dialog">
+            <xbl:handler event="xxforms-dialog-close" if="event('fb-save') and $i/@valid = 'true'" observer="dialog">
                 <xf:var name="form" value="xxf:binding('fb-dialog-validation-details')"/>
                 <xf:action type="xpath">
                     (: Write alerts and constraints :)
@@ -123,8 +122,8 @@
                 </xf:instance>
 
                 <!-- Enable/disable trigger -->
-                <xf:setvalue ev:event="xxforms-invalid" ev:observer="i" ref="@valid">false</xf:setvalue>
-                <xf:setvalue ev:event="xxforms-valid"   ev:observer="i" ref="@valid">true</xf:setvalue>
+                <xf:setvalue event="xxforms-invalid" observer="i" ref="@valid">false</xf:setvalue>
+                <xf:setvalue event="xxforms-valid"   observer="i" ref="@valid">true</xf:setvalue>
 
                 <xf:bind ref="default-alert">
                     <xf:bind
@@ -267,7 +266,7 @@
                                                     <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
                                                     <xf:value ref="if (self::choices) then () else if (value) then value else ."/>
                                                 </xf:itemset>
-                                                <xf:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
                                             </xf:select1>
                                             <!-- Schema type selection if applicable -->
                                             <xf:select1 ref=".[@type = 'datatype']/schema-type[exists($schema)]">
@@ -281,7 +280,7 @@
                                                     <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
                                                     <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
                                                 </xf:itemset>
-                                                <xf:setvalue ev:event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
                                             </xf:select1>
 
                                             <xf:textarea ref=".[@type = 'constraint']/constraint/@expression">
@@ -378,7 +377,7 @@
                     <xf:trigger ref="save-trigger" appearance="xxf:primary">
                         <xf:label ref="$resources/apply/label"/>
                         <!-- Close and save upon DOMActivate -->
-                        <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
+                        <xf:dispatch event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
                             <xf:property name="fb-save" value="true()"/>
                         </xf:dispatch>
                     </xf:trigger>
@@ -386,7 +385,7 @@
                     <xf:trigger appearance="minimal">
                         <xf:label ref="$resources/cancel/label"/>
                         <!-- Close and cancel upon DOMActivate -->
-                        <xf:dispatch ev:event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
+                        <xf:dispatch event="DOMActivate" name="xxforms-dialog-close" targetid="dialog">
                             <xf:property name="fb-save" value="false()"/>
                         </xf:dispatch>
                     </xf:trigger>

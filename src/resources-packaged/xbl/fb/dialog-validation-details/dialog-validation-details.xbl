@@ -41,7 +41,7 @@
 
                 <xf:insert
                     context="$default-alert"
-                    origin="fbf:readDefaultAlert($form, $i/control-name)"/>
+                    origin="fbf:readDefaultAlertAsXML($form, $i/control-name)"/>
 
                 <!-- Clear validations -->
                 <xf:var name="validations" value="$i/validations"/>

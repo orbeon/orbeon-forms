@@ -37,12 +37,21 @@ trait AlertsAndConstraintsOps extends ControlOps {
     val OldStandardAlertRef = """$fr-resources/detail/labels/alert"""
 
     // Return the first default alert for the given control, or a blank template if none exists
-    def readDefaultAlert(inDoc: NodeInfo, controlName: String): NodeInfo = (
+    def readDefaultAlertAsXML(inDoc: NodeInfo, controlName: String): NodeInfo = (
         AlertDetails.fromForm(inDoc, controlName)
-        find   (_.default)
+        find      (_.default)
         getOrElse AlertDetails(None, List(currentLang → ""), global = true)
-    ).toXML(currentLang)
+        toXML     currentLang
+    )
 
+    // Return all validations as XML for the given control
+    def readValidationsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
+        RequiredValidation.fromForm(inDoc, controlName) ::
+        DatatypeValidation.fromForm(inDoc, controlName) ::
+        ConstraintValidation.fromForm(inDoc, controlName) map
+        (v ⇒ elemToNodeInfo(v.toXML(currentLang))) toArray
+
+    // Write back everything
     def writeAlertsAndValidationsAsXML(inDoc: NodeInfo, controlName: String, defaultAlertElem: NodeInfo, validationElems: Array[NodeInfo]) = {
 
         // Current resolutions, which could be lifted in the future:
@@ -65,45 +74,14 @@ trait AlertsAndConstraintsOps extends ControlOps {
         val defaultAlert = AlertDetails.fromXML(defaultAlertElem, None)
 
         // Write type="required" and type="datatype"
-        allValidations collectFirst { case v: RequiredValidation ⇒ v } foreach (writeRequiredValidation(inDoc, controlName, _))
-        allValidations collectFirst { case v: DatatypeValidation ⇒ v } foreach (writeDatatypeValidation(inDoc, controlName, _))
+        allValidations collectFirst { case v: RequiredValidation ⇒ v } foreach (_.write(inDoc, controlName))
+        allValidations collectFirst { case v: DatatypeValidation ⇒ v } foreach (_.write(inDoc, controlName))
 
         // Write type="constraint"
         writeConstraintValidations(inDoc, controlName, defaultAlert, allValidations collect { case v: ConstraintValidation ⇒ v })
     }
 
-    def writeRequiredValidation(inDoc: NodeInfo, controlName: String, validation: RequiredValidation): Unit = {
-        updateMip(inDoc, controlName, "required", if (validation.required) "true()" else "")
-    }
-
-    def writeDatatypeValidation(inDoc: NodeInfo, controlName: String, validation: DatatypeValidation): Unit = {
-        val datatype =
-            validation match {
-                case DatatypeValidation(_, Some(builtinType), _, required) ⇒
-                    // If a builtin type, we just have a local name
-                    val nsURI =
-                        if (XFormsTypeNames(builtinType) || ! required && XFormsVariationTypeNames(builtinType))
-                            XF
-                        else
-                            XS
-
-                    val bind   = findBindByName(inDoc, controlName).get // require the bind
-                    val ns     = bind.namespaceMappings
-                    val prefix = ns collectFirst { case (prefix, `nsURI`) ⇒ prefix } get // mapping must be in scope
-
-                    prefix + ':' + builtinType
-                case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
-                    // Schema type OTOH comes with a prefix if needed
-                    schemaType
-                case _ ⇒
-                    // No type specified, should not happen, but if it does we remove the type MIP
-                    ""
-            }
-
-        updateMip(inDoc, controlName, "type", datatype)
-    }
-
-    def writeConstraintValidations(inDoc: NodeInfo, controlName: String, defaultAlert: AlertDetails, validations: List[ConstraintValidation]): Unit = {
+    private def writeConstraintValidations(inDoc: NodeInfo, controlName: String, defaultAlert: AlertDetails, validations: List[ConstraintValidation]): Unit = {
 
         val bind = findBindByName(inDoc, controlName).toList
         val existingAttributeConstraints = bind \@ FBConstraintQName
@@ -192,13 +170,6 @@ trait AlertsAndConstraintsOps extends ControlOps {
         }
     }
 
-    // Return all validations as XML for the given control
-    def readValidationsAsXML(inDoc: NodeInfo, controlName: String): Array[NodeInfo] =
-        RequiredValidation.fromForm(inDoc, controlName) ::
-        DatatypeValidation.fromForm(inDoc, controlName) ::
-        ConstraintValidation.fromForm(inDoc, controlName) map
-        (v ⇒ elemToNodeInfo(v.toXML(currentLang))) toArray
-
     sealed trait Validation {
         def level: ConstraintLevel
         def toXML(forLang: String): Elem
@@ -210,6 +181,10 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
 
     case class RequiredValidation(level: ConstraintLevel, required: Boolean) extends Validation {
+
+        def write(inDoc: NodeInfo, controlName: String): Unit =
+            updateMip(inDoc, controlName, "required", if (required) "true()" else "")
+
         def toXML(forLang: String): Elem =
             <validation type={Required.name} level={level.name}><required>{required.toString}</required></validation>
     }
@@ -232,6 +207,34 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
 
     case class DatatypeValidation(level: ConstraintLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
+
+        def write(inDoc: NodeInfo, controlName: String): Unit = {
+            val datatype =
+                this match {
+                    case DatatypeValidation(_, Some(builtinType), _, required) ⇒
+                        // If a builtin type, we just have a local name
+                        val nsURI =
+                            if (XFormsTypeNames(builtinType) || ! required && XFormsVariationTypeNames(builtinType))
+                                XF
+                            else
+                                XS
+
+                        val bind   = findBindByName(inDoc, controlName).get // require the bind
+                        val ns     = bind.namespaceMappings
+                        val prefix = ns collectFirst { case (prefix, `nsURI`) ⇒ prefix } get // mapping must be in scope
+
+                        prefix + ':' + builtinType
+                    case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
+                        // Schema type OTOH comes with a prefix if needed
+                        schemaType
+                    case _ ⇒
+                        // No type specified, should not happen, but if it does we remove the type MIP
+                        ""
+                }
+
+            updateMip(inDoc, controlName, "type", datatype)
+        }
+
         def toXML(forLang: String): Elem =
             <validation type="datatype" level={level.name}>
                 <builtin-type>{builtinType.getOrElse("")}</builtin-type>

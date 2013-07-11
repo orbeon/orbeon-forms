@@ -153,7 +153,7 @@ trait FormRunnerPermissions {
 
         def operations(header: String, dataUserInfo: String, condition: String): Seq[String] = {
             val request = NetUtils.getExternalContext.getRequest
-            val headerValue = request.getHeaderValuesMap.get(header).headOption
+            val headerValue = request.getHeaderValuesMap.asScala.get(header).toSeq.flatten.headOption
             headerValue
                 // Does the user info from the header match the user info on the data
                 .filter(_ == dataUserInfo)
@@ -184,9 +184,9 @@ trait FormRunnerPermissions {
     def javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): java.util.List[String] =
         allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).asJava
     def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
-        val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap
-        val username = headers.get("orbeon-username").headOption.getOrElse("")
-        val group    = headers.get("orbeon-group"   ).headOption.getOrElse("")
+        val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
+        val username = headers.get("orbeon-username").toSeq.flatten.headOption.getOrElse("")
+        val group    = headers.get("orbeon-group"   ).toSeq.flatten.headOption.getOrElse("")
         allAuthorizedOperations(permissionsElement, username, group)
     }
 

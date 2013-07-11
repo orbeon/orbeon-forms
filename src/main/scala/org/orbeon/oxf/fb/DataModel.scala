@@ -67,7 +67,7 @@ object DataModel {
             }
         }
 
-        findTopLevelBind(inDoc) foreach (update(_))
+        findTopLevelBind(inDoc) foreach update
     }
 
     // Update binds for automatic mode
@@ -133,7 +133,7 @@ object DataModel {
             val newElementInfo = XPath.DocumentWrapper.wrap(newElement)
             // Then attach a readonly bind node to it. This is as if there was a <bind readonly="true" for the node>
             val bindNode = new BindNode(bindId, newElementInfo, null)
-            bindNode.setReadonly(true)
+            bindNode.setReadonly(value = true)
             InstanceData.addBindNode(newElementInfo, bindNode)
 
             SingletonIterator.makeIterator(newElementInfo)

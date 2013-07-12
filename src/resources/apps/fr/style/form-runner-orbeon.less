@@ -118,25 +118,27 @@ body.orbeon { background-color: @frBackground }
     }
 
     // Navbar
-    .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
-        color: @navbarLinkColorActive;
-        font-size: 85%;
-        text-align: right;
-        a, button.btn-link { color: @navbarLinkColor }
-    }
-
-    .fr-language-choice, .fr-noscript-choice, .fr-status-icons {
-        float: right;
-    }
-
-    .fr-goto-content {
-        float: left;
-    }
-
-    .navbar-inverse {
+    .navbar {
         .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
-            color: @frNavBarTextColor;
-            a, button.btn-link { color: @navbarInverseLinkColor }
+            color: @navbarLinkColorActive;
+            font-size: 85%;
+            text-align: right;
+            a, button.btn-link { color: @navbarLinkColor }
+        }
+
+        .fr-language-choice, .fr-noscript-choice, .fr-status-icons {
+            float: right;
+        }
+
+        .fr-goto-content {
+            float: left;
+        }
+
+        &.navbar-inverse {
+            .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
+                color: @frNavBarTextColor;
+                a, button.btn-link { color: @navbarInverseLinkColor }
+            }
         }
     }
 

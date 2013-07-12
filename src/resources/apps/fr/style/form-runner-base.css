@@ -81,11 +81,14 @@
   /* ***** View, PDF, email ******************************************************************************************* */
 
 }
-.orbeon .fr-status-icons {
+.orbeon .navbar .fr-status-icons {
   display: block;
   float: left;
 }
-.orbeon .fr-status-icons i {
+.orbeon .navbar .fr-status-icons i {
+  margin-left: 5px;
+}
+.orbeon .navbar .badge {
   margin-left: 5px;
 }
 .orbeon .fr-body {

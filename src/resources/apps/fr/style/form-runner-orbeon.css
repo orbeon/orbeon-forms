@@ -186,40 +186,40 @@ body.orbeon {
   width: 100%;
   color: #6E6E6E;
 }
-.orbeon .fr-language-choice,
-.orbeon .fr-noscript-choice,
-.orbeon .fr-goto-content {
+.orbeon .navbar .fr-language-choice,
+.orbeon .navbar .fr-noscript-choice,
+.orbeon .navbar .fr-goto-content {
   color: #555555;
   font-size: 85%;
   text-align: right;
 }
-.orbeon .fr-language-choice a,
-.orbeon .fr-noscript-choice a,
-.orbeon .fr-goto-content a,
-.orbeon .fr-language-choice button.btn-link,
-.orbeon .fr-noscript-choice button.btn-link,
-.orbeon .fr-goto-content button.btn-link {
+.orbeon .navbar .fr-language-choice a,
+.orbeon .navbar .fr-noscript-choice a,
+.orbeon .navbar .fr-goto-content a,
+.orbeon .navbar .fr-language-choice button.btn-link,
+.orbeon .navbar .fr-noscript-choice button.btn-link,
+.orbeon .navbar .fr-goto-content button.btn-link {
   color: #777777;
 }
-.orbeon .fr-language-choice,
-.orbeon .fr-noscript-choice,
-.orbeon .fr-status-icons {
+.orbeon .navbar .fr-language-choice,
+.orbeon .navbar .fr-noscript-choice,
+.orbeon .navbar .fr-status-icons {
   float: right;
 }
-.orbeon .fr-goto-content {
+.orbeon .navbar .fr-goto-content {
   float: left;
 }
-.orbeon .navbar-inverse .fr-language-choice,
-.orbeon .navbar-inverse .fr-noscript-choice,
-.orbeon .navbar-inverse .fr-goto-content {
+.orbeon .navbar.navbar-inverse .fr-language-choice,
+.orbeon .navbar.navbar-inverse .fr-noscript-choice,
+.orbeon .navbar.navbar-inverse .fr-goto-content {
   color: #bbbbbb;
 }
-.orbeon .navbar-inverse .fr-language-choice a,
-.orbeon .navbar-inverse .fr-noscript-choice a,
-.orbeon .navbar-inverse .fr-goto-content a,
-.orbeon .navbar-inverse .fr-language-choice button.btn-link,
-.orbeon .navbar-inverse .fr-noscript-choice button.btn-link,
-.orbeon .navbar-inverse .fr-goto-content button.btn-link {
+.orbeon .navbar.navbar-inverse .fr-language-choice a,
+.orbeon .navbar.navbar-inverse .fr-noscript-choice a,
+.orbeon .navbar.navbar-inverse .fr-goto-content a,
+.orbeon .navbar.navbar-inverse .fr-language-choice button.btn-link,
+.orbeon .navbar.navbar-inverse .fr-noscript-choice button.btn-link,
+.orbeon .navbar.navbar-inverse .fr-goto-content button.btn-link {
   color: #999999;
 }
 .orbeon .fr-mode-new .xforms-required .xforms-label,

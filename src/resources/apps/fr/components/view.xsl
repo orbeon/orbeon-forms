@@ -545,9 +545,11 @@
             <xh:span class="fr-status-icons">
                 <xf:group model="fr-error-summary-model" ref=".[visible-counts/(@error + @warning) gt 0]">
                     <!-- Form has error or warning messages -->
-                    <xh:span class="badge badge-{{if (visible-counts/@error gt 0) then 'important' else if (visible-counts/@warning gt 0) then 'warning' else 'info'}}">
-                        <xf:output value="visible-counts/(@error, @warning, @info)[. gt 0]"/>
-                    </xh:span>
+                    <xf:repeat ref="visible-counts/(@error, @warning, @info)[. gt 0]">
+                        <xh:span class="badge badge-{{if (name() = 'error') then 'important' else if (name() = 'warning') then 'warning' else 'info'}}">
+                            <xf:output value="."/>
+                        </xh:span>
+                    </xf:repeat>
                 </xf:group>
                 <xf:group model="fr-error-summary-model" ref=".[visible-counts/(@error + @warning) = 0]" class="fr-validity-icon">
                     <!-- Form has no error or warning messages -->

@@ -295,10 +295,6 @@ body.orbeon {
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-alert .xforms-output-output ul {
   list-style-type: square;
 }
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-label,
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-row {
-  font-weight: bold;
-}
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-summary-body {
   padding: 0;
   margin-bottom: 10px;

@@ -416,8 +416,8 @@
             xxf:phantom="true">
             <xf:action type="xpath">
                 frf:errorMessage(if (event('error-type') = 'size-error')
-                                        then xxf:format-message(xxf:r('detail.messages.upload-error-size', 'fr-fr-resources'), (event('permitted'), event('actual')))
-                                        else xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
+                                 then xxf:format-message(xxf:r('detail.messages.upload-error-size', 'fr-fr-resources'), (event('permitted'), event('actual')))
+                                 else xxf:r(concat('detail.messages.', substring-after(event('xxf:type'), 'xxforms-')), 'fr-fr-resources'))
             </xf:action>
         </xf:action>
 
@@ -508,7 +508,15 @@
                         visible-infos-count-ref="visible-counts/@info"
                         valid-ref="valid">
                     <fr:label>
-                        <xf:output value="$fr-resources/errors/summary-title"/>
+                        <!-- If there are e.g. some errors AND warnings, the formatter will display a generic word such as "message" -->
+                        <xf:output
+                            value="xxf:format-message(
+                                       $fr-resources/errors/summary-title,
+                                       (
+                                           xxf:instance('fr-error-summary-instance')/visible-counts/(if (count((@error, @warning, @info)[. gt 0]) gt 1) then 3 else if (@error gt 0) then 0 else if (@warning gt 0) then 1 else if (@info gt 0) then 2 else 4),
+                                           xxf:instance('fr-error-summary-instance')/visible-counts/xs:integer(@alert)
+                                       )
+                                   )"/>
                     </fr:label>
                     <xsl:if test="$position = 'bottom'">
                         <fr:header/>

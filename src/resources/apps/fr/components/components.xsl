@@ -118,7 +118,9 @@
             </xsl:choose>
 
             <!-- Form title based on metadata or HTML title -->
-            <xf:var name="title" value="($title-from-metadata, $title-from-output, '{replace(xh:head/xh:title, '''', '''''')}')[normalize-space()][1]"/>
+            <xf:var
+                name="title"
+                value="string(($title-from-metadata, $title-from-output, '{replace(xh:head/xh:title, '''', '''''')}', $fr-resources/untitled-form)[normalize-space()][1])"/>
 
             <xsl:apply-templates select="node()"/>
         </xh:html>
@@ -134,11 +136,15 @@
                 <xsl:apply-templates select="xh:title/@*"/>
 
                 <!-- Display localized errors count and form title -->
-                <xf:output model="fr-error-summary-model"
-                           value="for $c in visible-counts/@error return
-                                  if ($c > 0)
-                                  then concat($c, ' ', $fr-resources/summary/titles/(if ($c = 1) then error-count else errors-count), ' - ', $title)
-                                  else $title"/>
+                <xf:output
+                    value="xxf:format-message(
+                               $fr-resources/errors/form-title,
+                               (
+                                   xxf:instance('fr-error-summary-instance')/visible-counts/(if (count((@error, @warning, @info)[. gt 0]) gt 1) then 3 else if (@error gt 0) then 0 else if (@warning gt 0) then 1 else if (@info gt 0) then 2 else 4),
+                                   xxf:instance('fr-error-summary-instance')/visible-counts/xs:integer(@alert),
+                                   $title
+                               )
+                           )"/>
             </xh:title>
 
             <!-- Form Runner CSS stylesheets -->
@@ -258,8 +264,8 @@
                 <error-summary>
                     <!-- For form builder we disable the error summary and say that the form is always valid -->
                     <valid><xsl:value-of select="$is-form-builder"/></valid>
-                    <counts         alert="0" error="0" warning="0" info=""/>
-                    <visible-counts alert="0" error="0" warning="0" info=""/>
+                    <counts         alert="0" error="0" warning="0" info="0"/>
+                    <visible-counts alert="0" error="0" warning="0" info="0"/>
                 </error-summary>
             </xf:instance>
 

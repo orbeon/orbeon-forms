@@ -20,10 +20,10 @@
                 <section-name>Section Name</section-name>
             </labels>
         </components>
+        <untitled-form>Untitled Form</untitled-form>
         <errors>
-            <!-- Used by error summary -->
-            <summary-title>Your form contains the following errors</summary-title>
-            <some>Errors on form</some>
+            <summary-title>Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}</summary-title>
+            <form-title>{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}</form-title>
             <none>No errors on form</none>
             <unsaved>Unsaved changes</unsaved>
         </errors>
@@ -214,9 +214,10 @@
                 <section-name>Nom de la section</section-name>
             </labels>
         </components>
+        <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
-            <summary-title>Votre formulaire contient les erreurs suivantes</summary-title>
-            <some>Ce formulaire contient des erreurs</some>
+            <summary-title>Votre formulaire {1,choice,0#ne contient aucun message|1#contient '{0,choice,0#l''''erreur suivante|1#l''''avertissement suivant|2#le message d''''information suivant|3#le message suivant}'|1&lt;contient '{0,choice,0#les erreurs suivantes|1#les avertissements suivants|2#les messages d''''information suivants|3#les messages suivants}'}</summary-title>
+            <form-title>{1,choice,0#|1#{1,number,integer} '{0,choice,0#erreur|1#avertissement|2#message d''''information|3#message}' - |1&lt;{1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}' - }{2}</form-title>
             <none>Ce formulaire ne contient pas d'erreurs</none>
             <unsaved>Modifications non enregistrées</unsaved>
         </errors>
@@ -407,10 +408,10 @@
                 <section-name>Nombre de Sección</section-name>
             </labels>
         </components>
+        <untitled-form>[Untitled Form]</untitled-form>
         <errors>
-            <!-- Used by error summary -->
-            <summary-title>Su formulario contiene los siguientes errores</summary-title>
-            <some>Errores en el formulario</some>
+            <summary-title>[Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
+            <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
             <none>No hay errores en el formulario</none>
             <unsaved>Cambios sin salvar</unsaved>
         </errors>
@@ -600,9 +601,10 @@
                 <section-name>Seksjonsnavn</section-name>
             </labels>
         </components>
+        <untitled-form>[Untitled Form]</untitled-form>
         <errors>
-            <summary-title>Skjemaet inneholder følgende feil</summary-title>
-            <some>ugyldige eller manglende svar i skjema</some>
+            <summary-title>[Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
+            <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
             <none>Ingen feil i skjema</none>
             <unsaved>Ulagrede endringer</unsaved>
         </errors>
@@ -790,9 +792,10 @@
                 <section-name>Название раздела</section-name>
             </labels>
         </components>
+        <untitled-form>[Untitled Form]</untitled-form>
         <errors>
-            <summary-title>[Your form contains the following errors]</summary-title>
-            <some>Есть ошибки</some>
+            <summary-title>[Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
+            <form-title>[{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
             <none>Ошибок нет</none>
             <unsaved>Несохраненные изменения</unsaved>
         </errors>

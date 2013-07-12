@@ -271,7 +271,7 @@
                                                     )
                                                 select
                                                     d.created,
-                     				                current_timestamp,
+                     				                <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                     d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
                                                     'Y', d.xml
@@ -330,9 +330,9 @@
                                                         )
                                                         select
                                                             case when last_modified_time is null
-                                                                then current_timestamp
+                                                                then <sql:param type="xs:dateTime" select="/request/timestamp"/>
                                                                 else created end as created,
-                                                            current_timestamp,
+                                                            <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                             <sql:param type="xs:string" select="/request/username"/>,
                                                             <sql:param type="xs:string" select="/request/app"/>,
                                                             <sql:param type="xs:string" select="/request/form"/>,

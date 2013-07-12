@@ -1729,9 +1729,9 @@
                         <xf:alert id="alert-2" level="error">Error level</xf:alert>
                         <xf:alert id="alert-3" level="warning">Warning level</xf:alert>
                         <xf:alert id="alert-4" level="error warning">Error and warning level</xf:alert>
-                        <xf:alert id="alert-5" constraint="length-constraint">Length constraint</xf:alert>
-                        <xf:alert id="alert-6" constraint="uppercase-constraint">Uppercase constraint</xf:alert>
-                        <xf:alert id="alert-7" constraint="length-constraint uppercase-constraint">Both constraints</xf:alert>
+                        <xf:alert id="alert-5" validation="length-constraint">Length constraint</xf:alert>
+                        <xf:alert id="alert-6" validation="uppercase-constraint">Uppercase constraint</xf:alert>
+                        <xf:alert id="alert-7" validation="length-constraint uppercase-constraint">Both constraints</xf:alert>
 
                         <xf:message
                                 event="xxforms-constraints-changed"

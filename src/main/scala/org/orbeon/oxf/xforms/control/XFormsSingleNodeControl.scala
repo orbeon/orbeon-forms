@@ -61,7 +61,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     // NOTE: At this time, the control only stores the constraints for a single level (the "highest" level). There is no
     // mixing of constraints among levels, like error and warning.
-    private var _alertLevel: Option[ConstraintLevel] = None
+    private var _alertLevel: Option[ValidationLevel] = None
     def alertLevel = _alertLevel
 
     private var _failedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
@@ -71,7 +71,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
     private var _wasReadonly = false
     private var _wasRequired = false
     private var _wasValid = true
-    private var _wasAlertLevel: Option[ConstraintLevel] = None
+    private var _wasAlertLevel: Option[ValidationLevel] = None
     private var _wasFailedConstraints: List[StaticBind#ConstraintXPathMIP] = Nil
 
     // Type
@@ -129,7 +129,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
                 // matching alerts for the error level, then no alert shown. Alerts for lower levels, in particular, such as
                 // warnings, don't show. There may be no matching level.
                 val alertLevel = {
-                    def controlHasLevel(level: ConstraintLevel) =
+                    def controlHasLevel(level: ValidationLevel) =
                         level == ErrorLevel && ! isValid || allFailedConstraints.contains(level)
 
                     LevelsByPriority find controlHasLevel

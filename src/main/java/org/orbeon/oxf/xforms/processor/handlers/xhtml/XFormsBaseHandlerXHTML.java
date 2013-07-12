@@ -52,7 +52,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
     }
 
-    private void addConstraintClasses(StringBuilder sb, scala.Option<StaticBind.ConstraintLevel> constraintLevel) {
+    private void addConstraintClasses(StringBuilder sb, scala.Option<StaticBind.ValidationLevel> constraintLevel) {
         if (constraintLevel.isDefined()) {
             final String levelName = constraintLevel.get().name();
             if (sb.length() > 0)
@@ -320,7 +320,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             if (isAlert) {
                 if (control instanceof XFormsSingleNodeControl) {
                     final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    final scala.Option<StaticBind.ConstraintLevel> constraintLevel = singleNodeControl.alertLevel();
+                    final scala.Option<StaticBind.ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
 
                     if (constraintLevel.isDefined()) {
                         if (classes.length() > 0)

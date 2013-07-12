@@ -143,26 +143,26 @@ object LHHASupport {
     // - If no alert is active for the control, return None.
     // - Only alerts for the highest ConstraintLevel are returned.
     //
-    def gatherActiveAlerts(control: XFormsSingleNodeControl): Option[(ConstraintLevel, List[LHHAAnalysis])] =
+    def gatherActiveAlerts(control: XFormsSingleNodeControl): Option[(ValidationLevel, List[LHHAAnalysis])] =
         if (control.isRelevant) {
 
             val staticAlerts = control.staticControl.asInstanceOf[StaticLHHASupport].alerts
 
             def alertsMatchingConstraints = {
                 val failedConstraintIds = control.failedConstraints.map(_.id).to[Set]
-                staticAlerts.iterator filter (_.forConstraints intersect failedConstraintIds nonEmpty)
+                staticAlerts.iterator filter (_.forValidations intersect failedConstraintIds nonEmpty)
             }
 
             // Find all alerts which match the given level, if there are any failed constraints for that level
             // NOTE: ErrorLevel is handled specially: in addition to failed constraints, the level matches if the
             // control is not valid. This is because a control can also be invalid due to a non-matching datatype or due
             // to the required-but-empty condition.
-            def alertsMatchingLevel(level: ConstraintLevel) =
+            def alertsMatchingLevel(level: ValidationLevel) =
                 staticAlerts.iterator filter (_.forLevels(level))
 
             // Alerts that specify neither a constraint nor a level
             def alertsMatchingAny =
-                staticAlerts.iterator filter (a ⇒ a.forConstraints.isEmpty && a.forLevels.isEmpty)
+                staticAlerts.iterator filter (a ⇒ a.forValidations.isEmpty && a.forLevels.isEmpty)
 
             // For that given level, identify all matching alerts if any, whether they match by constraint or by level.
             // Alerts that specify neither a constraint nor a level are considered a default, that is they are not added

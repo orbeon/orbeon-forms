@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.XFormsModel
 import org.orbeon.oxf.xforms.analysis.model.{StaticBind, Model}
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.ConstraintLevel
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.ValidationLevel
 
 /**
  * Interface to dependencies implementation.
@@ -54,5 +54,5 @@ trait XPathDependencies {
     def hasAnyCalculationBind(model: Model, instancePrefixedId: String): Boolean
     def hasAnyValidationBind(model: Model, instancePrefixedId: String): Boolean
 
-    def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ConstraintLevel): Boolean
+    def requireModelMIPUpdate(model: Model, bind: StaticBind, mipName: String, level: ValidationLevel): Boolean
 }

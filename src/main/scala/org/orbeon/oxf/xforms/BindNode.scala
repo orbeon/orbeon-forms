@@ -21,7 +21,7 @@ import org.orbeon.scaxon.XML
 import org.w3c.dom.Node.ELEMENT_NODE
 import collection.JavaConverters._
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ConstraintLevel}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
 import collection.breakOut
 
 // Holds MIPs associated with a given RuntimeBind iteration
@@ -56,7 +56,7 @@ class BindNode(val bindStaticId: String, item: Item, typeQName: QName) {
     // For a given level, an empty List is not allowed.
     var failedConstraints = EmptyConstraints
 
-    def constraintsSatisfiedForLevel(level: ConstraintLevel) = ! failedConstraints.contains(level)
+    def constraintsSatisfiedForLevel(level: ValidationLevel) = ! failedConstraints.contains(level)
 
     def setRelevant(value: Boolean)            = this._relevant = value
     def setReadonly(value: Boolean)            = this._readonly = value
@@ -77,7 +77,7 @@ class BindNode(val bindStaticId: String, item: Item, typeQName: QName) {
 
 object BindNode {
 
-    type Constraints = Map[ConstraintLevel, List[StaticBind#ConstraintXPathMIP]]
+    type Constraints = Map[ValidationLevel, List[StaticBind#ConstraintXPathMIP]]
 
     val EmptyConstraints: Constraints = Map()
 
@@ -104,7 +104,7 @@ object BindNode {
             bindNodes(0).failedConstraints
         else {
             // This is rather inefficient but hopefully rare
-            val buildersByLevel = collection.mutable.Map[ConstraintLevel, collection.mutable.Builder[StaticBind#ConstraintXPathMIP, List[StaticBind#ConstraintXPathMIP]]]()
+            val buildersByLevel = collection.mutable.Map[ValidationLevel, collection.mutable.Builder[StaticBind#ConstraintXPathMIP, List[StaticBind#ConstraintXPathMIP]]]()
 
             for {
                 level       ← StaticBind.LevelsByPriority

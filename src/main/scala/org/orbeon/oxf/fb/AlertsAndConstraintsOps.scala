@@ -158,7 +158,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 case (e, AlertDetails(Some(forConstraintId), _, _)) ⇒
                     def bindId       = bind \@ "id" stringValue
                     val constraintId = if (hasSingleErrorConstraint) bindId else forConstraintId
-                    insert(into = e, origin = attributeInfo(Constraint.name, constraintId))
+                    insert(into = e, origin = attributeInfo(VALIDATION_QNAME, constraintId))
                 case _ ⇒ // no attributes to insert if this is not an alert linked to a constraint
             }
         }
@@ -171,7 +171,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     }
 
     sealed trait Validation {
-        def level: ConstraintLevel
+        def level: ValidationLevel
         def toXML(forLang: String): Elem
     }
 
@@ -180,7 +180,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
             LevelByName(validationElem attValue "level")
     }
 
-    case class RequiredValidation(level: ConstraintLevel, required: Boolean) extends Validation {
+    case class RequiredValidation(level: ValidationLevel, required: Boolean) extends Validation {
 
         def write(inDoc: NodeInfo, controlName: String): Unit =
             updateMip(inDoc, controlName, "required", if (required) "true()" else "")
@@ -206,7 +206,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         }
     }
 
-    case class DatatypeValidation(level: ConstraintLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
+    case class DatatypeValidation(level: ValidationLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
 
         def write(inDoc: NodeInfo, controlName: String): Unit = {
             val datatype =
@@ -282,7 +282,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
         }
     }
 
-    case class ConstraintValidation(id: Option[String], level: ConstraintLevel, expression: String, alert: Option[AlertDetails]) extends Validation {
+    case class ConstraintValidation(id: Option[String], level: ValidationLevel, expression: String, alert: Option[AlertDetails]) extends Validation {
 
         private def alertOrPlaceholder(forLang: String) =
             alert orElse Some(AlertDetails(None, List(currentLang → ""), global = false)) map (_.toXML(forLang)) get
@@ -379,7 +379,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
                 def attValueOrNone(name: QName) = e att name map (_.stringValue) headOption
 
-                val constraintAtt = attValueOrNone(CONSTRAINT_QNAME)
+                val validationAtt = attValueOrNone(VALIDATION_QNAME)
                 val levelAtt      = attValueOrNone(LEVEL_QNAME)
                 val refAtt        = attValueOrNone(REF_QNAME)
 
@@ -402,7 +402,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                     case (lang, alerts) ⇒ lang → (alertIndexOpt flatMap alerts.lift map (_.stringValue) getOrElse "")
                 }
 
-                val forConstraints = gatherAlertConstraints(constraintAtt)
+                val forConstraints = gatherAlertValidations(validationAtt)
                 val forLevels      = gatherAlertLevels(levelAtt)
 
                 // Form Builder only handles a subset of the allowed XForms mappings for now

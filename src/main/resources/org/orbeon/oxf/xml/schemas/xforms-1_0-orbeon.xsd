@@ -359,7 +359,7 @@
             <xsd:attribute name="value" type="xforms:XPathExpression" use="optional"/>
             <xsd:attribute name="lang" type="xsd:string" use="optional"/>
             <xsd:attribute name="level" use="optional"/>
-            <xsd:attribute name="constraint" use="optional"/>
+            <xsd:attribute name="validation" use="optional"/>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>

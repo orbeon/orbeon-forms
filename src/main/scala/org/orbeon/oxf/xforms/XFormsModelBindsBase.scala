@@ -26,7 +26,7 @@ import org.orbeon.saxon.dom4j.TypedNodeWrapper
 import org.orbeon.saxon.om.{StructuredQName, Item, NodeInfo}
 import org.orbeon.saxon.value.SequenceExtent
 import scala.util.control.NonFatal
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ConstraintLevel}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{ErrorLevel, ValidationLevel}
 
 abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
 
@@ -107,7 +107,7 @@ abstract class XFormsModelBindsBase(model: XFormsModel) extends Logging {
                 ! Model.DEFAULT_VALID
         }
 
-    protected def failedConstraintMIPs(level: ConstraintLevel, bind: RuntimeBind, position: Int): List[StaticConstraintXPathMIP] =
+    protected def failedConstraintMIPs(level: ValidationLevel, bind: RuntimeBind, position: Int): List[StaticConstraintXPathMIP] =
         for {
             mips      ← bind.staticBind.constraintsByLevel.get(level).toList
             mip       ← mips

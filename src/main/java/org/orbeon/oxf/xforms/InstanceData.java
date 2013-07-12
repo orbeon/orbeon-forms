@@ -144,7 +144,7 @@ public class InstanceData {// rename to DataNodeProperties once done
         return Model.DEFAULT_VALID();
     }
 
-    public boolean constraintsSatisfiedForLevel(StaticBind.ConstraintLevel level) {
+    public boolean constraintsSatisfiedForLevel(StaticBind.ValidationLevel level) {
 
         if (bindNodes != null && bindNodes.size() > 0)
             for (final BindNode bindNode : bindNodes)
@@ -281,20 +281,20 @@ public class InstanceData {// rename to DataNodeProperties once done
         return (existingInstanceData == null) ? Model.DEFAULT_VALID() : existingInstanceData.getValid();
     }
 
-    public static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(NodeInfo nodeInfo) {
+    public static scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(NodeInfo nodeInfo) {
         return failedConstraints(getLocalInstanceData(nodeInfo, false));
     }
 
-    public static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(Node node) {
+    public static scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(Node node) {
         return failedConstraints(getLocalInstanceData(node));
     }
 
-    private static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(InstanceData existingInstanceData) {
+    private static scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(InstanceData existingInstanceData) {
         final Object o = (existingInstanceData == null)
                 ? BindNode.jCollectFailedConstraints(null)
                 : BindNode.jCollectFailedConstraints(existingInstanceData.bindNodes);
 
-        return (scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>>) o;
+        return (scala.collection.immutable.Map<StaticBind.ValidationLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>>) o;
     }
 
     public static boolean getTypeValid(NodeInfo nodeInfo) {

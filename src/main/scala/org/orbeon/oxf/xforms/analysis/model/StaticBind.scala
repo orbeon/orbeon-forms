@@ -78,7 +78,7 @@ class StaticBind(
         }
     }
 
-    class ConstraintXPathMIP(id: String, name: String, expression: String, val level: ConstraintLevel)
+    class ConstraintXPathMIP(id: String, name: String, expression: String, val level: ValidationLevel)
         extends XPathMIP(id, name, expression)
 
     // The type MIP is not an XPath expression
@@ -322,14 +322,14 @@ class StaticBind(
 }
 
 object StaticBind {
-    sealed trait ConstraintLevel { val name: String }
-    case object ErrorLevel   extends { val name = "error" }   with ConstraintLevel
-    case object WarningLevel extends { val name = "warning" } with ConstraintLevel
-    case object InfoLevel    extends { val name = "info" }    with ConstraintLevel
+    sealed trait ValidationLevel { val name: String }
+    case object ErrorLevel   extends { val name = "error" }   with ValidationLevel
+    case object WarningLevel extends { val name = "warning" } with ValidationLevel
+    case object InfoLevel    extends { val name = "info" }    with ValidationLevel
 
-    val LevelsByPriority = Seq(ErrorLevel, WarningLevel, InfoLevel): Seq[ConstraintLevel]
+    val LevelsByPriority = Seq(ErrorLevel, WarningLevel, InfoLevel): Seq[ValidationLevel]
     val LevelByName      = LevelsByPriority map (l ⇒ l.name → l) toMap
     val LevelSet         = LevelsByPriority.to[Set]
 
-    def jErrorLevel: ConstraintLevel = ErrorLevel
+    def jErrorLevel: ValidationLevel = ErrorLevel
 }

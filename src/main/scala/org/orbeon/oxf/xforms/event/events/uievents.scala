@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
 import org.orbeon.oxf.xforms.BindNode
-import org.orbeon.oxf.xforms.analysis.model.StaticBind.{InfoLevel, WarningLevel, ConstraintLevel, ErrorLevel}
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.{InfoLevel, WarningLevel, ValidationLevel, ErrorLevel}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
 class DOMActivateEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -110,21 +110,21 @@ class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGett
 
 class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XXFORMS_CONSTRAINTS_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget, level: Option[ConstraintLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]) =
+    def this(target: XFormsEventTarget, level: Option[ValidationLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]) =
         this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
 }
 
 object XXFormsConstraintsChangedEvent {
 
-    private def constraintsForLevel(current: List[StaticBind#ConstraintXPathMIP], level: ConstraintLevel) =
+    private def constraintsForLevel(current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) =
         current filter (_.level == level) map (_.id)
 
-    private def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ConstraintLevel) = {
+    private def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) = {
         val previousIds = previous.map(_.id).toSet
         constraintsForLevel(current, level) filterNot previousIds
     }
 
-    def properties(level: Option[ConstraintLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]): PropertyGetter = {
+    def properties(level: Option[ValidationLevel], previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP]): PropertyGetter = {
         case "level"            ⇒ level map (_.name)
         case "constraints"      ⇒ Option(current map (_.id))
         case "errors"           ⇒ Some(constraintsForLevel(current, ErrorLevel))

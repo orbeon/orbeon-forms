@@ -64,26 +64,26 @@ object SimpleProcess extends Actions with Logging {
         import org.orbeon.oxf.util.DynamicVariable
 
         // Keep stack frames for the execution of action. They can nest with sub-processes.
-        val processStackDyn = new DynamicVariable[ProcessState]
+        val processStackDyn = new DynamicVariable[List[StackFrame]]
         val processBreaks   = new Breaks
 
-        // With process
-        def withProcess[T](body: ⇒ T): T = {
-            processStackDyn.withValue(ProcessState(Nil)) {
+        // Scope an empty stack around a process execution
+        def withEmptyStack[T](body: ⇒ T): T = {
+            processStackDyn.withValue(Nil) {
                 body
             }
         }
 
         // Push a stack frame, run the body, and pop the frame
-        def withStackItem[T](process: String, programCounter: Int)(body: ⇒ T): T = {
-            val processStack = processStackDyn.value.get
-            processStack.stack = StackFrame(process, programCounter) :: processStack.stack
+        def withStackFrame[T](process: String, programCounter: Int)(body: ⇒ T): T = {
+            processStackDyn.value = StackFrame(process, programCounter) :: processStackDyn.value.get
             try body
-            finally processStack.stack = processStack.stack.tail
+            finally processStackDyn.value = processStackDyn.value.get.tail
         }
 
-        def serializeProcess = {
-            val stack = processStackDyn.value.get.stack
+        // Return a process string which contains the continuation of the process after the current action
+        def serializeContinuation = {
+            val stack = processStackDyn.value.get
 
             // Find the continuation, which is the concatenation of the continuation of all the sub-processes up to the
             // top-level process.
@@ -94,27 +94,26 @@ object SimpleProcess extends Actions with Logging {
                         val actionCount = (tokens.size + 1) / 2
                         val isLast      = actionCounter == actionCount - 1
 
-                        // If we are at the bottom, we can have:
-                        // 1. "foo then suspend recover bar"
-                        // 2. "foo then suspend then bar"
-                        // The failure case happens only if "suspend" fails. Upon recover, however, we always start with
-                        // a success. In this case and at the bottom only we prepend a "nop" which is always successful.
+                        // - If we are the last action, there is nothing to keep.
+                        // - Otherwise we start with the following combinator.
                         if (isLast)
                             Nil
                         else
                             tokens.drop(actionCounter * 2 + 1)
                 }
 
+            // Continuation is either empty or starts with a combinator. We prepend the (always successful) "nop".
             "nop" :: continuation mkString " "
         }
 
-        def saveProcess(value: String) =
-            setvalue(topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement, value)
+        // Save a process into Form Runner so it can be read later
+        def saveProcess(process: String) =
+            setvalue(topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement, process)
 
+        // Read a saved process
         def readSavedProcess =
             topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement.stringValue
 
-        case class ProcessState(var stack: List[StackFrame])
         case class StackFrame(process: String, actionCounter: Int)
     }
 
@@ -217,7 +216,7 @@ object SimpleProcess extends Actions with Logging {
         implicit val logger = containingDocument.getIndentedLogger("process")
         withDebug("running process", Seq("process" → process)) {
             // Scope the process (for suspend/resume)
-            withProcess {
+            withEmptyStack {
                 beforeProcess() flatMap { _ ⇒
                     tryBreakable {
                         runSubProcess(process)
@@ -254,7 +253,7 @@ object SimpleProcess extends Actions with Logging {
             def runAction(action: ActionAst) =
                 withDebug("running action", Seq("action" → action.toString)) {
                     // Push and pop the stack frame (for suspend/resume)
-                    withStackItem(process, programCounter) {
+                    withStackFrame(process, programCounter) {
                         AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
                     }
                 }
@@ -305,7 +304,7 @@ object SimpleProcess extends Actions with Logging {
 
     // Suspend the process
     def trySuspend(params: ActionParams): Try[Any] = Try {
-        saveProcess(serializeProcess)
+        saveProcess(serializeContinuation)
         Success()
     } flatMap
         (_ ⇒ trySuccess(Map()))

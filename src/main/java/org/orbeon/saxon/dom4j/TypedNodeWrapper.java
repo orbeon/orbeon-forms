@@ -129,7 +129,7 @@ public class TypedNodeWrapper extends NodeWrapper {
             } else {
                 try {
                     return stype.atomize(this);
-                } catch (Exception err) {
+                } catch (Exception err) { // TODO: Would be good to pass err.getMessage()
                     throw new TypedValueException(getDisplayName(), getAnnotationTypeName(annotation), getStringValue());
                 }
             }

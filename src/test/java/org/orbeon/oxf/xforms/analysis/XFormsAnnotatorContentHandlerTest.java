@@ -24,26 +24,16 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.processor.XFormsServer;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static junit.framework.Assert.*;
 
 public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
-
-    public static final HashMap<String, String> BASIC_NAMESPACE_MAPPINGS = new HashMap<String, String>();
-    static {
-        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XFORMS_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
-        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XXFORMS_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
-        BASIC_NAMESPACE_MAPPINGS.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
-        BASIC_NAMESPACE_MAPPINGS.put(XMLConstants.XHTML_PREFIX, XMLConstants.XHTML_NAMESPACE_URI);
-    }
 
     @Test
     public void formNamespaceElements() {

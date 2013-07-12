@@ -142,8 +142,11 @@ trait FormRunnerPersistence {
             }
     }
 
-    // Whether the form data is valid
+    // Whether the form data is valid as per the error summary
     // We use instance('fr-error-summary-instance')/valid and not xxf:valid() because the instance validity may not be
     // reflected with the use of XBL components.
     def dataValid = errorSummaryInstance.rootElement \ "valid" === "true"
+
+    // Return the number of warnings captured by the error summary
+    def countWarnings = (errorSummaryInstance.rootElement \ "counts" \@ "warning" stringValue).toInt
 }

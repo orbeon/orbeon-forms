@@ -256,19 +256,10 @@
         <xf:model id="fr-error-summary-model">
             <xf:instance id="fr-error-summary-instance" xxf:expose-xpath-types="true">
                 <error-summary>
-                    <xsl:choose>
-                        <!-- For form builder we disable the error summary and say that the form is always valid -->
-                        <xsl:when test="$is-form-builder">
-                            <valid>true</valid>
-                            <counts         alert="0" error="0" warning="0" info=""/>
-                            <visible-counts alert="0" error="0" warning="0" info=""/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <valid>false</valid>
-                            <counts         alert="0" error="0" warning="0" info=""/>
-                            <visible-counts alert="0" error="0" warning="0" info=""/>
-                        </xsl:otherwise>
-                    </xsl:choose>
+                    <!-- For form builder we disable the error summary and say that the form is always valid -->
+                    <valid><xsl:value-of select="$is-form-builder"/></valid>
+                    <counts         alert="0" error="0" warning="0" info=""/>
+                    <visible-counts alert="0" error="0" warning="0" info=""/>
                 </error-summary>
             </xf:instance>
 

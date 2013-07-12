@@ -1,0 +1,53 @@
+<!--
+  Copyright (C) 2013 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xxf:dialog
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xh="http://www.w3.org/1999/xhtml"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+        id="fr-warnings-dialog" level="modal" close="false" draggable="true" class="fr-dialog fr-warnings-dialog">
+
+    <xf:label ref="$fr-resources/detail/messages/warning-dialog-title"/>
+
+    <xh:img src="/ops/images/xforms/warning_64.png" alt="" class="fr-dialog-icon"/>
+    <xh:div class="fr-dialog-message">
+        <xf:output
+            value="xxf:format-message(
+                      $fr-resources/detail/messages/warning-dialog-message,
+                      xs:decimal(xxf:instance('fr-error-summary-instance')/counts/@warning))"/>
+    </xh:div>
+    <xh:div class="fr-dialog-buttons">
+        <xf:trigger>
+            <xf:label ref="$fr-resources/detail/buttons/warning-dialog-review"/>
+            <xf:action event="DOMActivate">
+                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                    process:runProcess('abort')
+                </xf:action>
+                <xf:dispatch name="xxforms-dialog-close" targetid="fr-warnings-dialog"/>
+            </xf:action>
+        </xf:trigger>
+        <xf:trigger appearance="xxf:primary">
+            <xf:label ref="$fr-resources/detail/buttons/warning-dialog-continue"/>
+            <xf:action event="DOMActivate">
+                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                    process:runProcess('resume')
+                </xf:action>
+                <xf:dispatch name="xxforms-dialog-close" targetid="fr-warnings-dialog"/>
+            </xf:action>
+        </xf:trigger>
+    </xh:div>
+</xxf:dialog>

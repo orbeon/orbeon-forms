@@ -287,6 +287,11 @@
         <xsl:output xmlns:xsl="http://www.w3.org/1999/XSL/Transform" method="xml" omit-xml-declaration="yes" indent="yes" saxon:indent-spaces="4"/>
     </xf:instance>
 
+    <!-- Instance to store suspended processes -->
+    <xf:instance id="fr-processes-instance">
+        <processes/>
+    </xf:instance>
+
     <xf:instance id="fr-triggers-instance">
         <triggers xmlns="">
             <strict-submit/>

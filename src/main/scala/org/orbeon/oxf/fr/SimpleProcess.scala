@@ -38,6 +38,9 @@ import org.apache.commons.lang3.StringUtils
 //
 object SimpleProcess extends Actions with Logging {
 
+    import ProcessParser._
+    import ProcessRuntime._
+
     private val ProcessPropertyPrefix = "oxf.fr.detail.process"
     private val ProcessPropertyTokens = ProcessPropertyPrefix split """\.""" size
     
@@ -47,15 +50,73 @@ object SimpleProcess extends Actions with Logging {
     private val StandardActions = Map[String, Action](
         "success" → trySuccess,
         "failure" → tryFailure,
-        "process" → tryProcess
+        "process" → tryProcess,
+        "suspend" → trySuspend,
+        "resume"  → tryResume,
+        "abort"   → tryAbort,
+        "nop"     → tryNOP
     )
 
     private val AllAllowedActions = StandardActions ++ AllowedActions
 
-    private val processBreaks = new Breaks
-    import processBreaks._
+    private object ProcessRuntime {
 
-    import ProcessParser._
+        import org.orbeon.oxf.util.DynamicVariable
+
+        // Keep stack frames for the execution of action. They can nest with sub-processes.
+        val processStackDyn = new DynamicVariable[ProcessState]
+        val processBreaks   = new Breaks
+
+        // With process
+        def withProcess[T](body: ⇒ T): T = {
+            processStackDyn.withValue(ProcessState(Nil)) {
+                body
+            }
+        }
+
+        // Push a stack frame, run the body, and pop the frame
+        def withStackItem[T](process: String, programCounter: Int)(body: ⇒ T): T = {
+            val processStack = processStackDyn.value.get
+            processStack.stack = StackFrame(process, programCounter) :: processStack.stack
+            try body
+            finally processStack.stack = processStack.stack.tail
+        }
+
+        def serializeProcess = {
+            val stack = processStackDyn.value.get.stack
+
+            // Find the continuation, which is the concatenation of the continuation of all the sub-processes up to the
+            // top-level process.
+            val continuation =
+                stack flatMap {
+                    case StackFrame(process, actionCounter) ⇒
+                        val tokens      = splitProcess(process)
+                        val actionCount = (tokens.size + 1) / 2
+                        val isLast      = actionCounter == actionCount - 1
+
+                        // If we are at the bottom, we can have:
+                        // 1. "foo then suspend recover bar"
+                        // 2. "foo then suspend then bar"
+                        // The failure case happens only if "suspend" fails. Upon recover, however, we always start with
+                        // a success. In this case and at the bottom only we prepend a "nop" which is always successful.
+                        if (isLast)
+                            Nil
+                        else
+                            tokens.drop(actionCounter * 2 + 1)
+                }
+
+            "nop" :: continuation mkString " "
+        }
+
+        def saveProcess(value: String) =
+            setvalue(topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement, value)
+
+        def readSavedProcess =
+            topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement.stringValue
+
+        case class ProcessState(var stack: List[StackFrame])
+        case class StackFrame(process: String, actionCounter: Int)
+    }
 
     private object ProcessParser {
 
@@ -77,9 +138,12 @@ object SimpleProcess extends Actions with Logging {
         // Later we also want to handle:
         // - foo(p1 = "v1", p2 = "v2")
         val ActionWithSingleAnonymousParam = """^([^(]+)(\("([^(^)^"]*)"\))?$""".r
-    
+
+        def splitProcess(process: String): List[String] = split(process)(breakOut)
+
         def parseProcess(process: String): ProcessNode = {
-            val tokens: List[String] = split(process)(breakOut)
+
+            val tokens = splitProcess(process)
     
             if (tokens.isEmpty)
                 // Empty process
@@ -134,6 +198,8 @@ object SimpleProcess extends Actions with Logging {
         }
     }
 
+    import processBreaks._
+
     // Main entry point for starting a process associated with a named button
     def runProcessByName(name: String): Unit =
         runProcess(rawProcessByName(name))
@@ -146,22 +212,26 @@ object SimpleProcess extends Actions with Logging {
         buildProcessFromLegacyProperties(name) getOrElse ""
     }
 
+    // Main entry point for starting a literal process
     def runProcess(process: String): Try[Any] = {
         implicit val logger = containingDocument.getIndentedLogger("process")
         withDebug("running process", Seq("process" → process)) {
-            beforeProcess() flatMap { _ ⇒
-                tryBreakable {
-                    runSubProcess(process)
-                } catchBreak {
-                    Success(()) // to change once `tryFailure` is supported
+            // Scope the process (for suspend/resume)
+            withProcess {
+                beforeProcess() flatMap { _ ⇒
+                    tryBreakable {
+                        runSubProcess(process)
+                    } catchBreak {
+                        Success(()) // to change once `tryFailure` is supported
+                    }
+                } doEitherWay {
+                    afterProcess()
+                } recoverWith { case t ⇒
+                    // Log and send a user error if there is one
+                    // NOTE: In the future, it would be good to provide the user with an error id.
+                    error(OrbeonFormatter.format(t))
+                    tryErrorMessage(Map(Some("resource") → "process-error"))
                 }
-            } doEitherWay {
-                afterProcess()
-            } recoverWith { case t ⇒
-                // Log and send a user error if there is one
-                // NOTE: In the future, it would be good to provide the user with an error id.
-                error(OrbeonFormatter.format(t))
-                tryErrorMessage(Map(Some("resource") → "process-error"))
             }
         }
     }
@@ -178,15 +248,22 @@ object SimpleProcess extends Actions with Logging {
             Success(())
         } else {
 
+            // Position of the action in the process (ignoring the combinators)
+            var programCounter = 0
+
             def runAction(action: ActionAst) =
                 withDebug("running action", Seq("action" → action.toString)) {
-                    AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
+                    // Push and pop the stack frame (for suspend/resume)
+                    withStackItem(process, programCounter) {
+                        AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
+                    }
                 }
 
             // Interpret process recursively
             @tailrec def nextGroup(tried: Try[Any], groups: Iterator[PairAst]): Try[Any] =
                 if (groups.hasNext) {
                     val PairAst(nextCombinator, nextAction) = groups.next()
+                    programCounter += 1
 
                     val newTried =
                         nextCombinator.combinator match {
@@ -225,6 +302,25 @@ object SimpleProcess extends Actions with Logging {
     // Run a sub-process
     def tryProcess(params: ActionParams): Try[Any] =
         Try(params.get(Some("name")) getOrElse params(None)) map rawProcessByName flatMap runSubProcess
+
+    // Suspend the process
+    def trySuspend(params: ActionParams): Try[Any] = Try {
+        saveProcess(serializeProcess)
+        Success()
+    } flatMap
+        (_ ⇒ trySuccess(Map()))
+
+    // Resume a process
+    def tryResume(params: ActionParams): Try[Any] =
+        runSubProcess(readSavedProcess)
+
+    // Abort a suspended process
+    def tryAbort(params: ActionParams): Try[Any] =
+        Try(saveProcess(""))
+
+    // Don't do anything
+    def tryNOP(params: ActionParams): Try[Any] =
+        Success()
 
     // NOTE: Clear the PDF URL *before* the process, because if we clear it after, it will be already cleared during the
     // second pass of a two-pass submission.
@@ -287,25 +383,27 @@ trait Actions {
     import SimpleProcess._
 
     def AllowedActions = Map[String, Action](
-        "validate"                    → tryValidate,
-        "pending-uploads"             → tryPendingUploads,
-        "save"                        → trySaveAttachmentsAndData,
-        "success-message"             → trySuccessMessage,
-        "error-message"               → tryErrorMessage,
-        "email"                       → trySendEmail,
-        "send"                        → trySend,
-        "navigate"                    → tryNavigate,
-        "review"                      → tryNavigateToReview,
-        "edit"                        → tryNavigateToEdit,
-        "summary"                     → tryNavigateToSummary,
-        "visit-all"                   → tryVisitAll,
-        "unvisit-all"                 → tryUnvisitAll,
-        "expand-all"                  → tryExpandSections,
-        "collapse-all"                → tryCollapseSections,
-        "result-dialog"               → tryShowResultDialog,
-        "captcha"                     → tryCaptcha,
-        "wizard-prev"                 → tryWizardPrev,
-        "wizard-next"                 → tryWizardNext
+        "pending-uploads" → tryPendingUploads,
+        "validate"        → tryValidate,
+        "warnings"        → tryWarnings,
+        "save"            → trySaveAttachmentsAndData,
+        "success-message" → trySuccessMessage,
+        "error-message"   → tryErrorMessage,
+        "email"           → trySendEmail,
+        "send"            → trySend,
+        "navigate"        → tryNavigate,
+        "review"          → tryNavigateToReview,
+        "edit"            → tryNavigateToEdit,
+        "summary"         → tryNavigateToSummary,
+        "visit-all"       → tryVisitAll,
+        "unvisit-all"     → tryUnvisitAll,
+        "expand-all"      → tryExpandSections,
+        "collapse-all"    → tryCollapseSections,
+        "dialog"          → tryShowDialog,
+        "result-dialog"   → tryShowResultDialog,
+        "captcha"         → tryCaptcha,
+        "wizard-prev"     → tryWizardPrev,
+        "wizard-next"     → tryWizardNext
     )
 
     // Check whether there are pending uploads
@@ -325,6 +423,13 @@ trait Actions {
 
             if (! ignore && ! dataValid)
                 throw new OXFException("Data is invalid")
+        }
+
+    // Check if there are warnings and fail if so
+    def tryWarnings(params: ActionParams): Try[Any] =
+        Try {
+            if (countWarnings > 0)
+                throw new OXFException("Form has warnings")
         }
 
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
@@ -408,6 +513,12 @@ trait Actions {
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
         Try(FormRunner.errorMessage(messageFromResourceOrInline(params)))
+
+    def tryShowDialog(params: ActionParams): Try[Any] =
+        Try {
+            val dialogName = params.get(Some("dialog")) orElse params.get(None)
+            dialogName foreach (show(_))
+        }
 
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {

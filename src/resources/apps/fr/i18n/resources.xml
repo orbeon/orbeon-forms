@@ -137,6 +137,10 @@
                 <submit-dialog-keep>Keep values and close</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>Close window</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <warning-dialog-review>Review</warning-dialog-review>
+                <warning-dialog-continue>Continue</warning-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Document saved successfully!</save-success>
@@ -149,6 +153,8 @@
                 <error-dialog-title>Unable to complete action</error-dialog-title>
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
+                <warning-dialog-title>Review Form Warnings</warning-dialog-title>
+                <warning-dialog-message>There {0,choice,1#is one warning|1&lt;are {0,number,integer} warnings} in your form. You can choose to review {0,choice,1#it|1&lt;them} first or to ignore {0,choice,1#it|1&lt;them} and continue with the operation.</warning-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
                 <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
@@ -323,6 +329,10 @@
                 <submit-dialog-keep>Garder les valeurs et fermer</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>Fermer la fenêtre</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <warning-dialog-review>Revoir</warning-dialog-review>
+                <warning-dialog-continue>Continuer</warning-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Document enregistré avec succès!</save-success>
@@ -335,6 +345,8 @@
                 <error-dialog-title>L'opération n'a pas pu être effectuée</error-dialog-title>
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
+                <warning-dialog-title>Revoir les avertissements</warning-dialog-title>
+                <warning-dialog-message>Il {0,choice,0#n'y a pas d'avertissements|1#y a un avertissement|1&lt;y a {0,number,integer} avertissements} dans le formulaire. Vous pouvez choisir de {0,choice,1#le|1&lt;les} passer en revue ou de {0,choice,1#l''|1&lt;les }ignorer et de continuer l''opération.</warning-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
@@ -512,6 +524,10 @@
                 <submit-dialog-keep>Mantener valores y cerrar</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>Cerrar Ventana</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <warning-dialog-review>[Review]</warning-dialog-review>
+                <warning-dialog-continue>[Continue]</warning-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Documento guardado correctamente!</save-success>
@@ -524,6 +540,8 @@
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
+                <warning-dialog-title>[Review Form Warnings]</warning-dialog-title>
+                <warning-dialog-message>[There {0,choice,1#is one warning|1&lt;are {0,number,integer} warnings} in your form. You can choose to review {0,choice,1#it|1&lt;them} first or to ignore {0,choice,1#it|1&lt;them} and continue with the operation.]</warning-dialog-message>
                 <buttons-message></buttons-message>
                 <saved-locally-open>Haga clic aquí para abrir el documento. La información ingresada será mostrada por la herramienta de la misma forma que cuando se guardo.</saved-locally-open>
                 <upload-in-progress>Hay subida de archivos en progreso. Por favor, intente nuevamente cuando la subida de archivos haya sido completada o cancelada.</upload-in-progress>
@@ -699,6 +717,10 @@
                 <submit-dialog-keep>Behold innhold og lukk</submit-dialog-keep>
                 <submit-dialog-go>OK</submit-dialog-go>
                 <submit-dialog-close-window>Lukk vindu</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <warning-dialog-review>[Review]</warning-dialog-review>
+                <warning-dialog-continue>[Continue]</warning-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Skjemaet er lagret!</save-success>
@@ -711,6 +733,8 @@
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Skjemaet er innsendt</submit-dialog-title>
                 <submit-dialog-message>Takk, informasjonen er innsendt.</submit-dialog-message>
+                <warning-dialog-title>[Review Form Warnings]</warning-dialog-title>
+                <warning-dialog-message>[There {0,choice,1#is one warning|1&lt;are {0,number,integer} warnings} in your form. You can choose to review {0,choice,1#it|1&lt;them} first or to ignore {0,choice,1#it|1&lt;them} and continue with the operation.]</warning-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klikk her for å åpne dokumentet. Informasjonen du skrev inn, vil bli vist i verktøyet slik det var da det ble lagret.</saved-locally-open>
                 <upload-in-progress>[Please retry once the file upload has completed or has been canceled.]</upload-in-progress>
@@ -882,6 +906,10 @@
                 <submit-dialog-keep>Сохранить значения и закрыть</submit-dialog-keep>
                 <submit-dialog-go>Ок</submit-dialog-go>
                 <submit-dialog-close-window>Закрыть окно</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <warning-dialog-review>[Review]</warning-dialog-review>
+                <warning-dialog-continue>[Continue]</warning-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Документ сохранен успешно!</save-success>
@@ -894,6 +922,8 @@
                 <error-dialog-title>[Unable to Complete Action]</error-dialog-title>
                 <submit-dialog-title>Форма отправлена</submit-dialog-title>
                 <submit-dialog-message>Информация успешно отправлена, спасибо!</submit-dialog-message>
+                <warning-dialog-title>[Review Form Warnings]</warning-dialog-title>
+                <warning-dialog-message>[There {0,choice,1#is one warning|1&lt;are {0,number,integer} warnings} in your form. You can choose to review {0,choice,1#it|1&lt;them} first or to ignore {0,choice,1#it|1&lt;them} and continue with the operation.]</warning-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Нажмите для открытия документа. Вся введенная информация будет доступна в том виде, в котором она была при сохранении.</saved-locally-open>
                 <upload-in-progress>Повторите попытку после окончания загрузки файла.</upload-in-progress>

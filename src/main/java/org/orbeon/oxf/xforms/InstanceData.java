@@ -282,7 +282,14 @@ public class InstanceData {// rename to DataNodeProperties once done
     }
 
     public static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(NodeInfo nodeInfo) {
-        final InstanceData existingInstanceData = getLocalInstanceData(nodeInfo, false);
+        return failedConstraints(getLocalInstanceData(nodeInfo, false));
+    }
+
+    public static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(Node node) {
+        return failedConstraints(getLocalInstanceData(node));
+    }
+
+    private static scala.collection.immutable.Map<StaticBind.ConstraintLevel, scala.collection.immutable.List<StaticBind.ConstraintXPathMIP>> failedConstraints(InstanceData existingInstanceData) {
         final Object o = (existingInstanceData == null)
                 ? BindNode.jCollectFailedConstraints(null)
                 : BindNode.jCollectFailedConstraints(existingInstanceData.bindNodes);
@@ -415,7 +422,7 @@ public class InstanceData {// rename to DataNodeProperties once done
     private static InstanceData getLocalInstanceData(NodeInfo nodeInfo, boolean forUpdate) {
         if (nodeInfo instanceof VirtualNode) {
             return getLocalInstanceData(XFormsUtils.getNodeFromNodeInfo(nodeInfo, ""));
-        } else if (nodeInfo != null && !forUpdate) {
+        } else if (nodeInfo != null && ! forUpdate) {
             return READONLY_LOCAL_INSTANCE_DATA;
         } else if (nodeInfo != null && forUpdate) {
             throw new OXFException("Cannot update MIP information on non-VirtualNode NodeInfo.");

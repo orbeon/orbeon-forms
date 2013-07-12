@@ -69,15 +69,16 @@ public class XFormsConstants {
         XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.add("alert");
     }
 
-    public static final String XFORMS_PREFIX = "xforms";
+    public static final String XFORMS_PREFIX = "xforms"; // TODO: remove3
     public static final String XFORMS_SHORT_PREFIX = "xf";
     public static final String XFORMS_NAMESPACE_URI = "http://www.w3.org/2002/xforms";
     public static final Namespace XFORMS_NAMESPACE = new Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI);
 
-    public static final String XXFORMS_PREFIX = "xxforms";
+    public static final String XXFORMS_PREFIX = "xxforms"; // TODO: remove
     public static final String XXFORMS_SHORT_PREFIX = "xxf";
     public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
     public static final Namespace XXFORMS_NAMESPACE = new Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
+    public static final Namespace XXFORMS_NAMESPACE_SHORT = new Namespace(XXFORMS_SHORT_PREFIX, XXFORMS_NAMESPACE_URI); // TODO: remove
 
     // Common attributes
     public static final QName REF_QNAME = new QName("ref");
@@ -337,6 +338,8 @@ public class XFormsConstants {
     public static final QName XXFORMS_EXPOSE_XPATH_TYPES_QNAME = new QName(XFormsProperties.EXPOSE_XPATH_TYPES_PROPERTY, XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EXCLUDE_RESULT_PREFIXES = new QName("exclude-result-prefixes", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_CUSTOM_MIPS_QNAME = new QName("custom-mips", XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_WARNING_QNAME = new QName("warning", XXFORMS_NAMESPACE_SHORT);
+    public static final QName XXFORMS_ANNOTATE_QNAME = new QName("annotate", XXFORMS_NAMESPACE_SHORT);
 
     public static final QName XXFORMS_INSTANCE_QNAME = new QName("instance", XXFORMS_NAMESPACE);
     public static final QName XXFORMS_SHOW_PROGRESS_QNAME = new QName("show-progress", XXFORMS_NAMESPACE);

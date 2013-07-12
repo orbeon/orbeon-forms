@@ -345,6 +345,7 @@
         resource="{instance('fr-send-submission-params')/@uri}"
         relevant="{instance('fr-send-submission-params')/@prune}"
         validate="false"
+        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{instance('fr-send-submission-params')/@method}"
         serialization="{instance('fr-send-submission-params')/@serialization}"
         ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
@@ -361,13 +362,14 @@
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
-        <params uri="" prune="" method="" content="" serialization=""/>
+        <params uri="" prune="" annotate="" method="" content="" serialization=""/>
     </xf:instance>
 
     <xf:submission id="fr-send-submission-none"
         resource="{event('uri')}"
         relevant="{event('prune')}"
         validate="false"
+        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
         method="{event('method')}"
         serialization="{if (event('method') = 'get') then 'none' else 'application/xml'}"
         ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"

@@ -266,6 +266,11 @@ public class ControlTree implements ExternalCopyable {
         return root != null ? root.childrenJava() : Collections.<XFormsControl>emptyList();
     }
 
+    public Map<String, XFormsControl> getEffectiveIdsToControls() {
+        // Delegate
+        return controlIndex.getEffectiveIdsToControls();
+    }
+
     public XFormsControl getControl(String effectiveId) {
         // Delegate
         return controlIndex.getControl(effectiveId);

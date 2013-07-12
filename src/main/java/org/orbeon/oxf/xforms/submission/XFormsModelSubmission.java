@@ -75,6 +75,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     private String avtRelevant;
     private String avtXXFormsCalculate;
     private String avtXXFormsUploads;
+    private String avtXXFormsAnnotate;
 
     private String avtSerialization;
 
@@ -191,6 +192,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             avtRelevant = submissionElement.attributeValue("relevant");
             avtXXFormsCalculate = submissionElement.attributeValue(XFormsConstants.XXFORMS_CALCULATE_QNAME);
             avtXXFormsUploads = submissionElement.attributeValue(XFormsConstants.XXFORMS_UPLOADS_QNAME);
+            avtXXFormsAnnotate = submissionElement.attributeValue(XFormsConstants.XXFORMS_ANNOTATE_QNAME);
 
             avtSerialization = submissionElement.attributeValue("serialization");
 
@@ -380,7 +382,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
                     // Create (but abandon) document to submit here because in case of error, an Ajax response will still be produced
                     if (p.serialize) {
-                        createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
+                        createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant, p.resolvedXXFormsAnnotate);
                     }
 
                     // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
@@ -411,7 +413,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     }
 
                     // Create document to submit
-                    documentToSubmit = createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant);
+                    documentToSubmit = createDocumentToSubmit(indentedLogger, p.refNodeInfo, p.refInstance, modelForInstance, p.resolvedValidate, p.resolvedRelevant, p.resolvedXXFormsAnnotate);
 
                 } else {
                     // Don't recreate document
@@ -757,6 +759,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         final boolean resolvedRelevant;
         final boolean resolvedXXFormsCalculate;
         final boolean resolvedXXFormsUploads;
+        final boolean resolvedXXFormsAnnotate;
 
         final boolean isHandlingClientGetAll;
 
@@ -841,6 +844,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
                 final String resolvedUploadsString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsUploads);
                 resolvedXXFormsUploads = serialize && !"false".equals(resolvedUploadsString);
+
+                final String resolvedAnnotateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsAnnotate);
+                resolvedXXFormsAnnotate = serialize && "true".equals(resolvedAnnotateString);
             }
 
             isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
@@ -1182,7 +1188,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     }
 
     private Document createDocumentToSubmit(IndentedLogger indentedLogger, NodeInfo currentNodeInfo,
-                                            XFormsInstance currentInstance, XFormsModel modelForInstance, boolean resolvedValidate, boolean resolvedRelevant) {
+                                            XFormsInstance currentInstance, XFormsModel modelForInstance, boolean resolvedValidate, boolean resolvedRelevant, boolean resolvedAnnotate) {
         final Document documentToSubmit;
 
         // Revalidate instance
@@ -1197,7 +1203,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             modelForInstance.doRevalidate();
 
         // Get selected nodes (re-root and prune)
-        documentToSubmit = reRootAndPrune(currentNodeInfo, resolvedRelevant);
+        documentToSubmit = reRootAndPrune(currentNodeInfo, resolvedRelevant, resolvedAnnotate);
 
         // Check that there are no validation errors
         // NOTE: If the instance is read-only, it can't have MIPs at the moment, and can't fail validation/requiredness, so we don't go through the process at all.
@@ -1219,7 +1225,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         return documentToSubmit;
     }
 
-    private Document reRootAndPrune(final NodeInfo currentNodeInfo, boolean resolvedRelevant) {
+    private Document reRootAndPrune(final NodeInfo currentNodeInfo, boolean resolvedRelevant, boolean resolvedAnnotate) {
 
         final Document documentToSubmit;
         if (currentNodeInfo instanceof VirtualNode) {
@@ -1257,8 +1263,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                         private void checkInstanceData(Node node) {
                             if (nodeToDetach[0] == null) {
                                 // Check "relevant" MIP and remove non-relevant nodes
-                                    if (!InstanceData.getInheritedRelevant(node))
-                                        nodeToDetach[0] = node;
+                                if (! InstanceData.getInheritedRelevant(node))
+                                    nodeToDetach[0] = node;
                             }
                         }
                     });
@@ -1267,6 +1273,10 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
                 } while (nodeToDetach[0] != null);
             }
+
+            // Annotate with warnings
+            if (resolvedAnnotate)
+                annotateWithWarnings(containingDocument, documentToSubmit);
 
             // TODO: handle includenamespaceprefixes
         } else {

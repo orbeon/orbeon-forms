@@ -551,10 +551,11 @@ trait Actions {
 
             // Defaults except for "uri"
             val Defaults = Map(
-                "method"  → "post",
-                "prune"   → "true",
-                "replace" → "none",
-                "content" → "xml"
+                "method"   → "post",
+                "prune"    → "true",
+                "annotate" → "false",
+                "replace"  → "none",
+                "content"  → "xml"
             )
 
             val propertiesAsPairs =

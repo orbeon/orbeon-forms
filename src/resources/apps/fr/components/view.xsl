@@ -543,7 +543,7 @@
         <!-- Status icons for detail page -->
         <xsl:if test="$is-detail">
             <xh:span class="fr-status-icons">
-                <xf:group model="fr-error-summary-model" ref=".[visible-counts/(@error + @warning) gt 0]">
+                <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert gt 0]">
                     <!-- Form has error or warning messages -->
                     <xf:repeat ref="visible-counts/(@error, @warning, @info)[. gt 0]">
                         <xh:span class="badge badge-{{if (name() = 'error') then 'important' else if (name() = 'warning') then 'warning' else 'info'}}">
@@ -551,7 +551,7 @@
                         </xh:span>
                     </xf:repeat>
                 </xf:group>
-                <xf:group model="fr-error-summary-model" ref=".[visible-counts/(@error + @warning) = 0]" class="fr-validity-icon">
+                <xf:group model="fr-error-summary-model" ref=".[visible-counts/@alert = 0]" class="fr-validity-icon">
                     <!-- Form has no error or warning messages -->
                     <xh:i class="icon-ok" title="{{$fr-resources/errors/none}}"/>
                 </xf:group>

@@ -27,8 +27,9 @@
     <xh:div class="fr-dialog-message">
         <xf:output
             value="xxf:format-message(
-                      $fr-resources/detail/messages/warning-dialog-message,
-                      xs:decimal(xxf:instance('fr-error-summary-instance')/counts/@warning))"/>
+                       $fr-resources/detail/messages/warning-dialog-message,
+                       xs:decimal(xxf:instance('fr-error-summary-instance')/visible-counts/@warning)
+                   )"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:trigger>

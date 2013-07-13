@@ -79,7 +79,7 @@ class XBLContainer(
     val contextStack = new XFormsContextStack(self)
 
     private var _childrenXBLContainers: mutable.Buffer[XBLContainer] = ArrayBuffer()
-    def childrenXBLContainers = _childrenXBLContainers
+    def childrenXBLContainers = _childrenXBLContainers.iterator
 
     def effectiveId = _effectiveId
     def partAnalysis: PartAnalysis = Option(parentXBLContainer) map (_.partAnalysis) orNull
@@ -157,36 +157,6 @@ class XBLContainer(
     // Whether this container is relevant, i.e. either is a top-level container OR is within a relevant container control
     // componentControl will be null if we are at the top-level
     def isRelevant: Boolean = (associatedControl eq null) || associatedControl.isRelevant
-
-    def findInSelfAndDescendants[T](findInModel: XFormsModel ⇒ Option[T], findInContainer: Option[XBLContainer ⇒ Option[T]] = None): Option[T] = {
-        if (isRelevant) {
-            if (models.nonEmpty)
-                for (model ← models) {
-                    val result = findInModel(model)
-                    if (result.isDefined)
-                        return result
-                }
-
-            if (_childrenXBLContainers.nonEmpty)
-                findInContainer foreach { find2 ⇒
-                    for (container ← _childrenXBLContainers) {
-                        val result = find2(container)
-                        if (result.isDefined)
-                            return result
-                    }
-                }
-        }
-        None
-    }
-
-    def doInSelfAndDescendants(doInModel: XFormsModel ⇒ Any, doInContainer: XBLContainer ⇒ Any): Unit =
-        if (isRelevant) {
-            for (model ← models)
-                doInModel(model)
-
-            for (container ← _childrenXBLContainers)
-                doInContainer(container)
-        }
 
     // Helper for XFormsContainingDocument
     def immutableHeadersMap(request: Request): Map[String, Array[String]] =
@@ -269,7 +239,7 @@ trait RefreshSupport {
     self: XBLContainer ⇒
 
     def startOutermostActionHandler(): Unit = // Q: What about relevance?
-        doInSelfAndDescendants(_.startOutermostActionHandler(), _.startOutermostActionHandler())
+        allModels foreach (_.startOutermostActionHandler)
 
     def endOutermostActionHandler(): Unit =
         if (isRelevant)
@@ -302,13 +272,13 @@ trait RefreshSupport {
         }
 
     def needRebuildRecalculateRevalidate: Boolean =
-        findInSelfAndDescendants[Boolean](m ⇒ if (m.needRebuildRecalculateRevalidate) Some(true) else None, Some(c ⇒ if (c.needRebuildRecalculateRevalidate) Some(true) else None)) isDefined
+        allModels exists (_.needRebuildRecalculateRevalidate)
 
     // NOTE: It used to be (Java implementation) that childrenContainers could be modified down the line and cause a
     // ConcurrentModificationException. This should no longer happen as once we obtain a reference to
     // childrenXBLContainers, that collection doesn't change.
     def rebuildRecalculateRevalidateIfNeeded(): Unit =
-        doInSelfAndDescendants(_.rebuildRecalculateRevalidateIfNeeded(), _.rebuildRecalculateRevalidateIfNeeded())
+        allModels foreach (_.rebuildRecalculateRevalidateIfNeeded)
 
     def requireRefresh(): Unit = {
         // Note that we don't recurse into children container as for now refresh is global
@@ -345,7 +315,7 @@ trait ContainerResolver {
 
     // Get object with the effective id specified within this container or descendant containers
     def getObjectByEffectiveId(effectiveId: String): XFormsObject =
-        findInSelfAndDescendants[XFormsObject](m ⇒ Option(m.getObjectByEffectiveId(effectiveId)), Some(c ⇒ Option(c.getObjectByEffectiveId(effectiveId)))) orNull
+        allModels map (_.getObjectByEffectiveId(effectiveId)) find (_ ne null) orNull
 
     /**
      * Return the current repeat index for the given xf:repeat id, -1 if the id is not found.
@@ -463,7 +433,10 @@ trait ContainerResolver {
 
     // Recursively find the instance containing the specified node
     def getInstanceForNode(nodeInfo: NodeInfo): XFormsInstance =
-        findInSelfAndDescendants[XFormsInstance](m ⇒ Option(m.getInstanceForNode(nodeInfo)), Some(c ⇒ Option(c.getInstanceForNode(nodeInfo)))) orNull
+        if (isRelevant)
+            allModels map (_.getInstanceForNode(nodeInfo)) find (_ ne null) orNull
+        else
+            null
 
     // Locally find the instance with the specified id, searching in any relevant model
     def findInstance(instanceStaticId: String): Option[XFormsInstance] =

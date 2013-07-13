@@ -48,7 +48,7 @@
                               name="unneeded-elements"
                               select="fbf:findBlankLHHAHoldersAndElements(/, 'help')/generate-id()"/>
 
-                <xsl:template match="*[generate-id() = $unneeded-elements]"/>
+                <xsl:template match="xf:help[generate-id() = $unneeded-elements]"/>
 
                 <!-- Custom instance: add dataModel namespace binding to top-level bind -->
                 <xsl:template match="xf:bind[@id = 'fr-form-binds']">
@@ -157,7 +157,7 @@
                 </xsl:template>
 
                 <!-- Add model actions -->
-                <xsl:template match="*[generate-id() = generate-id($model)]">
+                <xsl:template match="xf:model[generate-id() = generate-id($model)]">
                     <xsl:copy>
                         <!-- Namespace for fb:required -->
                         <xsl:namespace name="fb" select="'http://orbeon.org/oxf/xml/form-builder'"/>
@@ -203,28 +203,28 @@
                     - actions.xsl
                     - https://github.com/orbeon/orbeon-forms/issues/1019
                 -->
-                <xsl:template match="*[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
+                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
                     <xsl:copy>
                         <xsl:apply-templates select="@*"/>
                         <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="*[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
+                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
                     <xsl:copy>
                         <xsl:apply-templates select="@*"/>
                         <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'parameter')]"/>
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="*[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
+                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
                     <xsl:copy>
                         <xsl:apply-templates select="@*"/>
                         <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
                     </xsl:copy>
                 </xsl:template>
 
-                <xsl:template match="*[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
+                <xsl:template match="xf:model[generate-id() = generate-id($model)]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
                     <xsl:copy>
                         <xsl:apply-templates select="@*"/>
                         <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]"/>
@@ -232,8 +232,6 @@
                         <xsl:apply-templates select=".//(*:variable | *:var)[@name = ('item-label', 'item-value')]"/>
                     </xsl:copy>
                 </xsl:template>
-
-                <!-- TODO: convert legacy fr:repeat -->
 
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->
                 <xsl:template match="xh:head/meta[@http-equiv = 'Content-Type']"/>

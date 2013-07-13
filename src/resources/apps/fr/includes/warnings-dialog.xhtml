@@ -19,7 +19,7 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        id="fr-warnings-dialog" level="modal" close="false" draggable="true" class="fr-dialog fr-warnings-dialog">
+        id="fr-warnings-dialog" level="modal" close="true" draggable="true" class="fr-dialog fr-warnings-dialog">
 
     <xf:label ref="$fr-resources/detail/messages/warning-dialog-title"/>
 
@@ -33,21 +33,19 @@
     <xh:div class="fr-dialog-buttons">
         <xf:trigger>
             <xf:label ref="$fr-resources/detail/buttons/warning-dialog-review"/>
-            <xf:action event="DOMActivate">
-                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-                    process:runProcess('abort')
-                </xf:action>
-                <xf:dispatch name="xxforms-dialog-close" targetid="fr-warnings-dialog"/>
-            </xf:action>
+            <xxf:hide event="DOMActivate" dialog="fr-warnings-dialog"/>
         </xf:trigger>
         <xf:trigger appearance="xxf:primary">
             <xf:label ref="$fr-resources/detail/buttons/warning-dialog-continue"/>
-            <xf:action event="DOMActivate">
-                <xf:action type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-                    process:runProcess('resume')
-                </xf:action>
-                <xf:dispatch name="xxforms-dialog-close" targetid="fr-warnings-dialog"/>
-            </xf:action>
+            <xxf:hide event="DOMActivate" dialog="fr-warnings-dialog">
+                <xf:property name="process" value="'resume'"/>
+            </xxf:hide>
         </xf:trigger>
     </xh:div>
+
+    <!-- Run the "abort" process when the dialog is closed unless a process is specified -->
+    <xf:action event="xxforms-dialog-close" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+        process:runProcess((event('process'), 'abort')[1])
+    </xf:action>
+
 </xxf:dialog>

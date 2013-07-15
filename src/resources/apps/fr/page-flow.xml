@@ -51,7 +51,7 @@
     <!-- ==== Custom MySQL-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
+    <service path="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
              model="persistence/mysql/crud.xpl"/>
 
     <!-- Search -->

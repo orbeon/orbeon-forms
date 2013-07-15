@@ -41,7 +41,7 @@
         <p:output name="data" id="request"/>
     </p:processor>
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/mysql/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data)/(([^/]+)/([^/]+))?)</config></p:input>
+        <p:input name="config"><config>/fr/service/mysql/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data|draft)/(([^/]+)/([^/]+))?)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
@@ -64,13 +64,13 @@
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
                 <app><xsl:value-of select="$matcher-groups[1]"/></app>
                 <form><xsl:value-of select="$matcher-groups[2]"/></form>
-                <xsl:variable name="type" as="xs:string" select="if ($matcher-groups[4] = 'form') then 'form' else 'data'"/>
+                <xsl:variable name="type" as="xs:string" select="concat($matcher-groups[4], $matcher-groups[6])"/>
                 <type><xsl:value-of select="$type"/></type>
-                <xsl:if test="$type = 'data' and $matcher-groups[8] != ''">                             <!-- Document id is only used for data; might be missing for operations over a collection -->
+                <xsl:if test="$type = ('data', 'draft') and $matcher-groups[8] != ''">                             <!-- Document id is only used for data; might be missing for operations over a collection -->
                     <document-id><xsl:value-of select="$matcher-groups[8]"/></document-id>
                 </xsl:if>
                 <xsl:if test="$type = 'form' or $matcher-groups[9] != ''">                              <!-- Filename isn't present for operations over an app/form collection -->
-                    <filename><xsl:value-of select="if ($type = 'data') then $matcher-groups[9] else $matcher-groups[5]"/></filename>
+                    <filename><xsl:value-of select="if ($type = ('data', 'draft')) then $matcher-groups[9] else $matcher-groups[5]"/></filename>
                 </xsl:if>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <xsl:copy-of select="$request/body"/>
@@ -98,10 +98,12 @@
                                 <sql-out>
                                     <sql:connection>
                                         <xsl:copy-of select="/request/sql:datasource"/>
-                                        <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
+                                        <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-auto-save')"/>
+                                        <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
+                                        <xsl:variable name="draft" as="xs:string" select="if (/request/type = 'draft') then 'Y' else 'N'"/>
                                         <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
                                         <xsl:variable name="table-name" as="xs:string" select="concat(
-                                            if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition',
+                                            if ($is-data-draft) then 'orbeon_form_data' else 'orbeon_form_definition',
                                             if ($is-attachment) then '_attach' else '')"/>
 
                                         <sql:execute>
@@ -110,26 +112,31 @@
                                                     <xsl:value-of select="$last-modified-time"/>,
                                                     <xsl:if test="not($is-attachment)">t.xml xml</xsl:if>
                                                     <xsl:if test="$is-attachment">file_content</xsl:if>
-                                                    <xsl:if test="$is-data and $owner-group">, username, groupname</xsl:if>
+                                                    <xsl:if test="$is-data-draft and $owner-group">, username, groupname</xsl:if>
                                                 from <xsl:value-of select="$table-name"/> t
                                                     where app = <sql:param type="xs:string" select="/request/app"/>
                                                     and form = <sql:param type="xs:string" select="/request/form"/>
-                                                    <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                    <xsl:if test="$is-data-draft">
+                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                        <xsl:if test="$support-auto-save">and draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                    </xsl:if>
                                                     <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                                     and <xsl:value-of select="$last-modified-time"/> = (
                                                         select max(<xsl:value-of select="$last-modified-time"/>) from <xsl:value-of select="$table-name"/>
                                                         where app = <sql:param type="xs:string" select="/request/app"/>
                                                         and form = <sql:param type="xs:string" select="/request/form"/>
-                                                        <xsl:if test="$is-data">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                        <xsl:if test="$is-data-draft">
+                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                            <xsl:if test="$support-auto-save">and draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                        </xsl:if>
                                                         <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                                     )
-                                                    <!-- This will prevent request for document that have been deleted to return a delete doc -->
                                                     and deleted = 'N'
                                             </sql:query>
                                             <sql:result-set>
                                                 <sql:row-iterator>
                                                     <last-modified><sql:get-column-value column="{$last-modified-time}" type="xs:dateTime"/></last-modified>
-                                                    <xsl:if test="$is-data and $owner-group">
+                                                    <xsl:if test="$is-data-draft and $owner-group">
                                                         <username><sql:get-column-value column="username" type="xs:string"/></username>
                                                         <groupname><sql:get-column-value column="groupname" type="xs:string"/></groupname>
                                                     </xsl:if>
@@ -269,45 +276,65 @@
                                         <result>
                                             <sql:connection>
                                                 <xsl:copy-of select="/request/sql:datasource"/>
-                                                <sql:execute>
-                                                    <sql:update>
-                                                        <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
-                                                        <xsl:variable name="has-document-id" as="xs:boolean" select="exists(/request/document-id)"/>
-                                                        <xsl:variable name="table-name" as="xs:string" select="if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
+                                                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-auto-save')"/>
+                                                <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
+                                                <xsl:variable name="has-document-id" as="xs:boolean" select="exists(/request/document-id)"/>
+                                                <xsl:variable name="table-name" as="xs:string" select="if ($is-data-draft) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
 
-                                                        insert into <xsl:value-of select="$table-name"/>
-                                                            (
-                                                                <!-- TODO: This list of columns only works for the data (not form definition) table -->
-                                                                created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>,
-                                                                app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted, xml
-                                                                <xsl:if test="$is-data and $owner-group">, username, groupname</xsl:if>
-                                                            )
-                                                        select
-                                                            d.created,
-                                                            <sql:param type="xs:dateTime" select="/request/timestamp"/>,
-                                                            <sql:param type="xs:string" select="/request/username"/>,
-                                                            d.app, d.form, <xsl:if test="$is-data">d.document_id,</xsl:if>
-                                                            'Y', d.xml
-                                                            <xsl:if test="$is-data and $owner-group">, d.username, d.groupname</xsl:if>
-                                                        from
-                                                            orbeon_form_data d,
-                                                            (
-                                                                select
-                                                                    app, form, document_id, max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
-                                                                from orbeon_form_data
-                                                                where
-                                                                    app =  <sql:param type="xs:string" select="/request/app"/>
-                                                                    and form =  <sql:param type="xs:string" select="/request/form"/>
-                                                                    <xsl:if test="$is-data and $has-document-id">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
-                                                                group by
-                                                                    app, form, document_id
-                                                            ) m
+                                                <!-- Normal delete for data and form definitions (the latter to be implemented) -->
+                                                <xsl:if test="/request/type != 'draft'">
+                                                    <sql:execute>
+                                                        <sql:update>
+                                                            insert into <xsl:value-of select="$table-name"/>
+                                                                (
+                                                                    <!-- TODO: This list of columns only works for the data (not form definition) table -->
+                                                                    created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>,
+                                                                    app, form, <xsl:if test="$is-data-draft">document_id,</xsl:if> deleted, xml
+                                                                    <xsl:if test="$is-data-draft and $owner-group">, username, groupname</xsl:if>
+                                                                )
+                                                            select
+                                                                d.created,
+                                                                <sql:param type="xs:dateTime" select="/request/timestamp"/>,
+                                                                <sql:param type="xs:string" select="/request/username"/>,
+                                                                d.app, d.form, <xsl:if test="$is-data-draft">d.document_id,</xsl:if>
+                                                                'Y', d.xml
+                                                                <xsl:if test="$is-data-draft and $owner-group">, d.username, d.groupname</xsl:if>
+                                                            from
+                                                                orbeon_form_data d,
+                                                                (
+                                                                    select
+                                                                        app, form, document_id, max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
+                                                                    from orbeon_form_data
+                                                                    where
+                                                                        app =  <sql:param type="xs:string" select="/request/app"/>
+                                                                        and form =  <sql:param type="xs:string" select="/request/form"/>
+                                                                        <xsl:if test="$is-data-draft and $has-document-id">and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                                    group by
+                                                                        app, form, document_id
+                                                                ) m
+                                                            where
+                                                                d.document_id = m.document_id
+                                                                and d.<xsl:value-of select="$last-modified-time"/> = m.<xsl:value-of select="$last-modified-time"/>
+                                                                and d.deleted = 'N'
+                                                        </sql:update>
+                                                    </sql:execute>
+                                                </xsl:if>
+
+                                                <!-- Delete drafts in the following two cases:
+                                                     - data is deleted, in which case we don't want to keep corresponding drafts
+                                                     - a draft is explicitly deleted, which can be done from the summary page -->
+                                                <xsl:if test="$support-auto-save and /request/type = ('data', 'draft')">
+                                                    <xsl:variable name="delete-where">
                                                         where
-                                                            d.document_id = m.document_id
-                                                            and d.<xsl:value-of select="$last-modified-time"/> = m.<xsl:value-of select="$last-modified-time"/>
-                                                            and d.deleted = 'N'
-                                                    </sql:update>
-                                                </sql:execute>
+                                                            app = <sql:param type="xs:string" select="/request/app"/>
+                                                            and form = <sql:param type="xs:string" select="/request/form"/>
+                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                            and draft = 'Y'
+                                                    </xsl:variable>
+                                                    <sql:execute><sql:update>delete from orbeon_form_data        <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
+                                                    <sql:execute><sql:update>delete from orbeon_form_data_attach <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
+                                                </xsl:if>
+
                                             </sql:connection>
                                         </result>
                                     </sql:config>
@@ -331,20 +358,28 @@
                                         <result>
                                             <sql:connection>
                                                 <xsl:copy-of select="/request/sql:datasource"/>
+                                                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-auto-save')"/>
+                                                <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
+                                                <xsl:variable name="draft" as="xs:string" select="if (/request/type = 'draft') then 'Y' else 'N'"/>
+                                                <xsl:variable name="is-attachment" as="xs:boolean" select="not(/request/content-type = ('application/xml', 'text/xml') or ends-with(/request/content-type, '+xml'))"/>
+                                                <xsl:variable name="table-name" as="xs:string" select="concat(
+                                                    if ($is-data-draft) then 'orbeon_form_data' else 'orbeon_form_definition',
+                                                    if ($is-attachment) then '_attach' else '')"/>
                                                 <sql:execute>
                                                     <sql:update>
-                                                        <xsl:variable name="is-data" as="xs:boolean" select="/request/type = 'data'"/>
-                                                        <xsl:variable name="is-attachment" as="xs:boolean" select="not(/request/content-type = ('application/xml', 'text/xml') or ends-with(/request/content-type, '+xml'))"/>
-                                                        <xsl:variable name="table-name" as="xs:string" select="concat(
-                                                            if ($is-data) then 'orbeon_form_data' else 'orbeon_form_definition',
-                                                            if ($is-attachment) then '_attach' else '')"/>
                                                             insert
                                                                 into <xsl:value-of select="$table-name"/>
                                                                 (
-                                                                    created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>, app, form, <xsl:if test="$is-data">document_id,</xsl:if> deleted,
+                                                                    created,
+                                                                    <xsl:value-of select="$last-modified-time"/>,
+                                                                    <xsl:value-of select="$last-modified-by"/>,
+                                                                    app, form,
+                                                                    <xsl:if test="$is-data-draft">document_id,</xsl:if>
+                                                                    deleted,
+                                                                    <xsl:if test="$is-data-draft and $support-auto-save">draft, </xsl:if>
                                                                     <xsl:if test="$is-attachment">file_name, file_content</xsl:if>
                                                                     <xsl:if test="not($is-attachment)">xml</xsl:if>
-                                                                    <xsl:if test="$is-data and $owner-group">, username, groupname</xsl:if>
+                                                                    <xsl:if test="$is-data-draft and $owner-group">, username, groupname</xsl:if>
                                                                 )
                                                                 select
                                                                     case when <xsl:value-of select="$last-modified-time"/> is null
@@ -354,9 +389,9 @@
                                                                     <sql:param type="xs:string" select="/request/username"/>,
                                                                     <sql:param type="xs:string" select="/request/app"/>,
                                                                     <sql:param type="xs:string" select="/request/form"/>,
-                                                                    <xsl:if test="$is-data">
-                                                                        <sql:param type="xs:string" select="/request/document-id"/>,
-                                                                    </xsl:if> 'N',
+                                                                    <xsl:if test="$is-data-draft"><sql:param type="xs:string" select="/request/document-id"/>,</xsl:if>
+                                                                    'N',
+                                                                    <xsl:if test="$is-data-draft and $support-auto-save">'<xsl:value-of select="$draft"/>',</xsl:if>
                                                                     <xsl:if test="$is-attachment">
                                                                         <sql:param type="xs:string" select="/request/filename"/>,
                                                                         <sql:param type="xs:anyURI" sql-type="blob" select="/request/body" />
@@ -364,7 +399,7 @@
                                                                     <xsl:if test="not($is-attachment)">
                                                                         <sql:param type="odt:xmlFragment" sql-type="clob" select="/request/document/*" />
                                                                     </xsl:if>
-                                                                    <xsl:if test="$is-data and $owner-group">
+                                                                    <xsl:if test="$is-data-draft and $owner-group">
                                                                         , case when <xsl:value-of select="$last-modified-time"/> is null
                                                                             then <sql:param type="xs:string" select="/request/username"/>
                                                                             else username end as username
@@ -376,13 +411,13 @@
                                                                 (
                                                                     select
                                                                         max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>, created
-                                                                        <xsl:if test="$is-data and $owner-group">, username , groupname</xsl:if>
+                                                                        <xsl:if test="$is-data-draft and $owner-group">, username , groupname</xsl:if>
                                                                     from
                                                                     (
                                                                         (
                                                                             select
                                                                                 t.<xsl:value-of select="$last-modified-time"/>, t.created
-                                                                                <xsl:if test="$is-data and $owner-group">, t.username , t.groupname</xsl:if>
+                                                                                <xsl:if test="$is-data-draft and $owner-group">, t.username , t.groupname</xsl:if>
                                                                             from
                                                                                 <xsl:value-of select="$table-name"/> t,
                                                                                 (
@@ -391,14 +426,20 @@
                                                                                     where
                                                                                         app = <sql:param type="xs:string" select="/request/app"/>
                                                                                         and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                                        <xsl:if test="$is-data"> and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                                                        <xsl:if test="$is-data-draft">
+                                                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                                            <xsl:if test="$support-auto-save">and draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                                                        </xsl:if>
                                                                                         <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                                                                 ) l
                                                                             where
                                                                                 t.<xsl:value-of select="$last-modified-time"/> = l.<xsl:value-of select="$last-modified-time"/>
                                                                                 and t.app = <sql:param type="xs:string" select="/request/app"/>
                                                                                 and t.form = <sql:param type="xs:string" select="/request/form"/>
-                                                                                <xsl:if test="$is-data"> and t.document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                                                <xsl:if test="$is-data-draft">
+                                                                                    and t.document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                                    <xsl:if test="$support-auto-save">and t.draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                                                </xsl:if>
                                                                                 <xsl:if test="$is-attachment"> and t.file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                                                                 and t.<xsl:value-of select="$last-modified-time"/> = l.<xsl:value-of select="$last-modified-time"/>
                                                                                 and t.deleted = 'N'
@@ -407,13 +448,54 @@
                                                                         (
                                                                             select
                                                                                 null <xsl:value-of select="$last-modified-time"/>, null created
-                                                                                <xsl:if test="$is-data and $owner-group">, null username, null groupname</xsl:if>
+                                                                                <xsl:if test="$is-data-draft and $owner-group">, null username, null groupname</xsl:if>
                                                                             from dual
                                                                         )
                                                                     ) t2
                                                                 ) t3
                                                     </sql:update>
                                                 </sql:execute>
+                                                <xsl:if test="$support-auto-save and /request/type = 'data' and not($is-attachment)">
+                                                    <!--If we saved a "normal" document (not a draft), delete any draft document and draft attachments -->
+                                                    <xsl:variable name="delete-where">
+                                                        where
+                                                            app = <sql:param type="xs:string" select="/request/app"/>
+                                                            and form = <sql:param type="xs:string" select="/request/form"/>
+                                                            and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                            and draft = 'Y'
+                                                    </xsl:variable>
+                                                    <sql:execute><sql:update>delete from orbeon_form_data        <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
+                                                    <sql:execute><sql:update>delete from orbeon_form_data_attach <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
+                                                </xsl:if>
+                                                <xsl:if test="$support-auto-save and /request/type = 'draft'">
+                                                    <!-- If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name -->
+                                                    <sql:execute>
+                                                        <sql:update>
+                                                            delete from <xsl:value-of select="$table-name"/>
+                                                            where
+                                                                app = <sql:param type="xs:string" select="/request/app"/>
+                                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                                                and draft = 'Y'
+                                                                and <xsl:value-of select="$last-modified-time"/> !=
+                                                                    (
+                                                                        <!-- Additional level of nesting required on MySQL http://stackoverflow.com/a/45498/5295 -->
+                                                                        select <xsl:value-of select="$last-modified-time"/> from
+                                                                        (
+                                                                            select max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
+                                                                            from <xsl:value-of select="$table-name"/>
+                                                                            where
+                                                                                app = <sql:param type="xs:string" select="/request/app"/>
+                                                                                and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                                and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                                <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                                                                and draft = 'Y'
+                                                                        ) t
+                                                                    )
+                                                        </sql:update>
+                                                    </sql:execute>
+                                                </xsl:if>
                                             </sql:connection>
                                         </result>
                                     </sql:config>

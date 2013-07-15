@@ -200,13 +200,13 @@ object Controls {
 
         ancestorRepeatPrefixedId foreach { ancestorRepeatPrefixedId ⇒
             // There is a common ancestor repeat, use the current common iteration as starting point
-            for (i ← 0 to ops.getAncestorRepeats(ancestorRepeatPrefixedId).size)
+            for (i ← 0 to ops.getAncestorRepeatIds(ancestorRepeatPrefixedId).size)
                 appendIterationToSuffix(sourceParts(i))
         }
 
         // Find list of ancestor repeats for destination WITHOUT including the closest ancestor repeat if any
         // NOTE: make a copy because the source might be an immutable wrapped Scala collection which we can't reverse
-        val targetAncestorRepeats = ops.getAncestorRepeats(targetPrefixedId, ancestorRepeatPrefixedId).reverse
+        val targetAncestorRepeats = ops.getAncestorRepeatIds(targetPrefixedId, ancestorRepeatPrefixedId).reverse
 
         // Follow repeat indexes towards target
         for (repeatPrefixedId ← targetAncestorRepeats) {

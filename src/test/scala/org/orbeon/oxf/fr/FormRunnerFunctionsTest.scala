@@ -18,10 +18,13 @@ import org.junit.Test
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.saxon.om.NodeInfo
-import org.orbeon.scaxon.XML._
 import FormRunner._
 import org.orbeon.oxf.util.NetUtils
 import collection.JavaConverters._
+import org.dom4j.{Document ⇒ JDocument}
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.XFormsUtils._
+import org.orbeon.scaxon.XML._
 
 class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -117,5 +120,95 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         assert("it" === selectFormRunnerLang(app, form, "it", Seq("fr", "it", "en").asJava))
         assert("en" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "en").asJava))
         assert("fr" === selectFormRunnerLang(app, form, "zh", Seq("fr", "it", "es").asJava))
+    }
+
+    private def templateWithRepeats: JDocument =
+        <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+              xmlns:xf="http://www.w3.org/2002/xforms"
+              xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+              xmlns:ev="http://www.w3.org/2001/xml-events"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+            <xh:head>
+                <xh:title>XForms Hello</xh:title>
+                <xf:model>
+                    <xf:instance>
+                        <data>
+                            <c1/>
+                            <c2/>
+                            <c3>
+                                <c4/>
+                                <c5/>
+                                <c6>
+                                    <c7/>
+                                    <c8/>
+                                </c6>
+                                <c6>
+                                    <c7/>
+                                    <c8/>
+                                </c6>
+                                <c9/>
+                                <c10/>
+                            </c3>
+                            <c3>
+                                <c4/>
+                                <c5/>
+                                <c6>
+                                    <c7/>
+                                    <c8/>
+                                </c6>
+                                <c6>
+                                    <c7/>
+                                    <c8/>
+                                </c6>
+                                <c9/>
+                                <c10/>
+                            </c3>
+                            <c11/>
+                            <c12/>
+                        </data>
+                    </xf:instance>
+                </xf:model>
+            </xh:head>
+            <xh:body>
+                <xf:input id="c1" ref="c1"/>
+                <xf:input id="c2" ref="c2"/>
+                <xf:repeat id="c3" ref="c3">
+                    <xf:input id="c4" ref="c4"/>
+                    <xf:input id="c5" ref="c5"/>
+                    <xf:repeat id="c6" ref="c6">
+                        <xf:input id="c7" ref="c7"/>
+                        <xf:input id="c8" ref="c8"/>
+                    </xf:repeat>
+                    <xf:input id="c9" ref="c9"/>
+                    <xf:input id="c10" ref="c10"/>
+                </xf:repeat>
+                <xf:input id="c11" ref="c11"/>
+                <xf:input id="c12" ref="c12"/>
+            </xh:body>
+        </xh:html>
+
+
+    @Test def errorSummarySortString(): Unit = {
+        withActionAndDoc(setupDocument(templateWithRepeats)) {
+
+            val doc = containingDocument
+
+            val controlIds     = 1 to 12 map ("c" +)
+            val controlIndexes = controlIds map doc.getStaticOps.getControlPosition
+
+            // Static control position follows source document order
+            assert(controlIndexes.sorted === controlIndexes)
+
+            val effectiveAbsoluteIds =
+                doc.getControls.getCurrentControlTree.getEffectiveIdsToControls.asScala map
+                { case (id, _) ⇒ effectiveIdToAbsoluteId(id) } toList
+
+            val sortStrings =
+                effectiveAbsoluteIds map (controlSortString(_, 3))
+
+            // Effective sort strings follow document order
+            assert(sortStrings.sorted === sortStrings)
+        }
     }
 }

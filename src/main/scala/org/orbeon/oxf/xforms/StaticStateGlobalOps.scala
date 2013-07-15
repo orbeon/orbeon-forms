@@ -104,16 +104,19 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
      * @param endPrefixedId     prefixed id of end repeat
      * @return                  Seq of prefixed id from leaf to root, or empty
      */
-    def getAncestorRepeats(startPrefixedId: String, endPrefixedId: Option[String] = None): Seq[String] =
+    def getAncestorRepeatIds(startPrefixedId: String, endPrefixedId: Option[String] = None): List[String]  =
         // If element analysis is found, find all its ancestor repeats until the root or until the end prefixed id is
-        getControlAnalysisOption(startPrefixedId).toSeq flatMap
+        getControlAnalysisOption(startPrefixedId).toList flatMap
             (_.ancestorRepeatsAcrossParts) takeWhile
                 (a ⇒ Some(a.prefixedId) != endPrefixedId) map
                     (_.prefixedId)
 
+    def getAncestorRepeats(prefixedId: String): List[RepeatControl] =
+        getControlAnalysis(prefixedId).ancestorRepeatsAcrossParts
+
     def getAncestorOrSelfRepeats(startPrefixedId: String): Seq[String] =
         (getControlAnalysisOption(startPrefixedId).toSeq collect
-            { case r: RepeatControl ⇒ r.prefixedId }) ++ getAncestorRepeats(startPrefixedId, None)
+            { case r: RepeatControl ⇒ r.prefixedId }) ++ getAncestorRepeatIds(startPrefixedId, None)
 
     /**
      * Find the closest common ancestor repeat given two prefixed ids. If the prefixed ids denote repeats, include them
@@ -126,8 +129,8 @@ class StaticStateGlobalOps(topLevelPart: PartAnalysis) extends PartGlobalOps {
     def findClosestCommonAncestorRepeat(prefixedId1: String, prefixedId2: String): Option[String] = {
 
         // Starting from the root, find the couples of repeats with identical ids
-        val longestPrefix = getAncestorRepeats(prefixedId1).reverse zip
-            getAncestorRepeats(prefixedId2).reverse takeWhile
+        val longestPrefix = getAncestorRepeatIds(prefixedId1).reverse zip
+            getAncestorRepeatIds(prefixedId2).reverse takeWhile
                 { case (left, right) ⇒ left == right }
 
         // Return the id of the last element found

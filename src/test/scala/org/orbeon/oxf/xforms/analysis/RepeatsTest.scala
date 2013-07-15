@@ -90,13 +90,13 @@ class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
             (name, ancestors) ← repeatAncestors
             id = "repeat-" + name
         } yield
-            assert(document.getStaticOps.getAncestorRepeats(id) === ancestors)
+            assert(document.getStaticOps.getAncestorRepeatIds(id) === ancestors)
 
         // Test ancestors of other controls and actions
         for {
             id ← Seq("my-output", "action1", "action2")
         } yield
-            assert(document.getStaticOps.getAncestorRepeats(id) === Seq("repeat-employee", "repeat-department"))
+            assert(document.getStaticOps.getAncestorRepeatIds(id) === Seq("repeat-employee", "repeat-department"))
 
         // Test closest common ancestor
         assert(document.getStaticOps.findClosestCommonAncestorRepeat("repeat-employee", "repeat-office") === Some("repeat-department"))

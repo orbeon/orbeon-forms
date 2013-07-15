@@ -13,20 +13,42 @@
  */
 package org.orbeon.oxf.test
 
-import org.dom4j.{Element ⇒ JElement, Document ⇒ JDocument}
-import org.orbeon.oxf.xforms.XFormsInstance
+import org.dom4j.{Element ⇒ JElement}
+import org.mockito.Mockito
+import org.orbeon.oxf.util.IndentedLogger
+import org.orbeon.oxf.xforms.action.XFormsAPI._
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsSingleNodeControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.events.XXFormsValueEvent
 import org.orbeon.oxf.xforms.event.{ClientEvents, XFormsEventTarget, XFormsCustomEvent, Dispatch}
-import org.orbeon.oxf.xml.{Dom4j, TransformerUtils}
+import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.oxf.xforms.{XFormsContainingDocument, XFormsInstance}
+import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.scalatest.mock.MockitoSugar
 import scala.xml.{XML, Elem}
 
 
-trait XFormsSupport {
+trait XFormsSupport extends MockitoSugar {
 
     self: DocumentTestBase ⇒
+
+    def withActionAndDoc[T](doc: XFormsContainingDocument)(body: ⇒ T): T =
+        withScalaAction(mockActionInterpreter(doc)) {
+            withContainingDocument(doc) {
+                body
+            }
+        }
+
+    private def mockActionInterpreter(doc: XFormsContainingDocument) = {
+        val actionInterpreter = mock[XFormsActionInterpreter]
+        Mockito when actionInterpreter.containingDocument thenReturn doc
+        Mockito when actionInterpreter.container thenReturn doc
+        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
+
+        actionInterpreter
+    }
 
     // Dispatch a custom event to the object with the given prefixed id
     def dispatch(name: String, prefixedId: String) =

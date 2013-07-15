@@ -27,7 +27,7 @@ trait FormRunnerErrorSummary {
         val repeatEffectiveId = absoluteIdToEffectiveId(repeatAbsoluteId)
         val repeatPrefixedId  = getPrefixedId(repeatEffectiveId)
 
-        val ancestorRepeats = containingDocument.getStaticOps.getAncestorRepeats(prefixedId, null)
+        val ancestorRepeats = containingDocument.getStaticOps.getAncestorRepeatIds(prefixedId)
 
         if (ancestorRepeats exists (_ == repeatPrefixedId)) {
             // Control is a descendant of the repeat so might be impacted
@@ -48,19 +48,57 @@ trait FormRunnerErrorSummary {
             absoluteId // id is not impacted
     }
 
+    private val Digits = "0" * 5
+
     // Return a sorting string for the given control absolute id, taking repeats into account
     def controlSortString(absoluteId: String, repeatsDepth: Int): String = {
 
         val effectiveId = absoluteIdToEffectiveId(absoluteId)
         val prefixedId  = getPrefixedId(effectiveId)
 
-        def paddedRepeats =
-            getEffectiveIdSuffixParts(effectiveId).reverse.padTo(repeatsDepth, 0).reverse
+        val controlPosition =
+            containingDocument.getStaticOps.getControlPosition(prefixedId).get // argument must be a view control
 
-        def controlPositionAsList =
-            containingDocument.getStaticOps.getControlPosition(prefixedId).toList
+        val repeatsFromLeaf =
+            containingDocument.getStaticOps.getAncestorRepeats(prefixedId)
 
-        val digits = 5
-        paddedRepeats ++ controlPositionAsList map (_.formatted(s"%0${digits}d")) mkString "-"
+        def iterations =
+            getEffectiveIdSuffixParts(effectiveId)
+
+        // Use arrays indexes to *attempt* to be more efficient
+        // NOTE: Profiler shows that the 2 calls to ofDim take 50% of the method time
+        val result = Array.ofDim[Int](repeatsDepth * 2 + 1)
+
+        locally {
+            var i = (repeatsFromLeaf.size - 1) * 2
+            for (r ← repeatsFromLeaf) {
+                result(i) = r.index
+                i -= 2
+            }
+        }
+
+        locally {
+            var i = 1
+            for (iteration ← iterations) {
+                result(i) = iteration
+                i += 2
+            }
+        }
+
+        result(repeatsFromLeaf.size * 2) = controlPosition
+
+        def padWithZeros(i: Int) = {
+            val s    = i.toString
+            val diff = Digits.length - s.length
+
+            if (diff > 0) Digits.substring(0, diff) + s else s
+        }
+
+        val resultString = Array.ofDim[String](result.length)
+
+        for (i ← 0 to result.length - 1)
+            resultString(i) = padWithZeros(result(i))
+
+        resultString mkString "-"
     }
 }

@@ -40,7 +40,7 @@ object XFormsAPI {
     private val actionInterpreterDyn  = new DynamicVariable[XFormsActionInterpreter]
 
     // Every block of action must be run within this
-    def withScalaAction(interpreter: XFormsActionInterpreter)(body: ⇒ Any) {
+    def withScalaAction[T](interpreter: XFormsActionInterpreter)(body: ⇒ T): T = {
         actionInterpreterDyn.withValue(interpreter) {
             body
         }
@@ -53,7 +53,7 @@ object XFormsAPI {
         }
 
     // Every block of action must be run within this
-    def withContainingDocument(containingDocument: XFormsContainingDocument)(body: ⇒ Any) {
+    def withContainingDocument[T](containingDocument: XFormsContainingDocument)(body: ⇒ T): T = {
         containingDocumentDyn.withValue(containingDocument) {
             body
         }

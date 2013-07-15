@@ -13,42 +13,33 @@
  */
 package org.orbeon.oxf.fb
 
-import org.mockito.Mockito
-import org.orbeon.oxf.test.DocumentTestBase
-import org.orbeon.oxf.util.IndentedLogger
-import org.orbeon.oxf.xforms.XFormsContainingDocument
-import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter
-import org.orbeon.oxf.xforms.processor.XFormsServer
+import org.orbeon.oxf.test.{XFormsSupport, DocumentTestBase}
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.scaxon.XML._
-import org.scalatest.mock.MockitoSugar
+import org.orbeon.oxf.xforms.XFormsContainingDocument
 
-trait FormBuilderSupport extends MockitoSugar {
+trait FormBuilderSupport extends XFormsSupport {
 
     self: DocumentTestBase ⇒
 
     val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
 
     // Run the body in the action context of a form which simulates the main Form Builder model
-    def withActionAndDoc[T](url: String, isCustomInstance: Boolean = false)(body: DocumentWrapper ⇒ T): Unit =
-        withActionAndDoc(formBuilderContainingDocument(url, isCustomInstance))(body)
+    def withActionAndDoc[T](url: String, isCustomInstance: Boolean = false)(body: DocumentWrapper ⇒ T): T =
+        withActionAndFBDoc(formBuilderContainingDocument(url, isCustomInstance))(body)
 
-    def formBuilderContainingDocument(url: String, isCustomInstance: Boolean = false) =
+    private def formBuilderContainingDocument(url: String, isCustomInstance: Boolean = false) =
         setupDocument(formBuilderDoc(url, isCustomInstance))
 
-    def withActionAndDoc[T](doc: XFormsContainingDocument)(body: DocumentWrapper ⇒ T): Unit = {
-        val actionInterpreter = mockActionInterpreter(doc)
-        withScalaAction(actionInterpreter) {
-            withContainingDocument(doc) {
-                body(
-                    doc.models
-                    find    (_.getId == "fr-form-model")
-                    flatMap (m ⇒ Option(m.getInstance("fb-form-instance")))
-                    map     (_.documentInfo.asInstanceOf[DocumentWrapper])
-                    orNull
-                )
-            }
+    def withActionAndFBDoc[T](doc: XFormsContainingDocument)(body: DocumentWrapper ⇒ T): T = {
+        withActionAndDoc(doc) {
+            body(
+                doc.models
+                find    (_.getId == "fr-form-model")
+                flatMap (m ⇒ Option(m.getInstance("fb-form-instance")))
+                map     (_.documentInfo.asInstanceOf[DocumentWrapper])
+                orNull
+            )
         }
     }
 
@@ -106,13 +97,4 @@ trait FormBuilderSupport extends MockitoSugar {
                 <xh:body>
                 </xh:body>
             </xh:html>)
-
-    private def mockActionInterpreter(doc: XFormsContainingDocument) = {
-        val actionInterpreter = mock[XFormsActionInterpreter]
-        Mockito when actionInterpreter.containingDocument thenReturn doc
-        Mockito when actionInterpreter.container thenReturn doc
-        Mockito when actionInterpreter.indentedLogger thenReturn new IndentedLogger(XFormsServer.logger, "action")
-
-        actionInterpreter
-    }
 }

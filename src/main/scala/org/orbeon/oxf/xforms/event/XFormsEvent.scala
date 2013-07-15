@@ -197,7 +197,7 @@ object XFormsEvent {
     private def repeatAncestors(e: XFormsEvent): Option[Seq[String]] =
         if (hasEffectiveIdSuffix(e.targetObject.getEffectiveId)) {
             // There is a suffix so compute
-            val ancestorRepeats = e.containingDocument.getStaticOps.getAncestorRepeats(getPrefixedId(e.targetObject.getEffectiveId), null)
+            val ancestorRepeats = e.containingDocument.getStaticOps.getAncestorRepeatIds(getPrefixedId(e.targetObject.getEffectiveId))
             Some(ancestorRepeats map getStaticIdFromId)
         } else
             // No suffix

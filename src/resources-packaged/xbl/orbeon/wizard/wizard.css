@@ -66,6 +66,9 @@
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav .invalid > span > a {
   color: #b94a48;
 }
+.orbeon .xbl-fr-wizard .fr-wizard-toc .nav .invalid.active > span > a {
+  color: #ffffff;
+}
 .orbeon .xbl-fr-wizard .fr-wizard-toc .nav li {
   line-height: 30px;
   *height: 100%;

@@ -512,6 +512,7 @@ trait Actions {
             dialogName foreach (show(_))
         }
 
+    // TODO: Use dialog("fr-submission-result-dialog")
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {
             show("fr-submission-result-dialog", Map(

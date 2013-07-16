@@ -11,6 +11,7 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
+@import "bootstrap-src/less/variables";
 @spacing: 10px; // same as .fr-border
 
 .orbeon {
@@ -59,7 +60,6 @@
 
         tbody {
             a { text-decoration: none; color: black; outline: 0 }   // Links in table must appear as normal text
-            span { color: black;  }                                 // When there is no link (delete-only), override YUI CSS that shows current row text in white
         }
 
         td {
@@ -78,17 +78,17 @@
         }
 
         .fr-summary-repeat-selection-checkbox {
+            width: 1px;                                             // So the column takes the minimum possible space
             .xforms-select input { float: none }                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
             label {
+                display: inline-block;                              // Override Bootstrap's block, so we can have "Draft" next the checkbox
                 margin: 0;
                 padding: 0;
                 text-indent: 0;
                 input { margin: 0}
             }
+            .label { vertical-align: middle }                       // Vertically center Draft label on the chekcbox
         }
-
-        .fr-summary-repeat-column-number { text-align: right; width: 3em }
-
     }
 
     /* With IE 6/7, legend and overflow don't behave */

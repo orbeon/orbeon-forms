@@ -54,9 +54,6 @@
   color: black;
   outline: 0;
 }
-.orbeon .fr-summary-table-div tbody span {
-  color: black;
-}
 .orbeon .fr-summary-table-div td {
   white-space: nowrap;
 }
@@ -70,10 +67,14 @@
 .orbeon .fr-summary-table-div th {
   white-space: nowrap;
 }
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox {
+  width: 1px;
+}
 .orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox .xforms-select input {
   float: none;
 }
 .orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox label {
+  display: inline-block;
   margin: 0;
   padding: 0;
   text-indent: 0;
@@ -81,9 +82,8 @@
 .orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox label input {
   margin: 0;
 }
-.orbeon .fr-summary-table-div .fr-summary-repeat-column-number {
-  text-align: right;
-  width: 3em;
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox .label {
+  vertical-align: middle;
 }
 .orbeon .xforms-noscript .fr-summary-table-div td legend {
   display: none;

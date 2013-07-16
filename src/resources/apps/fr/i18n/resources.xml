@@ -52,7 +52,6 @@
             <titles>
                 <summary-title>Summary</summary-title>
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
-                <row-number>No.</row-number>
                 <created>Created</created>
                 <last-modified>Last Modified</last-modified>
                 <selected>Selected</selected>
@@ -80,6 +79,7 @@
                 <delete-confirmation>Are you sure you want to delete one or more forms?</delete-confirmation>
             </messages>
             <labels>
+                <draft>Draft</draft>
                 <language-choice>Choose language</language-choice>
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
@@ -111,7 +111,7 @@
                 <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
                 <email>&lt;i class="icon-envelope"/&gt; Email</email>
                 <validate>&lt;i class="icon-ok"/&gt; Validate</validate>
-                
+
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Submit</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Review</workflow-review>
@@ -245,7 +245,6 @@
             <titles>
                 <summary-title>Sommaire</summary-title>
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
-                <row-number>No.</row-number>
                 <created>Création</created>
                 <last-modified>Dernière modification</last-modified>
                 <selected>Sélection</selected>
@@ -273,6 +272,7 @@
                 <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires ?</delete-confirmation>
             </messages>
             <labels>
+                <draft>Brouillons</draft>
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
@@ -310,7 +310,7 @@
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Valider</workflow-review>
                 <workflow-send>&lt;i class="icon-arrow-right"/&gt; Envoyer</workflow-send>
                 <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Editer</workflow-edit>
-                
+
                 <!-- Other standard buttons -->
                 <home>&lt;i class="icon-home"/&gt; Accueil</home>
                 <summary>&lt;i class="icon-list"/&gt; Sommaire</summary>
@@ -440,7 +440,6 @@
             <titles>
                 <summary-title>Resumen</summary-title>
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
-                <row-number>No.</row-number>
                 <created>Creado</created>
                 <last-modified>Fecha de modificación</last-modified>
                 <selected>Seleccionado</selected>
@@ -468,6 +467,7 @@
                 <delete-confirmation>Esta seguro que desea borrar uno o más formularios?</delete-confirmation>
             </messages>
             <labels>
+                <draft>Borradores</draft>
                 <language-choice>Seleccione Idioma</language-choice>
                 <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
@@ -633,7 +633,6 @@
             <titles>
                 <summary-title>Oppsummering</summary-title>
                 <delete-confirmation>[Confirm Deletion]</delete-confirmation>
-                <row-number>Nr.</row-number>
                 <created>Opprettet</created>
                 <last-modified>Sist endret</last-modified>
                 <selected>Valgt</selected>
@@ -661,6 +660,7 @@
                 <delete-confirmation>Vil du slette markerte skjema?</delete-confirmation>
             </messages>
             <labels>
+                <draft>[Draft]</draft>
                 <language-choice>Velg språk</language-choice>
                 <form-choice>Velg et skjema</form-choice>
                 <free-search>Fritekstsøk</free-search>
@@ -693,7 +693,7 @@
                 <send>&lt;i class="icon-arrow-right"/&gt; Send</send>
                 <email>&lt;i class="icon-envelope"/&gt; Epost</email>
                 <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
-                
+
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Send inn</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Vis</workflow-review>
@@ -824,7 +824,6 @@
             <titles>
                 <summary-title>Общая информация</summary-title>
                 <delete-confirmation>[Confirm Deletion]</delete-confirmation>
-                <row-number>№.</row-number>
                 <created>Дата создания</created>
                 <last-modified>Дата изменения</last-modified>
                 <selected>Выбрана</selected>
@@ -852,6 +851,7 @@
                 <delete-confirmation>Вы уверены, что хотите удалить формы?</delete-confirmation>
             </messages>
             <labels>
+                <draft>черновик</draft>
                 <language-choice>Выберите язык</language-choice>
                 <form-choice>Выберите форму</form-choice>
                 <free-search>Поиск</free-search>
@@ -883,7 +883,7 @@
                 <send>&lt;i class="icon-arrow-right"/&gt; Отправить</send>
                 <email>&lt;i class="icon-envelope"/&gt; Email</email>
                 <validate>&lt;i class="icon-ok"/&gt; [Validate]</validate>
-                
+
                 <!-- Legacy buttons -->
                 <submit>&lt;i class="icon-arrow-right"/&gt; Отправить</submit>
                 <workflow-review>&lt;i class="icon-arrow-right"/&gt; Просмотреть</workflow-review>

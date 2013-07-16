@@ -463,9 +463,6 @@
                                 <xh:thead>
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
-                                        <xh:th fr:sortable="false" class="fr-summary-repeat-column-number" fr:resizeable="true">
-                                            <xf:output value="$fr-resources/summary/titles/row-number"/>
-                                        </xh:th>
                                         <xf:repeat ref="if ($show-created) then '' else ()">
                                             <xh:th fr:sortable="false" fr:resizeable="true">
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
@@ -489,8 +486,6 @@
                                     <xf:repeat ref="1 to count(document)" id="documents-repeat"><!-- iterate over positions so that repeat iterations are not recreated  -->
                                         <!-- 1-based position in the current page -->
                                         <xf:var name="position" value="position()"/>
-                                        <!-- 1-based position in the entire result set -->
-                                        <xf:var name="document-number" value="instance('fr-paging-instance')/from + $position - 1" as="xs:integer"/>
                                         <!-- Set context to current document -->
                                         <xf:group context="instance('fr-summary-instance')/document[$position]" appearance="xxf:internal">
                                             <xf:var name="document" value="."/>
@@ -501,8 +496,12 @@
                                             <xf:var name="global-operations" value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
                                             <xf:var name="current-document-operations" value="if (exists(@operations)) then xxf:split(@operations) else $global-operations" as="xs:string*"/>
                                             <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
-                                            <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/',
-                                                    $current-document-name, if (property('xxf:noscript')) then '?fr-noscript=true' else '')"/>
+                                            <xf:var name="req-parameters" value="(
+                                                    if (property('xxf:noscript')) then 'fr-noscript=true' else (),
+                                                    if ($document/@draft = 'Y') then 'draft=1' else ()
+                                                )"/>
+                                            <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/', $current-document-name,
+                                                    if (exists($req-parameters)) then concat('?', string-join($req-parameters, '&amp;')) else '')"/>
                                             <xh:tr class="{if (xxf:split(instance('fr-selection-instance')) = $current-document-name) then 'fr-summary-row-selected' else 'fr-summary-row-not-selected'}">
                                                 <xh:td class="fr-summary-repeat-selection-checkbox">
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
@@ -511,16 +510,7 @@
                                                             <xf:value value="$current-document-name"/>
                                                         </xf:item>
                                                     </xf:select>
-                                                </xh:td>
-                                                <xh:td class="fr-summary-repeat-column-number">
-                                                    <xf:group ref=".[$edit-view != '']">
-                                                        <xh:a href="{$current-document-href}" target="_blank">
-                                                            <xf:output value="$document-number"/>
-                                                        </xh:a>
-                                                    </xf:group>
-                                                    <xf:group ref=".[$edit-view = '']">
-                                                        <xf:output value="$document-number"/>
-                                                    </xf:group>
+                                                    <xf:output ref="if ($document/@draft = 'Y') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
                                                 </xh:td>
                                                 <!-- Why repeat and not group? -->
                                                 <xf:repeat ref="if ($show-created) then '' else ()">

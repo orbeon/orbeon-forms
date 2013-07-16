@@ -295,6 +295,15 @@ body.orbeon {
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-alert .xforms-output-output ul {
   list-style-type: square;
 }
+.orbeon .fr-view .xbl-fr-error-summary table {
+  margin: 2px;
+}
+.orbeon .fr-view .xbl-fr-error-summary td {
+  padding: 2px 10px;
+}
+.orbeon .fr-view .xbl-fr-error-summary .fr-error-number {
+  text-align: right;
+}
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-summary-body {
   padding: 0;
   margin-bottom: 10px;

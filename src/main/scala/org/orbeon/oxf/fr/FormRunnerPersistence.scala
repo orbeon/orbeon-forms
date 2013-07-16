@@ -22,6 +22,7 @@ import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xforms.analysis.model.StaticBind.ValidationLevel
 
 trait FormRunnerPersistence {
 
@@ -147,6 +148,6 @@ trait FormRunnerPersistence {
     // reflected with the use of XBL components.
     def dataValid = errorSummaryInstance.rootElement \ "valid" === "true"
 
-    // Return the number of warnings captured by the error summary
-    def countWarnings = (errorSummaryInstance.rootElement \ "counts" \@ "warning" stringValue).toInt
+    // Return the number of failed validations captured by the error summary for the given level
+    def countValidationsByLevel(level: ValidationLevel) = (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
 }

@@ -28,6 +28,7 @@ import scala.util.control.{NonFatal, ControlThrowable, Breaks}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.common.OXFException
 import org.apache.commons.lang3.StringUtils
+import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 
 // Implementation of simple processes
 //
@@ -382,27 +383,26 @@ trait Actions {
     import SimpleProcess._
 
     def AllowedActions = Map[String, Action](
-        "pending-uploads" → tryPendingUploads,
-        "validate"        → tryValidate,
-        "warnings"        → tryWarnings,
-        "save"            → trySaveAttachmentsAndData,
-        "success-message" → trySuccessMessage,
-        "error-message"   → tryErrorMessage,
-        "email"           → trySendEmail,
-        "send"            → trySend,
-        "navigate"        → tryNavigate,
-        "review"          → tryNavigateToReview,
-        "edit"            → tryNavigateToEdit,
-        "summary"         → tryNavigateToSummary,
-        "visit-all"       → tryVisitAll,
-        "unvisit-all"     → tryUnvisitAll,
-        "expand-all"      → tryExpandSections,
-        "collapse-all"    → tryCollapseSections,
-        "dialog"          → tryShowDialog,
-        "result-dialog"   → tryShowResultDialog,
-        "captcha"         → tryCaptcha,
-        "wizard-prev"     → tryWizardPrev,
-        "wizard-next"     → tryWizardNext
+        "pending-uploads"  → tryPendingUploads,
+        "validate"         → tryValidate,
+        "save"             → trySaveAttachmentsAndData,
+        "success-message"  → trySuccessMessage,
+        "error-message"    → tryErrorMessage,
+        "email"            → trySendEmail,
+        "send"             → trySend,
+        "navigate"         → tryNavigate,
+        "review"           → tryNavigateToReview,
+        "edit"             → tryNavigateToEdit,
+        "summary"          → tryNavigateToSummary,
+        "visit-all"        → tryVisitAll,
+        "unvisit-all"      → tryUnvisitAll,
+        "expand-all"       → tryExpandSections,
+        "collapse-all"     → tryCollapseSections,
+        "dialog"           → tryShowDialog,
+        "result-dialog"    → tryShowResultDialog,
+        "captcha"          → tryCaptcha,
+        "wizard-prev"      → tryWizardPrev,
+        "wizard-next"      → tryWizardNext
     )
 
     // Check whether there are pending uploads
@@ -415,20 +415,10 @@ trait Actions {
     // Validate form data and fail if invalid
     def tryValidate(params: ActionParams): Try[Any] =
         Try {
-            val property = params.get(Some("property")) orElse params.get(None)
+            val level = params.get(Some("level")) orElse params.get(None) map LevelByName getOrElse ErrorLevel
 
-            implicit val formRunnerParams = FormRunnerParams()
-            def ignore = property flatMap formRunnerProperty exists (_ == "false")
-
-            if (! ignore && ! dataValid)
-                throw new OXFException("Data is invalid")
-        }
-
-    // Check if there are warnings and fail if so
-    def tryWarnings(params: ActionParams): Try[Any] =
-        Try {
-            if (countWarnings > 0)
-                throw new OXFException("Form has warnings")
+            if (countValidationsByLevel(level) > 0)
+                throw new OXFException(s"Data has failed constraints for level ${level.name}")
         }
 
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =

@@ -19,30 +19,36 @@
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-        id="fr-warnings-dialog" level="modal" close="true" draggable="true" class="fr-dialog fr-warnings-dialog">
+        id="fr-validation-dialog" level="modal" close="true" draggable="true" class="fr-dialog fr-validation-dialog">
 
-    <xf:label ref="$fr-resources/detail/messages/warning-dialog-title"/>
+    <xf:label ref="$fr-resources/detail/messages/validation-dialog-title"/>
 
     <xh:img src="/ops/images/xforms/warning_64.png" alt="" class="fr-dialog-icon"/>
     <xh:div class="fr-dialog-message">
         <xf:output
             value="xxf:format-message(
-                       $fr-resources/detail/messages/warning-dialog-message,
-                       xs:decimal(xxf:instance('fr-error-summary-instance')/visible-counts/@warning)
+                       $fr-resources/detail/messages/validation-dialog-message,
+                       (
+                           xxf:instance('fr-error-summary-instance')/counts/(if (count((@error, @warning, @info)[. gt 0]) gt 1) then 3 else if (@error gt 0) then 0 else if (@warning gt 0) then 1 else if (@info gt 0) then 2 else 4),
+                           xxf:instance('fr-error-summary-instance')/counts/xs:integer(@alert)
+                       )
                    )"/>
     </xh:div>
     <xh:div class="fr-dialog-buttons">
         <xf:trigger>
-            <xf:label ref="$fr-resources/detail/buttons/warning-dialog-review"/>
-            <xxf:hide event="DOMActivate" dialog="fr-warnings-dialog"/>
-        </xf:trigger>
-        <xf:trigger appearance="xxf:primary">
-            <xf:label ref="$fr-resources/detail/buttons/warning-dialog-continue"/>
-            <xxf:hide event="DOMActivate" dialog="fr-warnings-dialog">
+            <xf:label ref="$fr-resources/detail/buttons/validation-dialog-continue"/>
+            <xxf:hide event="DOMActivate" dialog="fr-validation-dialog">
                 <xf:property name="process" value="'resume'"/>
             </xxf:hide>
         </xf:trigger>
+        <xf:trigger id="fr-validation-dialog-cancel" appearance="xxf:primary">
+            <xf:label ref="$fr-resources/detail/buttons/validation-dialog-review"/>
+            <xxf:hide event="DOMActivate" dialog="fr-validation-dialog"/>
+        </xf:trigger>
     </xh:div>
+
+    <!-- Focus on Cancel button first as that is the least dangerous operation -->
+    <xf:setfocus event="xxforms-dialog-open" control="fr-validation-dialog-cancel"/>
 
     <!-- Run the "abort" process when the dialog is closed unless a process is specified -->
     <xf:action event="xxforms-dialog-close" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">

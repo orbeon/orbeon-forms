@@ -400,7 +400,7 @@
         <!-- Misc standard dialogs -->
         <xi:include href="oxf:/apps/fr/includes/clear-dialog.xhtml"      xxi:omit-xml-base="true"/>
         <xi:include href="oxf:/apps/fr/includes/submission-dialog.xhtml" xxi:omit-xml-base="true"/>
-        <xi:include href="oxf:/apps/fr/includes/warnings-dialog.xhtml"   xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/validation-dialog.xhtml" xxi:omit-xml-base="true"/>
 
         <!-- Error dialog -->
         <fr:alert-dialog id="fr-error-dialog" close="true">

@@ -81,7 +81,7 @@
                                 <!-- NOTE: Use xxf:control so that xxf:client-id() can resolve, as it needs a concrete control to work. -->
                                 <xh:div class="tab-pane{if (position() = 1) then ' active' else ''}" id="tab-pane-{position()}" xxf:control="true">
                                     <xf:group xxbl:scope="outer" appearance="xxf:internal">
-                                        <xsl:apply-templates select="node() except fr:label"/>
+                                        <xsl:apply-templates select="@model | @context | @ref | @bind | node() except fr:label"/>
                                     </xf:group>
                                 </xh:div>
                             </xsl:for-each>

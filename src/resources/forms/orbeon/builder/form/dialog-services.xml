@@ -398,7 +398,7 @@
                          readonly="normalize-space(../initial-name)"/>
             <xf:bind ref="submission-id" calculate="concat(../name, '-submission')"/>
             <xf:bind ref="instance-id" calculate="concat(../name, '-instance')"/>
-            <xf:bind ref="request/resource" type="xs:anyURI" required="true()"/>
+            <xf:bind ref="request/resource" required="true()"/>
             <xf:bind ref="request/(is-soap, is-auth)" type="xs:boolean"/>
             <!--<xf:bind ref="request/soap-action"/>-->
             <!-- Compute mediatype based on SOAP or serialization -->
@@ -431,7 +431,7 @@
                 ref="saxon:parse(instance('fb-submission-editor-instance')/request/body)/*"
                 method="{instance('fb-submission-editor-instance')/request/method}"
                 serialization="{instance('fb-submission-editor-instance')/request/serialization}"
-                resource="{instance('fb-submission-editor-instance')/request/resource}"
+                resource="{xxf:evaluate-avt(instance('fb-submission-editor-instance')/request/resource)}"
                 mediatype="{instance('fb-submission-editor-instance')/request/mediatype}"
                 replace="text" target="instance('fb-submission-editor-instance')/response/body"
                 xxf:username="{instance('fb-submission-editor-instance')/request/username}"

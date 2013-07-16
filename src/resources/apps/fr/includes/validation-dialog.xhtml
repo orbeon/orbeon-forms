@@ -38,7 +38,7 @@
         <xf:trigger>
             <xf:label ref="$fr-resources/detail/buttons/validation-dialog-continue"/>
             <xxf:hide event="DOMActivate" dialog="fr-validation-dialog">
-                <xf:property name="process" value="'resume'"/>
+                <xf:property name="process" value="'validation-dialog-continue'"/>
             </xxf:hide>
         </xf:trigger>
         <xf:trigger id="fr-validation-dialog-cancel" appearance="xxf:primary">
@@ -52,7 +52,7 @@
 
     <!-- Run the "abort" process when the dialog is closed unless a process is specified -->
     <xf:action event="xxforms-dialog-close" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-        process:runProcess((event('process'), 'abort')[1])
+        process:runProcessByName((event('process'), 'validation-dialog-review')[1])
     </xf:action>
 
 </xxf:dialog>

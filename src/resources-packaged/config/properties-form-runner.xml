@@ -176,6 +176,8 @@
     <property as="xs:string"  name="oxf.fr.detail.process.require-valid-recover.*.*"            value='visit-all then expand-all then error-message("form-validation-error") then success'/>
     <property as="xs:string"  name="oxf.fr.detail.process.review-messages-recover.*.*"          value='dialog("fr-validation-dialog") then suspend'/>
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                      value='save'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"         value='abort'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*"       value='resume'/>
 
     <!-- Reusable processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*"                  value='pending-uploads recover require-uploads-recover'/>

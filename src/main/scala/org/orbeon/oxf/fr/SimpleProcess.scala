@@ -311,8 +311,11 @@ object SimpleProcess extends Actions with Logging {
         (_ ⇒ trySuccess(Map()))
 
     // Resume a process
-    def tryResume(params: ActionParams): Try[Any] =
-        runSubProcess(readSavedProcess)
+    def tryResume(params: ActionParams): Try[Any] = {
+        val process = readSavedProcess
+        saveProcess("")
+        runSubProcess(process)
+    }
 
     // Abort a suspended process
     def tryAbort(params: ActionParams): Try[Any] =

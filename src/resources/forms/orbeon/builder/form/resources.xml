@@ -198,11 +198,8 @@
             <label>Move Left</label>
         </move-left-icon>
         <control-details-icon>
-            <label>Control Details</label>
+            <label>Control Settings</label>
         </control-details-icon>
-        <validation-settings-icon>
-            <label>Validation Settings</label>
-        </validation-settings-icon>
         <switch-appearance-icon>
             <label>Switch Appearance</label>
         </switch-appearance-icon>
@@ -263,7 +260,11 @@
             <all>All</all>
         </dialog-form-settings>
         <dialog-control-details>
-            <label>Control Details</label>
+            <label>Control Settings</label>
+            <tab-base><label>Basic Settings</label></tab-base>
+            <tab-validations><label>Validations and Alerts</label></tab-validations>
+            <tab-formulas><label>Formulas</label></tab-formulas>
+            <tab-help><label>Help Message</label></tab-help>
             <control-name>
                 <label>Control Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -293,59 +294,6 @@
                     <value>fr-email-subject</value>
                 </item>
             </classes>
-        </dialog-control-details>
-        <dialog-section-details>
-            <label>Section Details</label>
-            <control-name>
-                <label>Section Name</label>
-                <alert>Name is already in use or incorrect</alert>
-                <hint>E.g.: "address"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibility</label>
-                <alert>Incorrect XPath expression</alert>
-                <hint>Boolean XPath expression</hint>
-            </visibility>
-            <readonly>
-                <label>Read-Only</label>
-                <alert>Incorrect XPath expression</alert>
-                <hint>Boolean XPath expression</hint>
-            </readonly>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Grid Details</label>
-            <grid-name>
-                <label>Grid Name</label>
-                <alert>Name is already in use or incorrect</alert>
-                <hint>E.g.: "first-name"</hint>
-            </grid-name>
-            <visibility>
-                <label>Visibility</label>
-                <alert>Incorrect XPath expression</alert>
-                <hint>Boolean XPath expression</hint>
-            </visibility>
-            <readonly>
-                <label>Read-Only</label>
-                <alert>Incorrect XPath expression</alert>
-                <hint>Boolean XPath expression</hint>
-            </readonly>
-            <min>
-                <label>Minimum Number of Repetitions</label>
-                <alert>Incorrect value</alert>
-                <hint>Non-negative number</hint>
-            </min>
-            <max>
-                <label>Maximum Number of Repetitions</label>
-                <alert>Incorrect value</alert>
-                <hint>Positive number</hint>
-            </max>
-            <other>Other</other>
-            <one>One repetition</one>
-            <unlimited>Unlimited</unlimited>
-            <no-minimum>No minimum</no-minimum>
-        </dialog-grid-details>
-        <dialog-validation-details>
-            <label>Validation Properties</label>
             <types>
                 <label>Data Type</label>
             </types>
@@ -492,10 +440,57 @@
             <validation-type><label>Validation Type</label></validation-type>
             <validation-details><label>Validation Details</label></validation-details>
             <level><label>Level</label></level>
-            <tab-formulas><label>Formulas</label></tab-formulas>
-            <tab-validations><label>Constraints and Alerts</label></tab-validations>
-            <tab-help><label>Help</label></tab-help>
-        </dialog-validation-details>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Section Details</label>
+            <control-name>
+                <label>Section Name</label>
+                <alert>Name is already in use or incorrect</alert>
+                <hint>E.g.: "address"</hint>
+            </control-name>
+            <visibility>
+                <label>Visibility</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </visibility>
+            <readonly>
+                <label>Read-Only</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </readonly>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Grid Details</label>
+            <grid-name>
+                <label>Grid Name</label>
+                <alert>Name is already in use or incorrect</alert>
+                <hint>E.g.: "first-name"</hint>
+            </grid-name>
+            <visibility>
+                <label>Visibility</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </visibility>
+            <readonly>
+                <label>Read-Only</label>
+                <alert>Incorrect XPath expression</alert>
+                <hint>Boolean XPath expression</hint>
+            </readonly>
+            <min>
+                <label>Minimum Number of Repetitions</label>
+                <alert>Incorrect value</alert>
+                <hint>Non-negative number</hint>
+            </min>
+            <max>
+                <label>Maximum Number of Repetitions</label>
+                <alert>Incorrect value</alert>
+                <hint>Positive number</hint>
+            </max>
+            <other>Other</other>
+            <one>One repetition</one>
+            <unlimited>Unlimited</unlimited>
+            <no-minimum>No minimum</no-minimum>
+        </dialog-grid-details>
         <dialog-confirmation>
             <label>Confirm</label>
         </dialog-confirmation>
@@ -1064,11 +1059,8 @@
             <label>Déplacer vers la gauche</label>
         </move-left-icon>
         <control-details-icon>
-            <label>Détails du contrôle</label>
+            <label>Paramètres du contrôle</label>
         </control-details-icon>
-        <validation-settings-icon>
-            <label>Réglage de la validation</label>
-        </validation-settings-icon>
         <switch-appearance-icon>
             <label>Changer l'apparence</label>
         </switch-appearance-icon>
@@ -1129,7 +1121,11 @@
             <all>Total</all>
         </dialog-form-settings>
         <dialog-control-details>
-            <label>Détails du contrôle</label>
+            <label>Paramètres du contrôle</label>
+            <tab-base><label>Paramètres de base</label></tab-base>
+            <tab-validations><label>Validations et alertes</label></tab-validations>
+            <tab-formulas><label>Formules</label></tab-formulas>
+            <tab-help><label>Message d'Aide</label></tab-help>
             <control-name>
                 <label>Nom du contrôle</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -1154,59 +1150,6 @@
                     <value>fr-email-subject</value>
                 </item>
             </classes>
-        </dialog-control-details>
-        <dialog-section-details>
-            <label>Détails de la section</label>
-            <control-name>
-                <label>Nom de la section</label>
-                <alert>Le nom est déjà utilisé ou incorrect</alert>
-                <hint>Par ex.: "addresse"</hint>
-            </control-name>
-            <visibility>
-                <label>Visibilité</label>
-                <alert>Expression XPath incorrecte</alert>
-                <hint>Expression XPath booléenne</hint>
-            </visibility>
-            <readonly>
-                <label>Lecture seule</label>
-                <alert>Expression XPath incorrecte</alert>
-                <hint>Expression XPath booléenne</hint>
-            </readonly>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Détails de la grille</label>
-            <grid-name>
-                <label>Nom de la grille</label>
-                <alert>Le nom est déjà utilisé ou incorrect</alert>
-                <hint>Par ex.: "addresse"</hint>
-            </grid-name>
-            <visibility>
-                <label>Visibilité</label>
-                <alert>Expression XPath incorrecte</alert>
-                <hint>Expression XPath booléenne</hint>
-            </visibility>
-            <readonly>
-                <label>Lecture seule</label>
-                <alert>Expression XPath incorrecte</alert>
-                <hint>Expression XPath booléenne</hint>
-            </readonly>
-            <min>
-                <label>Nombre minimum de répétitions</label>
-                <alert>Valeur incorrecte</alert>
-                <hint>Nombre non-négatif</hint>
-            </min>
-            <max>
-                <label>Nombre maximum de répétitions</label>
-                <alert>Valeur incorrecte</alert>
-                <hint>Nombre positif</hint>
-            </max>
-            <other>Autre</other>
-            <one>Une répétition</one>
-            <unlimited>Illimité</unlimited>
-            <no-minimum>Pas de minimum</no-minimum>
-        </dialog-grid-details>
-        <dialog-validation-details>
-            <label>Propriétés de validation</label>
             <types>
                 <label>Type de donnée</label>
             </types>
@@ -1353,10 +1296,57 @@
             <validation-type><label>Type de validation</label></validation-type>
             <validation-details><label>Détails de validation</label></validation-details>
             <level><label>Niveau</label></level>
-            <tab-formulas><label>Formules</label></tab-formulas>
-            <tab-validations><label>Contraintes et alertes</label></tab-validations>
-            <tab-help><label>Aide</label></tab-help>
-        </dialog-validation-details>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Détails de la section</label>
+            <control-name>
+                <label>Nom de la section</label>
+                <alert>Le nom est déjà utilisé ou incorrect</alert>
+                <hint>Par ex.: "addresse"</hint>
+            </control-name>
+            <visibility>
+                <label>Visibilité</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </visibility>
+            <readonly>
+                <label>Lecture seule</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </readonly>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Détails de la grille</label>
+            <grid-name>
+                <label>Nom de la grille</label>
+                <alert>Le nom est déjà utilisé ou incorrect</alert>
+                <hint>Par ex.: "addresse"</hint>
+            </grid-name>
+            <visibility>
+                <label>Visibilité</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </visibility>
+            <readonly>
+                <label>Lecture seule</label>
+                <alert>Expression XPath incorrecte</alert>
+                <hint>Expression XPath booléenne</hint>
+            </readonly>
+            <min>
+                <label>Nombre minimum de répétitions</label>
+                <alert>Valeur incorrecte</alert>
+                <hint>Nombre non-négatif</hint>
+            </min>
+            <max>
+                <label>Nombre maximum de répétitions</label>
+                <alert>Valeur incorrecte</alert>
+                <hint>Nombre positif</hint>
+            </max>
+            <other>Autre</other>
+            <one>Une répétition</one>
+            <unlimited>Illimité</unlimited>
+            <no-minimum>Pas de minimum</no-minimum>
+        </dialog-grid-details>
         <dialog-confirmation>
             <label>Confirmation</label>
         </dialog-confirmation>
@@ -1929,9 +1919,6 @@
         <control-details-icon>
             <label>Elementdetaljer</label>
         </control-details-icon>
-        <validation-settings-icon>
-            <label>Elementegenskaper</label>
-        </validation-settings-icon>
         <switch-appearance-icon>
             <label>Endre utseende</label>
         </switch-appearance-icon>
@@ -1993,6 +1980,10 @@
         </dialog-form-settings>
         <dialog-control-details>
             <label>Rediger elementdetaljer</label>
+            <tab-base><label>[Basic Settings]</label></tab-base>
+            <tab-validations><label>[Validations and Alerts]</label></tab-validations>
+            <tab-formulas><label>[Formulas]</label></tab-formulas>
+            <tab-help><label>[Help Message]</label></tab-help>
             <control-name>
                 <label>Elementnavn</label>
                 <alert>Navnet er galt eller allerede i bruk.</alert>
@@ -2017,59 +2008,6 @@
                     <value>fr-email-subject</value>
                 </item>
             </classes>
-        </dialog-control-details>
-        <dialog-section-details>
-            <label>Rediger seksjonsdetaljer</label>
-            <control-name>
-                <label>Seksjonsnavn</label>
-                <alert>Navnet er galt eller allerede i bruk.</alert>
-                <hint>F.eks.: «adresse»</hint>
-            </control-name>
-            <visibility>
-                <label>Synlighet</label>
-                <alert>Galt XPath-uttrykk</alert>
-                <hint>Boolsk XPath-uttrykk</hint>
-            </visibility>
-            <readonly>
-                <label>Skrivebeskyttet</label>
-                <alert>Galt XPath-uttrykk</alert>
-                <hint>Boolsk XPath-uttrykk</hint>
-            </readonly>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>[Grid Details]</label>
-            <grid-name>
-                <label>[Grid Name]</label>
-                <alert>[Name is already in use or incorrect]</alert>
-                <hint>[E.g.: "first-name"]</hint>
-            </grid-name>
-            <visibility>
-                <label>Synlighet</label>
-                <alert>Galt XPath-uttrykk</alert>
-                <hint>Boolsk XPath-uttrykk</hint>
-            </visibility>
-            <readonly>
-                <label>Skrivebeskyttet</label>
-                <alert>Galt XPath-uttrykk</alert>
-                <hint>Boolsk XPath-uttrykk</hint>
-            </readonly>
-            <min>
-                <label>[Minimum Number of Repetitions]</label>
-                <alert>[Incorrect value]</alert>
-                <hint>[Non-negative number]</hint>
-            </min>
-            <max>
-                <label>[Maximum Number of Repetitions]</label>
-                <alert>[Incorrect value]</alert>
-                <hint>[Positive number]</hint>
-            </max>
-            <other>[Other]</other>
-            <one>[One repetition]</one>
-            <unlimited>[Unlimited]</unlimited>
-            <no-minimum>[No minimum]</no-minimum>
-        </dialog-grid-details>
-        <dialog-validation-details>
-            <label>Rediger elementegenskaper</label>
             <types>
                 <label>Datatype</label>
             </types>
@@ -2216,10 +2154,57 @@
             <validation-type><label>[Validation Type]</label></validation-type>
             <validation-details><label>[Validation Details]</label></validation-details>
             <level><label>[Level]</label></level>
-            <tab-formulas><label>[Formulas]</label></tab-formulas>
-            <tab-validations><label>[Constraints and Alerts]</label></tab-validations>
-            <tab-help><label>[Help]</label></tab-help>
-        </dialog-validation-details>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Rediger seksjonsdetaljer</label>
+            <control-name>
+                <label>Seksjonsnavn</label>
+                <alert>Navnet er galt eller allerede i bruk.</alert>
+                <hint>F.eks.: «adresse»</hint>
+            </control-name>
+            <visibility>
+                <label>Synlighet</label>
+                <alert>Galt XPath-uttrykk</alert>
+                <hint>Boolsk XPath-uttrykk</hint>
+            </visibility>
+            <readonly>
+                <label>Skrivebeskyttet</label>
+                <alert>Galt XPath-uttrykk</alert>
+                <hint>Boolsk XPath-uttrykk</hint>
+            </readonly>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>[Grid Details]</label>
+            <grid-name>
+                <label>[Grid Name]</label>
+                <alert>[Name is already in use or incorrect]</alert>
+                <hint>[E.g.: "first-name"]</hint>
+            </grid-name>
+            <visibility>
+                <label>Synlighet</label>
+                <alert>Galt XPath-uttrykk</alert>
+                <hint>Boolsk XPath-uttrykk</hint>
+            </visibility>
+            <readonly>
+                <label>Skrivebeskyttet</label>
+                <alert>Galt XPath-uttrykk</alert>
+                <hint>Boolsk XPath-uttrykk</hint>
+            </readonly>
+            <min>
+                <label>[Minimum Number of Repetitions]</label>
+                <alert>[Incorrect value]</alert>
+                <hint>[Non-negative number]</hint>
+            </min>
+            <max>
+                <label>[Maximum Number of Repetitions]</label>
+                <alert>[Incorrect value]</alert>
+                <hint>[Positive number]</hint>
+            </max>
+            <other>[Other]</other>
+            <one>[One repetition]</one>
+            <unlimited>[Unlimited]</unlimited>
+            <no-minimum>[No minimum]</no-minimum>
+        </dialog-grid-details>
         <dialog-confirmation>
             <label>Bekreft</label>
         </dialog-confirmation>
@@ -2791,9 +2776,6 @@
         <control-details-icon>
             <label>Настройки элемента</label>
         </control-details-icon>
-        <validation-settings-icon>
-            <label>Настройки автоматической проверки</label>
-        </validation-settings-icon>
         <switch-appearance-icon>
             <label>Переключить внешний вид</label>
         </switch-appearance-icon>
@@ -2855,6 +2837,10 @@
         </dialog-form-settings>
         <dialog-control-details>
             <label>Настройки элемента</label>
+            <tab-base><label>[Basic Settings]</label></tab-base>
+            <tab-validations><label>[Validations and Alerts]</label></tab-validations>
+            <tab-formulas><label>[Formulas]</label></tab-formulas>
+            <tab-help><label>[Help Message]</label></tab-help>
             <control-name>
                 <label>Название элемента</label>
                 <alert>Название уже используется или некорректно</alert>
@@ -2879,59 +2865,6 @@
                     <value>fr-email-subject</value>
                 </item>
             </classes>
-        </dialog-control-details>
-        <dialog-section-details>
-            <label>Настройки раздела</label>
-            <control-name>
-                <label>Название раздела</label>
-                <alert>Название уже используется или некорректно</alert>
-                <hint>Например: "address"</hint>
-            </control-name>
-            <visibility>
-                <label>Настройки видимости</label>
-                <alert>Некорректное выражение XPath</alert>
-                <hint>Булево выражение XPath</hint>
-            </visibility>
-            <readonly>
-                <label>Только для чтения</label>
-                <alert>Некорректное выражение XPath</alert>
-                <hint>Булево выражение XPath</hint>
-            </readonly>
-        </dialog-section-details>
-        <dialog-grid-details>
-            <label>Редактировать настройки сетки</label>
-            <grid-name>
-                <label>Название сетки</label>
-                <alert>Имя уже используется или некорректно</alert>
-                <hint>Например: "first-name"</hint>
-            </grid-name>
-            <visibility>
-                <label>Настройки видимости</label>
-                <alert>Некорректное выражение XPath</alert>
-                <hint>Булево выражение XPath</hint>
-            </visibility>
-            <readonly>
-                <label>Только для чтения</label>
-                <alert>Некорректное выражение XPath</alert>
-                <hint>Булево выражение XPath</hint>
-            </readonly>
-            <min>
-                <label>Минимальное количество повторений</label>
-                <alert>Некорректное значение</alert>
-                <hint>Неотрицательное число</hint>
-            </min>
-            <max>
-                <label>Максимальное количество повторений</label>
-                <alert>Некорректное значение</alert>
-                <hint>Положительное число</hint>
-            </max>
-            <other>[Other]</other>
-            <one>[One repetition]</one>
-            <unlimited>[Unlimited]</unlimited>
-            <no-minimum>[No minimum]</no-minimum>
-        </dialog-grid-details>
-        <dialog-validation-details>
-            <label>Настройки автоматической проверки</label>
             <types>
                 <label>Тип данных</label>
             </types>
@@ -3078,10 +3011,57 @@
             <validation-type><label>[Validation Type]</label></validation-type>
             <validation-details><label>[Validation Details]</label></validation-details>
             <level><label>[Level]</label></level>
-            <tab-formulas><label>[Formulas]</label></tab-formulas>
-            <tab-validations><label>[Constraints and Alerts]</label></tab-validations>
-            <tab-help><label>[Help]</label></tab-help>
-        </dialog-validation-details>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Настройки раздела</label>
+            <control-name>
+                <label>Название раздела</label>
+                <alert>Название уже используется или некорректно</alert>
+                <hint>Например: "address"</hint>
+            </control-name>
+            <visibility>
+                <label>Настройки видимости</label>
+                <alert>Некорректное выражение XPath</alert>
+                <hint>Булево выражение XPath</hint>
+            </visibility>
+            <readonly>
+                <label>Только для чтения</label>
+                <alert>Некорректное выражение XPath</alert>
+                <hint>Булево выражение XPath</hint>
+            </readonly>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Редактировать настройки сетки</label>
+            <grid-name>
+                <label>Название сетки</label>
+                <alert>Имя уже используется или некорректно</alert>
+                <hint>Например: "first-name"</hint>
+            </grid-name>
+            <visibility>
+                <label>Настройки видимости</label>
+                <alert>Некорректное выражение XPath</alert>
+                <hint>Булево выражение XPath</hint>
+            </visibility>
+            <readonly>
+                <label>Только для чтения</label>
+                <alert>Некорректное выражение XPath</alert>
+                <hint>Булево выражение XPath</hint>
+            </readonly>
+            <min>
+                <label>Минимальное количество повторений</label>
+                <alert>Некорректное значение</alert>
+                <hint>Неотрицательное число</hint>
+            </min>
+            <max>
+                <label>Максимальное количество повторений</label>
+                <alert>Некорректное значение</alert>
+                <hint>Положительное число</hint>
+            </max>
+            <other>[Other]</other>
+            <one>[One repetition]</one>
+            <unlimited>[Unlimited]</unlimited>
+            <no-minimum>[No minimum]</no-minimum>
+        </dialog-grid-details>
         <dialog-confirmation>
             <label>Подтвердить</label>
         </dialog-confirmation>

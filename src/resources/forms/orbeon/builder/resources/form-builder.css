@@ -421,29 +421,26 @@ body {
   width: 400px;
 }
 .orbeon .fb-dialog-control-details {
-  width: 400px;
-}
-.orbeon .fb-dialog-validation-details {
   width: 800px;
 }
-.orbeon .fb-dialog-validation-details .xforms-label {
+.orbeon .fb-dialog-control-details .xforms-label {
   margin-top: 5px;
 }
-.orbeon .fb-dialog-validation-details .fb-validation-grids {
+.orbeon .fb-dialog-control-details .tab-pane {
   max-height: 450px;
   overflow-y: auto;
   padding: 0;
 }
-.orbeon .fb-dialog-validation-details .fb-validation-grids table {
+.orbeon .fb-dialog-control-details .tab-pane table {
   background-color: white;
 }
-.orbeon .fb-dialog-validation-details .fr-grid-validations .fr-grid-col-1 {
+.orbeon .fb-dialog-control-details .fr-grid-validations .fr-grid-col-1 {
   width: 140px;
 }
-.orbeon .fb-dialog-validation-details .fr-grid-validations .fr-grid-col-3 {
+.orbeon .fb-dialog-control-details .fr-grid-validations .fr-grid-col-3 {
   width: 110px;
 }
-.orbeon .fb-dialog-validation-details .fr-grid-help .xforms-textarea textarea {
+.orbeon .fb-dialog-control-details .fr-grid-help .xforms-textarea textarea {
   height: 108px;
 }
 .orbeon #fb-schema-upload-dialog {

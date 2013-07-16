@@ -379,12 +379,11 @@
                                 <!-- Other dialogs -->
                                 <xf:var name="form" value="."/>
 
-                                <fb:dialog-control-details     id="dialog-control-details"    form-ref="$form" resources-ref="$form-resources"/>
-                                <fb:dialog-validation-details  id="dialog-validation-details" ref="$form" resources-ref="$form-resources"/>
-                                <fb:dialog-grid-details        id="dialog-grid-details"       form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                                <fb:dialog-section-details     id="dialog-section-details"    form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                                <fb:dialog-help                id="dialog-help"               form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
-                                <fb:dialog-itemsets            id="dialog-itemsets"           resources-ref="$form-resources"/>
+                                <fb:dialog-control-details     id="dialog-control-details" ref="$form" resources-ref="$form-resources"/>
+                                <fb:dialog-grid-details        id="dialog-grid-details"    form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                                <fb:dialog-section-details     id="dialog-section-details" form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                                <fb:dialog-help                id="dialog-help"            form-ref="$form" resources-ref="$form-resources" components-ref="instance('fb-components-instance')"/>
+                                <fb:dialog-itemsets            id="dialog-itemsets"        resources-ref="$form-resources"/>
 
                                 <fr:alert-dialog id="dialog-confirmation">
                                     <fr:label ref="$form-resources/dialog-confirmation/label"/>
@@ -456,13 +455,6 @@
                                     <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-details-trigger">
                                         <xf:label><xh:img alt="{$fb-resources/control-details-icon/label}" title="{$fb-resources/control-details-icon/label}" src="/apps/fr/style/images/silk/cog.png"/></xf:label>
                                         <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-control-details">
-                                            <xf:property name="control-id" value="$control/@id"/>
-                                        </xf:dispatch>
-                                    </xf:trigger>
-                                    <!-- Edit validation for any control -->
-                                    <xf:trigger tabindex="-1" appearance="minimal" id="fb-edit-validation-trigger">
-                                        <xf:label><xh:img class="fb-control-alert" alt="{$fb-resources/validation-settings-icon/label}" title="{$fb-resources/validation-settings-icon/label}" src="/apps/fr/style/images/silk/exclamation.png"/></xf:label>
-                                        <xf:dispatch ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-validation-details">
                                             <xf:property name="control-id" value="$control/@id"/>
                                         </xf:dispatch>
                                     </xf:trigger>

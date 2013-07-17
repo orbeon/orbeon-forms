@@ -34,6 +34,9 @@ trait XFormsSupport extends MockitoSugar {
 
     self: DocumentTestBase ⇒
 
+    def withActionAndDoc[T](url: String)(body: ⇒ T): T =
+        withActionAndDoc(setupDocument(url))(body)
+
     def withActionAndDoc[T](doc: XFormsContainingDocument)(body: ⇒ T): T =
         withScalaAction(mockActionInterpreter(doc)) {
             withContainingDocument(doc) {
@@ -61,8 +64,13 @@ trait XFormsSupport extends MockitoSugar {
                 cancelable = true)
         )
 
-    // Get an instance value as a string
-    def instanceAsString(instance: XFormsInstance) = TransformerUtils.tinyTreeToString(instance.documentInfo)
+    // Get a top-level instance
+    def instance(instanceStaticId: String) =
+        document.findInstance(instanceStaticId)
+
+    // Convert an instance to a string
+    def instanceToString(instance: XFormsInstance) =
+        TransformerUtils.tinyTreeToString(instance.documentInfo)
 
     def getControlValue(controlId: String) = getValueControl(controlId).getValue
     def getControlExternalValue(controlId: String) = getValueControl(controlId).getExternalValue

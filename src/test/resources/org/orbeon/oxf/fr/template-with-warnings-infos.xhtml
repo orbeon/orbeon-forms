@@ -1,0 +1,83 @@
+<!--
+  Copyright (C) 2013 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xf="http://www.w3.org/2002/xforms">
+    <xh:head>
+        <xf:model id="fr-form-model" xxf:expose-xpath-types="true">
+            <xf:instance id="fr-form-instance">
+                <form>
+                    <my-section>
+                        <number/>
+                        <text/>
+                    </my-section>
+                </form>
+            </xf:instance>
+            <xf:bind id="fr-form-binds" ref="instance('fr-form-instance')">
+                <xf:bind id="my-section-bind" name="my-section" ref="my-section">
+                    <xf:bind id="number-bind" name="number" ref="number" required="true()" type="xs:integer">
+                        <xf:constraint id="min50-constraint" value=". ge 50" level="error"/>
+                        <xf:constraint id="min100-constraint" value=". ge 100" level="warning"/>
+                        <xf:constraint id="max1000-constraint" value=". le 1000" level="info"/>
+                    </xf:bind>
+                    <xf:bind id="text-bind" ref="text" name="text">
+                        <xf:constraint id="lower10-constraint" value="string-length(.) lt 10" level="warning"/>
+                        <xf:constraint id="uppercase-constraint"
+                                       value="substring(., 1, 1) = upper-case(substring(., 1, 1))"
+                                       level="warning"/>
+                    </xf:bind>
+                </xf:bind>
+            </xf:bind>
+            <xf:instance id="fr-form-resources" xxf:readonly="false">
+                <resources>
+                    <resource xml:lang="en">
+                        <my-section>
+                            <label>Errors, warnings and informational messages</label>
+                        </my-section>
+                        <number>
+                            <label>My Number</label>
+                            <alert>Must be 50 or more</alert>
+                            <alert>Should be 100 or more</alert>
+                            <alert>Nice, greater than 1000!</alert>
+                            <alert>Missing or incorrect value</alert>
+                        </number>
+                        <text>
+                            <label>My String</label>
+                            <alert>Should be shorter than 10 characters</alert>
+                            <alert>Should not start with a lowercase letter</alert>
+                            <alert>Missing or incorrect value</alert>
+                        </text>
+                    </resource>
+                </resources>
+            </xf:instance>
+            <xf:var name="form-resources" value="instance('fr-form-resources')/resource"/>
+        </xf:model>
+    </xh:head>
+    <xh:body>
+        <xf:input id="number-control" bind="number-bind">
+            <xf:label ref="$form-resources/number/label"/>
+            <xf:alert ref="$form-resources/number/alert[1]" validation="min50-constraint"/>
+            <xf:alert ref="$form-resources/number/alert[2]" validation="min100-constraint"/>
+            <xf:alert ref="$form-resources/number/alert[3]" validation="max1000-constraint"/>
+            <xf:alert ref="$form-resources/number/alert[4]"/>
+        </xf:input>
+        <xf:input id="text-control" bind="text-bind">
+            <xf:label ref="$form-resources/text/label"/>
+            <xf:alert ref="$form-resources/text/alert[1]" validation="lower10-constraint"/>
+            <xf:alert ref="$form-resources/text/alert[2]" validation="uppercase-constraint"/>
+            <xf:alert ref="$form-resources/text/alert[3]"/>
+        </xf:input>
+    </xh:body>
+</xh:html>

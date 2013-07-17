@@ -25,7 +25,7 @@ trait FormBuilderSupport extends XFormsSupport {
     val TemplateDoc = "oxf:/forms/orbeon/builder/form/template.xml"
 
     // Run the body in the action context of a form which simulates the main Form Builder model
-    def withActionAndDoc[T](url: String, isCustomInstance: Boolean = false)(body: DocumentWrapper ⇒ T): T =
+    def withActionAndFBDoc[T](url: String, isCustomInstance: Boolean = false)(body: DocumentWrapper ⇒ T): T =
         withActionAndFBDoc(formBuilderContainingDocument(url, isCustomInstance))(body)
 
     private def formBuilderContainingDocument(url: String, isCustomInstance: Boolean = false) =

@@ -1276,7 +1276,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 } while (nodeToDetach[0] != null);
             }
 
-            // Annotate with alets if needed
+            // Annotate with alerts if needed
             if (StringUtils.isNotBlank(resolvedAnnotate))
                 annotateWithAlerts(containingDocument, documentToSubmit, resolvedAnnotate);
 

@@ -31,7 +31,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     private val Control1 = "control-1"
 
     @Test def initialAlert() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             // Read initial alert
             val alertDetails = AlertDetails.fromForm(doc, Control1)
@@ -47,7 +47,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def warningConstraintAutomaticId() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
             val newValidation =
                 <validation type="constraint" id="" level="warning" default-alert="false">
                     <constraint expression="string-length() gt 10"/>
@@ -70,7 +70,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def warningConstraintSpecifyId() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
             val newValidation =
                 <validation type="constraint" id="length-constraint" level="warning" default-alert="false">
                     <constraint expression="string-length() gt 10"/>
@@ -84,7 +84,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def multipleValidations() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
                 
             val newValidations = Array(
                 <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
@@ -106,7 +106,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def removeAlertInMiddle() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
 
@@ -205,7 +205,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def defaultAlert() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val defaultAlertAsXML = AlertDetails.fromForm(doc, Control1).head.toXML(currentLang)
 
@@ -223,7 +223,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def singleConstraintHasBindId() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val newValidation =
                 <validation type="constraint" id="length5-constraint" level="error" default-alert="false">
@@ -251,7 +251,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def requiredAndDatatypeValidations() =
-        withActionAndDoc(AlertsDoc) { doc ⇒
+        withActionAndFBDoc(AlertsDoc) { doc ⇒
 
             val bind = findBindByName(doc, Control1).toList
 
@@ -314,7 +314,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def schemaType() =
-        withActionAndDoc(SchemaDoc) { doc ⇒
+        withActionAndFBDoc(SchemaDoc) { doc ⇒
 
             val bind = findBindByName(doc, Control1).toList
 
@@ -337,7 +337,7 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def schemaPrefix() =
-        withActionAndDoc(SchemaDoc) { doc ⇒
+        withActionAndFBDoc(SchemaDoc) { doc ⇒
             assert(Some("foo") === findSchemaPrefix(doc))
         }
     

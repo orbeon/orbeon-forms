@@ -23,11 +23,13 @@ import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl
 import org.orbeon.oxf.xforms.event.ListenersTrait
 import org.orbeon.oxf.xforms.{XFormsContainingDocument, InstanceData}
 
-abstract class XFormsModelSubmissionBase extends ListenersTrait {
+abstract class XFormsModelSubmissionBase extends ListenersTrait
+
+object XFormsModelSubmissionBase {
 
     // Annotate elements which have failed constraints with an xxf:error, xxf:warning or xxf:info attribute containing
     // the alert message. Only the levels passed in `annotate` are handled.
-    protected def annotateWithAlerts(containingDocument: XFormsContainingDocument, doc: Document, annotate: String): Unit = {
+    def annotateWithAlerts(containingDocument: XFormsContainingDocument, doc: Document, annotate: String): Unit = {
 
         val levelsToAnnotate = stringToSet(annotate) collect LevelByName
 

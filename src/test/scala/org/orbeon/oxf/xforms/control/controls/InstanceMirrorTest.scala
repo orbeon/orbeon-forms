@@ -107,7 +107,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                 // Dispatch event and assert result
                 dispatch("update" + (index + 1), "model")
 
-                assert(instanceAsString(innerInstance) === expectedInnerInstanceValue)
+                assert(instanceToString(innerInstance) === expectedInnerInstanceValue)
                 assert(nonInstanceChanges === expectedNonInstanceChanges)
         }
     }
@@ -191,7 +191,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                 case (expectedInstanceValue, index) ⇒
                     // Dispatch event and assert result
                     dispatch("update" + (index + 1), targetPrefixedId)
-                    assert(instanceAsString(mirroredInstance) === expectedInstanceValue)
+                    assert(instanceToString(mirroredInstance) === expectedInstanceValue)
                     updates += 1
             }
 

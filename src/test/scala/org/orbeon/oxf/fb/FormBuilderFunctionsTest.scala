@@ -38,7 +38,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     private val Section2 = "section-2"
 
     @Test def modelInstanceBodyElements(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
             assert(findModelElement(doc).getDisplayName === "xf:model")
             assert(hasIdValue(findModelElement(doc), "fr-form-model"))
 
@@ -48,7 +48,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def nameAndId(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Basic functions
             assert(controlName(controlId(Control1)) === Control1)
@@ -60,7 +60,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def controlElements(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Find bind element
             assert(qname(findBindByName(doc, Control1).get) === (XF → "bind"))
@@ -75,13 +75,13 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def sectionName(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
             assert(findSectionName(doc, Control1).get === Section1)
             assert(getControlNameOption(doc \\ "*:section" head).get === Section1)
         }
 
     @Test def newBinds(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
             ensureBinds(doc, Seq(Section1, Control2))
 
             assert(qname(findBindByName(doc, Control2).get) === (XF → "bind"))
@@ -94,7 +94,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def findNextId(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
             assert(nextId(doc, "control") === "control-3-control")
             assert(nextId(doc, "section") === "section-3-section")
 
@@ -102,7 +102,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def containers(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
             val firstTd = findFRBodyElement(doc) \\ "*:grid" \\ "*:td" head
 
             val containers = findAncestorContainers(firstTd)
@@ -121,7 +121,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     @Test def insertControlCustomXML(): Unit = insertControl(isCustomInstance = true)
 
     private def insertControl(isCustomInstance: Boolean): Unit =
-        withActionAndDoc(TemplateDoc, isCustomInstance) { doc ⇒
+        withActionAndFBDoc(TemplateDoc, isCustomInstance) { doc ⇒
 
             val binding = <binding element="xf|input" xmlns:xf="http://www.w3.org/2002/xforms"/>
 
@@ -159,7 +159,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     @Test def insertRepeatCustomXML(): Unit = insertRepeat(isCustomInstance = true)
 
     private def insertRepeat(isCustomInstance: Boolean): Unit =
-        withActionAndDoc(TemplateDoc, isCustomInstance) { doc ⇒
+        withActionAndFBDoc(TemplateDoc, isCustomInstance) { doc ⇒
 
             // Insert a new repeated grid after the current grid
             selectFirstTd(doc)
@@ -240,7 +240,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
     @Test def rowspanGetRowCells(): Unit =
-        withActionAndDoc(RowspansDoc) { doc ⇒
+        withActionAndFBDoc(RowspansDoc) { doc ⇒
 
             val grid = doc \\ "grid" head
 
@@ -261,7 +261,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
     @Test def rowspanInsertRowBelow(): Unit =
-        withActionAndDoc(RowspansDoc) { doc ⇒
+        withActionAndFBDoc(RowspansDoc) { doc ⇒
 
             val grid = doc \\ "grid" head
 
@@ -326,7 +326,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
         // For before/after td ids: create a doc, call the delete function, and assert the resulting selected td
         def deleteRowCheckSelectedTd(beforeTdId: String, afterTdId: String) =
-            withActionAndDoc(SectionsGridsDoc) { doc ⇒
+            withActionAndFBDoc(SectionsGridsDoc) { doc ⇒
 
                 def getTd(id: String) = doc \\ "*:td" find (hasIdValue(_, id)) head
 
@@ -405,7 +405,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
     @Test def lastGridInSectionAndCanInsert(): Unit =
-        withActionAndDoc(TemplateDoc) { doc ⇒
+        withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Initially can insert all
             assert(canInsertSection(doc) === true)
@@ -425,7 +425,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         }
 
     @Test def customXMLBindRef(): Unit =
-        withActionAndDoc(CustomXMLDoc, isCustomInstance = true) { doc ⇒
+        withActionAndFBDoc(CustomXMLDoc, isCustomInstance = true) { doc ⇒
 
             def rawBindRef(inDoc: NodeInfo, name: String) =
                 findBindByName(inDoc, name) flatMap
@@ -489,7 +489,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
     }
 
     @Test def controlEffectiveId(): Unit =
-        withActionAndDoc(SectionsRepeatsDoc) { doc ⇒
+        withActionAndFBDoc(SectionsRepeatsDoc) { doc ⇒
 
             val expected = Map(
                 "|fb∘section-1-section∘tmp-11-tmp∘control-1-control|"                      → "control-1-control",

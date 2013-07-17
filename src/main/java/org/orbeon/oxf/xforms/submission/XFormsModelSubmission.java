@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
@@ -759,7 +760,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         final boolean resolvedRelevant;
         final boolean resolvedXXFormsCalculate;
         final boolean resolvedXXFormsUploads;
-        final boolean resolvedXXFormsAnnotate;
+        final String resolvedXXFormsAnnotate;
 
         final boolean isHandlingClientGetAll;
 
@@ -846,7 +847,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 resolvedXXFormsUploads = serialize && !"false".equals(resolvedUploadsString);
 
                 final String resolvedAnnotateString = XFormsUtils.resolveAttributeValueTemplates(containingDocument, xpathContext, refNodeInfo , avtXXFormsAnnotate);
-                resolvedXXFormsAnnotate = serialize && "true".equals(resolvedAnnotateString);
+                resolvedXXFormsAnnotate = serialize ? resolvedAnnotateString : null;
             }
 
             isHandlingClientGetAll = XFormsProperties.isOptimizeGetAllSubmission(containingDocument) && actualHttpMethod.equals("GET")
@@ -1188,7 +1189,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     }
 
     private Document createDocumentToSubmit(IndentedLogger indentedLogger, NodeInfo currentNodeInfo,
-                                            XFormsInstance currentInstance, XFormsModel modelForInstance, boolean resolvedValidate, boolean resolvedRelevant, boolean resolvedAnnotate) {
+                                            XFormsInstance currentInstance, XFormsModel modelForInstance,
+                                            boolean resolvedValidate, boolean resolvedRelevant, String resolvedAnnotate) {
         final Document documentToSubmit;
 
         // Revalidate instance
@@ -1225,7 +1227,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         return documentToSubmit;
     }
 
-    private Document reRootAndPrune(final NodeInfo currentNodeInfo, boolean resolvedRelevant, boolean resolvedAnnotate) {
+    private Document reRootAndPrune(final NodeInfo currentNodeInfo, boolean resolvedRelevant, String resolvedAnnotate) {
 
         final Document documentToSubmit;
         if (currentNodeInfo instanceof VirtualNode) {
@@ -1274,9 +1276,9 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                 } while (nodeToDetach[0] != null);
             }
 
-            // Annotate with warnings
-            if (resolvedAnnotate)
-                annotateWithWarnings(containingDocument, documentToSubmit);
+            // Annotate with alets if needed
+            if (StringUtils.isNotBlank(resolvedAnnotate))
+                annotateWithAlerts(containingDocument, documentToSubmit, resolvedAnnotate);
 
             // TODO: handle includenamespaceprefixes
         } else {

@@ -546,7 +546,7 @@ trait Actions {
             val Defaults = Map(
                 "method"   → "post",
                 "prune"    → "true",
-                "annotate" → "false",
+                "annotate" → "",
                 "replace"  → "none",
                 "content"  → "xml"
             )

@@ -298,10 +298,14 @@ body.orbeon {
 .orbeon .fr-view .xbl-fr-error-summary table {
   margin: 2px;
 }
-.orbeon .fr-view .xbl-fr-error-summary td {
+.orbeon .fr-view .xbl-fr-error-summary table td {
   padding: 2px 10px;
+  vertical-align: top;
 }
-.orbeon .fr-view .xbl-fr-error-summary .fr-error-number {
+.orbeon .fr-view .xbl-fr-error-summary table td ul {
+  margin-bottom: 0;
+}
+.orbeon .fr-view .xbl-fr-error-summary table .fr-error-number {
   text-align: right;
 }
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-summary-body {

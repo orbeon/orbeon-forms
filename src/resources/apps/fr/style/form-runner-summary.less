@@ -77,8 +77,11 @@
             white-space: nowrap;
         }
 
-        .fr-summary-repeat-selection-checkbox {
+        .fr-summary-repeat-selection-checkbox,
+        .fr-summary-repeat-draft {
             width: 1px;                                             // So the column takes the minimum possible space
+        }
+        .fr-summary-repeat-selection-checkbox {
             .xforms-select input { float: none }                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
             label {
                 display: inline-block;                              // Override Bootstrap's block, so we can have "Draft" next the checkbox

@@ -458,11 +458,14 @@
                         <xf:var name="show-last-modified" value="xxf:property(string-join(('oxf.fr.summary.show-last-modified', $app, $form), '.'))"/>
 
                         <div class="fr-summary-table-div">
+                            <xf:var name="have-drafts" value="exists(document[@draft = 'Y'])"/>
+                            <xf:var name="drafts-class" value="string-join(('fr-summary-repeat-draft', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
                             <xh:table width="940px" class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
                                 <xh:thead>
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
+                                        <xh:th class="{$drafts-class}"/>
                                         <xf:repeat ref="if ($show-created) then '' else ()">
                                             <xh:th fr:sortable="false" fr:resizeable="true">
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
@@ -510,6 +513,8 @@
                                                             <xf:value value="$current-document-name"/>
                                                         </xf:item>
                                                     </xf:select>
+                                                </xh:td>
+                                                <xh:td class="{$drafts-class}">
                                                     <xf:output ref="if ($document/@draft = 'Y') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
                                                 </xh:td>
                                                 <!-- Why repeat and not group? -->

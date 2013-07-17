@@ -67,7 +67,8 @@
 .orbeon .fr-summary-table-div th {
   white-space: nowrap;
 }
-.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox {
+.orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox,
+.orbeon .fr-summary-table-div .fr-summary-repeat-draft {
   width: 1px;
 }
 .orbeon .fr-summary-table-div .fr-summary-repeat-selection-checkbox .xforms-select input {

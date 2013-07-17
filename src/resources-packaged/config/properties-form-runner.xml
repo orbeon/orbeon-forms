@@ -178,6 +178,7 @@
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                      value='save'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"         value='abort'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*"       value='resume'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                         value='save("draft")'/>
 
     <!-- Reusable processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*"                  value='pending-uploads recover require-uploads-recover'/>
@@ -229,6 +230,6 @@
     <property as="xs:string"  name="oxf.fr.detail.submit.buttons.*.*"                           value="clear keep go close-window"/>
     <!--<property as="xs:string"  name="oxf.fr.detail.submit.go.uri-xpath.*.*"                      value="/book/details/link"/>-->
     <property as="xs:boolean" name="oxf.fr.support-owner-group"                                 value="false"/>
-    <property as="xs:boolean" name="oxf.fr.support-auto-save"                                   value="false"/>
+    <property as="xs:boolean" name="oxf.fr.support-autosave"                                    value="false"/>
 
 </properties>

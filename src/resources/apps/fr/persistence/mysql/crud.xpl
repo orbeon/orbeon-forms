@@ -98,7 +98,7 @@
                                 <sql-out>
                                     <sql:connection>
                                         <xsl:copy-of select="/request/sql:datasource"/>
-                                        <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-auto-save')"/>
+                                        <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
                                         <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
                                         <xsl:variable name="draft" as="xs:string" select="if (/request/type = 'draft') then 'Y' else 'N'"/>
                                         <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
@@ -276,7 +276,7 @@
                                         <result>
                                             <sql:connection>
                                                 <xsl:copy-of select="/request/sql:datasource"/>
-                                                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-auto-save')"/>
+                                                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
                                                 <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
                                                 <xsl:variable name="has-document-id" as="xs:boolean" select="exists(/request/document-id)"/>
                                                 <xsl:variable name="table-name" as="xs:string" select="if ($is-data-draft) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
@@ -358,7 +358,7 @@
                                         <result>
                                             <sql:connection>
                                                 <xsl:copy-of select="/request/sql:datasource"/>
-                                                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-auto-save')"/>
+                                                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
                                                 <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
                                                 <xsl:variable name="draft" as="xs:string" select="if (/request/type = 'draft') then 'Y' else 'N'"/>
                                                 <xsl:variable name="is-attachment" as="xs:boolean" select="not(/request/content-type = ('application/xml', 'text/xml') or ends-with(/request/content-type, '+xml'))"/>

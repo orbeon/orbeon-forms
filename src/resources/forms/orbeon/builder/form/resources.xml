@@ -312,15 +312,16 @@
                     </choices>
                     <choices>
                         <label>Number Types</label>
-                        <type label="Simple-precision floating-point">float</type>
-                        <type label="Double-precision floating-point">double</type>
                         <type label="Decimal">decimal</type>
-                        <type label="Integer">integer</type>
 
+                        <type label="Integer">integer</type>
                         <type label="Positive integer">positiveInteger</type>
                         <type label="Non-positive integer">nonPositiveInteger</type>
                         <type label="Negative integer">negativeInteger</type>
                         <type label="Non-negative integer">nonNegativeInteger</type>
+
+                        <type label="Simple-precision floating-point">float</type>
+                        <type label="Double-precision floating-point">double</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -333,9 +334,9 @@
                     </choices>
                     <choices>
                         <label>Date and Time Types</label>
-                        <type label="Date and time">dateTime</type>
                         <type label="Date">date</type>
                         <type label="Time">time</type>
+                        <type label="Date and time">dateTime</type>
                         <type label="Duration">duration</type>
                         <type label="Year and month">gYearMonth</type>
                         <type label="Month and day">gMonthDay</type>
@@ -1159,15 +1160,16 @@
                     </choices>
                     <choices>
                         <label>Types numériques</label>
-                        <type label="Réel simple précision">float</type>
-                        <type label="Réel double précision">double</type>
                         <type label="Décimal">decimal</type>
-                        <type label="Entier">integer</type>
 
+                        <type label="Entier">integer</type>
                         <type label="Entier positif">positiveInteger</type>
                         <type label="Entier non positif">nonPositiveInteger</type>
                         <type label="Entier négatif">negativeInteger</type>
                         <type label="Entier non négatif">nonNegativeInteger</type>
+
+                        <type label="Réel simple précision">float</type>
+                        <type label="Réel double précision">double</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -1180,9 +1182,9 @@
                     </choices>
                     <choices>
                         <label>Types date et heure</label>
-                        <type label="Date et heure">dateTime</type>
                         <type label="Date">date</type>
                         <type label="Heure">time</type>
+                        <type label="Date et heure">dateTime</type>
                         <type label="Durée">duration</type>
                         <type label="Année et mois">gYearMonth</type>
                         <type label="Mois et jour">gMonthDay</type>
@@ -2008,15 +2010,17 @@
                     </choices>
                     <choices>
                         <label>Talltyper</label>
-                        <type label="Flyttall, enkel presisjon">float</type>
-                        <type label="Flyttall, dobbel presisjon">double</type>
-                        <type label="Desimaltall">decimal</type>
-                        <type label="Heltall">integer</type>
 
+                        <type label="Desimaltall">decimal</type>
+
+                        <type label="Heltall">integer</type>
                         <type label="Positivt heltall">positiveInteger</type>
                         <type label="Ikke-positivt heltall">nonPositiveInteger</type>
                         <type label="Negativt heltall">negativeInteger</type>
                         <type label="Ikke-negativt heltall">nonNegativeInteger</type>
+
+                        <type label="Flyttall, enkel presisjon">float</type>
+                        <type label="Flyttall, dobbel presisjon">double</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -2029,9 +2033,9 @@
                     </choices>
                     <choices>
                         <label>Tidstyper</label>
-                        <type label="Dato og klokkeslett">dateTime</type>
                         <type label="Dato">date</type>
                         <type label="Klokkeslett">time</type>
+                        <type label="Dato og klokkeslett">dateTime</type>
                         <type label="Varighet">duration</type>
                         <type label="År og måned">gYearMonth</type>
                         <type label="Måned og dag">gMonthDay</type>
@@ -2856,15 +2860,16 @@
                     </choices>
                     <choices>
                         <label>Числовые типы</label>
-                        <type label="Дробное число простой точности">float</type>
-                        <type label="Дробное число двойной точности">double</type>
                         <type label="Десятичное число">decimal</type>
-                        <type label="Целое число">integer</type>
 
+                        <type label="Целое число">integer</type>
                         <type label="Положительное целое">positiveInteger</type>
                         <type label="Не-положительное целое">nonPositiveInteger</type>
                         <type label="Отрицательное целое">negativeInteger</type>
                         <type label="Не-отрицательное целое">nonNegativeInteger</type>
+
+                        <type label="Дробное число простой точности">float</type>
+                        <type label="Дробное число двойной точности">double</type>
 
                         <type label="">long</type>
                         <type label="">int</type>
@@ -2877,9 +2882,9 @@
                     </choices>
                     <choices>
                         <label>Время</label>
-                        <type label="Дата и время">dateTime</type>
                         <type label="Дата">date</type>
                         <type label="Время">time</type>
+                        <type label="Дата и время">dateTime</type>
                         <type label="Длительность">duration</type>
                         <type label="Год и месяц">gYearMonth</type>
                         <type label="Месяц и день">gMonthDay</type>

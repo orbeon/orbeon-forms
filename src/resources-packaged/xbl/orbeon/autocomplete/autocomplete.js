@@ -157,7 +157,7 @@
             var result = [];
 
             // YUI autocomplete give us an escaped string
-            query = unescape(query);
+            query = decodeURIComponent(query);
             // Look again for the element, as on IE the <select> is recreated when the itemset changes, and so can't be cached
             var select1Container = YD.getElementsByClassName("fr-autocomplete-select1", null, this.container)[0];
             var select1Element = OD.getElementByTagName(select1Container, "select");

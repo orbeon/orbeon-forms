@@ -379,40 +379,49 @@
 
                                         <xf:select1 ref=".[@type = 'required']/required" appearance="full">
                                             <xf:label ref="$resources/dialog-control-details/required/label"/>
-                                            <xf:itemset ref="$resources/dialog-control-details/required//item">
+                                            <xf:itemset ref="$resources/dialog-control-details/required/item">
                                                 <xf:label ref="label"/>
                                                 <xf:value ref="value"/>
                                             </xf:itemset>
                                         </xf:select1>
 
                                         <!-- Built-in type -->
-                                        <xf:select1 ref=".[@type = 'datatype']/builtin-type">
-                                            <xf:label ref="$resources/dialog-control-details/builtin-type/label"/>
-                                            <!-- Add placeholder if there is a schema type -->
-                                            <xf:itemset ref=".[../schema-type != '']">
-                                                <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
-                                                <xf:value/>
-                                            </xf:itemset>
-                                            <xf:itemset ref="$resources/dialog-control-details/builtin-type/choices//(choices | type)">
-                                                <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then concat(@label, ' (', ., ')') else ."/>
-                                                <xf:value ref="if (self::choices) then () else if (value) then value else ."/>
-                                            </xf:itemset>
-                                            <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
-                                        </xf:select1>
-                                        <!-- Schema type selection if applicable -->
-                                        <xf:select1 ref=".[@type = 'datatype']/schema-type[exists($schema)]">
-                                            <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
-                                            <xf:item>
-                                                <xf:label ref="$resources/select/label"/>
-                                                <xf:value/>
-                                            </xf:item>
-                                            <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
-                                            <xf:itemset ref="$schema/xs:simpleType">
-                                                <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
-                                                <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
-                                            </xf:itemset>
-                                            <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
-                                        </xf:select1>
+                                        <xf:group ref=".[@type = 'datatype']">
+                                            <!-- Only keep reasonable types -->
+                                            <xf:var
+                                                name="supported"
+                                                value="'string', 'double', 'decimal', 'integer', 'dateTime', 'date', 'time',
+                                                      'boolean', 'email', 'positiveInteger', 'nonPositiveInteger',
+                                                      'negativeInteger', 'nonNegativeInteger',
+                                                      builtin-type/string()"/><!-- add supported type only if already present in the data -->
+                                            <xf:select1 ref="builtin-type">
+                                                <xf:label ref="$resources/dialog-control-details/builtin-type/label"/>
+                                                <!-- Add placeholder if there is a schema type -->
+                                                <xf:itemset ref=".[../schema-type != '']">
+                                                    <xf:label ref="$resources/dialog-control-details/builtin-type/use-schema-type"/>
+                                                    <xf:value/>
+                                                </xf:itemset>
+                                                <xf:itemset ref="$resources/dialog-control-details/builtin-type/choices//(choices[exists(type[. = $supported])] | type[. = $supported])">
+                                                    <xf:label ref="if (self::choices) then label else if (normalize-space(@label)) then @label else ."/>
+                                                    <xf:value ref="if (self::choices) then () else ."/>
+                                                </xf:itemset>
+                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../schema-type"/>
+                                            </xf:select1>
+                                            <!-- Schema type selection if applicable -->
+                                            <xf:select1 ref="schema-type[exists($schema)]">
+                                                <xf:label ref="$resources/dialog-control-details/schema-type/label"/>
+                                                <xf:item>
+                                                    <xf:label ref="$resources/select/label"/>
+                                                    <xf:value/>
+                                                </xf:item>
+                                                <!-- NOTE: Mark itemset as mutable as the schema may be updated -->
+                                                <xf:itemset ref="$schema/xs:simpleType">
+                                                    <xf:label ref="string-join(($schema-prefix, @name), ':')"/>
+                                                    <xf:value ref="string-join(($schema-prefix, @name), ':')"/>
+                                                </xf:itemset>
+                                                <xf:setvalue event="xforms-value-changed" if=". != ''" ref="../builtin-type"/>
+                                            </xf:select1>
+                                        </xf:group>
 
                                         <xf:textarea ref=".[@type = 'constraint']/constraint/@expression">
                                             <xf:label ref="$resources/dialog-control-details/constraint/label"/>

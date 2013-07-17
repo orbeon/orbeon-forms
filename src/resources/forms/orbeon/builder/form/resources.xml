@@ -306,15 +306,8 @@
                 <choices>
                     <choices>
                         <label>Common Types</label>
-                        <type label="Any string" allow-empty="true">string</type>
-                        <type label="Double-precision floating-point">double</type>
-                        <type label="Decimal">decimal</type>
-                        <type label="Integer">integer</type>
-                        <type label="Date and time">dateTime</type>
-                        <type label="Date">date</type>
-                        <type label="Time">time</type>
+                        <type label="String">string</type>
                         <type label="Boolean">boolean</type>
-                        <type label="Any URI">anyURI</type>
                         <type label="Email address">email</type>
                     </choices>
                     <choices>
@@ -339,7 +332,7 @@
                         <type label="">unsignedByte</type>
                     </choices>
                     <choices>
-                        <label>Time Types</label>
+                        <label>Date and Time Types</label>
                         <type label="Date and time">dateTime</type>
                         <type label="Date">date</type>
                         <type label="Time">time</type>
@@ -351,9 +344,8 @@
                         <type label="Day">gDay</type>
                     </choices>
                     <choices>
-                        <label>String Types</label>
-                        <type label="Any string" allow-empty="true">string</type>
-                        <type label="" allow-empty="true">normalizedString</type>
+                        <label>XML Types</label>
+                        <type label="">normalizedString</type>
                         <type label="">token</type>
                         <type label="">language</type>
                         <type label="">Name</type>
@@ -365,16 +357,15 @@
                         <type label="">ENTITIES</type>
                         <type label="">NMTOKEN</type>
                         <type label="">NMTOKENS</type>
+                        <type label="XML qualified name">QName</type>
+                        <type label="">NOTATION</type>
                     </choices>
                     <choices>
                         <label>Other Types</label>
-                        <type label="Boolean">boolean</type>
                         <!-- Not 100% sure if these two types allow empty content -->
-                        <type label="Base64-encoded binary" allow-empty="true">base64Binary</type>
-                        <type label="Hexadecimal-encoded binary" allow-empty="true">hexBinary</type>
+                        <type label="Base64-encoded binary">base64Binary</type>
+                        <type label="Hexadecimal-encoded binary">hexBinary</type>
                         <type label="Any URI">anyURI</type>
-                        <type label="XML qualified name">QName</type>
-                        <type label="">NOTATION</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -1162,15 +1153,8 @@
                 <choices>
                     <choices>
                         <label>Types courants</label>
-                        <type label="Chaîne de caractères" allow-empty="true">string</type>
-                        <type label="Réel double précision">double</type>
-                        <type label="Décimal">decimal</type>
-                        <type label="Entier">integer</type>
-                        <type label="Date et heure">dateTime</type>
-                        <type label="Date">date</type>
-                        <type label="Heure">time</type>
+                        <type label="Chaîne de caractères">string</type>
                         <type label="Booléen">boolean</type>
-                        <type label="URI">anyURI</type>
                         <type label="Adresse email">email</type>
                     </choices>
                     <choices>
@@ -1195,7 +1179,7 @@
                         <type label="">unsignedByte</type>
                     </choices>
                     <choices>
-                        <label>Types liés au temps</label>
+                        <label>Types date et heure</label>
                         <type label="Date et heure">dateTime</type>
                         <type label="Date">date</type>
                         <type label="Heure">time</type>
@@ -1208,8 +1192,7 @@
                     </choices>
                     <choices>
                         <label>Types chaînes de caractères</label>
-                        <type label="Chaîne de caractères" allow-empty="true">string</type>
-                        <type label="" allow-empty="true">normalizedString</type>
+                        <type label="">normalizedString</type>
                         <type label="">token</type>
                         <type label="">language</type>
                         <type label="">Name</type>
@@ -1221,16 +1204,15 @@
                         <type label="">ENTITIES</type>
                         <type label="">NMTOKEN</type>
                         <type label="">NMTOKENS</type>
+                        <type label="Nom XML qualifié">QName</type>
+                        <type label="">NOTATION</type>
                     </choices>
                     <choices>
                         <label>Autres types</label>
-                        <type label="Booléen">boolean</type>
                         <!-- Not 100% sure if these two types allow empty content -->
-                        <type label="Binaire encodé en Base64" allow-empty="true">base64Binary</type>
-                        <type label="Binaire encodé en hexadécimal" allow-empty="true">hexBinary</type>
+                        <type label="Binaire encodé en Base64">base64Binary</type>
+                        <type label="Binaire encodé en hexadécimal">hexBinary</type>
                         <type label="URI">anyURI</type>
-                        <type label="Nom XML qualifié">QName</type>
-                        <type label="">NOTATION</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -2020,15 +2002,8 @@
                 <choices>
                     <choices>
                         <label>Vanlige typer</label>
-                        <type label="Enhver streng" allow-empty="true">string</type>
-                        <type label="Flyttall, dobbel presisjon">double</type>
-                        <type label="Desimaltall">decimal</type>
-                        <type label="Heltall">integer</type>
-                        <type label="Dato og klokkeslett">dateTime</type>
-                        <type label="Dato">date</type>
-                        <type label="Klokkeslett">time</type>
+                        <type label="Enhver streng">string</type>
                         <type label="Boolsk verdi">boolean</type>
-                        <type label="URI">anyURI</type>
                         <type label="Email address">e-postadresse</type>
                     </choices>
                     <choices>
@@ -2066,8 +2041,7 @@
                     </choices>
                     <choices>
                         <label>Strengtyper</label>
-                        <type label="Enhver streng" allow-empty="true">string</type>
-                        <type label="" allow-empty="true">normalizedString</type>
+                        <type label="">normalizedString</type>
                         <type label="">token</type>
                         <type label="">language</type>
                         <type label="">Name</type>
@@ -2079,16 +2053,15 @@
                         <type label="">ENTITIES</type>
                         <type label="">NMTOKEN</type>
                         <type label="">NMTOKENS</type>
+                        <type label="XML qualified name">QName</type>
+                        <type label="">NOTATION</type>
                     </choices>
                     <choices>
                         <label>Andre typer</label>
-                        <type label="Boolsk verdi">boolean</type>
                         <!-- Not 100% sure if these two types allow empty content -->
-                        <type label="Binærfil i base64-format" allow-empty="true">base64Binary</type>
-                        <type label="Binærfil i heksadesimalformat" allow-empty="true">hexBinary</type>
+                        <type label="Binærfil i base64-format">base64Binary</type>
+                        <type label="Binærfil i heksadesimalformat">hexBinary</type>
                         <type label="Enhver URI">anyURI</type>
-                        <type label="XML qualified name">QName</type>
-                        <type label="">NOTATION</type>
                     </choices>
                 </choices>
             </builtin-type>
@@ -2877,15 +2850,8 @@
                 <choices>
                     <choices>
                         <label>Стандартные типы</label>
-                        <type label="Любая строка" allow-empty="true">string</type>
-                        <type label="Дробное число двойной точности">double</type>
-                        <type label="Десятичное число">decimal</type>
-                        <type label="Целое число">integer</type>
-                        <type label="Дата и время">dateTime</type>
-                        <type label="Дата">date</type>
-                        <type label="Время">time</type>
+                        <type label="Любая строка">string</type>
                         <type label="Булева переменная">boolean</type>
-                        <type label="Ссылка">anyURI</type>
                         <type label="Адрес e-mail">email</type>
                     </choices>
                     <choices>
@@ -2923,8 +2889,7 @@
                     </choices>
                     <choices>
                         <label>Строковые типы</label>
-                        <type label="Любая строка" allow-empty="true">string</type>
-                        <type label="" allow-empty="true">normalizedString</type>
+                        <type label="">normalizedString</type>
                         <type label="">token</type>
                         <type label="">language</type>
                         <type label="">Name</type>
@@ -2936,16 +2901,15 @@
                         <type label="">ENTITIES</type>
                         <type label="">NMTOKEN</type>
                         <type label="">NMTOKENS</type>
+                        <type label="XML qualified name">QName</type>
+                        <type label="">NOTATION</type>
                     </choices>
                     <choices>
                         <label>Другие типы</label>
-                        <type label="Булева переменная">boolean</type>
                         <!-- Not 100% sure if these two types allow empty content -->
-                        <type label="Данные в Base64" allow-empty="true">base64Binary</type>
-                        <type label="Данные в Hex" allow-empty="true">hexBinary</type>
+                        <type label="Данные в Base64">base64Binary</type>
+                        <type label="Данные в Hex">hexBinary</type>
                         <type label="Ссылка">anyURI</type>
-                        <type label="XML qualified name">QName</type>
-                        <type label="">NOTATION</type>
                     </choices>
                 </choices>
             </builtin-type>

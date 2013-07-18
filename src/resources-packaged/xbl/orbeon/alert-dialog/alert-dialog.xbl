@@ -160,9 +160,11 @@
                         </xf:label>
                         <xsl:copy-of select="$content except $fr-label"/>
                         <!-- If a custom target is provided, dispatch to it -->
-                        <!-- NOTE: For now target must be an absolute or effective id -->
                         <xf:action ev:event="DOMActivate">
-                            <xf:dispatch if="normalize-space($local/{$handler})" name="fr-{$handler}" targetid="{{$local/{$handler}}}" xxbl:scope="inner">
+                            <xf:var name="local"><xxf:sequence value="$local" xxbl:scope="inner"/></xf:var>
+                            <xf:var name="targetid" value="normalize-space($local/{$handler})"/>
+
+                            <xf:dispatch if="$targetid != ''" name="fr-{$handler}" targetid="{{$targetid}}">
                                 <xf:property name="context" value="$local/context"/>
                             </xf:dispatch>
                         </xf:action>

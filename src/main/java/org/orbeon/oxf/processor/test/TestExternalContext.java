@@ -369,7 +369,7 @@ public class TestExternalContext implements ExternalContext  {
         public void addHeader(String name, String value) {
         }
 
-        public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+        public boolean checkIfModifiedSince(long lastModified) {
             return true;
         }
 

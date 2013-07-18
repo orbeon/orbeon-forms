@@ -404,7 +404,7 @@ public class Portlet2ExternalContext implements ExternalContext {
             urlRewriter = new WSRPURLRewriter(URLRewriterUtils.getPathMatchersCallable(), request, URLRewriterUtils.isWSRPEncodeResources());
         }
 
-        public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+        public boolean checkIfModifiedSince(long lastModified) {
             // NIY / FIXME
             return true;
         }

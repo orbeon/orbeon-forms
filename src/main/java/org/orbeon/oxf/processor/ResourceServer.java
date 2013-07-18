@@ -120,7 +120,7 @@ public class ResourceServer extends ProcessorImpl {
                 }
 
                 // Check If-Modified-Since and don't return content if condition is met
-                if (!response.checkIfModifiedSince(lastModified, false)) {
+                if (!response.checkIfModifiedSince(lastModified)) {
                     response.setStatus(ExternalContext.SC_NOT_MODIFIED);
                     return;
                 }

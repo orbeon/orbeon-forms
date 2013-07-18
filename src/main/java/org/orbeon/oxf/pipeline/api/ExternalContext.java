@@ -128,7 +128,7 @@ public interface ExternalContext {
          */
         void setResourceCaching(long lastModified, long expires);
 
-        boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
+        boolean checkIfModifiedSince(long lastModified);
 
         void setTitle(String title);
 

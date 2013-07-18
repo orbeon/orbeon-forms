@@ -27,8 +27,8 @@ public class ResponseWrapper implements ExternalContext.Response {
         this._response = response;
     }
 
-    public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
-        return _response.checkIfModifiedSince(lastModified, allowOverride);
+    public boolean checkIfModifiedSince(long lastModified) {
+        return _response.checkIfModifiedSince(lastModified);
     }
 
     public String getCharacterEncoding() {

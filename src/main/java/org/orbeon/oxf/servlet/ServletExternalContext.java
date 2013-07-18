@@ -52,8 +52,6 @@ public class ServletExternalContext implements ExternalContext  {
     public static final String HTTP_NOCACHE_CACHE_HEADERS_DEFAULT   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0";
     public static final String HTTP_NOCACHE_CACHE_HEADERS_PROPERTY  = "oxf.http.nocache.cache-headers";
 
-    public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY    = "oxf.http.force-last-modified";
-
     public static final String SESSION_LISTENERS = "oxf.servlet.session-listeners";
 
     private final static String REWRITING_STRATEGY_DEFAULT = "servlet";
@@ -505,21 +503,6 @@ public class ServletExternalContext implements ExternalContext  {
             if (responseCachingDisabled) {
                 setResponseHeaders(nativeResponse, getNocacheCacheHeaders());
             } else {
-                // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
-                {
-                    final Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
-                    if (forceLastModified != null) {
-                        // The properties tell that we should override
-                        if (request.getRemoteUser() == null) {
-                            // If the user is not logged in, just used the specified properties
-                            lastModified = forceLastModified.getTime();
-                        } else {
-                            // If the user is logged in, make sure the correct lastModified is used
-                            lastModified = 0;
-                        }
-                    }
-                }
-
                 // Get current time and adjust lastModified
                 final long now = System.currentTimeMillis();
                 if (lastModified <= 0) lastModified = now;
@@ -556,21 +539,10 @@ public class ServletExternalContext implements ExternalContext  {
             }
         }
 
-        public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+        public boolean checkIfModifiedSince(long lastModified) {
             if (responseCachingDisabled) {
                 return true;
             } else {
-                // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
-                if (allowOverride) {
-                    Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
-                    if (forceLastModified != null) {
-                        if (request.getRemoteUser() == null)
-                            lastModified = forceLastModified.getTime();
-                        else
-                            return true;
-                    }
-                }
-                // Check whether user is logged-in
                 return NetUtils.checkIfModifiedSince(request, lastModified);
             }
         }

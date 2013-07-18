@@ -101,7 +101,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                     final boolean isForward = URLRewriterUtils.isForwarded(externalContext.getRequest());
                     if (!isForward) {
                         // Check If-Modified-Since (conditional GET) and don't return content if condition is met
-                        if (!response.checkIfModifiedSince(lastModified, true)) {
+                        if (!response.checkIfModifiedSince(lastModified)) {
                             response.setStatus(ExternalContext.SC_NOT_MODIFIED);
                             if (logger.isDebugEnabled())
                                 logger.debug("Sending SC_NOT_MODIFIED");

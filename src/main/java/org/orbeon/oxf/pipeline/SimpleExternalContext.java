@@ -263,7 +263,7 @@ public class SimpleExternalContext implements ExternalContext {
         public void setResourceCaching(long lastModified, long expires) {
         }
 
-        public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+        public boolean checkIfModifiedSince(long lastModified) {
             return true;
         }
 

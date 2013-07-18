@@ -49,6 +49,8 @@ public class ServletExternalContext implements ExternalContext  {
     public static final String HTTP_PAGE_CACHE_HEADERS_PROPERTY     = "oxf.http.page.cache-headers";
     public static final String HTTP_RESOURCE_CACHE_HEADERS_DEFAULT  = "Cache-Control: public; Pragma:";
     public static final String HTTP_RESOURCE_CACHE_HEADERS_PROPERTY = "oxf.http.resource.cache-headers";
+    public static final String HTTP_NOCACHE_CACHE_HEADERS_DEFAULT   = "Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0";
+    public static final String HTTP_NOCACHE_CACHE_HEADERS_PROPERTY  = "oxf.http.nocache.cache-headers";
 
     public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY    = "oxf.http.force-last-modified";
 
@@ -70,6 +72,7 @@ public class ServletExternalContext implements ExternalContext  {
     private static String defaultFormCharset;
     private static Map<String, String> pageCacheHeaders;
     private static Map<String, String> resourceCacheHeaders;
+    private static Map<String, String> nocacheCacheHeaders;
 
     public static String getDefaultFormCharset() {
         if (defaultFormCharset == null)
@@ -108,6 +111,12 @@ public class ServletExternalContext implements ExternalContext  {
         if (resourceCacheHeaders == null)
             resourceCacheHeaders = decodeCacheString(HTTP_RESOURCE_CACHE_HEADERS_PROPERTY, HTTP_RESOURCE_CACHE_HEADERS_DEFAULT);
         return resourceCacheHeaders;
+    }
+
+    private static Map<String, String> getNocacheCacheHeaders() {
+        if (nocacheCacheHeaders == null)
+            nocacheCacheHeaders = decodeCacheString(HTTP_NOCACHE_CACHE_HEADERS_PROPERTY, HTTP_NOCACHE_CACHE_HEADERS_DEFAULT);
+        return nocacheCacheHeaders;
     }
 
     private class Request implements ExternalContext.Request {
@@ -401,6 +410,8 @@ public class ServletExternalContext implements ExternalContext  {
 
     private class Response implements ExternalContext.Response {
 
+        private boolean responseCachingDisabled = false;
+
         private URLRewriter urlRewriter;
 
         private Response() {
@@ -431,6 +442,19 @@ public class ServletExternalContext implements ExternalContext  {
         }
 
         public void setStatus(int status) {
+            // If anybody ever sets a non-success status code, we disable caching of the output. This covers the
+            // following scenario:
+            //
+            // - request with If-Modified-Since arrives and causes PFC to run
+            // - oxf:http-serializer runs and sees pipeline NOT cacheable so reads the input
+            // - during execution of pipeline, HttpStatusCodeException is thrown
+            // - PFC catches it and calls setStatus()
+            // - error, not found, or unauthorized pipeline runs
+            // - oxf:http-serializer runs and sees pipeline IS cacheable so sends a 403
+            // - client sees wrong result!
+            if (! NetUtils.isSuccessCode(status))
+                responseCachingDisabled = true;
+
             nativeResponse.setStatus(status);
         }
 
@@ -478,67 +502,77 @@ public class ServletExternalContext implements ExternalContext  {
         }
 
         public void setPageCaching(long lastModified) {
-
-            // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
-            {
-                final Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
-                if (forceLastModified != null) {
-                    // The properties tell that we should override
-                    if (request.getRemoteUser() == null) {
-                        // If the user is not logged in, just used the specified properties
-                        lastModified = forceLastModified.getTime();
-                    } else {
-                        // If the user is logged in, make sure the correct lastModified is used
-                        lastModified = 0;
+            if (responseCachingDisabled) {
+                setResponseHeaders(nativeResponse, getNocacheCacheHeaders());
+            } else {
+                // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
+                {
+                    final Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+                    if (forceLastModified != null) {
+                        // The properties tell that we should override
+                        if (request.getRemoteUser() == null) {
+                            // If the user is not logged in, just used the specified properties
+                            lastModified = forceLastModified.getTime();
+                        } else {
+                            // If the user is logged in, make sure the correct lastModified is used
+                            lastModified = 0;
+                        }
                     }
                 }
+
+                // Get current time and adjust lastModified
+                final long now = System.currentTimeMillis();
+                if (lastModified <= 0) lastModified = now;
+
+                // Set last-modified
+                nativeResponse.setDateHeader("Last-Modified", lastModified);
+
+                // Make sure the client does not load from cache without revalidation
+                nativeResponse.setDateHeader("Expires", now);
+                setResponseHeaders(nativeResponse, getPageCacheHeaders());
             }
-
-            // Get current time and adjust lastModified
-            final long now = System.currentTimeMillis();
-            if (lastModified <= 0) lastModified = now;
-
-            // Set last-modified
-            nativeResponse.setDateHeader("Last-Modified", lastModified);
-
-            // Make sure the client does not load from cache without revalidation
-            nativeResponse.setDateHeader("Expires", now);
-            setResponseHeaders(nativeResponse, getPageCacheHeaders());
         }
 
         public void setResourceCaching(long lastModified, long expires) {
+            if (responseCachingDisabled) {
+                setResponseHeaders(nativeResponse, getNocacheCacheHeaders());
+            } else {
+                // Get current time and adjust parameters
+                final long now = System.currentTimeMillis();
+                if (lastModified <= 0) {
+                    lastModified = now;
+                    expires = now;
+                } else if (expires <= 0) {
+                    // Regular expiration strategy. We use the HTTP spec heuristic to calculate the "Expires" header value
+                    // (10% of the difference between the current time and the last modified time)
+                    expires = now + (now - lastModified) / 10;
+                }
 
-            // Get current time and adjust parameters
-            final long now = System.currentTimeMillis();
-            if (lastModified <= 0) {
-                lastModified = now;
-                expires = now;
-            } else if (expires <= 0) {
-                // Regular expiration strategy. We use the HTTP spec heuristic to calculate the "Expires" header value
-                // (10% of the difference between the current time and the last modified time)
-                expires = now + (now - lastModified) / 10;
+                // Set caching headers
+                nativeResponse.setDateHeader("Last-Modified", lastModified);
+                nativeResponse.setDateHeader("Expires", expires);
+
+                setResponseHeaders(nativeResponse, getResourceCacheHeaders());
             }
-
-            // Set caching headers
-            nativeResponse.setDateHeader("Last-Modified", lastModified);
-            nativeResponse.setDateHeader("Expires", expires);
-
-            setResponseHeaders(nativeResponse, getResourceCacheHeaders());
         }
 
         public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
-            // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
-            if (allowOverride) {
-                Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
-                if (forceLastModified != null) {
-                    if (request.getRemoteUser() == null)
-                        lastModified = forceLastModified.getTime();
-                    else
-                        return true;
+            if (responseCachingDisabled) {
+                return true;
+            } else {
+                // Check a special mode to make all pages appear static, unless the user is logged in (HACK)
+                if (allowOverride) {
+                    Date forceLastModified = Properties.instance().getPropertySet().getDateTime(HTTP_FORCE_LAST_MODIFIED_PROPERTY);
+                    if (forceLastModified != null) {
+                        if (request.getRemoteUser() == null)
+                            lastModified = forceLastModified.getTime();
+                        else
+                            return true;
+                    }
                 }
+                // Check whether user is logged-in
+                return NetUtils.checkIfModifiedSince(request, lastModified);
             }
-            // Check whether user is logged-in
-            return NetUtils.checkIfModifiedSince(request, lastModified);
         }
 
         public String getNamespacePrefix() {

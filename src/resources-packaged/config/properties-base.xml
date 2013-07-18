@@ -81,6 +81,7 @@
     -->
     <property as="xs:string"  name="oxf.http.page.cache-headers"                     value="Cache-Control: private, max-age=0; Pragma:"/>
     <property as="xs:string"  name="oxf.http.resource.cache-headers"                 value="Cache-Control: public; Pragma:"/>
+    <property as="xs:string"  name="oxf.http.nocache.cache-headers"                  value="Cache-Control: no-cache, no-store, must-revalidate; Pragma: no-cache; Expires: 0"/>
 
     <!-- Epilogue configuration -->
     <property as="xs:anyURI"  name="oxf.epilogue.theme"                              value="oxf:/config/theme-examples.xsl"/>

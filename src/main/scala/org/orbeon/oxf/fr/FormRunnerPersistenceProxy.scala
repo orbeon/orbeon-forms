@@ -38,10 +38,10 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
  * - proxies GET, PUT, DELETE and POST to the appropriate persistence implementation
  * - sets persistence implementation headers
  */
-class FormRunnerPersistenceProxy extends ProcessorImpl {
+    class FormRunnerPersistenceProxy extends ProcessorImpl {
 
     private val FormPath           = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
-    private val DataPath           = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/([^/]+)/([^/]+))""".r
+    private val DataPath           = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
     private val DataCollectionPath = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/data/)""".r
     private val SearchPath         = """/fr/service/persistence(/search/([^/]+)/([^/]+))""".r
     private val FormDefinitionPath = """/fr/service/persistence/form(/([^/]+)(/([^/]+))?)?""".r
@@ -59,7 +59,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
         val incomingPath = request.getRequestPath
         incomingPath match {
             case FormPath(path, app, form, _)           ⇒ proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, _, _)        ⇒ proxyRequest(request, response, app, form, "data", path)
+            case DataPath(path, app, form, _, _, _)     ⇒ proxyRequest(request, response, app, form, "data", path)
             case DataCollectionPath(path, app, form)    ⇒ proxyRequest(request, response, app, form, "data", path)
             case SearchPath(path, app, form)            ⇒ proxyRequest(request, response, app, form, "data", path)
             case FormDefinitionPath(path, _, _, _)      ⇒ proxyFormDefinition(request, response, path)

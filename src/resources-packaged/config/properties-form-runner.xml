@@ -79,6 +79,7 @@
     <property as="xs:boolean" name="oxf.fr.detail.hide-footer.*.*"                              value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-top.*.*"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.detail.hide-buttons-bar.*.*"                         value="false"/>
+    <property as="xs:integer" name="oxf.fr.detail.autosave-delay.*.*"                           value="5000"/>
 
     <!-- PDF template formatting -->
     <!-- NOTE: In the future we don't want those to apply to XHTML, but to an intermediate representation -->

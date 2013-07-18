@@ -36,6 +36,7 @@
              For the wizard, we even rely on the fact that internal wizard controls are in XBL outer scope. See also:
              https://github.com/orbeon/orbeon-forms/issues/940 -->
         <fr:process-button
+            id="fr-button-{$button-name}"
             name="{$button-name}"
             ref="xxf:instance('fr-triggers-instance')/{if ($button-name = ('edit', 'workflow-edit'))
                                                        then 'can-update'

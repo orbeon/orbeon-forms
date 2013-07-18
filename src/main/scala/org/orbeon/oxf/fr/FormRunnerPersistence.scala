@@ -39,7 +39,7 @@ trait FormRunnerPersistence {
         value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
     // Create a new attachment path
-    def createAttachmentPath(app: String, form: String, document: String, localURL: String): String = {
+    def createAttachmentPath(app: String, form: String, document: String, isDraft: Boolean, localURL: String): String = {
 
         // Here we could decide to use a nicer extension for the file. But since initially the filename comes from the
         // client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
@@ -49,16 +49,20 @@ trait FormRunnerPersistence {
         //val nonTrustedFilename = XFormsUploadControl.getParameter(localURL, "filename")
         //val nonTrustedMediatype = XFormsUploadControl.getParameter(localURL, "mediatype")
 
-        createFormDataAttachmentPath(app, form, document, SecureUtils.randomHexId + ".bin")
+        createFormDataAttachmentPath(app, form, document, isDraft, SecureUtils.randomHexId + ".bin")
     }
+
+    // Path for a form data
+    def createFormDataBasePath(app: String, form: String, document: String, isDraft: Boolean): String =
+        "/fr/service/persistence/crud/" + app + '/' + form + (if (isDraft) "/draft/" else "/data/") + document + "/"
+
+    // Path for a form data attachment
+    def createFormDataAttachmentPath(app: String, form: String, document: String, isDraft: Boolean, filename: String): String =
+        createFormDataBasePath(app, form, document, isDraft) + filename
 
     // Path for a form definition attachment
     def createFormDefinitionAttachmentPath(app: String, form: String, filename: String): String =
         "/fr/service/persistence/crud/" + app + '/' + form + "/form/" + filename
-
-    // Path for a form data attachment
-    def createFormDataAttachmentPath(app: String, form: String, document: String, filename: String): String =
-        "/fr/service/persistence/crud/" + app + '/' + form + "/data/" + document + '/' + filename
 
     // Whether the given path is an attachment path
     def isDataAttachmentPath(app: String, form: String, document: String, path: String): Boolean =

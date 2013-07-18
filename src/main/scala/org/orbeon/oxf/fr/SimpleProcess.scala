@@ -44,7 +44,7 @@ object SimpleProcess extends Actions with Logging {
 
     private val ProcessPropertyPrefix = "oxf.fr.detail.process"
     private val ProcessPropertyTokens = ProcessPropertyPrefix split """\.""" size
-    
+
     type ActionParams = Map[Option[String], String]
     type Action       = ActionParams ⇒ Try[Any]
 
@@ -144,7 +144,7 @@ object SimpleProcess extends Actions with Logging {
         def parseProcess(process: String): ProcessNode = {
 
             val tokens = splitProcess(process)
-    
+
             if (tokens.isEmpty)
                 // Empty process
                 ProcessNode(None, Nil)
@@ -159,15 +159,15 @@ object SimpleProcess extends Actions with Logging {
                     } yield
                         tokens(ProcessPropertyTokens)
                 )
-    
+
                 def actionUsage(action: String)         = s"action '$action' is not supported, must be one of: ${allowedActions mkString ", "}"
                 def combinatorUsage(combinator: String) = s"combinator '$combinator' is not supported, must be one of: ${CombinatorsByName.keys mkString ", "}"
-    
+
                 def checkAction(action: String)         = require(allowedActions(action), actionUsage(action))
                 def checkCombinator(combinator: String) = require(CombinatorsByName.contains(combinator) , combinatorUsage(combinator))
-    
+
                 def parseAction(rawAction: String) = {
-    
+
                     rawAction match {
                         case ActionWithSingleAnonymousParam(actionName, _, null) ⇒
                             checkAction(actionName)
@@ -179,20 +179,20 @@ object SimpleProcess extends Actions with Logging {
                             throw new IllegalArgumentException(s"invalid action syntax for '$rawAction'")
                     }
                 }
-    
+
                 require(tokens.size % 2 == 1, "process must have an odd number of steps")
-    
+
                 val firstAction = parseAction(tokens(0))
-    
+
                 val actions =
                     tokens.tail grouped 2 map {
                         case List(combinator, action) ⇒
                             checkCombinator(combinator)
-    
+
                             PairAst(CombinatorAst(CombinatorsByName(combinator)), parseAction(action))
-    
+
                     }
-    
+
                 ProcessNode(Some(firstAction), actions.toList)
             }
         }
@@ -427,6 +427,7 @@ trait Actions {
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, document, _) = FormRunnerParams()
+            val isDraft = params.get(None).exists(_ == "draft")
 
             require(document.isDefined)
 
@@ -443,7 +444,7 @@ trait Actions {
             val beforeURLs = uploadHolders map (_.stringValue.trim)
 
             // For each one compute the persistence resource name
-            val afterURLs  = beforeURLs map (url ⇒ createAttachmentPath(app, form, document.get, url))
+            val afterURLs  = beforeURLs map (url ⇒ createAttachmentPath(app, form, document.get, isDraft, url))
 
             val commonQueryString = s"valid=$dataValid"
 
@@ -468,7 +469,7 @@ trait Actions {
             def saveData() =
                 sendThrowOnError("fr-create-update-submission", Map(
                     "holder"   → Some(formInstance.rootElement),
-                    "resource" → Some(appendQueryString("data.xml", commonQueryString)))
+                    "resource" → Some(appendQueryString(createFormDataBasePath(app, form, document.get, isDraft) + "data.xml", commonQueryString)))
                 )
 
             // Do things in order
@@ -483,7 +484,11 @@ trait Actions {
             recalculate("fr-persistence-model")
             refresh("fr-persistence-model")
 
-            setvalue(topLevelInstance("fr-persistence-model", "fr-persistence-instance").get.rootElement \ "data-status", "clean")
+            // Mark data clean
+            val persistenceInstanceRoot = topLevelInstance("fr-persistence-model", "fr-persistence-instance").get.rootElement
+            val saveStatus = if (isDraft) Seq() else persistenceInstanceRoot \ "data-status"
+            val autoSaveStatus = persistenceInstanceRoot \ "autosave" \ "status"
+            (saveStatus ++ autoSaveStatus) foreach (setvalue(_, "clean"))
 
             // Notify that the data is saved
             dispatch(name = "fr-data-save-done", targetId = "fr-form-model", properties = Map(
@@ -519,7 +524,7 @@ trait Actions {
                 "fr-content" → Some(topLevelInstance("fr-persistence-model", "fr-create-update-submission-response").get.rootElement)
             ))
         }
-    
+
     def tryCaptcha(params: ActionParams): Try[Any] =
         Try {
             if (hasCaptcha && (persistenceInstance.rootElement \ "captcha" === "false"))

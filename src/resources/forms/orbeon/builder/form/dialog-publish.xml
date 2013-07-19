@@ -141,11 +141,11 @@
 
     <!-- Local model -->
     <xf:model id="fb-publish-model">
-        
+
         <!-- Publish form operation -->
         <xf:action ev:event="fb-publish-form">
             <!-- ASSUMPTION: the form has been previously saved, and so all attachments are saved as well -->
-            
+
             <!-- Clear results -->
             <xf:setvalue ref="instance('fb-publish-instance')/is-error">false</xf:setvalue>
             <xf:setvalue ref="instance('fb-publish-instance')/attachments" value="0"/>
@@ -165,7 +165,7 @@
 
             <xf:var name="attachment-holders"
                         value="instance('fb-form-to-publish-instance')/root()//(*[not(*)] | @*)
-                                [frf:isDataAttachmentPath($fb-app, $fb-form, $fb-document, normalize-space(.))]"/>
+                                [frf:isDataAttachmentPath($fb-app, $fb-form, false(), $fb-document, normalize-space(.))]"/>
 
             <xf:action iterate="$attachment-holders" if="instance('fb-publish-instance')/is-error = 'false'">
 

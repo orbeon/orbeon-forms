@@ -288,16 +288,25 @@
                                                             insert into <xsl:value-of select="$table-name"/>
                                                                 (
                                                                     <!-- TODO: This list of columns only works for the data (not form definition) table -->
-                                                                    created, <xsl:value-of select="$last-modified-time"/>, <xsl:value-of select="$last-modified-by"/>,
-                                                                    app, form, <xsl:if test="$is-data-draft">document_id,</xsl:if> deleted, xml
+                                                                    created,
+                                                                    <xsl:value-of select="$last-modified-time"/>,
+                                                                    <xsl:value-of select="$last-modified-by"/>,
+                                                                    app, form,
+                                                                    <xsl:if test="$is-data-draft">document_id,</xsl:if>
+                                                                    deleted,
+                                                                    <xsl:if test="$is-data-draft and $support-auto-save">draft, </xsl:if>
+                                                                    xml
                                                                     <xsl:if test="$is-data-draft and $owner-group">, username, groupname</xsl:if>
                                                                 )
                                                             select
                                                                 d.created,
                                                                 <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                                 <sql:param type="xs:string" select="/request/username"/>,
-                                                                d.app, d.form, <xsl:if test="$is-data-draft">d.document_id,</xsl:if>
-                                                                'Y', d.xml
+                                                                d.app, d.form,
+                                                                <xsl:if test="$is-data-draft">d.document_id,</xsl:if>
+                                                                'Y',
+                                                                <xsl:if test="$is-data-draft and $support-auto-save">'N', </xsl:if>
+                                                                d.xml
                                                                 <xsl:if test="$is-data-draft and $owner-group">, d.username, d.groupname</xsl:if>
                                                             from
                                                                 orbeon_form_data d,

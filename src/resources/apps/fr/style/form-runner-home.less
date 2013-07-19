@@ -12,13 +12,33 @@
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 
-.fr-view {
+@import "form-runner-common";
+
+.orbeon {
+
+    .fr-mode-home .fr-status-icons {
+        display: none
+    }
+
     table {
         .fr-summary, .fr-new {
             text-align: center;
         }
         th {
             white-space: nowrap;
+        }
+
+        .fr-home-repeat-selection-checkbox {
+            .fr-plain-checkbox-container();
+        }
+
+        .label {
+            display: inline-block;
+            text-align: center;
+
+            // This doesn't work correctly with Firefox :(
+            //box-sizing: border-box;
+            //width: 100%;
         }
     }
 }

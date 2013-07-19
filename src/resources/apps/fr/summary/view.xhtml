@@ -197,6 +197,10 @@
 
             <!-- 2. Check for authorized operations -->
             <xf:action ev:event="xforms-model-construct-done">
+
+                <!-- Send a "Not Found" error if the for is not available -->
+                <xf:action if="$source-form-metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
+
                 <xf:var name="ops" value="frf:javaAuthorizedOperationsBasedOnRoles($source-form-metadata/permissions)"/>
                 <xf:setvalue ref="xxf:instance('fr-authorized-operations')" value="string-join($ops, ' ')"/>
                 <!-- Send an "Unauthorized" error if the user is unauthorized -->

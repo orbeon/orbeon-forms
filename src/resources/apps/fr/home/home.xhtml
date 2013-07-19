@@ -11,39 +11,140 @@
 
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
-<xh:html xmlns:xs="http://www.w3.org/2001/XMLSchema"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:ev="http://www.w3.org/2001/xml-events"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      xmlns:f="http://orbeon.org/oxf/xml/formatting"
-      xmlns:xh="http://www.w3.org/1999/xhtml"
-      xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-      xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+<xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+         xmlns:xs="http://www.w3.org/2001/XMLSchema"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+         xmlns:saxon="http://saxon.sf.net/"
+         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xh:head>
-        <xh:title>
-            <xf:output ref="$fr-resources/home/title"/>
-        </xh:title>
+        <xh:title><xf:output ref="$fr-resources/home/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
-            <!-- NOTE: Necessary as referenced in view.xsl -->
+
             <xf:instance id="fr-form-instance">
                 <ui>
-                    <user-roles/>
+                    <user-roles/><!-- Q: Is this used at all? -->
+                    <selection/>
+                    <error/>
+                    <unpublish-button/>
+                    <publish-button/>
                 </ui>
             </xf:instance>
-            <xf:instance id="fr-forms"><forms/></xf:instance>       <!-- Forms metadata returned by service -->
 
-            <xf:submission id="get-forms" method="get" resource="/fr/service/persistence/form" replace="instance" instance="fr-forms"/>
-            <xf:action ev:event="xforms-model-construct-done">
-                <xf:send submission="get-forms"/>
-                <xf:action iterate="instance('fr-forms')/form">
-                    <xf:insert context="." origin="xxf:attribute('operations', string-join(frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions), ' '))"/>
+            <xf:var name="is-available"   value="saxon:expression('xxf:split(., ''/'')[3] = ''true''')"/>
+
+            <xf:bind ref="unpublish-button" readonly="not(normalize-space(../selection) and     xxf:forall(xxf:split(../selection), $is-available))"/>
+            <xf:bind ref="publish-button"   readonly="not(normalize-space(../selection) and not(xxf:exists(xxf:split(../selection), $is-available)))"/>
+
+            <!-- Forms metadata -->
+            <xf:instance id="fr-metadata"><forms/></xf:instance>
+            <xf:submission
+                id="read-metadata"
+                method="get"
+                serialization="none"
+                resource="/fr/service/persistence/form"
+                replace="instance"
+                instance="fr-metadata">
+
+                <xf:action event="xforms-submit-done" iterate="instance('fr-metadata')/form">
+                    <xf:insert
+                        context="."
+                        origin="xxf:attribute('operations', string-join(frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions), ' '))"/>
                 </xf:action>
+
+            </xf:submission>
+
+            <xf:action event="xforms-model-construct-done">
+                <xf:send submission="read-metadata"/>
             </xf:action>
+
+            <!-- Scope variable with Form Runner resources -->
+            <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
+
+            <xf:dispatch event="DOMActivate" observer="fr-publish-button fr-unpublish-button" target="publish-confirmation-dialog" name="fr-show">
+                <xf:property name="message"
+                             value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
+                                        if (event('xxf:observerid') = 'fr-unpublish-button') then 1 else 0,
+                                        count(xxf:split(selection))
+                                    ))"/>
+                <xf:property name="positive-targetid"
+                             value="'fr-form-model'"/>
+                <xf:property name="context"
+                             value="if (event('xxf:observerid') = 'fr-unpublish-button') then 'unpublish' else 'publish'"/>
+            </xf:dispatch>
+
+            <!-- Implementation of publish/unpublish -->
+            <xf:action event="fr-positive">
+                <xf:var name="unpublish" value="event('context') = 'unpublish'"/>
+                <!-- Iterate until there is an error -->
+                <xf:setvalue ref="error"/>
+                <xf:action iterate="xxf:split(selection)" if="instance()/error = ''">
+
+                    <xf:var name="app"  value="xxf:split(., '/')[1]"/>
+                    <xf:var name="form" value="xxf:split(., '/')[2]"/>
+
+                    <xf:send submission="read-form">
+                        <xf:property name="app"  value="$app"/>
+                        <xf:property name="form" value="$form"/>
+                    </xf:send>
+
+                    <xf:action if="instance()/error = ''">
+                        <xf:var
+                            name="metadata"
+                            value="instance('fr-form')/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata"/>
+
+                        <xf:delete
+                            ref="$metadata/available"/>
+                        <xf:insert
+                            if="$unpublish"
+                            context="$metadata"
+                            ref="*"
+                            origin="xxf:element('available', 'false')"/>
+
+                        <xf:send submission="write-form">
+                            <xf:property name="app"  value="$app"/>
+                            <xf:property name="form" value="$form"/>
+                        </xf:send>
+                    </xf:action>
+                </xf:action>
+
+                <!-- Clear selection because foo/bar/true might become foo/bar/false -->
+                <xf:setvalue ref="selection"/>
+                <xf:delete ref="instance('fr-form')/*"/>
+
+                <!-- Update the view -->
+                <xf:send submission="read-metadata"/>
+
+            </xf:action>
+
+            <!-- Form definition -->
+            <xf:instance id="fr-form"><xh:html/></xf:instance>
+
+            <xf:submission
+                id="read-form"
+                method="get"
+                serialization="none"
+                resource="/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml"
+                replace="instance"
+                instance="fr-form"/>
+
+            <xf:submission
+                id="write-form"
+                method="put"
+                ref="instance('fr-form')"
+                resource="/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml"
+                replace="none"/>
+
+            <xf:setvalue
+                event="xforms-submit-error"
+                observer="read-form write-form"
+                ref="error"
+                value="'true'"/>
         </xf:model>
     </xh:head>
     <xh:body>
@@ -51,7 +152,7 @@
         <xh:div class="container">
             <fr:row>
                 <fr:body>
-                    <xf:var name="forms" value="instance('fr-forms')/form[exists(*) and @operations != '']"/>
+                    <xf:var name="forms" value="instance('fr-metadata')/form[exists(*) and @operations != '']"/>
                     <xf:group ref=".[empty($forms)]">
                         <xh:div class="alert">
                             No forms have been deployed, or you don't have the permissions to access any
@@ -61,15 +162,35 @@
                     <xf:group ref=".[exists($forms)]">
                         <xh:table class="table table-bordered table-condensed table-striped table-hover">
                             <xh:tr>
-                                <!-- TODO: i18n -->
-                                <xh:th>Application</xh:th>
-                                <xh:th>Form</xh:th>
-                                <xh:th>Title</xh:th>
-                                <xh:th>View</xh:th>
-                                <xh:th>New</xh:th>
+                                <xh:th/>
+                                <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
+                                <xh:th><xf:output value="$fr-resources/home/titles/app"/></xh:th>
+                                <xh:th><xf:output value="$fr-resources/home/titles/form"/></xh:th>
+                                <xh:th><xf:output value="$fr-resources/home/titles/title"/></xh:th>
+                                <xh:th><xf:output value="$fr-resources/home/titles/view"/></xh:th>
+                                <xh:th><xf:output value="$fr-resources/home/titles/new"/></xh:th>
                             </xh:tr>
                             <xf:repeat ref="$forms">
+                                <xf:var name="current"   value="."/>
+                                <xf:var name="available" value="not(available = 'false')"/>
                                 <xh:tr>
+                                    <xh:td class="fr-home-repeat-selection-checkbox">
+                                        <xf:select appearance="full" ref="instance()/selection" id="document-selection">
+                                            <xf:item>
+                                                <xf:label/>
+                                                <xf:value context="$current" value="concat(application-name, '/', form-name, '/', $available)"/>
+                                            </xf:item>
+                                        </xf:select>
+                                    </xh:td>
+                                    <xh:td>
+                                        <xf:output
+                                            class="label{if ($available) then ' label-success' else ''}"
+                                            value="if ($available) then $fr-resources/home/labels/available else $fr-resources/home/labels/unavailable"/>
+                                        <xf:output
+                                            ref=".[form-name = 'library']"
+                                            class="label label-info"
+                                            value="$fr-resources/home/labels/library"/>
+                                    </xh:td>
                                     <xh:td>
                                         <xf:output value="application-name"/>
                                     </xh:td>
@@ -100,8 +221,25 @@
                 </fr:body>
             </fr:row>
             <fr:row>
+                <xh:span class="fr-buttons">
+                    <xf:trigger ref="unpublish-button" id="fr-unpublish-button">
+                        <xf:label mediatype="text/html" value="$fr-resources/home/buttons/unpublish"/>
+                    </xf:trigger>
+                    <xf:trigger ref="publish-button" id="fr-publish-button">
+                        <xf:label mediatype="text/html" value="$fr-resources/home/buttons/publish"/>
+                    </xf:trigger>
+                </xh:span>
+            </fr:row>
+            <fr:row>
                 <fr:version/>
             </fr:row>
         </xh:div>
+
+        <!-- Confirmation dialog -->
+        <fr:alert-dialog id="publish-confirmation-dialog" close="true">
+            <fr:label ref="$fr-resources/home/titles/publish-confirmation"/>
+            <fr:negative-choice/>
+            <fr:positive-choice/>
+        </fr:alert-dialog>
     </xh:body>
 </xh:html>

@@ -204,6 +204,27 @@
         </save-locally>
         <home>
             <title>Form Runner Home</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Unpublish</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>Confirm Form Publish/Unpublish</publish-confirmation>
+                <status>Status</status>
+                <app>Application</app>
+                <form>Form</form>
+                <title>Title</title>
+                <view>View</view>
+                <new>New</new>
+            </titles>
+            <messages>
+                <publish-confirmation>Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Available</available>
+                <unavailable>Unavailable</unavailable>
+                <library>Library</library>
+            </labels>
         </home>
     </resource>
     <resource xml:lang="fr">
@@ -269,7 +290,7 @@
             </paging>
             <messages>
                 <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
-                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires ?</delete-confirmation>
+                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires?</delete-confirmation>
             </messages>
             <labels>
                 <draft>Brouillons</draft>
@@ -397,7 +418,28 @@
             </dialog-body>
         </save-locally>
         <home>
-            <title>[Form Runner Home]</title>
+            <title>Accueil Form Runner</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Dépublier</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>Confirmer la publication/dépublication de formulaire</publish-confirmation>
+                <status>Etat</status>
+                <app>Application</app>
+                <form>Formulaire</form>
+                <title>Titre</title>
+                <view>Voir</view>
+                <new>Nouveau</new>
+            </titles>
+            <messages>
+                <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#publier|1#dépublier} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Disponible</available>
+                <unavailable>Indisponible</unavailable>
+                <library>Bibliothèque</library>
+            </labels>
         </home>
     </resource>
     <resource xml:lang="es">
@@ -537,7 +579,7 @@
                 <form-validation-error>Hay errores de validación. Corrija los errores e intente nuevamente</form-validation-error>
                 <database-error>Error de comunicación con la base de datos. Contacte al adminstrador de la aplicación.</database-error>
                 <process-error>Error corriendo el proceso. Contacte al adminstrador de la aplicación.</process-error>
-                <clear-confirm-message>Esta seguro de limpiar todos los campos de la página ? Los datos se perderán sino guarda los datos.</clear-confirm-message>
+                <clear-confirm-message>Esta seguro de limpiar todos los campos de la página? Los datos se perderán sino guarda los datos.</clear-confirm-message>
                 <error-dialog-title>Imposible completar la acción</error-dialog-title>
                 <submit-dialog-title>Formulario Enviado</submit-dialog-title>
                 <submit-dialog-message>Su información ha sido enviada.</submit-dialog-message>
@@ -591,6 +633,27 @@
         </save-locally>
         <home>
             <title>Incio Form Runner</title>
+            <buttons>
+                <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
+                <publish>[&lt;i class="icon-globe"/&gt; Publish]</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <status>[Status]</status>
+                <app>[App]</app>
+                <form>[Form]</form>
+                <title>[Title]</title>
+                <view>[View]</view>
+                <new>[New]</new>
+            </titles>
+            <messages>
+                <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+            </messages>
+            <labels>
+                <available>[Available]</available>
+                <unavailable>[Unavailable]</unavailable>
+                <library>[Library]</library>
+            </labels>
         </home>
     </resource>
     <resource xml:lang="no">
@@ -782,6 +845,27 @@
         </save-locally>
         <home>
             <title>[Form Runner Home]</title>
+            <buttons>
+                <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
+                <publish>[&lt;i class="icon-globe"/&gt; Publish]</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <status>[Status]</status>
+                <app>[App]</app>
+                <form>[Form]</form>
+                <title>[Title]</title>
+                <view>[View]</view>
+                <new>[New]</new>
+            </titles>
+            <messages>
+                <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+            </messages>
+            <labels>
+                <available>[Available]</available>
+                <unavailable>[Unavailable]</unavailable>
+                <library>[Library]</library>
+            </labels>
         </home>
     </resource>
     <resource xml:lang="ru">
@@ -971,6 +1055,27 @@
         </save-locally>
         <home>
             <title>[Form Runner Home]</title>
+            <buttons>
+                <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
+                <publish>[&lt;i class="icon-globe"/&gt; Publish]</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <status>[Status]</status>
+                <app>[App]</app>
+                <form>[Form]</form>
+                <title>[Title]</title>
+                <view>[View]</view>
+                <new>[New]</new>
+            </titles>
+            <messages>
+                <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+            </messages>
+            <labels>
+                <available>[Available]</available>
+                <unavailable>[Unavailable]</unavailable>
+                <library>[Library]</library>
+            </labels>
         </home>
     </resource>
 </resources>

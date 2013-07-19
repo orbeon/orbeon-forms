@@ -48,6 +48,22 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
+.fr-plain-checkbox-container {
+  width: 1px;
+}
+.fr-plain-checkbox-container label {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+.fr-plain-checkbox-container label input[type="checkbox"] {
+  float: none;
+  margin: 0;
+}
+.fr-plain-checkbox-container label .label {
+  vertical-align: middle;
+}
 .orbeon .license {
   text-align: center;
   font-size: 11px;

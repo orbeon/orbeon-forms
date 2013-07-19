@@ -47,3 +47,18 @@
     background-repeat: no-repeat;
     background-position: -120px -96px;
 }
+
+.fr-plain-checkbox-container {
+    width: 1px;                                             // So the column takes the minimum possible space
+    label {
+        display: inline-block;                              // Override Bootstrap's block, so we can have a "label" next the checkbox
+        margin: 0;
+        padding: 0;
+        text-indent: 0;
+        input[type="checkbox"] {
+            float: none;                                    // If the checkboxes is floated, IE7 incorrectly calculates the width of the column
+            margin: 0
+        }
+        .label { vertical-align: middle }                       // Vertically center Draft label on the chekcbox
+    }
+}

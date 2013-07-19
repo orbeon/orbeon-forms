@@ -137,6 +137,10 @@
 
         <!-- Compute authorized operations -->
         <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
+
+        <!-- Send a "Not Found" error if the for is not available -->
+        <xf:action if="$metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
+
         <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
         <xf:var name="ops" value="if (exists($from-persistence))
                                   then tokenize($from-persistence, '\s')

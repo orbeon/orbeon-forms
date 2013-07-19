@@ -33,7 +33,7 @@ public class XFormsTriggerMinimalHandler extends XFormsTriggerHandler {
         final XFormsTriggerControl triggerControl = (XFormsTriggerControl) control;
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true);
 
         // TODO: needs f:url-norewrite="true"?
         containerAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#");

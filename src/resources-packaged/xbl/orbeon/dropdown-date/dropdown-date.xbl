@@ -149,7 +149,10 @@
         </xbl:implementation>
         <xbl:template>
             <!-- Read external value -->
-            <xf:var name="binding" value="xxf:binding('fr-dropdown-date-binding')"/>
+            <xf:var name="binding"
+                    value="xxf:binding('fr-dropdown-date-binding')"/>
+            <xf:var name="view"
+                value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
             <xf:var name="value" as="xs:string" value="$binding/string()">
                 <xf:action ev:event="xforms-value-changed xforms-enabled">
                     <!-- Only set local values if the bound node is an xs:date -->
@@ -180,7 +183,7 @@
             </xf:var>
 
             <xf:group class="fr-component-group">
-                <xf:group ref=".[not(is-readonly = 'true' and property('xxf:readonly-appearance') = 'static')]">
+                <xf:group ref=".[not($view)]">
                     <!-- Don't show fields at all in static readonly mode -->
                     <!-- NOTE: navindex is copied to first field, but need one for second field too! -->
                     <xf:select1 ref="year" xbl:attr="navindex navindex=tabindex">
@@ -238,9 +241,9 @@
                         </xf:action>
                     </xf:action>
                 </xf:group>
-                <xf:group ref=".[is-readonly = 'true' and property('xxf:readonly-appearance') = 'static']">
+                <xf:group ref=".[$view]">
                     <!-- Static readonly mode -->
-                    <xf:output ref="$binding"/>
+                    <xf:input ref="$binding"/>
                 </xf:group>
             </xf:group>
         </xbl:template>

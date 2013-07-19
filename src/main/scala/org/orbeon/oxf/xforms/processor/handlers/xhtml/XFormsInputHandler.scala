@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.itemset.Itemset
 import org.orbeon.oxf.xml.XMLReceiverHelper
-import org.orbeon.oxf.xml.XMLConstants
+import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
 import org.orbeon.oxf.util.ScalaUtils._
@@ -28,13 +28,14 @@ import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import XFormsBaseHandlerXHTML._
 import XFormsConstants._
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
+import org.orbeon.oxf.xforms.processor.handlers.HandlerHelper
 
 /**
  * Handle xf:input.
  *
  * TODO: Subclasses per appearance.
  */
-class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeating = false
+class XFormsInputHandler extends XFormsControlLifecyleHandler(false) with HandlerHelper { // repeating = false
 
     private var placeHolderInfo: XFormsInputControl.PlaceHolderInfo = _
 
@@ -53,7 +54,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
 
     protected def handleControlStart(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) {
         val inputControl = control.asInstanceOf[XFormsInputControl]
-        val contentHandler = handlerContext.getController.getOutput
+        implicit val xmlReceiver = handlerContext.getController.getOutput
         val isRelevantControl = ! isNonRelevant(inputControl)
         val isConcreteControl = inputControl ne null
         if (isBoolean) {
@@ -85,22 +86,20 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                 if (isRelevantControl) {
                     val xhtmlPrefix = handlerContext.findXHTMLPrefix
                     val enclosingElementLocalname = "span"
-                    val enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname)
-                    val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false)
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes)
-                    val outputValue = inputControl.getExternalValue
-                    if (outputValue ne null)
-                        contentHandler.characters(outputValue.toCharArray, 0, outputValue.length)
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName)
+
+                    val atts = List("class" → "xforms-field")
+                    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, enclosingElementLocalname, atts) {
+                        val outputValue = inputControl.getExternalValue
+                        if (outputValue ne null)
+                            xmlReceiver.characters(outputValue.toCharArray, 0, outputValue.length)
+                    }
                 }
             }
         } else {
             // Create xh:span
             val xhtmlPrefix = handlerContext.findXHTMLPrefix
             val enclosingElementLocalname = "span"
-            val enclosingElementQName = XMLUtils.buildQName(xhtmlPrefix, enclosingElementLocalname)
             val inputQName = XMLUtils.buildQName(xhtmlPrefix, "input")
-            val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, inputControl, false)
 
             // Create xh:input
             if (! isStaticReadonly(inputControl)) {
@@ -156,13 +155,13 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                         val imgQName = XMLUtils.buildQName(xhtmlPrefix, "img")
                         reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
                         reusableAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, "")
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes)
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName)
+                        xmlReceiver.startElement(XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes)
+                        xmlReceiver.endElement(XHTML_NAMESPACE_URI, "img", imgQName)
                     } else {
                         if (isHTMLDisabled(inputControl))
                             outputDisabledAttribute(reusableAttributes)
-                        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
-                        contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName)
+                        xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
+                        xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
                     }
                 }
                 // Add second field for dateTime's time part
@@ -198,17 +197,18 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                     // TODO: set @size and @maxlength
 
                     handleAccessibilityAttributes(attributes, reusableAttributes)
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName)
+                    xmlReceiver.startElement(XHTML_NAMESPACE_URI, "input", inputQName, reusableAttributes)
+                    xmlReceiver.endElement(XHTML_NAMESPACE_URI, "input", inputQName)
                 }
             } else {
-                // Read-only mode
+                // Output static read-only value
                 if (isRelevantControl) {
-                    val outputValue = inputControl.getReadonlyValue
-                    contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName, containerAttributes)
-                    if (outputValue ne null)
-                        contentHandler.characters(outputValue.toCharArray, 0, outputValue.length)
-                    contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, enclosingElementLocalname, enclosingElementQName)
+                    val atts = List("class" → "xforms-field")
+                    withElement(xhtmlPrefix, XHTML_NAMESPACE_URI, enclosingElementLocalname, atts) {
+                        val outputValue = inputControl.getReadonlyValue
+                        if (outputValue ne null)
+                            xmlReceiver.characters(outputValue.toCharArray, 0, outputValue.length)
+                    }
                 }
             }
         }

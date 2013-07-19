@@ -69,7 +69,7 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
 
     protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
         // Add custom class
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, true);
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, RANGE_BACKGROUND_CLASS);
         return containerAttributes;
     }

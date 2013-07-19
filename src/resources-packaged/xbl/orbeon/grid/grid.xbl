@@ -121,7 +121,7 @@
                         </xsl:if>
 
                         <!-- Grid table -->
-                        <xh:table class="{'fr-grid',
+                        <xh:table class="{'fr-grid', concat('fr-grid-', $static-col-count),
                                           @class,
                                           (: Control name might not be available (unclear why normalize-space() is needed) :)
                                           for $name in fbf:controlName(@id)[normalize-space()] return concat('fr-grid-', $name),

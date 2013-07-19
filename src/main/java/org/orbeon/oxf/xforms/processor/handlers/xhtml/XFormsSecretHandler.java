@@ -37,7 +37,7 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
         final boolean isConcreteControl = secretControl != null;
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, secretControl, true);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, secretControl, true);
 
         // Create xhtml:input
         {
@@ -65,8 +65,11 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName, containerAttributes);
                 contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "input", inputQName);
             } else {
+                // Output static read-only value
                 final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+                containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field");
                 contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
+
                 final String value = secretControl.getValue();
                 // TODO: Make sure that Ajax response doesn't send the value back
                 if (value != null && value.length() > 0)

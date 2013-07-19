@@ -97,7 +97,10 @@
                                 first remove the grouping separator, then remove the prefix if any
                         -->
 
-                        <xf:var name="binding" value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
+                        <xf:var name="binding"
+                            value="xxf:binding('{if ($is-currency) then 'fr-currency' else 'fr-number'}')"/>
+                        <xf:var name="view"
+                            value="exf:readonly($binding) and property('xxf:readonly-appearance') = 'static'"/>
                         <!--
                             Be sure to replace $decimal-separator before $grouping-separator because $grouping-separator
                             can be blank: https://github.com/orbeon/orbeon-forms/issues/587
@@ -129,7 +132,7 @@
                             ev:event="DOMFocusOut"><xsl:value-of select="$js-object"/>.updateWithServerValue();</xxf:script>
 
                         <!-- Readwrite mode -->
-                        <xf:group ref="$binding[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]">
+                        <xf:group ref="$binding[not($view)]">
                             <xf:input
                                     ref="."
                                     class="xbl-fr-number-xforms-input xforms-hidden"
@@ -151,9 +154,7 @@
                             </xh:span>
                         </xf:group>
                         <!-- Static readonly mode -->
-                        <xf:group ref="$binding[exf:readonly() and property('xxf:readonly-appearance') = 'static']">
-                            <xf:output value="string-join(($prefix, $formatted, $suffix), ' ')"/>
-                        </xf:group>
+                        <xf:input ref="$binding[$view]" xxf:format="string-join(($prefix, $formatted, $suffix), ' ')"/>
                     </xf:group>
                 </xsl:template>
             </xsl:transform>

@@ -27,7 +27,7 @@
     <xbl:binding id="fr-date-picker" element="fr|date-picker">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date Picker</display-name>
-            <display-name lang="fi">Päivämäärävalitsin</display-name>
+            <display-name lang="fi">Päivämäärävalitsin</display-name>`
             <display-name lang="fr">Sélecteur de date</display-name>
             <display-name lang="ru">Дата в строке</display-name>
             <display-name lang="de">Datumsauswahl</display-name>
@@ -51,12 +51,11 @@
         <xbl:resources>
             <xbl:style>
                 .xbl-fr-date-picker .fr-component-group img { vertical-align: middle; margin-top: -4px; margin-left: 4px }
-                .xbl-fr-date-picker .xforms-readonly .xforms-input { display: none }
             </xbl:style>
         </xbl:resources>
         <xbl:template>
             <xf:group xbl:attr="model context ref bind" class="fr-component-group" xxbl:scope="outer">
-                <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert"/><xf:output ref="."/><xf:input ref=".[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]" appearance="minimal"/>
+                <xbl:content includes=":root > xf|label, :root > xf|help, :root > xf|hint, :root > xf|alert"/><xf:output ref=".[not(exf:readonly() and property('xxf:readonly-appearance') = 'static')]"/><xf:input ref="." appearance="minimal"/>
             </xf:group>
         </xbl:template>
     </xbl:binding>

@@ -560,12 +560,11 @@
                         <xxf:attribute for="my-currency≡xf-18" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-currency≡xf-21" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
                         <xxf:attribute for="my-currency≡xf-21" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-28" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
-                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-29"/>
-                        <xxf:control id="my-currency≡xf-31" class="add-on"/>
-                        <xxf:control id="my-currency≡xf-32">$</xxf:control>
-                        <xxf:control id="my-currency≡xf-33" class="add-on" relevant="false"/>
-                        <xxf:control id="my-currency≡xf-34" relevant="false"/>
+                        <xxf:control id="my-currency≡xf-29" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
+                        <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-30"/>
+                        <xxf:control id="my-currency≡xf-32" class="add-on"/>
+                        <xxf:control id="my-currency≡xf-33">$</xxf:control>
+                        <xxf:control id="my-currency≡xf-34" class="add-on" relevant="false"/>
                         <xxf:control id="my-currency≡xf-35" relevant="false"/>
                         <xxf:control id="my-currency≡xf-36" relevant="false"/>
                     </xxf:control-values>

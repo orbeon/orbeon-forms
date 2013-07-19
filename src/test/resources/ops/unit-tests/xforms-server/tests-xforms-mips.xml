@@ -2162,13 +2162,12 @@
                         <xxf:attribute for="my-number≡xf-16" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-number≡xf-19" class="xbl-fr-number-digits-after-decimal">0</xxf:control>
                         <xxf:attribute for="my-number≡xf-19" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-number≡xf-25" level="warning"/>
-                        <xxf:control id="my-number≡xf-26" class="xbl-fr-number-xforms-input xforms-hidden" level="warning"/>
-                        <xxf:control class="fr-width-10em" id="my-number≡xf-27"/>
-                        <xxf:control id="my-number≡xf-29" class="add-on" relevant="false"/>
-                        <xxf:control id="my-number≡xf-30" relevant="false"/>
-                        <xxf:control id="my-number≡xf-31" class="add-on" relevant="false"/>
-                        <xxf:control id="my-number≡xf-32" relevant="false"/>
+                        <xxf:control id="my-number≡xf-26" level="warning"/>
+                        <xxf:control id="my-number≡xf-27" class="xbl-fr-number-xforms-input xforms-hidden" level="warning"/>
+                        <xxf:control class="fr-width-10em" id="my-number≡xf-28"/>
+                        <xxf:control id="my-number≡xf-30" class="add-on" relevant="false"/>
+                        <xxf:control id="my-number≡xf-31" relevant="false"/>
+                        <xxf:control id="my-number≡xf-32" class="add-on" relevant="false"/>
                         <xxf:control id="my-number≡xf-33" relevant="false"/>
                         <xxf:control id="my-number≡xf-34" relevant="false"/>
                     </xxf:control-values>

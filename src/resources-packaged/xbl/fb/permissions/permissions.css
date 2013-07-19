@@ -975,6 +975,37 @@ body.orbeon {
   text-decoration: none;
   display: inline;
 }
+.orbeon .xforms-field {
+  display: inline-block;
+  padding: 4px 6px;
+  line-height: 20px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  width: 100%;
+  border: 1px solid #cccccc;
+  -webkit-transition: border linear .2s, box-shadow linear .2s;
+  -moz-transition: border linear .2s, box-shadow linear .2s;
+  -o-transition: border linear .2s, box-shadow linear .2s;
+  transition: border linear .2s, box-shadow linear .2s;
+  font-size: 13px;
+  margin-bottom: 0;
+  color: black;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 28px;
+  background-image: none;
+  background-color: #fcfcfc;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.025);
+  -moz-box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.025);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.025);
+  cursor: not-allowed;
+  overflow: hidden;
+  white-space: nowrap;
+  *height: 24px;
+  *line-height: 24px;
+}
 .orbeon select,
 .orbeon textarea,
 .orbeon input[type="text"],
@@ -1197,6 +1228,25 @@ body.orbeon {
   background-color: transparent;
   background-image: none;
   cursor: default;
+}
+@media print {
+  .orbeon .fr-mode-pdf .xforms-field {
+    height: 24px;
+    line-height: 24px;
+    background-color: red;
+  }
+  .orbeon .fr-mode-pdf .fr-grid-1 .xforms-field {
+    width: 98.5%;
+  }
+  .orbeon .fr-mode-pdf .fr-grid-2 .xforms-field {
+    width: 97%;
+  }
+  .orbeon .fr-mode-pdf .fr-grid-3 .xforms-field {
+    width: 95.5%;
+  }
+  .orbeon .fr-mode-pdf .fr-grid-4 .xforms-field {
+    width: 94%;
+  }
 }
 .orbeon .xforms-dialog.fb-permissions-dialog {
   width: 450px;

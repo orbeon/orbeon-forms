@@ -18,8 +18,7 @@ import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
-import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
-import org.orbeon.oxf.xforms.processor.handlers.HandlerHelper._
+import org.orbeon.oxf.xforms.processor.handlers.{HandlerHelper, XFormsBaseHandler}
 import org.orbeon.oxf.xml._
 import org.xml.sax._
 import XMLConstants._
@@ -27,7 +26,7 @@ import XMLConstants._
 /**
  * Handle xf:upload.
  */
-class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) {
+class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) with HandlerHelper {
 
     protected override def addCustomClasses(classes: jl.StringBuilder, control: XFormsControl) {
         val uploadControl = control.asInstanceOf[XFormsUploadControl]
@@ -40,7 +39,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) {
         implicit val receiver   = handlerContext.getController.getOutput
 
         val uploadControl       = Option(control.asInstanceOf[XFormsUploadControl])
-        val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, control, true)
+        val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true)
         val xhtmlPrefix         = handlerContext.findXHTMLPrefix
 
         // Enclosing xhtml:span

@@ -40,7 +40,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final boolean isConcreteControl = textareaControl != null;
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, control, true);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, true);
 
         // Create xhtml:textarea
         {

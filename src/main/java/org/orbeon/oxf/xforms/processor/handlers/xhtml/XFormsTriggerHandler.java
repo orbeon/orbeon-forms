@@ -57,9 +57,9 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
     }
 
     @Override
-    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
+    protected AttributesImpl getEmptyNestedControlAttributesMaybeWithId(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
         // Get standard attributes
-        final AttributesImpl containerAttributes = super.getContainerAttributes(uri, localname, attributes, effectiveId, control, addId);
+        final AttributesImpl containerAttributes = super.getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, control, addId);
 
         // Add title attribute if not yet present and there is a hint
         if (containerAttributes.getValue("title") == null) {

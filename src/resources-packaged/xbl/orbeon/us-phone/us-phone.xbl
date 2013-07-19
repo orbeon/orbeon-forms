@@ -79,7 +79,7 @@
                 </xh:span>
             </xf:group>
             <!-- View mode -->
-            <xf:output ref="$binding[$view]" value="$formatted"/>
+            <xf:input ref="$binding[$view]" xxf:format="$formatted"/>
         </xbl:template>
     </xbl:binding>
 

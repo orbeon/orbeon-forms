@@ -259,7 +259,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         // May be overridden by subclasses
     }
 
-    protected AttributesImpl getContainerAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
+    protected AttributesImpl getEmptyNestedControlAttributesMaybeWithId(String uri, String localname, Attributes attributes, String effectiveId, XFormsControl control, boolean addId) {
         reusableAttributes.clear();
         final AttributesImpl containerAttributes = reusableAttributes;
         if (addId)

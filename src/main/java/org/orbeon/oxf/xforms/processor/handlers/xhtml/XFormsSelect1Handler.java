@@ -92,7 +92,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         final XFormsControl xformsControl = (XFormsControl) xformsSelect1Control; // cast because Java is not aware that XFormsValueControl extends XFormsControl
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !isFull);
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, !isFull);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
@@ -282,9 +282,9 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 }
             }
         } else {
-            // Read-only mode
-
+            // Output static read-only value
             final String spanQName = XMLUtils.buildQName(xhtmlPrefix, "span");
+            containerAttributes.addAttribute("", "class", "class", "CDATA", "xforms-field");
             xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, containerAttributes);
             if (!handlerContext.isTemplate()) {
                 final String value = (xformsSelect1Control == null || xformsSelect1Control.getValue() == null) ? "" : xformsSelect1Control.getValue();
@@ -311,7 +311,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final SelectAppearanceTrait appearanceTrait = getAppearanceTrait();
         final XFormsControl xformsControl = (XFormsControl) xformsValueControl; // cast because Java is not aware that XFormsValueControl extends XFormsControl
 
-        final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !(appearanceTrait != null && appearanceTrait.isFull()));
+        final AttributesImpl containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, xformsControl, !(appearanceTrait != null && appearanceTrait.isFull()));
         containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items"); // to help with styling
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 

@@ -15,8 +15,9 @@ package org.orbeon.oxf.xforms.processor.handlers
 
 import org.orbeon.oxf.xml.{XMLUtils, DeferredXMLReceiver}
 import org.xml.sax.Attributes
+import org.xml.sax.helpers.AttributesImpl
 
-object HandlerHelper {
+trait HandlerHelper {
 
     def withElement[T](prefix: String, uri: String, localName: String, atts: Attributes)(body: ⇒ T)(implicit receiver: DeferredXMLReceiver): T = {
         val qName = XMLUtils.buildQName(prefix, localName)
@@ -34,5 +35,20 @@ object HandlerHelper {
         val result = body(formattingPrefix)
         context.findFormattingPrefixUndeclare(formattingPrefix)
         result
+    }
+
+    def addAttributes(attributesImpl: AttributesImpl, atts: List[(String, String)]): Unit = {
+        atts foreach {
+            case (name, value) ⇒
+                require(name ne null)
+                if (value ne null)
+                    attributesImpl.addAttribute("", name, name, "CDATA", value)
+        }
+    }
+
+    implicit def pairsToAttributes(atts: List[(String, String)]): Attributes = {
+        val saxAtts = new AttributesImpl
+        addAttributes(saxAtts, atts)
+        saxAtts
     }
 }

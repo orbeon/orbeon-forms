@@ -38,7 +38,7 @@ class XFormsTriggerFullHandler extends XFormsTriggerHandler {
         val triggerControl = control.asInstanceOf[XFormsTriggerControl]
         val xmlReceiver = handlerContext.getController.getOutput
 
-        val containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, triggerControl, true)
+        val containerAttributes = getEmptyNestedControlAttributesMaybeWithId(uri, localname, attributes, effectiveId, triggerControl, true)
 
         val isHTMLLabel = (triggerControl ne null) && triggerControl.isHTMLLabel
         val xhtmlPrefix = handlerContext.findXHTMLPrefix

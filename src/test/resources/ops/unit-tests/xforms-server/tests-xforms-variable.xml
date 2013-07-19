@@ -795,36 +795,25 @@
         </output>
     </test>
 
-    <test description="#698: Model variables shadow action and view variables" name="oxf:pipeline">
+    <test description="#1132: xf:model/xf:var/@model doesn't scope other model's variables" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
                 <xh:head>
-                    <xf:model id="model">
-                        <xf:instance id="instance"><value/></xf:instance>
-
-                        <xf:var name="foo" value="42"/>
-
-                        <xf:action event="xforms-ready">
-                            <xf:var name="foo" value="43"/>
-                            <xf:message value="$foo"/>
-                        </xf:action>
-
+                    <xf:model id="model1">
+                        <xf:instance><dummy/></xf:instance>
+                        <xf:var name="v11" value="42"/>
+                        <xf:var name="v12" value="43"/>
+                    </xf:model>
+                    <xf:model id="model2">
+                        <xf:instance><dummy/></xf:instance>
+                        <xf:var name="v21" model="model1" value="$v11"/>
+                        <xf:var name="v22" model="model1" value="$v12"/>
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:output id="output1" value="$foo"/>
-
-                    <xf:message event="xforms-enabled" observer="output1" value="$foo"/>
-
-                    <xf:var name="foo" value="44"/>
-                    <xf:output id="output2" value="$foo"/>
-
-                    <xf:message event="xforms-enabled" observer="output2" value="$foo"/>
-                    <xf:action event="xforms-enabled" observer="output2">
-                        <xf:var name="foo" value="45"/>
-                        <xf:message value="$foo"/>
-                    </xf:action>
+                    <xf:output id="o1" model="model2" value="$v21"/>
+                    <xf:output id="o2" model="model2" value="$v22"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -835,16 +824,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1">42</xxf:control>
-                        <xxf:control id="output2">44</xxf:control>
+                        <xxf:control id="o1">42</xxf:control>
+                        <xxf:control id="o2">43</xxf:control>
                     </xxf:control-values>
-                    <xxf:message level="modal">42</xxf:message>
-                    <xxf:message level="modal">44</xxf:message>
-                    <xxf:message level="modal">45</xxf:message>
-                    <xxf:message level="modal">43</xxf:message>
                 </xxf:action>
             </xxf:event-response>
         </output>
     </test>
+
+
 
 </group>

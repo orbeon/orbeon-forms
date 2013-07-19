@@ -96,7 +96,7 @@ public class Variable {
                     // TODO: in the future, we should allow null context for expressions that do not depend on the context
 
                     final XFormsFunction.Context functionContext = contextStack.getFunctionContext(sourceEffectiveId);
-                    final boolean scopeModelVariables = staticVariable instanceof ViewTrait; // see https://github.com/orbeon/orbeon-forms/issues/1104
+                    final boolean scopeModelVariables = VariableAnalysis.variableScopesModelVariables(staticVariable);
                     try {
                         variableValue = XPathCache.evaluateAsExtent(
                                 currentNodeset, bindingContext.getPosition(),

@@ -16,8 +16,6 @@ package org.orbeon.oxf.xforms.analysis
 import controls.ViewTrait
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.XFormsConstants
-import org.orbeon.saxon.om.Item
-import org.orbeon.oxf.xforms.model.DataModel
 
 /**
  * Trait representing a variable element, whether in the model or in the view.
@@ -95,5 +93,10 @@ object VariableAnalysis {
     def valueOrSelectAttribute(element: Element) = {
         val select = element.attributeValue(XFormsConstants.SELECT_QNAME)
         if (select ne null) select else element.attributeValue(XFormsConstants.VALUE_QNAME)
+    }
+
+    def variableScopesModelVariables(v: VariableAnalysisTrait) = {
+        // See https://github.com/orbeon/orbeon-forms/issues/1104 and https://github.com/orbeon/orbeon-forms/issues/1132
+        v.isInstanceOf[ViewTrait] || v.model != (v.parent flatMap (_.model))
     }
 }

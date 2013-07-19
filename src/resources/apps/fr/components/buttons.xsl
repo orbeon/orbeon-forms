@@ -47,7 +47,7 @@
                                                        else if ($button-name = 'wizard-next')
                                                        then 'xxf:binding(''fr-wizard-next'')'
                                                        else 'other'}">
-            <xsl:copy-of select="@appearance"/>
+            <xsl:copy-of select="@appearance | @model | @context | @ref | @bind"/>
         </fr:process-button>
     </xsl:template>
 

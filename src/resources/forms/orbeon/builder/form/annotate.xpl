@@ -236,6 +236,13 @@
                 <!-- Saxon serialization adds an extra meta element, make sure to remove it -->
                 <xsl:template match="xh:head/meta[@http-equiv = 'Content-Type']"/>
 
+                <!-- ======== Upgrading form ========-->
+
+                <!-- Use ref instead of nodeset -->
+                <xsl:template match="xf:*/@nodeset">
+                    <xsl:attribute name="ref" select="."/>
+                </xsl:template>
+
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="annotated"/>

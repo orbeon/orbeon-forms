@@ -37,7 +37,7 @@
                 <large-icon>/apps/fr/style/images/silk/picture.png</large-icon>
             </icon>
             <templates>
-                <bind type="xs:anyURI"/>
+                <bind type="xf:anyURI"/>
                 <instance filename="" mediatype="" size=""/>
                 <view>
                      <fr:image-attachment id="" ref="" class="fr-attachment">

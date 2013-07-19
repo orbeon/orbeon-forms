@@ -16,7 +16,6 @@ package org.orbeon.oxf.fr
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.apache.commons.lang3.StringUtils
 import org.orbeon.saxon.om.{Item, NodeInfo}
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
@@ -27,13 +26,23 @@ trait FormRunnerLang {
 
     import FormRunner._
 
+    case class AppForm(app: String, form: String) {
+        val toList = List(app, form)
+    }
+
+    // The client passes "*" or blank to indicate that there is no current app/form name
+    def hasAppForm(app: String, form: String) = app != "*" && app.nonEmpty && form != "*" && form.nonEmpty
+    def getAppForm(app: String, form: String) = hasAppForm(app, form) option AppForm(app, form)
+
     // List of available languages for the given form
     // Empty if the form doesn't have resources
     // If all of the form's resources are filtered via property, return the first language of the form, if any.
     def getFormLangSelection(app: String, form: String, formLanguages: JList[String]): JList[String] = {
 
-        val allowedFormLanguages = formLanguages.asScala.toList filter isAllowedLang(app, form)
-        val defaultLanguage = getDefaultLang(app, form)
+        val appForm = getAppForm(app, form)
+
+        val allowedFormLanguages = formLanguages.asScala.toList filter isAllowedLang(appForm)
+        val defaultLanguage = getDefaultLang(appForm)
 
         val withDefaultPrepended =
             if (allowedFormLanguages contains defaultLanguage)
@@ -48,43 +57,51 @@ trait FormRunnerLang {
     // Can be null (empty sequence) if there are no resources (or no allowed resources) in the form
     def selectFormLang(app: String, form: String, requestedLang: String, formLangs: JList[String]): String = {
 
-        val availableFormLangs  = getFormLangSelection(app, form, formLangs).asScala.toList
-        val actualRequestedLang = findRequestedLang(app, form, requestedLang) filter isAllowedLang(app, form)
+        val appForm = getAppForm(app, form)
 
-        selectLangUseDefault(app, form, actualRequestedLang, availableFormLangs).orNull
+        val availableFormLangs  = getFormLangSelection(app, form, formLangs).asScala.toList
+        val actualRequestedLang = findRequestedLang(appForm, requestedLang) filter isAllowedLang(appForm)
+
+        selectLangUseDefault(appForm, actualRequestedLang, availableFormLangs).orNull
     }
 
     // Get the Form Runner language
     // If possible, try to match the form language, otherwise
-    def selectFormRunnerLang(app: String, form: String, formLang: String, formRunnerLangs: JList[String]): String =
-        selectLangUseDefault(app, form, Option(formLang), formRunnerLangs.asScala.toList).orNull
+    def selectFormRunnerLang(app: String, form: String, requestedLang: String, formRunnerLangs: JList[String]): String = {
+        val appForm = getAppForm(app, form)
+        selectLangUseDefault(appForm, Option(requestedLang), formRunnerLangs.asScala.toList).orNull
+    }
 
     // Get the default language for the given app/form
     // If none is configured, return the global default "en"
     // Public for unit tests
-    def getDefaultLang(app: String, form: String): String =
-        Option(properties.getString(Seq("oxf.fr.default-language", app, form) mkString ".")) getOrElse "en"
+    def getDefaultLang(appForm: Option[AppForm]): String = {
+        val suffix = appForm.toList flatMap (_.toList)
+        Option(properties.getString("oxf.fr.default-language" :: suffix mkString ".")) getOrElse "en"
+    }
 
-    // Return a predicate telling whether a language is allowed for the given form, based on properties
+    // Return a predicate telling whether a language is allowed based on properties. If app/form are specified, then the
+    // result applies to that app/form, otherwise it is valid globally for Form Runner.
     // Public for unit tests
-    def isAllowedLang(app: String, form: String): String ⇒ Boolean = {
-        val set = stringOptionToSet(Option(properties.getString(Seq("oxf.fr.available-languages", app, form) mkString ".")))
+    def isAllowedLang(appForm: Option[AppForm]): String ⇒ Boolean = {
+        val suffix = appForm.toList flatMap (_.toList)
+        val set    = stringOptionToSet(Option(properties.getString("oxf.fr.available-languages" :: suffix mkString ".")))
         // If none specified via property or property contains a wildcard, all languages are considered available
         if (set.isEmpty || set("*")) _ ⇒ true else set
     }
 
     // The requested language, trying a few things in order (given parameter, request, session, default)
     // Public for unit tests
-    def findRequestedLang(app: String, form: String, requestedLang: String): Option[String] = {
+    def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
         val request = NetUtils.getExternalContext.getRequest
 
         def fromRequest = Option(request.getParameterMap.get("fr-language")) flatMap (_.lift(0)) map (_.toString)
         def fromSession = stringFromSession(request, "fr-language")
 
-        Option(StringUtils.trimToNull(requestedLang)) orElse
+        nonEmptyOrNone(requestedLang) orElse
             fromRequest orElse
             fromSession orElse
-            Option(getDefaultLang(app, form))
+            Option(getDefaultLang(appForm))
     }
 
     // Get a field's label for the summary page
@@ -93,9 +110,9 @@ trait FormRunnerLang {
         resourceLabelOpt getOrElse '[' + name + ']'
     }
 
-    private def selectLangUseDefault(app: String, form: String, requestedLang: Option[String], availableLangs: List[String]) = {
+    private def selectLangUseDefault(appForm: Option[AppForm], requestedLang: Option[String], availableLangs: List[String]) = {
         def matchingLanguage = availableLangs intersect requestedLang.toList headOption
-        def defaultLanguage  = availableLangs intersect List(getDefaultLang(app, form)) headOption
+        def defaultLanguage  = availableLangs intersect List(getDefaultLang(appForm)) headOption
         def firstLanguage    = availableLangs headOption
 
         matchingLanguage orElse defaultLanguage orElse firstLanguage

@@ -87,23 +87,23 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         val form = "order"
         
         // oxf.fr.default-language not set so "en" is the default
-        assert("en" === getDefaultLang(app, form))
+        assert("en" === getDefaultLang(getAppForm(app, form)))
         
         // oxf.fr.available-languages not set so all languages are allowed
-        assert(isAllowedLang(app, form)("en"))
-        assert(isAllowedLang(app, form)("foo"))
+        assert(isAllowedLang(getAppForm(app, form))("en"))
+        assert(isAllowedLang(getAppForm(app, form))("foo"))
         
         // Requested language
-        assert(Some("en") === findRequestedLang(app, form, null))
-        assert(Some("en") === findRequestedLang(app, form, "   "))
+        assert(Some("en") === findRequestedLang(getAppForm(app, form), null))
+        assert(Some("en") === findRequestedLang(getAppForm(app, form), "   "))
         
-        assert(Some("es") === findRequestedLang(app, form, "es"))
-        assert(Some("en") === findRequestedLang(app, form, "en"))
+        assert(Some("es") === findRequestedLang(getAppForm(app, form), "es"))
+        assert(Some("en") === findRequestedLang(getAppForm(app, form), "en"))
         
         NetUtils.getExternalContext.getRequest.getSession(true).getAttributesMap.put("fr-language", "fr")
         
-        assert(Some("fr") === findRequestedLang(app, form, null))
-        assert(Some("it") === findRequestedLang(app, form, "it"))
+        assert(Some("fr") === findRequestedLang(getAppForm(app, form), null))
+        assert(Some("it") === findRequestedLang(getAppForm(app, form), "it"))
         
         // Language selector
         assert(Seq("en", "fr", "it") === getFormLangSelection(app, form, Seq("fr", "it", "en").asJava).asScala)

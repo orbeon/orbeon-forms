@@ -15,9 +15,9 @@
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
+    <!-- NOTE: Support 2 modes: 1. $app and $form are provided 2. They are not provided and are set to '*' -->
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
     <xf:var name="app"  value="$parameters/app"/>
     <xf:var name="form" value="$parameters/form"/>
@@ -33,12 +33,16 @@
     </xf:instance>
 
     <!-- Public variables pointing to the current form and Form Runner languages -->
-    <xf:var name="lang"    value="instance('fr-language-instance')"/>
-    <xf:var name="fr-lang" value="instance('fr-fr-language-instance')"/>
-    
+    <xf:var name="lang"                  value="instance('fr-language-instance')"/>
+    <xf:var name="fr-lang"               value="instance('fr-fr-language-instance')"/>
+
     <!-- Public variables pointing to current form and Form Runner resources -->
-    <xf:var name="fr-form-resources" value="xxf:instance('fr-form-resources')/resource[@xml:lang = $lang][1]" as="element(resource)?"/>
-    <xf:var name="fr-fr-resources"   value="instance('fr-fr-resources')/resource[@xml:lang = $fr-lang][1]" as="element(resource)?"/>
+    <xf:var name="fr-form-resources"     value="xxf:instance('fr-form-resources')/resource[@xml:lang = $lang][1]" as="element(resource)?"/>
+    <xf:var name="fr-fr-resources"       value="instance('fr-fr-resources')/resource[@xml:lang = $fr-lang][1]"    as="element(resource)?"/>
+
+    <!-- Language selector variables -->
+    <xf:var name="fr-selector-lang"      value="if ($app != '*') then $lang else $fr-lang"/>
+    <xf:var name="fr-selector-resources" value="if ($app != '*') then xxf:instance('fr-form-resources') else instance('fr-fr-resources')"/>
 
     <!-- Instance containing the Form Runner resources -->
     <xf:instance id="fr-fr-resources"><dummy/></xf:instance>
@@ -50,9 +54,10 @@
     <!-- Instance containing all the ISO 639-1 languages -->
     <xf:instance id="fr-languages-instance" src="oxf:/apps/fr/i18n/languages.xml" xxf:readonly="true" xxf:cache="true"/>
 
-    <xf:action ev:event="fr-update-language">
+    <xf:action event="fr-update-language">
         <!-- Find form language -->
         <xf:setvalue
+            if="$app != '*'"
             ref="$lang"
             value="frf:selectFormLang(
                         $app,
@@ -66,20 +71,20 @@
             value="frf:selectFormRunnerLang(
                         $app,
                         $form,
-                        $lang,
+                        if ($app != '*') then $lang else $fr-lang,
                         instance('fr-fr-resources')/resource/@xml:lang/string())"/>
 
         <!-- Save current form language into the session -->
-        <xf:insert context="." origin="xxf:set-session-attribute('fr-language', string($lang))"/>
+        <xf:insert context="." origin="xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))"/>
     </xf:action>
 
     <!-- Respond to language change in the UI -->
-    <xf:action ev:observer="fr-language-selector" ev:event="xforms-value-changed">
+    <xf:action observer="fr-language-selector" event="xforms-value-changed">
         <xf:dispatch name="fr-update-language" targetid="fr-resources-model"/>
     </xf:action>
 
     <!-- Initialization: get Form Runner resources and set the initial language -->
-    <xf:action ev:event="xforms-model-construct-done">
+    <xf:action event="xforms-model-construct-done">
         <xf:send submission="fr-get-fr-resources"/>
         <xf:dispatch name="fr-update-language" targetid="fr-resources-model"/>
     </xf:action>

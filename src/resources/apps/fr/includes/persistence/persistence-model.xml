@@ -14,12 +14,10 @@
 <xf:model id="fr-persistence-model"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xf="http://www.w3.org/2002/xforms"
-        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:exf="http://www.exforms.org/exf/1-0"
         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
         xmlns:xi="http://www.w3.org/2001/XInclude"
         xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
-        xmlns:f="http://orbeon.org/oxf/xml/formatting"
         xmlns:saxon="http://saxon.sf.net/"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
@@ -37,7 +35,7 @@
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
-    <xf:action ev:event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+    <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
         <!-- Initialize parameters to pass to "new" service -->
         <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -133,7 +131,7 @@
     </xf:action>
 
     <!-- 2. Check form permissions for detail modes -->
-    <xf:action ev:event="xforms-model-construct-done" if="not($mode = ('summary', 'home'))">
+    <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home'))">
 
         <!-- Compute authorized operations -->
         <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
@@ -167,7 +165,7 @@
     </xf:action>
 
 
-    <xf:action ev:event="xforms-ready">
+    <xf:action event="xforms-ready">
         <!-- Force all this so we can safely set the data status -->
         <xf:rebuild/>
         <xf:recalculate/>
@@ -178,7 +176,7 @@
     </xf:action>
 
     <!-- Clear operation -->
-    <xf:action ev:event="fr-clear">
+    <xf:action event="fr-clear">
         <!-- Case of inline template -->
         <xf:insert ref="xxf:instance('fr-form-instance')" origin="instance('fr-initial-instance')"/>
 
@@ -194,17 +192,18 @@
     </xf:action>
 
     <!-- New document operation -->
-    <xf:setvalue ev:event="fr-new-document" ref="$document" value="secure:randomHexId()"/>
+    <xf:setvalue event="fr-new-document" ref="$document" value="secure:randomHexId()"/>
 
     <!-- Delete operation -->
-    <xf:action ev:event="fr-delete-data">
+    <xf:action event="fr-delete-data">
         <xf:send submission="fr-delete-document-submission">
             <xf:property name="document-id" value="event('document-id')"/>
         </xf:send>
     </xf:action>
 
     <xf:submission id="fr-delete-document-submission"
-            method="delete" serialization="none"
+            method="delete"
+            serialization="none"
             resource="/fr/service/persistence/crud/{$app}/{$form}/data/{event('document-id')}/data.xml"
             replace="none"/>
 
@@ -219,23 +218,29 @@
          code and where the data might not be valid. For instance: auto-save, or saving as Draft as soon as a new
          form instance is created. -->
     <xf:submission id="fr-create-update-submission"
-            validate="false" relevant="false" method="put"
+            validate="false"
+            relevant="false"
+            method="put"
             ref="event('holder')"
             resource="{event('resource')}"
-            replace="text" target="instance('fr-create-update-submission-response')"/>
+            replace="text"
+            target="instance('fr-create-update-submission-response')"/>
 
     <!-- Submission to create/update an attachment -->
     <xf:submission id="fr-create-update-attachment-submission"
-            method="put" serialization="application/octet-stream"
+            method="put"
+            serialization="application/octet-stream"
             ref="event('holder')"
             resource="{event('resource')}"
             replace="none"/>
 
     <!-- Get document -->
     <xf:submission id="fr-get-document-submission"
-            method="get" serialization="none"
+            method="get"
+            serialization="none"
             resource="/fr/service/persistence/crud/{$app}/{$form}/{if (xxf:get-request-parameter('draft') = '1') then 'draft' else 'data'}/{$document}/data.xml"
-            replace="instance" xxf:instance="fr-form-instance">
+            replace="instance"
+            xxf:instance="fr-form-instance">
         <!-- Save value of Orbeon-Operations header -->
         <xf:action event="xforms-submit-done">
             <xf:var name="operations-header" value="event('response-headers')[name = 'orbeon-operations']/value"/>
@@ -260,9 +265,12 @@
 
     <!-- Calls a service to get the initial instance -->
     <xf:submission id="fr-get-instance-from-service"
-            method="get" separator="&amp;" ref="instance('fr-service-parameters')"
+            method="get"
+            separator="&amp;"
+            ref="instance('fr-service-parameters')"
             resource="{xxf:property(string-join(('oxf.fr.detail.new.service.uri', $app, $form), '.'))}"
-            replace="instance" xxf:instance="fr-form-instance"/>
+            replace="instance"
+            xxf:instance="fr-form-instance"/>
 
     <xf:instance id="fr-persistence-instance">
         <save xmlns="">
@@ -349,7 +357,7 @@
 
     <!-- HACK: dependencies: recalculate this model when there is a change in the instance holding error/validity
          information, so that the above binds are kept in sync. Ideally would need smart dependency system. -->
-    <xf:recalculate ev:event="xxforms-value-changed" ev:observer="fr-error-summary-instance"/>
+    <xf:recalculate event="xxforms-value-changed" observer="fr-error-summary-instance"/>
 
     <!-- Configurable send -->
     <!-- TODO: Remove duplication once @replace is an AVT -->
@@ -363,7 +371,7 @@
         ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="all">
         <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
-        <xf:action ev:event="xforms-submit">
+        <xf:action event="xforms-submit">
             <xf:action iterate="instance('fr-send-submission-params')/@*">
                 <xf:setvalue ref="." value="event(name(context()))"/>
             </xf:action>
@@ -403,12 +411,12 @@
     </xf:instance>
 
     <!-- React to issue loading the document. We consider this fatal. -->
-    <xf:action ev:event="xforms-submit-error" ev:target="fr-get-document-submission" type="xpath">
+    <xf:action event="xforms-submit-error" target="fr-get-document-submission" type="xpath">
         frf:sendError((event('response-status-code'), 500)[1])
     </xf:action>
 
     <!-- Clear message -->
-    <xf:action ev:observer="#document" ev:event="DOMFocusIn">
+    <xf:action observer="#document" event="DOMFocusIn">
         <xf:toggle case="fr-message-none" xxf:deferred-updates="false"/>
         <xf:setvalue ref="$persistence-instance/message"/>
     </xf:action>
@@ -416,7 +424,7 @@
 
     <!-- React to instance mutation events -->
     <!-- NOTE: We check the standard fr-form-instance, but also fb-form-instance, which is where Form Builder really does its work  -->
-    <xf:action ev:observer="fr-form-instance fb-form-instance" ev:event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed">
+    <xf:action observer="fr-form-instance fb-form-instance" event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed">
         <xf:action if="$mode = ('new', 'edit')">
             <!-- Mark status as dirty if data changes -->
             <xf:setvalue ref="$persistence-instance/data-status" value="'dirty'"/>
@@ -430,7 +438,7 @@
     </xf:action>
 
     <!-- Keep track of whether we need to autosave -->
-    <xf:action observer="fr-button-save-draft fr-button-save-final" ev:event="xforms-enabled">
+    <xf:action observer="fr-button-save-draft fr-button-save-final" event="xforms-enabled">
         <xf:setvalue ref="$autosave/enabled" value="'true'"/>
         <xf:setvalue ref="$autosave/delay"   value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
     </xf:action>

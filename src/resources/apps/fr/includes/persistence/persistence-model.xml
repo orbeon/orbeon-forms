@@ -238,7 +238,7 @@
     <xf:submission id="fr-get-document-submission"
             method="get"
             serialization="none"
-            resource="/fr/service/persistence/crud/{$app}/{$form}/{if (xxf:get-request-parameter('draft') = '1') then 'draft' else 'data'}/{$document}/data.xml"
+            resource="/fr/service/persistence/crud/{$app}/{$form}/{if (xxf:get-request-parameter('draft') = 'true') then 'draft' else 'data'}/{$document}/data.xml"
             replace="instance"
             xxf:instance="fr-form-instance">
         <!-- Save value of Orbeon-Operations header -->

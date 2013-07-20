@@ -505,7 +505,7 @@
                                             <xf:var name="edit-view" value="if ($current-document-operations = ('*', 'update')) then 'edit' else if ($current-document-operations = 'read') then 'view' else ''"/>
                                             <xf:var name="req-parameters" value="(
                                                     if (property('xxf:noscript')) then 'fr-noscript=true' else (),
-                                                    if ($document/@draft = 'Y') then 'draft=1' else ()
+                                                    if ($document/@draft = 'Y') then 'draft=true' else ()
                                                 )"/>
                                             <xf:var name="current-document-href" value="concat('/fr/', $app, '/', $form, '/', $edit-view, '/', $current-document-name,
                                                     if (exists($req-parameters)) then concat('?', string-join($req-parameters, '&amp;')) else '')"/>

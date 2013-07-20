@@ -29,7 +29,7 @@ trait ProxyPortletEdit extends GenericPortlet {
     case object Action        extends Preference { val name = "action" }
     case object ReadOnly      extends Preference { val name = "read-only" }
 
-    private val PreferenceLabels = Map(
+    private val PreferenceLabels = Seq(
         FormRunnerURL → "Form Runner URL",
         AppName       → "Form Runner app name",
         FormName      → "Form Runner form name",

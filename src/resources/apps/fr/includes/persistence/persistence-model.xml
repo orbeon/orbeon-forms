@@ -35,7 +35,7 @@
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
-    <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+    <xf:action event="xforms-ready" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
         <!-- Initialize parameters to pass to "new" service -->
         <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -107,7 +107,30 @@
             <xf:action if="not($mode = ('new', 'test')) and not($is-new-id) and not($is-submit)">
                 <!-- Load document with the provided id from persistence layer -->
                 <xf:message level="xxf:log-debug">Loading data by id from persistence layer: <xf:output value="$document"/></xf:message>
-                <xf:send submission="fr-get-document-submission"/>
+                <xf:var name="draft-requested" value="xxf:get-request-parameter('draft') = 'true'"/>
+                <xf:action if="$draft-requested">
+                    <xf:send submission="fr-get-document-submission">
+                        <xxf:context name="data-or-draft" value="'draft'"/>
+                    </xf:send>
+                </xf:action>
+                <xf:action if="not($draft-requested)">
+                    <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-document-id', $document)"/>
+                    <xf:send if="xxf:property('oxf.fr.support-autosave')" submission="fr-search-drafts-submission"/>
+                    <xf:var name="draft-found" value="exists(instance('fr-search-drafts-response')/document)"/>
+                    <xxf:show if="$draft-found" dialog="found-draft-for-document"/>
+                    <xf:send if="not($draft-found)" submission="fr-get-document-submission">
+                        <xxf:context name="data-or-draft" value="'data'"/>
+                    </xf:send>
+                </xf:action>
+            </xf:action>
+
+            <!-- For new documents, see if we have drafts -->
+            <xf:action if="$mode = 'new'">
+                <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-never-saved-document', 'true')"/>
+                <xf:send if="xxf:property('oxf.fr.support-autosave')" submission="fr-search-drafts-submission"/>
+                <xf:var name="drafts-found" value="count(instance('fr-search-drafts-response')/document)"/>
+                <xxf:show if="$drafts-found = 1" dialog="found-draft-for-never-saved"/>
+                <xxf:show if="$drafts-found > 1" dialog="found-drafts-for-never-saved"/>
             </xf:action>
 
             <xf:message level="xxf:log-debug">
@@ -131,7 +154,7 @@
     </xf:action>
 
     <!-- 2. Check form permissions for detail modes -->
-    <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home'))">
+    <xf:action event="xforms-ready" if="not($mode = ('summary', 'home'))">
 
         <!-- Compute authorized operations -->
         <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
@@ -234,11 +257,28 @@
             resource="{event('resource')}"
             replace="none"/>
 
+    <!-- Search for drafts, to possibly warn users there is a newer draft -->
+    <xf:submission id="fr-search-drafts-submission"
+            method="post"
+            resource="/fr/service/persistence/search/{$app}/{$form}"
+            ref="instance('fr-search-drafts-request')"
+            replace="instance"
+            instance="fr-search-drafts-response"/>
+    <xf:instance id="fr-search-drafts-request">
+        <search>
+        	<drafts>only</drafts>
+        	<page-size>10</page-size>
+        	<page-number>1</page-number>
+        	<lang>en</lang>
+        </search>
+    </xf:instance>
+    <xf:instance id="fr-search-drafts-response"><dummy/></xf:instance>
+
     <!-- Get document -->
     <xf:submission id="fr-get-document-submission"
             method="get"
             serialization="none"
-            resource="/fr/service/persistence/crud/{$app}/{$form}/{if (xxf:get-request-parameter('draft') = 'true') then 'draft' else 'data'}/{$document}/data.xml"
+            resource="/fr/service/persistence/crud/{$app}/{$form}/{event('data-or-draft')}/{$document}/data.xml"
             replace="instance"
             xxf:instance="fr-form-instance">
         <!-- Save value of Orbeon-Operations header -->

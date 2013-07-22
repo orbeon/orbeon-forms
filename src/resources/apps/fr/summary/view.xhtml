@@ -252,6 +252,11 @@
                     <xf:setvalue ref="$query/@control"       value="indexedControl:control  (context())"/>
                 </xf:action>
 
+                <!-- If requested to, only show drafts for never saved document -->
+                <xf:insert if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"
+                           context="instance('fr-search-instance')"
+                           origin="xxf:element('drafts', (xxf:attribute('for-never-saved-document', 'true'), 'only'))"/>
+
                 <!-- Query initial list of documents -->
                 <xf:send submission="search-submission"/>
 

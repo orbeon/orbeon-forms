@@ -164,6 +164,17 @@
                 <upload-error>There was an error during the upload. Please try again.</upload-error>
                 <upload-error-size>The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.</upload-error-size>
             </messages>
+            <drafts>
+                <found-draft>Found draft</found-draft>
+                <found-drafts>Found drafts</found-drafts>
+                <found-draft-for-document>After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?</found-draft-for-document>
+                <found-draft-for-never-saved>A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?</found-drafts-for-never-saved>
+                <open-saved>Open saved document</open-saved>
+                <open-draft>Open auto-saved draft</open-draft>
+                <view-drafts>View auto-saved drafts</view-drafts>
+                <start-new>Start from scratch</start-new>
+            </drafts>
             <labels>
                 <language-choice>Language</language-choice>
                 <errors>Summary of errors</errors>
@@ -378,6 +389,17 @@
                 <upload-error>Une erreur s'est produite durant le téléchargement vers le serveur. Veuillez ressayer.</upload-error>
                 <upload-error-size>Le fichier téléchargé est trop grand. La taille maximale est {0,number,integer} bytes et la taille reçue est {1,number,integer} bytes.</upload-error-size>
             </messages>
+            <drafts>
+                <found-draft>Un brouillon est disponible</found-draft>
+                <found-drafts>Plusieurs brouillons sont disponibles</found-drafts>
+                <found-draft-for-document>Après que ce document ait été enregistré, un brouillon a été auto-enregistré, et il se peut que ce dernier contenne des informations supplémentaires. Voulez-vous ouvrir le document enregistré, ou le brouillon auto-enregistré?</found-draft-for-document>
+                <found-draft-for-never-saved>Un brouillon pour ce formulaire a éte auto-enregistré. Voulez-vous commencer à partir de zéro ou d'ouvrir le brouillon auto-enregistré?</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>Plusieurs brouillons pour ce formulaire ont été enregistrés. Voulez-vous commencer à partir de zéro ou voir ces brouillons auto-enregistrés (pour ensuite peut-être modifier l'un d'entre eux)?</found-drafts-for-never-saved>
+                <open-saved>Ouvrir le document enregistré</open-saved>
+                <open-draft>Ouvrir le brouillon auto-enregistrés</open-draft>
+                <view-drafts>Voir les brouillons automatiquement enregistrés</view-drafts>
+                <start-new>Recommencer à zéro</start-new>
+            </drafts>
             <labels>
                 <language-choice>Langue</language-choice>
                 <errors>Résumé des erreurs</errors>
@@ -594,6 +616,17 @@
                 <upload-error>Ha habido un error durante la subida de archivos. Intentelo nuevamente.</upload-error>
                 <upload-error-size>El arvhivo subido es demasiado largo. El largo máximo permitido es {0,number,integer} bytes y el tamaño del archivo subido es {1,number,integer} bytes.</upload-error-size>
             </messages>
+            <drafts>
+                <found-draft>[Found draft]</found-draft>
+                <found-drafts>[Found drafts]</found-drafts>
+                <found-draft-for-document>[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved>[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <open-saved>[Open saved document]</open-saved>
+                <open-draft>[Open auto-saved draft]</open-draft>
+                <view-drafts>[View auto-saved drafts]</view-drafts>
+                <start-new>[Start from scratch]</start-new>
+            </drafts>
             <labels>
                 <language-choice>Idioma</language-choice>
                 <errors>Resumen de errores</errors>
@@ -809,6 +842,17 @@
                 <upload-error>[There was an error during the upload. Please try again.]</upload-error>
                 <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
             </messages>
+            <drafts>
+                <found-draft>[Found draft]</found-draft>
+                <found-drafts>[Found drafts]</found-drafts>
+                <found-draft-for-document>[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved>[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <open-saved>[Open saved document]</open-saved>
+                <open-draft>[Open auto-saved draft]</open-draft>
+                <view-drafts>[View auto-saved drafts]</view-drafts>
+                <start-new>[Start from scratch]</start-new>
+            </drafts>
             <labels>
                 <language-choice>Språk</language-choice>
                 <errors>Oppsummering av feil</errors>
@@ -1020,6 +1064,17 @@
                 <upload-error>[There was an error during the upload. Please try again.]</upload-error>
                 <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
             </messages>
+            <drafts>
+                <found-draft>[Found draft]</found-draft>
+                <found-drafts>[Found drafts]</found-drafts>
+                <found-draft-for-document>[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved>[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <open-saved>[Open saved document]</open-saved>
+                <open-draft>[Open auto-saved draft]</open-draft>
+                <view-drafts>[View auto-saved drafts]</view-drafts>
+                <start-new>[Start from scratch]</start-new>
+            </drafts>
             <labels>
                 <language-choice>Язык</language-choice>
                 <errors>Ошибки</errors>

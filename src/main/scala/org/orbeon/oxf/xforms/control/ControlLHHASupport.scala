@@ -20,7 +20,6 @@ import LHHASupport._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 import org.orbeon.oxf.xforms.analysis.controls.{StaticLHHASupport, LHHAAnalysis}
 import org.orbeon.oxf.util.ScalaUtils._
-import collection.breakOut
 
 trait ControlLHHASupport {
 
@@ -148,9 +147,11 @@ object LHHASupport {
 
             val staticAlerts = control.staticControl.asInstanceOf[StaticLHHASupport].alerts
 
+            def nonEmptyOption[T](l: List[T]) = l.nonEmpty option l
+
             def alertsMatchingConstraints = {
                 val failedConstraintIds = control.failedConstraints.map(_.id).to[Set]
-                staticAlerts.iterator filter (_.forValidations intersect failedConstraintIds nonEmpty)
+                nonEmptyOption(staticAlerts filter (_.forValidations intersect failedConstraintIds nonEmpty))
             }
 
             // Find all alerts which match the given level, if there are any failed constraints for that level
@@ -158,23 +159,21 @@ object LHHASupport {
             // control is not valid. This is because a control can also be invalid due to a non-matching datatype or due
             // to the required-but-empty condition.
             def alertsMatchingLevel(level: ValidationLevel) =
-                staticAlerts.iterator filter (_.forLevels(level))
+                nonEmptyOption(staticAlerts filter (_.forLevels(level)))
 
             // Alerts that specify neither a constraint nor a level
             def alertsMatchingAny =
-                staticAlerts.iterator filter (a ⇒ a.forValidations.isEmpty && a.forLevels.isEmpty)
+                nonEmptyOption(staticAlerts filter (a ⇒ a.forValidations.isEmpty && a.forLevels.isEmpty))
 
             // For that given level, identify all matching alerts if any, whether they match by constraint or by level.
             // Alerts that specify neither a constraint nor a level are considered a default, that is they are not added
             // if other alerts have already been matched.
-            // Q: Should the same logic apply to levels? That is, an alert only for a level should show only if there is
-            // no more specific alert for that given level?
             // Alerts are returned in document order
             control.alertLevel flatMap { level ⇒
-                val matchingAlertsNoDefault = alertsMatchingConstraints ++ alertsMatchingLevel(level) toList
-                val matchingAlertsOrDefault = if (matchingAlertsNoDefault.nonEmpty) matchingAlertsNoDefault else alertsMatchingAny
 
-                val matchingAlertIds = matchingAlertsOrDefault map (_.staticId) toSet
+                val alerts = alertsMatchingConstraints orElse alertsMatchingLevel(level) orElse alertsMatchingAny getOrElse Nil
+
+                val matchingAlertIds = alerts map (_.staticId) toSet
                 val matchingAlerts   = staticAlerts filter (a ⇒ matchingAlertIds(a.staticId))
 
                 matchingAlerts.nonEmpty option (level, matchingAlerts)

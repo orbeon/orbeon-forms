@@ -33,7 +33,7 @@
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
-    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave') and exists(xxf:get-remote-user())"/>
+    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave') and exists(xxf:get-remote-user()) and $mode = 'edit'"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action event="xforms-ready" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">

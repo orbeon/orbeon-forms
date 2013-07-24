@@ -33,6 +33,7 @@
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
+    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave') and exists(xxf:get-remote-user())"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action event="xforms-ready" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
@@ -115,7 +116,7 @@
                 </xf:action>
                 <xf:action if="not($draft-requested)">
                     <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-document-id', $document)"/>
-                    <xf:send if="xxf:property('oxf.fr.support-autosave')" submission="fr-search-drafts-submission"/>
+                    <xf:send if="$autosave-enabled" submission="fr-search-drafts-submission"/>
                     <xf:var name="draft-found" value="exists(instance('fr-search-drafts-response')/document)"/>
                     <xxf:show if="$draft-found" dialog="found-draft-for-document"/>
                     <xf:send if="not($draft-found)" submission="fr-get-document-submission">
@@ -127,7 +128,7 @@
             <!-- For new documents, see if we have drafts -->
             <xf:action if="$mode = 'new'">
                 <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-never-saved-document', 'true')"/>
-                <xf:send if="xxf:property('oxf.fr.support-autosave')" submission="fr-search-drafts-submission"/>
+                <xf:send if="$autosave-enabled" submission="fr-search-drafts-submission"/>
                 <xf:var name="drafts-found" value="count(instance('fr-search-drafts-response')/document)"/>
                 <xxf:show if="$drafts-found = 1" dialog="found-draft-for-never-saved"/>
                 <xxf:show if="$drafts-found > 1" dialog="found-drafts-for-never-saved"/>
@@ -319,7 +320,7 @@
             <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->
             <data-status>clean</data-status>
             <autosave>
-                <enabled>false</enabled>
+                <do-autosave>false</do-autosave>
                 <delay/>
                 <status>clean</status>
                 <change-timestamp/>
@@ -461,7 +462,6 @@
         <xf:setvalue ref="$persistence-instance/message"/>
     </xf:action>
 
-
     <!-- React to instance mutation events -->
     <!-- NOTE: We check the standard fr-form-instance, but also fb-form-instance, which is where Form Builder really does its work  -->
     <xf:action observer="fr-form-instance fb-form-instance" event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed">
@@ -470,17 +470,17 @@
             <xf:setvalue ref="$persistence-instance/data-status" value="'dirty'"/>
             <xf:setvalue ref="$autosave/status"                  value="'dirty'"/>
             <xf:setvalue ref="$autosave/change-timestamp"        value="current-dateTime()"/>
-            <xf:dispatch if="$autosave/enabled = 'true'"
+            <xf:dispatch if="$autosave/do-autosave = 'true'"
                          name="maybe-autosave" targetid="fr-persistence-model"
                          delay="{$autosave/delay}" xxf:show-progress="false"/>
         </xf:action>
-
     </xf:action>
 
     <!-- Keep track of whether we need to autosave -->
-    <xf:action observer="fr-button-save-draft fr-button-save-final" event="xforms-enabled">
-        <xf:setvalue ref="$autosave/enabled" value="'true'"/>
-        <xf:setvalue ref="$autosave/delay"   value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
+    <xf:action if="$autosave-enabled"
+               observer="fr-button-save-draft fr-button-save-final" event="xforms-enabled">
+        <xf:setvalue ref="$autosave/do-autosave" value="'true'"/>
+        <xf:setvalue ref="$autosave/delay"       value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
     </xf:action>
 
     <xf:action event="maybe-autosave" if="$autosave/status = 'dirty'">

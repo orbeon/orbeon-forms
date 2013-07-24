@@ -285,6 +285,8 @@ body.orbeon {
   -webkit-border-top-right-radius: 4px;
   -moz-border-radius-topright: 4px;
   border-top-right-radius: 4px;
+  *padding: 0 5px;
+  *margin: 0;
 }
 .orbeon .fr-view .xbl-fr-error-summary .fr-level-info .fr-error-title {
   background-color: #333333;
@@ -323,6 +325,9 @@ body.orbeon {
 }
 .orbeon .fr-view .xbl-fr-error-summary table .fr-error-number {
   text-align: right;
+}
+.orbeon .fr-view .xbl-fr-error-summary table .fr-error-number .xforms-output-output:after {
+  content: ".";
 }
 .orbeon .fr-view .xbl-fr-error-summary .fr-error-summary-body {
   padding: 0;

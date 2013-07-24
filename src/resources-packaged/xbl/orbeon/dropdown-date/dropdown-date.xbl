@@ -101,6 +101,16 @@
                             <month>Mois</month>
                             <day>Jour</day>
                         </resource>
+                        <resource xml:lang="it">
+                            <year>Anno</year>
+                            <month>Mese</month>
+                            <day>Giorno</day>
+                        </resource>
+                        <resource xml:lang="de">
+                            <year>Jahr</year>
+                            <month>Monat</month>
+                            <day>Tag</day>
+                        </resource>
                     </resources>
                 </xf:instance>
 

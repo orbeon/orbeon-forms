@@ -233,6 +233,7 @@
     <property as="xs:boolean" name="oxf.fr.support-owner-group"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.support-autosave"                                    value="false"/>
 
-    <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en fr"/>
+    <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en fr it de"/>
+    <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="en fr it de"/>
 
 </properties>

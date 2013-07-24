@@ -95,6 +95,11 @@ YAHOO.xbl.fr.Date.prototype = {
                 "WEEKDAYS_SHORT": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
                 "START_WEEKDAY": 0
             },
+	        "it": {
+                "MONTHS_LONG": [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",  "Settembre",  "Ottobre",  "Novembre",  "Dicembre" ],
+                "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Me", "Gi", "Ve", "Sa"],
+                "START_WEEKDAY": 1
+            },
             "fr": {
                 "MONTHS_LONG": [ "Janvier", "F\xe9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet",
                                  "Ao\xfbt",  "Septembre",  "Octobre",  "Novembre",  "D\xe9cembre" ],

@@ -22,8 +22,14 @@
         </components>
         <untitled-form>Untitled Form</untitled-form>
         <errors>
-            <summary-title>Your form {1,choice,0#does not contain any messages|1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}</summary-title>
-            <form-title>{1,choice,0#|1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}</form-title>
+            <summary-title>Your form {1,choice,
+                0#does not contain any messages|
+                1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}</form-title>
             <none>No errors on form</none>
             <unsaved>Unsaved changes</unsaved>
         </errors>
@@ -154,7 +160,10 @@
                 <submit-dialog-title>Form Submitted</submit-dialog-title>
                 <submit-dialog-message>Your information has been submitted, thank you.</submit-dialog-message>
                 <validation-dialog-title>Review Form Validation Messages</validation-dialog-title>
-                <validation-dialog-message>Your form {1,choice,0#does not contain any messages|1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.</validation-dialog-message>
+                <validation-dialog-message>Your form {1,choice,
+                    0#does not contain any messages|
+                    1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.</validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Click here to open the document. The information you entered will be displayed on the tool as it was in the moment you saved your work.</saved-locally-open>
                 <upload-in-progress>There are file uploads in progress. Please retry once the file upload has completed or has been canceled.</upload-in-progress>
@@ -248,8 +257,18 @@
         </components>
         <untitled-form>Formulaire sans titre</untitled-form>
         <errors>
-            <summary-title>Votre formulaire {1,choice,0#ne contient aucun message|1#contient '{0,choice,0#l''''erreur suivante|1#l''''avertissement suivant|2#le message d''''information suivant|3#le message suivant}'|1&lt;contient '{0,choice,0#les erreurs suivantes|1#les avertissements suivants|2#les messages d''''information suivants|3#les messages suivants}'}</summary-title>
-            <form-title>{1,choice,0#|1#{1,number,integer} '{0,choice,0#erreur|1#avertissement|2#message d''''information|3#message}' - |1&lt;{1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}' - }{2}</form-title>
+            <summary-title>Votre formulaire {1,choice,
+                0#ne contient aucun message|
+                1#contient '{0,choice,0#l''''erreur suivante|1#l''''avertissement suivant|
+                2#le message d''''information suivant|3#le message suivant}'|
+                1&lt;contient '{0,choice,
+                    0#les erreurs suivantes|
+                    1#les avertissements suivants|
+                    2#les messages d''''information suivants|3#les messages suivants}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#erreur|1#avertissement|2#message d''''information|3#message}' - |
+                1&lt;{1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}' - }{2}</form-title>
             <none>Ce formulaire ne contient pas d'erreurs</none>
             <unsaved>Modifications non enregistrées</unsaved>
         </errors>
@@ -379,7 +398,10 @@
                 <submit-dialog-title>Formulaire envoyé</submit-dialog-title>
                 <submit-dialog-message>Merci, vos informations ont été envoyées.</submit-dialog-message>
                 <validation-dialog-title>Revoir les messages de validation</validation-dialog-title>
-                <validation-dialog-message>Votre formulaire {1,choice,0#ne contient aucun message|1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}. Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération.</validation-dialog-message>
+                <validation-dialog-message>Votre formulaire {1,choice,
+                    0#ne contient aucun message|
+                    1#contient '{0,choice,0#une erreur|1#un avertissement|2#un message d''''information|3#un message}'|
+                    1&lt;contient {1,number,integer} '{0,choice,0#erreurs|1#avertissements|2#messages d''''information|3#messages}'}. Vous pouvez choisir de {1,choice,1#le|1&lt;les} passer en revue ou de {1,choice,1#l''ignorer|1&lt;les ignorer} et de poursuivre l''opération.</validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Cliquer ici pour ouvrir le document. Les informations entrées seront affichées telles qu'elles ont été sauvegardées.</saved-locally-open>
                 <upload-in-progress>Des téléchargement de fichiers sont en cours. Veuillez ressayer une fois que les transferts sont terminés ou annulés.</upload-in-progress>
@@ -1130,6 +1152,475 @@
                 <available>[Available]</available>
                 <unavailable>[Unavailable]</unavailable>
                 <library>[Library]</library>
+            </labels>
+        </home>
+    </resource>
+    <resource xml:lang="it">
+        <components>
+            <labels>
+                <open-section>Mostra sezione</open-section>
+                <close-section>Nascondi sezione</close-section>
+                <section-name>Nome della sezione</section-name>
+            </labels>
+        </components>
+	    <untitled-form>Modulo senza nome</untitled-form>
+        <errors>
+            <summary-title>Il suo modulo {1,choice,
+                0#non contiene avvisi|
+                1#contiene '{0,choice,0#il seguente errore|1#la seguente avvertenza|2#il seguente avviso|3#il seguente avviso}'|
+                1&lt;contiene '{0,choice,0#i seguenti errori|1#le seguenti avvertenze|2#i seguenti avvisi|3#i seguenti avvisi}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Errore|1#Avvertenza|2#Avviso|3#Avviso}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Errori|1#Avvertenze|2#Avvisi|3#Avvisi}' - }{2}</form-title>
+            <none>Non ci sono errori nel modulo</none>
+            <unsaved>Modifiche non salvate</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon Forms confirmazione</subject>
+            <body>Prego allegare un file in formato PDF o XML.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D] [MNn], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Recensione</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Cancella</delete>
+                <import>&lt;i class="icon-upload"/&gt; Importa</import>
+                <new>&lt;i class="icon-plus"/&gt; Nuovo</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Modifica</edit><!-- unused as of 2013-04-05 -->
+            </buttons>
+            <titles>
+                <summary-title>Sommario</summary-title>
+                <delete-confirmation>Conferma cancella</delete-confirmation>
+                <created>Creato</created>
+                <last-modified>Ultimo modificato</last-modified>
+                <selected>Selezionato</selected>
+                <refresh>Questa operazione aggiorna la pagina</refresh>
+                <toc>Tabella dei contenuti</toc>
+                <description>Descrizione</description>
+                <help>Aiuto</help>
+                <error-count>Errore nel modulo</error-count>
+                <errors-count>Errori nel modulo</errors-count>
+            </titles>
+            <search>
+                <search>Cerca</search>
+                <search-forms>&lt;i class="icon-search"/&gt; Cerca moduli</search-forms>
+                <show-options>Mostra opzioni di ricerca</show-options>
+                <close-options>Chiudi opzioni di ricerca</close-options>
+                <returned-1>Risultato della ricerca</returned-1>
+                <returned-2>documenti.</returned-2>
+            </search>
+            <paging>
+                <to>a</to>
+                <of>di</of>
+            </paging>
+            <messages>
+                <no-form-found><i>I dati del modulo non sono stati trovati.</i></no-form-found>
+                <delete-confirmation>Sei sicuro di volere cancellare uno o più moduli?</delete-confirmation>
+            </messages>
+            <labels>
+		        <draft>Bozza</draft>
+                <language-choice>Seleziona lingua</language-choice>
+                <form-choice>Seleziona un modulo</form-choice>
+                <free-search>Ricerca libera</free-search>
+                <any>[Tutti]</any>
+                <previous>Indietro</previous>
+                <next>Avanti</next>
+                <script>Versione completa</script>
+                <noscript>Versione accessibile</noscript>
+                <refresh>Aggiorna</refresh>
+                <close-box>[chiudi]</close-box>
+                <help-back>Indietro</help-back>
+                <goto-content>Vai a contenuto</goto-content>
+            </labels>
+            <formats>
+                <date>[D] [MNn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D] [MNn] [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[D] [MNn] [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Salva</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Salva</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Salva</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Esamina</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Modifica</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                <validate>&lt;i class="icon-ok"/&gt; Validare</validate>
+
+                <!-- Legacy buttons -->
+                <submit>&lt;i class="icon-arrow-right"/&gt; Presentare</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Esamina</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Modifica</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Invia modulo</workflow-send>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <summary>&lt;i class="icon-list"/&gt; Sommario</summary>
+                <close>&lt;i class="icon-remove"/&gt; Chiudi</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Cancella</clear>
+                <cancel>Cancella</cancel>
+                <save-locally>Salva localmente</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Prossimo</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Precedente</wizard-prev>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Cancella e chiudi</submit-dialog-clear>
+                <submit-dialog-keep>Memorizza valori e chiudi</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Chiudi finestra</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+	                <validation-dialog-review>Recensione</validation-dialog-review>
+	                <validation-dialog-continue>Continua</validation-dialog-continue>
+            </buttons>
+            <messages>
+                <save-success>Il documento è stato salvato!</save-success>
+                <save-draft-success>Bozza salvata correttamente!</save-draft-success>
+                <email-success>Email inviata correttamente!</email-success>
+                <form-validation-error>Ci sono errori di validazione. Prego controllare che tutti i spazi sono compilati in modo corretto.</form-validation-error>
+                <database-error>Nella communicazione con la banca dati è apparso un errore. Si prega di contattare l'amministratore.</database-error>
+                <process-error>È apparso un errore mentre in questo processo. Si prega di contattare l'amministratore.</process-error>
+                <clear-confirm-message>Sei sicuro di volere pulitre tutti i spazi in questa pagina? Tutti i dati che non sono salvati saranno perduti.</clear-confirm-message>
+                <error-dialog-title>Non è stato possibile completare questa Azione</error-dialog-title>
+                <submit-dialog-title>Il modulo è stato inviato</submit-dialog-title>
+                <submit-dialog-message>L'informazione è stata inviata. Grazie.</submit-dialog-message>
+                <validation-dialog-title>Elenco dei messaggi di convalida del modulo</validation-dialog-title>
+                <validation-dialog-message>Il suo modulo {1,choice,
+                    0#non contiene avvisi|
+	                1#'{0,choice,0#contiene un errore|1#contiene un avvertimento|2#contiene un avviso|3#contiene un avviso}'|
+	                1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}. È possibile ricontrollare il modulo oppure procedere.</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Clickare per aprire il documento. Le informazioni saranno mostrati nel modo in cui erano quando hai salvato il documento.</saved-locally-open>
+                <upload-in-progress>Ci sono operazioni di caricamento in corso. Si prega di provare quando il file è caricato o cancellato completamente.</upload-in-progress>
+                <upload-start>Il caricamento ha iniziato</upload-start>
+                <upload-cancel>L'operazione di caricamento è stata cancellata da un utente.</upload-cancel>
+                <upload-done>Caricamento completato</upload-done>
+                <upload-error>È apparso un errore durante il caricamento. Si prega di riprovare.</upload-error>
+                <upload-error-size>Il file caricato è troppo grande. La grandezza massima è di {0,number,integer} bytes. La grandezza del file inviato è di {1,number,integer} bytes.</upload-error-size>
+            </messages>
+            <drafts>
+                <found-draft>[Found draft]</found-draft>
+                <found-drafts>[Found drafts]</found-drafts>
+                <found-draft-for-document>[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved>[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <open-saved>[Open saved document]</open-saved>
+                <open-draft>[Open auto-saved draft]</open-draft>
+                <view-drafts>[View auto-saved drafts]</view-drafts>
+                <start-new>[Start from scratch]</start-new>
+            </drafts>
+            <labels>
+                <language-choice>Lingua</language-choice>
+                <errors>Elenco di errori</errors>
+                <check-errors-in-form>Questo modulo contiene errori</check-errors-in-form>
+                <error-details>Visualizza dettagli del errore</error-details>
+                <confirm>Confirma</confirm>
+                <alert>Campo obbligatorio o errato</alert>
+
+                <captcha-label>Codice di sicurezza</captcha-label>
+                <captcha-alert>Il valore inserito no è uguale a quello visualizzato nell'immagine</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Questa è una visualizzazione che non può essere cambiata.
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Salva localmente</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Clicca qui per salvare i dati del tuo modulo come file HTML sul tuo computer.
+                    </p>
+                    <p>
+                        Per riaprire i dati del tuo modulo:
+                    </p>
+                    <ul>
+                        <li>Apri il file HTML nel tuo browser (Fai click sul file o trascinalo nella finestra del tuo browser).</li>
+                        <li>Fai click sul pulsante per aprire che apparirà per confirmare.</li>
+                    </ul>
+                    <p>
+                        <b>AVVISO:</b> Le dati ancora non sono salvate sul server. Se lo cancelli
+			sarà perso.
+			</p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Form Runner Home</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Nascondi</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
+                <status>Stato</status>
+                <app>Applicazione</app>
+                <form>Modulo</form>
+                <title>Titolo</title>
+                <view>Vizualizza</view>
+                <new>Nuovo</new>
+            </titles>
+            <messages>
+                <publish-confirmation>È sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Disponibile</available>
+                <unavailable>Non disponibile</unavailable>
+                <library>Biblioteca</library>
+            </labels>
+        </home>
+    </resource>
+    <resource xml:lang="de">
+        <components>
+            <labels>
+                <open-section>Abschnitt anzeigen</open-section>
+                <close-section>Abschnitt verstecken</close-section>
+                <section-name>Abschnittsname</section-name>
+            </labels>
+        </components>
+	    <untitled-form>Formular ohne Namen</untitled-form>
+        <errors>
+            <summary-title>Ihr Formular {1,choice,
+                0#enthält keine Hinweise|
+                1#enthält '{0,choice,0#den folgenden Fehler|1#die folgende Warnung|2#den folgenden Hinweis|3#den folgenden Hinweis}'|
+                1&lt;enthält '{0,choice,0#die folgenden Fehler|1#die folgenden Warnungen|2#die folgenden Hinweise|3#die folgenden Hinweise}'}</summary-title>
+            <form-title>{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Fehler|1#Warnung|2#Hinweis|3#Hinweis}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Hinweise|3#Hinweise}' - }{2}</form-title>
+            <none>Keine Fehler im Formular</none>
+            <unsaved>Ungespeicherte Änderungen</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon Forms: Confirmation</subject>
+            <body>Bitte eine Datei im PDF oder XML-Format anhängen.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[D].[M].[Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D].[M].[Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Übersicht</review>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Löschen</delete>
+                <import>&lt;i class="icon-upload"/&gt; Importieren</import>
+                <new>&lt;i class="icon-plus"/&gt; Neu</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Ändern</edit><!-- unused as of 2013-04-05 -->
+            </buttons>
+            <titles>
+                <summary-title>Übersicht</summary-title>
+                <delete-confirmation>Löschen bestätigen</delete-confirmation>
+                <created>Erstellt</created>
+                <last-modified>Änderungsdatum</last-modified>
+                <selected>Ausgewählt</selected>
+                <refresh>Diese Operation wird die Seite aktualisieren</refresh>
+                <toc>Inhaltstabelle</toc>
+                <description>Beschreibung</description>
+                <help>Hilfe</help>
+                <error-count>Fehler im Formular</error-count>
+                <errors-count>Fehler im Formular</errors-count>
+            </titles>
+            <search>
+                <search>Suchen</search>
+                <search-forms>&lt;i class="icon-search"/&gt; Suche Formular</search-forms>
+                <show-options>Zeige Suchoptionen an</show-options>
+                <close-options>Schließe Suchoptionen</close-options>
+                <returned-1>Suchergebnisse</returned-1>
+                <returned-2>Dokumente.</returned-2>
+            </search>
+            <paging>
+                <to>bis</to>
+                <of>von</of>
+            </paging>
+            <messages>
+                <no-form-found><i>Es wurde kein Formular gefunden.</i></no-form-found>
+                <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen?</delete-confirmation>
+            </messages>
+            <labels>
+		        <draft>Entwurf</draft>
+                <language-choice>Sprachauswahl</language-choice>
+                <form-choice>Wählen Sie ein Formular</form-choice>
+                <free-search>Freie Suche</free-search>
+                <any>[Alle]</any>
+                <previous>Zurück</previous>
+                <next>Weiter</next>
+                <script>Vollversion</script>
+                <noscript>verfügbare Version</noscript>
+                <refresh>Aktualisieren</refresh>
+                <close-box>[Schließen]</close-box>
+                <help-back>Zurück</help-back>
+                <goto-content>Gehe zu Inhalt</goto-content>
+            </labels>
+            <formats>
+                <date>[D]. [Mn] [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[D]. [Mn] [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[D]. [Mn] [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Speichern</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Speichern</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Speichern</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Ändern</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Einsenden</send>
+                <email>&lt;i class="icon-envelope"/&gt; Email</email>
+                <validate>&lt;i class="icon-ok"/&gt; Validieren</validate>
+
+                <!-- Legacy buttons -->
+                <submit>&lt;i class="icon-arrow-right"/&gt; Abschicken</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Überprüfen</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Ändern</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Einsenden</workflow-send>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Home</home>
+                <summary>&lt;i class="icon-list"/&gt; Übersicht</summary>
+                <close>&lt;i class="icon-remove"/&gt; Schließen</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Zurücksetzen</clear>
+                <cancel>Löschen</cancel>
+                <save-locally>Lokal speichern</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Nächstes</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Vorheriges</wizard-prev>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Zurücksetzen und schließen</submit-dialog-clear>
+                <submit-dialog-keep>Werte beibehalten und schließen</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Fenster schließen</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <validation-dialog-review>Überprüfung</validation-dialog-review>
+                <validation-dialog-continue>Weiter</validation-dialog-continue>
+            </buttons>
+            <messages>
+                <save-success>Document erfolgreich gespeichert!</save-success>
+                <save-draft-success>Entwurf erfolgreich gespeichert!</save-draft-success>
+                <email-success>Email erfolgreich gesendet!</email-success>
+                <form-validation-error>Validierungsfehler! Bitte füllen Sie alle Felder richtig aus und versuchen Sie es erneut.</form-validation-error>
+                <database-error>Bei der Kommunikation mit der Datenbank ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</database-error>
+                <process-error>Beim Ausführen dieses Prozesses ist ein Fehler aufgetreten. Bitte wenden Sie sich an den Administrator.</process-error>
+                <clear-confirm-message>Sind Sie sich sicher, dass Sie alle Felder auf dieser Seite zurücksetzen wollen? Ungespeicherte Änderungen gehen verloren.</clear-confirm-message>
+                <error-dialog-title>Aktion konnte nicht ausgeführt werden</error-dialog-title>
+                <submit-dialog-title>Formular abgeschickt</submit-dialog-title>
+                <submit-dialog-message>Ihre Daten wurden abgeschickt. Danke.</submit-dialog-message>
+                <validation-dialog-title>Überblick über Meldungen zur Formularvalidierung</validation-dialog-title>
+                <validation-dialog-message>Ihr Formular enthält {1,choice,
+                    0#keine Hinweise|
+	                1#'{0,choice,0#einen Fehler|1#eine Warnung|2#einen Hinweis|3#einen Hinweis}'|
+	                1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Hinweise|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Klicken Sie hier, um das Dokument zu öffnen. Die Inhalte werden so angezeigt, wie abgespeichert.</saved-locally-open>
+                <upload-in-progress>Es werden im Moment schon Dateien hochgeladen. Bitte versuchen Sie es sobald die Dateien erfolgreich hochgeladen wurden.</upload-in-progress>
+                <upload-start>Hochladen gestartet</upload-start>
+                <upload-cancel>Das Hochladen der Datei wurde von einem Benutzer abgebrochen.</upload-cancel>
+                <upload-done>Datei fertig hochgeladen</upload-done>
+                <upload-error>Während dem Hochladen ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.</upload-error>
+                <upload-error-size>Die hochgeladene Datei ist zu groß. Die maximale Dateigröße liegt bei {0,number,integer} Bytes. Die hochgeladene Datei hat eine Größe von {1,number,integer} Byte.</upload-error-size>
+            </messages>
+            <drafts>
+                <found-draft>[Found draft]</found-draft>
+                <found-drafts>[Found drafts]</found-drafts>
+                <found-draft-for-document>[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved>[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <open-saved>[Open saved document]</open-saved>
+                <open-draft>[Open auto-saved draft]</open-draft>
+                <view-drafts>[View auto-saved drafts]</view-drafts>
+                <start-new>[Start from scratch]</start-new>
+            </drafts>
+            <labels>
+                <language-choice>Sprache</language-choice>
+                <errors>Liste der Fehler</errors>
+                <check-errors-in-form>Formular beinhaltet Fehler</check-errors-in-form>
+                <error-details>Fehlerdetails anzeigen</error-details>
+                <confirm>Bestätigen</confirm>
+                <alert>Pflichtfeld oder fehlerhafter Wert</alert>
+
+                <captcha-label>Sicherheitscode</captcha-label>
+                <captcha-alert>Der eingegebene Wert entspricht nicht dem auf dem Bild</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Die angezeigten Daten können nicht geändert werden.
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Lokal speichern</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Den "Speichern" Knopf drücken um das Formular auf ihrem Rechner als HTML-Dokument zu speichern.
+                    </p>
+                    <p>
+                        Um das Formular wieder zu öffenen:
+                    </p>
+                    <ul>
+                        <li>Öffnen Sie die HTML-Datei in ihrem Browser (Entweder indem Sie auf die Datei klicken oder indem Sie die Datei in ein neues Browserfenster Ziehen).</li>
+                        <li>Klicken Sie den Knopf zum Öffnen, der die Bestätigung anzeigen wird.</li>
+                    </ul>
+                    <p>
+                        <b>WARNUNG:</b> Die Daten sind nicht auf dem Server gespeichert. Löschen Sie diese Datei, so ist Sie unwiderruflich gelöscht.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Form Runner Home</title>
+            <buttons>
+                <unpublish>&lt;i class="icon-ban-circle"/&gt; Verbergen</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>Bestätige veröffentlichen/ veröffentlichen rückgängig machen</publish-confirmation>
+                <status>Status</status>
+                <app>Applikation</app>
+                <form>Formular</form>
+                <title>Titel</title>
+                <view>Ansehen</view>
+                <new>Neu</new>
+            </titles>
+            <messages>
+                <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} die Formulare} {0,choice,0#veröffentlichen |1#nicht mehr öffentlich zugänglich haben} wollen?</publish-confirmation>
+            </messages>
+            <labels>
+                <available>Verfügbar</available>
+                <unavailable>Nicht verfügbar</unavailable>
+                <library>Bibliothek</library>
             </labels>
         </home>
     </resource>

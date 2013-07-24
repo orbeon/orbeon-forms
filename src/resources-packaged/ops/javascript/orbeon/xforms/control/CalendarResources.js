@@ -28,6 +28,20 @@
                 invalidYear: "Year needs to be a number"
             }
         },
+	    "it": {
+            properties: {
+                "MONTHS_LONG": [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",  "Settembre",  "Ottobre",  "Novembre",  "Dicembre" ],
+                "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Me", "Gi", "Ve", "Sa"],
+                "START_WEEKDAY": 0
+            },
+            navigator: {
+                month: "Mese",
+                year: "Anno",
+                submit: "OK",
+                cancel: "Cancella",
+                invalidYear: "Anno deve essere un numero"
+            }
+        },
         "fr": {
             properties: {
                 "MONTHS_LONG": [ "Janvier", "F\xe9vrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Ao\xfbt",  "Septembre",  "Octobre",  "Novembre",  "D\xe9cembre" ],

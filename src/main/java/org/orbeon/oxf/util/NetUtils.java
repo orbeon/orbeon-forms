@@ -306,12 +306,19 @@ public class NetUtils {
     }
 
     public static String getContentTypeMediaType(String contentType) {
-        if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
+        contentType = StringUtils.trimToNull(contentType);
+        if (contentType == null)
             return null;
-        int semicolonIndex = contentType.indexOf(";");
+
+        final int semicolonIndex = contentType.indexOf(";");
         if (semicolonIndex == -1)
             return contentType;
-        return contentType.substring(0, semicolonIndex).trim();
+
+        final String mediatype = StringUtils.trimToNull(contentType.substring(0, semicolonIndex));
+        if (mediatype == null || mediatype.equalsIgnoreCase("content/unknown"))
+            return null;
+        else
+            return mediatype;
     }
 
     /**

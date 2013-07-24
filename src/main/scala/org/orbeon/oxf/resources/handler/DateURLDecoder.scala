@@ -18,6 +18,7 @@ import org.apache.commons.codec.net.URLCodec
 import org.orbeon.oxf.util.NetUtils
 import collection.JavaConverters._
 
+// Decode as per https://tools.ietf.org/html/rfc2397
 object DataURLDecoder {
 
     private val DefaultMediatype = "text/plain"
@@ -51,6 +52,7 @@ object DataURLDecoder {
         new DecodedDataURL(decodedData, mediatype, charset)
     }
 
+    // Support missing attribute values so we can collect ";base64" as well
     private def parseContentTypeParameters(s: String) = {
 
         def parseParameter(p: String) = {
@@ -64,4 +66,5 @@ object DataURLDecoder {
 
 class DecodedDataURL(val bytes: Array[Byte], val mediatype: String, val charset: Option[String]) {
     def contentType = mediatype + (charset map (";" + _) getOrElse "")
+    def asString    = charset map (new String(bytes, _))
 }

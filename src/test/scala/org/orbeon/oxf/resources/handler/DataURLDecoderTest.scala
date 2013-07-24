@@ -27,6 +27,7 @@ class DataURLDecoderTest extends AssertionsForJUnit {
         assert("image/png" === decoded.mediatype)
         assert(None        === decoded.charset)
         assert("image/png" === decoded.contentType)
+        assert(None        === decoded.asString)
     }
 
     @Test def testDecodeText(): Unit = {
@@ -35,7 +36,7 @@ class DataURLDecoderTest extends AssertionsForJUnit {
         assert("text/plain"          === decoded.mediatype)
         assert(Some("US-ASCII")      === decoded.charset)
         assert("text/plain;US-ASCII" === decoded.contentType)
-        assert("If you can't explain it simply, you don't understand it well enough." === new String(decoded.bytes, decoded.charset.get))
+        assert(Some("If you can't explain it simply, you don't understand it well enough.") === decoded.asString)
     }
 
     @Test def testCharset(): Unit = {
@@ -44,7 +45,16 @@ class DataURLDecoderTest extends AssertionsForJUnit {
         assert("text/plain"          === decoded.mediatype)
         assert(Some("UTF-8")         === decoded.charset)
         assert("text/plain;UTF-8"    === decoded.contentType)
-        assert("If you can't explain it simply, you don't understand it well enough." === new String(decoded.bytes, decoded.charset.get))
+        assert(Some("If you can't explain it simply, you don't understand it well enough.") === decoded.asString)
+    }
+
+    @Test def testNoContentType(): Unit = {
+        val decoded = DataURLDecoder.decode("data:;base64," + EncodedQuote)
+
+        assert("text/plain"          === decoded.mediatype)
+        assert(Some("US-ASCII")      === decoded.charset)
+        assert("text/plain;US-ASCII" === decoded.contentType)
+        assert(Some("If you can't explain it simply, you don't understand it well enough.") === decoded.asString)
     }
 
     @Test def testNoBase64(): Unit = {
@@ -53,6 +63,6 @@ class DataURLDecoderTest extends AssertionsForJUnit {
         assert("text/plain"          === decoded.mediatype)
         assert(Some("UTF-8")         === decoded.charset)
         assert("text/plain;UTF-8"    === decoded.contentType)
-        assert(EncodedQuote === new String(decoded.bytes, decoded.charset.get))
+        assert(Some(EncodedQuote)    === decoded.asString)
     }
 }

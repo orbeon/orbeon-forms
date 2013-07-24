@@ -257,13 +257,24 @@
                                             (
                                                 select count(*) from orbeon_form_data data
                                                 where
-                                                    (app, form, document_id, <xsl:value-of select="$last-modified-time"/>) in (
-                                                        select app, form, document_id, max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
+                                                    (
+                                                        app, form, document_id,
+                                                        <xsl:value-of select="$last-modified-time"/>
+                                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                    )
+                                                    in
+                                                    (
+                                                        select
+                                                            app, form, document_id,
+                                                            max(<xsl:value-of select="$last-modified-time"/>) <xsl:value-of select="$last-modified-time"/>
+                                                            <xsl:if test="$support-auto-save">, draft</xsl:if>
                                                         from orbeon_form_data
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
-                                                        group by app, form, document_id)
+                                                        group by app, form, document_id
+                                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                    )
                                                     and deleted = 'N'
                                                     <xsl:copy-of select="$owner-group-condition"/>
                                             ) total,

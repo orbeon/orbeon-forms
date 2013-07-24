@@ -13,9 +13,7 @@
  */
 package org.orbeon.oxf.resources
 
-import org.orbeon.oxf.resources.handler.HTTPHandler
-import org.orbeon.oxf.resources.handler.OXFHandler
-import org.orbeon.oxf.resources.handler.SystemHandler
+import org.orbeon.oxf.resources.handler.{DataHandler, HTTPHandler, OXFHandler, SystemHandler}
 import java.net._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils.{getProtocol, removeQueryString}
@@ -40,6 +38,7 @@ object URLFactory {
         case "http" | "https"       ⇒ new URL(context, spec, HTTP)
         case OXFHandler.PROTOCOL    ⇒ new URL(context, removeQueryString(spec), OXF)
         case SystemHandler.PROTOCOL ⇒ new URL(context, removeQueryString(spec), System)
+        case "data"                 ⇒ new URL(context, removeQueryString(spec), DataHandler)
         case "file"                 ⇒ new URL(context, removeQueryString(spec))
         case _                      ⇒ new URL(context, spec)
     }

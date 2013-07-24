@@ -16,7 +16,6 @@ package org.orbeon.oxf.resources.handler
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.net.URLCodec
 import org.orbeon.oxf.util.NetUtils
-import collection.JavaConverters._
 
 // Decode as per https://tools.ietf.org/html/rfc2397
 object DataURLDecoder {

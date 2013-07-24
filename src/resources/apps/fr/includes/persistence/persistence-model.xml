@@ -196,7 +196,8 @@
         <xf:revalidate/>
         <xf:refresh/>
         <!-- Set the initial data status -->
-        <xf:setvalue ref="$persistence-instance/data-status" value="../initial-data-status"/>
+        <xf:setvalue iterate="($persistence-instance/data-status, $autosave/status)"
+                     ref="." value="../initial-data-status"/>
     </xf:action>
 
     <!-- Clear operation -->

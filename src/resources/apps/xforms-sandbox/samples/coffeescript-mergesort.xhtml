@@ -52,14 +52,14 @@
 
                 # Read values of all 10 controls as numbers
                 unsortedValues = for index in [1..10]
-                  Number ORBEON.controls.getValue "my-output·" + index
+                  Number ORBEON.controls.getValue "my-output⊙" + index
 
                 # Sort values
                 sortedValues = mergeSort unsortedValues
 
                 # Sort and write back sorted values
                 for index in [1..10]
-                  ORBEON.controls.setValue "my-output·" + index, sortedValues[index - 1]
+                  ORBEON.controls.setValue "my-output⊙" + index, sortedValues[index - 1]
 
                 ]]>
             </xxf:script>

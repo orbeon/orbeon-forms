@@ -214,11 +214,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1">Ada</xxf:control>
-                        <xxf:control id="my-input·2">Marie</xxf:control>
-                        <xxf:control id="my-input·3">Clara</xxf:control>
+                        <xxf:control id="my-input⊙1">Ada</xxf:control>
+                        <xxf:control id="my-input⊙2">Marie</xxf:control>
+                        <xxf:control id="my-input⊙3">Clara</xxf:control>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-input·2"/>
+                    <xxf:focus control-id="my-input⊙2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -542,18 +542,18 @@
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="|my-repeat|"/>
-                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-input·1|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-input⊙1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="|my-input·2|"/>
-                                    <event type="DOMFocusOut" target="|my-repeat~iteration·2|"/>
-                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-input·1|"/>
+                                    <event type="DOMFocusOut" target="|my-input⊙2|"/>
+                                    <event type="DOMFocusOut" target="|my-repeat~iteration⊙2|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-input⊙1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="|my-input·1|"/>
-                                    <event type="DOMFocusOut" target="|my-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-input·1|"/>
+                                    <event type="DOMFocusOut" target="|my-input⊙1|"/>
+                                    <event type="DOMFocusOut" target="|my-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-input⊙1|"/>
                                     <separator/>
                                 </events>
                             </instance>
@@ -565,9 +565,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1" visited="true"/>
+                        <xxf:control id="my-input⊙1" visited="true"/>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-input·1"/>
+                    <xxf:focus control-id="my-input⊙1"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -637,8 +637,8 @@
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="|my-repeat|"/>
-                                    <event type="DOMFocusIn" target="|my-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-input·1|"/>
+                                    <event type="DOMFocusIn" target="|my-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-input⊙1|"/>
                                     <separator/>
                                     <separator/>
                                 </events>
@@ -651,7 +651,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values/>
-                    <xxf:focus control-id="my-input·2"/>
+                    <xxf:focus control-id="my-input⊙2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -722,39 +722,39 @@
                             <instance id="events-instance" model-id="events-model">
                                 <events>
                                     <event type="DOMFocusIn" target="|my-outer-repeat|"/>
-                                    <event type="DOMFocusIn" target="|my-outer-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-inner-repeat·1|"/>
-                                    <event type="DOMFocusIn" target="|my-inner-repeat~iteration·1-1|"/>
-                                    <event type="DOMFocusIn" target="|my-input·1-1|"/>
+                                    <event type="DOMFocusIn" target="|my-outer-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat~iteration⊙1-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input⊙1-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="|my-input·1-1|"/>
-                                    <event type="DOMFocusOut" target="|my-inner-repeat~iteration·1-1|"/>
-                                    <event type="DOMFocusOut" target="|my-inner-repeat·1|"/>
-                                    <event type="DOMFocusOut" target="|my-outer-repeat~iteration·1|"/>
-                                    <event type="DOMFocusIn" target="|my-outer-repeat~iteration·2|"/>
-                                    <event type="DOMFocusIn" target="|my-inner-repeat·2|"/>
-                                    <event type="DOMFocusIn" target="|my-inner-repeat~iteration·2-1|"/>
-                                    <event type="DOMFocusIn" target="|my-input·2-1|"/>
+                                    <event type="DOMFocusOut" target="|my-input⊙1-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat~iteration⊙1-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat⊙1|"/>
+                                    <event type="DOMFocusOut" target="|my-outer-repeat~iteration⊙1|"/>
+                                    <event type="DOMFocusIn" target="|my-outer-repeat~iteration⊙2|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat⊙2|"/>
+                                    <event type="DOMFocusIn" target="|my-inner-repeat~iteration⊙2-1|"/>
+                                    <event type="DOMFocusIn" target="|my-input⊙2-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="|my-input·2-1|"/>
-                                    <event type="DOMFocusOut" target="|my-inner-repeat~iteration·2-1|"/>
-                                    <event type="DOMFocusOut" target="|my-inner-repeat·2|"/>
-                                    <event type="DOMFocusOut" target="|my-outer-repeat~iteration·2|"/>
+                                    <event type="DOMFocusOut" target="|my-input⊙2-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat~iteration⊙2-1|"/>
+                                    <event type="DOMFocusOut" target="|my-inner-repeat⊙2|"/>
+                                    <event type="DOMFocusOut" target="|my-outer-repeat~iteration⊙2|"/>
                                     <event type="DOMFocusOut" target="|my-outer-repeat|"/>
                                 </events>
                             </instance>
                         </instances>
                         <controls>
                             <control effective-id="my-outer-repeat" index="3"/>
-                            <control effective-id="my-inner-repeat·1" index="1"/>
-                            <control effective-id="my-inner-repeat·2" index="1"/>
+                            <control effective-id="my-inner-repeat⊙1" index="1"/>
+                            <control effective-id="my-inner-repeat⊙2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1-1" visited="true"/>
-                        <xxf:control id="my-input·2-1" visited="true"/>
+                        <xxf:control id="my-input⊙1-1" visited="true"/>
+                        <xxf:control id="my-input⊙2-1" visited="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1025,7 +1025,7 @@
                             <xf:setfocus control="my-gaga"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Move focus within gaga -->
-                            <xf:setfocus control="|my-gaga∘gaga-2|"/>
+                            <xf:setfocus control="|my-gaga≡gaga-2|"/>
                             <xf:insert model="events-model" context="." ref="*" origin="xxf:element('separator')"/>
                             <!-- Focus on toto -->
                             <xf:setfocus control="my-toto"/>
@@ -1097,10 +1097,10 @@
                                     <separator/>
                                     <event type="DOMFocusOut" target="|my-gaga|"/>
                                     <event type="DOMFocusIn" target="|my-toto|"/>
-                                    <event type="DOMFocusIn" target="|my-toto∘toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto≡toto-1|"/>
                                     <separator/>
-                                    <event type="DOMFocusOut" target="|my-toto∘toto-1|"/>
-                                    <event type="DOMFocusIn" target="|my-toto∘toto-2|"/>
+                                    <event type="DOMFocusOut" target="|my-toto≡toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto≡toto-2|"/>
                                 </events>
                             </instance>
                         </instances>
@@ -1110,11 +1110,11 @@
                     <xxf:control-values>
                         <xxf:control id="my-input-1" visited="true"/>
                         <xxf:control id="my-gaga" visited="true"/>
-                        <xxf:control id="my-gaga∘gaga-1" visited="true"/>
-                        <xxf:control id="my-gaga∘gaga-2" visited="true"/>
-                        <xxf:control id="my-toto∘toto-1" visited="true"/>
+                        <xxf:control id="my-gaga≡gaga-1" visited="true"/>
+                        <xxf:control id="my-gaga≡gaga-2" visited="true"/>
+                        <xxf:control id="my-toto≡toto-1" visited="true"/>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-toto∘toto-2"/>
+                    <xxf:focus control-id="my-toto≡toto-2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1174,10 +1174,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1">Ada</xxf:control>
-                        <xxf:control id="my-input·2">Marie</xxf:control>
+                        <xxf:control id="my-input⊙1">Ada</xxf:control>
+                        <xxf:control id="my-input⊙2">Marie</xxf:control>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-input·2"/>
+                    <xxf:focus control-id="my-input⊙2"/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -1247,8 +1247,8 @@
                                     <separator/>
                                     <event type="DOMFocusOut" target="|my-gaga|"/>
                                     <event type="DOMFocusIn" target="|my-toto|"/>
-                                    <event type="DOMFocusIn" target="|my-toto∘xf-9|"/>
-                                    <event type="DOMFocusIn" target="|my-toto∘toto-1|"/>
+                                    <event type="DOMFocusIn" target="|my-toto≡xf-9|"/>
+                                    <event type="DOMFocusIn" target="|my-toto≡toto-1|"/>
                                     <separator/>
                                 </events>
                             </instance>
@@ -1259,7 +1259,7 @@
                     <xxf:control-values>
                         <xxf:control id="my-gaga" visited="true"/>
                     </xxf:control-values>
-                    <xxf:focus control-id="my-toto∘toto-1"/>
+                    <xxf:focus control-id="my-toto≡toto-1"/>
                 </xxf:action>
             </xxf:event-response>
         </output>

@@ -461,62 +461,62 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-group·1" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·1">bloody</xxf:control>
-                        <xxf:control id="repeat-current-output-2·1">bloody</xxf:control>
-                        <xxf:control id="repeat-index-1·1">5</xxf:control>
-                        <xxf:control id="repeat-index-2·1">5</xxf:control>
-                        <xxf:control id="repeat-context-1·1">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·1">bloody</xxf:control>
-                        <xxf:control id="my-group·2" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·2">valencia</xxf:control>
-                        <xxf:control id="repeat-current-output-2·2">valencia</xxf:control>
-                        <xxf:control id="repeat-index-1·2">5</xxf:control>
-                        <xxf:control id="repeat-index-2·2">5</xxf:control>
-                        <xxf:control id="repeat-context-1·2">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·2">valencia</xxf:control>
-                        <xxf:control id="my-group·3" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·3">green</xxf:control>
-                        <xxf:control id="repeat-current-output-2·3">green</xxf:control>
-                        <xxf:control id="repeat-index-1·3">5</xxf:control>
-                        <xxf:control id="repeat-index-2·3">5</xxf:control>
-                        <xxf:control id="repeat-context-1·3">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·3">green</xxf:control>
-                        <xxf:control id="my-group·4" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·4">red</xxf:control>
-                        <xxf:control id="repeat-current-output-2·4">red</xxf:control>
-                        <xxf:control id="repeat-index-1·4">5</xxf:control>
-                        <xxf:control id="repeat-index-2·4">5</xxf:control>
-                        <xxf:control id="repeat-context-1·4">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·4">red</xxf:control>
-                        <xxf:control id="my-group·5" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·5">iPod</xxf:control>
-                        <xxf:control id="repeat-current-output-2·5">iPod</xxf:control>
-                        <xxf:control id="repeat-index-1·5">5</xxf:control>
-                        <xxf:control id="repeat-index-2·5">5</xxf:control>
-                        <xxf:control id="repeat-context-1·5">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·5">iPod</xxf:control>
-                        <xxf:control id="my-group·6" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·6">green</xxf:control>
-                        <xxf:control id="repeat-current-output-2·6">green</xxf:control>
-                        <xxf:control id="repeat-index-1·6">5</xxf:control>
-                        <xxf:control id="repeat-index-2·6">5</xxf:control>
-                        <xxf:control id="repeat-context-1·6">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·6">green</xxf:control>
-                        <xxf:control id="my-group·7" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·7">williams</xxf:control>
-                        <xxf:control id="repeat-current-output-2·7">williams</xxf:control>
-                        <xxf:control id="repeat-index-1·7">5</xxf:control>
-                        <xxf:control id="repeat-index-2·7">5</xxf:control>
-                        <xxf:control id="repeat-context-1·7">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·7">williams</xxf:control>
-                        <xxf:control id="my-group·8" readonly="true"/>
-                        <xxf:control id="repeat-current-output-1·8">yellow</xxf:control>
-                        <xxf:control id="repeat-current-output-2·8">yellow</xxf:control>
-                        <xxf:control id="repeat-index-1·8">5</xxf:control>
-                        <xxf:control id="repeat-index-2·8">5</xxf:control>
-                        <xxf:control id="repeat-context-1·8">fruits</xxf:control>
-                        <xxf:control id="repeat-context-2·8">yellow</xxf:control>
+                        <xxf:control id="my-group⊙1" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙1">bloody</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙1">bloody</xxf:control>
+                        <xxf:control id="repeat-index-1⊙1">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙1">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙1">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙1">bloody</xxf:control>
+                        <xxf:control id="my-group⊙2" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙2">valencia</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙2">valencia</xxf:control>
+                        <xxf:control id="repeat-index-1⊙2">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙2">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙2">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙2">valencia</xxf:control>
+                        <xxf:control id="my-group⊙3" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙3">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙3">green</xxf:control>
+                        <xxf:control id="repeat-index-1⊙3">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙3">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙3">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙3">green</xxf:control>
+                        <xxf:control id="my-group⊙4" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙4">red</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙4">red</xxf:control>
+                        <xxf:control id="repeat-index-1⊙4">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙4">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙4">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙4">red</xxf:control>
+                        <xxf:control id="my-group⊙5" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙5">iPod</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙5">iPod</xxf:control>
+                        <xxf:control id="repeat-index-1⊙5">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙5">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙5">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙5">iPod</xxf:control>
+                        <xxf:control id="my-group⊙6" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙6">green</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙6">green</xxf:control>
+                        <xxf:control id="repeat-index-1⊙6">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙6">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙6">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙6">green</xxf:control>
+                        <xxf:control id="my-group⊙7" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙7">williams</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙7">williams</xxf:control>
+                        <xxf:control id="repeat-index-1⊙7">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙7">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙7">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙7">williams</xxf:control>
+                        <xxf:control id="my-group⊙8" readonly="true"/>
+                        <xxf:control id="repeat-current-output-1⊙8">yellow</xxf:control>
+                        <xxf:control id="repeat-current-output-2⊙8">yellow</xxf:control>
+                        <xxf:control id="repeat-index-1⊙8">5</xxf:control>
+                        <xxf:control id="repeat-index-2⊙8">5</xxf:control>
+                        <xxf:control id="repeat-context-1⊙8">fruits</xxf:control>
+                        <xxf:control id="repeat-context-2⊙8">yellow</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -588,18 +588,18 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="exforms-sort-output·1">3-AAA</xxf:control>
-                        <xxf:control id="exforms-sort-output·2">2-BBB</xxf:control>
-                        <xxf:control id="exforms-sort-output·3">1-CCC</xxf:control>
-                        <xxf:control id="xxforms-sort-output·1">3-AAA</xxf:control>
-                        <xxf:control id="xxforms-sort-output·2">2-BBB</xxf:control>
-                        <xxf:control id="xxforms-sort-output·3">1-CCC</xxf:control>
-                        <xxf:control id="exforms-sort-v-output·1">3-AAA</xxf:control>
-                        <xxf:control id="exforms-sort-v-output·2">2-BBB</xxf:control>
-                        <xxf:control id="exforms-sort-v-output·3">1-CCC</xxf:control>
-                        <xxf:control id="xxforms-sort-v-output·1">3-AAA</xxf:control>
-                        <xxf:control id="xxforms-sort-v-output·2">2-BBB</xxf:control>
-                        <xxf:control id="xxforms-sort-v-output·3">1-CCC</xxf:control>
+                        <xxf:control id="exforms-sort-output⊙1">3-AAA</xxf:control>
+                        <xxf:control id="exforms-sort-output⊙2">2-BBB</xxf:control>
+                        <xxf:control id="exforms-sort-output⊙3">1-CCC</xxf:control>
+                        <xxf:control id="xxforms-sort-output⊙1">3-AAA</xxf:control>
+                        <xxf:control id="xxforms-sort-output⊙2">2-BBB</xxf:control>
+                        <xxf:control id="xxforms-sort-output⊙3">1-CCC</xxf:control>
+                        <xxf:control id="exforms-sort-v-output⊙1">3-AAA</xxf:control>
+                        <xxf:control id="exforms-sort-v-output⊙2">2-BBB</xxf:control>
+                        <xxf:control id="exforms-sort-v-output⊙3">1-CCC</xxf:control>
+                        <xxf:control id="xxforms-sort-v-output⊙1">3-AAA</xxf:control>
+                        <xxf:control id="xxforms-sort-v-output⊙2">2-BBB</xxf:control>
+                        <xxf:control id="xxforms-sort-v-output⊙3">1-CCC</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -645,8 +645,8 @@
                 <xxf:control-values>
                     <xxf:control id="output1">state=CA</xxf:control>
                     <xxf:control id="output2">state=CA&amp;city=San Francisco</xxf:control>
-                    <xxf:control id="output3·1">position=1&amp;index=1</xxf:control>
-                    <xxf:control id="output3·2">position=2&amp;index=1</xxf:control>
+                    <xxf:control id="output3⊙1">position=1&amp;index=1</xxf:control>
+                    <xxf:control id="output3⊙2">position=2&amp;index=1</xxf:control>
                 </xxf:control-values>
             </xxf:action>
         </xxf:event-response>
@@ -1008,10 +1008,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="xf-3·1" label="Nodeset : ">Garfield</xxf:control>
-                        <xxf:control id="xf-3·2" label="Nodeset : ">Heathcliff</xxf:control>
-                        <xxf:control id="xf-3·3" label="Nodeset : ">Felix</xxf:control>
-                        <xxf:control id="xf-3·4" label="Nodeset : ">Tom</xxf:control>
+                        <xxf:control id="xf-3⊙1" label="Nodeset : ">Garfield</xxf:control>
+                        <xxf:control id="xf-3⊙2" label="Nodeset : ">Heathcliff</xxf:control>
+                        <xxf:control id="xf-3⊙3" label="Nodeset : ">Felix</xxf:control>
+                        <xxf:control id="xf-3⊙4" label="Nodeset : ">Tom</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1550,12 +1550,12 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:attribute for="xf-1" name="xml:lang">it</xxf:attribute>
-                        <xxf:control id="my-foo-1∘output1">it</xxf:control>
-                        <xxf:control id="my-foo-1∘output2">it</xxf:control>
-                        <xxf:control id="my-foo-1∘output3">zh</xxf:control>
-                        <xxf:control id="my-foo-2∘output1">es</xxf:control>
-                        <xxf:control id="my-foo-2∘output2">es</xxf:control>
-                        <xxf:control id="my-foo-2∘output3">zh</xxf:control>
+                        <xxf:control id="my-foo-1≡output1">it</xxf:control>
+                        <xxf:control id="my-foo-1≡output2">it</xxf:control>
+                        <xxf:control id="my-foo-1≡output3">zh</xxf:control>
+                        <xxf:control id="my-foo-2≡output1">es</xxf:control>
+                        <xxf:control id="my-foo-2≡output2">es</xxf:control>
+                        <xxf:control id="my-foo-2≡output3">zh</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1601,9 +1601,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="output1">At 7:25 PM on July 23, 2010, we detected 3 spaceships on the planet Mars.</xxf:control>
-                        <xxf:control id="output2·1">There are no files.</xxf:control>
-                        <xxf:control id="output2·2">There is one file.</xxf:control>
-                        <xxf:control id="output2·3">There are 1,273 files.</xxf:control>
+                        <xxf:control id="output2⊙1">There are no files.</xxf:control>
+                        <xxf:control id="output2⊙2">There is one file.</xxf:control>
+                        <xxf:control id="output2⊙3">There are 1,273 files.</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1815,20 +1815,20 @@
                     <dynamic-state>
                         <controls>
                             <control effective-id="repeat-department" index="1"/>
-                            <control effective-id="repeat-employee·1" index="1"/>
-                            <control effective-id="repeat-employee·2" index="1"/>
+                            <control effective-id="repeat-employee⊙1" index="1"/>
+                            <control effective-id="repeat-employee⊙2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="o1·1">1</xxf:control>
-                        <xxf:control id="o2·1-1">1-1-1</xxf:control>
-                        <xxf:control id="o2·1-2">1-2-2</xxf:control>
-                        <xxf:control id="o1·2">2</xxf:control>
-                        <xxf:control id="o2·2-1">2-1-1</xxf:control>
-                        <xxf:control id="o2·2-2">2-2-2</xxf:control>
-                        <xxf:control id="o2·2-3">2-3-3</xxf:control>
+                        <xxf:control id="o1⊙1">1</xxf:control>
+                        <xxf:control id="o2⊙1-1">1-1-1</xxf:control>
+                        <xxf:control id="o2⊙1-2">1-2-2</xxf:control>
+                        <xxf:control id="o1⊙2">2</xxf:control>
+                        <xxf:control id="o2⊙2-1">2-1-1</xxf:control>
+                        <xxf:control id="o2⊙2-2">2-2-2</xxf:control>
+                        <xxf:control id="o2⊙2-3">2-3-3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1894,22 +1894,22 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="o1·1">true</xxf:control>
-                        <xxf:control id="o2·1">true</xxf:control>
-                        <xxf:control id="o3·1">true</xxf:control>
-                        <xxf:control id="o4·1">true</xxf:control>
-                        <xxf:control id="o1·2">false</xxf:control>
-                        <xxf:control id="o2·2">false</xxf:control>
-                        <xxf:control id="o3·2">false</xxf:control>
-                        <xxf:control id="o4·2">false</xxf:control>
-                        <xxf:control id="o1·3">true</xxf:control>
-                        <xxf:control id="o2·3">true</xxf:control>
-                        <xxf:control id="o3·3">true</xxf:control>
-                        <xxf:control id="o4·3">true</xxf:control>
-                        <xxf:control id="o1·4">false</xxf:control>
-                        <xxf:control id="o2·4">true</xxf:control>
-                        <xxf:control id="o3·4">false</xxf:control>
-                        <xxf:control id="o4·4">true</xxf:control>
+                        <xxf:control id="o1⊙1">true</xxf:control>
+                        <xxf:control id="o2⊙1">true</xxf:control>
+                        <xxf:control id="o3⊙1">true</xxf:control>
+                        <xxf:control id="o4⊙1">true</xxf:control>
+                        <xxf:control id="o1⊙2">false</xxf:control>
+                        <xxf:control id="o2⊙2">false</xxf:control>
+                        <xxf:control id="o3⊙2">false</xxf:control>
+                        <xxf:control id="o4⊙2">false</xxf:control>
+                        <xxf:control id="o1⊙3">true</xxf:control>
+                        <xxf:control id="o2⊙3">true</xxf:control>
+                        <xxf:control id="o3⊙3">true</xxf:control>
+                        <xxf:control id="o4⊙3">true</xxf:control>
+                        <xxf:control id="o1⊙4">false</xxf:control>
+                        <xxf:control id="o2⊙4">true</xxf:control>
+                        <xxf:control id="o3⊙4">false</xxf:control>
+                        <xxf:control id="o4⊙4">true</xxf:control>
                         <xxf:control id="valid-attribute">true</xxf:control>
                         <xxf:control id="valid-descendant">true</xxf:control>
                         <xxf:control id="invalid-attribute">false</xxf:control>
@@ -1961,14 +1961,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output·1">is-not-g</xxf:control>
-                        <xxf:control id="my-output·2">is-not-g</xxf:control>
-                        <xxf:control id="my-output·3">is-g</xxf:control>
-                        <xxf:control id="my-output·4">is-not-g</xxf:control>
-                        <xxf:control id="my-output·5">is-not-g</xxf:control>
-                        <xxf:control id="my-output·6">is-g</xxf:control>
-                        <xxf:control id="my-output·7">is-not-g</xxf:control>
-                        <xxf:control id="my-output·8">is-not-g</xxf:control>
+                        <xxf:control id="my-output⊙1">is-not-g</xxf:control>
+                        <xxf:control id="my-output⊙2">is-not-g</xxf:control>
+                        <xxf:control id="my-output⊙3">is-g</xxf:control>
+                        <xxf:control id="my-output⊙4">is-not-g</xxf:control>
+                        <xxf:control id="my-output⊙5">is-not-g</xxf:control>
+                        <xxf:control id="my-output⊙6">is-g</xxf:control>
+                        <xxf:control id="my-output⊙7">is-not-g</xxf:control>
+                        <xxf:control id="my-output⊙8">is-not-g</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

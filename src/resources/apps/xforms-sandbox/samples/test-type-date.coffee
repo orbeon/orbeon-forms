@@ -27,7 +27,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
     checkValues: (iteration) ->
         controlIds = ["date", "time", "dateTime"]
         for controlId in controlIds
-            [inputControl, outputControl] = (YD.get controlId + "-" + type + "·" + iteration for type in ["input", "output"])
+            [inputControl, outputControl] = (YD.get controlId + "-" + type + "⊙" + iteration for type in ["input", "output"])
             outputValue = Document.getValue outputControl
             isoDateTimes = outputValue.split "T"
             for input in inputControl.getElementsByTagName "input"
@@ -51,13 +51,13 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
     # After an increment, values are still formatted on desktop browsers and ISO on iOS
     testValueAfterIncrement: ->
         Test.runMayCauseXHR this,
-            -> Test.click "increment-date-time·1"
+            -> Test.click "increment-date-time⊙1"
             -> @checkValues "1"
             -> Test.click "add"
-            -> Test.click "increment-date-time·2"
+            -> Test.click "increment-date-time⊙2"
             -> @checkValues "2"
             -> Test.click "remove"
-            -> Test.click "reset-date-time·1"
+            -> Test.click "reset-date-time⊙1"
 
 Test.onOrbeonLoadedRunTest()
 

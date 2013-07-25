@@ -393,14 +393,14 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-control·1" class="+foo-bar-is-not-g">bloody</xxf:control>
-                        <xxf:control id="my-control·2" class="+foo-bar-is-not-g">valencia</xxf:control>
-                        <xxf:control id="my-control·3" class="+foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control·4" class="+foo-bar-is-not-g">red</xxf:control>
-                        <xxf:control id="my-control·5" class="+foo-bar-is-not-g">iPod</xxf:control>
-                        <xxf:control id="my-control·6" class="+foo-bar-is-g">green</xxf:control>
-                        <xxf:control id="my-control·7" class="+foo-bar-is-not-g">williams</xxf:control>
-                        <xxf:control id="my-control·8" class="+foo-bar-is-not-g">yellow</xxf:control>
+                        <xxf:control id="my-control⊙1" class="+foo-bar-is-not-g">bloody</xxf:control>
+                        <xxf:control id="my-control⊙2" class="+foo-bar-is-not-g">valencia</xxf:control>
+                        <xxf:control id="my-control⊙3" class="+foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-control⊙4" class="+foo-bar-is-not-g">red</xxf:control>
+                        <xxf:control id="my-control⊙5" class="+foo-bar-is-not-g">iPod</xxf:control>
+                        <xxf:control id="my-control⊙6" class="+foo-bar-is-g">green</xxf:control>
+                        <xxf:control id="my-control⊙7" class="+foo-bar-is-not-g">williams</xxf:control>
+                        <xxf:control id="my-control⊙8" class="+foo-bar-is-not-g">yellow</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -890,22 +890,22 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output-relevant·1">true</xxf:control>
-                        <xxf:control id="output-readonly·1">true</xxf:control>
-                        <xxf:control id="output-required·1">true</xxf:control>
-                        <xxf:control id="output-type·1">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·1">true</xxf:control>
-                        <xxf:control id="output-default·1">42</xxf:control>
-                        <xxf:control id="output-custom·1">42, 43</xxf:control>
-                        <xxf:control id="output-calculate·1">43</xxf:control>
-                        <xxf:control id="output-relevant·2">true</xxf:control>
-                        <xxf:control id="output-readonly·2">false</xxf:control>
-                        <xxf:control id="output-required·2">false</xxf:control>
-                        <xxf:control id="output-type·2">xs:integer</xxf:control>
-                        <xxf:control id="output-constraint·2">false</xxf:control>
-                        <xxf:control id="output-default·2">44</xxf:control>
-                        <xxf:control id="output-custom·2">44, 45</xxf:control>
-                        <xxf:control id="output-calculate·2">45</xxf:control>
+                        <xxf:control id="output-relevant⊙1">true</xxf:control>
+                        <xxf:control id="output-readonly⊙1">true</xxf:control>
+                        <xxf:control id="output-required⊙1">true</xxf:control>
+                        <xxf:control id="output-type⊙1">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint⊙1">true</xxf:control>
+                        <xxf:control id="output-default⊙1">42</xxf:control>
+                        <xxf:control id="output-custom⊙1">42, 43</xxf:control>
+                        <xxf:control id="output-calculate⊙1">43</xxf:control>
+                        <xxf:control id="output-relevant⊙2">true</xxf:control>
+                        <xxf:control id="output-readonly⊙2">false</xxf:control>
+                        <xxf:control id="output-required⊙2">false</xxf:control>
+                        <xxf:control id="output-type⊙2">xs:integer</xxf:control>
+                        <xxf:control id="output-constraint⊙2">false</xxf:control>
+                        <xxf:control id="output-default⊙2">44</xxf:control>
+                        <xxf:control id="output-custom⊙2">44, 45</xxf:control>
+                        <xxf:control id="output-calculate⊙2">45</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1138,17 +1138,17 @@
                     <dynamic-state>
                         <controls>
                             <control effective-id="repeat1" index="1"/>
-                            <control effective-id="repeat2·1" index="1"/>
-                            <control effective-id="repeat2·2" index="1"/>
+                            <control effective-id="repeat2⊙1" index="1"/>
+                            <control effective-id="repeat2⊙2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="input1·1-1">Mickey</xxf:control>
-                        <xxf:control id="input1·1-2">Minnie</xxf:control>
-                        <xxf:control id="input1·2-1">Donald</xxf:control>
-                        <xxf:control id="input1·2-2">Daisy</xxf:control>
+                        <xxf:control id="input1⊙1-1">Mickey</xxf:control>
+                        <xxf:control id="input1⊙1-2">Minnie</xxf:control>
+                        <xxf:control id="input1⊙2-1">Donald</xxf:control>
+                        <xxf:control id="input1⊙2-2">Daisy</xxf:control>
                         <xxf:control id="input2">Mickey</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
@@ -1195,10 +1195,10 @@
         <output name="response">
             <controls>
                 <xh:span id="my-input1" class="xforms-control xforms-input">
-                    <xh:input id="my-input1∘xforms-input-1" type="text" name="my-input1∘xforms-input-1" value="cA" class="xforms-input-input"/>
+                    <xh:input id="my-input1≡xforms-input-1" type="text" name="my-input1≡xforms-input-1" value="cA" class="xforms-input-input"/>
                 </xh:span>
                 <xh:span id="my-input2" class="xforms-control xforms-input xforms-type-custom-myType">
-                    <xh:input id="my-input2∘xforms-input-1" type="text" name="my-input2∘xforms-input-1" value="CA" class="xforms-input-input"/>
+                    <xh:input id="my-input2≡xforms-input-1" type="text" name="my-input2≡xforms-input-1" value="CA" class="xforms-input-input"/>
                 </xh:span>
             </controls>
         </output>

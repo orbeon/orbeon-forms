@@ -306,24 +306,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="output1·1">row2</xxf:control>
-                        <xxf:control id="output1·2">row1</xxf:control>
-                        <xxf:control id="output1·3">row3</xxf:control>
-                        <xxf:control id="output2·1">row2</xxf:control>
-                        <xxf:control id="output2·2">row3</xxf:control>
-                        <xxf:control id="output2·3">row1</xxf:control>
-                        <xxf:control id="output3·1">row2</xxf:control>
-                        <xxf:control id="output3·2">row1</xxf:control>
-                        <xxf:control id="output3·3">row3</xxf:control>
-                        <xxf:control id="output4·1">row1</xxf:control>
-                        <xxf:control id="output4·2">row3</xxf:control>
-                        <xxf:control id="output4·3">row2</xxf:control>
-                        <xxf:control id="output5·1">row3</xxf:control>
-                        <xxf:control id="output5·2">row1</xxf:control>
-                        <xxf:control id="output5·3">row2</xxf:control>
-                        <xxf:control id="output6·1">row1</xxf:control>
-                        <xxf:control id="output6·2">row3</xxf:control>
-                        <xxf:control id="output6·3">row2</xxf:control>
+                        <xxf:control id="output1⊙1">row2</xxf:control>
+                        <xxf:control id="output1⊙2">row1</xxf:control>
+                        <xxf:control id="output1⊙3">row3</xxf:control>
+                        <xxf:control id="output2⊙1">row2</xxf:control>
+                        <xxf:control id="output2⊙2">row3</xxf:control>
+                        <xxf:control id="output2⊙3">row1</xxf:control>
+                        <xxf:control id="output3⊙1">row2</xxf:control>
+                        <xxf:control id="output3⊙2">row1</xxf:control>
+                        <xxf:control id="output3⊙3">row3</xxf:control>
+                        <xxf:control id="output4⊙1">row1</xxf:control>
+                        <xxf:control id="output4⊙2">row3</xxf:control>
+                        <xxf:control id="output4⊙3">row2</xxf:control>
+                        <xxf:control id="output5⊙1">row3</xxf:control>
+                        <xxf:control id="output5⊙2">row1</xxf:control>
+                        <xxf:control id="output5⊙3">row2</xxf:control>
+                        <xxf:control id="output6⊙1">row1</xxf:control>
+                        <xxf:control id="output6⊙2">row3</xxf:control>
+                        <xxf:control id="output6⊙3">row2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -874,8 +874,8 @@
          -->
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="plate·3">777</xxf:event>
-                <xxf:event name="xxforms-value" source-control-id="leased·3">leased</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="plate⊙3">777</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="leased⊙3">leased</xxf:event>
             </xxf:action>
         </input>
         <input name="controls">
@@ -947,11 +947,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="plate·1">777</xxf:control>
-                        <xxf:control id="leased·1">leased</xxf:control>
-                        <xxf:control id="plate·2">666</xxf:control>
-                        <xxf:control id="plate·3">333</xxf:control>
-                        <xxf:control id="leased·3"/>
+                        <xxf:control id="plate⊙1">777</xxf:control>
+                        <xxf:control id="leased⊙1">leased</xxf:control>
+                        <xxf:control id="plate⊙2">666</xxf:control>
+                        <xxf:control id="plate⊙3">333</xxf:control>
+                        <xxf:control id="leased⊙3"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

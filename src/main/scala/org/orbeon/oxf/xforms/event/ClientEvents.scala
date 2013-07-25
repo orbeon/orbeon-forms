@@ -206,9 +206,9 @@ object ClientEvents extends Logging {
         AllCategories flatMap ((groups + (SelectBlank → blankEvents)).get(_)) flatten
     }
 
-    // Incoming ids can have the form `my-repeat·1` in order to target a repeat iteration. This is ambiguous without
+    // Incoming ids can have the form `my-repeat⊙1` in order to target a repeat iteration. This is ambiguous without
     // knowing that `my-repeat` refers to a repeat and without knowing the repeat hierarchy, so we should change it
-    // in the future, but in the meanwhile we map this id to `my-repeat~iteration·1` based on static information.
+    // in the future, but in the meanwhile we map this id to `my-repeat~iteration⊙1` based on static information.
     // NOTE: Leave public for unit tests
     def adjustIdForRepeatIteration(doc: XFormsContainingDocument, effectiveId: String) =
         doc.getStaticOps.getControlAnalysis(getPrefixedId(effectiveId)) match {

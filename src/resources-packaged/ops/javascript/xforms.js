@@ -984,7 +984,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
-             * For example: appendToEffectivefId("foo·1", "bar") returns "foobar·1"
+             * For example: appendToEffectivefId("foo⊙1", "bar") returns "foobar⊙1"
              */
             appendToEffectiveId: function(effectiveId, ending) {
                 var prefixedId = ORBEON.util.Utils.getEffectiveIdNoSuffix(effectiveId);
@@ -992,7 +992,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
-             * For example: getEffectiveIdNoSuffix("foo·1-2") returns "foo"
+             * For example: getEffectiveIdNoSuffix("foo⊙1-2") returns "foo"
              */
             getEffectiveIdNoSuffix: function(effectiveId) {
                 if (effectiveId == null)
@@ -1007,7 +1007,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
             },
 
             /**
-             * For example: getEffectiveIdNoSuffix("foo·1-2") returns "·1-2"
+             * For example: getEffectiveIdNoSuffix("foo⊙1-2") returns "⊙1-2"
              */
             getEffectiveIdSuffixWithSeparator: function(effectiveId) {
                 if (effectiveId == null)
@@ -1069,7 +1069,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         //
                         // getElementById("my-input") correctly returns <span id="my-input">
                         //
-                        // Now clone the template. getElementById("my-input") now returns <input id="my-input$$c·1" name="my-input﻿·1">
+                        // Now clone the template. getElementById("my-input") now returns <input id="my-input$$c⊙1" name="my-input﻿⊙1">
                         //
                         // That's because IE mixes up the element id and the name, AND the name "my-input" incorrectly points to
                         // the cloned element.
@@ -2594,10 +2594,10 @@ ORBEON.xforms.FlatNesting = {
      *
      *      <span class="xforms-repeat-delimiter">
      *          ...
-     *          <span class="xforms-repeat-begin-end" id="repeat-begin-inner-repeat·1">
+     *          <span class="xforms-repeat-begin-end" id="repeat-begin-inner-repeat⊙1">
      *          <span class="xforms-repeat-delimiter">
      *              ...
-     *          <span class="xforms-repeat-begin-end" id="repeat-end-inner-repeat·1"></span>
+     *          <span class="xforms-repeat-begin-end" id="repeat-end-inner-repeat⊙1"></span>
      *          ...
      *      <span class="xforms-repeat-delimiter">
      */
@@ -4671,7 +4671,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     /**
      * Renumber the IDs for a given repeat ID, for all the elements between the begin and end marker for that repeat
-     * @param repeatID      E.g. repeat-begin-todo·1 for the repeat on to-dos in the first to-do list.
+     * @param repeatID      E.g. repeat-begin-todo⊙1 for the repeat on to-dos in the first to-do list.
      */
     _renumberIDs: function(repeatID) {
 

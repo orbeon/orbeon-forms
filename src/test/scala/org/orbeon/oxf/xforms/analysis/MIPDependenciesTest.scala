@@ -26,74 +26,74 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
         // Initial state
-        assert("150" === getControlValue("line-total·1"))
+        assert("150" === getControlValue("line-total⊙1"))
         assert("2150" === getControlValue("subtotal"))
 
         // Change first item price to foo
-        setControlValue("price·1", "foo")
+        setControlValue("price⊙1", "foo")
 
-        assert(!isValid("price·1"))
-        assert(!isValid("line-total·1"))
-        assert("-" === getControlValue("line-total·1"))
+        assert(!isValid("price⊙1"))
+        assert(!isValid("line-total⊙1"))
+        assert("-" === getControlValue("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
         // Change first item price to 100
-        setControlValue("price·1", "100")
+        setControlValue("price⊙1", "100")
 
-        assert(isValid("price·1"))
-        assert(isValid("line-total·1"))
-        assert("300" === getControlValue("line-total·1"))
+        assert(isValid("price⊙1"))
+        assert(isValid("line-total⊙1"))
+        assert("300" === getControlValue("line-total⊙1"))
         assert("2300" === getControlValue("subtotal"))
     }
 
     @Test def relevance() {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
-        val units = getControlValue("units·1")
+        val units = getControlValue("units⊙1")
 
         // Change first item units to foo
-        setControlValue("units·1", "foo")
+        setControlValue("units⊙1", "foo")
 
-        assert(!isValid("units·1"))
-        assert(!isRelevant("line-total·1"))
+        assert(!isValid("units⊙1"))
+        assert(!isRelevant("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
         // Change back item  units
-        setControlValue("units·1", units)
+        setControlValue("units⊙1", units)
 
-        assert(isValid("units·1"))
-        assert(isRelevant("line-total·1"))
-        assert(isValid("line-total·1"))
-        assert("150" === getControlValue("line-total·1"))
+        assert(isValid("units⊙1"))
+        assert(isRelevant("line-total⊙1"))
+        assert(isValid("line-total⊙1"))
+        assert("150" === getControlValue("line-total⊙1"))
         assert("2150" === getControlValue("subtotal"))
     }
 
     @Test def typeConstraintInvalid() {
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
 
-        val units = getControlValue("units·1")
+        val units = getControlValue("units⊙1")
 
         // Change first item units to a constraint-invalid value
-        setControlValue("units·1", "0")
+        setControlValue("units⊙1", "0")
 
-        assert(!isValid("units·1"))
-        assert(!isRelevant("line-total·1"))
+        assert(!isValid("units⊙1"))
+        assert(!isRelevant("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
         // Then change to type-invalid too
-        setControlValue("units·1", "foo")
+        setControlValue("units⊙1", "foo")
 
-        assert(!isValid("units·1"))
-        assert(!isRelevant("line-total·1"))
+        assert(!isValid("units⊙1"))
+        assert(!isRelevant("line-total⊙1"))
         assert("2000" === getControlValue("subtotal"))
 
         // Change back item  units
-        setControlValue("units·1", units)
+        setControlValue("units⊙1", units)
 
-        assert(isValid("units·1"))
-        assert(isRelevant("line-total·1"))
-        assert(isValid("line-total·1"))
-        assert("150" === getControlValue("line-total·1"))
+        assert(isValid("units⊙1"))
+        assert(isRelevant("line-total⊙1"))
+        assert(isValid("line-total⊙1"))
+        assert("150" === getControlValue("line-total⊙1"))
         assert("2150" === getControlValue("subtotal"))
     }
 
@@ -102,16 +102,16 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
         // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
 
-        assert(isRequired("name·1"))
-        assert(isValid("name·1"))
+        assert(isRequired("name⊙1"))
+        assert(isValid("name⊙1"))
 
-        setControlValue("name·1", "")
-        assert(isRequired("name·1"))
-        assert(!isValid("name·1"))
+        setControlValue("name⊙1", "")
+        assert(isRequired("name⊙1"))
+        assert(!isValid("name⊙1"))
 
-        setControlValue("name·1", "100")
-        assert(isRequired("name·1"))
-        assert(isValid("name·1"))
+        setControlValue("name⊙1", "100")
+        assert(isRequired("name⊙1"))
+        assert(isValid("name⊙1"))
     }
 
     @Test def testNormalizeSpaceContextConstraint() {
@@ -119,13 +119,13 @@ class MIPDependenciesTest extends DocumentTestBase with AssertionsForJUnit {
 
         // NOTE: The value of @required has no dependencies in this sample, so this is a weak test
 
-        assert(isValid("name·1"))
+        assert(isValid("name⊙1"))
 
-        setControlValue("name·1", "    ") // series of spaces
-        assert(!isValid("name·1"))
+        setControlValue("name⊙1", "    ") // series of spaces
+        assert(!isValid("name⊙1"))
 
-        setControlValue("name·1", "100")
-        assert(isValid("name·1"))
+        setControlValue("name⊙1", "100")
+        assert(isValid("name⊙1"))
     }
 
     // See: [ #315733 ] Incorrect MIPs when more than two binds point to the same node

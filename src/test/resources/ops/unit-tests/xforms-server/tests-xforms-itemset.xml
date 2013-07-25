@@ -1252,9 +1252,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-select·1">1</xxf:control>
-                        <xxf:itemset id="my-select·1">[{"label":"Apple","value":"1"}]</xxf:itemset>
-                        <xxf:control id="my-output·1">1</xxf:control>
+                        <xxf:control id="my-select⊙1">1</xxf:control>
+                        <xxf:itemset id="my-select⊙1">[{"label":"Apple","value":"1"}]</xxf:itemset>
+                        <xxf:control id="my-output⊙1">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

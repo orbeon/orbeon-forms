@@ -98,28 +98,28 @@
                     <dynamic-state>
                         <controls>
                         <control effective-id="id123" index="1"/>
-                            <control effective-id="id124·1" index="2"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124⊙1" index="2"/>
+                            <control effective-id="id124⊙2" index="1"/>
+                            <control effective-id="id124⊙3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                     <xxf:control-values>
-                        <xxf:control id="id125·1-1">f11</xxf:control>
-                        <xxf:control id="id126·1-1">l11</xxf:control>
-                        <xxf:control id="id125·1-2">f12</xxf:control>
-                        <xxf:control id="id126·1-2">l12</xxf:control>
-                        <xxf:control id="id125·2-1">f21</xxf:control>
-                        <xxf:control id="id126·2-1">l21</xxf:control>
-                        <xxf:control id="id125·3-1">f31</xxf:control>
-                        <xxf:control id="id126·3-1">l31</xxf:control>
-                        <xxf:control id="id125·3-2">f32</xxf:control>
-                        <xxf:control id="id126·3-2">l32</xxf:control>
-                        <xxf:control id="id125·3-3">f33</xxf:control>
-                        <xxf:control id="id126·3-3">l33</xxf:control>
-                        <xxf:control id="id125·3-4">f34</xxf:control>
-                        <xxf:control id="id126·3-4">l34</xxf:control>
+                        <xxf:control id="id125⊙1-1">f11</xxf:control>
+                        <xxf:control id="id126⊙1-1">l11</xxf:control>
+                        <xxf:control id="id125⊙1-2">f12</xxf:control>
+                        <xxf:control id="id126⊙1-2">l12</xxf:control>
+                        <xxf:control id="id125⊙2-1">f21</xxf:control>
+                        <xxf:control id="id126⊙2-1">l21</xxf:control>
+                        <xxf:control id="id125⊙3-1">f31</xxf:control>
+                        <xxf:control id="id126⊙3-1">l31</xxf:control>
+                        <xxf:control id="id125⊙3-2">f32</xxf:control>
+                        <xxf:control id="id126⊙3-2">l32</xxf:control>
+                        <xxf:control id="id125⊙3-3">f33</xxf:control>
+                        <xxf:control id="id126⊙3-3">l33</xxf:control>
+                        <xxf:control id="id125⊙3-4">f34</xxf:control>
+                        <xxf:control id="id126⊙3-4">l34</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -189,51 +189,51 @@
                         </instances>
                         <controls>
                             <control effective-id="id123" index="3"/>
-                            <control effective-id="id124·1" index="3"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
-                            <control effective-id="id124·4" index="2"/>
+                            <control effective-id="id124⊙1" index="3"/>
+                            <control effective-id="id124⊙2" index="1"/>
+                            <control effective-id="id124⊙3" index="2"/>
+                            <control effective-id="id124⊙4" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id127·1-1" label="Insert"/>
-                        <xxf:control id="id125·1-1">f11</xxf:control>
-                        <xxf:control id="id126·1-1">l11</xxf:control>
-                        <xxf:control id="id127·1-2" label="Insert"/>
-                        <xxf:control id="id125·1-2">f12</xxf:control>
-                        <xxf:control id="id126·1-2">l12</xxf:control>
-                        <xxf:control id="id127·1-3" label="Insert"/>
-                        <xxf:control id="id125·1-3">f12</xxf:control>
-                        <xxf:control id="id126·1-3">l12</xxf:control>
-                        <xxf:control id="id127·2-1" label="Insert"/>
-                        <xxf:control id="id125·2-1">f21</xxf:control>
-                        <xxf:control id="id126·2-1">l21</xxf:control>
-                        <xxf:control id="id127·3-1" label="Insert"/>
-                        <xxf:control id="id125·3-1">f31</xxf:control>
-                        <xxf:control id="id126·3-1">l31</xxf:control>
-                        <xxf:control id="id127·3-2" label="Insert"/>
-                        <xxf:control id="id125·3-2">f32</xxf:control>
-                        <xxf:control id="id126·3-2">l32</xxf:control>
-                        <xxf:control id="id127·3-3" label="Insert"/>
-                        <xxf:control id="id125·3-3">f33</xxf:control>
-                        <xxf:control id="id126·3-3">l33</xxf:control>
-                        <xxf:control id="id127·3-4" label="Insert"/>
-                        <xxf:control id="id125·3-4">f34</xxf:control>
-                        <xxf:control id="id126·3-4">l34</xxf:control>
-                        <xxf:control id="id127·4-1" label="Insert"/>
-                        <xxf:control id="id125·4-1">f31</xxf:control>
-                        <xxf:control id="id126·4-1">l31</xxf:control>
-                        <xxf:control id="id127·4-2" label="Insert"/>
-                        <xxf:control id="id125·4-2">f32</xxf:control>
-                        <xxf:control id="id126·4-2">l32</xxf:control>
-                        <xxf:control id="id127·4-3" label="Insert"/>
-                        <xxf:control id="id125·4-3">f33</xxf:control>
-                        <xxf:control id="id126·4-3">l33</xxf:control>
-                        <xxf:control id="id127·4-4" label="Insert"/>
-                        <xxf:control id="id125·4-4">f34</xxf:control>
-                        <xxf:control id="id126·4-4">l34</xxf:control>
+                        <xxf:control id="id127⊙1-1" label="Insert"/>
+                        <xxf:control id="id125⊙1-1">f11</xxf:control>
+                        <xxf:control id="id126⊙1-1">l11</xxf:control>
+                        <xxf:control id="id127⊙1-2" label="Insert"/>
+                        <xxf:control id="id125⊙1-2">f12</xxf:control>
+                        <xxf:control id="id126⊙1-2">l12</xxf:control>
+                        <xxf:control id="id127⊙1-3" label="Insert"/>
+                        <xxf:control id="id125⊙1-3">f12</xxf:control>
+                        <xxf:control id="id126⊙1-3">l12</xxf:control>
+                        <xxf:control id="id127⊙2-1" label="Insert"/>
+                        <xxf:control id="id125⊙2-1">f21</xxf:control>
+                        <xxf:control id="id126⊙2-1">l21</xxf:control>
+                        <xxf:control id="id127⊙3-1" label="Insert"/>
+                        <xxf:control id="id125⊙3-1">f31</xxf:control>
+                        <xxf:control id="id126⊙3-1">l31</xxf:control>
+                        <xxf:control id="id127⊙3-2" label="Insert"/>
+                        <xxf:control id="id125⊙3-2">f32</xxf:control>
+                        <xxf:control id="id126⊙3-2">l32</xxf:control>
+                        <xxf:control id="id127⊙3-3" label="Insert"/>
+                        <xxf:control id="id125⊙3-3">f33</xxf:control>
+                        <xxf:control id="id126⊙3-3">l33</xxf:control>
+                        <xxf:control id="id127⊙3-4" label="Insert"/>
+                        <xxf:control id="id125⊙3-4">f34</xxf:control>
+                        <xxf:control id="id126⊙3-4">l34</xxf:control>
+                        <xxf:control id="id127⊙4-1" label="Insert"/>
+                        <xxf:control id="id125⊙4-1">f31</xxf:control>
+                        <xxf:control id="id126⊙4-1">l31</xxf:control>
+                        <xxf:control id="id127⊙4-2" label="Insert"/>
+                        <xxf:control id="id125⊙4-2">f32</xxf:control>
+                        <xxf:control id="id126⊙4-2">l32</xxf:control>
+                        <xxf:control id="id127⊙4-3" label="Insert"/>
+                        <xxf:control id="id125⊙4-3">f33</xxf:control>
+                        <xxf:control id="id126⊙4-3">l33</xxf:control>
+                        <xxf:control id="id127⊙4-4" label="Insert"/>
+                        <xxf:control id="id125⊙4-4">f34</xxf:control>
+                        <xxf:control id="id126⊙4-4">l34</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -292,32 +292,32 @@
                         </instances>
                         <controls>
                             <control effective-id="id123" index="1"/>
-                            <control effective-id="id124·1" index="1"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124⊙1" index="1"/>
+                            <control effective-id="id124⊙2" index="1"/>
+                            <control effective-id="id124⊙3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id127·1-1" label="Delete"/>
-                        <xxf:control id="id125·1-1">f11</xxf:control>
-                        <xxf:control id="id126·1-1">l11</xxf:control>
-                        <xxf:control id="id127·2-1" label="Delete"/>
-                        <xxf:control id="id125·2-1">f21</xxf:control>
-                        <xxf:control id="id126·2-1">l21</xxf:control>
-                        <xxf:control id="id127·3-1" label="Delete"/>
-                        <xxf:control id="id125·3-1">f31</xxf:control>
-                        <xxf:control id="id126·3-1">l31</xxf:control>
-                        <xxf:control id="id127·3-2" label="Delete"/>
-                        <xxf:control id="id125·3-2">f32</xxf:control>
-                        <xxf:control id="id126·3-2">l32</xxf:control>
-                        <xxf:control id="id127·3-3" label="Delete"/>
-                        <xxf:control id="id125·3-3">f33</xxf:control>
-                        <xxf:control id="id126·3-3">l33</xxf:control>
-                        <xxf:control id="id127·3-4" label="Delete"/>
-                        <xxf:control id="id125·3-4">f34</xxf:control>
-                        <xxf:control id="id126·3-4">l34</xxf:control>
+                        <xxf:control id="id127⊙1-1" label="Delete"/>
+                        <xxf:control id="id125⊙1-1">f11</xxf:control>
+                        <xxf:control id="id126⊙1-1">l11</xxf:control>
+                        <xxf:control id="id127⊙2-1" label="Delete"/>
+                        <xxf:control id="id125⊙2-1">f21</xxf:control>
+                        <xxf:control id="id126⊙2-1">l21</xxf:control>
+                        <xxf:control id="id127⊙3-1" label="Delete"/>
+                        <xxf:control id="id125⊙3-1">f31</xxf:control>
+                        <xxf:control id="id126⊙3-1">l31</xxf:control>
+                        <xxf:control id="id127⊙3-2" label="Delete"/>
+                        <xxf:control id="id125⊙3-2">f32</xxf:control>
+                        <xxf:control id="id126⊙3-2">l32</xxf:control>
+                        <xxf:control id="id127⊙3-3" label="Delete"/>
+                        <xxf:control id="id125⊙3-3">f33</xxf:control>
+                        <xxf:control id="id126⊙3-3">l33</xxf:control>
+                        <xxf:control id="id127⊙3-4" label="Delete"/>
+                        <xxf:control id="id125⊙3-4">f34</xxf:control>
+                        <xxf:control id="id126⊙3-4">l34</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -363,9 +363,9 @@
                     <dynamic-state>
                         <controls>
                             <control effective-id="department-repeat" index="3"/>
-                            <control effective-id="employee-repeat·1" index="2"/>
-                            <control effective-id="employee-repeat·2" index="1"/>
-                            <control effective-id="employee-repeat·3" index="2"/>
+                            <control effective-id="employee-repeat⊙1" index="2"/>
+                            <control effective-id="employee-repeat⊙2" index="1"/>
+                            <control effective-id="employee-repeat⊙3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -425,9 +425,9 @@
                     <dynamic-state>
                         <controls>
                             <control effective-id="department-repeat" index="2"/>
-                            <control effective-id="employee-repeat·1" index="1"/>
-                            <control effective-id="employee-repeat·2" index="1"/>
-                            <control effective-id="employee-repeat·3" index="4"/>
+                            <control effective-id="employee-repeat⊙1" index="1"/>
+                            <control effective-id="employee-repeat⊙2" index="1"/>
+                            <control effective-id="employee-repeat⊙3" index="4"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -442,7 +442,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxf:action>
-                <xxf:event name="DOMActivate" source-control-id="id125·3-2"/>
+                <xxf:event name="DOMActivate" source-control-id="id125⊙3-2"/>
             </xxf:action>
         </input>
         <input name="controls">
@@ -489,9 +489,9 @@
                     <dynamic-state>
                         <controls>
                             <control effective-id="id123" index="3"/>
-                            <control effective-id="id124·1" index="1"/>
-                            <control effective-id="id124·2" index="1"/>
-                            <control effective-id="id124·3" index="2"/>
+                            <control effective-id="id124⊙1" index="1"/>
+                            <control effective-id="id124⊙2" index="1"/>
+                            <control effective-id="id124⊙3" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -586,9 +586,9 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="test-trigger" label="Add"/>
-                        <xxf:control id="first-name-input·1">Joe</xxf:control>
-                        <xxf:control id="first-name-input·2">Billy</xxf:control>
-                        <xxf:control id="first-name-input·3">Mary</xxf:control>
+                        <xxf:control id="first-name-input⊙1">Joe</xxf:control>
+                        <xxf:control id="first-name-input⊙2">Billy</xxf:control>
+                        <xxf:control id="first-name-input⊙3">Mary</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -659,10 +659,10 @@
         <output name="response">
             <controls>
                 <control effective-id="repeat1" index="2"/>
-                <control effective-id="repeat2·2" index="2"/>
+                <control effective-id="repeat2⊙2" index="2"/>
                 <control effective-id="repeat3" index="1"/>
                 <control effective-id="repeat4" index="1"/>
-                <control effective-id="repeat5·2" index="1"/>
+                <control effective-id="repeat5⊙2" index="1"/>
             </controls>
         </output>
     </test>
@@ -729,12 +729,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="title-control·1" label="Title" required="true">Don Quixote de la Mancha</xxf:control>
-                        <xxf:control id="author-control·1" label="Author" required="true">Miguel de Cervantes Saavedra</xxf:control>
-                        <xxf:control id="title-control·2" label="Title" required="true">Jacques le fataliste et son maître</xxf:control>
-                        <xxf:control id="author-control·2" label="Author" required="true">Denis Diderot</xxf:control>
-                        <xxf:control id="title-control·3" label="Title" required="true">Childhood's End</xxf:control>
-                        <xxf:control id="author-control·3" label="Author" required="true">Arthur C. Clarke</xxf:control>
+                        <xxf:control id="title-control⊙1" label="Title" required="true">Don Quixote de la Mancha</xxf:control>
+                        <xxf:control id="author-control⊙1" label="Author" required="true">Miguel de Cervantes Saavedra</xxf:control>
+                        <xxf:control id="title-control⊙2" label="Title" required="true">Jacques le fataliste et son maître</xxf:control>
+                        <xxf:control id="author-control⊙2" label="Author" required="true">Denis Diderot</xxf:control>
+                        <xxf:control id="title-control⊙3" label="Title" required="true">Childhood's End</xxf:control>
+                        <xxf:control id="author-control⊙3" label="Author" required="true">Arthur C. Clarke</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -789,12 +789,12 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1" label="City: " readonly="true">San Francisco</xxf:control>
-                        <xxf:control id="my-output·1" label="Position: ">1</xxf:control>
-                        <xxf:control id="my-input·2" label="City: " readonly="true">Los Angeles</xxf:control>
-                        <xxf:control id="my-output·2" label="Position: ">2</xxf:control>
-                        <xxf:control id="my-input·3" label="City: " readonly="true">San Diego</xxf:control>
-                        <xxf:control id="my-output·3" label="Position: ">3</xxf:control>
+                        <xxf:control id="my-input⊙1" label="City: " readonly="true">San Francisco</xxf:control>
+                        <xxf:control id="my-output⊙1" label="Position: ">1</xxf:control>
+                        <xxf:control id="my-input⊙2" label="City: " readonly="true">Los Angeles</xxf:control>
+                        <xxf:control id="my-output⊙2" label="Position: ">2</xxf:control>
+                        <xxf:control id="my-input⊙3" label="City: " readonly="true">San Diego</xxf:control>
+                        <xxf:control id="my-output⊙3" label="Position: ">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -880,9 +880,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1">bloody</xxf:control>
-                        <xxf:control id="my-input·2">yellow</xxf:control>
-                        <xxf:control id="my-input·3">green</xxf:control>
+                        <xxf:control id="my-input⊙1">bloody</xxf:control>
+                        <xxf:control id="my-input⊙2">yellow</xxf:control>
+                        <xxf:control id="my-input⊙3">green</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -893,7 +893,7 @@
         <input name="config" href="wrap-server.xpl"/>
         <input name="action">
             <xxf:action>
-                <xxf:event name="xxforms-value" source-control-id="approvalStatus-input·2">bbb</xxf:event>
+                <xxf:event name="xxforms-value" source-control-id="approvalStatus-input⊙2">bbb</xxf:event>
             </xxf:action>
         </input>
         <input name="controls">
@@ -992,17 +992,17 @@
                         </instances>
                         <controls>
                             <control effective-id="authorization-repeat" index="2"/>
-                            <control effective-id="condition-repeat·1" index="1"/>
-                            <control effective-id="condition-repeat·2" index="1"/>
+                            <control effective-id="condition-repeat⊙1" index="1"/>
+                            <control effective-id="condition-repeat⊙2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="approvalStatus-input·2">bbb</xxf:control>
+                        <xxf:control id="approvalStatus-input⊙2">bbb</xxf:control>
                         <xxf:copy-repeat-template id="condition-repeat" parent-indexes="2" start-suffix="1" end-suffix="2"/>
-                        <xxf:control id="description-textarea·2-1" label="Condition:"/>
-                        <xxf:control id="description-textarea·2-2" label="Condition:"/>
+                        <xxf:control id="description-textarea⊙2-1" label="Condition:"/>
+                        <xxf:control id="description-textarea⊙2-2" label="Condition:"/>
                     </xxf:control-values>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="authorization-repeat" new-index="2"/>
@@ -1068,8 +1068,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="orange-repeat-output·1" label="Orange type:">Persian</xxf:control>
-                        <xxf:control id="orange-repeat-output·2" label="Orange type:">Navel</xxf:control>
+                        <xxf:control id="orange-repeat-output⊙1" label="Orange type:">Persian</xxf:control>
+                        <xxf:control id="orange-repeat-output⊙2" label="Orange type:">Navel</xxf:control>
                         <xxf:control id="detail-type" label="Orange type:">Persian</xxf:control>
                         <xxf:control id="detail-id" label="Orange id:">1</xxf:control>
                     </xxf:control-values>
@@ -1144,8 +1144,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-title·1">T3</xxf:control>
-                        <xxf:control id="my-author·1">A3</xxf:control>
+                        <xxf:control id="my-title⊙1">T3</xxf:control>
+                        <xxf:control id="my-author⊙1">A3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1224,10 +1224,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1">1</xxf:control>
-                        <xxf:control id="my-input·2">2</xxf:control>
-                        <xxf:control id="my-input·3">3</xxf:control>
-                        <xxf:control id="my-input·4">4</xxf:control>
+                        <xxf:control id="my-input⊙1">1</xxf:control>
+                        <xxf:control id="my-input⊙2">2</xxf:control>
+                        <xxf:control id="my-input⊙3">3</xxf:control>
+                        <xxf:control id="my-input⊙4">4</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1315,7 +1315,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output·1">1</xxf:control>
+                        <xxf:control id="my-output⊙1">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1502,7 +1502,7 @@
                         </instances>
                         <controls>
                             <control effective-id="my-outer-repeat" index="1"/>
-                            <control effective-id="my-inner-repeat·1" index="2"/>
+                            <control effective-id="my-inner-repeat⊙1" index="2"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1693,9 +1693,9 @@
                         </instances>
                         <controls>
                             <control effective-id="my-outer-repeat" index="3"/>
-                            <control effective-id="my-inner-repeat·1" index="2"/>
-                            <control effective-id="my-inner-repeat·2" index="2"/>
-                            <control effective-id="my-inner-repeat·3" index="1"/>
+                            <control effective-id="my-inner-repeat⊙1" index="2"/>
+                            <control effective-id="my-inner-repeat⊙2" index="2"/>
+                            <control effective-id="my-inner-repeat⊙3" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1781,41 +1781,41 @@
                         </instances>
                         <controls>
                             <control effective-id="department-repeat" index="1"/>
-                            <control effective-id="employee-repeat·1" index="1"/>
-                            <control effective-id="employee-repeat·2" index="1"/>
-                            <control effective-id="employee-repeat·3" index="1"/>
+                            <control effective-id="employee-repeat⊙1" index="1"/>
+                            <control effective-id="employee-repeat⊙2" index="1"/>
+                            <control effective-id="employee-repeat⊙3" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="department-output-1·1">3</xxf:control>
-                        <xxf:control id="department-output-2·1">3</xxf:control>
-                        <xxf:control id="employee-output-1·1-1">2</xxf:control>
-                        <xxf:control id="employee-output-2·1-1">2</xxf:control>
-                        <xxf:control id="department-output-3·1-1">3</xxf:control>
-                        <xxf:control id="employee-output-1·1-2">2</xxf:control>
-                        <xxf:control id="employee-output-2·1-2">2</xxf:control>
-                        <xxf:control id="department-output-3·1-2">3</xxf:control>
-                        <xxf:control id="department-output-1·2">3</xxf:control>
-                        <xxf:control id="department-output-2·2">3</xxf:control>
-                        <xxf:control id="employee-output-1·2-1">1</xxf:control>
-                        <xxf:control id="employee-output-2·2-1">1</xxf:control>
-                        <xxf:control id="department-output-3·2-1">3</xxf:control>
-                        <xxf:control id="department-output-1·3">3</xxf:control>
-                        <xxf:control id="department-output-2·3">3</xxf:control>
-                        <xxf:control id="employee-output-1·3-1">4</xxf:control>
-                        <xxf:control id="employee-output-2·3-1">4</xxf:control>
-                        <xxf:control id="department-output-3·3-1">3</xxf:control>
-                        <xxf:control id="employee-output-1·3-2">4</xxf:control>
-                        <xxf:control id="employee-output-2·3-2">4</xxf:control>
-                        <xxf:control id="department-output-3·3-2">3</xxf:control>
-                        <xxf:control id="employee-output-1·3-3">4</xxf:control>
-                        <xxf:control id="employee-output-2·3-3">4</xxf:control>
-                        <xxf:control id="department-output-3·3-3">3</xxf:control>
-                        <xxf:control id="employee-output-1·3-4">4</xxf:control>
-                        <xxf:control id="employee-output-2·3-4">4</xxf:control>
-                        <xxf:control id="department-output-3·3-4">3</xxf:control>
+                        <xxf:control id="department-output-1⊙1">3</xxf:control>
+                        <xxf:control id="department-output-2⊙1">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙1-1">2</xxf:control>
+                        <xxf:control id="employee-output-2⊙1-1">2</xxf:control>
+                        <xxf:control id="department-output-3⊙1-1">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙1-2">2</xxf:control>
+                        <xxf:control id="employee-output-2⊙1-2">2</xxf:control>
+                        <xxf:control id="department-output-3⊙1-2">3</xxf:control>
+                        <xxf:control id="department-output-1⊙2">3</xxf:control>
+                        <xxf:control id="department-output-2⊙2">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙2-1">1</xxf:control>
+                        <xxf:control id="employee-output-2⊙2-1">1</xxf:control>
+                        <xxf:control id="department-output-3⊙2-1">3</xxf:control>
+                        <xxf:control id="department-output-1⊙3">3</xxf:control>
+                        <xxf:control id="department-output-2⊙3">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙3-1">4</xxf:control>
+                        <xxf:control id="employee-output-2⊙3-1">4</xxf:control>
+                        <xxf:control id="department-output-3⊙3-1">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙3-2">4</xxf:control>
+                        <xxf:control id="employee-output-2⊙3-2">4</xxf:control>
+                        <xxf:control id="department-output-3⊙3-2">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙3-3">4</xxf:control>
+                        <xxf:control id="employee-output-2⊙3-3">4</xxf:control>
+                        <xxf:control id="department-output-3⊙3-3">3</xxf:control>
+                        <xxf:control id="employee-output-1⊙3-4">4</xxf:control>
+                        <xxf:control id="employee-output-2⊙3-4">4</xxf:control>
+                        <xxf:control id="department-output-3⊙3-4">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -1906,41 +1906,41 @@
                         </instances>
                         <controls>
                             <control effective-id="department-repeat" index="3"/>
-                            <control effective-id="employee-repeat·1" index="2"/>
-                            <control effective-id="employee-repeat·2" index="1"/>
-                            <control effective-id="employee-repeat·3" index="3"/>
+                            <control effective-id="employee-repeat⊙1" index="2"/>
+                            <control effective-id="employee-repeat⊙2" index="1"/>
+                            <control effective-id="employee-repeat⊙3" index="3"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="department-output-1·1">3</xxf:control>
-                        <xxf:control id="department-output-2·1">3</xxf:control>
-                            <xxf:control id="employee-output-1·1-1">2</xxf:control>
-                            <xxf:control id="employee-output-2·1-1">2</xxf:control>
-                        <xxf:control id="department-output-3·1-1">3</xxf:control>
-                            <xxf:control id="employee-output-1·1-2">2</xxf:control>
-                            <xxf:control id="employee-output-2·1-2">2</xxf:control>
-                        <xxf:control id="department-output-3·1-2">3</xxf:control>
-                        <xxf:control id="department-output-1·2">3</xxf:control>
-                        <xxf:control id="department-output-2·2">3</xxf:control>
-                            <xxf:control id="employee-output-1·2-1">1</xxf:control>
-                            <xxf:control id="employee-output-2·2-1">1</xxf:control>
-                        <xxf:control id="department-output-3·2-1">3</xxf:control>
-                        <xxf:control id="department-output-1·3">3</xxf:control>
-                        <xxf:control id="department-output-2·3">3</xxf:control>
-                            <xxf:control id="employee-output-1·3-1">3</xxf:control>
-                            <xxf:control id="employee-output-2·3-1">3</xxf:control>
-                        <xxf:control id="department-output-3·3-1">3</xxf:control>
-                            <xxf:control id="employee-output-1·3-2">3</xxf:control>
-                            <xxf:control id="employee-output-2·3-2">3</xxf:control>
-                        <xxf:control id="department-output-3·3-2">3</xxf:control>
-                            <xxf:control id="employee-output-1·3-3">3</xxf:control>
-                            <xxf:control id="employee-output-2·3-3">3</xxf:control>
-                        <xxf:control id="department-output-3·3-3">3</xxf:control>
-                            <xxf:control id="employee-output-1·3-4">3</xxf:control>
-                            <xxf:control id="employee-output-2·3-4">3</xxf:control>
-                        <xxf:control id="department-output-3·3-4">3</xxf:control>
+                        <xxf:control id="department-output-1⊙1">3</xxf:control>
+                        <xxf:control id="department-output-2⊙1">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙1-1">2</xxf:control>
+                            <xxf:control id="employee-output-2⊙1-1">2</xxf:control>
+                        <xxf:control id="department-output-3⊙1-1">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙1-2">2</xxf:control>
+                            <xxf:control id="employee-output-2⊙1-2">2</xxf:control>
+                        <xxf:control id="department-output-3⊙1-2">3</xxf:control>
+                        <xxf:control id="department-output-1⊙2">3</xxf:control>
+                        <xxf:control id="department-output-2⊙2">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙2-1">1</xxf:control>
+                            <xxf:control id="employee-output-2⊙2-1">1</xxf:control>
+                        <xxf:control id="department-output-3⊙2-1">3</xxf:control>
+                        <xxf:control id="department-output-1⊙3">3</xxf:control>
+                        <xxf:control id="department-output-2⊙3">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙3-1">3</xxf:control>
+                            <xxf:control id="employee-output-2⊙3-1">3</xxf:control>
+                        <xxf:control id="department-output-3⊙3-1">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙3-2">3</xxf:control>
+                            <xxf:control id="employee-output-2⊙3-2">3</xxf:control>
+                        <xxf:control id="department-output-3⊙3-2">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙3-3">3</xxf:control>
+                            <xxf:control id="employee-output-2⊙3-3">3</xxf:control>
+                        <xxf:control id="department-output-3⊙3-3">3</xxf:control>
+                            <xxf:control id="employee-output-1⊙3-4">3</xxf:control>
+                            <xxf:control id="employee-output-2⊙3-4">3</xxf:control>
+                        <xxf:control id="department-output-3⊙3-4">3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2004,11 +2004,11 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="position-output·1">1</xxf:control>
-                        <xxf:control id="index-output-1·1">1</xxf:control>
-                        <xxf:control id="input·1">New item</xxf:control>
-                        <xxf:control id="output-group·1" relevant="false"/>
-                        <xxf:control id="output·1" relevant="false"/>
+                        <xxf:control id="position-output⊙1">1</xxf:control>
+                        <xxf:control id="index-output-1⊙1">1</xxf:control>
+                        <xxf:control id="input⊙1">New item</xxf:control>
+                        <xxf:control id="output-group⊙1" relevant="false"/>
+                        <xxf:control id="output⊙1" relevant="false"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2074,8 +2074,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output·1">000000000001</xxf:control>
-                        <xxf:control id="my-output·2">000000000000</xxf:control>
+                        <xxf:control id="my-output⊙1">000000000001</xxf:control>
+                        <xxf:control id="my-output⊙2">000000000000</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2296,10 +2296,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-position·1">1</xxf:control>
-                        <xxf:control id="my-value·1" readonly="true">2</xxf:control>
-                        <xxf:control id="my-position·2">2</xxf:control>
-                        <xxf:control id="my-value·2" readonly="true">1</xxf:control>
+                        <xxf:control id="my-position⊙1">1</xxf:control>
+                        <xxf:control id="my-value⊙1" readonly="true">2</xxf:control>
+                        <xxf:control id="my-position⊙2">2</xxf:control>
+                        <xxf:control id="my-value⊙2" readonly="true">1</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2381,8 +2381,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-input·1">1</xxf:control>
-                        <xxf:control id="my-input·2">2</xxf:control>
+                        <xxf:control id="my-input⊙1">1</xxf:control>
+                        <xxf:control id="my-input⊙2">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2470,10 +2470,10 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-name·1">WA</xxf:control>
-                        <xxf:control id="my-value·1">111</xxf:control>
-                        <xxf:control id="my-name·2">CA</xxf:control>
-                        <xxf:control id="my-value·2">222</xxf:control>
+                        <xxf:control id="my-name⊙1">WA</xxf:control>
+                        <xxf:control id="my-value⊙1">111</xxf:control>
+                        <xxf:control id="my-name⊙2">CA</xxf:control>
+                        <xxf:control id="my-value⊙2">222</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2527,18 +2527,18 @@
                     <dynamic-state>
                         <controls>
                             <control effective-id="repeat-department" index="2"/>
-                            <control effective-id="repeat-employee·1" index="2"/>
-                            <control effective-id="repeat-employee·2" index="3"/>
+                            <control effective-id="repeat-employee⊙1" index="2"/>
+                            <control effective-id="repeat-employee⊙2" index="3"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output·1-1">1 1 2 2</xxf:control>
-                        <xxf:control id="my-output·1-2">1 2 2 2</xxf:control>
-                        <xxf:control id="my-output·2-1">2 1 2 3</xxf:control>
-                        <xxf:control id="my-output·2-2">2 2 2 3</xxf:control>
-                        <xxf:control id="my-output·2-3">2 3 2 3</xxf:control>
+                        <xxf:control id="my-output⊙1-1">1 1 2 2</xxf:control>
+                        <xxf:control id="my-output⊙1-2">1 2 2 2</xxf:control>
+                        <xxf:control id="my-output⊙2-1">2 1 2 3</xxf:control>
+                        <xxf:control id="my-output⊙2-2">2 2 2 3</xxf:control>
+                        <xxf:control id="my-output⊙2-3">2 3 2 3</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2847,8 +2847,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-output·1">1</xxf:control>
-                        <xxf:control id="my-output·2">2</xxf:control>
+                        <xxf:control id="my-output⊙1">1</xxf:control>
+                        <xxf:control id="my-output⊙2">2</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -2923,20 +2923,20 @@
                         <instances>
                             <instance id="events" model-id="model">
                                 <events>
-                                    <event observer="|my-bar-1∘my-department-repeat|" type="my-event" target="|my-bar-1∘my-department-repeat|"/>
-                                    <event observer="|my-bar-1∘my-department-repeat|" type="xforms-enabled" target="|my-bar-1∘my-department-repeat|"/>
+                                    <event observer="|my-bar-1≡my-department-repeat|" type="my-event" target="|my-bar-1≡my-department-repeat|"/>
+                                    <event observer="|my-bar-1≡my-department-repeat|" type="xforms-enabled" target="|my-bar-1≡my-department-repeat|"/>
                                 </events>
                             </instance>
                         </instances>
                         <controls>
-                            <control effective-id="my-bar-1∘my-department-repeat" index="1"/>
+                            <control effective-id="my-bar-1≡my-department-repeat" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-bar-1∘my-output·1">42</xxf:control>
-                        <xxf:control id="my-bar-1∘my-output·2">42</xxf:control>
+                        <xxf:control id="my-bar-1≡my-output⊙1">42</xxf:control>
+                        <xxf:control id="my-bar-1≡my-output⊙2">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

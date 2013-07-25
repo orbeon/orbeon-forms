@@ -482,8 +482,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-trigger·1" label="Do Stuff"/>
-                        <xxf:control id="my-trigger·2" label="Do Stuff" readonly="true"/>
+                        <xxf:control id="my-trigger⊙1" label="Do Stuff"/>
+                        <xxf:control id="my-trigger⊙2" label="Do Stuff" readonly="true"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>
@@ -588,20 +588,20 @@
                         </instances>
                         <controls>
                             <control effective-id="xf-4" index="3"/>
-                            <control effective-id="dialog-1·1" visible="true" constrain="true"/>
-                            <control effective-id="dialog-1·2" visible="false"/>
-                            <control effective-id="dialog-1·3" visible="false"/>
+                            <control effective-id="dialog-1⊙1" visible="true" constrain="true"/>
+                            <control effective-id="dialog-1⊙2" visible="false"/>
+                            <control effective-id="dialog-1⊙3" visible="false"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="dialog-1·1" label="Banana"/>
-                        <xxf:div id="dialog-1·1" visibility="visible" constrain="true"/>
-                        <xxf:control id="dialog-1·2" label="Strawberry"/>
-                        <xxf:div id="dialog-1·2" visibility="hidden"/>
-                        <xxf:control id="dialog-1·3" label="Vanilla"/>
-                        <xxf:div id="dialog-1·3" visibility="hidden"/>
+                        <xxf:control id="dialog-1⊙1" label="Banana"/>
+                        <xxf:div id="dialog-1⊙1" visibility="visible" constrain="true"/>
+                        <xxf:control id="dialog-1⊙2" label="Strawberry"/>
+                        <xxf:div id="dialog-1⊙2" visibility="hidden"/>
+                        <xxf:control id="dialog-1⊙3" label="Vanilla"/>
+                        <xxf:div id="dialog-1⊙3" visibility="hidden"/>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

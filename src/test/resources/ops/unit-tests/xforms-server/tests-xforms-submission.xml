@@ -117,10 +117,10 @@
                         </instances>
                         <controls>
                             <control effective-id="repeat1" index="2"/>
-                            <control effective-id="repeat2·2" index="1"/>
+                            <control effective-id="repeat2⊙2" index="1"/>
                             <control effective-id="repeat4" index="1"/>
-                            <control effective-id="repeat5·1" index="1"/>
-                            <control effective-id="repeat5·2" index="1"/>
+                            <control effective-id="repeat5⊙1" index="1"/>
+                            <control effective-id="repeat5⊙2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>

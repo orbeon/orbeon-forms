@@ -22,8 +22,8 @@ class XFormsUtilsTest extends DocumentTestBase with AssertionsForJUnit {
     @Test def effectiveAndAbsolute(): Unit = {
         val pairs = Map(
             "foo"             → "|foo|",
-            "foo$bar"         → "|foo$bar|",
-            "foo$bar$baz·1·2" → "|foo$bar$baz·1·2|"
+            "foo≡bar"         → "|foo≡bar|",
+            "foo≡bar≡baz⊙1-2" → "|foo≡bar≡baz⊙1-2|"
         )
 
         for ((effective, absolute) ← pairs) {
@@ -38,6 +38,6 @@ class XFormsUtilsTest extends DocumentTestBase with AssertionsForJUnit {
         assert(! isAbsoluteId("||"))
         assert(! isAbsoluteId("|"))
         assert(! isAbsoluteId(""))
-        assert(! isAbsoluteId("$$"))
+        assert(! isAbsoluteId("≡≡"))
     }
 }

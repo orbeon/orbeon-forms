@@ -106,7 +106,7 @@ object Controls {
             if (idSuffix.isEmpty)
                 staticElement.prefixedId
             else
-                staticElement.prefixedId + REPEAT_HIERARCHY_SEPARATOR_1 + (idSuffix mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING)
+                staticElement.prefixedId + REPEAT_SEPARATOR + (idSuffix mkString REPEAT_INDEX_SEPARATOR_STRING)
 
         // Instantiate the control
         // TODO LATER: controls must take ElementAnalysis, not Element
@@ -189,9 +189,9 @@ object Controls {
 
         def appendIterationToSuffix(iteration: Int) {
             if (targetIndexBuilder.isEmpty)
-                targetIndexBuilder.append(REPEAT_HIERARCHY_SEPARATOR_1)
+                targetIndexBuilder.append(REPEAT_SEPARATOR)
             else if (targetIndexBuilder.length != 1)
-                targetIndexBuilder.append(REPEAT_HIERARCHY_SEPARATOR_2)
+                targetIndexBuilder.append(REPEAT_INDEX_SEPARATOR)
 
             targetIndexBuilder.append(iteration.toString)
         }

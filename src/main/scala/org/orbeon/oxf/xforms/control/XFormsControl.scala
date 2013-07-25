@@ -112,7 +112,7 @@ class XFormsControl(
         if (staticControl.isWithinRepeat) {
             val parentEffectiveId = parent.getEffectiveId
             val parentSuffix = XFormsUtils.getEffectiveIdSuffix(parentEffectiveId)
-            effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + parentSuffix
+            effectiveId = XFormsUtils.getPrefixedId(effectiveId) + XFormsConstants.REPEAT_SEPARATOR + parentSuffix
             if (_childrenActions.nonEmpty)
                 for (actionControl ← _childrenActions)
                     actionControl.updateEffectiveId()

@@ -103,8 +103,8 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
             case "dateTime" if isNoscript ⇒
                 // Split into date and time parts
                 // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
-                val datePart = getDateTimeDatePart(externalValue.trim, REPEAT_HIERARCHY_SEPARATOR_1)
-                val timePart = getDateTimeTimePart(externalValue.trim, REPEAT_HIERARCHY_SEPARATOR_1)
+                val datePart = getDateTimeDatePart(externalValue.trim, REPEAT_SEPARATOR)
+                val timePart = getDateTimeTimePart(externalValue.trim, REPEAT_SEPARATOR)
                 if (datePart.nonEmpty || timePart.nonEmpty)
                     // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
                     parse(DateParsePatterns, datePart) + 'T' + parse(TimeParsePatterns, timePart)

@@ -153,7 +153,7 @@
                 ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
                     YAHOO.util.UserAction.click(YAHOO.util.Dom.get("repeat-show-hide"));
                 }, function() {
-                    var repeatInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "in-repeat" + XFORMS_SEPARATOR_1 + "1")[0];
+                    var repeatInput = YAHOO.util.Dom.getElementsByClassName("xbl-fr-number-visible-input", null, "in-repeat" + XF_REPEAT_SEPARATOR + "1")[0];
                     YAHOO.util.Assert.areEqual("$ 42.00", repeatInput.value);
                 });
             });

@@ -16,7 +16,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     name: "Controls in repeat (also tests setvalue/getvalue)",
 
     repeatRebuildWorker: function(controlId) {
-        var fullId = controlId + XFORMS_SEPARATOR_1 + "1";
+        var fullId = controlId + XF_REPEAT_SEPARATOR + "1";
         YAHOO.util.Assert.areEqual("true", ORBEON.xforms.Document.getValue(fullId));
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             ORBEON.xforms.Document.setValue("repeat-shown", "false");
@@ -64,8 +64,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
         var elements = this.getFormControls();
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
-            if (element.id != "disabled-input" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1"
-                    && element.id != "readonly-input" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1")
+            if (element.id != "disabled-input" + XF_COMPONENT_SEPARATOR + "xforms-input-1" + XF_REPEAT_SEPARATOR + "1"
+                    && element.id != "readonly-input" + XF_COMPONENT_SEPARATOR + "xforms-input-1" + XF_REPEAT_SEPARATOR + "1")
                 YAHOO.util.Assert.areEqual(disabled, element.disabled, "element " + element.id + " supposed to have disabled = " + disabled);
         }
     },
@@ -84,7 +84,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     },
 
     testReadonlyBecomingRelevant: function() {
-        var inputContainer = YAHOO.util.Dom.get("readonly-input" + XFORMS_SEPARATOR_1 + "1");
+        var inputContainer = YAHOO.util.Dom.get("readonly-input" + XF_REPEAT_SEPARATOR + "1");
         var inputField = ORBEON.util.Dom.getElementByTagName(inputContainer, "input");
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             YAHOO.util.Assert.isTrue(inputField.disabled, "input field initially disabled because bound to a readonly node");
@@ -111,11 +111,11 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     testAddToItemset: function() {
         // Get initial value for flavor
-        var flavorSelect1 = YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
+        var flavorSelect1 = YAHOO.util.Dom.get("flavor-select1-full" + XF_REPEAT_SEPARATOR + "1");
         var initialFlavorValue = ORBEON.xforms.Controls.getCurrentValue(flavorSelect1);
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
             // Click on text field
-            var addTrigger = YAHOO.util.Dom.get("add-flavor" + XFORMS_SEPARATOR_1 + "1");
+            var addTrigger = YAHOO.util.Dom.get("add-flavor" + XF_REPEAT_SEPARATOR + "1");
             YAHOO.util.UserAction.click(addTrigger);
         }, function() {
             // Check that the values didn't change
@@ -126,52 +126,52 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     testUpdateRadio: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on Set to strawberry button
-             var setToStrawBerryTrigger = YAHOO.util.Dom.get("set-to-strawberry" + XFORMS_SEPARATOR_1 + "1");
+             var setToStrawBerryTrigger = YAHOO.util.Dom.get("set-to-strawberry" + XF_REPEAT_SEPARATOR + "1");
              YAHOO.util.UserAction.click(setToStrawBerryTrigger);
          }, function() {
              // Check all the select/select1 changed
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e1" + XFORMS_SEPARATOR_1 + "1").checked, "radio is checked");
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e1" + XFORMS_SEPARATOR_1 + "1").checked, "checkbox is checked");
-             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select1-compact" + XFORMS_SEPARATOR_1 + "1").options[1].selected, "list single is selected");
-             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XFORMS_SEPARATOR_1 + "1").options[1].selected, "list multiple is selected");
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full" + XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR + "e1" + XF_REPEAT_SEPARATOR + "1").checked, "radio is checked");
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select-full" + XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR + "e1" + XF_REPEAT_SEPARATOR + "1").checked, "checkbox is checked");
+             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select1-compact" + XF_REPEAT_SEPARATOR + "1").options[1].selected, "list single is selected");
+             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XF_REPEAT_SEPARATOR + "1").options[1].selected, "list multiple is selected");
         });
     },
 
     testUpdateList: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Set value in list to vanilla
-             var select1Id = "flavor-select1-compact" + XFORMS_SEPARATOR_1 + "1";
+             var select1Id = "flavor-select1-compact" + XF_REPEAT_SEPARATOR + "1";
              var select1Control = YAHOO.util.Dom.get(select1Id);
              var select1List = this.getSelect(select1Id);
              ORBEON.xforms.Controls.setCurrentValue(select1Control, select1List.options[3].value);
              ORBEON.xforms.Events.change({target: select1Control});
          }, function() {
              // Check vanilla radio is checked
-             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e3" + XFORMS_SEPARATOR_1 + "1").checked, "radio checked");
+             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("flavor-select1-full" + XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR + "e3" + XF_REPEAT_SEPARATOR + "1").checked, "radio checked");
         });
     },
 
     testUpdateCheckbox: function() {
          ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
              // Click on key lime checkbox (in addition to already selected strawberry)
-             var dhlCheckbox = YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3 + "e2" + XFORMS_SEPARATOR_1 + "1");
+             var dhlCheckbox = YAHOO.util.Dom.get("flavor-select-full" + XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR + "e2" + XF_REPEAT_SEPARATOR + "1");
              dhlCheckbox.click();
          }, function() {
              // Check strawberry and key lime are selected in the list
-             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XFORMS_SEPARATOR_1 + "1").options[1].selected, "strawberry is selected");
-             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XFORMS_SEPARATOR_1 + "1").options[2].selected, "key lime is selected");
+             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XF_REPEAT_SEPARATOR + "1").options[1].selected, "strawberry is selected");
+             YAHOO.util.Assert.isTrue(this.getSelect("flavor-select-compact" + XF_REPEAT_SEPARATOR + "1").options[2].selected, "key lime is selected");
         });
     },
 
     testOutOfRange: function() {
-        function valueOfRadio() { return ORBEON.xforms.Document.getValue("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1") }
+        function valueOfRadio() { return ORBEON.xforms.Document.getValue("flavor-select1-full" + XF_REPEAT_SEPARATOR + "1") }
 
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-           YAHOO.util.UserAction.click("set-out-of-range" + XFORMS_SEPARATOR_1 + "1");
+           YAHOO.util.UserAction.click("set-out-of-range" + XF_REPEAT_SEPARATOR + "1");
         }, function() {
             YAHOO.util.Assert.areEqual("", valueOfRadio(), "value is empty string after setting value to out of range");
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-               YAHOO.util.UserAction.click("set-to-strawberry" + XFORMS_SEPARATOR_1 + "1");
+               YAHOO.util.UserAction.click("set-to-strawberry" + XF_REPEAT_SEPARATOR + "1");
             }, function() {
                 YAHOO.util.Assert.areEqual("s", valueOfRadio(), "apple radio is selected after putting an 'x' in the node");
             });
@@ -180,24 +180,24 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     testClasses: function() {
         function checkColors(firstColor, secondColor) {
-            var radioContainer = YAHOO.util.Dom.get("flavor-select1-full" + XFORMS_SEPARATOR_1 + "1");
+            var radioContainer = YAHOO.util.Dom.get("flavor-select1-full" + XF_REPEAT_SEPARATOR + "1");
             radioContainer = YAHOO.util.Dom.getFirstChild(radioContainer);
             var radios = YAHOO.util.Dom.getChildren(radioContainer);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(radios[0], firstColor), "radio has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(radios[1], secondColor), "radio has " + secondColor + " class");
-            var checkboxContainer = YAHOO.util.Dom.get("flavor-select-full" + XFORMS_SEPARATOR_1 + "1");
+            var checkboxContainer = YAHOO.util.Dom.get("flavor-select-full" + XF_REPEAT_SEPARATOR + "1");
             checkboxContainer = YAHOO.util.Dom.getFirstChild(checkboxContainer);
             var checkboxes = YAHOO.util.Dom.getChildren(checkboxContainer);
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(checkboxes[0], firstColor), "check box has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(checkboxes[1], secondColor), "check box has " + secondColor + " class");
-            var select1Options = YAHOO.util.Dom.get("flavor-select1-compact" + XFORMS_SEPARATOR_1 + "1").getElementsByTagName("option");
+            var select1Options = YAHOO.util.Dom.get("flavor-select1-compact" + XF_REPEAT_SEPARATOR + "1").getElementsByTagName("option");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(select1Options[0], firstColor), "list for select1 has " + firstColor + " class");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(select1Options[1], secondColor), "list for select1 has " + secondColor + " class");
         }
 
         checkColors("orange", "red");
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-           YAHOO.util.UserAction.click("change-colors" + XFORMS_SEPARATOR_1 + "1");
+           YAHOO.util.UserAction.click("change-colors" + XF_REPEAT_SEPARATOR + "1");
         }, function() {
             checkColors("yellow", "brown");
         });
@@ -208,8 +208,8 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xf:input type xs:date",
 
-    dateValueControlId: "date" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    dateValueControlId: "date" + XF_REPEAT_SEPARATOR + "1",
+    dateValueInputId: "date" + XF_COMPONENT_SEPARATOR + "xforms-input-1" + XF_REPEAT_SEPARATOR + "1",
 
     testOpenHideCalendar: function() {
         // Click on text field
@@ -272,10 +272,10 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xf:input type xs:time",
 
-    timeValueId: "time" + XFORMS_SEPARATOR_1 + "1",
-    timeValueInputId: "time" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
-    dateValueId: "date" + XFORMS_SEPARATOR_1 + "1",
-    dateValueInputId: "date" + XFORMS_SEPARATOR_3 + "xforms-input-1" + XFORMS_SEPARATOR_1 + "1",
+    timeValueId: "time" + XF_REPEAT_SEPARATOR + "1",
+    timeValueInputId: "time" + XF_COMPONENT_SEPARATOR + "xforms-input-1" + XF_REPEAT_SEPARATOR + "1",
+    dateValueId: "date" + XF_REPEAT_SEPARATOR + "1",
+    dateValueInputId: "date" + XF_COMPONENT_SEPARATOR + "xforms-input-1" + XF_REPEAT_SEPARATOR + "1",
 
     workerTimeParsing: function(typedValue, expectedValue) {
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
@@ -331,7 +331,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xf:trigger appearance=\"minimal\"",
 
-    triggerId: "trigger-minimal" + XFORMS_SEPARATOR_1 + "1",
+    triggerId: "trigger-minimal" + XF_REPEAT_SEPARATOR + "1",
 
     // Test that the control is correctly restored when the iteration is recreated
     // http://forge.objectweb.org/tracker/index.php?func=detail&aid=313369&group_id=168&atid=350207
@@ -355,7 +355,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
 
     name: "xf:output appearance=\"xxf:download\"",
 
-    outputFileId: "output-file-value" + XFORMS_SEPARATOR_1 + "1",
+    outputFileId: "output-file-value" + XF_REPEAT_SEPARATOR + "1",
 
     // Test that the control is correctly restored when the iteration is recreated
     // http://forge.objectweb.org/tracker/index.php?func=detail&aid=313369&group_id=168&atid=350207
@@ -385,14 +385,14 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
     name: "Type change",
 
     testChangeToDate: function() {
-        var input = YAHOO.util.Dom.get("type-change-input" + XFORMS_SEPARATOR_1 + "1");
+        var input = YAHOO.util.Dom.get("type-change-input" + XF_REPEAT_SEPARATOR + "1");
         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-            YAHOO.util.UserAction.click("set-type-date" + XFORMS_SEPARATOR_1 + "1");
+            YAHOO.util.UserAction.click("set-type-date" + XF_REPEAT_SEPARATOR + "1");
         }, function() {
             var inputInput = ORBEON.util.Dom.getChildElementByClass(input, "xforms-input-input");
             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(inputInput, "xforms-type-date"));
             ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                YAHOO.util.UserAction.click("set-type-float" + XFORMS_SEPARATOR_1 + "1");
+                YAHOO.util.UserAction.click("set-type-float" + XF_REPEAT_SEPARATOR + "1");
             }, function() {
                 var inputInput = ORBEON.util.Dom.getChildElementByClass(input, "xforms-input-input");
                 YAHOO.util.Assert.isTrue(YAHOO.util.Dom.hasClass(inputInput, "xforms-type-string"));

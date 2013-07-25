@@ -22,7 +22,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
 
     testHiddenTemplateShowsWhenInserted: ->
         isCatVisible = (position) ->
-            cat = YD.get ("cat" + XFORMS_SEPARATOR_1 + position)
+            cat = YD.get ("cat" + XF_REPEAT_SEPARATOR + position)
             not (_.any ["xforms-disabled", "xforms-disabled-subsequent"], (c) -> YD.hasClass cat.parentElement, c)
 
         Test.runMayCauseXHR this,

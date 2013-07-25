@@ -23,7 +23,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
     # Test a group around a group around a tr is correctly hidden and shown again when becoming disabled
     # and then back enabled.
     testGroupAroundTr: () ->
-        groupBegin = document.getElementById "group-begin-group-update-full" + XFORMS_SEPARATOR_1 + "2"
+        groupBegin = document.getElementById "group-begin-group-update-full" + XF_REPEAT_SEPARATOR + "2"
         button = OD.getElementByTagName (OD.get "toggle-two"), "button"
         Test.executeSequenceCausingAjaxRequest this, [[
             () -> button.click()
@@ -105,7 +105,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
     testDialogInitialized: () ->
         Test.executeSequenceCausingAjaxRequest this, [[
             () -> addIteration = OD.getElementByTagName (OD.get "add-iteration"), "button"; addIteration.click()
-            () -> Assert.isObject ORBEON.xforms.Globals.dialogs["dialog" + XFORMS_SEPARATOR_1 + "1"]
+            () -> Assert.isObject ORBEON.xforms.Globals.dialogs["dialog" + XF_REPEAT_SEPARATOR + "1"]
         ]]
 
 Test.onOrbeonLoadedRunTest()

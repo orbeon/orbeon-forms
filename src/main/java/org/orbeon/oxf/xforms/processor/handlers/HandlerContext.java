@@ -308,8 +308,8 @@ public class HandlerContext {
         } else {
             // Create postfix depending on whether we are appending to an existing postfix or not
             newIdPostfix = (currentIdPostfix.length() == 0)
-                    ? "" + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iteration
-                    : currentIdPostfix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iteration;
+                    ? "" + XFormsConstants.REPEAT_SEPARATOR + iteration
+                    : currentIdPostfix + XFormsConstants.REPEAT_INDEX_SEPARATOR + iteration;
         }
 
         if (repeatContextStack == null)

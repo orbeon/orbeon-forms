@@ -90,7 +90,7 @@ YAHOO.tool.TestRunner.add new YAHOO.tool.TestCase
         ORBEON.util.Test.executeSequenceCausingAjaxRequest this, [[
             () -> Test.click "add-iteration"
             () ->
-                container = OD.get "rte-in-iteration" + XFORMS_SEPARATOR_1  + "1"
+                container = OD.get "rte-in-iteration" + XF_REPEAT_SEPARATOR  + "1"
                 rte = Page.getControl container
                 # Delay call to getValue, which is synchronous and doesn't return the right value before RTE is rendered
                 rte.onRendered => @resume(); Assert.areEqual "Inside iteration", rte.getValue()

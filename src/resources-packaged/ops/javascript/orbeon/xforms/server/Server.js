@@ -29,7 +29,7 @@
                 element = ORBEON.util.Dom.get("repeat-begin-" + id);
                 if (element == null) {
                     // Try getting repeat delimiter
-                    var separatorPosition = Math.max(id.lastIndexOf(XFORMS_SEPARATOR_1), id.lastIndexOf(XFORMS_SEPARATOR_2));
+                    var separatorPosition = Math.max(id.lastIndexOf(XF_REPEAT_SEPARATOR), id.lastIndexOf(XF_REPEAT_INDEX_SEPARATOR));
                     if (separatorPosition != -1) {
                         var repeatID = id.substring(0, separatorPosition);
                         var iteration = id.substring(separatorPosition + 1);

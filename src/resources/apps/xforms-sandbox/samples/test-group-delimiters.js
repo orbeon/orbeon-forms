@@ -13,7 +13,7 @@ YAHOO.tool.TestRunner.add(new YAHOO.tool.TestCase({
                 var mask = Math.pow(2, enabledIndex);
                 var isEnabled = (count & mask) == mask;
                 enabled[3 - enabledIndex] = isEnabled;
-                ORBEON.xforms.Document.setValue("level-enabled" + XFORMS_SEPARATOR_1 + (3 - enabledIndex + 1), isEnabled ? "true" : "false");
+                ORBEON.xforms.Document.setValue("level-enabled" + XF_REPEAT_SEPARATOR + (3 - enabledIndex + 1), isEnabled ? "true" : "false");
             }
             return enabled;
         }

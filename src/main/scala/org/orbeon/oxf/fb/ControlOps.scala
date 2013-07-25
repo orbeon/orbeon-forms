@@ -584,10 +584,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         val containerIds = ancestorContainers map (_ attValue "id")
         val repeatDepth  = ancestorContainers count IsRepeat
 
-        def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
-        val prefixedId = containerIds :+ staticId mkString COMPONENT_SEPARATOR_STRING
+        def suffix = 1 to repeatDepth map (_ ⇒ 1) mkString REPEAT_INDEX_SEPARATOR_STRING
+        val prefixedId = containerIds :+ staticId mkString XF_COMPONENT_SEPARATOR_STRING
 
-        prefixedId + (if (repeatDepth == 0) "" else REPEAT_HIERARCHY_SEPARATOR_1 + suffix)
+        prefixedId + (if (repeatDepth == 0) "" else REPEAT_SEPARATOR + suffix)
     }
 
     // Find all resource holders and elements which are unneeded because the resources are blank

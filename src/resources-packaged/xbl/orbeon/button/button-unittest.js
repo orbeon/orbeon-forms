@@ -110,7 +110,7 @@
         testInitInRepeat: function() {
             function checkIsDisabled(count) {
                 for (var index = 1; index < count; index++)
-                    YUA.isTrue(this.isButtonYuiDisabled("init-in-repeat" + XFORMS_SEPARATOR_1 + index),
+                    YUA.isTrue(this.isButtonYuiDisabled("init-in-repeat" + XF_REPEAT_SEPARATOR + index),
                             "button " + index + " is expected to be disabled");
             }
             checkIsDisabled.call(this, 1);

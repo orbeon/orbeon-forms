@@ -37,8 +37,8 @@
                         ORBEON.xforms.Document.setValue("maxLength", "100");
                     }, function() {
                         // If the tables have been correctly updated, their cells styles (IE) or classes (FF) should be set
-                        var table1 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table' + XFORMS_SEPARATOR_1 + '1');
-                        var table2 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table' + XFORMS_SEPARATOR_1 + '2');
+                        var table1 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table' + XF_REPEAT_SEPARATOR + '1');
+                        var table2 = YAHOO.util.Dom.get('my-accordion$repeat-refresh-table$repeat-refresh-table-table' + XF_REPEAT_SEPARATOR + '2');
                         thiss.checkCellClasses(table1, true);
                         thiss.checkCellStyles(table1, true);
                         thiss.checkCellClasses(table2, true);
@@ -159,19 +159,19 @@
                     ORBEON.xforms.Document.setValue("show", "true");
                 }, function() {
                     // Check the table structure
-                    var table = YAHOO.util.Dom.get('my-accordion$_314415-table$_314415-table-table' + XFORMS_SEPARATOR_1 + '1');
+                    var table = YAHOO.util.Dom.get('my-accordion$_314415-table$_314415-table-table' + XF_REPEAT_SEPARATOR + '1');
                     thiss.checkTableStructure(table, 1, true);
 
                     ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                         ORBEON.xforms.Document.setValue("show", "false");
                     }, function() {
-                        table = YAHOO.util.Dom.get('my-accordion$_314415-table$_314415-table-table' + XFORMS_SEPARATOR_1 + '1');
+                        table = YAHOO.util.Dom.get('my-accordion$_314415-table$_314415-table-table' + XF_REPEAT_SEPARATOR + '1');
                         YAHOO.util.Assert.isNull(table, "The table should have been deleted");
                         ORBEON.util.Test.executeCausingAjaxRequest(thiss, function() {
                             ORBEON.xforms.Document.setValue("show", "true");
                         }, function() {
                             // Check the table structure
-                            table = YAHOO.util.Dom.get('my-accordion$_314415-table$_314415-table-table' + XFORMS_SEPARATOR_1 + '1');
+                            table = YAHOO.util.Dom.get('my-accordion$_314415-table$_314415-table-table' + XF_REPEAT_SEPARATOR + '1');
                             thiss.checkTableStructure(table, 1, true);
 
                             thiss.closeAccordionCase(thiss, '_314415');

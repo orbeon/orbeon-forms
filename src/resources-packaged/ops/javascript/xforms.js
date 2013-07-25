@@ -16,10 +16,11 @@
 /**
  * Constants
  */
-var XFORMS_SEPARATOR_1 = "\xB7";
-var XFORMS_SEPARATOR_2 = "-";
-var XFORMS_SEPARATOR_3 = "\u2218";
-var XFORMS_SEPARATOR_4 = XFORMS_SEPARATOR_3 + XFORMS_SEPARATOR_3;
+var XF_REPEAT_SEPARATOR = "\u2299";
+var XF_REPEAT_INDEX_SEPARATOR = "-";
+var XF_COMPONENT_SEPARATOR = "\u2261";
+var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
+
 var XFORMS_SERVER_PATH = "/xforms-server";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
@@ -997,7 +998,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (effectiveId == null)
                     return null;
 
-                var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
+                var suffixIndex = effectiveId.indexOf(XF_REPEAT_SEPARATOR);
                 if (suffixIndex != -1) {
                     return effectiveId.substring(0, suffixIndex);
                 } else {
@@ -1012,7 +1013,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 if (effectiveId == null)
                     return null;
 
-                var suffixIndex = effectiveId.indexOf(XFORMS_SEPARATOR_1);
+                var suffixIndex = effectiveId.indexOf(XF_REPEAT_SEPARATOR);
                 if (suffixIndex != -1) {
                     return effectiveId.substring(suffixIndex);
                 } else {
@@ -1038,7 +1039,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                 // Compute new id
                 var idSuffixWithDepth = idSuffix;
                 for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
-                    idSuffixWithDepth += XFORMS_SEPARATOR_2 + "1";
+                    idSuffixWithDepth += XF_REPEAT_INDEX_SEPARATOR + "1";
 
                 // Update id attribute
                 if (element.id) {
@@ -1154,11 +1155,11 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     return id;
 
                 // Remove "-" at the beginning of the suffix, if any
-                if (suffix.charAt(0) == XFORMS_SEPARATOR_2)
+                if (suffix.charAt(0) == XF_REPEAT_INDEX_SEPARATOR)
                     suffix = suffix.substring(1);
 
                 // Add suffix with the right separator
-                id += id.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+                id += id.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
                 id += suffix;
 
                 return id;
@@ -1185,7 +1186,7 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                         var parent = ORBEON.xforms.Globals.repeatTreeChildToParent[currentId];
                         if (parent == null) break;
                         var grandParent = ORBEON.xforms.Globals.repeatTreeChildToParent[parent];
-                        parentRepeatIndexes = (grandParent == null ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2)
+                        parentRepeatIndexes = (grandParent == null ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR)
                                 + ORBEON.xforms.Globals.repeatIndexes[parent] + parentRepeatIndexes;
                         currentId = parent;
                     }
@@ -1772,11 +1773,11 @@ ORBEON.xforms.Controls = {
     // Mapping between className (parameter of this method and added after "xforms-") and id of elements
     // in the case where they are outside of the control element.
     _classNameToId: {
-        "label":   XFORMS_SEPARATOR_4 + "l",
-        "hint":    XFORMS_SEPARATOR_4 + "t",
-        "help":    XFORMS_SEPARATOR_4 + "p",
-        "alert":   XFORMS_SEPARATOR_4 + "a",
-        "control": XFORMS_SEPARATOR_4 + "c"
+        "label":   XF_LHHAI_SEPARATOR + "l",
+        "hint":    XF_LHHAI_SEPARATOR + "t",
+        "help":    XF_LHHAI_SEPARATOR + "p",
+        "alert":   XF_LHHAI_SEPARATOR + "a",
+        "control": XF_LHHAI_SEPARATOR + "c"
     },
 
     /**
@@ -3290,7 +3291,7 @@ ORBEON.xforms.Events = {
                         // Found beginning of current iteration, tell server
                         var form = ORBEON.xforms.Controls.getForm(sibling);
                         var targetId = sibling.id.substring("repeat-begin-".length);
-                        targetId += targetId.indexOf(XFORMS_SEPARATOR_1) == -1 ? XFORMS_SEPARATOR_1 : XFORMS_SEPARATOR_2;
+                        targetId += targetId.indexOf(XF_REPEAT_SEPARATOR) == -1 ? XF_REPEAT_SEPARATOR : XF_REPEAT_INDEX_SEPARATOR;
                         targetId += delimiterCount;
                         var event = new ORBEON.xforms.server.AjaxServer.Event(form, targetId, null, "xxforms-repeat-activate");
                         ORBEON.xforms.server.AjaxServer.fireEvents([event]);
@@ -4380,7 +4381,7 @@ ORBEON.xforms.Init = {
         var backgroundDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-background", "div", range)[0];
 
         var thumbDiv = YAHOO.util.Dom.getElementsByClassName("xforms-range-thumb", "div", range)[0];
-        thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, XFORMS_SEPARATOR_4 + "thumb");
+        thumbDiv.id = ORBEON.util.Utils.appendToEffectiveId(range.id, XF_LHHAI_SEPARATOR + "thumb");
 
         var slider = YAHOO.widget.Slider.getHorizSlider(backgroundDiv.id, thumbDiv.id, 0, 200);
         slider.subscribe("change", ORBEON.xforms.Events.sliderValueChange);
@@ -4654,11 +4655,11 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
 
     _renumberIDsWorker: function(element, repeatDepth, newIndex) {
         // Rename ID on this element
-        var repeatSeparatorPosition = element.id.indexOf(XFORMS_SEPARATOR_1);
+        var repeatSeparatorPosition = element.id.indexOf(XF_REPEAT_SEPARATOR);
         if (repeatSeparatorPosition != -1) {
-            var repeatIndexes =  element.id.substring(repeatSeparatorPosition + 1).split(XFORMS_SEPARATOR_2);
+            var repeatIndexes =  element.id.substring(repeatSeparatorPosition + 1).split(XF_REPEAT_INDEX_SEPARATOR);
             repeatIndexes[repeatDepth] = newIndex;
-            var newID = element.id.substring(0, repeatSeparatorPosition) + XFORMS_SEPARATOR_1 + repeatIndexes.join(XFORMS_SEPARATOR_2);
+            var newID = element.id.substring(0, repeatSeparatorPosition) + XF_REPEAT_SEPARATOR + repeatIndexes.join(XF_REPEAT_INDEX_SEPARATOR);
             element.id = newID;
 
         }
@@ -4677,7 +4678,7 @@ YAHOO.extend(ORBEON.xforms.DnD.DraggableItem, YAHOO.util.DDProxy, {
         // Figure at what depth this repeat is
         var repeatDepth = 0;
         var currentRepeat = repeatID;
-        var repeatSeparatorPosition = currentRepeat.indexOf(XFORMS_SEPARATOR_1);
+        var repeatSeparatorPosition = currentRepeat.indexOf(XF_REPEAT_SEPARATOR);
         if (repeatSeparatorPosition != -1)
             currentRepeat = currentRepeat.substring(0, repeatSeparatorPosition);
         while (true) {

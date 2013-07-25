@@ -984,7 +984,7 @@ public class XFormsUtils {
      * @return              true iif the effective id has a suffix
      */
     public static boolean hasEffectiveIdSuffix(String effectiveId) {
-        return (effectiveId != null) && effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1) != -1;
+        return (effectiveId != null) && effectiveId.indexOf(XFormsConstants.REPEAT_SEPARATOR) != -1;
     }
 
     /**
@@ -997,7 +997,7 @@ public class XFormsUtils {
         if (effectiveId == null)
             return null;
 
-        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_SEPARATOR);
         if (suffixIndex != -1) {
             return effectiveId.substring(suffixIndex + 1);
         } else {
@@ -1015,7 +1015,7 @@ public class XFormsUtils {
         if (effectiveId == null)
             return null;
 
-        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_SEPARATOR);
         if (suffixIndex != -1) {
             return effectiveId.substring(suffixIndex);
         } else {
@@ -1035,7 +1035,7 @@ public class XFormsUtils {
         if (effectiveId == null)
             return null;
 
-        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_SEPARATOR);
         if (suffixIndex != -1) {
             return effectiveId.substring(0, suffixIndex);
         } else {
@@ -1094,10 +1094,10 @@ public class XFormsUtils {
         final String iterationPrefixedId = getPrefixedId(repeatEffectiveId) + "~iteration";
         if (parentSuffix.equals("")) {
             // E.g. foobar => foobar~iteration.3
-            return iterationPrefixedId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + iterationIndex;
+            return iterationPrefixedId + XFormsConstants.REPEAT_SEPARATOR + iterationIndex;
         } else {
             // E.g. foobar.3-7 => foobar~iteration.3-7-2
-            return iterationPrefixedId + parentSuffix + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2 + iterationIndex;
+            return iterationPrefixedId + parentSuffix + XFormsConstants.REPEAT_INDEX_SEPARATOR + iterationIndex;
         }
     }
 
@@ -1111,9 +1111,9 @@ public class XFormsUtils {
         if (effectiveId == null)
             return null;
 
-        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+        final int suffixIndex = effectiveId.indexOf(XFormsConstants.REPEAT_SEPARATOR);
         if (suffixIndex != -1) {
-            final String[] stringResult = StringUtils.split(effectiveId.substring(suffixIndex + 1), XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
+            final String[] stringResult = StringUtils.split(effectiveId.substring(suffixIndex + 1), XFormsConstants.REPEAT_INDEX_SEPARATOR);
             final int[] result = new int[stringResult.length];
             for (int i = 0; i < stringResult.length; i++) {
                 final String currentString = stringResult[i];
@@ -1129,7 +1129,7 @@ public class XFormsUtils {
         if (iterations.length == 0)
             return prefixedId;
         else
-            return prefixedId + XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1 + StringUtils.join(iterations, XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_2);
+            return prefixedId + XFormsConstants.REPEAT_SEPARATOR + StringUtils.join(iterations, XFormsConstants.REPEAT_INDEX_SEPARATOR);
     }
 
     /**
@@ -1144,7 +1144,7 @@ public class XFormsUtils {
     public static String getRelatedEffectiveId(String baseEffectiveId, String staticId) {
         final String prefix = getEffectiveIdPrefix(baseEffectiveId);
         final String suffix; {
-            final int suffixIndex = baseEffectiveId.indexOf(XFormsConstants.REPEAT_HIERARCHY_SEPARATOR_1);
+            final int suffixIndex = baseEffectiveId.indexOf(XFormsConstants.REPEAT_SEPARATOR);
             suffix = (suffixIndex == -1) ? "" : baseEffectiveId.substring(suffixIndex);
         }
         return prefix + staticId + suffix;

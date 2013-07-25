@@ -289,12 +289,12 @@ object EventHandlerImpl extends Logging {
     // - foo$bar.1-2 and Array(4, 5, 6) => foo$bar.4-5-6
     // - foo$bar.1-2 and Array() => foo$bar
     def replaceIdSuffix(prefixedOrEffectiveId: String , parts: Array[Int]): String = {
-        val prefixedId = prefixedOrEffectiveId split REPEAT_HIERARCHY_SEPARATOR_1 head
+        val prefixedId = prefixedOrEffectiveId split REPEAT_SEPARATOR head
 
         if (parts.length == 0)
             prefixedId
         else
-            prefixedId + REPEAT_HIERARCHY_SEPARATOR_1 + (parts mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING)
+            prefixedId + REPEAT_SEPARATOR + (parts mkString REPEAT_INDEX_SEPARATOR_STRING)
     }
 
     // Append space-separated suffix indexes to existing indexes

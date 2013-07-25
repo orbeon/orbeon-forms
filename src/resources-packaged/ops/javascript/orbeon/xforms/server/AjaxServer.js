@@ -862,7 +862,7 @@
                                                 // Decrement nestedRepeatLevel when we we exit a nested repeat
                                                 if (YAHOO.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-end-") == 0)
                                                     nestedRepeatLevel--;
-                                                ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XFORMS_SEPARATOR_2 + suffix, nestedRepeatLevel);
+                                                ORBEON.util.Utils.addSuffixToIdsAndRemoveDisabled(newTemplateNode, parentIndexes == "" ? String(suffix) : parentIndexes + XF_REPEAT_INDEX_SEPARATOR + suffix, nestedRepeatLevel);
                                                 // Increment nestedRepeatLevel when we enter a nested repeat
                                                 if (YAHOO.util.Dom.hasClass(newTemplateNode, "xforms-repeat-begin-end") && templateNode.id.indexOf("repeat-begin-") == 0)
                                                     nestedRepeatLevel++;
@@ -1085,7 +1085,7 @@
                                             spanContainer.appendChild(templateClone);
                                             templateClone.innerHTML = new String(templateClone.innerHTML).replace(new RegExp(ORBEON.util.Utils.escapeRegex("$xforms-template-label$"), "g"), itemElement.label.replace(new RegExp("\\$", "g"), "$$$$"));
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-template-value$", itemElement.value);
-                                            var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XFORMS_SEPARATOR_4 + "e" + itemIndex);
+                                            var itemEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e" + itemIndex);
                                             ORBEON.util.Utils.stringReplace(templateClone, isFull ? "$xforms-item-id-select$" : "$xforms-item-id-select1$", itemEffectiveId);
                                             ORBEON.util.Utils.stringReplace(templateClone, "$xforms-item-name$", controlId);
                                             if (! _.isUndefined(itemElement.attributes) && ! _.isUndefined(itemElement.attributes["class"])) {
@@ -1331,7 +1331,7 @@
                                                     // Replace placeholders
                                                     insertIntoDocument([booleanTemplateClone]);
                                                     ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-template-value$", "true");
-                                                    var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XFORMS_SEPARATOR_4 + "e0");
+                                                    var booleanEffectiveId = ORBEON.util.Utils.appendToEffectiveId(controlId, XF_LHHAI_SEPARATOR + "e0");
                                                     ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-id-select$", booleanEffectiveId);
                                                     ORBEON.util.Utils.stringReplace(booleanTemplateClone, "$xforms-item-name$", controlId);
 

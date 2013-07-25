@@ -165,7 +165,7 @@ class XFormsRepeatControl(container: XBLContainer, parent: XFormsControl, elemen
             val destinationControl =
             if (dndEnd.length > 1) {
                 // DnD destination is a different repeat control
-                val containingRepeatEffectiveId = getPrefixedId + REPEAT_HIERARCHY_SEPARATOR_1 + (dndEnd mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING)
+                val containingRepeatEffectiveId = getPrefixedId + REPEAT_SEPARATOR + (dndEnd mkString REPEAT_INDEX_SEPARATOR_STRING)
                 containingDocument.getObjectByEffectiveId(containingRepeatEffectiveId).asInstanceOf[XFormsRepeatControl]
             } else
                 // DnD destination is the current repeat control
@@ -687,8 +687,8 @@ object XFormsRepeatControl {
         }
     
     private def suffixForRepeats(indexes: collection.Map[String, Int], repeats: Seq[RepeatControl]) =
-        repeats map (repeat ⇒ indexes(repeat.prefixedId)) mkString REPEAT_HIERARCHY_SEPARATOR_2_STRING
+        repeats map (repeat ⇒ indexes(repeat.prefixedId)) mkString REPEAT_INDEX_SEPARATOR_STRING
     
     private def addSuffix(prefixedId: String, suffix: String) =
-        prefixedId + (if (suffix.length > 0) REPEAT_HIERARCHY_SEPARATOR_1 + suffix else "")
+        prefixedId + (if (suffix.length > 0) REPEAT_SEPARATOR + suffix else "")
 }

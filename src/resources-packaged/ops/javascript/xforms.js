@@ -1621,8 +1621,9 @@ ORBEON.xforms.Controls = {
                 ORBEON.util.Dom.setStringValue(mediatypeSpan, attribute3);
             if (attribute4 != null)
                 ORBEON.util.Dom.setStringValue(sizeSpan, attribute4);
+            // NOTE: Server can send a space-separated value but accept expects a comma-separated value
             if (attribute5 != null)
-                $(control).find(".xforms-upload-select").attr("accept", attribute5);
+                $(control).find(".xforms-upload-select").attr("accept", attribute5.split(/\s+/).join(","));
         } else if (YAHOO.util.Dom.hasClass(control, "xforms-type-dateTime")) {
             // Only update value if different from the one we have. This handle the case where the fields contain invalid
             // values with the T letter in them. E.g. aTb/cTd, aTbTcTd sent to server, which we don't know anymore how

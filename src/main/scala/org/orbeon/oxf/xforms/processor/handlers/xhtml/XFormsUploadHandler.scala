@@ -17,6 +17,7 @@ import java.{lang ⇒ jl}
 import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
+import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl.mediatypeToAccept
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
 import org.orbeon.oxf.xforms.processor.handlers.HandlerHelper._
 import org.orbeon.oxf.xml._
@@ -60,7 +61,7 @@ class XFormsUploadHandler extends XFormsControlLifecyleHandler(false) {
                 // NOTE: @value was meant to suggest an initial file name, but this is not supported by browsers
 
                 // @accept
-                uploadControl flatMap (_.acceptValue) foreach
+                uploadControl flatMap (_.acceptValue) map mediatypeToAccept foreach
                     (accept ⇒ reusableAttributes.addAttribute("", "accept", "accept", ContentHandlerHelper.CDATA, accept))
     
                 XFormsBaseHandler.handleAccessibilityAttributes(attributes, reusableAttributes)

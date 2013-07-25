@@ -67,10 +67,6 @@ object ControlAnalysisFactory {
     class UploadControl(staticStateContext: StaticStateContext, element: Element, parent: Option[ElementAnalysis], preceding: Option[ElementAnalysis], scope: Scope)
             extends InputValueControl(staticStateContext, element, parent, preceding, scope) {
 
-        // List of accepted mediatypes
-        // NOTE: XForms 2 deprecates @mediatype and recommends @accept
-        val accept = ElementAnalysis.attSet(element, "accept") ++ ElementAnalysis.attSet(element, "mediatype")
-
         override protected def externalEventsDef = super.externalEventsDef ++ UploadExternalEvents
         override val externalEvents = externalEventsDef
 

@@ -395,11 +395,11 @@ Inserting error information into error list:
                                             <xh:td>
                                                 <xf:group ref=".[$has-label and property('xxf:noscript')]">
                                                     <!-- In noscript mode, use a plain link to the effective id -->
-                                                    <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output value="@label" class="fr-error-label"/></xh:a>
+                                                    <xh:a href="#{{xxf:client-id(@absolute-id)}}"><xf:output mediatype="text/html" value="@label" class="fr-error-label"/></xh:a>
                                                 </xf:group>
                                                 <!-- Otherwise use trigger -->
                                                 <xf:trigger ref=".[$has-label and not(property('xxf:noscript'))]" appearance="minimal" class="fr-error-label">
-                                                    <xf:label value="@label"/>
+                                                    <xf:label mediatype="text/html" value="@label"/>
                                                     <!-- Set focus to control using absolute id -->
                                                     <xf:setfocus ev:event="DOMActivate" control="{{@absolute-id}}"/>
                                                 </xf:trigger>

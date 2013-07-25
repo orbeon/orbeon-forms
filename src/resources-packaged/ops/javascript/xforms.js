@@ -23,13 +23,10 @@ var XF_LHHAI_SEPARATOR = XF_COMPONENT_SEPARATOR + XF_COMPONENT_SEPARATOR;
 
 var XFORMS_SERVER_PATH = "/xforms-server";
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-var PATH_TO_JAVASCRIPT_1 = "/ops/javascript/xforms";
-var PATH_TO_JAVASCRIPT_2 = XFORMS_SERVER_PATH + "/";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
 var XFORMS_REGEXP_CR = new RegExp("\\r", "g");
-var XFORMS_REGEXP_SINGLE_QUOTE = new RegExp("'", "g");
 var XFORMS_REGEXP_OPEN_ANGLE = new RegExp("<", "g");
 var XFORMS_REGEXP_CLOSE_ANGLE = new RegExp(">", "g");
 var XFORMS_REGEXP_AMPERSAND = new RegExp("&", "g");

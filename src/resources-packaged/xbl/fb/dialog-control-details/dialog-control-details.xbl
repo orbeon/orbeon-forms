@@ -194,7 +194,7 @@
                 <xf:setvalue event="xxforms-invalid" observer="i" ref="@valid">false</xf:setvalue>
                 <xf:setvalue event="xxforms-valid"   observer="i" ref="@valid">true</xf:setvalue>
 
-                !-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
+                <!-- NOTE: We use normalize-space() to make sure there is no leading/trailing space -->
                 <xf:bind ref="control-name"
                     type="xs:NCName"
                     calculate="normalize-space()"

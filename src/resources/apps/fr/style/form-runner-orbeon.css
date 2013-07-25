@@ -225,6 +225,9 @@ body.orbeon {
 .orbeon .navbar .fr-goto-content {
   float: left;
 }
+.orbeon .navbar .fr-status-icons {
+  *margin-top: 13px;
+}
 .orbeon .navbar.navbar-inverse .fr-language-choice,
 .orbeon .navbar.navbar-inverse .fr-noscript-choice,
 .orbeon .navbar.navbar-inverse .fr-goto-content {

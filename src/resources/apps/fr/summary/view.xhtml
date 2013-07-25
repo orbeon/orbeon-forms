@@ -634,8 +634,9 @@
                     <ul>
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-first">
+                                <!-- https://github.com/orbeon/orbeon-forms/issues/1042 -->
                                 <xf:label>
-                                    <xh:i class="icon-step-backward"/>
+                                    <xh:i class="icon-step-backward"/>&#x200b;
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="1"/>
@@ -647,7 +648,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/prev-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/prev-trigger" appearance="minimal" class="fr-navigate-prev">
                                 <xf:label>
-                                    <xh:i class="icon-chevron-left"/>
+                                    <xh:i class="icon-chevron-left"/>&#x200b;
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". - 1"/>
@@ -674,7 +675,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-next">
                                 <xf:label>
-                                    <xh:i class="icon-chevron-right"/>
+                                    <xh:i class="icon-chevron-right"/>&#x200b;
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value=". + 1"/>
@@ -686,7 +687,7 @@
                         <li class="{if (xxf:readonly(instance('fr-paging-instance')/next-trigger)) then 'disabled' else ''}">
                             <xf:trigger ref="instance('fr-paging-instance')/next-trigger" appearance="minimal" class="fr-navigate-last">
                                 <xf:label>
-                                    <xh:i class="icon-step-forward"/>
+                                    <xh:i class="icon-step-forward"/>&#x200b;
                                 </xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <xf:setvalue ref="instance('fr-search-instance')/page-number" value="instance('fr-paging-instance')/page-count"/>

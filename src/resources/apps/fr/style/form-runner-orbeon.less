@@ -134,6 +134,11 @@ body.orbeon { background-color: @frBackground }
             float: left;
         }
 
+        // IE7: https://github.com/orbeon/orbeon-forms/issues/1042
+        .fr-status-icons {
+            *margin-top: (@navbarHeight - @frIconHeight) / 2;
+        }
+
         &.navbar-inverse {
             .fr-language-choice, .fr-noscript-choice, .fr-goto-content {
                 color: @frNavBarTextColor;

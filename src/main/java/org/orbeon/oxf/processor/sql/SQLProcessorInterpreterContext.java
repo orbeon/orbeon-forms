@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorGenericDelegate;
+import org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJDBC4Delegate;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorStandardDelegate;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
@@ -136,11 +137,9 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                 Class clazz = null;
 
                 if ("oracle".equalsIgnoreCase(productName)) {
-                    // First try Tomcat 5
+                    // Try Tomcat 5/6
                     try {
-                        // Try load a class used by Tomcat 5, and that we use in our code
                         getClass().getClassLoader().loadClass("org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement");
-                        // We went this far, so the class must exist
                         clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcat5Delegate");
                         SQLProcessor.logger.info("Using Oracle Tomcat 5 delegate.");
                     } catch (Throwable t) {
@@ -169,35 +168,22 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                     // First try Tomcat 4
                     if (clazz == null) {
                         try {
+                            getClass().getClassLoader().loadClass("org.apache.commons.dbcp.DelegatingPreparedStatement");
                             clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcat4Delegate");
                             SQLProcessor.logger.info("Using Oracle Tomcat 4 delegate.");
                         } catch (Throwable t) {
                             // Ignore
                         }
                     }
-                    // Then try WebLogic (8.1 or greater)
+                    // Then use the JDBC4 delegate
                     if (clazz == null) {
-                        try {
-                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleWebLogic81Delegate");
-                            SQLProcessor.logger.info("Using Oracle WebLogic delegate.");
-                        } catch (Throwable t) {
-                            // Ignore
-                        }
-                    }
-                    // Then try the generic delegate
-                    if (clazz == null) {
-                        try {
-                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleGenericDelegate");
-                            SQLProcessor.logger.info("Using Oracle generic delegate.");
-                        } catch (Throwable t) {
-                            clazz = SQLProcessorGenericDelegate.class;
-                            SQLProcessor.logger.info("Could not load Oracle database delegate. Using generic delegate.");
-                        }
+                        clazz = SQLProcessorOracleJDBC4Delegate.class;
+                        SQLProcessor.logger.info("Using Oracle JDBC4 delegate.");
                     }
                 } else if ("HSQL Database Engine".equalsIgnoreCase(productName)) {
                     // HSQLDB
                     try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorHSQLDBDelegate");
+                    clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorHSQLDBDelegate");
                         SQLProcessor.logger.info("Using HSQLDB delegate.");
                     } catch (Throwable t) {
                         clazz = SQLProcessorGenericDelegate.class;

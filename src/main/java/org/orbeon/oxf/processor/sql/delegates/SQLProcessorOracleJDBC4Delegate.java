@@ -15,26 +15,37 @@ package org.orbeon.oxf.processor.sql.delegates;
 
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.sql.DatabaseDelegate;
 import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
- * Version for Oracle.
- *
- * NOTE: This will work if PreparedStatement and ResultSet can be directly cast to their Oracle counterparts. This is
- * the case for WebLogic 8.1, which has its own delegate.
+ * Works with JDBC4 or app servers that don't wrap, as is apparently the case with WebLogic 8.1 (and maybe newer
+ * versions, hopefully all the way to WebLogic 12c, the first version that supports JDBC 4).
  */
-public class SQLProcessorOracleGenericDelegate extends SQLProcessorOracleDelegateBase implements DatabaseDelegate {
-    protected OraclePreparedStatement getOraclePreparedStatement(PreparedStatement stmt) {
-        // Simply cast
-        return (OraclePreparedStatement) stmt;
+public class SQLProcessorOracleJDBC4Delegate extends SQLProcessorOracleDelegateBase implements DatabaseDelegate {
+
+    protected OraclePreparedStatement getOraclePreparedStatement(PreparedStatement statement) {
+        try {
+            return statement instanceof OraclePreparedStatement
+                ? (OraclePreparedStatement) statement
+                : statement.unwrap(OraclePreparedStatement.class);
+        } catch (SQLException e) {
+            throw new OXFException(e);
+        }
     }
 
     protected OracleResultSet getOracleResultSet(ResultSet resultSet) {
-        // Simply cast
-        return (OracleResultSet) resultSet;
+        try {
+            return resultSet instanceof OracleResultSet
+                ? (OracleResultSet) resultSet
+                : resultSet.unwrap(OracleResultSet.class);
+        } catch (SQLException e) {
+            throw new OXFException(e);
+        }
     }
 }

@@ -80,6 +80,10 @@
 .orbeon .fr-mode-home .fr-status-icons {
   display: none;
 }
+.orbeon .row .alert {
+  display: block;
+  margin: 0;
+}
 .orbeon table .fr-summary,
 .orbeon table .fr-new {
   text-align: center;

@@ -238,6 +238,7 @@
                 <new>New</new>
             </titles>
             <messages>
+                <no-forms>You don't have access to any deployed forms.</no-forms>
                 <publish-confirmation>Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?</publish-confirmation>
             </messages>
             <labels>
@@ -477,6 +478,7 @@
                 <new>Nouveau</new>
             </titles>
             <messages>
+                <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
                 <publish-confirmation>Etes-vous sûr de vouloir {0,choice,0#publier|1#dépublier} {1,choice,1#un formulaire|1&lt;{1,number,integer} formulaires}?</publish-confirmation>
             </messages>
             <labels>
@@ -702,6 +704,7 @@
                 <new>[New]</new>
             </titles>
             <messages>
+                <no-forms>[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
             </messages>
             <labels>
@@ -925,6 +928,7 @@
                 <new>[New]</new>
             </titles>
             <messages>
+                <no-forms>[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
             </messages>
             <labels>
@@ -1146,6 +1150,7 @@
                 <new>[New]</new>
             </titles>
             <messages>
+                <no-forms>[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
             </messages>
             <labels>
@@ -1381,6 +1386,7 @@
                 <new>Nuovo</new>
             </titles>
             <messages>
+                <no-forms>[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation>È sicuro di voler {0,choice,0#pubblicare|1#annullare la pubblicazione di} {1,choice,1#un modulo|1&lt;{1,number,integer}moduli}?</publish-confirmation>
             </messages>
             <labels>
@@ -1615,6 +1621,7 @@
                 <new>Neu</new>
             </titles>
             <messages>
+                <no-forms>[You don't have access to any deployed forms.]</no-forms>
                 <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} die Formulare} {0,choice,0#veröffentlichen |1#nicht mehr öffentlich zugänglich haben} wollen?</publish-confirmation>
             </messages>
             <labels>

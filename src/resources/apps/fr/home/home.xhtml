@@ -34,17 +34,18 @@
                 <ui>
                     <selection/>
                     <error/>
+                    <any-has-admin/>
                     <unpublish-button/>
                     <publish-button/>
                 </ui>
             </xf:instance>
 
-            <xf:var name="is-available"   value="saxon:expression('xxf:split(., ''/'')[3] = ''true''')"/>
+            <xf:var name="is-available"     value="saxon:expression('xxf:split(., ''/'')[3] = ''true''')"/>
 
             <xf:bind ref="unpublish-button" readonly="not(normalize-space(../selection) and     xxf:forall(xxf:split(../selection), $is-available))"/>
             <xf:bind ref="publish-button"   readonly="not(normalize-space(../selection) and not(xxf:exists(xxf:split(../selection), $is-available)))"/>
 
-            <xf:var name="fb-permissions" value="xxf:instance('fb-permissions')"/>
+            <xf:var name="any-has-admin" value="any-has-admin = 'true'"/>
 
             <!-- Forms metadata -->
             <xf:instance id="fr-metadata"><forms/></xf:instance>
@@ -56,31 +57,45 @@
                 replace="instance"
                 instance="fr-metadata">
 
-                <xf:action event="xforms-submit-done" iterate="instance('fr-metadata')/form">
-                    <xf:var
-                        name="has-access"
-                        value="fbf:canAccessFormBuilderForm($fb-permissions, application-name, form-name)"/>
+                <xf:action event="xforms-submit-done">
+                    <xf:action iterate="instance('fr-metadata')/form">
 
-                    <xf:var
-                        name="remove-form"
-                        value="not($has-access) and available = 'false'"/>
-
-                    <!-- If the current user doesn't have FB access to the current form, and that form is unavailable,
-                         don't show the form at all. For the user, the form is in effect non-existing. -->
-                    <xf:delete
-                        if="$remove-form"
-                        ref="."/>
-
-                    <!-- Otherwise show the form and set extra attributes -->
-                    <xf:action if="not($remove-form)">
-                        <xf:insert
-                            context="."
-                            origin="xxf:attribute('allow-publish-unpublish', $has-access)"/>
+                        <xf:var
+                            name="has-admin-permissions"
+                            value="fbf:hasAdminPermissionsFor(xxf:instance('fb-permissions'), application-name, form-name)"/>
 
                         <xf:insert
                             context="."
-                            origin="xxf:attribute('operations', string-join(frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions), ' '))"/>
+                            origin="xxf:attribute('operations',
+                                        string-join((frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions),
+                                                     if ($has-admin-permissions) then 'admin' else ()), ' '))"/>
+
+                        <!-- Hide the form if:
+
+                            - it doesn't have any metadata (should not happen but it if does, something is fishy)
+                            - current user doesn't have FB admin access AND:
+                                - form is unavailable
+                                - user has no operations associated with the form data
+                                - form is a library
+                         -->
+                        <xf:var
+                            name="hide-form"
+                            value="empty(*)
+                                   or (
+                                       not($has-admin-permissions) and (
+                                           available = 'false'
+                                           or normalize-space(@operations) = ''
+                                           or form-name = 'library'
+                                       )
+                                   )"/>
+
+                        <xf:delete
+                            if="$hide-form"
+                            ref="."/>
                     </xf:action>
+                    <!-- Only show admin ops column if at least one form has op -->
+                    <xf:var name="has-admin" value="saxon:expression('xxf:split() = ''admin''')"/>
+                    <xf:setvalue ref="instance()/any-has-admin" value="xxf:exists(instance('fr-metadata')/form/@operations, $has-admin)"/>
                 </xf:action>
 
             </xf:submission>
@@ -179,18 +194,17 @@
         <xh:div class="container">
             <fr:row>
                 <fr:body>
-                    <xf:var name="forms"          value="instance('fr-metadata')/form[exists(*) and @operations != '']"/>
+                    <xf:var name="forms" value="instance('fr-metadata')/form"/>
                     <xf:group ref=".[empty($forms)]">
-                        <xh:div class="alert">
-                            No forms have been deployed, or you don't have the permissions to access any
-                            of the deployed forms.
-                        </xh:div>
+                        <xf:output class="alert" value="$fr-resources/home/messages/no-forms"/>
                     </xf:group>
                     <xf:group ref=".[exists($forms)]">
                         <xh:table class="table table-bordered table-condensed table-striped table-hover">
                             <xh:tr>
-                                <xh:th/>
-                                <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
+                                <xf:group ref=".[$any-has-admin]">
+                                    <xh:th/>
+                                    <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
+                                </xf:group>
                                 <xh:th><xf:output value="$fr-resources/home/titles/app"/></xh:th>
                                 <xh:th><xf:output value="$fr-resources/home/titles/form"/></xh:th>
                                 <xh:th><xf:output value="$fr-resources/home/titles/title"/></xh:th>
@@ -200,27 +214,31 @@
                             <xf:repeat ref="$forms">
                                 <xf:var name="current"   value="."/>
                                 <xf:var name="available" value="not(available = 'false')"/>
+                                <xf:var name="ops"       value="xxf:split(@operations)"/>
                                 <xh:tr>
-                                    <xh:td class="fr-home-repeat-selection-checkbox">
-                                        <xf:select
-                                            appearance="full"
-                                            ref="instance()/selection[$current/@allow-publish-unpublish = 'true']"
-                                            id="document-selection">
-                                            <xf:item>
-                                                <xf:label/>
-                                                <xf:value context="$current" value="concat(application-name, '/', form-name, '/', $available)"/>
-                                            </xf:item>
-                                        </xf:select>
-                                    </xh:td>
-                                    <xh:td>
-                                        <xf:output
-                                            class="label{if ($available) then ' label-success' else ''}"
-                                            value="if ($available) then $fr-resources/home/labels/available else $fr-resources/home/labels/unavailable"/>
-                                        <xf:output
-                                            ref=".[form-name = 'library']"
-                                            class="label label-info"
-                                            value="$fr-resources/home/labels/library"/>
-                                    </xh:td>
+                                    <xf:group ref=".[$any-has-admin]">
+                                        <xh:td class="fr-home-repeat-selection-checkbox">
+                                            <xf:select
+                                                appearance="full"
+                                                ref="instance()/selection[$ops = 'admin']"
+                                                id="document-selection">
+                                                <xf:item>
+                                                    <xf:label/>
+                                                    <xf:value context="$current" value="concat(application-name, '/', form-name, '/', $available)"/>
+                                                </xf:item>
+                                            </xf:select>
+                                        </xh:td>
+                                        <xh:td>
+                                            <xf:output
+                                                ref=".[$ops = 'fb-admin']"
+                                                class="label{if ($available) then ' label-success' else ''}"
+                                                value="if ($available) then $fr-resources/home/labels/available else $fr-resources/home/labels/unavailable"/>
+                                            <xf:output
+                                                ref=".[form-name = 'library']"
+                                                class="label label-info"
+                                                value="$fr-resources/home/labels/library"/>
+                                        </xh:td>
+                                    </xf:group>
                                     <xh:td>
                                         <xf:output value="application-name"/>
                                     </xh:td>
@@ -231,14 +249,14 @@
                                         <xf:output value="(title[@xml:lang = $fr-lang], title)[1]"/>
                                     </xh:td>
                                     <xh:td class="fr-summary">
-                                        <xf:group ref=".[xxf:split(@operations) = ('*', 'update', 'read', 'delete')]">
+                                        <xf:group ref=".[$available and $ops = ('*', 'update', 'read', 'delete')]">
                                             <xh:a href="/fr/{application-name}/{form-name}/summary">
                                                 <xh:i class="icon-list"/>
                                             </xh:a>
                                         </xf:group>
                                     </xh:td>
                                     <xh:td class="fr-new">
-                                        <xf:group ref=".[xxf:split(@operations) = ('*', 'create')]">
+                                        <xf:group ref=".[$available and $ops = ('*', 'create')]">
                                             <xh:a href="/fr/{application-name}/{form-name}/new">
                                                 <xh:i class="icon-plus"/>
                                             </xh:a>

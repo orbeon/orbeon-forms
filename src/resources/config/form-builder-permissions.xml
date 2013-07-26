@@ -12,8 +12,33 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <roles>
+    <!--
+        The behavior is as follows:
 
-    <!-- Default for distribution: give everybody access to every form -->
-    <role name="*" app="*" form="*"/>
-    
+        - by default no <role> elements are present
+        - for the Form Builder Summary and New pages, this is equivalent to:
+          <role name="*" app="*" form="*"/>
+        - for the Form Runner Home page
+          - no <role> elements
+            - user cannot unpublish/publish any forms
+            - user cannot see unavailable forms
+          - with <role name="*" app="*" form="*"/>:
+            - user can unpublish/publish any forms
+            - user sees unavailable forms
+
+        This ensures:
+
+        - that Form Builder is usable out of the box even without setting Form Builder permissions
+        - that the Form Runner Home page, which can by default be accessed by any user unless it is explicitly
+          protected, does not inadvertently provide access to administrative functions
+
+    Examples:
+
+        Any user can create and administrate any form:
+        <role name="*" app="*" form="*"/>
+
+        User with role "orbeon-user" can create and administrate any "acme" forms:
+        <role name="orbeon-user" app="acme" form="*"/>
+
+    -->
 </roles>

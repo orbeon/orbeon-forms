@@ -44,7 +44,7 @@
             <xf:var name="form" as="xs:string" value="xxf:instance('fr-parameters-instance')/form"/>
 
             <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
-            <xf:var name="has-fb-roles" value="$is-fb and xxf:instance('fb-permissions')/@has-roles = 'true'"/>
+            <xf:var name="has-fb-roles" value="$is-fb and not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
 
             <xf:var name="app-query"         value="if ($has-fb-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xf:var name="form-query"        value="if ($app-query)    then instance('fr-search-instance')/query[contains(@path, 'form-name')        and @search-field = 'true'] else ()" as="element(query)?"/>

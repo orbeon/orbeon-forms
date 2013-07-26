@@ -506,9 +506,6 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         if (isHTML != isItemsetHTMLMediatype(inDoc, controlName))
             setHTMLMediatype(findControlByName(inDoc, controlName).toList child "itemset" child "label", isHTML)
 
-    private def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
-        nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
-
     private def setHTMLMediatype(nodes: Seq[NodeInfo], isHTML: Boolean): Unit =
         nodes foreach { lhhaElement ⇒
             if (isHTML)

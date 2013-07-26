@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2011 Orbeon, Inc.
+ * Copyright (C) 2013 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,13 +13,14 @@
  */
 package org.orbeon.oxf.fr
 
-object FormRunner
-    extends FormRunnerPersistence
-    with FormRunnerPermissions
-    with FormRunnerPDF
-    with FormRunnerLang
-    with FormRunnerErrorSummary
-    with FormRunnerBaseOps
-    with FormRunnerControlOps
-    with FormRunnerContainerOps
-    with FormRunnerSummaryOps
+import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.scaxon.XML._
+
+trait FormRunnerSummaryOps {
+    // Get a field's label in HTML for the Summary page
+    def htmlFieldLabel(name: String, htmlLabel: Boolean, resources: NodeInfo): String = {
+        def resourceLabelOpt = (resources \ name \ "label" map (v ⇒ if (htmlLabel) v.stringValue else XMLUtils.escapeXMLMinimal(v.stringValue))).headOption
+        resourceLabelOpt getOrElse '[' + name + ']'
+    }
+}

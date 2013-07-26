@@ -77,4 +77,7 @@ trait FormRunnerControlOps extends FormRunnerBaseOps {
 
     def isBindForName(bind: NodeInfo, name: String) =
         hasIdValue(bind, bindId(name)) || bindRefOrNodeset(bind) == Some(name) // also check ref/nodeset in case id is not present
+
+    def hasHTMLMediatype(nodes: Seq[NodeInfo]) =
+        nodes exists (element ⇒ (element attValue "mediatype") == "text/html")
 }

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.relational
 
 import collection.JavaConverters._
 import java.util.{List ⇒ JList}
-import org.orbeon.saxon.om.DocumentInfo
+import org.orbeon.saxon.om.{NodeInfo, DocumentInfo}
 import java.sql.Connection
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner._
@@ -29,12 +29,14 @@ object Index {
         cleanStatement.setString(1, documentId)
         cleanStatement.execute()
 
-        //
         findIndexedControls(formDoc)
     }
 
-    // Returns the name of the controls that are searchable from a form definition
-    def jFindIndexedControls(formDoc: DocumentInfo): JList[IndexedControl] = findIndexedControls(formDoc).asJava
+    // For Summary page
+    def jFindIndexedControls(formDoc: DocumentInfo): JList[NodeInfo] =
+        findIndexedControls(formDoc) map (_.toXML) asJava
+
+    // Returns the controls that are searchable from a form definition
     def findIndexedControls(formDoc: DocumentInfo): Seq[IndexedControl] = {
 
         // Controls in the view, with the fr-summary or fr-search class
@@ -54,10 +56,15 @@ object Index {
                 inSummary   = control.attClasses("fr-summary"),
                 xpath       = binds map (_.attValue("ref") + "[1]") mkString "/",
                 xsType      = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
-                control     = localname(control)
+                control     = localname(control),
+                htmlLabel   = hasHTMLMediatype(control \ (XF → "label"))
              )
         }
     }
 
-    case class IndexedControl(name: String, inSearch: Boolean, inSummary: Boolean, xpath: String, xsType: String, control: String)
+    case class IndexedControl(name: String, inSearch: Boolean, inSummary: Boolean, xpath: String, xsType: String, control: String, htmlLabel: Boolean) {
+        def toXML: NodeInfo =
+            <query name={name} path={xpath} type={xsType} control={control} search-field={inSearch.toString}
+                   summary-field={inSummary.toString} match="substring" html-label={htmlLabel.toString}/>
+    }
 }

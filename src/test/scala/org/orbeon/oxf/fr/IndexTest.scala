@@ -109,10 +109,10 @@ class IndexTest extends DocumentTestBase with AssertionsForJUnit {
 
         val indexedControls = Index.findIndexedControls(elemToDocumentInfo(formElem))
 
-        assert(indexedControls(0) === IndexedControl("in-summary", false, true,  "section-1[1]/in-summary[1]",          "xs:string", "input"))
-        assert(indexedControls(1) === IndexedControl("in-search",  true,  false, "section-1[1]/in-search[1]",           "xs:string", "input"))
-        assert(indexedControls(2) === IndexedControl("in-both",    true,  true,  "section-1[1]/in-both[1]",             "xs:string", "input"))
-        assert(indexedControls(3) === IndexedControl("date",       true,  true,  "section-1[1]/date[1]",                "xf:date"  , "input"))
-        assert(indexedControls(4) === IndexedControl("in-repeat",  true,  true,  "section-1[1]/repeat[1]/in-repeat[1]", "xs:string", "input"))
+        assert(indexedControls(0) === IndexedControl("in-summary", false, true,  "section-1[1]/in-summary[1]",          "xs:string", "input", false))
+        assert(indexedControls(1) === IndexedControl("in-search",  true,  false, "section-1[1]/in-search[1]",           "xs:string", "input", false))
+        assert(indexedControls(2) === IndexedControl("in-both",    true,  true,  "section-1[1]/in-both[1]",             "xs:string", "input", false))
+        assert(indexedControls(3) === IndexedControl("date",       true,  true,  "section-1[1]/date[1]",                "xf:date"  , "input", false))
+        assert(indexedControls(4) === IndexedControl("in-repeat",  true,  true,  "section-1[1]/repeat[1]/in-repeat[1]", "xs:string", "input", false))
     }
 }

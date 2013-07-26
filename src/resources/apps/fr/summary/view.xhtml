@@ -141,10 +141,6 @@
 
             </xf:bind>
 
-            <xf:instance id="fr-search-template" xxf:readonly="true">
-                <query xmlns="" name="" path="" type="" control="" search-field="" summary-field="" match="substring"/>
-            </xf:instance>
-
             <!-- Paging information -->
             <xf:instance id="fr-paging-instance">
                 <search xmlns="">
@@ -243,16 +239,10 @@
                 <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
                 <!-- Create elements holding structured search data -->
-                <xf:action iterate="index:jFindIndexedControls(instance('fr-source-form-instance')/root())">
-                    <xf:insert context="instance('fr-search-instance')" ref="query" origin="instance('fr-search-template')"/>
-                    <xf:var name="query" value="instance('fr-search-instance')/query[last()]"/>
-                    <xf:setvalue ref="$query/@name"          value="indexedControl:name     (context())"/>
-                    <xf:setvalue ref="$query/@path"          value="indexedControl:xpath    (context())"/>
-                    <xf:setvalue ref="$query/@type"          value="indexedControl:xsType   (context())"/>
-                    <xf:setvalue ref="$query/@summary-field" value="indexedControl:inSummary(context())"/>
-                    <xf:setvalue ref="$query/@search-field"  value="indexedControl:inSearch (context())"/>
-                    <xf:setvalue ref="$query/@control"       value="indexedControl:control  (context())"/>
-                </xf:action>
+                <xf:insert
+                    context="instance('fr-search-instance')"
+                    ref="query"
+                    origin="index:jFindIndexedControls(instance('fr-source-form-instance')/root())"/>
 
                 <!-- If requested to, only show drafts for never saved document -->
                 <xf:insert if="xxf:get-request-parameter('drafts-for-never-saved-document') = 'true'"
@@ -338,17 +328,17 @@
 
                                     <!-- Application -->
                                     <xf:group ref="$app-query[$has-fb-roles]" class="fr-summary-search-item">
-                                        <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
+                                        <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
                                         <!-- Use an input if app name is a wildcard -->
                                         <xf:var name="is-input" value="xxf:instance('fb-permissions')/app[@name = '*']" as="xs:boolean"/>
                                         <xf:input ref=".[$is-input]">
                                             <xf:label>
-                                                <xf:output value="$label"/>
+                                                <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                         </xf:input>
                                         <xf:select1 ref=".[not($is-input)]">
                                             <xf:label>
-                                                <xf:output value="$label"/>
+                                                <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                             <xf:itemset ref="xxf:instance('fb-permissions')/app">
                                                 <xf:label ref="@name"/>
@@ -370,18 +360,18 @@
                                     </xf:group>
                                     <!-- Form -->
                                     <xf:group ref="$form-query" class="fr-summary-search-item">
-                                        <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
+                                        <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
                                         <xf:var name="current-app" value="xxf:instance('fb-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
                                         <xf:var name="is-input" value="xxf:instance('fb-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
                                         <xf:input ref=".[$is-input]">
                                             <xf:label>
-                                                <xf:output value="$label"/>
+                                                <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                         </xf:input>
                                         <xf:select1 ref=".[not($is-input)]">
                                             <xf:label>
-                                                <xf:output value="$label"/>
+                                                <xf:output mediatype="text/html" value="$label"/>
                                             </xf:label>
                                             <xf:itemset ref="$current-app/form">
                                                 <xf:label ref="@name"/>
@@ -402,22 +392,22 @@
                                     <!-- Structured search over query terms that have search-field set to 'true' -->
                                     <xf:repeat ref="instance('fr-search-instance')/query[@path and @search-field = 'true']" id="search-repeat">
                                         <xf:var name="control-name" value="@name"/>
-                                        <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
+                                        <xf:var name="label" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
 
                                         <xf:group ref=".[not($has-fb-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                             <!-- input -->
                                             <xf:input ref=".[@control = ('input', 'inplace-input', 'output')]">
-                                                <xf:label value="$label"/>
+                                                <xf:label mediatype="text/html" value="$label"/>
                                             </xf:input>
                                             <!-- textarea -->
                                             <xf:input ref=".[@control = 'textarea']">
-                                                <xf:label value="$label"/>
+                                                <xf:label mediatype="text/html" value="$label"/>
                                             </xf:input>
                                             <!-- select1 -->
                                             <xf:select1 ref=".[@control = 'select1']">
-                                                <xf:label value="$label"/>
+                                                <xf:label mediatype="text/html" value="$label"/>
                                                 <xf:item>
                                                     <xf:label ref="$fr-resources/summary/labels/any"/>
                                                     <xf:value/>
@@ -489,7 +479,7 @@
                                         <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
                                             <xh:th fr:sortable="false" fr:resizeable="true">
                                                 <!-- Output showing as the header of the column -->
-                                                <xf:output value="frf:summaryLanguage(@name, $form-resources)"/>
+                                                <xf:output mediatype="text/html" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
                                             </xh:th>
                                         </xf:repeat>
                                     </xh:tr>

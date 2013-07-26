@@ -973,33 +973,6 @@ public class XMLUtils {
         return str;
     }
 
-    public static String escapeXML(String str) {
-        str = StringUtils.replace(str, "&", "&amp;");
-        str = StringUtils.replace(str, "<", "&lt;");
-        str = StringUtils.replace(str, ">", "&gt;");
-        str = StringUtils.replace(str, "\"", "&quot;");
-        str = StringUtils.replace(str, "'", "&apos;");
-        return str;
-    }
-
-    public static String unescapeXML(String str) {
-        str = StringUtils.replace(str, "&amp;", "&");
-        str = StringUtils.replace(str, "&lt;", "<");
-        str = StringUtils.replace(str, "&gt;", ">");
-        str = StringUtils.replace(str, "&quot;", "\"");
-        str = StringUtils.replace(str, "&apos;", "'");
-        return str;
-    }
-
-    public static String escapeHTML(String str) {
-        str = StringUtils.replace(str, "&", "&amp;");
-        str = StringUtils.replace(str, "<", "&lt;");
-        str = StringUtils.replace(str, ">", "&gt;");
-        str = StringUtils.replace(str, "\"", "&quot;");
-        str = StringUtils.replace(str, "'", "&#39;");
-        return str;
-    }
-
     public static org.dom4j.Document cleanXML(org.dom4j.Document doc, String stylesheetURL) {
         try {
             final org.dom4j.Element element = doc.getRootElement();

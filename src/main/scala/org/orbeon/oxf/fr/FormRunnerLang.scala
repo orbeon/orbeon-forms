@@ -16,11 +16,10 @@ package org.orbeon.oxf.fr
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.saxon.om.{Item, NodeInfo}
+import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.scaxon.XML
-import XML._
+import org.orbeon.scaxon.XML._
 
 trait FormRunnerLang {
 
@@ -102,12 +101,6 @@ trait FormRunnerLang {
             fromRequest orElse
             fromSession orElse
             Option(getDefaultLang(appForm))
-    }
-
-    // Get a field's label for the summary page
-    def summaryLanguage(name: String, resources: NodeInfo): String = {
-        def resourceLabelOpt = (resources \ name \ "label" map (_.getStringValue)).headOption
-        resourceLabelOpt getOrElse '[' + name + ']'
     }
 
     private def selectLangUseDefault(appForm: Option[AppForm], requestedLang: Option[String], availableLangs: List[String]) = {

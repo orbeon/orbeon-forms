@@ -36,7 +36,7 @@
          - https://github.com/orbeon/orbeon-forms/issues/1019
      -->
 
-    <xsl:template match="/xh:html/xh:head/xf:model[1]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
+    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -46,7 +46,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[1]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
+    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -58,7 +58,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[1]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
+    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -68,7 +68,7 @@
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[1]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
+    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->

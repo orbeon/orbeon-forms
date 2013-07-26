@@ -1,0 +1,60 @@
+<!--
+    Copyright (C) 2013 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xf:model id="fb-permissions-model"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:xf="http://www.w3.org/2002/xforms"
+        xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+        xmlns:saxon="http://saxon.sf.net/"
+        xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
+
+    <!-- Model initialization -->
+    <xf:action event="xforms-model-construct-done">
+
+        <xf:var
+            name="fb-roles"
+            value="     if (doc-available('oxf:/config/form-builder-permissions.xml')) then doc('oxf:/config/form-builder-permissions.xml')
+                   else if (doc-available('oxf:/config/form-runner-roles.xml'))        then doc('oxf:/config/form-runner-roles.xml')
+                   else ()"/>
+
+        <xf:action if="exists($fb-roles)">
+
+            <xf:insert ref="instance('fb-permissions')" origin="fbf:formBuilderPermissionsAsXML($fb-roles)"/>
+
+            <xf:message level="xxf:log-debug">
+                ORBEON FORM BUILDER ROLES DEBUG INFORMATION:
+                Resulting permissions: <xf:output value="saxon:serialize(instance('fb-permissions'), 'xml')"/>
+            </xf:message>
+        </xf:action>
+    </xf:action>
+
+    <xf:instance id="fb-permissions">
+        <apps xmlns="" has-roles="false">
+            <!--
+            Example:
+            <app name="orbeon">
+                <form name="bookshelf"/>
+                <form name="dmv-14"/>
+            </app>
+            <app name="foo">
+                <form name="*"/>
+            </app>
+            Or: 
+            <app name="*">
+                <form name="*"/>
+            </app>
+            -->
+        </apps>
+    </xf:instance>
+
+</xf:model>

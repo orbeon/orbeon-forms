@@ -32,7 +32,10 @@
         <!-- Make sure to use the source form's title -->
         <xh:title><xf:output value="$source-form-metadata/title[@xml:lang = xxf:instance('fr-language-instance')], $source-form-metadata/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-summary.css" type="text/css" media="all"/>
-        <!-- Summary page XForms model -->
+
+        <!-- This page needs access to Form Builder permission -->
+        <xi:include href="oxf:/forms/orbeon/builder/form/permissions-model.xml" xxi:omit-xml-base="true"/>
+        <!-- FR Summary page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
 
             <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
@@ -40,13 +43,12 @@
             <xf:var name="app" as="xs:string" value="xxf:instance('fr-parameters-instance')/app"/>
             <xf:var name="form" as="xs:string" value="xxf:instance('fr-parameters-instance')/form"/>
 
-            <!-- NOTE: This test is duplicated in other places -->
-            <xf:var name="is-form-builder" value="$app = 'orbeon' and $form = 'builder'"/>
+            <xf:var name="is-fb"        value="$app = 'orbeon' and $form = 'builder'"/>
+            <xf:var name="has-fb-roles" value="$is-fb and xxf:instance('fb-permissions')/@has-roles = 'true'"/>
 
-            <xf:var name="has-roles" value="xxf:instance('fr-permissions')/@has-roles = 'true'" as="xs:boolean"/>
-            <xf:var name="app-query" value="if ($is-form-builder and $has-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xf:var name="form-query" value="if ($app-query) then instance('fr-search-instance')/query[contains(@path, 'form-name') and @search-field = 'true'] else ()" as="element(query)?"/>
-            <xf:var name="initial-app-value" value="if ($app-query) then xxf:instance('fr-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
+            <xf:var name="app-query"         value="if ($has-fb-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xf:var name="form-query"        value="if ($app-query)    then instance('fr-search-instance')/query[contains(@path, 'form-name')        and @search-field = 'true'] else ()" as="element(query)?"/>
+            <xf:var name="initial-app-value" value="if ($app-query)    then xxf:instance('fb-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
 
             <!-- Source form -->
             <xf:instance id="fr-source-form-instance" xxf:readonly="false"><!-- Set to false so that xf:insert works -->
@@ -129,13 +131,13 @@
                              calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
                 <!-- Adjust value for form if there is an app constraint and a form constraint -->
                 <xf:bind ref="$form-query" readonly="false()"
-                             calculate="(for $a in xxf:instance('fr-permissions')/app[@name = $app-query]
+                             calculate="(for $a in xxf:instance('fb-permissions')/app[@name = $app-query]
                                              return for $current in . return if ($a/form[@name = ($current, '*')]) then .
                                                  else $a/form[1]/@name, .)[1]"/>
                 <!-- Force exact query match if there is an app constraint -->
                 <xf:bind ref="$app-query/@match" readonly="false()" calculate="if ($initial-app-value) then 'exact' else ."/>
                 <!-- Force exact query match if there is a form constraint -->
-                <xf:bind ref="$form-query/@match" readonly="false()" calculate="if (xxf:instance('fr-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
+                <xf:bind ref="$form-query/@match" readonly="false()" calculate="if (xxf:instance('fb-permissions')/app[@name = $app-query]/form[1][not(@name = '*')]) then 'exact' else ."/>
 
             </xf:bind>
 
@@ -299,8 +301,6 @@
         <fr:navbar/>
         <xh:div class="container">
             <fr:row>
-                <!-- Whether this is the summary page for the form builder -->
-                <xf:var name="is-form-builder" value="$app = 'orbeon' and $form = 'builder'"/>
                 <!--<fr:header>-->
                     <!--&lt;!&ndash; Make sure to use the source form's logo &ndash;&gt;-->
                     <!--<fr:logo paths="$source-form-metadata/logo[@xml:lang = xxf:instance('fr-language-instance')], $source-form-metadata/logo"/>-->
@@ -337,10 +337,10 @@
                                     <!-- Special form builder search: use input or select1 for app/form name -->
 
                                     <!-- Application -->
-                                    <xf:group ref="$app-query[$is-form-builder and $has-roles]" class="fr-summary-search-item">
+                                    <xf:group ref="$app-query[$has-fb-roles]" class="fr-summary-search-item">
                                         <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
                                         <!-- Use an input if app name is a wildcard -->
-                                        <xf:var name="is-input" value="xxf:instance('fr-permissions')/app[@name = '*']" as="xs:boolean"/>
+                                        <xf:var name="is-input" value="xxf:instance('fb-permissions')/app[@name = '*']" as="xs:boolean"/>
                                         <xf:input ref=".[$is-input]">
                                             <xf:label>
                                                 <xf:output value="$label"/>
@@ -350,7 +350,7 @@
                                             <xf:label>
                                                 <xf:output value="$label"/>
                                             </xf:label>
-                                            <xf:itemset model="fr-roles-model" ref="instance('fr-permissions')/app">
+                                            <xf:itemset ref="xxf:instance('fb-permissions')/app">
                                                 <xf:label ref="@name"/>
                                                 <xf:value ref="@name"/>
                                             </xf:itemset>
@@ -371,9 +371,9 @@
                                     <!-- Form -->
                                     <xf:group ref="$form-query" class="fr-summary-search-item">
                                         <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
-                                        <xf:var name="current-app" value="xxf:instance('fr-permissions')/app[@name = $app-query]"/>
+                                        <xf:var name="current-app" value="xxf:instance('fb-permissions')/app[@name = $app-query]"/>
                                         <!-- Use an input if app name or form name is a wildcard -->
-                                        <xf:var name="is-input" value="xxf:instance('fr-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
+                                        <xf:var name="is-input" value="xxf:instance('fb-permissions')/app/@name = '*' or $current-app/form[@name = '*']" as="xs:boolean"/>
                                         <xf:input ref=".[$is-input]">
                                             <xf:label>
                                                 <xf:output value="$label"/>
@@ -404,7 +404,7 @@
                                         <xf:var name="control-name" value="@name"/>
                                         <xf:var name="label" value="frf:summaryLanguage(@name, $form-resources)"/>
 
-                                        <xf:group ref=".[not($is-form-builder and $has-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
+                                        <xf:group ref=".[not($has-fb-roles and (contains(@path, 'application-name') or contains(@path, 'form-name')))]" class="fr-summary-search-item">
                                             <!-- Regular search field (exclude app/form name if we are Form Builder and we have roles) -->
 
                                             <!-- input -->

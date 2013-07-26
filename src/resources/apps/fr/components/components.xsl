@@ -42,9 +42,13 @@
 
     <xsl:variable name="is-pe" select="version:isPE()"/>
 
+    <!-- Either the model with id fr-form-model, or the first model -->
+    <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
+    <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
+
     <xsl:variable name="is-detail" select="not($mode = ('summary', ''))" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
-    <xsl:variable name="is-noscript-support" select="not(/xh:html/xh:head/xf:model[1]/@xxf:noscript-support = 'false')" as="xs:boolean"/>
+    <xsl:variable name="is-noscript-support" select="not($fr-form-model/@xxf:noscript-support = 'false')" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'
                                                 and $is-noscript-support" as="xs:boolean"/>
     <xsl:variable name="input-data" select="/*" as="element(xh:html)"/>
@@ -213,8 +217,8 @@
         </xsl:copy>
     </xsl:template>
 
-    <!-- Add Form Runner models and scripts -->
-    <xsl:template match="/xh:html/xh:head/xf:model[1]">
+    <!-- Add Form Runner models and scripts before the main model -->
+    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]">
 
         <!-- Model receiving input parameters -->
         <xf:model id="fr-parameters-model"
@@ -243,9 +247,6 @@
 
         <xf:var name="url-base-for-requests" value="'{$url-base-for-requests}'"/>
 
-        <!-- This model handles Form Builder roles and permissions -->
-        <!-- NOTE: We could remove this if not($is-form-builder), except for the use of the $fr-roles variable -->
-        <xi:include href="oxf:/apps/fr/includes/roles-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles i18n resources -->
         <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles global actions on form sections -->
@@ -322,7 +323,7 @@
             <xsl:apply-templates select="node()"/>
 
             <!-- Variable exposing all the user roles -->
-            <xf:var name="fr-roles" value="xxf:split(xxf:instance('fr-permissions')/@all-roles)" as="xs:string*"/>
+            <xf:var name="fr-roles" value="frf:orbeonRolesAsString()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
             <!-- Variable exposing the form mode -->
             <xf:var name="fr-mode" value="string(xxf:instance('fr-parameters-instance')/mode)"/>
 
@@ -341,7 +342,7 @@
 
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[1]/xf:instance[1]">
+    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:instance[1]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
 

@@ -35,7 +35,7 @@
                 <xf:setvalue iterate="'app', 'form', 'title', 'description', 'mode'"
                     ref="instance()/*[name() = context()]" value="event(context())"/>
                 <!-- -->
-                <xf:setvalue if="$app-chooser = 'output'" ref="app" value="xxf:instance('fr-permissions')/app/@name"/>
+                <xf:setvalue if="$app-chooser = 'output'" ref="app" value="xxf:instance('fb-permissions')/app/@name"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>
         </xbl:handlers>
@@ -53,8 +53,8 @@
 
                 <!-- Control used for choosing the app name; value can be: 'input', 'select1', or 'output' -->
                 <xf:var name="app-chooser" value="
-                    if (xxf:instance('fr-permissions')/app[@name = '*']) then 'input'
-                    else if (count(xxf:instance('fr-permissions')/app) = 1) then 'output'
+                    if (xxf:instance('fb-permissions')/app[@name = '*']) then 'input'
+                    else if (count(xxf:instance('fb-permissions')/app) = 1)   then 'output'
                     else 'select1'"/>
 
                 <xf:bind
@@ -134,7 +134,7 @@
                                         <xf:label ref="$resources/select/label"/>
                                         <xf:value/>
                                     </xf:item>
-                                    <xf:itemset ref="xxf:instance('fr-permissions')/app">
+                                    <xf:itemset ref="xxf:instance('fb-permissions')/app">
                                         <xf:label ref="@name"/>
                                         <xf:value ref="@name"/>
                                     </xf:itemset>

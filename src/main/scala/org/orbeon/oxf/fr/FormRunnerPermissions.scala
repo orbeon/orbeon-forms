@@ -202,6 +202,8 @@ trait FormRunnerPermissions {
 
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest
-        Option(request.getHeaderValuesMap.get("orbeon-roles")) getOrElse Array[String]() toSet
+        request.getHeaderValuesMap.asScala.getOrElse("orbeon-roles", Array.empty[String]) toSet
     }
+
+    def orbeonRolesAsString: String = orbeonRoles mkString " "
 }

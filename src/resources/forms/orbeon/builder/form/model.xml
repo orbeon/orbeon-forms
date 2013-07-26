@@ -151,11 +151,11 @@
         <!-- NOTE: $fb-lang has already been set by fr-annotate-data above -->
 
         <!-- Check permissions if there are roles -->
-        <xf:var name="has-roles" value="not(xxf:instance('fr-permissions')/@has-roles = 'false')"/>
+        <xf:var name="has-roles" value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
         <xf:action if="$has-roles">
             <xf:var name="app"         value="xxf:bind('application-name-bind')"/>
             <xf:var name="form"        value="xxf:bind('form-name-bind')"/>
-            <xf:var name="permissions" value="xxf:instance('fr-permissions')"/>
+            <xf:var name="permissions" value="xxf:instance('fb-permissions')"/>
 
             <xf:action if="xxf:instance('fr-parameters-instance')/mode = 'new'">
                 <!-- New form -->

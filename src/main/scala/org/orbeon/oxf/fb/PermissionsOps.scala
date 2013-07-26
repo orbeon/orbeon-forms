@@ -15,13 +15,14 @@ package org.orbeon.oxf.fb
 
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
-import org.orbeon.oxf.fr.FormRunnerPermissions
+import org.orbeon.oxf.fr.FormRunner.orbeonRoles
 
-trait PermissionsOps extends FormRunnerPermissions {
+trait PermissionsOps {
 
-    def canAccessFormBuilderForm(frPermissions: NodeInfo, app: String, form: String): Boolean = {
+    // Whether, given permissions in XML form, the user has Form Builder access to the given app/form 
+    def canAccessFormBuilderForm(fbPermissions: NodeInfo, app: String, form: String): Boolean = {
 
-        def findAppElement(a: String) = frPermissions \ "app" find (_ \@ "name" === a)
+        def findAppElement(a: String) = fbPermissions \ "app" find (_ \@ "name" === a)
         def findFormElement(e: NodeInfo, f: String) = e \ "form" find (_ \@ "name" === f)
 
         def matchesApp(a: String) = findAppElement(a).isDefined
@@ -30,38 +31,34 @@ trait PermissionsOps extends FormRunnerPermissions {
         matchesApp("*") || (matchesApp(app) && (matchesForm(findAppElement(app).get, "*") || matchesForm(findAppElement(app).get, form)))
     }
 
-    def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo): NodeInfo = {
-        // Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
-        getFormBuilderPermissionsAsXML(formRunnerRoles, orbeonRoles)
-    }
-
-    def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): NodeInfo = {
-
-        val appForms = getFormBuilderPermissions(formRunnerRoles, incomingRoleNames)
+    // For XForms callers
+    def formBuilderPermissionsAsXML(formBuilderRoles: NodeInfo): NodeInfo = {
+        // NOTE: Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
+        val appForms = formBuilderPermissions(formBuilderRoles, orbeonRoles)
 
         if (appForms.isEmpty)
-            <apps has-roles="false" all-roles=""/>
+            <apps has-roles="false"/>
         else
             // Result document contains a tree structure of apps and forms
-            <apps has-roles="true" all-roles={incomingRoleNames mkString " "}>{
+            <apps has-roles="true">{
                 appForms map { case (app, forms) ⇒
                     <app name={app}>{ forms map { form ⇒ <form name={form}/> } }</app>
                 }
             }</apps>
     }
 
-    def getFormBuilderPermissions(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): Map[String, Set[String]] = {
+    def formBuilderPermissions(formBuilderRoles: NodeInfo, incomingRoleNames: Set[String]): Map[String, Set[String]] = {
 
-        val configuredRoles = formRunnerRoles.root \ * \ "role"
+        val configuredRoles = formBuilderRoles.root \ * \ "role"
         if (configuredRoles.isEmpty) {
             // No role configured
             Map()
         } else {
             // Roles configured
             val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet
-            val applicableRoleNames = allConfiguredRoleNames & incomingRoleNames
-            val applicableRoles = configuredRoles filter (e ⇒ (applicableRoleNames + "*")(e.attValue("name")))
-            val applicableAppNames = applicableRoles map (_.attValue("app")) toSet
+            val applicableRoleNames    = allConfiguredRoleNames & incomingRoleNames
+            val applicableRoles        = configuredRoles filter (e ⇒ (applicableRoleNames + "*")(e.attValue("name")))
+            val applicableAppNames     = applicableRoles map (_.attValue("app")) toSet
 
             if (applicableAppNames("*")) {
                 // User has access to all apps (and therefore all forms)

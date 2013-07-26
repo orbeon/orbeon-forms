@@ -25,11 +25,13 @@
     <xh:head>
         <xh:title><xf:output ref="$fr-resources/home/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-home.css" type="text/css" media="all"/>
+        <!-- This page needs access to Form Builder permission -->
+        <xi:include href="oxf:/forms/orbeon/builder/form/permissions-model.xml" xxi:omit-xml-base="true"/>
+        <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
 
             <xf:instance id="fr-form-instance">
                 <ui>
-                    <user-roles/><!-- Q: Is this used at all? -->
                     <selection/>
                     <error/>
                     <unpublish-button/>
@@ -42,7 +44,7 @@
             <xf:bind ref="unpublish-button" readonly="not(normalize-space(../selection) and     xxf:forall(xxf:split(../selection), $is-available))"/>
             <xf:bind ref="publish-button"   readonly="not(normalize-space(../selection) and not(xxf:exists(xxf:split(../selection), $is-available)))"/>
 
-            <xf:var name="fb-permissions" value="xxf:instance('fr-permissions')"/>
+            <xf:var name="fb-permissions" value="xxf:instance('fb-permissions')"/>
 
             <!-- Forms metadata -->
             <xf:instance id="fr-metadata"><forms/></xf:instance>
@@ -257,9 +259,6 @@
                         <xf:label mediatype="text/html" value="$fr-resources/home/buttons/publish"/>
                     </xf:trigger>
                 </xh:span>
-                <!--xxx<xf:output value="saxon:serialize(xxf:instance('fr-permissions'), 'xml')"/>-->
-                <!--xxx<xf:output value="saxon:serialize(xxf:instance('fr-metadata'), 'xml')"/>-->
-
             </fr:row>
             <fr:row>
                 <fr:version/>

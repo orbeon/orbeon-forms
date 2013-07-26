@@ -86,6 +86,7 @@
 }
 .orbeon table th {
   white-space: nowrap;
+  min-width: 12px;
 }
 .orbeon table .fr-home-repeat-selection-checkbox {
   width: 1px;

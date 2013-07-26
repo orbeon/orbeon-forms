@@ -183,6 +183,7 @@ trait FormRunnerPermissions {
      */
     def javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): java.util.List[String] =
         allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement).asJava
+
     def allAuthorizedOperationsAssumingOwnerGroupMember(permissionsElement: NodeInfo): Seq[String] = {
         val headers = NetUtils.getExternalContext.getRequest.getHeaderValuesMap.asScala
         val username = headers.get("orbeon-username").toSeq.flatten.headOption.getOrElse("")
@@ -202,61 +203,5 @@ trait FormRunnerPermissions {
     def orbeonRoles: Set[String] = {
         val request = NetUtils.getExternalContext.getRequest
         Option(request.getHeaderValuesMap.get("orbeon-roles")) getOrElse Array[String]() toSet
-    }
-
-    def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo): NodeInfo = {
-        // Whether in container or header mode, roles are parsed into the Orbeon-Roles header at this point
-        getFormBuilderPermissionsAsXML(formRunnerRoles, orbeonRoles)
-    }
-
-    def getFormBuilderPermissionsAsXML(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): NodeInfo = {
-
-        val appForms = getFormBuilderPermissions(formRunnerRoles, incomingRoleNames)
-
-        if (appForms.isEmpty)
-            <apps has-roles="false" all-roles=""/>
-        else
-            // Result document contains a tree structure of apps and forms
-            <apps has-roles="true" all-roles={incomingRoleNames mkString " "}>{
-                appForms map { case (app, forms) ⇒
-                    <app name={app}>{ forms map { form ⇒ <form name={form}/> } }</app>
-                }
-            }</apps>
-    }
-
-    def getFormBuilderPermissions(formRunnerRoles: NodeInfo, incomingRoleNames: Set[String]): Map[String, Set[String]] = {
-
-        val configuredRoles = formRunnerRoles.root \ * \ "role"
-        if (configuredRoles.isEmpty) {
-            // No role configured
-            Map()
-        } else {
-            // Roles configured
-            val allConfiguredRoleNames = configuredRoles map (_.attValue("name")) toSet
-            val applicableRoleNames = allConfiguredRoleNames & incomingRoleNames
-            val applicableRoles = configuredRoles filter (e ⇒ (applicableRoleNames + "*")(e.attValue("name")))
-            val applicableAppNames = applicableRoles map (_.attValue("app")) toSet
-
-            if (applicableAppNames("*")) {
-                // User has access to all apps (and therefore all forms)
-                Map("*" → Set("*"))
-            } else {
-                // User has access to certain apps only
-                (for {
-                    app ← applicableAppNames
-                    forms = {
-                        val applicableFormsForApp = applicableRoles filter (_.attValue("app") == app) map (_.attValue("form")) toSet
-
-                        if (applicableFormsForApp("*")) Set("*") else applicableFormsForApp
-                    }
-                } yield
-                    app → forms) toMap
-            }
-        }
-    }
-
-    private def isAuthorized(appForms: Map[String, Set[String]], app: String, form: String) = {
-        // Authorized if access to all apps OR if access to current app AND (access to all forms in app OR to specific form in app)
-        (appForms contains "*") || (appForms.get(app) exists (_ & Set("*", form) nonEmpty))
     }
 }

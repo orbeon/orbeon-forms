@@ -19,7 +19,8 @@
          xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
          xmlns:saxon="http://saxon.sf.net/"
          xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
-         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
+         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+         xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder">
 
     <xh:head>
         <xh:title><xf:output ref="$fr-resources/home/title"/></xh:title>
@@ -41,6 +42,8 @@
             <xf:bind ref="unpublish-button" readonly="not(normalize-space(../selection) and     xxf:forall(xxf:split(../selection), $is-available))"/>
             <xf:bind ref="publish-button"   readonly="not(normalize-space(../selection) and not(xxf:exists(xxf:split(../selection), $is-available)))"/>
 
+            <xf:var name="fb-permissions" value="xxf:instance('fr-permissions')"/>
+
             <!-- Forms metadata -->
             <xf:instance id="fr-metadata"><forms/></xf:instance>
             <xf:submission
@@ -52,9 +55,30 @@
                 instance="fr-metadata">
 
                 <xf:action event="xforms-submit-done" iterate="instance('fr-metadata')/form">
-                    <xf:insert
-                        context="."
-                        origin="xxf:attribute('operations', string-join(frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions), ' '))"/>
+                    <xf:var
+                        name="has-access"
+                        value="fbf:canAccessFormBuilderForm($fb-permissions, application-name, form-name)"/>
+
+                    <xf:var
+                        name="remove-form"
+                        value="not($has-access) and available = 'false'"/>
+
+                    <!-- If the current user doesn't have FB access to the current form, and that form is unavailable,
+                         don't show the form at all. For the user, the form is in effect non-existing. -->
+                    <xf:delete
+                        if="$remove-form"
+                        ref="."/>
+
+                    <!-- Otherwise show the form and set extra attributes -->
+                    <xf:action if="not($remove-form)">
+                        <xf:insert
+                            context="."
+                            origin="xxf:attribute('allow-publish-unpublish', $has-access)"/>
+
+                        <xf:insert
+                            context="."
+                            origin="xxf:attribute('operations', string-join(frf:javaAllAuthorizedOperationsAssumingOwnerGroupMember(permissions), ' '))"/>
+                    </xf:action>
                 </xf:action>
 
             </xf:submission>
@@ -65,6 +89,7 @@
 
             <!-- Scope variable with Form Runner resources -->
             <xf:var name="fr-resources" model="fr-resources-model" value="$fr-fr-resources"/>
+            <xf:var name="fr-lang"      model="fr-resources-model" value="$fr-lang"/>
 
             <xf:dispatch event="DOMActivate" observer="fr-publish-button fr-unpublish-button" target="publish-confirmation-dialog" name="fr-show">
                 <xf:property name="message"
@@ -152,7 +177,7 @@
         <xh:div class="container">
             <fr:row>
                 <fr:body>
-                    <xf:var name="forms" value="instance('fr-metadata')/form[exists(*) and @operations != '']"/>
+                    <xf:var name="forms"          value="instance('fr-metadata')/form[exists(*) and @operations != '']"/>
                     <xf:group ref=".[empty($forms)]">
                         <xh:div class="alert">
                             No forms have been deployed, or you don't have the permissions to access any
@@ -175,7 +200,10 @@
                                 <xf:var name="available" value="not(available = 'false')"/>
                                 <xh:tr>
                                     <xh:td class="fr-home-repeat-selection-checkbox">
-                                        <xf:select appearance="full" ref="instance()/selection" id="document-selection">
+                                        <xf:select
+                                            appearance="full"
+                                            ref="instance()/selection[$current/@allow-publish-unpublish = 'true']"
+                                            id="document-selection">
                                             <xf:item>
                                                 <xf:label/>
                                                 <xf:value context="$current" value="concat(application-name, '/', form-name, '/', $available)"/>
@@ -198,7 +226,7 @@
                                         <xf:output value="form-name"/>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:output value="title"/>
+                                        <xf:output value="(title[@xml:lang = $fr-lang], title)[1]"/>
                                     </xh:td>
                                     <xh:td class="fr-summary">
                                         <xf:group ref=".[xxf:split(@operations) = ('*', 'update', 'read', 'delete')]">
@@ -229,6 +257,9 @@
                         <xf:label mediatype="text/html" value="$fr-resources/home/buttons/publish"/>
                     </xf:trigger>
                 </xh:span>
+                <!--xxx<xf:output value="saxon:serialize(xxf:instance('fr-permissions'), 'xml')"/>-->
+                <!--xxx<xf:output value="saxon:serialize(xxf:instance('fr-metadata'), 'xml')"/>-->
+
             </fr:row>
             <fr:row>
                 <fr:version/>

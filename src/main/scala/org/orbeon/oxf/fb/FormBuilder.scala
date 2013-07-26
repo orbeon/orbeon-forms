@@ -27,3 +27,4 @@ object FormBuilder
     with SectionOps
     with AlertsAndConstraintsOps
     with SchemaOps
+    with PermissionsOps

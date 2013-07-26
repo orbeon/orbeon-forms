@@ -25,6 +25,7 @@ import org.dom4j.{Document ⇒ JDocument}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.fb.FormBuilder.getFormBuilderPermissions
 
 class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 

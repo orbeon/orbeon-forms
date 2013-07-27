@@ -82,7 +82,7 @@
             </paging>
             <messages>
                 <no-form-found><i>No form data was found.</i></no-form-found>
-                <delete-confirmation>Are you sure you want to delete one or more forms?</delete-confirmation>
+                <delete-confirmation>Are you sure you want to delete one or more forms? Note that when deleting a saved document, the corresponding drafts are deleted as well.</delete-confirmation>
             </messages>
             <labels>
                 <draft>Draft</draft>
@@ -321,7 +321,7 @@
             </paging>
             <messages>
                 <no-form-found><i>Aucun formulaire trouvé.</i></no-form-found>
-                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires?</delete-confirmation>
+                <delete-confirmation>Etes-vous sûr de vouloir supprimer un ou plusieurs formulaires? Notez que lors de la suppression d'un document enregistré, les brouillons correspondants sont également supprimés.</delete-confirmation>
             </messages>
             <labels>
                 <draft>Brouillons</draft>
@@ -552,7 +552,7 @@
             </paging>
             <messages>
                 <no-form-found><i>No se encontró el formulario.</i></no-form-found>
-                <delete-confirmation>Esta seguro que desea borrar uno o más formularios?</delete-confirmation>
+                <delete-confirmation>Esta seguro que desea borrar uno o más formularios? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
                 <draft>Borradores</draft>
@@ -778,7 +778,7 @@
             </paging>
             <messages>
                 <no-form-found><i>Ingen skjema funnet.</i></no-form-found>
-                <delete-confirmation>Vil du slette markerte skjema?</delete-confirmation>
+                <delete-confirmation>Vil du slette markerte skjema? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
                 <draft>[Draft]</draft>
@@ -1002,7 +1002,7 @@
             </paging>
             <messages>
                 <no-form-found><i>Форм не найдено.</i></no-form-found>
-                <delete-confirmation>Вы уверены, что хотите удалить формы?</delete-confirmation>
+                <delete-confirmation>Вы уверены, что хотите удалить формы? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
                 <draft>черновик</draft>
@@ -1230,7 +1230,7 @@
             </paging>
             <messages>
                 <no-form-found><i>I dati del modulo non sono stati trovati.</i></no-form-found>
-                <delete-confirmation>Sei sicuro di volere cancellare uno o più moduli?</delete-confirmation>
+                <delete-confirmation>Sei sicuro di volere cancellare uno o più moduli? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
 		        <draft>Bozza</draft>
@@ -1466,7 +1466,7 @@
             </paging>
             <messages>
                 <no-form-found><i>Es wurde kein Formular gefunden.</i></no-form-found>
-                <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen?</delete-confirmation>
+                <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
 		        <draft>Entwurf</draft>

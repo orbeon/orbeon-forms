@@ -26,6 +26,7 @@
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:index="org.orbeon.oxf.fr.relational.Index"
       xmlns:indexedControl="org.orbeon.oxf.fr.relational.Index$IndexedControl"
+      xmlns:version="java:org.orbeon.oxf.common.Version"
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
@@ -49,6 +50,10 @@
             <xf:var name="app-query"         value="if ($has-fb-roles) then instance('fr-search-instance')/query[contains(@path, 'application-name') and @search-field = 'true'] else ()" as="element(query)?"/>
             <xf:var name="form-query"        value="if ($app-query)    then instance('fr-search-instance')/query[contains(@path, 'form-name')        and @search-field = 'true'] else ()" as="element(query)?"/>
             <xf:var name="initial-app-value" value="if ($app-query)    then xxf:instance('fb-permissions')/app[1][not(@name = '*')]/@name else ()" as="xs:string?"/>
+
+            <xf:var name="selection-is-one-document" value="count(xxf:split(instance('fr-selection-instance'))) = 1"/>
+            <xf:var name="selection-data-or-draft"   value="if ($selection-is-one-document) then substring-before(instance('fr-selection-instance'), '/') else ()"/>
+            <xf:var name="selection-document-id"     value="if ($selection-is-one-document) then substring-after (instance('fr-selection-instance'), '/') else ()"/>
 
             <!-- Source form -->
             <xf:instance id="fr-source-form-instance" xxf:readonly="false"><!-- Set to false so that xf:insert works -->
@@ -101,8 +106,12 @@
                 <xf:load resource="/fr/{$app}/{$form}/new{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"/>
             </xf:action>
 
-            <xf:action ev:event="fr-summary-view" if="count(xxf:split(instance('fr-selection-instance'))) = 1">
-                <xf:load resource="/fr/{$app}/{$form}/view/{normalize-space(instance('fr-selection-instance'))}{if (property('xxf:noscript')) then '?fr-noscript=true' else ''}"/>
+            <xf:action ev:event="fr-summary-view" if="$selection-is-one-document">
+                <xf:var name="params" value="(
+                        if (property('xxf:noscript'))           then 'fr-noscript=true' else (),
+                        if ($selection-data-or-draft = 'draft') then 'draft=true'       else ()
+                    )"/>
+                <xf:load resource="/fr/{$app}/{$form}/view/{$selection-document-id}{if (exists($params)) then concat('?', string-join($params, '&amp;')) else ()}"/>
             </xf:action>
 
             <!-- Instance to track search results and paging -->
@@ -510,7 +519,7 @@
                                                     <xf:select appearance="full" ref="instance('fr-selection-instance')" id="document-selection">
                                                         <xf:item>
                                                             <xf:label/>
-                                                            <xf:value value="$current-document-name"/>
+                                                            <xf:value value="concat(if ($document/@draft = 'Y') then 'draft' else 'data', '/', $current-document-name)"/>
                                                         </xf:item>
                                                     </xf:select>
                                                 </xh:td>
@@ -718,13 +727,16 @@
                                     </xf:action>
                                 </xf:trigger>
                             </xf:group>
-                            <!-- PDF button -->
-                            <!-- Don't show the PDF template button in CE (also on detail page) -->
-                            <xf:group ref="if (. = 'pdf' and not($has-pdf-template and not(version:isPE()))) then if ($view-enabled) then $enabled else $disabled else ()"
-                                    xmlns:version="java:org.orbeon.oxf.common.Version">
+                            <!-- PDF button
+                                 - don't show the PDF template button in CE (also on detail page)
+                                 - button not enabled when a draft is selected (not sure it makes sense to create a PDF
+                                   for a draft and the PDF functionality right now doesn't support creating a PDF for a draft) -->
+                            <xf:group ref="if (. = 'pdf' and not($has-pdf-template and not(version:isPE())))
+                                           then (if ($view-enabled and $selection-data-or-draft = 'data') then $enabled else $disabled)
+                                           else ()">
                                 <fr:href-button
                                         ref="."
-                                        href="/fr/{$app}/{$form}/pdf/{xxf:split(normalize-space(instance('fr-selection-instance')))[1]}?fr-language={xxf:lang()}">
+                                        href="/fr/{$app}/{$form}/pdf/{$selection-document-id}?fr-language={xxf:instance('fr-language-instance')}">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/pdf"/>
                                 </fr:href-button>
                             </xf:group>
@@ -776,9 +788,9 @@
                 <xf:action ev:event="DOMActivate">
                     <!-- Parse the selected rows -->
                     <xf:action iterate="xxf:split(instance('fr-selection-instance'))">
-                        <xf:var name="document-name" value="." as="xs:string"/>
+                        <xf:var name="document" value="." as="xs:string"/>
                         <xf:dispatch name="fr-delete-data" targetid="fr-persistence-model">
-                            <xf:property name="document-id" value="$document-name"/>
+                            <xf:property name="document-data-or-draft-id" value="$document"/>
                         </xf:dispatch>
                     </xf:action>
                     <!-- Reset search selection and navigation -->

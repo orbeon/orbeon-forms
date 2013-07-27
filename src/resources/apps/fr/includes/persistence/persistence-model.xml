@@ -222,14 +222,14 @@
     <!-- Delete operation -->
     <xf:action event="fr-delete-data">
         <xf:send submission="fr-delete-document-submission">
-            <xf:property name="document-id" value="event('document-id')"/>
+            <xf:property name="document-data-or-draft-id" value="event('document-data-or-draft-id')"/>
         </xf:send>
     </xf:action>
 
     <xf:submission id="fr-delete-document-submission"
             method="delete"
             serialization="none"
-            resource="/fr/service/persistence/crud/{$app}/{$form}/data/{event('document-id')}/data.xml"
+            resource="/fr/service/persistence/crud/{$app}/{$form}/{event('document-data-or-draft-id')}/data.xml"
             replace="none"/>
 
     <!-- Instance to store the result of the create/update submission -->

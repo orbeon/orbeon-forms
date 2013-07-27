@@ -135,7 +135,7 @@
                     <xsl:variable name="search-operations"        select="('*', 'read', 'update', 'delete')"/>
                     <xsl:variable name="search-permissions"       select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
                     <xsl:variable name="support-auto-save"        as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
-                    <xsl:variable name="include-drafts"           as="xs:boolean" select="$support-auto-save     and (empty(/search/drafts) or /search/drafts = ('include', 'only'))  and /search/@orbeon-username != ''"/>
+                    <xsl:variable name="include-drafts"           as="xs:boolean" select="$support-auto-save     and (empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
                     <xsl:variable name="include-non-drafts"       as="xs:boolean" select="not($support-auto-save) or (empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
 
                     <!-- Are we authorized to see all the data based because of our role? -->
@@ -250,7 +250,8 @@
                                     order by created desc
                                 </xsl:variable>
 
-                                <!-- Get total number of document in collection for this app/form -->
+                                <!-- Get total number of document in collection for this app/form
+                                     - the count includes drafts, whether returned or not, except for anonymous users, who can't use the draft functionality  -->
                                 <sql:execute>
                                     <sql:query>
                                         select
@@ -272,6 +273,7 @@
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
+                                                            <xsl:if test="$support-auto-save and /search/@orbeon-username = ''"> and draft = 'N'</xsl:if>
                                                         group by app, form, document_id
                                                         <xsl:if test="$support-auto-save">, draft</xsl:if>
                                                     )

@@ -58,8 +58,19 @@ public abstract class SQLProcessorOracleDelegateBase implements DatabaseDelegate
         // Get an OraclePreparedStatement
         final OraclePreparedStatement oracleStmt = getOraclePreparedStatement(stmt);
 
+        // Get an OracleConnection to prevent ClassCastException in oracle.sql.CLOB
+        // - see this post from 2004 https://forums.oracle.com/thread/281238
+        // - this still seems to be the case with Oracle 12c Release 1 (12.1.0.1) ojdbc6_g.jar
+        // - we only observed OraclePreparedStatement.getConnection() returning a wrapped
+        //   connection when getting the OraclePreparedStatement through JDBC 4, so
+        //   unwrapping the connection with JDBC 4's unwrap should be fine
+        final Connection connection = oracleStmt.getConnection();
+        final OracleConnection oracleConnection = connection instanceof OracleConnection
+                ? (OracleConnection) connection
+                : connection.unwrap(OracleConnection.class);
+
         // Create a temporary CLOB
-        final CLOB clob = CLOB.createTemporary(oracleStmt.getConnection(), true, CLOB.DURATION_SESSION);
+        final CLOB clob = CLOB.createTemporary(oracleConnection, true, CLOB.DURATION_SESSION);
 
         // Write to the CLOB
         final Writer writer = clob.getCharacterOutputStream();

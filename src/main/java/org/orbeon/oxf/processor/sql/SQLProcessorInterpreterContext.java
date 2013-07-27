@@ -146,6 +146,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                         // Ignore
                     }
                     // Try JBoss 7 delegate
+                    // - since JBoss 7 supports JDBC 4, we shouldn't need this, and we should just be able to use SQLProcessorOracleJDBC4Delegate
                     if (clazz == null) {
                         try {
                             getClass().getClassLoader().loadClass("org.jboss.jca.adapters.jdbc.WrappedPreparedStatement");
@@ -161,16 +162,6 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                             getClass().getClassLoader().loadClass("org.jboss.resource.adapter.jdbc.WrappedPreparedStatement");
                             clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJBoss6Delegate");
                             SQLProcessor.logger.info("Using Oracle JBoss 6 delegate.");
-                        } catch (Throwable t) {
-                            // Ignore
-                        }
-                    }
-                    // First try Tomcat 4
-                    if (clazz == null) {
-                        try {
-                            getClass().getClassLoader().loadClass("org.apache.commons.dbcp.DelegatingPreparedStatement");
-                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcat4Delegate");
-                            SQLProcessor.logger.info("Using Oracle Tomcat 4 delegate.");
                         } catch (Throwable t) {
                             // Ignore
                         }

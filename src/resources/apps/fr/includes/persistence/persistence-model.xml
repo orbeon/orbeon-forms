@@ -33,7 +33,8 @@
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
-    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave') and exists(xxf:get-remote-user()) and $mode = 'edit'"/>
+    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave') and exists(xxf:get-remote-user()) and $mode = ('new', 'edit')"/>
+    <xf:var name="autosave-delay"   value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
     <xf:action event="xforms-ready" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
@@ -321,8 +322,6 @@
             <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->
             <data-status>clean</data-status>
             <autosave>
-                <do-autosave>false</do-autosave>
-                <delay/>
                 <status>clean</status>
                 <change-timestamp/>
             </autosave>
@@ -468,31 +467,25 @@
     <xf:action observer="fr-form-instance fb-form-instance" event="xforms-insert xforms-delete xxforms-replace xxforms-value-changed">
         <xf:action if="$mode = ('new', 'edit')">
             <!-- Mark status as dirty if data changes -->
-            <xf:setvalue ref="$persistence-instance/data-status" value="'dirty'"/>
-            <xf:setvalue ref="$autosave/status"                  value="'dirty'"/>
-            <xf:setvalue ref="$autosave/change-timestamp"        value="current-dateTime()"/>
-            <xf:dispatch if="$autosave/do-autosave = 'true'"
-                         name="maybe-autosave" targetid="fr-persistence-model"
-                         delay="{$autosave/delay}" xxf:show-progress="false"/>
+            <xf:setvalue ref="$persistence-instance/data-status"     value="'dirty'"/>
+            <xf:action if="$autosave-enabled">
+                <xf:setvalue ref="$autosave/status"                  value="'dirty'"/>
+                <xf:setvalue ref="$autosave/change-timestamp"        value="current-dateTime()"/>
+                <xf:dispatch name="maybe-autosave" targetid="fr-persistence-model"
+                             delay="{$autosave-delay}" xxf:show-progress="false"/>
+            </xf:action>
         </xf:action>
     </xf:action>
 
-    <!-- Keep track of whether we need to autosave -->
-    <xf:action if="$autosave-enabled"
-               observer="fr-button-save-draft fr-button-save-final" event="xforms-enabled">
-        <xf:setvalue ref="$autosave/do-autosave" value="'true'"/>
-        <xf:setvalue ref="$autosave/delay"       value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
-    </xf:action>
-
     <xf:action event="maybe-autosave" if="$autosave/status = 'dirty'">
-        <xf:var name="delay" value="xs:dayTimeDuration(concat('PT', $autosave/delay div 1000, 'S'))"/>
+        <xf:var name="delay" value="xs:dayTimeDuration(concat('PT', $autosave-delay div 1000, 'S'))"/>
         <xf:var name="autosave-time" value="xs:dateTime($autosave/change-timestamp) + $delay"/>
         <xf:var name="autosave-now" value="$autosave-time le current-dateTime()"/>
         <xf:action if="$autosave-now" type="xpath">process:runProcessByName('autosave')</xf:action>
         <!-- Ideally we'd like delay = $wait, but it would require converting an xs:dateTimeDuration in ms -->
         <xf:dispatch if="not($autosave-now)"
                      name="maybe-autosave" targetid="fr-persistence-model"
-                     delay="{$autosave/delay}"
+                     delay="{$autosave-delay}"
                      xxf:show-progress="false"/>
     </xf:action>
 

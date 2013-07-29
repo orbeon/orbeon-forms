@@ -98,8 +98,8 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
 
         getBuiltinTypeName match {
             case "boolean"                ⇒ normalizeBooleanString(externalValue)
-            case "date"     if isNoscript ⇒ parse(DateParsePatterns, externalValue.trim)
-            case "time"     if isNoscript ⇒ parse(TimeParsePatterns, externalValue.trim)
+            case "date"     if isNoscript ⇒ parseForNoscript(DateParsePatterns, externalValue.trim) // TODO: https://github.com/orbeon/orbeon-forms/issues/1154
+            case "time"     if isNoscript ⇒ parseForNoscript(TimeParsePatterns, externalValue.trim)
             case "dateTime" if isNoscript ⇒
                 // Split into date and time parts
                 // We use the same separator as the repeat separator. This is set in xforms-server-submit.xpl.
@@ -107,7 +107,7 @@ class XFormsInputControl(container: XBLContainer, parent: XFormsControl, element
                 val timePart = getDateTimeTimePart(externalValue.trim, REPEAT_SEPARATOR)
                 if (datePart.nonEmpty || timePart.nonEmpty)
                     // Parse and recombine with 'T' separator (result may be invalid dateTime, of course!)
-                    parse(DateParsePatterns, datePart) + 'T' + parse(TimeParsePatterns, timePart)
+                    parseForNoscript(DateParsePatterns, datePart) + 'T' + parseForNoscript(TimeParsePatterns, timePart) // TODO: https://github.com/orbeon/orbeon-forms/issues/1154
                 else
                     // Special case of empty parts
                     ""
@@ -233,7 +233,7 @@ object XFormsInputControl {
             value.substring(separatorIndex + 1).trim
     }
 
-    private def parse(patterns: Seq[ParsePattern], value: String): String = {
+    private def parseForNoscript(patterns: Seq[ParsePattern], value: String): String = {
         for (currentPattern ← patterns.toIterator) {
             val result = MatchResult(currentPattern.regex.pattern, value)
             if (result.matches)
@@ -242,8 +242,8 @@ object XFormsInputControl {
         value
     }
 
-    def testParseTime(value: String) = parse(TimeParsePatterns, value)
-    def testParseDate(value: String) = parse(XFormsInputControl.DateParsePatterns, value)
+    def testParseTimeForNoscript(value: String) = parseForNoscript(TimeParsePatterns, value)
+    def testParseDateForNoscript(value: String) = parseForNoscript(DateParsePatterns, value)
 
     def getPlaceholderInfo(elementAnalysis: ElementAnalysis, control: XFormsControl): PlaceHolderInfo = {
         val isLabelPlaceholder = LHHAAnalysis.hasLHHAPlaceholder(elementAnalysis, "label")

@@ -201,11 +201,9 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
     def getMediatypeAttribute = mediatypeAttribute.orNull
     def getValueAttribute = valueAttribute
 
-    // No type information is returned when there is a value attribute
-    // Question: what if we have both @ref and @value? Should a type still be provided? This is not supported in
-    // XForms 1.1 but we do support it, with the idea that the bound node does not provide the value but provides
-    // mips. Not sure if the code below makes sense after all then.
-    override def valueType: QName = if (valueAttribute eq null) super.valueType else null
+    // If we have both @ref and @value, read the type
+    // XForms doesn't specify this as of XForms 2.0, but we already read the other MIPs so it makes sense.
+    override def valueType = super.valueType
 
     // It usually doesn't make sense to focus on xf:output, at least not in the sense "focus to enter data". So we
     // disallow this for now.

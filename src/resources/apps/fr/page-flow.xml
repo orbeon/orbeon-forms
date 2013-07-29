@@ -69,7 +69,7 @@
     <!-- ==== Custom DB2-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/db2/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
+    <service path="/fr/service/db2/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
              model="persistence/db2/crud.xpl"/>
 
     <!-- Search -->

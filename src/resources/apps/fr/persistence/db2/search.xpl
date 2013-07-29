@@ -131,6 +131,9 @@
                     <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
                     <xsl:variable name="search-operations" select="('*', 'read', 'update', 'delete')"/>
                     <xsl:variable name="search-permissions" select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
+                    <xsl:variable name="support-auto-save"        as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
+                    <xsl:variable name="include-drafts"           as="xs:boolean" select="$support-auto-save     and (empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
+                    <xsl:variable name="include-non-drafts"       as="xs:boolean" select="not($support-auto-save) or (empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
 
                     <!-- Are we authorized to see all the data based because of our role? -->
                     <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
@@ -160,65 +163,115 @@
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
-                                        data.created, data.last_modified_time, data.document_id
+                                        created, last_modified_time, document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
 					                        , XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
                                         , username, groupname
-                                    from orbeon_form_data data,
-                                        (
-                                            select max(last_modified_time) last_modified_time, app, form, document_id
-                                            from orbeon_form_data
-                                            where
-                                                app = <sql:param type="xs:string" select="/search/app"/>
-                                                and form = <sql:param type="xs:string" select="/search/form"/>
-                                            group by app, form, document_id
-                                        ) latest
-                                    where
-                                        <!-- Merge with 'latest', to make sure we only consider the document with the most recent last_date -->
-                                        data.last_modified_time = latest.last_modified_time
-                                        and data.app = latest.app
-                                        and data.form = latest.form
-                                        and data.document_id = latest.document_id
-                                        <!-- Don't take document that have been deleted -->
-                                        and data.deleted = 'N'
-                                        <!-- Conditions on searchable columns -->
-                                        <xsl:for-each select="/search/query[@path and normalize-space() != '']">
-                                            <xsl:choose>
-                                                <xsl:when test="@match = 'exact'">
-                                                    <!-- Exact match -->
-						                            and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>
-						                            = "<xsl:value-of select="f:escape-sql(.)"/>"]')
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <!-- Substring -->
-						                            and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xsl:for-each>
-                                        <!-- Condition for free text search -->
-                                        <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
-                                            and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
+                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                    from
+                                    (
+                                        <xsl:if test="$include-non-drafts">
+                                            (
+                                                select data.*
+                                                from orbeon_form_data data,
+                                                    (
+                                                        select max(last_modified_time) last_modified_time, app, form, document_id
+                                                        from orbeon_form_data
+                                                        where
+                                                            app = <sql:param type="xs:string" select="/search/app"/>
+                                                            and form = <sql:param type="xs:string" select="/search/form"/>
+                                                            <xsl:if test="$support-auto-save"> and draft = 'N'</xsl:if>
+                                                        group by app, form, document_id
+                                                    ) latest
+                                                where
+                                                    <!-- Merge with 'latest', to make sure we only consider the document with the most recent last_date -->
+                                                    data.last_modified_time = latest.last_modified_time
+                                                    and data.app = latest.app
+                                                    and data.form = latest.form
+                                                    and data.document_id = latest.document_id
+                                                    and data.deleted = 'N'
+                                                    <!-- Conditions on searchable columns -->
+                                                    <xsl:for-each select="/search/query[@path and normalize-space() != '']">
+                                                        <xsl:choose>
+                                                            <xsl:when test="@match = 'exact'">
+                                                                <!-- Exact match -->
+                                                                and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>
+                                                                = "<xsl:value-of select="f:escape-sql(.)"/>"]')
+                                                            </xsl:when>
+                                                            <xsl:otherwise>
+                                                                <!-- Substring -->
+                                                                and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
+                                                            </xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xsl:for-each>
+                                                    <!-- Condition for free text search -->
+                                                    <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
+                                                        and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
+                                                    </xsl:if>
+                                                    <xsl:copy-of select="$owner-group-condition"/>
+                                            )
                                         </xsl:if>
-                                        <xsl:copy-of select="$owner-group-condition"/>
+                                        <xsl:if test="$include-non-drafts and $include-drafts">
+                                            union all
+                                        </xsl:if>
+                                        <xsl:if test="$include-drafts">
+                                            (
+                                                select *
+                                                from orbeon_form_data d1
+                                                where
+                                                    app = <sql:param type="xs:string" select="/search/app"/>
+                                                    and form = <sql:param type="xs:string" select="/search/form"/>
+                                                    and draft = 'Y'
+                                                    <xsl:if test="exists(/search/drafts/@for-document-id)">
+                                                        and document_id = <sql:param type="xs:string" select="/search/drafts/@for-document-id"/>
+                                                    </xsl:if>
+                                                    <xsl:if test="/search/drafts/@for-never-saved-document = 'true'">
+                                                        and
+                                                        (
+                                                            select count(*)
+                                                            from orbeon_form_data d2
+                                                            where
+                                                                d2.app = <sql:param type="xs:string" select="/search/app"/>
+                                                                and d2.form = <sql:param type="xs:string" select="/search/form"/>
+                                                                and d2.draft = 'N'
+                                                                and d2.document_id = d1.document_id
+                                                        ) = 0
+                                                    </xsl:if>
+                                            )
+                                        </xsl:if>
+                                    ) mysql1
                                     order by created desc
                                 </xsl:variable>
 
-                                <!-- Get total number of document in collection for this app/form -->
+                                <!-- Get total number of document in collection for this app/form
+                                     - the count includes drafts, whether returned or not, except for anonymous users, who can't use the draft functionality  -->
                                 <sql:execute>
                                     <sql:query>
                                         select
                                             (
                                                 select count(*) from orbeon_form_data data
                                                 where
-                                                    (app, form, document_id, last_modified_time) in (
-                                                        select app, form, document_id, max(last_modified_time) last_modified_time
+                                                    (
+                                                        app, form, document_id,
+                                                        last_modified_time
+                                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                    )
+                                                    in
+                                                    (
+                                                        select
+                                                            app, form, document_id,
+                                                            max(last_modified_time) last_modified_time
+                                                            <xsl:if test="$support-auto-save">, draft</xsl:if>
                                                         from orbeon_form_data
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
-                                                        group by app, form, document_id)
+                                                            <xsl:if test="$support-auto-save and /search/@orbeon-username = ''"> and draft = 'N'</xsl:if>
+                                                        group by app, form, document_id
+                                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                    )
                                                     and deleted = 'N'
                                                     <xsl:copy-of select="$owner-group-condition"/>
                                             ) total,
@@ -251,6 +304,7 @@
                                                 <document-id><sql:get-column-value column="document_id"/></document-id>
                                                 <username><sql:get-column-value column="username"/></username>
                                                 <groupname><sql:get-column-value column="groupname"/></groupname>
+                                                <xsl:if test="$support-auto-save"><draft><sql:get-column-value column="draft"/></draft></xsl:if>
                                                 <xsl:for-each select="/search/query[@path]">
                                                     <detail><sql:get-column-value column="detail_{position()}"/></detail>
                                                 </xsl:for-each>
@@ -300,6 +354,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
                 <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
+                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
 
                 <!-- Move total and search-total as attribute -->
                 <xsl:template match="documents">
@@ -312,6 +367,9 @@
                 <!-- Add wrapping details element -->
                 <xsl:template match="document">
                     <document created="{created}" last-modified="{last-modified}" name="{document-id}" operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
+                        <xsl:if test="$support-auto-save">
+                            <xsl:attribute name="draft" select="draft"/>
+                        </xsl:if>
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

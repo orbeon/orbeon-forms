@@ -30,7 +30,7 @@
 
     <head>
         <!-- Make sure to use the source form's title -->
-        <xh:title><xf:output value="$source-form-metadata/title[@xml:lang = xxf:instance('fr-language-instance')], $source-form-metadata/title"/></xh:title>
+        <xh:title><xf:output value="$source-form-metadata/title[@xml:lang = xxf:lang()], $source-form-metadata/title"/></xh:title>
         <xh:link rel="stylesheet" href="/apps/fr/style/form-runner-summary.css" type="text/css" media="all"/>
 
         <!-- This page needs access to Form Builder permission -->
@@ -278,6 +278,7 @@
                 <!-- Set language upon submitting -->
                 <xf:action ev:event="xforms-submit">
                     <!-- This works now that #122 is fixed https://github.com/orbeon/orbeon-forms/issues/122 -->
+                    <!-- NOTE: xxf:lang() doesn't seem to work here -->
                     <xf:setvalue ref="lang" value="xxf:instance('fr-language-instance')"/>
                 </xf:action>
                 <xf:action ev:event="xforms-submit-error">
@@ -293,14 +294,14 @@
             <fr:row>
                 <!--<fr:header>-->
                     <!--&lt;!&ndash; Make sure to use the source form's logo &ndash;&gt;-->
-                    <!--<fr:logo paths="$source-form-metadata/logo[@xml:lang = xxf:instance('fr-language-instance')], $source-form-metadata/logo"/>-->
+                    <!--<fr:logo paths="$source-form-metadata/logo[@xml:lang = xxf:lang()], $source-form-metadata/logo"/>-->
                     <!--<fr:title/>-->
                     <!--<fr:language-selector/>-->
                     <!--<fr:noscript-selector/>-->
                     <!--<fr:form-builder-doc/>-->
                     <!--<fr:goto-content/>-->
                 <!--</fr:header>-->
-                <!--<fr:description paths="$source-form-metadata/description[@xml:lang = xxf:instance('fr-language-instance')], $source-form-metadata/description"/>-->
+                <!--<fr:description paths="$source-form-metadata/description[@xml:lang = xxf:lang()], $source-form-metadata/description"/>-->
                 <fr:body>
                     <xf:group class="fr-summary-search">
 
@@ -520,7 +521,7 @@
                                                 <xf:repeat ref="if ($show-created) then '' else ()">
                                                     <xf:var name="created"
                                                                 value="if ($document/@created castable as xs:dateTime)
-                                                                       then format-dateTime(xs:dateTime($document/@created), $fr-resources/summary/formats/save-datetime, xxf:instance('fr-language-instance'), (), ())
+                                                                       then format-dateTime(xs:dateTime($document/@created), $fr-resources/summary/formats/save-datetime, xxf:lang(), (), ())
                                                                        else ."/>
                                                     <xh:td>
                                                         <xf:group ref=".[$edit-view != '']">
@@ -537,7 +538,7 @@
                                                 <xf:repeat ref="if ($show-last-modified) then '' else ()">
                                                     <xf:var name="last-modified"
                                                                 value="if ($document/@last-modified castable as xs:dateTime)
-                                                                       then format-dateTime(xs:dateTime($document/@last-modified), $fr-resources/summary/formats/save-datetime, xxf:instance('fr-language-instance'), (), ())
+                                                                       then format-dateTime(xs:dateTime($document/@last-modified), $fr-resources/summary/formats/save-datetime, xxf:lang(), (), ())
                                                                        else ."/>
                                                     <xh:td>
                                                         <xf:group ref=".[$edit-view != '']">
@@ -573,11 +574,11 @@
                                                                             else
                                                                                 for $type in substring-after($query/@type, ':') return
                                                                                     if ($type = 'date') then
-                                                                                        (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxf:instance('fr-language-instance'), (), ()) else .)
+                                                                                        (if (. castable as xs:date) then format-date(xs:date(.), $fr-resources/summary/formats/date, xxf:lang(), (), ()) else .)
                                                                                     else if ($type = 'time') then
-                                                                                        (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxf:instance('fr-language-instance'), (), ()) else .)
+                                                                                        (if (. castable as xs:time) then format-time(xs:time(.), $fr-resources/summary/formats/time, xxf:lang(), (), ()) else .)
                                                                                     else if ($type = 'dateTime') then
-                                                                                        (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxf:instance('fr-language-instance'), (), ()) else .)
+                                                                                        (if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), $fr-resources/summary/formats/dateTime, xxf:lang(), (), ()) else .)
                                                                                     else if ($type = 'dayTimeDuration') then
                                                                                         (
                                                                                             if (. castable as xs:dayTimeDuration) then
@@ -723,7 +724,7 @@
                                     xmlns:version="java:org.orbeon.oxf.common.Version">
                                 <fr:href-button
                                         ref="."
-                                        href="/fr/{$app}/{$form}/pdf/{xxf:split(normalize-space(instance('fr-selection-instance')))[1]}?fr-language={xxf:instance('fr-language-instance')}">
+                                        href="/fr/{$app}/{$form}/pdf/{xxf:split(normalize-space(instance('fr-selection-instance')))[1]}?fr-language={xxf:lang()}">
                                     <xf:label mediatype="text/html" value="$fr-resources/summary/buttons/pdf"/>
                                 </fr:href-button>
                             </xf:group>

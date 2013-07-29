@@ -426,7 +426,10 @@
                                                                 where
                                                                     app = <sql:param type="xs:string" select="/request/app"/>
                                                                     and form = <sql:param type="xs:string" select="/request/form"/>
-                                                                    <xsl:if test="$is-data-draft"> and document_id = <sql:param type="xs:string" select="/request/document-id"/></xsl:if>
+                                                                    <xsl:if test="$is-data-draft">
+                                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                        <xsl:if test="$support-auto-save">and draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                                    </xsl:if>
                                                                     <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                                             ) l
                                                         where
@@ -435,6 +438,47 @@
                                                     ) t3
                                             </sql:update>
                                         </sql:execute>
+                                        <xsl:if test="$support-auto-save and /request/type = 'data' and not($is-attachment)">
+                                            <!--If we saved a "normal" document (not a draft), delete any draft document and draft attachments -->
+                                            <xsl:variable name="delete-where">
+                                                where
+                                                    app = <sql:param type="xs:string" select="/request/app"/>
+                                                    and form = <sql:param type="xs:string" select="/request/form"/>
+                                                    and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                    and draft = 'Y'
+                                            </xsl:variable>
+                                            <sql:execute><sql:update>delete from orbeon_form_data        <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
+                                            <sql:execute><sql:update>delete from orbeon_form_data_attach <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
+                                        </xsl:if>
+                                        <xsl:if test="$support-auto-save and /request/type = 'draft'">
+                                            <!-- If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name -->
+                                            <sql:execute>
+                                                <sql:update>
+                                                    delete from <xsl:value-of select="$table-name"/>
+                                                    where
+                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                        <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                                        and draft = 'Y'
+                                                        and last_modified_time !=
+                                                            (
+                                                                <!-- Additional level of nesting required on MySQL http://stackoverflow.com/a/45498/5295 -->
+                                                                select last_modified_time from
+                                                                (
+                                                                    select max(last_modified_time) last_modified_time
+                                                                    from <xsl:value-of select="$table-name"/>
+                                                                    where
+                                                                        app = <sql:param type="xs:string" select="/request/app"/>
+                                                                        and form = <sql:param type="xs:string" select="/request/form"/>
+                                                                        and document_id = <sql:param type="xs:string" select="/request/document-id"/>
+                                                                        <xsl:if test="$is-attachment"> and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
+                                                                        and draft = 'Y'
+                                                                ) t
+                                                            )
+                                                </sql:update>
+                                            </sql:execute>
+                                        </xsl:if>
                                     </sql:connection>
                                 </result>
                             </sql:config>

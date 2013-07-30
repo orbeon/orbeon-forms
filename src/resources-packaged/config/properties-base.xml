@@ -36,7 +36,6 @@
     <property as="xs:anyURI"  name="oxf.url-rewriting.service.base-uri"              value=""/>
     <!-- Support "servlet" or "wsrp" (or "portlet2" for backward compatibility") -->
     <property as="xs:string"  name="oxf.url-rewriting.strategy.servlet"              value="servlet"/>
-    <!-- TODO: support for base context for servlet rewriting strategy -->
     <!--<property as="xs:string"  name="oxf.url-rewriting.portlet.context"               value=""/>-->
     <property as="xs:string"  name="oxf.url-rewriting.wsrp.context"                  value=""/>
     <property as="xs:boolean" name="oxf.url-rewriting.wsrp.encode-resources"         value="false"/>

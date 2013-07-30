@@ -481,7 +481,7 @@
         <xf:var name="delay" value="xs:dayTimeDuration(concat('PT', $autosave-delay div 1000, 'S'))"/>
         <xf:var name="autosave-time" value="xs:dateTime($autosave/change-timestamp) + $delay"/>
         <xf:var name="autosave-now" value="$autosave-time le current-dateTime()"/>
-        <xf:action if="$autosave-now" type="xpath">process:runProcessByName('autosave')</xf:action>
+        <xf:action if="$autosave-now" type="xpath">process:runProcessByName('oxf.fr.detail.process', 'autosave')</xf:action>
         <!-- Ideally we'd like delay = $wait, but it would require converting an xs:dateTimeDuration in ms -->
         <xf:dispatch if="not($autosave-now)"
                      name="maybe-autosave" targetid="fr-persistence-model"

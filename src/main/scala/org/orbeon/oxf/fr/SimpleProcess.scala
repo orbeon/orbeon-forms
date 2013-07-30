@@ -18,7 +18,6 @@ import org.orbeon.exception.OrbeonFormatter
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{NetUtils, Logging}
 import org.orbeon.oxf.xforms.action.XFormsAPI._
-import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._
 import annotation.tailrec
 import collection.breakOut
@@ -37,13 +36,13 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 // - The property specifies a sequence of actions separated by combinators.
 // - Actions are predefined, but some of them are configurable.
 //
-object SimpleProcess extends Actions with Logging {
+object SimpleProcess extends FormRunnerActions with XFormsActions with Logging {
 
     import ProcessParser._
     import ProcessRuntime._
 
-    private val ProcessPropertyPrefix = "oxf.fr.detail.process"
-    private val ProcessPropertyTokens = ProcessPropertyPrefix split """\.""" size
+    private def processPropertyPrefix(scope: String) = scope
+    private def processPropertyTokens(scope: String) = processPropertyPrefix(scope) split """\.""" size
 
     type ActionParams = Map[Option[String], String]
     type Action       = ActionParams ⇒ Try[Any]
@@ -58,33 +57,33 @@ object SimpleProcess extends Actions with Logging {
         "nop"     → tryNOP
     )
 
-    private val AllAllowedActions = StandardActions ++ AllowedActions
+    private val AllAllowedActions = StandardActions ++ AllowedFormRunnerActions ++ AllowedXFormsActions
 
     private object ProcessRuntime {
 
         import org.orbeon.oxf.util.DynamicVariable
 
         // Keep stack frames for the execution of action. They can nest with sub-processes.
-        val processStackDyn = new DynamicVariable[List[StackFrame]]
+        val processStackDyn = new DynamicVariable[Process]
         val processBreaks   = new Breaks
 
         // Scope an empty stack around a process execution
-        def withEmptyStack[T](body: ⇒ T): T = {
-            processStackDyn.withValue(Nil) {
+        def withEmptyStack[T](scope: String)(body: ⇒ T): T = {
+            processStackDyn.withValue(Process(scope, Nil)) {
                 body
             }
         }
 
         // Push a stack frame, run the body, and pop the frame
         def withStackFrame[T](process: String, programCounter: Int)(body: ⇒ T): T = {
-            processStackDyn.value = StackFrame(process, programCounter) :: processStackDyn.value.get
+            processStackDyn.value.get.frames = StackFrame(process, programCounter) :: processStackDyn.value.get.frames
             try body
-            finally processStackDyn.value = processStackDyn.value.get.tail
+            finally processStackDyn.value.get.frames = processStackDyn.value.get.frames.tail
         }
 
         // Return a process string which contains the continuation of the process after the current action
         def serializeContinuation = {
-            val stack = processStackDyn.value.get
+            val stack = processStackDyn.value.get.frames
 
             // Find the continuation, which is the concatenation of the continuation of all the sub-processes up to the
             // top-level process.
@@ -115,6 +114,7 @@ object SimpleProcess extends Actions with Logging {
         def readSavedProcess =
             topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement.stringValue
 
+        case class Process(scope: String, var frames: List[StackFrame])
         case class StackFrame(process: String, actionCounter: Int)
     }
 
@@ -141,7 +141,7 @@ object SimpleProcess extends Actions with Logging {
 
         def splitProcess(process: String): List[String] = split(process)(breakOut)
 
-        def parseProcess(process: String): ProcessNode = {
+        def parseProcess(scope: String, process: String): ProcessNode = {
 
             val tokens = splitProcess(process)
 
@@ -154,10 +154,10 @@ object SimpleProcess extends Actions with Logging {
                 // Allowed actions are either built-in actions or other processes
                 val allowedActions = AllAllowedActions.keySet ++ (
                     for {
-                        property ← properties.propertiesStartsWith(ProcessPropertyPrefix)
+                        property ← properties.propertiesStartsWith(processPropertyPrefix(scope))
                         tokens   = property split """\."""
                     } yield
-                        tokens(ProcessPropertyTokens)
+                        tokens(processPropertyTokens(scope))
                 )
 
                 def actionUsage(action: String)         = s"action '$action' is not supported, must be one of: ${allowedActions mkString ", "}"
@@ -201,23 +201,23 @@ object SimpleProcess extends Actions with Logging {
     import processBreaks._
 
     // Main entry point for starting a process associated with a named button
-    def runProcessByName(name: String): Unit =
-        runProcess(rawProcessByName(name))
+    def runProcessByName(scope: String, name: String): Unit =
+        runProcess(scope, rawProcessByName(scope, name))
 
-    private def rawProcessByName(name: String) = {
+    private def rawProcessByName(scope: String, name: String) = {
         implicit val formRunnerParams = FormRunnerParams()
 
-        formRunnerProperty(ProcessPropertyPrefix + '.' + name) flatMap
+        formRunnerProperty(processPropertyPrefix(scope) + '.' + name) flatMap
         nonEmptyOrNone orElse // don't accept an existing but blank property
         buildProcessFromLegacyProperties(name) getOrElse ""
     }
 
     // Main entry point for starting a literal process
-    def runProcess(process: String): Try[Any] = {
+    def runProcess(scope: String, process: String): Try[Any] = {
         implicit val logger = containingDocument.getIndentedLogger("process")
         withDebug("running process", Seq("process" → process)) {
             // Scope the process (for suspend/resume)
-            withEmptyStack {
+            withEmptyStack(scope) {
                 beforeProcess() flatMap { _ ⇒
                     tryBreakable {
                         runSubProcess(process)
@@ -241,7 +241,7 @@ object SimpleProcess extends Actions with Logging {
         implicit val logger = containingDocument.getIndentedLogger("process")
 
         // Parse
-        val parsedProcess = ProcessParser.parseProcess(process)
+        val parsedProcess = ProcessParser.parseProcess(processStackDyn.value.get.scope, process)
 
         if (parsedProcess.action.isEmpty) {
             debug("empty process, canceling process")
@@ -301,7 +301,7 @@ object SimpleProcess extends Actions with Logging {
 
     // Run a sub-process
     def tryProcess(params: ActionParams): Try[Any] =
-        Try(params.get(Some("name")) getOrElse params(None)) map rawProcessByName flatMap runSubProcess
+        Try(params.get(Some("name")) getOrElse params(None)) map (rawProcessByName(processStackDyn.value.get.scope, _)) flatMap runSubProcess
 
     // Suspend the process
     def trySuspend(params: ActionParams): Try[Any] = Try {
@@ -381,11 +381,40 @@ object SimpleProcess extends Actions with Logging {
     }
 }
 
-trait Actions {
+trait XFormsActions {
+    import SimpleProcess._
+
+    def AllowedXFormsActions = Map[String, Action](
+        "xf:send"     → tryXFormsSend,
+        "xf:dispatch" → tryXFormsDispatch,
+        "xf:show"     → tryShowDialog,
+        "dialog"      → tryShowDialog
+    )
+
+    def tryXFormsSend(params: ActionParams): Try[Any] =
+        Try {
+            val submission = params.get(Some("submission")) orElse params.get(None)
+            submission foreach (sendThrowOnError(_))
+        }
+
+    def tryXFormsDispatch(params: ActionParams): Try[Any] =
+        Try {
+            val eventName = params.get(Some("name")) orElse params.get(None)
+            eventName foreach (dispatch(_, "fr-form-model"))
+        }
+
+    def tryShowDialog(params: ActionParams): Try[Any] =
+        Try {
+            val dialogName = params.get(Some("dialog")) orElse params.get(None)
+            dialogName foreach (show(_))
+        }
+}
+
+trait FormRunnerActions {
 
     import SimpleProcess._
 
-    def AllowedActions = Map[String, Action](
+    def AllowedFormRunnerActions = Map[String, Action](
         "pending-uploads"  → tryPendingUploads,
         "validate"         → tryValidate,
         "save"             → trySaveAttachmentsAndData,
@@ -401,7 +430,6 @@ trait Actions {
         "unvisit-all"      → tryUnvisitAll,
         "expand-all"       → tryExpandSections,
         "collapse-all"     → tryCollapseSections,
-        "dialog"           → tryShowDialog,
         "result-dialog"    → tryShowResultDialog,
         "captcha"          → tryCaptcha,
         "wizard-prev"      → tryWizardPrev,
@@ -520,12 +548,6 @@ trait Actions {
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
         Try(FormRunner.errorMessage(messageFromResourceOrInline(params)))
-
-    def tryShowDialog(params: ActionParams): Try[Any] =
-        Try {
-            val dialogName = params.get(Some("dialog")) orElse params.get(None)
-            dialogName foreach (show(_))
-        }
 
     // TODO: Use dialog("fr-submission-result-dialog")
     def tryShowResultDialog(params: ActionParams): Try[Any] =

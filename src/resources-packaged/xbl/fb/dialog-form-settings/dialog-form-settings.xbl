@@ -217,7 +217,7 @@
                             <!-- NOTE: Ideally we would go back to where we came from! We had an attempt for that with
                                  window.close() in the old home/back button. But it's a bit unclear what's best. -->
                             <xf:action ev:event="DOMActivate" if="$is-new-form" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
-                                process:runProcessByName('close')
+                                process:runProcessByName('oxf.fr.detail.process', 'close')
                             </xf:action>
                         </xf:trigger>
                     </xh:div>

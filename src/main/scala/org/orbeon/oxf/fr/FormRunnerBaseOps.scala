@@ -76,7 +76,10 @@ trait FormRunnerBaseOps {
     def properties = Properties.instance.getPropertySet
 
     def buildPropertyName(name: String)(implicit p: FormRunnerParams) =
-        name :: p.app :: p.form :: Nil mkString "."
+        if (hasAppForm(p.app, p.form))
+            name :: p.app :: p.form :: Nil mkString "."
+        else
+            name
 
     // Return a property using the form's app/name, None if the property is not defined
     def formRunnerProperty(name: String)(implicit p: FormRunnerParams) =

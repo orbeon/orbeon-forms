@@ -236,14 +236,14 @@ class ResourcesAggregator extends ProcessorImpl {
                                 if (isAsyncPortletLoad)
                                     outputScriptCSSAsJSON()
 
-                                // Close body element
-                                super.endElement(uri, localname, qName)
-
                                 // Combined and inline JS
                                 // Scripts at the bottom of the page. This is not valid HTML, but it is a recommended practice for
                                 // performance as of early 2008. See http://developer.yahoo.com/performance/rules.html#js_bottom
                                 if (! isAsyncPortletLoad && XFormsProperties.isJavaScriptAtBottom)
                                     outputJS()
+
+                                // Close body element
+                                super.endElement(uri, localname, qName)
 
                             } else if (filter && level == 3 && inHead) {
                                 currentInlineElement = null

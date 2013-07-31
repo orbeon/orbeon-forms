@@ -1876,6 +1876,12 @@
                     <xh:style type="text/css">.blue { color: blue }</xh:style>
                 </xh:head>
                 <xh:body>
+                    <xh:script type="text/javascript" src="/xforms-server/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
+                    <xh:script type="text/javascript" src="/xforms-server/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
+                    <xh:script src="http://example.org/script.js" type="text/javascript"/>
+                    <xh:script>function foo()</xh:script>
+                    <xh:script xmlns:f="http://orbeon.org/oxf/xml/formatting" src="/js5.js" type="text/javascript" f:url-norewrite="true"></xh:script>
+                    <xh:script>function bar()</xh:script>
                     <xh:ul>
                         <xh:li>/css1.css</xh:li>
                         <xh:li>/css2.css</xh:li>
@@ -1894,12 +1900,6 @@
                         <xh:li>/js4.js</xh:li>
                     </xh:ul>
                 </xh:body>
-                <xh:script type="text/javascript" src="/xforms-server/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
-                <xh:script type="text/javascript" src="/xforms-server/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
-                <xh:script src="http://example.org/script.js" type="text/javascript"/>
-                <xh:script>function foo()</xh:script>
-                <xh:script xmlns:f="http://orbeon.org/oxf/xml/formatting" src="/js5.js" type="text/javascript" f:url-norewrite="true"></xh:script>
-                <xh:script>function bar()</xh:script>
             </xh:html>
         </output>
     </test>

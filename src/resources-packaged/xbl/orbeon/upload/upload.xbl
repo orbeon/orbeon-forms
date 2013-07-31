@@ -34,10 +34,10 @@
             <xbl:style>
                 .xbl-fr-upload-fakefile {
                     white-space: nowrap;
-                	position: absolute;
-                	top: 0px;
-                	left: 0px;
-                	z-index: 1;
+                    position: absolute;
+                    top: 0px;
+                    left: 0px;
+                    z-index: 1;
                 }
 
                 .xbl-fr-upload-field-container {
@@ -46,12 +46,12 @@
                 }
 
                 .xbl-fr-upload .xforms-upload, .xbl-fr-upload .xforms-upload-select {
-                	position: relative;
-                	text-align: right;
-                	-moz-opacity:0 ;
-                	filter:alpha(opacity: 0);
-                	opacity: 0;
-                	z-index: 2;
+                    position: relative;
+                    text-align: right;
+                    -moz-opacity:0 ;
+                    filter:alpha(opacity: 0);
+                    opacity: 0;
+                    z-index: 2;
                 }
 
                 .xbl-fr-upload-visible-input, .xbl-fr-upload .yui-button {
@@ -67,15 +67,15 @@
                         <xxf:script id="xf-en" ev:event="xforms-enabled">YAHOO.xbl.fr.Upload.instance(this).init();</xxf:script>
                         <xbl:content includes=":root > xf|filename, :root > xf|mediatype, :root > xxf|size"/>
                     </xf:upload>
-                	<xh:div class="xbl-fr-upload-fakefile">
-                		<xh:input class="xbl-fr-upload-visible-input"/>
-                		<xh:span class="yui-button">
-                		    <xh:span class="first-child">
-                        		<xh:button type="button">Select file</xh:button>
-                		    </xh:span>
-                		</xh:span>
-                	</xh:div>
-            	</xh:div>
+                    <xh:div class="xbl-fr-upload-fakefile">
+                        <xh:input class="xbl-fr-upload-visible-input"/>
+                        <xh:span class="yui-button">
+                            <xh:span class="first-child">
+                                <xh:button type="button">Select file</xh:button>
+                            </xh:span>
+                        </xh:span>
+                    </xh:div>
+                </xh:div>
             </xf:group>
         </xbl:template>
     </xbl:binding>

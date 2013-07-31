@@ -13,14 +13,14 @@
 Events = ORBEON.xforms.Events
 
 $ ->
-	# Replace spacer image to photo image
-	setPlaceholderImage = () ->
-		spacer = '/ops/images/xforms/spacer.gif'
-		$("#fr-form-group .fb-upload img.xforms-output-output[src $= '#{spacer}']").each (index, image) ->
-			prefix = image.src.substr(0, image.src.indexOf(spacer))
-			image.src = prefix + '/apps/fr/style/images/silk/photo.png'
+    # Replace spacer image to photo image
+    setPlaceholderImage = () ->
+        spacer = '/ops/images/xforms/spacer.gif'
+        $("#fr-form-group .fb-upload img.xforms-output-output[src $= '#{spacer}']").each (index, image) ->
+            prefix = image.src.substr(0, image.src.indexOf(spacer))
+            image.src = prefix + '/apps/fr/style/images/silk/photo.png'
 
-	# Initial run when the form is first loaded
-	setPlaceholderImage()
-	# Run again after every Ajax request
-	Events.ajaxResponseProcessedEvent.subscribe setPlaceholderImage
+    # Initial run when the form is first loaded
+    setPlaceholderImage()
+    # Run again after every Ajax request
+    Events.ajaxResponseProcessedEvent.subscribe setPlaceholderImage

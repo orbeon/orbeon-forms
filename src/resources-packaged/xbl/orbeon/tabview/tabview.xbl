@@ -24,7 +24,7 @@
          xmlns:oxf="http://www.orbeon.com/oxf/processors"
          xmlns:exf="http://www.exforms.org/exf/1-0">
 
- 	<xbl:script type="text/javascript" src="/ops/yui/element/element.js"/>
+    <xbl:script type="text/javascript" src="/ops/yui/element/element.js"/>
     <xbl:script src="/xbl/orbeon/tabview/tabview.js"/>
     <xbl:script src="/ops/yui/tabview/tabview-min.js"/>
 

@@ -1770,7 +1770,7 @@
             <messages>
                 <save-success>Asiakirja tallennettu onnistuneesti!</save-success>
                 <save-draft-success>[Draft saved successfully!]</save-draft-success>
-                <email-success[>Email sent successfully!]</email-success>
+                <email-success>[Email sent successfully!]</email-success>
                 <form-validation-error>[There are validation errors. Please retry once all fields have been properly filled-out.]</form-validation-error>
                 <database-error>[Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.]</database-error>
                 <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>

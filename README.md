@@ -1,7 +1,7 @@
 Orbeon Forms - Open source web forms done the right way
 =======================================================
 
-Last updated for Orbeon Forms 4.3 July 2013
+Last updated for Orbeon Forms 4.3 August 2013
 
 [![Build Status](https://secure.travis-ci.org/orbeon/orbeon-forms.png)](http://travis-ci.org/orbeon/orbeon-forms)
 
@@ -17,22 +17,17 @@ includes:
 - A core forms processing engine which implements specifications such as XForms 1.1
   and XBL 2 with no need for client-side software besides a standard web browser.
 
-For more information about Orbeon Forms, please visit:
-
-- <http://www.orbeon.com/>
-- <http://wiki.orbeon.com/forms/>
-
-Also check the Orbeon Forms [Frequently Asked Questions (FAQ)](http://wiki.orbeon.com/forms/orbeon-forms-faq).
+For more information about Orbeon Forms, please visit [orbeon.com](http://www.orbeon.com/).
 
 
 What's new in the latest releases
 ---------------------------------
 
-- [complete list of changes](http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40) for the latest release
 - [Orbeon Forms 4.2 announcement](http://blog.orbeon.com/2013/05/orbeon-forms-42.html)
 - [Orbeon Forms 4.1 announcement](http://blog.orbeon.com/2013/04/orbeon-forms-41.html)
 - [Orbeon Forms 4.0.1 announcement](http://blog.orbeon.com/2013/03/orbeon-forms-401.html)
 - [Orbeon Forms 4.0 announcement](http://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
+- [Orbeon Forms 4 release notes](http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40)
 
 
 Downloading and installing
@@ -55,9 +50,9 @@ Community and support
 See the [community](http://www.orbeon.com/community) page. In a nutshell:
 
 - Ask short questions directed to Orbeon on [Twitter](https://twitter.com/intent/tweet?in_reply_to=orbeon&in_reply_to_status_id=261900968369729536&source=webclient&text=%40orbeon+).
-- Asl technical questions on [StackOverflow](http://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
+- Ask technical questions on [StackOverflow](http://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
 - Use the [discussion forum](http://discuss.orbeon.com/) for discussions and feedback.
-- For commercial support and licensing, see:
+- For commercial support and licensing:
     - <http://www.orbeon.com/services>
     - <info@orbeon.com>
 
@@ -65,16 +60,20 @@ See the [community](http://www.orbeon.com/community) page. In a nutshell:
 Documentation
 -------------
 
-All documentation is available on the [Orbeon Forms wiki](http://wiki.orbeon.com/forms/).
+All documentation is available online:
+
+- [Wiki on Google Docs](http://wiki.orbeon.com/forms/)
+- [Wiki on github](https://github.com/orbeon/orbeon-forms/wiki/)
+- [Frequently Asked Questions (FAQ)](http://wiki.orbeon.com/forms/orbeon-forms-faq)
 
 
 What's happening?
 -----------------
 
-- Orbeon Blog: <http://blog.orbeon.com/>
-- Orbeon on Twitter: <http://twitter.com/orbeon>
-- Latest commits on github: <https://github.com/orbeon/orbeon-forms/commits/>
-- Mailing-list archive: <http://orbeon-forms-ops-users.24843.n4.nabble.com/>
+- [Orbeon Blog](http://blog.orbeon.com/)
+- [Orbeon on Twitter](http://twitter.com/orbeon)
+- [Latest commits on github](https://github.com/orbeon/orbeon-forms/commits/)
+- [Forum archive](http://discuss.orbeon.com/)
 
 
 Compiling Orbeon Forms

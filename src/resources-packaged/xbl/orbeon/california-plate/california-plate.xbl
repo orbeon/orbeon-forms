@@ -30,6 +30,8 @@
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">California Plate</display-name>
             <display-name lang="fr">Plaque californienne</display-name>
+			<display-name lang="de">Kfz-Kennzeichen Kalifornien</display-name>
+			<display-name lang="de">Targa california</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>

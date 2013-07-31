@@ -27,6 +27,8 @@
             <display-name lang="en">US State</display-name>
             <display-name lang="fr">Etat US</display-name>
             <display-name lang="ru">Штат США</display-name>
+            <display-name lang="de">US-Staaten</display-name>
+            <display-name lang="it">Stati membri USA</display-name>
             <icon lang="en">
                 <small-icon>/xbl/orbeon/us-state/us-flag.png</small-icon>
                 <large-icon>/xbl/orbeon/us-state/us-flag.png</large-icon>

@@ -131,10 +131,12 @@
                                     <xh:ul>
                                         <xh:li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
                                             <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
-                                                <!-- https://github.com/orbeon/orbeon-forms/issues/723
-                                                     https://github.com/orbeon/orbeon-forms/issues/1042 -->
-                                                <xf:label>
-                                                    <xh:i class="icon-chevron-left"/>&#x200b;
+                                                <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
+                                                     a CSS  bug with IE 7:
+                                                     https://github.com/orbeon/orbeon-forms/issues/723
+                                                 -->
+                                                <xf:label xml:space="preserve">
+                                                    <xh:i class="icon-chevron-left"/>
                                                 </xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <xf:toggle case="{{$prev-cases[last()]}}"/>
@@ -151,8 +153,12 @@
                                         </xh:li>
                                         <xh:li class="{{if (xxf:readonly($next-button-ref)) then 'disabled' else ''}}">
                                             <xf:trigger id="fr-wizard-next" ref="$next-button-ref" appearance="minimal" class="fr-wizard-next">
-                                                <xf:label>
-                                                    <xh:i class="icon-chevron-right"/>&#x200b;
+                                                <!-- NOTE: without xml:space="preserve", XSLT strip spaces. This causes
+                                                     a CSS  bug with IE 7:
+                                                     https://github.com/orbeon/orbeon-forms/issues/723
+                                                 -->
+                                                <xf:label xml:space="preserve">
+                                                    <xh:i class="icon-chevron-right"/>
                                                 </xf:label>
                                                 <xf:action ev:event="DOMActivate">
                                                     <xf:toggle case="{{$next-cases[1]}}"/>

@@ -30,12 +30,12 @@
             <xbl:style src="/xbl/orbeon/alert-dialog/alert-dialog.css"/>
         </xbl:resources>
         <xbl:handlers>
-            <xbl:handler event="fr-show" phase="target">
-                <xf:setvalue if="event('message')" ref="message" value="event('message')"/>
-                <xf:setvalue if="event('context')" ref="context" value="event('context')"/>
+            <xbl:handler event="fr-show xxforms-dialog-open" phase="target">
+                <xf:setvalue if="event('message')"           ref="message"  value="event('message')"/>
+                <xf:setvalue if="event('context')"           ref="context"  value="event('context')"/>
                 <xf:setvalue if="event('positive-targetid')" ref="positive" value="event('positive-targetid')"/>
                 <xf:setvalue if="event('negative-targetid')" ref="negative" value="event('negative-targetid')"/>
-                <xf:setvalue if="event('neutral-targetid')" ref="neutral" value="event('neutral-targetid')"/>
+                <xf:setvalue if="event('neutral-targetid')"  ref="neutral"  value="event('neutral-targetid')"/>
                 <xxf:show dialog="dialog" xxbl:scope="inner"/>
             </xbl:handler>
         </xbl:handlers>

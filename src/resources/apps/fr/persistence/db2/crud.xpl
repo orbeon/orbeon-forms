@@ -405,7 +405,7 @@
                                                         </xsl:variable>
 
                                                         select created <xsl:if test="$is-data-draft">, username , groupname</xsl:if>
-                                                        from sysibm.sysdummy1 left outer join orbeon_form_data
+                                                        from sysibm.sysdummy1 left outer join <xsl:value-of select="$table-name"/>
                                                         on
                                                             (last_modified_time, <xsl:value-of select="$columns"/>)
                                                             in

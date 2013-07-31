@@ -35,6 +35,8 @@
             <display-name lang="en">Autocomplete</display-name>
             <display-name lang="fr">Auto-complétion</display-name>
             <display-name lang="ru">Автозаполнение</display-name>
+	    	<display-name lang="it">Completamento automatico</display-name>
+            <display-name lang="de">Autovervollständigung</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/autocomplete.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/autocomplete.png</large-icon>
@@ -59,8 +61,12 @@
                 <xf:input ref="@resource">
                     <xf:label lang="en">Resource URI</xf:label>
                     <xf:label lang="fr">URI de la ressource</xf:label>
+					<xf:label lang="it">URI della risorsa</xf:label>
+                    <xf:label lang="de">URI der Ressource</xf:label>
                     <xf:hint lang="en">HTTP URI returning data used for the suggestions</xf:hint>
                     <xf:hint lang="fr">URI HTTP auquel réside le service</xf:hint>
+					<xf:hint lang="de">HTTP URI welche die Daten für den Hinweis liefert</xf:hint>
+                    <xf:hint lang="it">URI HTTP che da i dati per il suggerimento</xf:hint>
                 </xf:input>
                 <xf:input ref="xf:itemset/@ref">
                     <xf:label ref="$resources/dialog-actions/items/label"/>

@@ -76,6 +76,7 @@
                                     <xsl:attribute name="class" select="'fr-section-title'"/>
 
                                     <!-- Open/close button -->
+                                    <xf:var name="fb-vars" value="xxf:instance('fb-variables')"/>
                                     <xf:group appearance="xxf:internal">
                                         <!-- A bit tricky: the switch is further below, and xxf:case('switch') can
                                              return () if the switch is not yet initialized. In that case, it means we

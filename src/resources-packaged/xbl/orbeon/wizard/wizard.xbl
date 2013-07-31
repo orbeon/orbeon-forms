@@ -130,7 +130,7 @@
                                 <xh:div class="pagination pagination-centered">
                                     <xh:ul>
                                         <xh:li class="{{if (xxf:readonly($prev-button-ref)) then 'disabled' else ''}}">
-                                            <xf:trigger id="fr-wizard-prev"  ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
+                                            <xf:trigger id="fr-wizard-prev" ref="$prev-button-ref" appearance="minimal" class="fr-wizard-prev">
                                                 <!-- https://github.com/orbeon/orbeon-forms/issues/723
                                                      https://github.com/orbeon/orbeon-forms/issues/1042 -->
                                                 <xf:label>

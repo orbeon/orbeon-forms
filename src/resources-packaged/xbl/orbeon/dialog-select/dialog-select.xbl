@@ -33,6 +33,8 @@
             <display-name lang="en">Dialog Multi Selector</display-name>
             <display-name lang="fr">Dialogue liste multiple</display-name>
             <display-name lang="ru">Несколько из диалога</display-name>
+            <display-name lang="it">Dialog Multi Selector</display-name>
+            <display-name lang="de">Dialog Multi Selector</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>

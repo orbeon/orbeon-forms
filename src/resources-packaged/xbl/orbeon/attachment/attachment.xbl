@@ -30,6 +30,7 @@
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">File Attachment</display-name>
+            <display-name lang="fi">Tiedoston liittäminen</display-name>
             <display-name lang="fr">Fichier joint</display-name>
             <display-name lang="ru">Загрузка файла</display-name>
             <display-name lang="it">File allegato</display-name>
@@ -60,6 +61,7 @@
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
                         <resource xml:lang="en"><download>Download</download></resource>
+                        <resource xml:lang="fi"><download>[Download]</download></resource>
                         <resource xml:lang="fr"><download>Télécharger</download></resource>
                         <resource xml:lang="de"><download>Herunterladen</download></resource>
                         <resource xml:lang="it"><download>Scaricare</download></resource>

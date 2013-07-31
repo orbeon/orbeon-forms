@@ -27,6 +27,7 @@
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Attachments</display-name>
+        <display-name lang="fi">Liitteet</display-name>
         <display-name lang="fr">Fichiers joints</display-name>
         <display-name lang="ru">[Attachments]</display-name>
         <display-name lang="it">Allegati</display-name>
@@ -36,6 +37,7 @@
     <xbl:binding id="fb-output-image" element="xf|output">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Image</display-name>
+            <display-name lang="fi">Kuva</display-name>
             <display-name lang="fr">Image</display-name>
             <display-name lang="ru">Изображение</display-name>
             <display-name lang="de">Bild</display-name>

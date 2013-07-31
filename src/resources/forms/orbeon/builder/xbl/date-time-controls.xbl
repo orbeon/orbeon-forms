@@ -27,6 +27,7 @@
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Date and Time</display-name>
+        <display-name lang="fi">Päivämäärä ja kellonaika</display-name>
         <display-name lang="fr">Contrôles date et heure</display-name>
         <display-name lang="ru">[Date and time]</display-name>
         <display-name lang="de">Datum und Uhrzeit</display-name>
@@ -36,6 +37,7 @@
     <xbl:binding id="fb-input-date" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date</display-name>
+            <display-name lang="fi">Päivämäärä</display-name>
             <display-name lang="fr">Date</display-name>
             <display-name lang="ru">Дата</display-name>
             <display-name lang="de">Datum</display-name>
@@ -61,6 +63,7 @@
     <xbl:binding id="fb-input-time" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Time</display-name>
+            <display-name lang="fi">Kellonaika</display-name>
             <display-name lang="fr">Heure</display-name>
             <display-name lang="ru">Время</display-name>
             <display-name lang="de">Uhrzeit</display-name>
@@ -86,6 +89,7 @@
     <xbl:binding id="fb-input-dateTime" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Date and Time</display-name>
+            <display-name lang="fi">Päivämäärä ja kellonaika</display-name>
             <display-name lang="fr">Date et heure</display-name>
             <display-name lang="ru">Дата и время</display-name>
             <display-name lang="de">Datum und Uhrzeit</display-name>

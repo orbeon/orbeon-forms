@@ -30,6 +30,7 @@
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Fields Date</display-name>
+            <display-name lang="fi">Päivämääräkentät</display-name>
             <display-name lang="fr">Date avec champs</display-name>
             <display-name lang="ru">Дата: раздельные поля</display-name>
             <display-name lang="de">Datum in Feldern</display-name>

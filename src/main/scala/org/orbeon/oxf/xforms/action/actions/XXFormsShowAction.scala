@@ -14,9 +14,7 @@
 package org.orbeon.oxf.xforms.action.actions
 
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl
-import org.orbeon.oxf.xforms.event.Dispatch
-import org.orbeon.oxf.xforms.event.XFormsEvent
+import org.orbeon.oxf.xforms.event.{XFormsEventTarget, Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent
 
 /**
@@ -29,7 +27,7 @@ class XXFormsShowAction extends XFormsAction {
         val actionElement      = actionContext.element
 
         resolveControl("dialog")(actionContext) match {
-            case Some(targetDialog: XXFormsDialogControl) ⇒
+            case Some(targetDialog: XFormsEventTarget) ⇒
                 val constrainToViewport = interpreter.resolveAVT(actionElement, "constrain") != "false"
                 val neighborEffectiveId = resolveControl("neighbor", required = false)(actionContext) map (_.getEffectiveId)
                 XXFormsShowAction.showDialog(targetDialog, neighborEffectiveId, constrainToViewport, XFormsAction.eventProperties(interpreter, actionElement))
@@ -43,7 +41,7 @@ class XXFormsShowAction extends XFormsAction {
 
 object XXFormsShowAction {
     def showDialog(
-            targetDialog: XXFormsDialogControl,
+            targetDialog: XFormsEventTarget,
             neighborEffectiveId: Option[String] = None,
             constrainToViewport: Boolean = true,
             properties: XFormsEvent.PropertyGetter = XFormsEvent.EmptyGetter) = {

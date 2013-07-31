@@ -17,9 +17,9 @@ import org.dom4j.Element;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.xforms.action.XFormsAction;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
-import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.Dispatch;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogCloseEvent;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.saxon.om.Item;
@@ -41,8 +41,8 @@ public class XXFormsHideAction extends XFormsAction {
         if (dialogStaticId != null) {
             // Dispatch xxforms-dialog-close event to dialog
             final Object controlObject = actionInterpreter.resolveObject(actionElement, dialogStaticId);
-            if (controlObject instanceof XXFormsDialogControl) {
-                final XXFormsDialogControl targetDialog = (XXFormsDialogControl) controlObject;
+            if (controlObject instanceof XFormsEventTarget) {
+                final XFormsEventTarget targetDialog = (XFormsEventTarget) controlObject;
                 final XFormsEvent newEvent = new XXFormsDialogCloseEvent(targetDialog, XFormsAction.eventProperties(actionInterpreter, actionElement));
                 Dispatch.dispatchEvent(newEvent);
             } else {

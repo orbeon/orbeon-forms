@@ -5126,4 +5126,858 @@
             </items>
         </template>
     </resource>
+    <resource xml:lang="fi">
+        <!-- Form metadata -->
+        <!-- NOTE: Summary page expects to find application-name and form-name for the summary page here -->
+        <application-name>
+            <label>Sovelluksen nimi</label>
+            <hint>Tunnistaa ryhmän lomakkeita, esimerkiksi toiminnallisuuden tai osaston perusteella (esim. "myynnit"). Jos sinulla on lomakeryhmä, voit käyttää organisaatiosi nimeä (esim. "huippu"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
+            <alert>Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
+        </application-name>
+        <form-name>
+            <label>Lomakkeen nimi</label>
+            <hint>Tunnistaa juuri tämän lomakkeen (esim. "terveysrekisteri" tai "korvausvaatimus"). Tämä nimi näkyy lähetetyn lomakkeen URL:ssä, joten on suositeltavaa käyttää ainoastaan pieniä kirjaimia.</hint>
+            <alert>Ei saa olla tyhjä tai sisältää välilyöntejä</alert>
+        </form-name>
+        <title>
+            <label>Lomakkeen otsikko</label>
+            <hint>Lomakkeen otsikko nykyisellä kielellä</hint>
+        </title>
+        <description>
+            <label>Lomakkeen kuvaus</label>
+            <hint>Lomakkeen kuvaus nykyisellä kielellä</hint>
+        </description>
+        <logo>
+            <label>Logo</label>
+            <hint>Logo näkyy lomakkeesi yläosassa</hint>
+        </logo>
+        <!-- Toolbox -->
+        <cut>
+            <label>Leikkaa</label>
+        </cut>
+        <copy>
+            <label>Kopioi</label>
+        </copy>
+        <paste>
+            <label>Liitä</label>
+        </paste>
+        <form-structure>
+            <label>Lomakerakenne</label>
+        </form-structure>
+        <controls>
+            <label>Kontrolli</label>
+        </controls>
+        <i18n>
+            <label>Kansainvälistyminen</label>
+        </i18n>
+        <language>
+            <label>Nykyinen kieli</label>
+        </language>
+        <advanced>
+            <label>Kehittynyt</label>
+        </advanced>
+        <services-actions>
+            <label>Palvelut &amp; Toiminnot</label>
+        </services-actions>
+        <http-services>
+            <label>HTTP-palvelut</label>
+        </http-services>
+        <database-services>
+            <label>Tietokantapalvelut</label>
+        </database-services>
+        <actions>
+            <label>Toiminnot</label>
+        </actions>
+        <new-section>
+            <label>Uusi lohko</label>
+        </new-section>
+        <new-grid>
+            <label>Uusi ruudukko</label>
+        </new-grid>
+        <new-repeat>
+            <label>Uusi toisto</label>
+        </new-repeat>
+        <change-schema>
+            <label>Uusi skeema</label>
+        </change-schema>
+        <upload-schema>
+            <label>Lähetä skeema</label>
+        </upload-schema>
+        <change-pdf>
+            <label>Muuta PDF</label>
+        </change-pdf>
+        <upload-pdf>
+            <label>Liitä PDF</label>
+        </upload-pdf>
+        <change-css>
+            <label>Muuta CSS</label>
+        </change-css>
+        <upload-css>
+            <label>Liitä CSS</label>
+        </upload-css>
+        <show-source>
+            <label>Näytä lähde</label>
+        </show-source>
+        <edit-source>
+            <label>Muokkaa koodi</label>
+        </edit-source>
+        <custom-xml>
+            <label>Sovita XML</label>
+        </custom-xml>
+        <permissions>
+            <label>Määritä käyttöoikeudet</label>
+        </permissions>
+        <reload-components>
+            <label>Lataa työkalupakki uudelleen</label>
+        </reload-components>
+        <enter-section-title>
+            <label>Klikkaa syöttääksesi lohkon otsikko</label>
+        </enter-section-title>
+        <type-section-title>
+            <label>Kirjoita lohkon otsikko</label>
+        </type-section-title>
+        <enter-label>
+            <label>Klikkaa syöttääksesi nimike</label>
+        </enter-label>
+        <type-label>
+            <label>Kirjoita nimikkeesi tähän</label>
+        </type-label>
+        <enter-hint>
+            <label>Klikkaa lisätäksesi vihje</label>
+        </enter-hint>
+        <type-hint>
+            <label>Kirjoita vihjeesi tähän</label>
+        </type-hint>
+        <enter-text>
+            <label>Klikkaa syötääksesi tekstiä</label>
+        </enter-text>
+        <click-cell>
+            <label>Klikkaa valitaksesi tämän solun</label>
+        </click-cell>
+        <insert-control>
+            <label>Käytä työkalupalkkia lisätäksesi kontrollin</label>
+        </insert-control>
+        <edit-items>
+            <label>Muokkaa kohdetta</label>
+        </edit-items>
+        <expand-icon>
+            <label>Laajenna</label>
+        </expand-icon>
+        <shrink-icon>
+            <label>Pienennä</label>
+        </shrink-icon>
+        <delete-control-icon>
+            <label>Poista kontrolli</label>
+        </delete-control-icon>
+        <delete-grid-icon>
+            <label>Poista ruudukko</label>
+        </delete-grid-icon>
+        <delete-section-icon>
+            <label>Poista lohko</label>
+        </delete-section-icon>
+        <delete-row-icon>
+            <label>Poista rivi</label>
+        </delete-row-icon>
+        <delete-column-icon>
+            <label>Poista sarake</label>
+        </delete-column-icon>
+        <insert-column-left-icon>
+            <label>Lisää sarake vasemmalle</label>
+        </insert-column-left-icon>
+        <insert-column-right-icon>
+            <label>Lisää sarake oikealle</label>
+        </insert-column-right-icon>
+        <insert-row-above-icon>
+            <label>Lisää rivi yläpuolelle</label>
+        </insert-row-above-icon>
+        <insert-row-below-icon>
+            <label>Lisää rivi alapuolelle</label>
+        </insert-row-below-icon>
+        <section-details-icon>
+            <label>Lohkon yksityiskohdat</label>
+        </section-details-icon>
+        <grid-details-icon>
+            <label>Ruudukon yksityiskohdat</label>
+        </grid-details-icon>
+        <move-up-icon>
+            <label>Siirry ylös</label>
+        </move-up-icon>
+        <move-down-icon>
+            <label>Siirry alas</label>
+        </move-down-icon>
+        <move-right-icon>
+            <label>Siirry oikealle</label>
+        </move-right-icon>
+        <move-left-icon>
+            <label>Siirry vasemmalle</label>
+        </move-left-icon>
+        <control-details-icon>
+            <label>Kontrollin yksityiskohdat</label>
+        </control-details-icon>
+        <switch-appearance-icon>
+            <label>Kytkimen ulkonäkö</label>
+        </switch-appearance-icon>
+        <help-icon>
+            <label>Muokkaa Ohje</label>
+        </help-icon>
+        <!-- Common -->
+        <add>
+            <label>Lisää</label>
+        </add>
+        <remove>
+            <label>Poista</label>
+        </remove>
+        <edit>
+            <label>Muokkaa</label>
+        </edit>
+        <!-- Dialogs -->
+        <continue>
+            <label>Jatka</label>
+        </continue>
+        <apply>
+            <label>Käytä</label>
+        </apply>
+        <cancel>
+            <label>Peruuta</label>
+        </cancel>
+        <close>
+            <label>Sulje</label>
+        </close>
+        <delete>
+            <label>Poista</label>
+        </delete>
+        <test>
+            <label>&lt;i class="icon-cog"/&gt; Testaa</label>
+        </test>
+        <publish>
+            <label>&lt;i class="icon-globe"/&gt; Julkaise</label>
+        </publish>
+        <save-as>
+            <label>Tallenna nimellä…</label>
+        </save-as>
+        <or>
+            <label>tai</label>
+        </or>
+        <select>
+            <label>[Valitse...]</label>
+        </select>
+        <dialog-form-settings>
+            <label>Lomakeasetukset</label>
+            <save-as>Tallenna nimellä…</save-as>
+            <open><label>[Form settings]</label></open>
+            <stats>Lomatilastot</stats>
+            <sections>Lohkot</sections>
+            <repeats>Toistot</repeats>
+            <grids>Ruudukot</grids>
+            <section-templates>Lohkomallinteet</section-templates>
+            <controls>Kontrollit</controls>
+            <all>Kaikki</all>
+        </dialog-form-settings>
+        <dialog-control-details>
+            <label>Kontrolliyksityiskohdat</label>
+            <tab-base><label>[Basic Settings]</label></tab-base>
+            <tab-validations><label>[Validations and Alerts]</label></tab-validations>
+            <tab-formulas><label>[Formulas]</label></tab-formulas>
+            <tab-help><label>[Help Message]</label></tab-help>
+            <control-name>
+                <label>Kontrollin nimi</label>
+                <alert>Nimi on virheellinen tai se on jo käytössä</alert>
+                <hint>Esim.: "etunimi"</hint>
+            </control-name>
+            <control-xpath>
+                <label>XPath</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Viittaa solmuun, johon tämän hallinnan arvo on varastoitu</hint>
+            </control-xpath>
+            <classes>
+                <label>Tiivistelmäsivu</label>
+                <item>
+                    <label>Näytä tiivistelmänä</label>
+                    <value>fr-summary</value>
+                </item>
+                <item>
+                    <label>Näytä haussa</label>
+                    <value>fr-search</value>
+                </item>
+                <item>
+                    <label>Sähköpostin vastaanottaja</label>
+                    <value>fr-email-recipient</value>
+                </item>
+                <item>
+                    <label>Näytä sähköpostin aiheena</label>
+                    <value>fr-email-subject</value>
+                </item>
+            </classes>
+            <types>
+                <label>Datatyyppi</label>
+            </types>
+            <builtin-type>
+                <label>Sisäänrakennettu datatyyppi</label>
+                <hint>Sisäänrakennettu datatyyppi</hint>
+
+                <use-schema-type>Käytä skeeman tyyppiä</use-schema-type>
+
+                <choices>
+                    <choices>
+                        <label>Yleiset tyypit</label>
+                        <type label="Mikä tahansa merkkijono">string</type>
+                        <type label="Boolean">boolean</type>
+                        <type label="Sähköpostiosoite">email</type>
+                    </choices>
+                    <choices>
+                        <label>Numerotyypit</label>
+                        <type label="Desimaalinen">decimal</type>
+
+                        <type label="Kokonaisluku">integer</type>
+                        <type label="Positiivinen kokonaisluku">positiveInteger</type>
+                        <type label="Ei-positiivinen kokonaisluku">nonPositiveInteger</type>
+                        <type label="Negatiivinen kokonaisluku">negativeInteger</type>
+                        <type label="Ei-negatiivinen kokonaisluku">nonNegativeInteger</type>
+
+                        <type label="Yksinkertainen tarkkuus liukulukuja">float</type>
+                        <type label="Tuplatarkkuus liukulukuja">double</type>
+
+                        <type label="">long</type>
+                        <type label="">int</type>
+                        <type label="">short</type>
+                        <type label="">byte</type>
+                        <type label="">unsignedLong</type>
+                        <type label="">unsignedInt</type>
+                        <type label="">unsignedShort</type>
+                        <type label="">unsignedByte</type>
+                    </choices>
+                    <choices>
+                        <label>Aikatyypit</label>
+                        <type label="Päivämäärä">date</type>
+                        <type label="Kellonaika">time</type>
+                        <type label="Päivämäärä ja kellonaika">dateTime</type>
+                        <type label="Kesto">duration</type>
+                        <type label="Vuosi ja kuukausi">gYearMonth</type>
+                        <type label="Kuukausi ja päivä">gMonthDay</type>
+                        <type label="Vuosi">gYear</type>
+                        <type label="Kuukausi">gMonth</type>
+                        <type label="Päivä">gDay</type>
+                    </choices>
+                    <choices>
+                        <label>[XML Types]</label>
+                        <type label="">normalizedString</type>
+                        <type label="">token</type>
+                        <type label="">language</type>
+                        <type label="">Name</type>
+                        <type label="">NCName</type>
+                        <type label="">ID</type>
+                        <type label="">IDREF</type>
+                        <type label="">IDREFS</type>
+                        <type label="">ENTITY</type>
+                        <type label="">ENTITIES</type>
+                        <type label="">NMTOKEN</type>
+                        <type label="">NMTOKENS</type>
+                        <type label="XML-kvalifioitu nimi">QName</type>
+                        <type label="">NOTATION</type>
+                    </choices>
+                    <choices>
+                        <label>Muut tyypit</label>
+                        <!-- Not 100% sure if these two types allow empty content -->
+                        <type label="Base64-encoded binary">base64Binary</type>
+                        <type label="Hexadecimal-encoded binary">hexBinary</type>
+                        <type label="Mikätahansa URI">anyURI</type>
+                    </choices>
+                </choices>
+            </builtin-type>
+            <schema-type>
+                <label>Skeeman tyyppi</label>
+                <hint>Tuodun skeeman tyyppi</hint>
+            </schema-type>
+            <required>
+                <label>Pakollinen</label>
+                <hint>Pakollinen data?</hint>
+                <item>
+                    <label>Kyllä</label>
+                    <value>true</value>
+                </item>
+                <item>
+                    <label>Ei</label>
+                    <value>false</value>
+                </item>
+            </required>
+            <constraint>
+                <label>Rajoite</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </constraint>
+            <visibility>
+                <label>Näkyvyys</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </visibility>
+            <readonly>
+                <label>Vain luku</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </readonly>
+            <default>
+                <label>Alkuperäinen arvo</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>XPath-lauseke</hint>
+            </default>
+            <calculate>
+                <label>Laskettu arvo</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>XPath-lauseke</hint>
+            </calculate>
+            <help>
+                <label>Ohjeviesti</label>
+                <hint>Viesti näytetään käyttäjän klikatessa ohje-kuvaketta nimikkeen vieressä</hint>
+            </help>
+            <alert>
+                <label>Virheviesti</label>
+                <hint>Viesti näytetään, kun kontrollidata on väärää tai puuttuu</hint>
+            </alert>
+            <default-alert>
+                <label>[Default alert message]</label>
+                <hint>[Active when there is not a more specific alert message]</hint>
+            </default-alert>
+            <use-global-alert>
+                <label>[Use global default alert message]</label>
+            </use-global-alert>
+            <use-default-alert>
+                <label>[Use default alert message]</label>
+            </use-default-alert>
+            <validation-type><label>[Validation Type]</label></validation-type>
+            <validation-details><label>V[alidation Details]</label></validation-details>
+            <level><label>[Level]</label></level>
+        </dialog-control-details>
+        <dialog-section-details>
+            <label>Lohkon yksityiskohdat</label>
+            <control-name>
+                <label>Lohkon nimi</label>
+                <alert>Nimi on virheellinen tai se on jo käytössä</alert>
+                <hint>Esim.: "osoite"</hint>
+            </control-name>
+            <visibility>
+                <label>Näkyvyys</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </visibility>
+            <readonly>
+                <label>Vain luku</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </readonly>
+        </dialog-section-details>
+        <dialog-grid-details>
+            <label>Ruudukon yksityiskohdat</label>
+            <grid-name>
+                <label>Ruudukon nimi</label>
+                <alert>Nimi on virheellinen tai se on jo käytössä</alert>
+                <hint>Esim.: "etunimi"</hint>
+            </grid-name>
+            <visibility>
+                <label>Näkyvyys</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </visibility>
+            <readonly>
+                <label>Vain luku</label>
+                <alert>Virheellinen XPath-lauseke</alert>
+                <hint>Boolean XPath-lauseke</hint>
+            </readonly>
+            <min>
+                <label>Toistojen vähimmäismäärä</label>
+                <alert>Virheellinen arvo</alert>
+                <hint>Positiivinen numero</hint>
+            </min>
+            <max>
+                <label>Toistojen maksimimäärä</label>
+                <alert>Virheellinen arvo</alert>
+                <hint>Positiivinen numero</hint>
+            </max>
+            <other>Muu</other>
+            <one>Yksi toisto</one>
+            <unlimited>Rajaton</unlimited>
+            <no-minimum>Ei vähimmäismäärää</no-minimum>
+        </dialog-grid-details>
+        <dialog-confirmation>
+            <label>Vahvista</label>
+        </dialog-confirmation>
+        <dialog-help>
+            <label>Ohje</label>
+            <help-message>
+                <label>Ohjeviesti</label>
+            </help-message>
+        </dialog-help>
+        <dialog-publish>
+            <label>Julkaise lomake</label>
+            <publish>
+                <label>Julkaise</label>
+            </publish>
+            <publish-and-open>
+                <label>Julkaise ja avaa</label>
+            </publish-and-open>
+            <messages>
+                <open-summary>Avaa julkaistun lomakkeen tiivistelmäsivu</open-summary>
+                <open-new>Avaa julkaistun lomakkeen uusi sivu</open-new>
+            </messages>
+        </dialog-publish>
+        <dialog-add-language>
+            <label>Lisää kieli</label>
+            <new-language>
+                <label>Lisää seuraava kieli</label>
+            </new-language>
+            <common>Yleisimmät kielet</common>
+            <all>Muut kielet</all>
+            <add-language>
+                <label>Lisää kieli</label>
+            </add-language>
+            <remove-language>
+                <label>Poista kieli</label>
+            </remove-language>
+        </dialog-add-language>
+        <dialog-upload-schema>
+            <label>XML-skeeman lähettäminen</label>
+            <schema-type>
+                <label>Saatavilla olevat skeematyypit</label>
+                <hint>Yksinkertaiset, lähetetyn skeeman saatavilla olevat tyypit</hint>
+            </schema-type>
+            <namespace-uri>
+                <label>Skeeman nimiavaruus URI</label>
+                <hint>Tämä on lähetetyn skeeman nimiavaruus URI</hint>
+            </namespace-uri>
+            <operations>
+                <label>Operaatiot</label>
+            </operations>
+            <delete-schema>
+                <label>Poista olemassaoleva XML-skeema</label>
+            </delete-schema>
+            <change-schema>
+                <label>Muuta XML-skeeman</label>
+            </change-schema>
+            <replace-schema>
+                <label>Korvaa XML-skeema</label>
+            </replace-schema>
+            <upload-schema>
+                <label>Lähetä XML-skeema</label>
+            </upload-schema>
+            <messages>
+                <no-simple-types>Skeemasi ei sisällä yksinkertaisia tyyppejä. Sinun ei ole mahdollista valita tyyppejä tästä skeemasta oikeellisuutta varten.</no-simple-types>
+                <has-includes>Skeemasi sisältää tuotuja osia. Nämä kytketään pois päältä.</has-includes>
+                <not-a-schema>Lähetetty tiedosto ei ole kelpaava skeema.</not-a-schema>
+                <new-schema-information>Uuden skeeman tietoja</new-schema-information>
+                <existing-schema-information>Olemassaolevan skeeman tietoja</existing-schema-information>
+            </messages>
+        </dialog-upload-schema>
+        <dialog-edit-source>
+            <label>Lähde</label>
+            <source>
+                <alert>Ole hyvä ja varmista, että XML-sisältö on muotoutunut oikein</alert>
+            </source>
+        </dialog-edit-source>
+        <dialog-view-source>
+            <label>Näytä lähde</label>
+        </dialog-view-source>
+        <dialog-upload-pdf>
+            <label>Liitä PDF-mallinne</label>
+            <upload-pdf>
+                <label>PDF-tiedosto</label>
+            </upload-pdf>
+        </dialog-upload-pdf>
+        <dialog-itemsets>
+            <label>Itemset-editori</label>
+            <resources-language>
+                <label>Resurssi-kieli</label>
+            </resources-language>
+            <label>
+                <label>Nimike</label>
+            </label>
+            <value>
+                <label>Arvo</label>
+            </value>
+        </dialog-itemsets>
+        <dialog-http-services>
+            <label>HTTP-palvelineditori</label>
+            <service-name>
+                <label>Palvelun nimi</label>
+                <hint>Valitse nimi tälle palvelulle</hint>
+            </service-name>
+            <resource>
+                <label>Resurssi URL</label>
+                <hint>HTTP URL jolla palvelu sijaitsee</hint>
+            </resource>
+            <method>
+                <label>Metodi</label>
+            </method>
+            <serialization>
+                <label>Serialisaatio</label>
+            </serialization>
+            <soap-submission>
+                <label>SOAP-palvelu</label>
+                <hint>Onko tämä SOAP-palvelu</hint>
+            </soap-submission>
+            <soap-action>
+                <label>SOAP-toiminto</label>
+                <hint>Valinnainen SOAP-toiminnon otsikko</hint>
+            </soap-action>
+            <http-authentication>
+                <label>HTTP-todentaminen</label>
+                <hint>HTTP-todentaminen</hint>
+            </http-authentication>
+            <username>
+                <label>Käyttäjänimi</label>
+            </username>
+            <password>
+                <label>Salasana</label>
+            </password>
+            <request-body>
+                <label>Ohjelmakoodin pyyntö</label>
+                <hint>XML-data (voi olla SOAP-kuori)</hint>
+            </request-body>
+            <response>
+                <label>Vastaus</label>
+            </response>
+            <error-type>
+                <label>Virhetyyppi</label>
+                <item>
+                    <label>Hakemus käynnissä</label>
+                    <value>submission-in-progress</value>
+                </item>
+                <item>
+                    <label>Ei dataa</label>
+                    <value>no-data</value>
+                </item>
+                <item>
+                    <label>Oikeellisuusvirhe</label>
+                    <value>validation-error</value>
+                </item>
+                <item>
+                    <label>Resurssivirhe</label>
+                    <value>resource-error</value>
+                </item>
+                <item>
+                    <label>Kohdevirhe</label>
+                    <value>target-error</value>
+                </item>
+                <item>
+                    <label>Sisäinen virhe</label>
+                    <value>xxforms-internal-error</value>
+                </item>
+            </error-type>
+            <resource-uri>
+                <label>Resurssi URL</label>
+            </resource-uri>
+            <status-code>
+                <label>Statuskoodi</label>
+            </status-code>
+            <headers>
+                <label>Otsikot</label>
+            </headers>
+            <header-name>
+                <label>Nimi</label>
+            </header-name>
+            <header-value>
+                <label>Arvo(t)</label>
+            </header-value>
+            <response-body>
+                <label>Ohjelmakoodin vastaus</label>
+            </response-body>
+            <save>
+                <label>Tallenna</label>
+            </save>
+            <test>
+                <label>Testaa</label>
+            </test>
+        </dialog-http-services>
+        <dialog-database-services>
+            <label>Tietokantapalvelun muokkaaja</label>
+            <service-name>
+                <label>Palvelun nimi</label>
+                <hint>Valitse nimi tälle palvelulle</hint>
+            </service-name>
+            <datasource>
+                <label>Datalähde</label>
+                <hint>JNDI-datalähde tälle palvelulle</hint>
+            </datasource>
+            <query>
+                <label>SQL-kysely</label>
+                <hint>SQL-kysely, joka voi sisältää paikkamerkkejä parametrejä varten</hint>
+            </query>
+            <save>
+                <label>Tallenna</label>
+            </save>
+            <test>
+                <label>Testaa</label>
+            </test>
+        </dialog-database-services>
+        <dialog-actions>
+            <label>Toimintoeditori</label>
+            <service-name>
+                <label>Toiminnon nimi</label>
+                <hint>Valitse nimi tälle palvelulle</hint>
+            </service-name>
+            <event-type>
+                <label>Reagoi</label>
+                <hint>Tapahtuma (kontrollissa tai globaalissa) johon reagoidaan</hint>
+                <!-- Just a value change -->
+                <item>
+                    <label>Arvonmuutos</label>
+                    <value>xforms-value-changed</value>
+                </item>
+                <!-- Value change AND the first time the control shows -->
+                <item>
+                    <label>FI Arvonmuutos tai lomakkeen lataus</label>
+                    <value>xforms-value-changed xforms-enabled</value>
+                </item>
+                <!-- Control activation -->
+                <item>
+                    <label>Aktivointi</label>
+                    <value>DOMActivate</value>
+                </item>
+                <!-- Form load -->
+                <item>
+                    <label>Lomakkeen lataus</label>
+                    <value>xforms-ready</value>
+                </item>
+            </event-type>
+            <event-condition>
+                <label>Tila</label>
+                <item>
+                    <label>Aja aina</label>
+                    <value>true()</value>
+                </item>
+                <item>
+                    <label>Aja vain luonnin yhteydessä</label>
+                    <value>$fr-mode='new'</value>
+                </item>
+            </event-condition>
+            <event-control>
+                <label>Kontrolli</label>
+            </event-control>
+            <service-to-call>
+                <label>Palvelu johon soitetaan</label>
+                <hint>Palvelu johon soitetaan tapahtuman tapahtuessa</hint>
+            </service-to-call>
+            <request-parameters>
+                <label>Aseta palvelupyyntöarvot</label>
+            </request-parameters>
+            <source-control>
+                <label>Lähdekontrolli</label>
+            </source-control>
+            <destination-xpath>
+                <label>Kohde XPath-lauseke</label>
+            </destination-xpath>
+            <request-database-parameter>
+                <label>Aseta tietokantapalveluiden parametrit</label>
+            </request-database-parameter>
+            <parameter-number>
+                <label>Parametrin numero</label>
+            </parameter-number>
+            <response-values>
+                <label>Aseta vastauskontrollin arvot</label>
+            </response-values>
+            <destination-control>
+                <label>Kohdekontrolli</label>
+            </destination-control>
+            <source-xpath>
+                <label>XPath-lausekkeen lähde</label>
+            </source-xpath>
+            <response-itemset>
+                <label>Aseta vastausvalinnan kontrollointivälineet</label>
+            </response-itemset>
+            <destination-selection-control>
+                <label>Kohdevalinnan kontrolli</label>
+            </destination-selection-control>
+            <itemset>
+                <label>Osaset</label>
+                <hint>XPath-lausekkeet, uusien osasten rakentamiseen</hint>
+            </itemset>
+            <items>
+                <label>Osaset</label>
+                <hint>XPath-lauseke palauttaa yhden solmun jokaiselle osaselle</hint>
+            </items>
+            <label>
+                <label>Nimike</label>
+                <hint>XPath-lauseke, joka liittyy osasen solmuun</hint>
+            </label>
+            <value>
+                <label>Arvo</label>
+                <hint>XPath-lausek, joka liittyy osasen solmuun</hint>
+            </value>
+            <save>
+                <label>Tallenna</label>
+            </save>
+            <test>
+                <label>Testaa</label>
+            </test>
+        </dialog-actions>
+        <dialog-test>
+            <label>Lomakkeen esikatselu</label>
+        </dialog-test>
+        <dialog-pe>
+            <label>Orbeon-lomakkeiden PE-toiminnot</label>
+            <message>
+                <div>
+                    <p>Tämä toiminto on saatavilla vain Orbeon-lomakkeiden PE-versiossa.</p>
+                    <p>[For more information, please visit the <a href="http://www.orbeon.com/download" target="_blank">Orbeon web site</a>.]</p>
+                </div>
+            </message>
+        </dialog-pe>
+        <dialog-custom-xml>
+            <label>Mukauta XML</label>
+            <mode-label>Käyttäjien lisäämä informaatio säilötään XML-dokumentissa:</mode-label>
+            <mode-automatic>Anna Form Builderin generoida XML minu varten</mode-automatic>
+            <mode-custom>Hankin mukautetun XML-dokumentin</mode-custom>
+        </dialog-custom-xml>
+        <dialog-permissions>
+            <label>Käyttöoikeudet</label>
+            <role-based-permissions>Salli tähän lomakkeeseen roolipohjaiset käyttöoikeudet.</role-based-permissions>
+            <role>Rooli</role>
+            <permissions>Käyttöoikeudet</permissions>
+            <operations>Operaatiot</operations>
+            <anyone>Kuka tahansa</anyone>
+            <owner>[Owner]</owner>
+            <group-members>[Group members]</group-members>
+            <create>[Create]</create>
+            <read>[Read]</read>
+            <update>[Update]</update>
+            <delete>Poista</delete>
+        </dialog-permissions>
+        <!-- Messages -->
+        <messages>
+            <delete-section>Haluatko varmasti poistaa nykyisen lohkon?</delete-section>
+            <delete-grid>Haluatko varmasti poistaa nykyisen ruudukon?</delete-grid>
+            <delete-column>Haluatko varmasti poistaa nykyisen sarakkeen?</delete-column>
+            <delete-row>Haluatko varmasti poistaa nykyisen rivin?</delete-row>
+            <expand-cell>Haluatko varmasti laajentaa nykyisen solun? Yksi kontrolli deletoidaan.</expand-cell>
+            <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit?</delete-resources>
+            <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
+            <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
+            <controls-will-be-deleted>[{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.]</controls-will-be-deleted>
+            <publish-form>Haluatko varmasti julkaista tämän lomakkeen? Tämä teko syrjäyttää olemassaolevan lomakkeen seuraavilla ominaisuuksilla:</publish-form>
+            <publish-success>Lomake julkaistiin onnistuneesti. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
+            <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
+            <metadata-edit-title>Lomakkeen metatiedot</metadata-edit-title>
+            <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen (voit muuttaa näitä myöhemmin):</new-metadata-output>
+            <edit-metadata-output/>
+            <save-as-metadata-output>Syötä uusi nimi sekä sovellukselle että lomakkeelle. Näitä käytetään tämän lomakkeen kopiota varten:</save-as-metadata-output>
+            <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.]</xpath-errors>
+            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
+        </messages>
+        <template>
+            <untitled-form>Nimetön lomake</untitled-form>
+            <untitled-section>Nimetön lohko</untitled-section>
+            <items>
+                <item>
+                    <label>Ensimmäinen valinta</label>
+                    <value>yksi</value>
+                </item>
+                <item>
+                    <label>Toinen valinta</label>
+                    <value>kaksi</value>
+                </item>
+                <item>
+                    <label>Kolmas valinta</label>
+                    <value>kolme</value>
+                </item>
+            </items>
+        </template>
+    </resource>
 </resources>

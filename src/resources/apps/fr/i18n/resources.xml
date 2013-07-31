@@ -1631,4 +1631,239 @@
             </labels>
         </home>
     </resource>
+    <resource xml:lang="fi">
+        <components>
+            <labels>
+                <open-section>Näytä lohko</open-section>
+                <close-section>Piilota lohko</close-section>
+                <section-name>Lohkon nimi</section-name>
+            </labels>
+        </components>
+        <untitled-form>[Untitled Form]</untitled-form>
+        <errors>
+            <summary-title>[Your form {1,choice,
+                0#does not contain any messages|
+                1#contains the following '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                1&lt;contains the following '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}]</summary-title>
+            <form-title>[{1,choice,
+                0#|
+                1#{1,number,integer} '{0,choice,0#Error|1#Warning|2#Informational Message|3#Message}' - |
+                1&lt;{1,number,integer} '{0,choice,0#Errors|1#Warnings|2#Informational Messages|3#Messages}' - }{2}]</form-title>
+            <none>Ei virheitä lomakkeessa</none>
+            <unsaved>Tallentamattomat muutokset</unsaved>
+        </errors>
+        <email>
+            <subject>Orbeon-lomakkeiden vahvistus</subject>
+            <body>Ole hyvä ja katso PDF- ja XML-formaatissa olevaa lomaketta.</body>
+        </email>
+        <!-- Formats used for PDF template -->
+        <print>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+            </formats>
+        </print>
+        <summary>
+            <buttons>
+                <home>&lt;i class="icon-home"/&gt; Koti</home>
+                <review>&lt;i class="icon-eye-open"/&gt; Käy läpi</review>
+                <pdf>&lt;i class="icon-print"/&gt; Näytä PDF</pdf>
+                <delete>&lt;i class="icon-remove-sign"/&gt; Poista</delete>
+                <import>&lt;i class="icon-upload"/&gt; Tuo</import>
+                <new>&lt;i class="icon-plus"/&gt; Uusi</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Muokkaa</edit><!-- unused as of 2013-04-05 -->
+            </buttons>
+            <titles>
+                <summary-title>Yhteenveto</summary-title>
+                <delete-confirmation>[Confirm Deletion]</delete-confirmation>
+                <created>Luotu</created>
+                <last-modified>Viimeksi muokattu</last-modified>
+                <selected>Valittu</selected>
+                <refresh>Tämä toiminto lataa sivun uudelleen</refresh>
+                <toc>Sisällysluettelo</toc>
+                <description>Kuvaus</description>
+                <help>Ohje</help>
+                <error-count>Virhe lomakkeessasi</error-count>
+                <errors-count>Virheitä lomakkeessasi</errors-count>
+            </titles>
+            <search>
+                <search>Etsi</search>
+                <search-forms>Etsi lomakkeita</search-forms>
+                <show-options>Näytä hakuvaihtoehdot</show-options>
+                <close-options>Sulje hakuvaihtoehdot</close-options>
+                <returned-1>Etsintä palautetaan</returned-1>
+                <returned-2>Dokumentit</returned-2>
+            </search>
+            <paging>
+                <to>-</to>
+                <of>/</of>
+            </paging>
+            <messages>
+                <no-form-found><i>Taulukkotietoja ei löytynyt.</i></no-form-found>
+                <delete-confirmation>Haluatko varmasti poistaa yhden tai yhden tai useampia taulukoita?</delete-confirmation>
+            </messages>
+            <labels>
+                <draft>[Draft]</draft>
+                <language-choice>Valitse kieli</language-choice>
+                <form-choice>Valitse taulukko</form-choice>
+                <free-search>Vapaa haku</free-search>
+                <any>[mikä tahansa]</any>
+                <previous>Paluu</previous>
+                <next>Seuraava</next>
+                <script>Täysi versio</script>
+                <noscript>Helppokäyttöinen versio</noscript>
+                <refresh>Lataa sivu uudelleen</refresh>
+                <close-box>[sulje]</close-box>
+                <help-back>Paluu</help-back>
+                <goto-content>Siirry sisältöön</goto-content>
+            </labels>
+            <formats>
+                <date>[MNn] [D], [Y]</date>
+                <time>[H01]:[m01]:[s01]</time>
+                <dateTime>[MNn] [D], [Y] [H01]:[m01]:[s01]</dateTime>
+                <save-datetime>[MNn] [D], [Y] [H01]:[m01]:[s01]</save-datetime>
+            </formats>
+        </summary>
+        <detail>
+            <buttons>
+                <!-- Standard process buttons -->
+                <save>&lt;i class="icon-hdd"/&gt; Tallenna</save>
+                <save-final>&lt;i class="icon-hdd"/&gt; Tallenna</save-final>
+                <save-draft>&lt;i class="icon-inbox"/&gt; Tallenna</save-draft>
+                <review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</review>
+                <edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</edit>
+                <send>&lt;i class="icon-arrow-right"/&gt; Lähetä</send>
+                <email>&lt;i class="icon-envelope"/&gt; Sähköposti</email>
+                <validate>[&lt;i class="icon-ok"/&gt; Validate]</validate>
+
+                <!-- Legacy buttons -->
+                <submit>&lt;i class="icon-arrow-right"/&gt; Toimita</submit>
+                <workflow-review>&lt;i class="icon-arrow-right"/&gt; Käy läpi</workflow-review>
+                <workflow-edit>&lt;i class="icon-arrow-left"/&gt; Muokkaa</workflow-edit>
+                <workflow-send>&lt;i class="icon-arrow-right"/&gt; Lähetä</workflow-send>
+
+                <!-- Other standard buttons -->
+                <home>&lt;i class="icon-home"/&gt; Koti</home>
+                <summary>&lt;i class="icon-list"/&gt; Summary</summary>
+                <close>&lt;i class="icon-remove"/&gt; Sulje</close>
+                <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
+                <clear>&lt;i class="icon-remove-sign"/&gt; Tyhjennä</clear>
+                <cancel>Peruuta</cancel>
+                <save-locally>Tallenna paikallisesti</save-locally>
+                <collapse-all>&lt;i class="icon-resize-small"/&gt;</collapse-all>
+                <expand-all>&lt;i class="icon-resize-full"/&gt;</expand-all>
+                <refresh>&lt;i class="icon-refresh"/&gt;</refresh>
+                <wizard-next>&lt;i class="icon-chevron-right"/&gt; Next</wizard-next>
+                <wizard-prev>&lt;i class="icon-chevron-left"/&gt; Prev</wizard-prev>
+
+                <!-- Submit dialog -->
+                <submit-dialog-clear>Tyhjennä ja sulje</submit-dialog-clear>
+                <submit-dialog-keep>Pidä arvot ja sulje</submit-dialog-keep>
+                <submit-dialog-go>OK</submit-dialog-go>
+                <submit-dialog-close-window>Sulje ikkuna</submit-dialog-close-window>
+
+                <!-- Warning dialog -->
+                <validation-dialog-review>Review</validation-dialog-review>
+                <validation-dialog-continue>Continue</validation-dialog-continue>
+            </buttons>
+            <messages>
+                <save-success>Asiakirja tallennettu onnistuneesti!</save-success>
+                <save-draft-success>[Draft saved successfully!]</save-draft-success>
+                <email-success[>Email sent successfully!]</email-success>
+                <form-validation-error>[There are validation errors. Please retry once all fields have been properly filled-out.]</form-validation-error>
+                <database-error>[Virhe tietokannan kanssa kommunikoinnissa. Ole hyvä ja ota yhteyttä järjestelmänvalvojaan.]</database-error>
+                <process-error>[There was an error running the process. Please contact the application administrator.]</process-error>
+                <clear-confirm-message>[Are you sure you want to clear all the fields on this page? Your data will be lost if you haven't saved it.]</clear-confirm-message>
+                <error-dialog-title>Kykenemätön suorittamaan toimintaa loppuun</error-dialog-title>
+                <submit-dialog-title>Lomake toimitettu</submit-dialog-title>
+                <submit-dialog-message>Tietosi on toimitettu.</submit-dialog-message>
+                <validation-dialog-title>[Review Form Validation Messages]</validation-dialog-title>
+                <validation-dialog-message>[Your form {1,choice,
+                    0#does not contain any messages|
+                    1#contains one '{0,choice,0#error|1#warning|2#informational message|3#message}'|
+                    1&lt;contains {1,number,integer} '{0,choice,0#errors|1#warnings|2#informational messages|3#messages}'}. You can choose to review {1,choice,1#it|1&lt;them} first or to ignore {1,choice,1#it|1&lt;them} and continue with the operation.]</validation-dialog-message>
+                <buttons-message/>
+                <saved-locally-open>Klikkaa tästä dokumentin avataksesi. Syöttämäsi tiedot näytetään siten, kuin ne olivat tallentaessasi työsi.</saved-locally-open>
+                <upload-in-progress>Tiedoston lataaminen käynnissä. Ole hyvä ja yritä latausten päätyttyä tai keskeytettyä uudelleen.</upload-in-progress>
+                <upload-start>[Upload started]</upload-start>
+                <upload-cancel>[Upload canceled by the user]</upload-cancel>
+                <upload-done>[Upload complete]</upload-done>
+                <upload-error>[There was an error during the upload. Please try again.]</upload-error>
+                <upload-error-size>[The file uploaded is too large. The maximum size allowed is {0,number,integer} bytes and the actual size received is {1,number,integer} bytes.]</upload-error-size>
+            </messages>
+            <drafts>
+                <found-draft>[Found draft]</found-draft>
+                <found-drafts>[Found drafts</found-drafts>
+                <found-draft-for-document>[After this document was saved, a draft was auto-saved, and it might contain additional work. Do you want to open the saved document, or the auto-saved draft?]</found-draft-for-document>
+                <found-draft-for-never-saved>[A draft for this form was auto-saved. Would you like to start from scratch or to open the auto-saved draft?]</found-draft-for-never-saved>
+                <found-drafts-for-never-saved>[Several drafts for this form were auto-saved. Would you like to start from scratch or to see the auto-saved drafts (and then possibly edit one of them)?]</found-drafts-for-never-saved>
+                <open-saved>[Open saved document]</open-saved>
+                <open-draft>[Open auto-saved draft]</open-draft>
+                <view-drafts>[View auto-saved drafts]</view-drafts>
+                <start-new>[Start from scratch]</start-new>
+            </drafts>
+            <labels>
+                <language-choice>Kieli</language-choice>
+                <errors>Virheiden tiivistelmä</errors>
+                <check-errors-in-form>Tämä lomake pitää sisällään virheitä</check-errors-in-form>
+                <error-details>Näytä virhetiedot</error-details>
+                <confirm>Vahvista</confirm>
+                <alert>Puuttuva tai virheellinen arvo</alert>
+
+                <captcha-label>Kuvavarmenne</captcha-label>
+                <captcha-alert>Antamasi arvo ei täsmännyt kuvan kanssa, ole hyvä ja yritä uudelleen</captcha-alert>
+            </labels>
+            <view>
+                <explanation>
+                    Tämä on kirjoitussuojattu näkymä tiedoistasi.
+                </explanation>
+            </view>
+        </detail>
+        <save-locally>
+            <dialog-title>Tallenna paikallisesti</dialog-title>
+            <dialog-body>
+                <div>
+                    <p>
+                        Klikkaa Tallenna-painiketta tallentaaksesi tiedot koneellesi HTML-tiedostona.
+                    </p>
+                    <p>
+                        Uudelleenavataksesi taulukkotietosi:
+                    </p>
+                    <ul>
+                        <li>Avaa HTML-tiedosto selaimellasi (klikkaa tiedostoa tai siirrä se selainikkunaasi).</li>
+                        <li>Klikkaa Avaa-painiketta vahvistaaksesi.</li>
+                    </ul>
+                    <p>
+                        <b>VAROITUS:</b> Tietoja ei tallenneta palvelimelle. Jos poistat tallentamasi tiedoston, menetät tietosi.
+                    </p>
+                </div>
+            </dialog-body>
+        </save-locally>
+        <home>
+            <title>Form Runner Koti</title>
+            <buttons>
+                <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
+                <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
+            </buttons>
+            <titles>
+                <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <status>[Status]</status>
+                <app>[Application]</app>
+                <form>[Form]</form>
+                <title>[Title]</title>
+                <view>[View]</view>
+                <new>[New]</new>
+            </titles>
+            <messages>
+                <no-forms>[You don't have access to any deployed forms.]</no-forms>
+                <publish-confirmation>[Are you sure you want to {0,choice,0#publish|1#unpublish} {1,choice,1#one form|1&lt;{1,number,integer} forms}?]</publish-confirmation>
+            </messages>
+            <labels>
+                <available>[Available]</available>
+                <unavailable>[Unavailable]</unavailable>
+                <library>[Library]</library>
+            </labels>
+        </home>
+    </resource>
 </resources>

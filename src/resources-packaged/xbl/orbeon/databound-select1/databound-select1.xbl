@@ -27,6 +27,7 @@
     <xbl:binding id="fr-databound-select1" element="fr|databound-select1" xxbl:mode="lhha binding value">
         <fb:metadata>
             <fb:display-name lang="en">Dynamic Data Dropdown</fb:display-name>
+            <fb:display-name lang="fi">Dynaamisen datan pudotusvalikko</fb:display-name>
             <fb:display-name lang="fr">Menu données dynamique</fb:display-name>
             <fb:display-name lang="ru">Список из веб-сервиса</fb:display-name>
             <fb:display-name lang="de">Daten Dropdown-Liste</fb:display-name>
@@ -52,11 +53,13 @@
             <fb:control-details>
                 <xf:input ref="@resource">
                     <xf:label lang="en">Resource URL</xf:label>
+                    <xf:label lang="fi">Resurssi URL</xf:label>
                     <xf:label lang="fr">URL de la ressource</xf:label>
                     <xf:label lang="ru">URL ресурса</xf:label>
                     <xf:label lang="it">URL della risorsa</xf:label>
                     <xf:label lang="de">URL der Ressource</xf:label>
                     <xf:hint lang="en">HTTP URL returning data used to populate the dropdown</xf:hint>
+                    <xf:hint lang="fi">HTTP URL palauttaa pudotusvalikon täyttämiseen käytettyä dataa</xf:hint>
                     <xf:hint lang="fr">URL HTTP auquel réside le service</xf:hint>
                     <xf:hint lang="ru">HTTP URL сервиса, данными из которого будет заполнен выпадающий список</xf:hint>
                     <xf:hint lang="it">URL HTTP che da i dati per il menu a tendina</xf:hint>

@@ -28,7 +28,22 @@
                 invalidYear: "Year needs to be a number"
             }
         },
-	    "it": {
+        "fi": {
+            properties: {
+                "MONTHS_LONG": [ "Tammikuu", "Helmikuu", "Maaliskuu", "Huhtikuu", "Toukokuu", "Kes\u00e4kuu", "Hein\u00e4kuu", "Elokuu", "Syyskuu", "Lokakuu", "Marraskuu", "Joulukuu" ],
+                "MONTHS_SHORT": ["Tammi", "Helmi", "Maalis", "Huhti", "Touko", "Kes\u00e4", "Hein\u00e4", "Elo", "Syys", "Loka", "Marras", "Joulu"],
+                "WEEKDAYS_SHORT": ["Ma", "Ti", "Ke", "To", "Pe", "La", "Su"],
+                "START_WEEKDAY": 0
+            },
+            navigator: {
+                month: "Kuukausi",
+                year: "Vuosi",
+                submit: "OK",
+                cancel: "Peruuttaa",
+                invalidYear: "Vuosi on oltava numero"
+            }
+        },
+	"it": {
             properties: {
                 "MONTHS_LONG": [ "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto",  "Settembre",  "Ottobre",  "Novembre",  "Dicembre" ],
                 "WEEKDAYS_SHORT": ["Do", "Lu", "Ma", "Me", "Gi", "Ve", "Sa"],

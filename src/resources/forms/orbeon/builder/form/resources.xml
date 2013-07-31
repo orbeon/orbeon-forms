@@ -3662,12 +3662,12 @@
             <all>Tutti</all>
         </dialog-form-settings>
         <dialog-control-details>
- 	<label>Impostazioni del controllo</label>
+            <label>Impostazioni del controllo</label>
             <tab-base><label>Impostazioni di base</label></tab-base>
-	    <tab-validations><label>Validazioni e avvisi</label></tab-validations>
-	    <tab-formulas><label>Formule</label></tab-formulas>
+            <tab-validations><label>Validazioni e avvisi</label></tab-validations>
+            <tab-formulas><label>Formule</label></tab-formulas>
             <tab-help><label>Messaggio d'aiuto</label></tab-help>
-	<control-name>
+            <control-name>
                 <label>Nome del controllo</label>
                 <alert>Il nome richiesto esiste già</alert>
                 <hint>Ad esempio: "primo nome"</hint>
@@ -3696,7 +3696,7 @@
                     <value>fr-email-subject</value>
                 </item>
             </classes>
-	           <types>
+            <types>
                 <label>Tipi di dati</label>
             </types>
             <builtin-type>
@@ -4222,7 +4222,7 @@
             <operations>Operazioni</operations>
             <anyone>Tutti</anyone>
             <owner>Proprietario</owner>
-	        <group-members>Membri del gruppo</group-members>
+            <group-members>Membri del gruppo</group-members>
             <create>Crea</create>
             <read>Leggi</read>
             <update>Aggiorna</update>
@@ -4518,10 +4518,10 @@
         <dialog-control-details>
             <label>Einstellungen Bedienelement</label>
             <tab-base><label>Grundeinstellungen</label></tab-base>
-	    <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
-	    <tab-formulas><label>Formeln</label></tab-formulas>
+        <tab-validations><label>Validierungen und Benachrichtigungen</label></tab-validations>
+        <tab-formulas><label>Formeln</label></tab-formulas>
             <tab-help><label>Hilfnachricht</label></tab-help>
-	        <control-name>
+            <control-name>
                 <label>Bedienelementname</label>
                 <alert>Name ist bereits vergeben oder ungültig</alert>
                 <hint>Z.B.: "vorname"</hint>

@@ -34,6 +34,8 @@
             <display-name lang="en">Dropdown Date</display-name>
             <display-name lang="fr">Date avec menus</display-name>
             <display-name lang="ru">Дата выпадающим меню</display-name>
+            <display-name lang="it">Data a tendina</display-name>
+            <display-name lang="de">Dropdown-Datum</display-name>
             <icon lang="en">
                 <small-icon>/ops/images/xforms/calendar.png</small-icon>
                 <large-icon>/ops/images/xforms/calendar.png</large-icon>

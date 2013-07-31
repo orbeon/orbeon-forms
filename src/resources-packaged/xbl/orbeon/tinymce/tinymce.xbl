@@ -33,6 +33,8 @@
             <display-name lang="en">Formatted Text</display-name>
             <display-name lang="fr">Texte formatté</display-name>
             <display-name lang="ru">Текст в формате HTML</display-name>
+            <display-name lang="de">HTML-Formatierter Text</display-name>
+            <display-name lang="it">Testo formattato in HTML</display-name>
             <icon lang="en">
                 <small-icon>/forms/orbeon/builder/images/html5.png</small-icon>
                 <large-icon>/forms/orbeon/builder/images/html5.png</large-icon>

@@ -29,6 +29,8 @@
             <fb:display-name lang="en">Dynamic Data Dropdown</fb:display-name>
             <fb:display-name lang="fr">Menu données dynamique</fb:display-name>
             <fb:display-name lang="ru">Список из веб-сервиса</fb:display-name>
+            <fb:display-name lang="de">Daten Dropdown-Liste</fb:display-name>
+            <fb:display-name lang="it">Tendina dati</fb:display-name>
             <fb:icon lang="en">
                 <fb:small-icon>/forms/orbeon/builder/images/dropdown.png</fb:small-icon>
                 <fb:large-icon>/forms/orbeon/builder/images/dropdown.png</fb:large-icon>
@@ -52,9 +54,13 @@
                     <xf:label lang="en">Resource URL</xf:label>
                     <xf:label lang="fr">URL de la ressource</xf:label>
                     <xf:label lang="ru">URL ресурса</xf:label>
+                    <xf:label lang="it">URL della risorsa</xf:label>
+                    <xf:label lang="de">URL der Ressource</xf:label>
                     <xf:hint lang="en">HTTP URL returning data used to populate the dropdown</xf:hint>
                     <xf:hint lang="fr">URL HTTP auquel réside le service</xf:hint>
                     <xf:hint lang="ru">HTTP URL сервиса, данными из которого будет заполнен выпадающий список</xf:hint>
+                    <xf:hint lang="it">URL HTTP che da i dati per il menu a tendina</xf:hint>
+                    <xf:hint lang="de">HTTP URL die die Inhalte für das Dropdown-Menü liefert</xf:hint>
                 </xf:input>
                 <xf:input ref="xf:itemset/@ref">
                     <xf:label ref="$resources/dialog-actions/items/label"/>

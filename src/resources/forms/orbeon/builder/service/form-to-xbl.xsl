@@ -90,6 +90,8 @@
                 <display-name lang="en"><xsl:value-of select="fr:title('en', 'Section Templates')"/></display-name>
                 <display-name lang="fr"><xsl:value-of select="fr:title('fr', 'Modèles de sections')"/></display-name>
                 <display-name lang="ru"><xsl:value-of select="fr:title('ru', 'Шаблоны разделов')"/></display-name>
+                <display-name lang="de"><xsl:value-of select="fr:title('de', 'Templates der Abschnitte')"/></display-name>
+                <display-name lang="it"><xsl:value-of select="fr:title('it', 'Templates della sezione')"/></display-name>
                 <icon lang="en">
                     <small-icon>/forms/orbeon/builder/images/input.png</small-icon>
                     <large-icon>/forms/orbeon/builder/images/input.png</large-icon>

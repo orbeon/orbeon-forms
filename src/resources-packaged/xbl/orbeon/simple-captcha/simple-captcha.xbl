@@ -50,6 +50,8 @@
                     <resources>
                         <resource xml:lang="en"><ask-to-type-word>Type the word above:</ask-to-type-word></resource>
                         <resource xml:lang="fr"><ask-to-type-word>Veuillez entrer le mot ci-dessus:</ask-to-type-word></resource>
+                        <resource xml:lang="de"><ask-to-type-word>Geben Sie die obigen Wörter ein:</ask-to-type-word></resource>
+                        <resource xml:lang="it"><ask-to-type-word>Inserisci le parole come visualizzate sull'immagine:</ask-to-type-word></resource>
                     </resources>
                 </xf:instance>
             </xf:model>

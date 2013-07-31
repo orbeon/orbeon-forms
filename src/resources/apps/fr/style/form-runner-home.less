@@ -16,10 +16,6 @@
 
 .orbeon {
 
-    .fr-mode-home .fr-status-icons {
-        display: none
-    }
-
     .row .alert {
         display: block;
         margin: 0;
@@ -34,17 +30,35 @@
             min-width: 12px;
         }
 
-        .fr-home-repeat-selection-checkbox {
+        .fr-home-select {
             .fr-plain-checkbox-container();
+        }
+
+        .fr-home-last-modified {
+            white-space: nowrap;
         }
 
         .label {
             display: inline-block;
-            text-align: center;
+            text-align: left;
+            .box-sizing(border-box);
+            width: 100%;
+        }
+    }
 
-            // This doesn't work correctly with Firefox :(
-            //box-sizing: border-box;
-            //width: 100%;
+    .fr-credentials-dialog {
+
+        .fr-dialog-credentials-fields {
+            margin-left: 110px;
+        }
+
+        img { float: left; margin: 5px 10px 0 10px }
+        .fb-dialog-form-settings-fields {
+            float: left;
+            width: 110px;
+            input, textarea {
+                width: 100%;
+            }
         }
     }
 }

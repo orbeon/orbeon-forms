@@ -27,9 +27,9 @@
         xmlns:frf="java:org.orbeon.oxf.fr.FormRunner">
 
     <xsl:variable name="view"           select="(/xh:html/xh:body/fr:view)[1]" as="element(fr:view)?"/>
+    <xsl:variable name="fluid"          select="$view/@fluid = 'true'"/>
     <xsl:variable name="body"           select="($view/fr:body, $view)[1]"           as="element()?"/>
     <xsl:variable name="custom-buttons" select="$view/fr:buttons"                    as="element()*"/>
-    <xsl:variable name="custom-layout"  select="empty($body)"/>
 
     <!-- Template for the default layout of a form -->
     <xsl:variable name="default-page-template" as="element(*)*">
@@ -77,7 +77,7 @@
     </xsl:variable>
 
     <xsl:template match="fr:row">
-        <xh:div class="row">
+        <xh:div class="row{if ($fluid) then '-fluid' else ''}">
             <xh:div class="span12">
                 <xsl:apply-templates select="@* | node()"/>
             </xh:div>
@@ -120,8 +120,8 @@
             <!-- .orbeon is here to scope all Orbeon CSS rules -->
             <xsl:attribute name="class" select="string-join(('orbeon', concat('xforms-', if ($is-inline-hints) then 'disable' else 'enable', '-hint-as-tooltip'), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
-            <xf:group model="fr-form-model" id="fr-view" class="container fr-view{concat(' fr-mode-', $mode)}" xxf:element="div">
-                <xsl:apply-templates select="if ($custom-layout) then node() else $default-page-template"/>
+            <xf:group model="fr-form-model" id="fr-view" class="container{if ($fluid) then '-fluid' else ''} fr-view{concat(' fr-mode-', $mode)}" xxf:element="div">
+                <xsl:apply-templates select="if ($is-detail and not($is-form-builder)) then $default-page-template else node()"/>
                 <xsl:call-template name="fr-hidden-controls"/>
                 <xsl:call-template name="fr-dialogs"/>
             </xf:group>

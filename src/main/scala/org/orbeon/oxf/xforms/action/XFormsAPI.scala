@@ -19,7 +19,6 @@ import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
 import org.orbeon.scaxon.XML._
 import org.w3c.dom.Node.{ELEMENT_NODE, ATTRIBUTE_NODE}
-import org.orbeon.oxf.xforms.xbl.XBLContainer
 
 import org.orbeon.oxf.util.DynamicVariable
 import org.orbeon.oxf.xforms.model.DataModel
@@ -30,8 +29,11 @@ import org.orbeon.oxf.xforms.event.{XFormsEventTarget, Dispatch, XFormsEvent}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission
 import org.orbeon.oxf.xforms.event.events.{XFormsSubmitDoneEvent, XFormsSubmitErrorEvent, XFormsSubmitEvent}
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.control.controls.{XXFormsDialogControl, XFormsCaseControl}
+import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl
 import util.Try
+import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.xforms.control.XFormsControl
 
 object XFormsAPI {
 
@@ -184,28 +186,9 @@ object XFormsAPI {
             case Seq(att, _*) ⇒ setvalue(att, value)
         }
 
-    // Return an instance's root element in the current action context
-    def instanceRoot(staticId: String, searchAncestors: Boolean = false): Option[NodeInfo] = {
-
-        val ai = actionInterpreter
-
-        def ancestorXBLContainers = {
-            def recurse(container: XBLContainer): List[XBLContainer] = container :: (container.getParentXBLContainer match {
-                case parent: XBLContainer ⇒ recurse(parent)
-                case _ ⇒ Nil
-            })
-
-            recurse(ai.container)
-        }
-
-        val containersToSearch =
-            if (searchAncestors) ancestorXBLContainers else List(ai.container)
-
-        containersToSearch flatMap
-            (_.findInstance(staticId)) find
-                (_ ne null) map
-                    (_.rootElement)
-    }
+    // Return an instance's root element in the current action context as per xxf:instance()
+    def instanceRoot(staticId: String): Option[NodeInfo] =
+        XXFormsInstance.findInAncestorScopes(actionInterpreter.container, staticId)
 
     // Return an instance within a top-level model
     def topLevelInstance(modelId: String, instanceId: String) =
@@ -318,13 +301,24 @@ object XFormsAPI {
     }
 
     // xf:show
-    def show(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit = {
-        val dialogControl = containingDocument.getObjectByEffectiveId(dialogId).asInstanceOf[XXFormsDialogControl]
-        XXFormsShowAction.showDialog(dialogControl, properties = properties)
-    }
+    def show(dialogId: String, properties: PropertyGetter = EmptyGetter): Unit =
+        collectByErasedType[XFormsEventTarget](containingDocument.getObjectByEffectiveId(dialogId)) foreach {
+            XXFormsShowAction.showDialog(_, properties = properties)
+        }
 
     // xf:load
     def load(url: String, target: Option[String] = None, progress: Boolean = true): Unit = {
         XFormsLoadAction.resolveStoreLoadValue(containingDocument, null, true, url, target.orNull, null, false, false)
+    }
+
+    // xf:setfocus
+    def setfocus(controlId: String, inputOnly: Boolean = false): Unit =
+        collectByErasedType[XFormsControl](containingDocument.getObjectByEffectiveId(controlId)) foreach {
+            XFormsSetfocusAction.setfocus(_, inputOnly)
+        }
+
+    // xxf:invalidate-instance
+    def invalidateInstance(resource: String): Unit = {
+        ???
     }
 }

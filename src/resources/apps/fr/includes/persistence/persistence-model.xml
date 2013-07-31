@@ -274,7 +274,14 @@
             ref="event('holder')"
             resource="{event('resource')}"
             replace="text"
-            target="instance('fr-create-update-submission-response')"/>
+            target="instance('fr-create-update-submission-response')">
+
+        <!-- Clear response if not HTML -->
+        <xf:setvalue
+            if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
+            ref="instance('fr-create-update-submission-response')"/>
+
+    </xf:submission>
 
     <!-- Submission to create/update an attachment -->
     <xf:submission id="fr-create-update-attachment-submission"

@@ -454,66 +454,22 @@ trait FormRunnerActions {
 
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
-            val FormRunnerParams(app, form, document, _) = FormRunnerParams()
+            val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
             val isDraft = params.get(None).exists(_ == "draft")
-
-            require(document.isDefined)
 
             // Notify that the data is about to be saved
             dispatch(name = "fr-data-save-prepare", targetId = "fr-form-model")
 
-            // Find all instance nodes containing file URLs we need to upload
-            val (uploadHolders, beforeURLs, afterURLs) = (
-                for {
-                    holder ← formInstance.root \\ Node
-                    if isAttribute(holder) || isElement(holder) && ! hasChildElement(holder)
-                    beforeURL     = holder.stringValue.trim
-                    isUploaded    = isUploadedFileURL(beforeURL)
-                    isDraftToMove = (! isDraft) && isDataAttachmentPath(app, form, isDraft = true, document.get, beforeURL)
-                    if isUploaded || isDraftToMove
-                } yield {
-                    val afterURL  =
-                        if (isUploaded)
-                            createAttachmentPath(app, form, isDraft, document.get, beforeURL)
-                        else {
-                            val filename = getAttachmentPathFilename(beforeURL)
-                            createFormDataAttachmentPath(app, form, isDraft = false, document.get, filename)
-                        }
-                    (holder, beforeURL, afterURL)
-                }
-            ).unzip3
-
-            val commonQueryString = s"valid=$dataValid"
-
-            // Save all attachments
-            // - also pass a "valid" argument with whether the data was valid
-            def saveAttachments(): Unit =
-                uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
-                    sendThrowOnError("fr-create-update-attachment-submission", Map(
-                        "holder"   → Some(holder),
-                        "resource" → Some(appendQueryString(resource, commonQueryString)))
-                    )
-                }
-
-            // Update the paths on success
-            def updatePaths() =
-                uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
-                    setvalue(holder, resource)
-                }
-
-            // Save XML document
-            // - always store form data as "data.xml"
-            // - also pass a "valid" argument with whether the data was valid
-            def saveData() =
-                sendThrowOnError("fr-create-update-submission", Map(
-                    "holder"   → Some(formInstance.rootElement),
-                    "resource" → Some(appendQueryString(createFormDataBasePath(app, form, isDraft, document.get) + "data.xml", commonQueryString)))
-                )
-
-            // Do things in order, so we don't update path or save the data if any the upload fails
-            saveAttachments()
-            updatePaths()
-            saveData()
+            // Save
+            val (beforeURLs, afterURLs) = putWithAttachments(
+                data              = formInstance.root,
+                toBaseURI         = "", // local save
+                fromBasePath      = createFormDataBasePath(app, form, ! isDraft, document),
+                toBasePath        = createFormDataBasePath(app, form, isDraft, document),
+                filename          = "data.xml",
+                commonQueryString = s"valid=$dataValid",
+                forceAttachments  = false
+            )
 
             // If we were in new mode, now we must be in edit mode
             setvalue(parametersInstance.rootElement \ "mode", "edit")

@@ -23,10 +23,13 @@ import org.orbeon.oxf.util.Headers._
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.ValidationLevel
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 
 trait FormRunnerPersistence {
 
     import FormRunner._
+
+    val PersistenceBasePath = "/fr/service/persistence/crud"
 
     // Check whether a value correspond to an uploaded file
     //
@@ -38,41 +41,20 @@ trait FormRunnerPersistence {
     def isUploadedFileURL(value: String): Boolean =
         value.startsWith("file:/") && XFormsUploadControl.verifyMAC(value)
 
-    // Create a new attachment path
-    def createAttachmentPath(app: String, form: String, isDraft: Boolean, document: String, localURL: String): String = {
-
-        // Here we could decide to use a nicer extension for the file. But since initially the filename comes from the
-        // client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
-        // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now, we
-        // just use .bin as an extension.
-
-        //val nonTrustedFilename = XFormsUploadControl.getParameter(localURL, "filename")
-        //val nonTrustedMediatype = XFormsUploadControl.getParameter(localURL, "mediatype")
-
-        createFormDataAttachmentPath(app, form, isDraft, document, SecureUtils.randomHexId + ".bin")
-    }
-
-    def dataCollection(isDraft: Boolean) = if (isDraft) "/draft/" else "/data/"
-
-    // Path for a form data
+    // Base path for form data
     def createFormDataBasePath(app: String, form: String, isDraft: Boolean, document: String): String =
-        "/fr/service/persistence/crud/" + app + '/' + form + dataCollection(isDraft) + document + "/"
+        PersistenceBasePath :: app :: form :: (if (isDraft) "draft" else "data") :: document :: "" :: Nil mkString "/"
 
-    // Path for a form data attachment
-    def createFormDataAttachmentPath(app: String, form: String, isDraft: Boolean, document: String, filename: String): String =
-        createFormDataBasePath(app, form, isDraft, document) + filename
+    // Base path for form definition
+    def createFormDefinitionBasePath(app: String, form: String) =
+        PersistenceBasePath :: app :: form :: "form" :: "" :: Nil mkString "/"
 
-    // Path for a form definition attachment
-    def createFormDefinitionAttachmentPath(app: String, form: String, filename: String): String =
-        "/fr/service/persistence/crud/" + app + '/' + form + "/form/" + filename
-
-    // Whether the given path is an attachment path
-    def isDataAttachmentPath(app: String, form: String, isDraft: Boolean, document: String, path: String): Boolean =
-        path.startsWith("/fr/service/persistence/crud/" + app + '/' + form + dataCollection(isDraft) + document + '/') &&
-            path.endsWith(".bin")
+    // Whether the given path is an attachment path (ignoring an optional query string)
+    def isAttachmentURLFor(basePath: String, url: String) =
+        url.startsWith(basePath) && splitQuery(url)._1.endsWith(".bin")
 
     // For a given attachment path, return the filename
-    def getAttachmentPathFilename(path: String): String = path.split('/').last
+    def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last
 
     def getPersistenceURLHeaders(app: String, form: String, formOrData: String) = {
 
@@ -132,7 +114,7 @@ trait FormRunnerPersistence {
 
     // Retrieves a form from the persistence layer
     def readPublishedForm(appName: String, formName: String)(implicit logger: IndentedLogger): Option[DocumentInfo] = {
-        val uri = "/fr/service/persistence/crud/" + appName + "/" + formName + "/form/form.xhtml"
+        val uri = createFormDefinitionBasePath(appName, formName) + "form.xhtml"
         val urlString = URLRewriterUtils.rewriteServiceURL(NetUtils.getExternalContext.getRequest, uri, URLRewriter.REWRITE_MODE_ABSOLUTE)
         val url = URLFactory.createURL(urlString)
 
@@ -156,4 +138,77 @@ trait FormRunnerPersistence {
 
     // Return the number of failed validations captured by the error summary for the given level
     def countValidationsByLevel(level: ValidationLevel) = (errorSummaryInstance.rootElement \ "counts" \@ level.name stringValue).toInt
+
+    def collectAttachments(data: DocumentInfo, fromBasePath: String, toBasePath: String, forceAttachments: Boolean) = (
+        for {
+            holder        ← data \\ Node
+            if isAttribute(holder) || isElement(holder) && ! hasChildElement(holder)
+            beforeURL     = holder.stringValue.trim
+            isUploaded    = isUploadedFileURL(beforeURL)
+            if isUploaded ||
+                isAttachmentURLFor(fromBasePath, beforeURL) && ! isAttachmentURLFor(toBasePath, beforeURL) ||
+                isAttachmentURLFor(toBasePath, beforeURL) && forceAttachments
+        } yield {
+            // Here we could decide to use a nicer extension for the file. But since initially the filename comes from
+            // the client, it cannot be trusted, nor can its mediatype. A first step would be to do content-sniffing to
+            // determine a more trusted mediatype. A second step would be to put in an API for virus scanning. For now,
+            // we just use .bin as an extension.
+            val filename =
+                if (isUploaded)
+                    SecureUtils.randomHexId + ".bin"
+                else
+                    getAttachmentPathFilenameRemoveQuery(beforeURL)
+
+            val afterURL =
+                toBasePath + filename
+
+            (holder, beforeURL, afterURL)
+        }
+    ).unzip3
+
+    def putWithAttachments(
+            data: DocumentInfo,
+            toBaseURI: String,
+            fromBasePath: String,
+            toBasePath: String,
+            filename: String,
+            commonQueryString: String,
+            forceAttachments: Boolean) = {
+
+        // Find all instance nodes containing file URLs we need to upload
+        val (uploadHolders, beforeURLs, afterURLs) =
+            collectAttachments(data, fromBasePath, toBasePath, forceAttachments)
+
+        // Save all attachments
+        // - also pass a "valid" argument with whether the data was valid
+        def saveAttachments(): Unit =
+            uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
+                sendThrowOnError("fr-create-update-attachment-submission", Map(
+                    "holder"   → Some(holder),
+                    "resource" → Some(appendQueryString(toBaseURI + resource, commonQueryString)))
+                )
+            }
+
+        // Update the paths on success
+        def updatePaths() =
+            uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
+                setvalue(holder, resource)
+            }
+
+        // Save XML document
+        // - always store form data as "data.xml"
+        // - also pass a "valid" argument with whether the data was valid
+        def saveData() =
+            sendThrowOnError("fr-create-update-submission", Map(
+                "holder"   → Some(data.rootElement),
+                "resource" → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)))
+            )
+
+        // Do things in order, so we don't update path or save the data if any the upload fails
+        saveAttachments()
+        updatePaths()
+        saveData()
+
+        beforeURLs → afterURLs
+    }
 }

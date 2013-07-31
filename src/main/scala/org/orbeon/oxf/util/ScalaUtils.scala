@@ -16,8 +16,6 @@ package org.orbeon.oxf.util
 import org.orbeon.errorified.Exceptions
 import org.orbeon.exception._
 import org.apache.log4j.Logger
-import java.net.URLEncoder.{encode ⇒ encodeURL}
-import java.net.URLDecoder.{decode ⇒ decodeURL}
 import org.apache.commons.lang3.StringUtils.{isNotBlank, trimToEmpty}
 import collection.mutable
 import collection.generic.CanBuildFrom
@@ -26,7 +24,7 @@ import scala.util.{Success, Failure, Try}
 import scala.util.control.NonFatal
 import java.io.{Writer, Reader, OutputStream, InputStream}
 
-object ScalaUtils {
+object ScalaUtils extends PathOps {
 
     private val CopyBufferSize = 8192
 
@@ -124,55 +122,12 @@ object ScalaUtils {
                 throw newException(Exceptions.getRootThrowable(t))
         }
 
-    def dropTrailingSlash(s: String) = if (s.size == 0 || s.last != '/') s else s.init
-    def dropStartingSlash(s: String) = if (s.size == 0 || s.head != '/') s else s.tail
-    def appendStartingSlash(s: String) = if (s.size != 0 && s.head == '/') s else '/' + s
-
     // Semi-standard pipe operator
     implicit class PipeOps[A](val a: A) extends AnyVal { def |>[B](f: A ⇒ B) = f(a) }
 
     // Convert a string of tokens to a set
     def stringToSet(s: String)               = split[Set](s)
     def stringOptionToSet(s: Option[String]) = s map stringToSet getOrElse Set.empty[String]
-
-    // Split out a URL's query part
-    def splitQuery(url: String): (String, Option[String]) = {
-        val index = url.indexOf('?')
-        if (index == -1)
-            (url, None)
-        else
-            (url.substring(0, index), Some(url.substring(index + 1)))
-    }
-
-    // Recombine a path/query and parameters into a resulting URL
-    def recombineQuery(pathQuery: String, params: Seq[(String, String)]) =
-        pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
-
-    // Decode a query string into a sequence of pairs
-    // We assume that there are no spaces in the input query
-    def decodeSimpleQuery(query: String): Seq[(String, String)] =
-        for {
-            nameValue      ← query.split('&').toList
-            if nameValue.nonEmpty
-            nameValueArray = nameValue.split('=')
-            if nameValueArray.size >= 1
-            encodedName    = nameValueArray(0)
-            if encodedName.nonEmpty
-            decodedName    = decodeURL(encodedName, "utf-8")
-            decodedValue   = decodeURL(nameValueArray.lift(1) getOrElse "", "utf-8")
-        } yield
-            decodedName → decodedValue
-
-    // Get the first query parameter value for the given name
-    def getFirstQueryParameter(url: String, name: String) = {
-        val query = splitQuery(url)._2 map decodeSimpleQuery getOrElse Seq()
-
-        query find (_._1 == name) map { case (k, v) ⇒ v }
-    }
-
-    // Encode a sequence of pairs to a query string
-    def encodeSimpleQuery(parameters: Seq[(String, String)]): String =
-        parameters map { case (name, value) ⇒ encodeURL(name, "utf-8") + '=' + encodeURL(value, "utf-8") } mkString "&"
 
     // Combine the second values of each tuple that have the same name
     // The caller can specify the type of the resulting values, e.g.:

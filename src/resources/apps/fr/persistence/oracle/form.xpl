@@ -47,7 +47,8 @@
                             <sql:query>
                                 select
                                     extract(xml, '/xh:html/xh:head/xf:model/xf:instance[@id = "fr-form-metadata"]/metadata',
-                                    'xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"').getClobVal() metadata
+                                    'xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms"').getClobVal() metadata,
+                                    last_modified last_modified_time
                                 from (
                                     select t.*, dense_rank() over (partition by app, form order by last_modified desc) as latest
                                     from orbeon_form_definition t)

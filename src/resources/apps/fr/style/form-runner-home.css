@@ -77,9 +77,6 @@
 .fr-plain-checkbox-container label .label {
   vertical-align: middle;
 }
-.orbeon .fr-mode-home .fr-status-icons {
-  display: none;
-}
 .orbeon .row .alert {
   display: block;
   margin: 0;
@@ -92,23 +89,45 @@
   white-space: nowrap;
   min-width: 12px;
 }
-.orbeon table .fr-home-repeat-selection-checkbox {
+.orbeon table .fr-home-select {
   width: 1px;
 }
-.orbeon table .fr-home-repeat-selection-checkbox label {
+.orbeon table .fr-home-select label {
   display: inline-block;
   margin: 0;
   padding: 0;
   text-indent: 0;
 }
-.orbeon table .fr-home-repeat-selection-checkbox label input[type="checkbox"] {
+.orbeon table .fr-home-select label input[type="checkbox"] {
   float: none;
   margin: 0;
 }
-.orbeon table .fr-home-repeat-selection-checkbox label .label {
+.orbeon table .fr-home-select label .label {
   vertical-align: middle;
+}
+.orbeon table .fr-home-last-modified {
+  white-space: nowrap;
 }
 .orbeon table .label {
   display: inline-block;
-  text-align: center;
+  text-align: left;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+}
+.orbeon .fr-credentials-dialog .fr-dialog-credentials-fields {
+  margin-left: 110px;
+}
+.orbeon .fr-credentials-dialog img {
+  float: left;
+  margin: 5px 10px 0 10px;
+}
+.orbeon .fr-credentials-dialog .fb-dialog-form-settings-fields {
+  float: left;
+  width: 110px;
+}
+.orbeon .fr-credentials-dialog .fb-dialog-form-settings-fields input,
+.orbeon .fr-credentials-dialog .fb-dialog-form-settings-fields textarea {
+  width: 100%;
 }

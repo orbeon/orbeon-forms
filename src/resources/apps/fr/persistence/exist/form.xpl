@@ -42,10 +42,16 @@
                 if (xmldb:collection-available($fr-path)) then
                     for $app  in xmldb:get-child-collections($fr-path)[$request-app = '' or . = $request-app],
                         $form in xmldb:get-child-collections(concat($fr-path, '/', $app))[$request-form = '' or . = $request-form]
+                    let $coll     := concat($fr-path, '/', $app, '/', $form, '/form')
+                    let $doc-path := concat($coll, '/form.xhtml')
+                    where doc-available($doc-path)
+                    order by xmldb:last-modified($coll, 'form.xhtml') descending
                     return
                         element form {
-                            doc(concat($fr-path, '/', $app, '/', $form, '/form/form.xhtml'))
-                            /xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*
+                            doc($doc-path)/xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*,
+                            element last-modified-time {
+                                xmldb:last-modified($coll, 'form.xhtml')
+                            }
                         }
                 else ()
             </exist:text></exist:query>

@@ -21,7 +21,7 @@
       xmlns:fr="http://orbeon.org/oxf/xml/form-runner"
       xmlns:fb="http://orbeon.org/oxf/xml/form-builder"
       xmlns:saxon="http://saxon.sf.net/"
-      xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
+      xmlns:fbf="java:org.orbeon.oxf.fb.FormBuilder"
 
       id="fb-publish-dialog" level="modal" close="true" draggable="true" model="fb-publish-model">
 
@@ -60,8 +60,9 @@
                         </xf:label>
                         <!-- Dispatch publish event -->
                         <xf:dispatch ev:event="DOMActivate" name="fb-publish-form" targetid="fb-publish-model">
-                            <xf:property name="app" value="$app"/>
-                            <xf:property name="form" value="$form"/>
+                            <xf:property name="app"      value="$app"/>
+                            <xf:property name="form"     value="$form"/>
+                            <xf:property name="document" model="fr-persistence-model" value="$document"/>
                         </xf:dispatch>
                     </xf:trigger>
                     <xf:output value="$form-resources/or/label"/>
@@ -82,7 +83,7 @@
                     <xf:output value="xxf:format-message($form-resources/messages/publish-success, xs:integer(instance('fb-publish-instance')/attachments))"/>
                 </xh:p>
                 <!-- Display response content if present -->
-                <xf:var name="response" value="instance('fb-publish-instance')/response"/>
+                <xf:var name="response" value="instance('fr-create-update-submission-response')"/>
                 <xf:group ref=".[normalize-space($response) != '']">
                     <xh:div class="fb-publish-message">
                         <xf:output value="$response" mediatype="text/html"/>
@@ -136,132 +137,29 @@
     <!-- Initialize dialog -->
     <xf:toggle ev:event="xxforms-dialog-open" case="fb-publish-dialog-message-start"/>
 
-    <!-- Clean-up upon close -->
-    <xf:setvalue ev:event="xxforms-dialog-close" ref="instance('fb-publish-instance')/response"/>
+    <!-- Clean-up response upon close -->
+    <xf:setvalue ev:event="xxforms-dialog-close" ref="instance('fr-create-update-submission-response')"/>
 
     <!-- Local model -->
     <xf:model id="fb-publish-model">
 
         <!-- Publish form operation -->
-        <xf:action ev:event="fb-publish-form">
-            <!-- ASSUMPTION: the form has been previously saved, and so all attachments are saved as well -->
-
-            <!-- Clear results -->
-            <xf:setvalue ref="instance('fb-publish-instance')/is-error">false</xf:setvalue>
-            <xf:setvalue ref="instance('fb-publish-instance')/attachments" value="0"/>
-            <xf:setvalue ref="instance('fb-publish-instance')/response"/>
-
-            <!-- Make sure XBL bindings for section templates are present -->
-            <xf:insert ref="instance('fb-form-to-publish-instance')"
-                           origin="xxf:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
-                                    ('data', 'bindings'),
-                                    (xxf:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', xxf:instance('fb-form-instance'), 'data'), xxf:instance('fb-components-instance')),
-                                    'data')"/>
-
-            <!-- Publish attachments if any -->
-            <xf:var name="fb-app"      model="fr-persistence-model" value="$app"/>
-            <xf:var name="fb-form"     model="fr-persistence-model" value="$form" />
-            <xf:var name="fb-document" model="fr-persistence-model" value="$document" />
-
-            <xf:var name="attachment-holders"
-                        value="instance('fb-form-to-publish-instance')/root()//(*[not(*)] | @*)
-                                [frf:isDataAttachmentPath($fb-app, $fb-form, false(), $fb-document, normalize-space(.))]"/>
-
-            <xf:action iterate="$attachment-holders" if="instance('fb-publish-instance')/is-error = 'false'">
-
-                <xf:var name="p" value="position()"/>
-                <xf:var name="holder" value="."/>
-                <xf:var name="filename" value="frf:getAttachmentPathFilename(normalize-space($holder))"/>
-                <xf:var name="resource" value="frf:createFormDefinitionAttachmentPath(event('app'), event('form'), $filename)"/>
-
-                <!-- Publish attachment -->
-                <xf:send submission="fr-publish-attachment-submission">
-                    <xf:property name="holder" value="$holder"/>
-                    <xf:property name="resource" value="$resource"/>
-                </xf:send>
-
-                <!-- Update attachment path in form to submit -->
-                <xf:setvalue
-                    if="instance('fb-publish-instance')/is-error = 'false'"
-                    ref="$holder"
-                    value="$resource"/>
-
-            </xf:action>
-
-            <!-- Publish form -->
-            <xf:send submission="fr-publish-form-submission" if="instance('fb-publish-instance')/is-error = 'false'">
-                <xf:property name="app" value="event('app')"/>
-                <xf:property name="form" value="event('form')"/>
-            </xf:send>
+        <xf:action ev:event="fb-publish-form" type="xpath">
+            (: First make sure XBL bindings for section templates are present :)
+            for $annotated in
+                xxf:call-xpl('oxf:/forms/orbeon/builder/form/add-template-bindings.xpl',
+                    ('data', 'bindings'),
+                    (xxf:call-xpl('oxf:/forms/orbeon/builder/form/deannotate.xpl', 'data', xxf:instance('fb-form-instance'), 'data'), xxf:instance('fb-components-instance')),
+                    'data')
+            return
+                fbf:publish($annotated, event('app'), event('form'), event('document'))
         </xf:action>
 
-        <!-- Other stuff -->
         <xf:instance id="fb-publish-instance">
             <publish>
-                <is-error/>
                 <attachments>0</attachments>
-                <response/>
             </publish>
         </xf:instance>
-
-        <!-- De-annotated form to submit -->
-        <xf:instance id="fb-form-to-publish-instance">
-            <dummy xmlns=""/>
-        </xf:instance>
-
-        <!-- Submission to create/update an attachment -->
-        <xf:submission
-                id="fr-publish-attachment-submission"
-                method="put" serialization="application/octet-stream"
-                ref="event('holder')"
-                resource="{event('resource')}"
-                replace="none"/>
-
-        <!-- Increment number of attachments saved -->
-        <xf:setvalue
-            ev:event="xforms-submit-done"
-            ev:observer="fr-publish-attachment-submission"
-            ref="instance('fb-publish-instance')/attachments"
-            value="xs:integer(.) + 1"/>
-
-        <!-- Submission to publish the form -->
-        <xf:submission
-                id="fr-publish-form-submission"
-                ref="instance('fb-form-to-publish-instance')"
-                method="put"
-                resource="/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml?document={xxf:instance('fr-parameters-instance')/document}"
-                replace="text"
-                targetref="instance('fb-publish-instance')/response">
-
-            <!-- Clean-up after submission -->
-            <xf:insert
-                ev:event="xforms-submit-done xforms-submit-error"
-                ref="instance('fb-form-to-publish-instance')"
-                origin="xf:element('dummy')"/>
-
-            <!-- Respond to successful publish submission -->
-            <xf:action ev:event="xforms-submit-done">
-                <!-- Try to invalidate shared instances with the given resource URI so that the deployed form will be
-                     re-read by Form Runner. This works only if Form Builder is in the same webapp as the Form Runner
-                     running the deployed form. -->
-                <xxf:invalidate-instance resource="{event('resource-uri')}"/>
-                <!-- Clear response if not HTML -->
-                <xf:setvalue
-                        if="not(starts-with(event('response-headers')[lower-case(name) = 'content-type']/value, 'text/html'))"
-                        ref="instance('fb-publish-instance')/response"/>
-                <!-- Open success area -->
-                <xf:toggle case="fb-publish-dialog-success"/>
-                <xf:setfocus control="fb-publish-dialog"/>
-            </xf:action>
-
-        </xf:submission>
-
-        <!-- Any submission error -->
-        <xf:action ev:event="xforms-submit-error">
-            <xf:setvalue ref="instance('fb-publish-instance')/is-error">true</xf:setvalue>
-            <xf:toggle case="fb-publish-dialog-error"/>
-            <xf:setfocus control="fb-publish-dialog"/>
-        </xf:action>
 
     </xf:model>
 

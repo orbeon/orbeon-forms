@@ -63,7 +63,7 @@
                         <xsl:copy-of select="/request/sql:datasource"/>
                         <sql:execute>
                             <sql:query>
-                                select  d.xml xml
+                                select  d.xml xml, d.last_modified_time last_modified_time
                                 from    orbeon_form_definition d,
                                         (
                                             select      app, form, max(last_modified_time) last_modified_time

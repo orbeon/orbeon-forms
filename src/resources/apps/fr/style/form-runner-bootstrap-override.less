@@ -223,4 +223,48 @@ body.orbeon {
       background-color: transparent;
       cursor: default;
     }
+
+    // Dropdowns
+    // ---------
+
+    .dropdown-menu a {
+        text-decoration: none;
+    }
+
+    // Hover state
+    // -----------
+    .dropdown-menu li > span > a:hover,
+    .dropdown-menu li > span > a:focus,
+    .dropdown-submenu:hover > a {
+      text-decoration: none;
+      color: @dropdownLinkColorHover;
+      background-color: @dropdownLinkBackgroundHover;
+      #gradient > .vertical(@dropdownLinkBackgroundHover, darken(@dropdownLinkBackgroundHover, 5%));
+    }
+
+    // Active state
+    // ------------
+    .dropdown-menu .active > span > a,
+    .dropdown-menu .active > span > a:hover {
+      color: @dropdownLinkColorHover;
+      text-decoration: none;
+      outline: 0;
+      background-color: @dropdownLinkBackgroundActive;
+      #gradient > .vertical(@dropdownLinkBackgroundActive, darken(@dropdownLinkBackgroundActive, 5%));
+    }
+
+    // Disabled state
+    // --------------
+    // Gray out text and ensure the hover state remains gray
+    .dropdown-menu .disabled > span > a,
+    .dropdown-menu .disabled > span > a:hover {
+      color: @grayLight;
+    }
+    // Nuke hover effects
+    .dropdown-menu .disabled > span > a:hover {
+      text-decoration: none;
+      background-color: transparent;
+      background-image: none;
+      cursor: default;
+    }
 }

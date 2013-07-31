@@ -28,3 +28,4 @@ object FormBuilder
     with AlertsAndConstraintsOps
     with SchemaOps
     with PermissionsOps
+    with PublishOps

@@ -17,7 +17,7 @@ import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.scaxon.XML._
 
-trait FormRunnerSummaryOps {
+trait FormRunnerSummary {
     // Get a field's label in HTML for the Summary page
     def htmlFieldLabel(name: String, htmlLabel: Boolean, resources: NodeInfo): String = {
         def resourceLabelOpt = (resources \ name \ "label" map (v ⇒ if (htmlLabel) v.stringValue else XMLUtils.escapeXMLMinimal(v.stringValue))).headOption

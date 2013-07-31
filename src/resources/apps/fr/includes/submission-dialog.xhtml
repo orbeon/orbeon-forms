@@ -72,9 +72,9 @@
         </xf:group>
     </xh:div>
     <!-- Set value when dialog opens -->
-    <xf:setvalue ev:event="xxforms-dialog-open" ref="." value="event('fr-content')"/>
+    <xf:setvalue ev:event="xxforms-dialog-open" ref="instance()" value="event('fr-content')"/>
     <!-- Clear value when dialog closes -->
-    <xf:setvalue ev:event="xxforms-dialog-close" ref="."/>
+    <xf:setvalue ev:event="xxforms-dialog-close" ref="instance()"/>
     <!-- Local model -->
     <xf:model id="fr-submission-result-model">
         <xf:instance id="fr-submission-result-instance">
@@ -82,7 +82,7 @@
         </xf:instance>
 
         <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
-        <xf:var name="app" value="$parameters/app"/>
+        <xf:var name="app"  value="$parameters/app"/>
         <xf:var name="form" value="$parameters/form"/>
 
     </xf:model>

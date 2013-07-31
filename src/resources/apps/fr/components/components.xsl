@@ -46,7 +46,7 @@
     <xsl:variable name="fr-form-model"    select="/xh:html/xh:head/(xf:model[@id = 'fr-form-model'], xf:model[1])[1]"/>
     <xsl:variable name="fr-form-model-id" select="generate-id($fr-form-model)"/>
 
-    <xsl:variable name="is-detail" select="not($mode = ('summary', ''))" as="xs:boolean"/>
+    <xsl:variable name="is-detail" select="not($mode = ('summary', 'home', ''))" as="xs:boolean"/>
     <xsl:variable name="is-form-builder" select="$app = 'orbeon' and $form = 'builder'" as="xs:boolean"/>
     <xsl:variable name="is-noscript-support" select="not($fr-form-model/@xxf:noscript-support = 'false')" as="xs:boolean"/>
     <xsl:variable name="is-noscript" select="doc('input:request')/request/parameters/parameter[name = 'fr-noscript']/value = 'true'

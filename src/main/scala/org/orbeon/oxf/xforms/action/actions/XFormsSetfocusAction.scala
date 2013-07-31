@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.action.actions
 import org.orbeon.oxf.xforms.action.{DynamicActionContext, XFormsAction}
 import org.orbeon.oxf.xforms.event.Dispatch
 import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent
+import org.orbeon.oxf.xforms.control.XFormsControl
 
 /**
 * 10.1.7 The setfocus Element
@@ -32,6 +33,10 @@ class XFormsSetfocusAction extends XFormsAction {
 
         // Resolve and update control
         resolveControl("control")(context) foreach
-            (control ⇒ Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly)))
+            (XFormsSetfocusAction.setfocus(_, inputOnly))
     }
+}
+object XFormsSetfocusAction {
+    def setfocus(control: XFormsControl, inputOnly: Boolean = false): Unit =
+        Dispatch.dispatchEvent(new XFormsFocusEvent(control, inputOnly))
 }

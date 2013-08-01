@@ -29,8 +29,9 @@ YAHOO.xbl.fr.WPaint.prototype =
         testCanvasEl = document.createElement('canvas');
         @canvasSupported = !!(testCanvasEl.getContext && testCanvasEl.getContext('2d'))
         if @canvasSupported
-            # Remove the canvas used just to show the canvas isn't supported and show the image selector
-            $(@container).find('.fr-wpaint-no-canvas').detach()
+            # Hide the canvas used just to show the canvas isn't supported and show the image selector
+            # NOTE: Don't remove it as it contains an `xf:output` which needs to be there in case the FR language changes.
+            $(@container).find('.fr-wpaint-no-canvas').addClass('xforms-hidden')
             $(@container).find('.xforms-upload').removeClass('xforms-hidden')
             # Register events
             @imageEl.imagesLoaded(=> @imageLoaded())

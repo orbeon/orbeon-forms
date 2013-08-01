@@ -37,7 +37,7 @@
     <xf:var name="autosave-delay"   value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->
-    <xf:action event="xforms-ready" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+    <xf:action event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
 
         <!-- Initialize parameters to pass to "new" service -->
         <xf:var name="pass-request-parameters" value="xxf:property(string-join(('oxf.fr.detail.new.service.passing-request-parameters', $app, $form), '.'))"/>
@@ -119,7 +119,14 @@
                     <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-document-id', $document)"/>
                     <xf:send if="$autosave-enabled" submission="fr-search-drafts-submission"/>
                     <xf:var name="draft-found" value="exists(instance('fr-search-drafts-response')/document)"/>
-                    <xxf:show if="$draft-found" dialog="found-draft-for-document"/>
+
+                    <!-- Remember to show the dialog upon xforms-ready -->
+                    <xf:setvalue
+                        if="$draft-found"
+                        ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                        value="'found-draft-for-document'"/>
+
+                    <!-- Otherwise just load the data -->
                     <xf:send if="not($draft-found)" submission="fr-get-document-submission">
                         <xxf:context name="data-or-draft" value="'data'"/>
                     </xf:send>
@@ -131,8 +138,12 @@
                 <xf:insert context="instance('fr-search-drafts-request')/drafts" origin="xxf:attribute('for-never-saved-document', 'true')"/>
                 <xf:send if="$autosave-enabled" submission="fr-search-drafts-submission"/>
                 <xf:var name="drafts-found" value="count(instance('fr-search-drafts-response')/document)"/>
-                <xxf:show if="$drafts-found = 1" dialog="found-draft-for-never-saved"/>
-                <xxf:show if="$drafts-found > 1" dialog="found-drafts-for-never-saved"/>
+
+                <!-- Remember to show the dialog upon xforms-ready -->
+                <xf:setvalue
+                    if="$draft-found > 0"
+                    ref="instance('fr-persistence-instance')/initial-dialog-to-show"
+                    value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
             </xf:action>
 
             <xf:message level="xxf:log-debug">
@@ -155,19 +166,21 @@
 
     </xf:action>
 
-    <!-- 2. Check form permissions for detail modes -->
+    <!-- 2. Check form availability based on form metadata -->
+    <!-- Do this here as we need fr-form-model to be initialized. -->
+    <xf:action
+        event="xforms-ready"
+        if="xxf:instance('fr-form-metadata')/available = 'false'"
+        type="xpath">frf:sendError(404)</xf:action>
+
+    <!-- 3. Check form permissions for detail modes -->
     <xf:action event="xforms-ready" if="not($mode = ('summary', 'home'))">
 
         <!-- Compute authorized operations -->
-        <xf:var name="metadata" value="xxf:instance('fr-form-metadata')"/>
-
-        <!-- Send a "Not Found" error if the for is not available -->
-        <xf:action if="$metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
-
         <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
         <xf:var name="ops" value="if (exists($from-persistence))
                                   then tokenize($from-persistence, '\s')
-                                  else frf:javaAuthorizedOperationsBasedOnRoles($metadata/permissions)"/>
+                                  else frf:javaAuthorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
 
         <xf:setvalue
             ref="instance('fr-authorized-operations')"
@@ -187,6 +200,12 @@
 
         <!-- Send an "Unauthorized" error if the user is unauthorized -->
         <xf:action if="$unauthorized-access" type="xpath">frf:sendError(403)</xf:action>
+
+        <!-- Show initial dialog if needed -->
+        <xxf:show
+            if="normalize-space(instance('fr-persistence-instance')/initial-dialog-to-show)"
+            dialog="{instance('fr-persistence-instance')/initial-dialog-to-show}"/>
+
     </xf:action>
 
 
@@ -317,6 +336,8 @@
 
     <xf:instance id="fr-persistence-instance">
         <save xmlns="">
+            <!-- Dialog to show upon xforms-ready for handling drafts -->
+            <initial-dialog-to-show/>
             <!-- Initial data status -->
             <initial-data-status>clean</initial-data-status>
             <!-- Whether form data is clean or dirty (i.e. saved or not saved) -->

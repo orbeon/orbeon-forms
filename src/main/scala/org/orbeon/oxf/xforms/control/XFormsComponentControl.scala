@@ -49,7 +49,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
     private var _nestedContainer: Option[XBLContainer] = None
     def nestedContainer = _nestedContainer.get
 
-    private var _outerListener: Option[(XFormsInstance, EventListener)] = None
+    private var _listeners: Seq[(XFormsInstance, EventListener)] = Seq.empty
 
     // Create nested container upon creation
     createNestedContainer()
@@ -69,7 +69,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
 
     // Destroy container and models if any
     def destroyNestedContainer(): Unit = {
-        destroyMirrorListener()
+        destroyMirrorListenerIfNeeded()
         nestedContainer.destroy()
         _nestedContainer = None
     }
@@ -100,7 +100,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         contextStack.getCurrentBindingContext
     }
 
-    override def onCreate() {
+    override def onCreate(): Unit = {
         super.onCreate()
         if (Controls.isRestoringDynamicState)
             nestedContainer.restoreModelsState()
@@ -128,24 +128,26 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
             toOuterInstanceNodeXBL(outerInstance, referenceNode, nestedContainer.partAnalysis)))
 
         // Set outer and inner listeners
-        InstanceMirror.addListener(outerInstance, outerListener)
-        InstanceMirror.addListener(mirrorInstance, innerListener)
 
-        _outerListener = Some((outerInstance, outerListener))
+        _listeners = Seq(outerInstance → outerListener, mirrorInstance → innerListener)
+
+        _listeners foreach { case (instance, listener) ⇒
+            InstanceMirror.addListener(instance, listener)
+        }
 
         Some(referenceNode)
     }
 
-    private def destroyMirrorListener(): Unit = {
-        _outerListener foreach { case (outerInstance, outerListener) ⇒
-            InstanceMirror.removeListener(outerInstance, outerListener)
+    private def destroyMirrorListenerIfNeeded(): Unit = {
+        _listeners foreach { case (instance, listener) ⇒
+            InstanceMirror.removeListener(instance, listener)
         }
 
-        _outerListener = None
+        _listeners = Seq.empty
     }
 
-    override def onDestroy() {
-        destroyMirrorListener()
+    override def onDestroy(): Unit = {
+        destroyMirrorListenerIfNeeded()
         super.onDestroy()
     }
 
@@ -154,6 +156,22 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         // xforms-model-construct, without RRR
         for (model ← nestedContainer.models)
             Dispatch.dispatchEvent(new XFormsModelConstructEvent(model, rrr = false))
+
+        initializeMirrorListenerIfNeeded(dispatch = false)
+
+        // Do RRR as xforms-model-construct didn't do it
+        for (model ← nestedContainer.models) {
+            model.doRebuild()
+            model.doRecalculate(true)
+            model.doRevalidate()
+        }
+
+        // xforms-model-construct-done
+        for (model ← nestedContainer.models)
+            Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
+    }
+
+    private def initializeMirrorListenerIfNeeded(dispatch: Boolean): Unit = {
 
         // NOTE: Must be called after xforms-model-construct so that instances are present
         def findMirrorInstance =
@@ -178,36 +196,25 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
                     exposeXPathTypes      = mirrorInstance.exposeXPathTypes,
                     removeInstanceData    = true)
 
-            // Update initial instance without dispatching events
-            mirrorInstance.replace(doc, dispatch = false)
+            // Update initial instance
+            mirrorInstance.replace(doc, dispatch)
 
             // Create the listeners
             createMirrorListener(mirrorInstance, referenceNode.get)
         }
-
-        // Do RRR as xforms-model-construct didn't do it
-        for (model ← nestedContainer.models) {
-            model.doRebuild()
-            model.doRecalculate(true)
-            model.doRevalidate()
-        }
-
-        // xforms-model-construct-done
-        for (model ← nestedContainer.models)
-            Dispatch.dispatchEvent(new XFormsModelConstructDoneEvent(model))
     }
 
-    override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext) {
+    override def onBindingUpdate(oldBinding: BindingContext, newBinding: BindingContext): Unit = {
         super.onBindingUpdate(oldBinding, newBinding)
         val isNodesetChange = ! Controls.compareNodesets(oldBinding.getNodeset.asScala, newBinding.getNodeset.asScala)
         if (isNodesetChange) {
-            // Control's binding changed
-            // NOP for now
+            destroyMirrorListenerIfNeeded()
+            initializeMirrorListenerIfNeeded(dispatch = true)
         }
     }
 
     // This is called iif the iteration index changes
-    override def updateEffectiveId() {
+    override def updateEffectiveId(): Unit = {
 
         // Update rest of control tree
         super.updateEffectiveId()
@@ -216,7 +223,7 @@ class XFormsComponentControl(container: XBLContainer, parent: XFormsControl, ele
         nestedContainer.updateEffectiveId(getEffectiveId)
     }
 
-    override def iterationRemoved() {
+    override def iterationRemoved(): Unit = {
         // Inform descendants
         super.iterationRemoved()
 

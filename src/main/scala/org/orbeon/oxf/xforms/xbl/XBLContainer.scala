@@ -171,15 +171,17 @@ trait ModelContainer {
 
     self: XBLContainer ⇒
 
-    private var _models = Seq[XFormsModel]()
+    private var _models = Seq.empty[XFormsModel]
     def models = _models
 
-    // Create and index models corresponding to this container's scope.
+    // Create and index models corresponding to this container's scope
     def addAllModels(): Unit =
-        for (model ← partAnalysis.getModelsForScope(innerScope)) {
-            val modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)
-            _models :+= new XFormsModel(self, modelEffectiveId, model)
-        }
+        _models =
+            for {
+                model ← partAnalysis.getModelsForScope(innerScope)
+                modelEffectiveId = model.prefixedId + XFormsUtils.getEffectiveIdSuffixWithSeparator(effectiveId)
+            } yield
+                new XFormsModel(self, modelEffectiveId, model)
 
     protected def initializeModels(): Unit =
         initializeModels(Array(XFORMS_MODEL_CONSTRUCT, XFORMS_MODEL_CONSTRUCT_DONE, XFORMS_READY))

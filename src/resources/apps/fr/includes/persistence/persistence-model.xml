@@ -26,14 +26,19 @@
         xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
 
     <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
-    <xf:var name="app" value="$parameters/app" as="xs:string"/>
-    <xf:var name="form" value="$parameters/form" as="xs:string"/>
-    <xf:var name="document" value="$parameters/document"/>
-    <xf:var name="mode" value="$parameters/mode"/>
+    <xf:var name="app"        value="$parameters/app" as="xs:string"/>
+    <xf:var name="form"       value="$parameters/form" as="xs:string"/>
+    <xf:var name="is-fb"      value="$app = 'orbeon' and $form = 'builder'"/>
+    <xf:var name="document"   value="$parameters/document"/>
+    <xf:var name="mode"       value="$parameters/mode"/>
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
-    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave') and exists(xxf:get-remote-user()) and $mode = ('new', 'edit')"/>
+    <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
+    <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave')
+                                           and exists(xxf:get-remote-user())
+                                           and $mode = ('new', 'edit')
+                                           and not($is-fb)"/>
     <xf:var name="autosave-delay"   value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>
 
     <!-- 1. Model initialization when we have a specific app and form -->

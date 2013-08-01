@@ -401,6 +401,14 @@ public class XFormsProperties {
         return Properties.instance().getPropertySet().getBoolean(DEBUG_REQUEST_STATS_PROPERTY, false);
     }
 
+    public static int getRetryMaxDelay() {
+        return Properties.instance().getPropertySet().getInteger(RETRY_MAX_DELAY, ((Integer) getPropertyDefinition(RETRY_MAX_DELAY).defaultValue).intValue());
+    }
+
+    public static int getRetryDelayIncrement() {
+        return Properties.instance().getPropertySet().getInteger(RETRY_DELAY_INCREMENT, ((Integer) getPropertyDefinition(RETRY_DELAY_INCREMENT).defaultValue).intValue());
+    }
+
     // == XForms document properties ===================================================================================
 
     public static String getStateHandling(XFormsContainingDocument containingDocument) {

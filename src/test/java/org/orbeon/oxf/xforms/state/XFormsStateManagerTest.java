@@ -248,6 +248,8 @@ public class XFormsStateManagerTest extends ResourceManagerTestBase {
         final State state2 = new State();
 
         final Lock lock = stateManager.acquireDocumentLock(parameters);
+        if (lock == null)
+            fail("Ajax update lock timeout exceeded");
         try {
             state2.document = stateManager.beforeUpdate(parameters);
 

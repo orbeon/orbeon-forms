@@ -27,6 +27,7 @@ import org.orbeon.oxf.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.xforms.XFormsProperties;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -297,10 +298,16 @@ public class XFormsStateManager implements XFormsStateLifecycle {
         if (lock == null)
             throw new OXFException("Session has expired. Unable to process incoming request.");
 
-        // Lock document
-        lock.lock();
-
-        return lock;
+        // Lock document for at most the max retry delay plus an increment
+        try {
+            final boolean acquired = lock.tryLock(XFormsProperties.getRetryMaxDelay() + 2 * XFormsProperties.getRetryDelayIncrement(), TimeUnit.MILLISECONDS);
+            if (acquired)
+                return lock;
+            else
+                return null;
+        } catch (InterruptedException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**

@@ -50,7 +50,11 @@ trait ListenersTrait {
                     listener match {
                         case Some(listener) ⇒
                             // Remove given listener only
-                            listeners += eventName → (currentListeners filterNot (_ eq listener))
+                            val newListeners = currentListeners filterNot (_ eq listener)
+                            if (newListeners.nonEmpty)
+                                listeners += eventName → newListeners
+                            else
+                                listeners -= eventName
                         case None ⇒
                             // Remove all listeners
                             listeners -= eventName

@@ -230,7 +230,7 @@
                                         </xh:td>
                                         <xh:td>
                                             <xf:output
-                                                ref=".[$ops = 'fb-admin']"
+                                                ref=".[$ops = 'admin']"
                                                 class="label{if ($available) then ' label-success' else ''}"
                                                 value="if ($available) then $fr-resources/home/labels/available else $fr-resources/home/labels/unavailable"/>
                                             <xf:output
@@ -269,14 +269,14 @@
                 </fr:body>
             </fr:row>
             <fr:row>
-                <xh:span class="fr-buttons">
+                <xf:group ref=".[$any-has-admin]" class="fr-buttons">
                     <xf:trigger ref="unpublish-button" id="fr-unpublish-button">
                         <xf:label mediatype="text/html" value="$fr-resources/home/buttons/unpublish"/>
                     </xf:trigger>
                     <xf:trigger ref="publish-button" id="fr-publish-button">
                         <xf:label mediatype="text/html" value="$fr-resources/home/buttons/publish"/>
                     </xf:trigger>
-                </xh:span>
+                </xf:group>
             </fr:row>
             <fr:row>
                 <fr:version/>

@@ -300,7 +300,7 @@ public class XFormsStateManager implements XFormsStateLifecycle {
 
         // Lock document for at most the max retry delay plus an increment
         try {
-            final boolean acquired = lock.tryLock(XFormsProperties.getRetryMaxDelay() + 2 * XFormsProperties.getRetryDelayIncrement(), TimeUnit.MILLISECONDS);
+            final boolean acquired = lock.tryLock(XFormsProperties.getAjaxTimeout() + XFormsProperties.getRetryDelayIncrement(), TimeUnit.MILLISECONDS);
             if (acquired)
                 return lock;
             else

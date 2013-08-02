@@ -4602,69 +4602,6 @@
         </output>
     </test>
 
-    <test description="#1166: XBL with mirror instance doesn't rebind after context change" name="oxf:pipeline">
-        <!-- See: https://github.com/orbeon/orbeon-forms/issues/787 -->
-        <input name="config" href="wrap-xforms-state.xpl"/>
-        <input name="document">
-            <xh:html>
-                <xh:head>
-                    <xf:model id="model">
-                        <xf:instance id="outer-instance" xxf:exclude-result-prefixes="#all">
-                            <instance position="1">
-                                <value>42</value>
-                                <value>43</value>
-                            </instance>
-                        </xf:instance>
-                        <xf:action event="xforms-ready">
-                            <xf:setvalue ref="@position" value="2"/>
-                        </xf:action>
-                    </xf:model>
-                    <xbl:xbl>
-                        <xbl:binding id="fr-gaga" element="fr|gaga">
-                            <xbl:template>
-                                <xf:model id="gaga-model">
-                                    <xf:instance id="gaga-instance" xxbl:mirror="true">
-                                        <empty/>
-                                    </xf:instance>
-                                </xf:model>
-                                <xf:input id="gaga-input" ref="."/>
-                            </xbl:template>
-                        </xbl:binding>
-                    </xbl:xbl>
-                </xh:head>
-                <xh:body>
-                    <xf:group ref="value[position() = instance()/@position]">
-                        <fr:gaga id="my-gaga"/>
-                    </xf:group>
-                </xh:body>
-            </xh:html>
-        </input>
-        <output name="response">
-            <xxf:event-response>
-                <xxf:dynamic-state>
-                    <dynamic-state>
-                        <instances>
-                            <instance id="outer-instance" model-id="model">
-                                <instance position="2">
-                                    <value>42</value>
-                                    <value>43</value>
-                                </instance>
-                            </instance>
-                            <instance id="gaga-instance" model-id="my-gaga≡gaga-model">
-                                <value>43</value>
-                            </instance>
-                        </instances>
-                    </dynamic-state>
-                </xxf:dynamic-state>
-                <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="my-gaga≡gaga-input">43</xxf:control>
-                    </xxf:control-values>
-                </xxf:action>
-            </xxf:event-response>
-        </output>
-    </test>
-
     <!--
 
     TODO: more XBL ids tests:

@@ -197,4 +197,66 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
         assert(updates === expected.size * 2)
     }
+
+    // #1166: XBL with mirror instance doesn't rebind after context change
+    @Test def mirrorXBLRebind(): Unit = {
+
+        this setupDocument
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml"
+                     xmlns:xf="http://www.w3.org/2002/xforms"
+                     xmlns:ev="http://www.w3.org/2001/xml-events"
+                     xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                     xmlns:xbl="http://www.w3.org/ns/xbl"
+                     xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
+                     xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
+
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="outer-instance" xxf:exclude-result-prefixes="#all">
+                            <instance position="1">
+                                <value>42</value>
+                                <value>43</value>
+                            </instance>
+                        </xf:instance>
+                    </xf:model>
+                    <xbl:xbl>
+                        <xbl:binding id="fr-gaga" element="fr|gaga">
+                            <xbl:template>
+                                <xf:model id="gaga-model">
+                                    <xf:instance id="gaga-instance" xxbl:mirror="true">
+                                        <empty/>
+                                    </xf:instance>
+                                </xf:model>
+                                <xf:input id="gaga-input" ref="."/>
+                            </xbl:template>
+                        </xbl:binding>
+                    </xbl:xbl>
+                </xh:head>
+                <xh:body>
+                    <xf:input id="position-input" ref="@position"/>
+                    <xf:group ref="value[position() = instance()/@position]">
+                        <fr:gaga id="my-gaga"/>
+                    </xf:group>
+                </xh:body>
+            </xh:html>
+
+        val PositionInputId = "position-input"
+        val GagaInputId     = "my-gaga" + COMPONENT_SEPARATOR + "gaga-input"
+
+        // Initial values
+        assert("42" === getControlValue(GagaInputId))
+        setControlValue(PositionInputId, "2")
+        assert("43" === getControlValue(GagaInputId))
+
+        // Set new values
+        setControlValue(GagaInputId, "222")
+        setControlValue(PositionInputId, "1")
+        setControlValue(GagaInputId, "111")
+
+        // Check new values
+        setControlValue(PositionInputId, "2")
+        assert("222" === getControlValue(GagaInputId))
+        setControlValue(PositionInputId, "1")
+        assert("111" === getControlValue(GagaInputId))
+    }
 }

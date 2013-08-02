@@ -15,8 +15,8 @@ package org.orbeon.oxf.xforms.function
 
 import org.orbeon.oxf.xforms.XFormsObject
 import org.orbeon.oxf.xforms.control.XFormsControl
-import org.orbeon.saxon.expr.{Expression, XPathContext}
-import org.orbeon.saxon.om.{Item, EmptyIterator, ListIterator, ArrayIterator}
+import org.orbeon.saxon.expr.{ExpressionTool, Expression, XPathContext}
+import org.orbeon.saxon.om._
 import org.orbeon.saxon.value.{BooleanValue, StringValue}
 import collection.JavaConverters._
 
@@ -31,11 +31,23 @@ protected trait FunctionSupport extends XFormsFunction {
     def stringArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
         stringArgumentOpt(i) orElse (Option(xpathContext.getContextItem) map (_.getStringValue))
 
+    def booleanArgument(i: Int, default: Boolean)(implicit xpathContext: XPathContext) =
+        arguments.lift(i) map effectiveBooleanValue getOrElse default
+
+    def booleanArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
+        arguments.lift(i) map effectiveBooleanValue
+
+    def itemArgumentsOpt(i: Int)(implicit xpathContext: XPathContext) =
+        arguments.lift(i) map (_.iterate(xpathContext))
+
     def itemArgumentOpt(i: Int)(implicit xpathContext: XPathContext) =
-        arguments.lift(i) map (_.evaluateItem(xpathContext))
+        itemArgumentsOpt(i) map (_.next())
 
     def itemArgumentOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
-        itemArgumentOpt(i) orElse Option(xpathContext.getContextItem)
+        Option(itemArgumentOpt(i) getOrElse xpathContext.getContextItem)
+
+    def itemArgumentsOrContextOpt(i: Int)(implicit xpathContext: XPathContext) =
+        itemArgumentsOpt(i) getOrElse SingletonIterator.makeIterator(xpathContext.getContextItem)
 
     // Resolve the relevant control by argument expression
     def relevantControl(i: Int)(implicit xpathContext: XPathContext): Option[XFormsControl] =
@@ -61,6 +73,9 @@ protected trait FunctionSupport extends XFormsFunction {
                 Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, staticOrAbsoluteId, null)) map
                     (_.getEffectiveId)
         }
+
+    def effectiveBooleanValue(e: Expression)(implicit xpathContext: XPathContext) =
+        ExpressionTool.effectiveBooleanValue(e.iterate(xpathContext))
 
     def asIterator(v: Array[String]) = new ArrayIterator(v map StringValue.makeStringValue)
     def asIterator(v: Seq[String])   = new ListIterator (v map StringValue.makeStringValue asJava)

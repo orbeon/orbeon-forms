@@ -1835,7 +1835,7 @@
         </output>
     </test>
 
-    <test description="xxf:valid()" name="oxf:pipeline">
+    <test description="xf:valid() and xxf:valid()" name="oxf:pipeline">
         <input name="config" href="wrap-xforms-state.xpl"/>
         <input name="document">
             <xh:html>
@@ -1866,7 +1866,7 @@
                     </xf:model>
                 </head>
                 <body>
-                    <xf:repeat ref="1 to count(items/*)">
+                    <xf:repeat id="repeat1" ref="1 to count(items/*)">
                         <xf:var name="e" value="instance()/items/element[xxf:repeat-position()]"/>
                         <xf:output id="o1" value="xxf:valid($e/*)"/>
                         <xf:output id="o2" value="xxf:valid($e/*, false(), true())"/>
@@ -1874,12 +1874,27 @@
                         <xf:output id="o4" value="xxf:valid($e, true(), true())"/>
                     </xf:repeat>
 
-                    <xf:output id="valid-attribute" value="xxf:valid(valid-attribute, true())"/>
-                    <xf:output id="valid-descendant" value="xxf:valid(valid-descendant, true())"/>
-                    <xf:output id="invalid-attribute" value="xxf:valid(invalid-attribute, true())"/>
-                    <xf:output id="invalid-descendant" value="xxf:valid(invalid-descendant, true())"/>
-                    <xf:output id="valid-atomic" value="xxf:valid(42)"/>
-                    <xf:output id="valid-empty" value="xxf:valid(())"/>
+                    <xf:output id="valid-attribute1"    value="xxf:valid(valid-attribute, true())"/>
+                    <xf:output id="valid-descendant1"   value="xxf:valid(valid-descendant, true())"/>
+                    <xf:output id="invalid-attribute1"  value="xxf:valid(invalid-attribute, true())"/>
+                    <xf:output id="invalid-descendant1" value="xxf:valid(invalid-descendant, true())"/>
+                    <xf:output id="valid-atomic1"       value="xxf:valid(42)"/>
+                    <xf:output id="valid-empty1"        value="xxf:valid(())"/>
+
+                    <xf:repeat id="repeat2" ref="1 to count(items/*)">
+                        <xf:var name="e" value="instance()/items/element[xxf:repeat-position()]"/>
+                        <xf:output id="o5" value="xf:valid($e/*, false(), false())"/>
+                        <xf:output id="o6" value="xf:valid($e/*, true(), false())"/>
+                        <xf:output id="o7" value="xf:valid($e, false())"/>
+                        <xf:output id="o8" value="xf:valid($e)"/>
+                    </xf:repeat>
+
+                    <xf:output id="valid-attribute2"    value="xf:valid(valid-attribute)"/>
+                    <xf:output id="valid-descendant2"   value="xf:valid(valid-descendant)"/>
+                    <xf:output id="invalid-attribute2"  value="xf:valid(invalid-attribute)"/>
+                    <xf:output id="invalid-descendant2" value="xf:valid(invalid-descendant)"/>
+                    <xf:output id="valid-atomic2"       value="xf:valid(42)"/>
+                    <xf:output id="valid-empty2"        value="xf:valid(())"/>
                 </body>
             </xh:html>
         </input>
@@ -1888,7 +1903,8 @@
                 <xxf:dynamic-state>
                     <dynamic-state>
                         <controls>
-                            <control effective-id="xf-8" index="1"/>
+                            <control effective-id="repeat1" index="1"/>
+                            <control effective-id="repeat2" index="1"/>
                         </controls>
                     </dynamic-state>
                 </xxf:dynamic-state>
@@ -1910,12 +1926,35 @@
                         <xxf:control id="o2⊙4">true</xxf:control>
                         <xxf:control id="o3⊙4">false</xxf:control>
                         <xxf:control id="o4⊙4">true</xxf:control>
-                        <xxf:control id="valid-attribute">true</xxf:control>
-                        <xxf:control id="valid-descendant">true</xxf:control>
-                        <xxf:control id="invalid-attribute">false</xxf:control>
-                        <xxf:control id="invalid-descendant">false</xxf:control>
-                        <xxf:control id="valid-atomic">true</xxf:control>
-                        <xxf:control id="valid-empty">true</xxf:control>
+                        <xxf:control id="valid-attribute1">true</xxf:control>
+                        <xxf:control id="valid-descendant1">true</xxf:control>
+                        <xxf:control id="invalid-attribute1">false</xxf:control>
+                        <xxf:control id="invalid-descendant1">false</xxf:control>
+                        <xxf:control id="valid-atomic1">true</xxf:control>
+                        <xxf:control id="valid-empty1">true</xxf:control>
+
+                        <xxf:control id="o5⊙1">true</xxf:control>
+                        <xxf:control id="o6⊙1">true</xxf:control>
+                        <xxf:control id="o7⊙1">true</xxf:control>
+                        <xxf:control id="o8⊙1">true</xxf:control>
+                        <xxf:control id="o5⊙2">false</xxf:control>
+                        <xxf:control id="o6⊙2">false</xxf:control>
+                        <xxf:control id="o7⊙2">false</xxf:control>
+                        <xxf:control id="o8⊙2">false</xxf:control>
+                        <xxf:control id="o5⊙3">true</xxf:control>
+                        <xxf:control id="o6⊙3">true</xxf:control>
+                        <xxf:control id="o7⊙3">true</xxf:control>
+                        <xxf:control id="o8⊙3">true</xxf:control>
+                        <xxf:control id="o5⊙4">false</xxf:control>
+                        <xxf:control id="o6⊙4">true</xxf:control>
+                        <xxf:control id="o7⊙4">false</xxf:control>
+                        <xxf:control id="o8⊙4">true</xxf:control>
+                        <xxf:control id="valid-attribute2">true</xxf:control>
+                        <xxf:control id="valid-descendant2">true</xxf:control>
+                        <xxf:control id="invalid-attribute2">false</xxf:control>
+                        <xxf:control id="invalid-descendant2">false</xxf:control>
+                        <xxf:control id="valid-atomic2">true</xxf:control>
+                        <xxf:control id="valid-empty2">true</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

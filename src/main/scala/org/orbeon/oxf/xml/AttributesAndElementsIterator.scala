@@ -49,7 +49,7 @@ class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true
             // Move to next child
             val next = children.next().asInstanceOf[NodeInfo]
             if (next ne null) {
-                attributes = next.iterateAxis(Axis.ATTRIBUTE);
+                attributes = next.iterateAxis(Axis.ATTRIBUTE)
                 if (next.hasChildNodes)
                     descendants = new AttributesAndElementsIterator(next, false)
                 next
@@ -57,7 +57,7 @@ class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true
                 null
         } else {
             // This is the start
-            attributes = start.iterateAxis(Axis.ATTRIBUTE);
+            attributes = start.iterateAxis(Axis.ATTRIBUTE)
 
             children =
                 if (start.hasChildNodes)
@@ -71,6 +71,11 @@ class AttributesAndElementsIterator(start: NodeInfo, includeSelf: Boolean = true
                 findNext()
         }
     }
+}
+
+object AttributesAndElementsIterator {
+    def apply(start: NodeInfo, includeSelf: Boolean = true)
+        = new AttributesAndElementsIterator(start, includeSelf)
 }
 
 //

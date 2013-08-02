@@ -18,7 +18,7 @@ import org.orbeon.saxon.expr.StaticProperty._
 import org.orbeon.saxon.`type`.BuiltInAtomicType._
 import org.orbeon.oxf.xforms.function.xxforms._
 import org.orbeon.oxf.xml.OrbeonFunctionLibrary
-import org.orbeon.oxf.xforms.function.{Event, If}
+import org.orbeon.oxf.xforms.function.{XXFormsValid, Event, If}
 import org.orbeon.oxf.xforms.function.exforms.EXFormsMIP
 
 /*

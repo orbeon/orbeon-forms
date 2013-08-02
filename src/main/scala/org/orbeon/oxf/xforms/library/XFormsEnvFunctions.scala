@@ -48,5 +48,11 @@ trait XFormsEnvFunctions extends OrbeonFunctionLibrary {
         Fun("event", classOf[Event], 0, 1, Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
             Arg(STRING, EXACTLY_ONE)
         )
+
+        Fun("valid", classOf[XFormsValid], op = 0, min = 0, BOOLEAN, EXACTLY_ONE,
+            Arg(Type.ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(BOOLEAN, EXACTLY_ONE),
+            Arg(BOOLEAN, EXACTLY_ONE)
+        )
     }
 }

@@ -263,11 +263,9 @@ object XML {
     private def hasNonEmptyChildNode(nodeInfo: NodeInfo) =
         nodeInfo child Text filter (_.stringValue.nonEmpty) nonEmpty
 
-    // Whether the node is an attribute
-    def isAttribute(nodeInfo: NodeInfo) = nodeInfo self @*
-
-    // Whether the node is an attribute
-    def isElement(nodeInfo: NodeInfo) = nodeInfo self *
+    def isAttribute(nodeInfo: NodeInfo)          = nodeInfo.getNodeKind.toShort == Type.ATTRIBUTE
+    def isElement(nodeInfo: NodeInfo)            = nodeInfo.getNodeKind.toShort == Type.ELEMENT
+    def isElementOrAttribute(nodeInfo: NodeInfo) = ElementOrAttribute(nodeInfo.getNodeKind.toShort)
 
     // Whether the given node has at least one child element
     def hasChildElement(nodeInfo: NodeInfo) = nodeInfo child * nonEmpty

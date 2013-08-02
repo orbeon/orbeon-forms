@@ -365,6 +365,7 @@ public class XFormsServer extends ProcessorImpl {
             XFormsContainingDocument.checkAndRunDeferredSubmission(replaceAllCallable, response);
         } else {
             indentedLogger.logInfo("", "Ajax update lock timeout exceeded, returning");
+            throw new OXFException("Ajax update lock timeout exceeded");
         }
     }
 

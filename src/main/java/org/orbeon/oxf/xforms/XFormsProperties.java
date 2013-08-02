@@ -93,7 +93,6 @@ public class XFormsProperties {
     private static final String DELAY_BEFORE_FORCE_INCREMENTAL_REQUEST_PROPERTY = "delay-before-force-incremental-request";
     private static final String DELAY_BEFORE_GECKO_COMMUNICATION_ERROR_PROPERTY = "delay-before-gecko-communication-error";
     private static final String DELAY_BEFORE_CLOSE_MINIMAL_DIALOG_PROPERTY = "delay-before-close-minimal-dialog";
-    private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
     private static final String INTERNAL_SHORT_DELAY_PROPERTY = "internal-short-delay";
     private static final String DELAY_BEFORE_DISPLAY_LOADING_PROPERTY = "delay-before-display-loading";
     private static final String DELAY_BEFORE_UPLOAD_PROGRESS_REFRESH_PROPERTY = "delay-before-upload-progress-refresh";
@@ -112,8 +111,11 @@ public class XFormsProperties {
 
     private static final String ASYNC_SUBMISSION_POLL_DELAY = "submission-poll-delay";
 
+    // TODO: Make these global properties
+    private static final String DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY = "delay-before-ajax-timeout";
     public static final String RETRY_DELAY_INCREMENT = "retry.delay-increment";
     public static final String RETRY_MAX_DELAY = "retry.max-delay";
+
     public static final String USE_ARIA = "use-aria";
 
     public static final String XFORMS11_SWITCH_PROPERTY = "xforms11-switch";
@@ -121,6 +123,7 @@ public class XFormsProperties {
     public static final String ENCRYPT_ITEM_VALUES_PROPERTY = "encrypt-item-values";
     public static final String XPATH_ANALYSIS_PROPERTY = "xpath-analysis";
 
+    // TODO: Make this a global property: right now it is used 1/2 global, 1/2 document
     public static final String CACHE_DOCUMENT_PROPERTY = "cache.document";
     private static final boolean CACHE_DOCUMENT_DEFAULT = true;
 
@@ -351,14 +354,12 @@ public class XFormsProperties {
     			(ADDITIONAL_AVT_ELEMENT_NAMESPACES);
 
 		return additionalElementNamespacesStr != null?additionalElementNamespacesStr.split("\\s"):EMPTY_STRING_ARRAY;
-    	
     }
 
     public static String[] getAdditionalRefIdAttributeNames() {
     	String additionalRefIdAttributeNames = Properties.instance().getPropertySet().getString
     			(ADDITIONAL_REF_ID_ATTRIBUTE_NAMES);
 		return additionalRefIdAttributeNames != null?additionalRefIdAttributeNames.split("\\s"):EMPTY_STRING_ARRAY;
-    	
     }
     
     public static boolean isMinimalResources() {
@@ -401,12 +402,12 @@ public class XFormsProperties {
         return Properties.instance().getPropertySet().getBoolean(DEBUG_REQUEST_STATS_PROPERTY, false);
     }
 
-    public static int getRetryMaxDelay() {
-        return Properties.instance().getPropertySet().getInteger(RETRY_MAX_DELAY, ((Integer) getPropertyDefinition(RETRY_MAX_DELAY).defaultValue).intValue());
+    public static int getAjaxTimeout() {
+        return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY, ((Integer) getPropertyDefinition(DELAY_BEFORE_AJAX_TIMEOUT_PROPERTY).defaultValue).intValue());
     }
 
     public static int getRetryDelayIncrement() {
-        return Properties.instance().getPropertySet().getInteger(RETRY_DELAY_INCREMENT, ((Integer) getPropertyDefinition(RETRY_DELAY_INCREMENT).defaultValue).intValue());
+        return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_DELAY_INCREMENT, ((Integer) getPropertyDefinition(RETRY_DELAY_INCREMENT).defaultValue).intValue());
     }
 
     // == XForms document properties ===================================================================================

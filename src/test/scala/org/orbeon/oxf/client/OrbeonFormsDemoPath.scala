@@ -16,8 +16,7 @@ package org.orbeon.oxf.client
 import org.junit.Test
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.junit.MustMatchersForJUnit
-import org.openqa.selenium.interactions.{Actions, Action}
-import org.openqa.selenium.Keys
+import org.openqa.selenium.By
 import org.scalatest.selenium.WebBrowser.click
 
 trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // with AssertionsForJUnit
@@ -40,7 +39,7 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
 
             _ ← click on linkText("Controls Form")
             // https://github.com/orbeon/orbeon-forms/issues/887
-            //eventually(assert(pageTitle === "Form Builder Controls"))
+            _ ← eventually(assert(pageTitle === "Form Builder Controls"))
 
             _ ← eventually(assert(Wizard.pageSelected("text-controls")))
 
@@ -62,6 +61,12 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
             _ ← Wizard.nextPage()
             _ ← assert(! Wizard.pageSelected("text-controls"))
             _ ← assert(Wizard.pageSelected("typed-controls"))
+
+            // Switch language and check a control label
+            _ ← click on partialLinkText("Français")
+            numberControl ← elementByStaticId("number-control")
+            _ ← assert("Nombre" === numberControl.underlying.findElements(By.tagName("label")).get(0).getText)
+            _ ← click on partialLinkText("English")
 
             // RFE: etc.
 

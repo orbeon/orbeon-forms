@@ -141,7 +141,7 @@
 
                 <!-- Remember to show the dialog upon xforms-ready -->
                 <xf:setvalue
-                    if="$draft-found > 0"
+                    if="$drafts-found > 0"
                     ref="instance('fr-persistence-instance')/initial-dialog-to-show"
                     value="if ($drafts-found = 1) then 'found-draft-for-never-saved' else 'found-drafts-for-never-saved'"/>
             </xf:action>

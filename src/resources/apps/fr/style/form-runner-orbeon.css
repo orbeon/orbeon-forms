@@ -270,6 +270,7 @@ body.orbeon {
   background-image: url(asterisk.png);
 }
 .orbeon .xforms-invalid.xforms-visited .xforms-input-input,
+.orbeon .xforms-invalid.xforms-visited input[type='password'],
 .orbeon textarea.xforms-invalid.xforms-visited {
   border-color: #b94a48;
 }

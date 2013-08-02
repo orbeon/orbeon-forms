@@ -665,8 +665,8 @@
     <!-- Add a default xf:alert for those fields which don't have one. Only do this within grids and dialogs. -->
     <!-- Q: Do we really need this? -->
     <xsl:template
-        match="xh:body//fr:grid//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xf:alert)]
-                       | xh:body//xxf:dialog//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload') and not(xf:alert)]">
+        match="xh:body//fr:grid//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]
+                       | xh:body//xxf:dialog//xf:*[local-name() = ('input', 'textarea', 'select', 'select1', 'upload', 'secret') and not(xf:alert)]">
         <xsl:copy>
             <xsl:apply-templates select="@* | node()"/>
             <xf:alert ref="$fr-resources/detail/labels/alert"/>

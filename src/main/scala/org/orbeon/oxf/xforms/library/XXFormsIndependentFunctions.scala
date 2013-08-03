@@ -175,13 +175,31 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
         // xxf:forall
         Fun("forall", classOf[XXFormsForall], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
             Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, EXACTLY_ONE)
+            Arg(ITEM_TYPE, EXACTLY_ONE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
 
         // xxf:exists
         Fun("exists", classOf[XXFormsExists], op = 0, min = 2, BOOLEAN, EXACTLY_ONE,
             Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
-            Arg(ITEM_TYPE, EXACTLY_ONE)
+            Arg(ITEM_TYPE, EXACTLY_ONE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
+            Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
     }
 }

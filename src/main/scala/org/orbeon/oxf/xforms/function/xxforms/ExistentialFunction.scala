@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.function.xxforms
 
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
-import org.orbeon.saxon.expr.XPathContext
+import org.orbeon.saxon.expr.{ExpressionTool, XPathContext}
 import org.orbeon.saxon.functions.Evaluate.PreparedExpression
 import org.orbeon.saxon.trace.Location
 import org.orbeon.saxon.trans.{SaxonErrorCode, XPathException}
@@ -46,15 +46,21 @@ trait ExistentialFunction extends XFormsFunction with FunctionSupport {
         }
 
         val items = arguments(0).iterate(context)
-        val expr  =
+        val pexpr  =
             Option(arguments(1).evaluateItem(context)) collect
             { case o: ObjectValue        ⇒ o.getObject  } collect
-            { case e: PreparedExpression ⇒ e.expression } getOrElse
+            { case e: PreparedExpression ⇒ e } getOrElse
             { throwDynamicError() }
 
-        val c = context.newMinorContext
+        val c = context.newCleanContext
         c.setOriginatingConstructType(Location.SAXON_HIGHER_ORDER_EXTENSION_FUNCTION)
         c.setCurrentIterator(items)
+        c.openStackFrame(pexpr.stackFrameMap)
+
+        for (i ← 2 to arguments.length - 1) {
+            val slot = pexpr.variables(i - 2).getLocalSlotNumber
+            c.setLocalVariable(slot, ExpressionTool.eagerEvaluate(arguments(i), c))
+        }
 
         breakable {
             while (true) {
@@ -62,7 +68,7 @@ trait ExistentialFunction extends XFormsFunction with FunctionSupport {
                 if (next eq null)
                     break()
 
-                expr.evaluateItem(c) match {
+                pexpr.expression.evaluateItem(c) match {
                     case b: BooleanValue ⇒
                         if (returnNonDefaultValue(b.getBooleanValue))
                             return ! defaultValue

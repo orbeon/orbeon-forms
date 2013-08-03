@@ -65,11 +65,10 @@ trait OrbeonFormsDemoPath extends MustMatchersForJUnit with FormRunnerOps { // w
             // Switch language and check a control label
             _ ← click on partialLinkText("Français")
             numberControl ← elementByStaticId("number-control")
-            _ ← assert("Nombre" === numberControl.underlying.findElements(By.tagName("label")).get(0).getText)
+            _ ← assert("Nombre" === numberControl.findAll(By.tagName("label")).next.getText)
             _ ← click on partialLinkText("English")
 
             // RFE: etc.
-
         }()
     }
 }

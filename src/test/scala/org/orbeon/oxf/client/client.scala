@@ -15,7 +15,7 @@ package org.orbeon.oxf.client
 
 import org.junit.{After, AfterClass, BeforeClass}
 import org.openqa.selenium.firefox.{FirefoxProfile, FirefoxDriver}
-import org.openqa.selenium.{NoAlertPresentException, Keys, WebDriver}
+import org.openqa.selenium._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.selenium.WebBrowser
@@ -27,6 +27,7 @@ import java.io.File
 import java.util.concurrent.TimeUnit
 import org.scalatest.matchers.ShouldMatchers
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import collection.JavaConverters._
 
 // Basic client API
 trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
@@ -139,6 +140,8 @@ trait OrbeonFormsOps extends WebBrowser with ShouldMatchers {
                 e
             case _ ⇒ throw new IllegalArgumentException("Element is not a focusable XForms control")
         }
+
+        def findAll(by: By) = e.underlying.findElements(by).asScala.toIterator
 
         // Firefox: name(input) = 'INPUT' and local-name(input) = 'input'.
         // Chrome:  name(input) = 'input' and local-name(input) = 'input'.

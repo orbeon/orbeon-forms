@@ -123,9 +123,9 @@ object XML {
     }
 
     // Useful predicates
-    val hasChildren: NodeInfo ⇒ Boolean = element ⇒ element \ * nonEmpty
-    val hasId: (NodeInfo) ⇒ Boolean = (element) ⇒ element \@ "id" nonEmpty
-    val hasIdValue: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element \@ "id" === id
+    val hasChildren: NodeInfo ⇒ Boolean = element ⇒ element / * nonEmpty
+    val hasId: (NodeInfo) ⇒ Boolean = (element) ⇒ element /@ "id" nonEmpty
+    val hasIdValue: (NodeInfo, String) ⇒ Boolean = (element, id) ⇒ element /@ "id" === id
     val exists: (Seq[Item]) ⇒ Boolean = (items) ⇒ items.nonEmpty
 
     // Get the value of the first attribute passed if any
@@ -305,14 +305,19 @@ object XML {
         def ===(s: String) = (s eq null) && (nodeInfo eq null) || (nodeInfo ne null) && nodeInfo.getStringValue == s
         def !==(s: String) = ! ===(s)
 
-        def \(test: Test) = find(Axis.CHILD, test)
+        def /(test: Test) = find(Axis.CHILD, test)
+        def \(test: Test) = /(test)
         def \\(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         // Return an element's attributes
-        def \@(attName: String): Seq[NodeInfo] = \@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
-        def \@(attName: QName): Seq[NodeInfo] = \@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
-        def \@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
-        def \@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
+        def /@(attName: String): Seq[NodeInfo] = /@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
+        def \@(attName: String): Seq[NodeInfo] = /@(attName)
+        def /@(attName: QName): Seq[NodeInfo] = /@(new NodeQNameTest((attName.getNamespaceURI, attName.getName), Some(Type.ATTRIBUTE)))
+        def \@(attName: QName): Seq[NodeInfo] = /@(attName)
+        def /@(attName: (String, String)): Seq[NodeInfo] = \@(new NodeQNameTest(attName, Some(Type.ATTRIBUTE)))
+        def \@(attName: (String, String)): Seq[NodeInfo] = /@(attName)
+        def /@(test: Test): Seq[NodeInfo] = find(Axis.ATTRIBUTE, test)
+        def \@(test: Test): Seq[NodeInfo] = /@(test)
 
         // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
 //        def \\@(attName: String): Seq[NodeInfo] = \\@(new NodeLocalNameTest(attName, Some(Type.ATTRIBUTE)))
@@ -321,15 +326,15 @@ object XML {
 //        def \\@(test: Test): Seq[NodeInfo] = find(Axis.DESCENDANT, test)
 
         def root = nodeInfo.getDocumentRoot
-        def rootElement = root \ * head
+        def rootElement = root / * head
 
-        def att(attName: String) = \@(attName)
-        def att(test: Test) = \@(test)
-        def child(test: Test) = \(test)
+        def att(attName: String) = /@(attName)
+        def att(test: Test) = /@(test)
+        def child(test: Test) = /(test)
         def descendant(test: Test) = \\(test)
 
-        def attValue(attName: String) = \@(attName).stringValue
-        def attValue(attName: QName)  = \@(attName).stringValue
+        def attValue(attName: String) = /@(attName).stringValue
+        def attValue(attName: QName)  = /@(attName).stringValue
         def attTokens(attName: String) = stringOptionToSet(Some(attValue(attName)))
         def attClasses = attTokens("class")
 
@@ -359,7 +364,7 @@ object XML {
 
         def stringValue = nodeInfo.getStringValue
 
-        def hasIdValue(id: String) = nodeInfo \@ "id" === id
+        def hasIdValue(id: String) = nodeInfo /@ "id" === id
 
         private def find(axisNumber: Byte, test: Test): Seq[NodeInfo] = {
             // We know the result contains only NodeInfo, but ouch, this is a cast!
@@ -382,13 +387,19 @@ object XML {
         def ===(s: String) = seq exists (_ === s)
         def !==(s: String) = ! ===(s)
 
-        def \(test: Test): Seq[NodeInfo] = seq flatMap (_ \ test)
+        def /(test: Test): Seq[NodeInfo] = seq flatMap (_ / test)
+        def \(test: Test): Seq[NodeInfo] = /(test)
         def \\(test: Test): Seq[NodeInfo] = seq flatMap (_ \\ test)
 
-        def \@(attName: String): Seq[NodeInfo] = seq flatMap (_ \@ attName)
-        def \@(attName: QName): Seq[NodeInfo] = seq flatMap (_ \@ attName)
-        def \@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \@ attName)
-        def \@(test: Test): Seq[NodeInfo] = seq flatMap (_ \@ test)
+        def /@(attName: String): Seq[NodeInfo] = seq flatMap (_ /@ attName)
+        def /@(attName: QName): Seq[NodeInfo] = seq flatMap (_ /@ attName)
+        def /@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ /@ attName)
+        def /@(test: Test): Seq[NodeInfo] = seq flatMap (_ /@ test)
+        
+        def \@(attName: String): Seq[NodeInfo] = /@(attName)
+        def \@(attName: QName): Seq[NodeInfo]  = /@(attName)
+        def \@(attName: (String, String))      = /@(attName)
+        def \@(test: Test): Seq[NodeInfo]      = /@(test)
 
         // The following doesn't work right now because the DESCENDANT axis doesn't include attributes
 //        def \\@(attName: String): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
@@ -396,12 +407,12 @@ object XML {
 //        def \\@(attName: (String, String)): Seq[NodeInfo] = seq flatMap (_ \\@ attName)
 //        def \\@(test: Test): Seq[NodeInfo] = seq flatMap (_ \\@ test)
 
-        def att(attName: String) = \@(attName)
-        def child(test: Test) = \(test)
+        def att(attName: String) = /@(attName)
+        def child(test: Test) = /(test)
         def descendant(test: Test) = \\(test)
 
-        def attValue(attName: String) = \@(attName) map (_.stringValue)
-        def attValue(attName: QName)  = \@(attName) map (_.stringValue)
+        def attValue(attName: String) = /@(attName) map (_.stringValue)
+        def attValue(attName: QName)  = /@(attName) map (_.stringValue)
 
         def self(test: Test) = seq flatMap (_ self test)
         def parent(test: Test) = seq flatMap (_ parent test)
@@ -440,7 +451,7 @@ object XML {
                     case None    ⇒ None
                 }
 
-        val tokens: List[String] = split(path, "/")(breakOut)
+        val tokens = split[List](path, "/")
 
         findChild(Some(context), tokens)
     }
@@ -479,10 +490,10 @@ object XML {
         else
             new DocumentWrapper(elemToDom4j(e), null, XPathCache.getGlobalConfiguration)
 
-    implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) \ * head
-    implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) \ *
-    implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToDocumentInfo(e) \ * head
-    implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) \ *
+    implicit def elemToItem(e: Elem): Item = elemToDocumentInfo(e) / * head
+    implicit def elemToItemSeq(e: Elem): Seq[Item] = elemToDocumentInfo(e) / *
+    implicit def elemToNodeInfo(e: Elem): NodeInfo = elemToDocumentInfo(e) / * head
+    implicit def elemToNodeInfoSeq(e: Elem): Seq[NodeInfo] = elemToDocumentInfo(e) / *
 
     implicit def stringSeqToSequenceIterator(seq: Seq[String]): SequenceIterator =
         new ListIterator(seq map stringToStringValue asJava)

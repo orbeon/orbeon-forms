@@ -42,4 +42,24 @@
         <add>Добавить</add>
         <remove>Удалить</remove>
     </resource>
+    <resource xml:lang="de">
+        <select>...</select>
+        <title>Auswahl</title>
+        <available>Verfügbar</available>
+        <selected>Ausgewählt</selected>
+        <confirm>Bestätigen</confirm>
+        <cancel>Abbrechen</cancel>
+        <add>Hinzufügen</add>
+        <remove>Löschen</remove>
+    </resource>
+    <resource xml:lang="it">
+        <select>...</select>
+        <title>Selezione</title>
+        <available>Disponibile</available>
+        <selected>Selezionato</selected>
+        <confirm>Conferma</confirm>
+        <cancel>Cancella</cancel>
+        <add>Aggiungere</add>
+        <remove>Elimina</remove>
+    </resource>
 </resources>

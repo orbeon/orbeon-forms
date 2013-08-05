@@ -87,6 +87,14 @@
                             <canvas-not-supported>Pour annoter des images, votre navigateur doit supporter le canvas HTML5</canvas-not-supported>
                             <annotated-image>Image annotée</annotated-image>
                         </resource>
+                        <resource xml:lang="de">
+                            <canvas-not-supported>Um bearbeitbare Bilder zu verwenden, muss ihr Browser das Canvas-Element von HTML5 unterstützen</canvas-not-supported>
+                            <annotated-image>Bearbeitbares Bild</annotated-image>
+                        </resource>
+                        <resource xml:lang="it">
+                            <canvas-not-supported>Per usare le immagini modificabili, suo Browser deve avere il supporto per canvas di HTML5</canvas-not-supported>
+                            <annotated-image>Immagine modificabile</annotated-image>
+                        </resource>
                     </resources>
                 </xf:instance>
                 <xf:insert event="xforms-model-construct-done" if="empty(instance()/*)"

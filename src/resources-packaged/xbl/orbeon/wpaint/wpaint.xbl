@@ -92,7 +92,7 @@
                             <annotated-image>Bearbeitbares Bild</annotated-image>
                         </resource>
                         <resource xml:lang="it">
-							<canvas-not-supported>Per usare le immagini modificabili, suo Browser deve avere il supporto per canvas di HTML5</canvas-not-supported>
+                            <canvas-not-supported>Per usare le immagini modificabili, suo Browser deve avere il supporto per canvas di HTML5</canvas-not-supported>
                             <annotated-image>Immagine modificabile</annotated-image>
                         </resource>
                     </resources>

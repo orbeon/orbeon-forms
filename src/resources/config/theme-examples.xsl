@@ -12,13 +12,16 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xsl:stylesheet version="2.0"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xh="http://www.w3.org/1999/xhtml"
-    xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
-    xmlns:version="java:org.orbeon.oxf.common.Version">
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                xmlns:f="http://orbeon.org/oxf/xml/formatting"
+                xmlns:xh="http://www.w3.org/1999/xhtml"
+                xmlns:xf="http://www.w3.org/2002/xforms"
+                xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+                xmlns:version="java:org.orbeon.oxf.common.Version"
+                xmlns:xi="http://www.w3.org/2001/XInclude"
+                xmlns:xxi="http://orbeon.org/oxf/xml/xinclude"
+                xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <xsl:import href="theme-plain.xsl"/>
 
@@ -57,6 +60,9 @@
                 </xh:div>
                 <xsl:apply-templates select="node()"/>
             </xh:div>
+            <xsl:if test="p:property('oxf.epilogue.show-feedback')">
+                <xsl:copy-of select="doc('oxf:/config/feedback.xhtml')"/>
+            </xsl:if>
         </xsl:copy>
     </xsl:template>
 

@@ -15,7 +15,9 @@
     Regular theme for Form Runner.
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xh="http://www.w3.org/1999/xhtml">
+                xmlns:xh="http://www.w3.org/1999/xhtml"
+                xmlns:xi="http://www.w3.org/2001/XInclude"
+                xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <!-- Just use the plain theme -->
     <xsl:import href="../../config/theme-plain.xsl"/>
@@ -26,6 +28,15 @@
             <!-- Favicon -->
             <xh:link rel="shortcut icon" href="/ops/images/orbeon-icon-16.ico"/>
             <xh:link rel="icon" href="/ops/images/orbeon-icon-16.png" type="image/png"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="xh:body">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+            <xsl:if test="p:property('oxf.epilogue.show-feedback')">
+                <xsl:copy-of select="doc('oxf:/config/feedback.xhtml')"/>
+            </xsl:if>
         </xsl:copy>
     </xsl:template>
 

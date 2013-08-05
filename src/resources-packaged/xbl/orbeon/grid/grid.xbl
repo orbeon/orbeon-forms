@@ -148,9 +148,14 @@
                                                 </xsl:if>
                                                 <xsl:copy-of select="@colspan"/>
                                                 <xsl:if test="$lhh-in-header and empty($control/self::xf:trigger)">
-                                                    <!-- NOTE: XPath expressions on LHH elements can't be relative to the controls in case there is no iteration. -->
-                                                    <!-- LATER: Change this once labels outside repeats are supported (http://goo.gl/tSz4i)? -->
-                                                    <xf:group xxbl:scope="outer">
+                                                    <!-- XPath expressions on LHH elements can't be relative to the controls in case there is no iteration
+                                                         - it seems we won't be able to lift that restriction even once labels outside repeats are supported,
+                                                           see bug #241 http://goo.gl/tSz4i -->
+                                                    <!-- We try to bind the group the first node, so we show the required "star" next to the header
+                                                         - this is not an ideal solution, as it only works if there is at least one iteration
+                                                         - arguably, if there are no iteration, whether a control is required or not doesn't matter -->
+                                                    <xf:var   xxbl:scope="outer" name="first-bound-node" value="xxf:binding('{$control/@id}')"/>
+                                                    <xf:group xxbl:scope="outer" ref="if (exists($first-bound-node)) then $first-bound-node else .">
                                                         <xsl:apply-templates select="$control/(xf:label, xf:help, xf:hint)"/>
                                                     </xf:group>
                                                 </xsl:if>

@@ -123,26 +123,27 @@
                 <xsl:template match="fr:positive-choice">
                     <!-- TODO: i18n -->
                     <xsl:variable name="default"><xh:i class="icon-ok"/> Yes</xsl:variable>
-                    <xsl:copy-of select="xf:trigger(*, $default, 'positive')"/>
+                    <xsl:copy-of select="xf:trigger(@xxf:modal | *, $default, 'positive')"/>
                 </xsl:template>
 
                 <xsl:template match="fr:negative-choice">
                     <!-- TODO: i18n -->
                     <xsl:variable name="default"><xh:i class="icon-remove"/> No</xsl:variable>
-                    <xsl:copy-of select="xf:trigger(*, $default, 'negative')"/>
+                    <xsl:copy-of select="xf:trigger(@xxf:modal | *, $default, 'negative')"/>
                 </xsl:template>
 
                 <xsl:template match="fr:neutral-choice">
                     <!-- TODO: i18n -->
-                    <xsl:copy-of select="xf:trigger(*, 'OK', 'neutral')"/>
+                    <xsl:copy-of select="xf:trigger(@xxf:modal | *, 'OK', 'neutral')"/>
                 </xsl:template>
 
                 <xsl:function name="xf:trigger" as="element(xf:trigger)">
-                    <xsl:param name="content" as="element()*"/>
+                    <xsl:param name="content" as="node()*"/>
                     <xsl:param name="default" as="item()*"/>
                     <xsl:param name="handler" as="xs:string"/>
                     <xsl:variable name="fr-label" as="element(fr:label)?" select="$content/self::fr:label"/>
                     <xf:trigger xxbl:scope="outer">
+                        <xsl:copy-of select="$content except $fr-label"/>
                         <xf:label>
                             <xsl:choose>
                                 <xsl:when test="exists($fr-label)">
@@ -158,7 +159,6 @@
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xf:label>
-                        <xsl:copy-of select="$content except $fr-label"/>
                         <!-- If a custom target is provided, dispatch to it -->
                         <xf:action ev:event="DOMActivate">
                             <xf:var name="local"><xxf:sequence value="$local" xxbl:scope="inner"/></xf:var>

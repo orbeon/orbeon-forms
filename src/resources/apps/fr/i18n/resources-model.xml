@@ -75,7 +75,9 @@
                         instance('fr-fr-resources')/resource/@xml:lang/string())"/>
 
         <!-- Save current form language into the session -->
-        <xf:insert context="." origin="xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))"/>
+        <xf:action type="xpath">
+            xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))
+        </xf:action>
     </xf:action>
 
     <!-- Respond to language change in the UI -->

@@ -247,8 +247,6 @@
 
         <xf:var name="url-base-for-requests" value="'{$url-base-for-requests}'"/>
 
-        <!-- This model handles i18n resources -->
-        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles global actions on form sections -->
         <xf:model id="fr-sections-model">
 
@@ -334,6 +332,10 @@
             <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
 
         </xsl:copy>
+
+        <!-- This model handles i18n resources -->
+        <!-- NOTE: Place after fr-form-model, as it needs the list of available form languages. -->
+        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
 
         <xsl:if test="not($is-noscript)">
             <!-- Handle checking dirty status -->

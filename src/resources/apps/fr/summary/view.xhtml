@@ -25,7 +25,6 @@
       xmlns:saxon="http://saxon.sf.net/"
       xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"
       xmlns:index="org.orbeon.oxf.fr.relational.Index"
-      xmlns:indexedControl="org.orbeon.oxf.fr.relational.Index$IndexedControl"
       xmlns:version="java:org.orbeon.oxf.common.Version"
       xmlns="http://www.w3.org/1999/xhtml">
 
@@ -81,11 +80,14 @@
                     replace="instance" instance="fr-source-form-instance" xxf:readonly="true" xxf:cache="false" xxf:xinclude="true"/>
 
             <!-- Standard Form Runner data instance -->
+            <!-- TODO: Can we remove this? -->
             <xf:instance id="fr-form-instance">
                 <dummy/>
             </xf:instance>
 
             <!-- Standard Form Runner resources instance -->
+            <!-- Initially empty, but we copy the source form resources into there during initialization.
+                 fr-persistence-model then has access to the form resources as if in the detail page. -->
             <xf:instance id="fr-form-resources">
                 <resources xmlns=""/>
             </xf:instance>
@@ -236,16 +238,6 @@
                 <xf:var name="page-size" value="instance('fr-search-instance')/page-size" as="element(page-size)"/>
                 <xf:setvalue ref="$page-size" model="fr-persistence-model"
                              value="xxf:property(string-join(('oxf.fr.summary.page-size', $app, $form), '.'))"/>
-
-                <!-- Rebuild resource variables after source form has been loaded, because resources model variables
-                     (e.g. $fr-form-resources) are used right after we are called. If you don't rebuild, control labels
-                     in structured search are not found. -->
-                <xf:rebuild model="fr-resources-model"/>
-
-                <xf:var name="summary-elements" as="element()*"
-                        value="instance('fr-source-form-instance')/xh:body//*[(@ref or @bind) and @class and xxf:classes() = ('fr-summary', 'fr-search')]"/>
-
-                <xf:var name="form-resources" model="fr-resources-model" value="$fr-form-resources" as="element(resource)?"/>
 
                 <!-- Create elements holding structured search data -->
                 <xf:insert

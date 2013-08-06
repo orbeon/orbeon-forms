@@ -68,7 +68,8 @@ trait FormRunnerLang {
     // If possible, try to match the form language, otherwise
     def selectFormRunnerLang(app: String, form: String, requestedLang: String, formRunnerLangs: JList[String]): String = {
         val appForm = getAppForm(app, form)
-        selectLangUseDefault(appForm, Option(requestedLang), formRunnerLangs.asScala.toList).orNull
+        val actualRequestedLang = findRequestedLang(appForm, requestedLang) filter isAllowedLang(appForm)
+        selectLangUseDefault(appForm, actualRequestedLang, formRunnerLangs.asScala.toList).orNull
     }
 
     // Get the default language for the given app/form

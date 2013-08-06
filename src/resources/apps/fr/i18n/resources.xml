@@ -227,15 +227,38 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Unpublish</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Publish</publish>
+                <cancel>Cancel</cancel>
+                <connect>Connect</connect>
+                <select>Select</select>
+                <operation>Operation</operation>
+                <all>All</all>
+                <none>None</none>
+                <unpublished-local>Unpublished local forms</unpublished-local>
+                <published-local>Published local forms</published-local>
+                <unpublished-remote>Unpublished remote forms</unpublished-remote>
+                <published-remote>Published remote forms</published-remote>
+                <newer-local>Forms that are newer locally</newer-local>
+                <newer-remote>Forms that are newer remotely</newer-remote>
+                <publish-local>Publish local forms</publish-local>
+                <unpublish-local>Unpublish local forms</unpublish-local>
+                <publish-remote>Publish remote forms</publish-remote>
+                <unpublish-remote>Unpublish remote forms</unpublish-remote>
+                <push-to-remote>Push to remote</push-to-remote>
+                <pull-from-remote>Pull from remote</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirm Form Publish/Unpublish</publish-confirmation>
+                <credentials>Remote Server Credentials</credentials>
                 <status>Status</status>
                 <app>Application</app>
                 <form>Form</form>
                 <title>Title</title>
                 <view>View</view>
                 <new>New</new>
+                <local>Local</local>
+                <remote>Remote</remote>
+                <form-identification>Form Identification</form-identification>
+                <last-modified>Last Modified</last-modified>
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
@@ -245,7 +268,15 @@
                 <available>Available</available>
                 <unavailable>Unavailable</unavailable>
                 <library>Library</library>
+                <newer>Newer</newer>
+                <username>Username</username>
+                <password>Password</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[MNn] [D]</day-this-year>
+                <short-date>[M01]/[D01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="fr">
@@ -467,15 +498,38 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Dépublier</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Publier</publish>
+                <cancel>Annuler</cancel>
+                <connect>Connecter</connect>
+                <select>Sélectionner</select>
+                <operation>Opération</operation>
+                <all>Tous</all>
+                <none>Aucun</none>
+                <unpublished-local>Formulaires locaux non publiés</unpublished-local>
+                <published-local>Formulaires locaux publiés</published-local>
+                <unpublished-remote>Formulaires distants non publiés</unpublished-remote>
+                <published-remote>Formulaires distants publiés</published-remote>
+                <newer-local>Formulaires locaux plus récents</newer-local>
+                <newer-remote>Formulaires distants plus récents</newer-remote>
+                <publish-local>Publier les formulaires locaux</publish-local>
+                <unpublish-local>Dépublier les formulaires locaux</unpublish-local>
+                <publish-remote>Publier les formulaires distants</publish-remote>
+                <unpublish-remote>Dépublier les formulaires distants</unpublish-remote>
+                <push-to-remote>Transférer vers le serveur distant</push-to-remote>
+                <pull-from-remote>Transférer depuis le serveur distant</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmer la publication/dépublication de formulaire</publish-confirmation>
-                <status>Etat</status>
+                <credentials>Autorisation du serveur distant</credentials>
+                <status>Status</status>
                 <app>Application</app>
                 <form>Formulaire</form>
                 <title>Titre</title>
                 <view>Voir</view>
                 <new>Nouveau</new>
+                <local>Local</local>
+                <remote>Distant</remote>
+                <form-identification>Identification du formulaire</form-identification>
+                <last-modified>Modification</last-modified>
             </titles>
             <messages>
                 <no-forms>Vous n'avez accès à aucun formulaire déployé.</no-forms>
@@ -485,7 +539,15 @@
                 <available>Disponible</available>
                 <unavailable>Indisponible</unavailable>
                 <library>Bibliothèque</library>
+                <newer>Plus récent</newer>
+                <username>Nom d'utilisateur</username>
+                <password>Mot de passe</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="es">
@@ -693,15 +755,38 @@
             <buttons>
                 <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
                 <publish>[&lt;i class="icon-globe"/&gt; Publish]</publish>
+                <cancel>[Cancel]</cancel>
+                <connect>[Connect]</connect>
+                <select>[Select]</select>
+                <operation>[Operation]</operation>
+                <all>[All]</all>
+                <none>[None]</none>
+                <unpublished-local>[Unpublished local forms]</unpublished-local>
+                <published-local>[Published local forms]</published-local>
+                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
+                <published-remote>[Published remote forms]</published-remote>
+                <newer-local>[Forms that are newer locally]</newer-local>
+                <newer-remote>[Forms that are newer remotely]</newer-remote>
+                <publish-local>[Publish local forms]</publish-local>
+                <unpublish-local>[Unpublish local forms]</unpublish-local>
+                <publish-remote>[Publish remote forms]</publish-remote>
+                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
+                <push-to-remote>[Push to remote]</push-to-remote>
+                <pull-from-remote>[Pull from remote]</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
-                <status>[Status]</status>
+                <credentials>[Remote Server Credentials]</credentials>
+                <status>Status]</status>
                 <app>[App]</app>
                 <form>[Form]</form>
                 <title>[Title]</title>
                 <view>[View]</view>
                 <new>[New]</new>
+                <local>[Local]</local>
+                <remote>[Remote]</remote>
+                <form-identification>[Form Identification]</form-identification>
+                <last-modified>[Last Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -711,7 +796,15 @@
                 <available>[Available]</available>
                 <unavailable>[Unavailable]</unavailable>
                 <library>[Library]</library>
+                <newer>[Newer]</newer>
+                <username>[Username]</username>
+                <password>[Password]</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="no">
@@ -917,15 +1010,38 @@
             <buttons>
                 <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
                 <publish>[&lt;i class="icon-globe"/&gt; Publish]</publish>
+                <cancel>[Cancel]</cancel>
+                <connect>[Connect]</connect>
+                <select>[Select]</select>
+                <operation>[Operation]</operation>
+                <all>[All]</all>
+                <none>[None]</none>
+                <unpublished-local>[Unpublished local forms]</unpublished-local>
+                <published-local>[Published local forms]</published-local>
+                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
+                <published-remote>[Published remote forms]</published-remote>
+                <newer-local>[Forms that are newer locally]</newer-local>
+                <newer-remote>[Forms that are newer remotely]</newer-remote>
+                <publish-local>[Publish local forms]</publish-local>
+                <unpublish-local>[Unpublish local forms]</unpublish-local>
+                <publish-remote>[Publish remote forms]</publish-remote>
+                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
+                <push-to-remote>[Push to remote]</push-to-remote>
+                <pull-from-remote>[Pull from remote]</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <credentials>[Remote Server Credentials]</credentials>
                 <status>[Status]</status>
                 <app>[App]</app>
                 <form>[Form]</form>
                 <title>[Title]</title>
                 <view>[View]</view>
                 <new>[New]</new>
+                <local>[Local]</local>
+                <remote>[Remote]</remote>
+                <form-identification>[Form Identification]</form-identification>
+                <last-modified>[Last Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -935,7 +1051,15 @@
                 <available>[Available]</available>
                 <unavailable>[Unavailable]</unavailable>
                 <library>[Library]</library>
+                <newer>[Newer]</newer>
+                <username>[Username]</username>
+                <password>[Password]</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="ru">
@@ -1139,15 +1263,38 @@
             <buttons>
                 <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
                 <publish>[&lt;i class="icon-globe"/&gt; Publish]</publish>
+                <cancel>[Cancel]</cancel>
+                <connect>[Connect]</connect>
+                <select>[Select]</select>
+                <operation>[Operation]</operation>
+                <all>[All]</all>
+                <none>[None]</none>
+                <unpublished-local>[Unpublished local forms]</unpublished-local>
+                <published-local>[Published local forms]</published-local>
+                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
+                <published-remote>[Published remote forms]</published-remote>
+                <newer-local>[Forms that are newer locally]</newer-local>
+                <newer-remote>[Forms that are newer remotely]</newer-remote>
+                <publish-local>[Publish local forms]</publish-local>
+                <unpublish-local>[Unpublish local forms]</unpublish-local>
+                <publish-remote>[Publish remote forms]</publish-remote>
+                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
+                <push-to-remote>[Push to remote]</push-to-remote>
+                <pull-from-remote>[Pull from remote]</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <credentials>[Remote Server Credentials]</credentials>
                 <status>[Status]</status>
                 <app>[App]</app>
                 <form>[Form]</form>
                 <title>[Title]</title>
                 <view>[View]</view>
                 <new>[New]</new>
+                <local>[Local]</local>
+                <remote>[Remote]</remote>
+                <form-identification>[Form Identification]</form-identification>
+                <last-modified>[Last Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1157,7 +1304,15 @@
                 <available>[Available]</available>
                 <unavailable>[Unavailable]</unavailable>
                 <library>[Library]</library>
+                <newer>[Newer]</newer>
+                <username>[Username]</username>
+                <password>[Password]</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="it">
@@ -1375,15 +1530,38 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Nascondi</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Pubblica</publish>
+                <cancel>[Cancel]</cancel>
+                <connect>[Connect]</connect>
+                <select>[Select]</select>
+                <operation>[Operation]</operation>
+                <all>[All]</all>
+                <none>[None]</none>
+                <unpublished-local>[Unpublished local forms]</unpublished-local>
+                <published-local>[Published local forms]</published-local>
+                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
+                <published-remote>[Published remote forms]</published-remote>
+                <newer-local>[Forms that are newer locally]</newer-local>
+                <newer-remote>[Forms that are newer remotely]</newer-remote>
+                <publish-local>[Publish local forms]</publish-local>
+                <unpublish-local>[Unpublish local forms]</unpublish-local>
+                <publish-remote>[Publish remote forms]</publish-remote>
+                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
+                <push-to-remote>[Push to remote]</push-to-remote>
+                <pull-from-remote>[Pull from remote]</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
-                <status>Stato</status>
+                <credentials>[Remote Server Credentials]</credentials>
+                <status>[Status]</status>
                 <app>Applicazione</app>
                 <form>Modulo</form>
                 <title>Titolo</title>
                 <view>Vizualizza</view>
                 <new>Nuovo</new>
+                <local>[Local]</local>
+                <remote>[Remote]</remote>
+                <form-identification>[Form Identification]</form-identification>
+                <last-modified>[Last Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1393,7 +1571,15 @@
                 <available>Disponibile</available>
                 <unavailable>Non disponibile</unavailable>
                 <library>Biblioteca</library>
+                <newer>[Newer]</newer>
+                <username>[Username]</username>
+                <password>[Password]</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="de">
@@ -1610,15 +1796,38 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Verbergen</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
+                <cancel>[Cancel]</cancel>
+                <connect>[Connect]</connect>
+                <select>[Select]</select>
+                <operation>[Operation]</operation>
+                <all>[All]</all>
+                <none>[None]</none>
+                <unpublished-local>[Unpublished local forms]</unpublished-local>
+                <published-local>[Published local forms]</published-local>
+                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
+                <published-remote>[Published remote forms]</published-remote>
+                <newer-local>[Forms that are newer locally]</newer-local>
+                <newer-remote>[Forms that are newer remotely]</newer-remote>
+                <publish-local>[Publish local forms]</publish-local>
+                <unpublish-local>[Unpublish local forms]</unpublish-local>
+                <publish-remote>[Publish remote forms]</publish-remote>
+                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
+                <push-to-remote>[Push to remote]</push-to-remote>
+                <pull-from-remote>[Pull from remote]</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>Bestätige veröffentlichen/ veröffentlichen rückgängig machen</publish-confirmation>
-                <status>Status</status>
+                <credentials>[Remote Server Credentials]</credentials>
+                <status>[Status]</status>
                 <app>Applikation</app>
                 <form>Formular</form>
                 <title>Titel</title>
                 <view>Ansehen</view>
                 <new>Neu</new>
+                <local>[Local]</local>
+                <remote>[Remote]</remote>
+                <form-identification>[Form Identification]</form-identification>
+                <last-modified>[Last Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1628,7 +1837,15 @@
                 <available>Verfügbar</available>
                 <unavailable>Nicht verfügbar</unavailable>
                 <library>Bibliothek</library>
+                <newer>[Newer]</newer>
+                <username>[Username]</username>
+                <password>[Password]</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
     <resource xml:lang="fi">
@@ -1845,15 +2062,38 @@
             <buttons>
                 <unpublish>[&lt;i class="icon-ban-circle"/&gt; Unpublish]</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Julkaise</publish>
+                <cancel>[Cancel]</cancel>
+                <connect>[Connect]</connect>
+                <select>[Select]</select>
+                <operation>[Operation]</operation>
+                <all>[All]</all>
+                <none>[None]</none>
+                <unpublished-local>[Unpublished local forms]</unpublished-local>
+                <published-local>[Published local forms]</published-local>
+                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
+                <published-remote>[Published remote forms]</published-remote>
+                <newer-local>[Forms that are newer locally]</newer-local>
+                <newer-remote>[Forms that are newer remotely]</newer-remote>
+                <publish-local>[Publish local forms]</publish-local>
+                <unpublish-local>[Unpublish local forms]</unpublish-local>
+                <publish-remote>[Publish remote forms]</publish-remote>
+                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
+                <push-to-remote>[Push to remote]</push-to-remote>
+                <pull-from-remote>[Pull from remote]</pull-from-remote>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
+                <credentials>[Remote Server Credentials]</credentials>
                 <status>[Status]</status>
-                <app>[Application]</app>
+                <app>[App]</app>
                 <form>[Form]</form>
                 <title>[Title]</title>
                 <view>[View]</view>
                 <new>[New]</new>
+                <local>[Local]</local>
+                <remote>[Remote]</remote>
+                <form-identification>[Form Identification]</form-identification>
+                <last-modified>[Last Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1863,7 +2103,15 @@
                 <available>[Available]</available>
                 <unavailable>[Unavailable]</unavailable>
                 <library>[Library]</library>
+                <newer>[Newer]</newer>
+                <username>[Username]</username>
+                <password>[Password]</password>
             </labels>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
         </home>
     </resource>
 </resources>

@@ -273,6 +273,8 @@
             method="put"
             ref="event('holder')"
             resource="{event('resource')}"
+            xxf:username="event('username')"
+            xxf:password="event('password')"
             replace="text"
             target="instance('fr-create-update-submission-response')">
 
@@ -289,6 +291,8 @@
             serialization="application/octet-stream"
             ref="event('holder')"
             resource="{event('resource')}"
+            xxf:username="event('username')"
+            xxf:password="event('password')"
             replace="none"/>
 
     <!-- Search for drafts, to possibly warn users there is a newer draft -->

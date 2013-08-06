@@ -116,7 +116,7 @@ trait FormRunnerHome {
     def canPublishRemoteToLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalAndRemote)
 
-    def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, force: Boolean): Unit =
+    def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(
             data              = xhtml.root,
             toBaseURI         = toBaseURI,
@@ -124,6 +124,8 @@ trait FormRunnerHome {
             toBasePath        = createFormDefinitionBasePath(app, form),
             filename          = "form.xhtml",
             commonQueryString = "",
-            forceAttachments  = force
+            forceAttachments  = forceAttachments,
+            username          = nonEmptyOrNone(username),
+            password          = nonEmptyOrNone(password)
         )
 }

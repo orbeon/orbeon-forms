@@ -173,7 +173,9 @@ trait FormRunnerPersistence {
             toBasePath: String,
             filename: String,
             commonQueryString: String,
-            forceAttachments: Boolean) = {
+            forceAttachments: Boolean,
+            username: Option[String] = None,
+            password: Option[String] = None) = {
 
         // Find all instance nodes containing file URLs we need to upload
         val (uploadHolders, beforeURLs, afterURLs) =
@@ -185,7 +187,9 @@ trait FormRunnerPersistence {
             uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
                 sendThrowOnError("fr-create-update-attachment-submission", Map(
                     "holder"   → Some(holder),
-                    "resource" → Some(appendQueryString(toBaseURI + resource, commonQueryString)))
+                    "resource" → Some(appendQueryString(toBaseURI + resource, commonQueryString)),
+                    "username" → username,
+                    "password" → password)
                 )
             }
 
@@ -201,7 +205,9 @@ trait FormRunnerPersistence {
         def saveData() =
             sendThrowOnError("fr-create-update-submission", Map(
                 "holder"   → Some(data.rootElement),
-                "resource" → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)))
+                "resource" → Some(appendQueryString(toBaseURI + toBasePath + filename, commonQueryString)),
+                "username" → username,
+                "password" → password)
             )
 
         // Do things in order, so we don't update path or save the data if any the upload fails

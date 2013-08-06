@@ -28,7 +28,7 @@ trait FormRunnerHome {
 
     private case class AvailableAndTime(available: Boolean, time: Long)
 
-    private case class Form(app: String, form: String, local: Option[AvailableAndTime], remote: Option[AvailableAndTime]) {
+    private case class Form(app: String, form: String, local: Option[AvailableAndTime], remote: Option[AvailableAndTime], ops: Set[String]) {
         def isLocalAvailable    = local  exists (_.available)
         def isRemoteAvailable   = remote exists (_.available)
         def isLocalUnavailable  = local  exists (! _.available)
@@ -49,7 +49,8 @@ trait FormRunnerHome {
             Form(form / "application-name" stringValue,
                 form / "form-name" stringValue,
                 localTime.nonEmpty  option AvailableAndTime(! (form / "available"        === "false"), DateUtils.parseISODateOrDateTime(localTime.stringValue)),
-                remoteTime.nonEmpty option AvailableAndTime(! (form / "remote-available" === "false"), DateUtils.parseISODateOrDateTime(remoteTime.stringValue))
+                remoteTime.nonEmpty option AvailableAndTime(! (form / "remote-available" === "false"), DateUtils.parseISODateOrDateTime(remoteTime.stringValue)),
+                stringToSet(form /@ "operations")
             )
         }
     }
@@ -116,6 +117,15 @@ trait FormRunnerHome {
 
     def canPublishRemoteToLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isRemote)
+
+    private val SummaryOps = Set("*", "update", "read", "delete")
+    private val NewOps     = Set("*", "create")
+
+    def canNavigateSummary(selection: String, forms: SequenceIterator) =
+        formsForSelection(selection, forms) exists (f ⇒ f.isLocal && (f.ops intersect SummaryOps nonEmpty))
+    
+    def canNavigateNew(selection: String, forms: SequenceIterator) =
+        formsForSelection(selection, forms) exists (f ⇒ f.isLocal && (f.ops intersect NewOps nonEmpty))
 
     def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(

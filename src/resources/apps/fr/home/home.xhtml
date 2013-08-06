@@ -67,6 +67,8 @@
                     <remote-publish-action/>
                     <local-to-remote-action/>
                     <remote-to-local-action/>
+                    <summary-action/>
+                    <new-action/>
 
                     <local-unpublish-select/>
                     <local-publish-select/>
@@ -91,6 +93,8 @@
                 <xf:bind ref="remote-publish-action"   readonly="not(normalize-space(../selection) and frf:canPublishRemote(../selection, $forms))"/>
                 <xf:bind ref="local-to-remote-action"  readonly="not(normalize-space(../selection) and frf:canPublishLocalToRemote(../selection, $forms))"/>
                 <xf:bind ref="remote-to-local-action"  readonly="not(normalize-space(../selection) and frf:canPublishRemoteToLocal(../selection, $forms))"/>
+                <xf:bind ref="summary-action"          readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateSummary(../selection, $forms))"/>
+                <xf:bind ref="new-action"              readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateNew(../selection, $forms))"/>
                 
                 <xf:bind ref="local-unpublish-select"  readonly="not(frf:canSelectUnpublishedLocal(../selection, $forms))"/>
                 <xf:bind ref="local-publish-select"    readonly="not(frf:canSelectPublishedLocal(../selection, $forms))"/>
@@ -433,10 +437,23 @@
                                         <xf:label ref="$fr-resources/home/buttons/pull-from-remote"/>
                                     </xf:trigger>
                                 </li>
+                                <li class="divider"/>
+                                <li class="{if (xxf:readonly(summary-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" ref="summary-action" id="fr-summary-button">
+                                        <xf:label ref="$fr-resources/home/buttons/navigate-summary"/>
+                                        <xf:load event="DOMActivate" resource="/fr/{xxf:split(instance()/selection, '/')[1]}/{xxf:split(instance()/selection, '/')[2]}/summary"/>
+                                    </xf:trigger>
+                                </li>
+                                <li class="{if (xxf:readonly(new-action)) then 'disabled' else ()}">
+                                    <xf:trigger appearance="minimal" ref="summary-action" id="fr-new-button">
+                                        <xf:label ref="$fr-resources/home/buttons/navigate-new"/>
+                                        <xf:load event="DOMActivate" resource="/fr/{xxf:split(instance()/selection, '/')[1]}/{xxf:split(instance()/selection, '/')[2]}/new"/>
+                                    </xf:trigger>
+                                </li>
                             </ul>
                         </div>
 
-                        <xf:trigger class="btn-group">
+                        <xf:trigger class="btn-group" xxf:modal="true">
                             <xf:label mediatype="text/html" ref="$fr-resources/detail/buttons/refresh"/>
                             <xf:dispatch event="DOMActivate" name="fr-initialize" targetid="fr-form-model"/>
                         </xf:trigger>
@@ -463,18 +480,21 @@
                                 <xh:th><xf:output value="$fr-resources/home/titles/app"/></xh:th>
                                 <xh:th><xf:output value="$fr-resources/home/titles/form"/></xh:th>
                                 <xh:th><xf:output value="$fr-resources/home/titles/title"/></xh:th>
-                                <!--<xh:th><xf:output value="$fr-resources/home/titles/view"/></xh:th>-->
-                                <!--<xh:th><xf:output value="$fr-resources/home/titles/new"/></xh:th>-->
                             </xh:tr>
                         </xh:thead>
                         <xh:tbody>
                             <xf:repeat ref="$forms">
-                                <xf:var name="current"            value="."/>
-                                <xf:var name="local-available"    value="frf:isLocalAvailable(.)"/>
-                                <xf:var name="local-unavailable"  value="frf:isLocalUnavailable(.)"/>
-                                <xf:var name="remote-available"   value="frf:isRemoteAvailable(.)"/>
-                                <xf:var name="remote-unavailable" value="frf:isRemoteUnavailable(.)"/>
-                                <xf:var name="ops"                value="xxf:split(@operations)"/>
+                                <xf:var name="current"              value="."/>
+                                <xf:var name="local-available"      value="frf:isLocalAvailable(.)"/>
+                                <xf:var name="local-unavailable"    value="frf:isLocalUnavailable(.)"/>
+                                <xf:var name="remote-available"     value="frf:isRemoteAvailable(.)"/>
+                                <xf:var name="remote-unavailable"   value="frf:isRemoteUnavailable(.)"/>
+                                <xf:var name="ops"                  value="xxf:split(@operations)"/>
+                                <xf:var name="can-navigate-summary" value="$ops = ('*', 'update', 'read', 'delete')"/>
+                                <xf:var name="can-navigate-new"     value="$ops = ('*', 'create')"/>
+                                <xf:var name="link"                 value="if ($can-navigate-summary or can-navigate-new)
+                                                                           then concat('/fr/', application-name, '/', form-name, '/', if ($can-navigate-summary) then 'summary' else 'new')
+                                                                           else ()"/>
                                 <xh:tr>
                                     <xf:group ref=".[$any-has-admin]">
                                         <xh:td class="fr-home-select">
@@ -544,28 +564,24 @@
                                         </xh:td>
                                     </xf:group>
                                     <xh:td>
-                                        <xf:output value="application-name"/>
+                                        <xh:a href="{$link}" target="_blank" class="{if ($link) then '' else 'xforms-hidden'}">
+                                            <xf:output ref=".[$link]" value="application-name"/>
+                                        </xh:a>
+                                        <xf:output ref=".[not($link)]" value="application-name"/>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:output value="form-name"/>
+                                        <xh:a href="{$link}" target="_blank" class="{if ($link) then '' else 'xforms-hidden'}">
+                                            <xf:output ref=".[$link]" value="form-name"/>
+                                        </xh:a>
+                                        <xf:output ref=".[not($link)]" value="form-name"/>
                                     </xh:td>
                                     <xh:td>
-                                        <xf:output value="(title[@xml:lang = $fr-lang], title)[1]"/>
+                                        <xf:var name="title" value="(title[@xml:lang = $fr-lang], title)[1]"/>
+                                        <xh:a href="{$link}" target="_blank" class="{if ($link) then '' else 'xforms-hidden'}">
+                                            <xf:output ref=".[$link]" value="$title"/>
+                                        </xh:a>
+                                        <xf:output ref=".[not($link)]" value="$title"/>
                                     </xh:td>
-                                    <!--<xh:td class="fr-summary">-->
-                                        <!--<xf:group ref=".[$local-available and $ops = ('*', 'update', 'read', 'delete')]">-->
-                                            <!--<xh:a href="/fr/{application-name}/{form-name}/summary">-->
-                                                <!--<xh:i class="icon-list"/>-->
-                                            <!--</xh:a>-->
-                                        <!--</xf:group>-->
-                                    <!--</xh:td>-->
-                                    <!--<xh:td class="fr-new">-->
-                                        <!--<xf:group ref=".[$local-available and $ops = ('*', 'create')]">-->
-                                            <!--<xh:a href="/fr/{application-name}/{form-name}/new">-->
-                                                <!--<xh:i class="icon-plus"/>-->
-                                            <!--</xh:a>-->
-                                        <!--</xf:group>-->
-                                    <!--</xh:td>-->
                                 </xh:tr>
                             </xf:repeat>
                         </xh:tbody>
@@ -587,7 +603,7 @@
                     process:runProcessByName('oxf.fr.home.process', 'confirmation-cancel')
                 </xf:action>
             </fr:negative-choice>
-            <fr:positive-choice>
+            <fr:positive-choice xxf:modal="true">
                 <xf:action event="DOMActivate" type="xpath">
                     process:runProcessByName('oxf.fr.home.process', 'confirmation-ok')
                 </xf:action>
@@ -619,10 +635,10 @@
                 </fr:grid>
             </xh:div>
             <xh:div class="fr-dialog-buttons">
-                <xf:trigger id="cancel-button">
+                <xf:trigger id="cancel-button" xxf:modal="true">
                     <xf:label ref="$fr-resources/home/buttons/cancel"/>
                 </xf:trigger>
-                <xf:trigger appearance="xxf:primary" id="connect-button">
+                <xf:trigger appearance="xxf:primary" id="connect-button" xxf:modal="true">
                     <xf:label ref="$fr-resources/home/buttons/connect"/>
                 </xf:trigger>
             </xh:div>

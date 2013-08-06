@@ -92,6 +92,22 @@
   white-space: nowrap;
   min-width: 12px;
 }
+.orbeon table td {
+  position: relative;
+}
+.orbeon table td a {
+  width: 100%;
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  text-decoration: none;
+  color: black;
+  outline: 0;
+}
+.orbeon table td a:hover {
+  text-decoration: none;
+  color: black;
+}
 .orbeon table .fr-home-select {
   width: 1px;
 }

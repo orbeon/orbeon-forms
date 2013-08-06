@@ -118,7 +118,8 @@
   margin-bottom: 0;
   max-width: none;
 }
-.orbeon .fr-summary-table-div tbody a {
+.orbeon .fr-summary-table-div tbody a,
+.orbeon .fr-summary-table-div tbody a:hover {
   text-decoration: none;
   color: black;
   outline: 0;

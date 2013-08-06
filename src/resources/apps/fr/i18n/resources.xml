@@ -15,8 +15,8 @@
     <resource xml:lang="en">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
-                <day-this-year>[MNn] [D]</day-this-year>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <day-this-year>[MNn,*-3] [D]</day-this-year>
                 <short-date>[M01]/[D01]/[Y01]</short-date>
             </formats>
         </common>
@@ -252,6 +252,8 @@
                 <unpublish-remote>Unpublish remote forms</unpublish-remote>
                 <push-to-remote>Push to remote</push-to-remote>
                 <pull-from-remote>Pull from remote</pull-from-remote>
+                <navigate-summary>Navigate to Summary</navigate-summary>
+                <navigate-new>Navigate to New</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>Confirm Form Publish/Unpublish</publish-confirmation>
@@ -284,7 +286,7 @@
     <resource xml:lang="fr">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -525,6 +527,8 @@
                 <unpublish-remote>Dépublier les formulaires distants</unpublish-remote>
                 <push-to-remote>Transférer vers le serveur distant</push-to-remote>
                 <pull-from-remote>Transférer depuis le serveur distant</pull-from-remote>
+                <navigate-summary>Naviguer à la page de sommaire</navigate-summary>
+                <navigate-new>Naviguer à la page de création</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>Confirmer la publication/dépublication de formulaire</publish-confirmation>
@@ -557,7 +561,7 @@
     <resource xml:lang="es">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -784,6 +788,8 @@
                 <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
                 <push-to-remote>[Push to remote]</push-to-remote>
                 <pull-from-remote>[Pull from remote]</pull-from-remote>
+                <navigate-summary>[Navigate to Summary]</navigate-summary>
+                <navigate-new>[Navigate to New]</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -816,7 +822,7 @@
     <resource xml:lang="no">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1041,6 +1047,8 @@
                 <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
                 <push-to-remote>[Push to remote]</push-to-remote>
                 <pull-from-remote>[Pull from remote]</pull-from-remote>
+                <navigate-summary>[Navigate to Summary]</navigate-summary>
+                <navigate-new>[Navigate to New]</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1073,7 +1081,7 @@
     <resource xml:lang="ru">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1296,6 +1304,8 @@
                 <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
                 <push-to-remote>[Push to remote]</push-to-remote>
                 <pull-from-remote>[Pull from remote]</pull-from-remote>
+                <navigate-summary>[Navigate to Summary]</navigate-summary>
+                <navigate-new>[Navigate to New]</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>
@@ -1328,7 +1338,7 @@
     <resource xml:lang="it">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1565,6 +1575,8 @@
                 <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
                 <push-to-remote>[Push to remote]</push-to-remote>
                 <pull-from-remote>[Pull from remote]</pull-from-remote>
+                <navigate-summary>[Navigate to Summary]</navigate-summary>
+                <navigate-new>[Navigate to New]</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>Conferma la pubblicazione o la annullazione della pubblicazione del modulo</publish-confirmation>
@@ -1597,7 +1609,7 @@
     <resource xml:lang="de">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1833,6 +1845,8 @@
                 <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
                 <push-to-remote>[Push to remote]</push-to-remote>
                 <pull-from-remote>[Pull from remote]</pull-from-remote>
+                <navigate-summary>[Navigate to Summary]</navigate-summary>
+                <navigate-new>[Navigate to New]</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>Bestätige veröffentlichen/ veröffentlichen rückgängig machen</publish-confirmation>
@@ -1865,7 +1879,7 @@
     <resource xml:lang="fi">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
+                <within-day>[H01]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -2101,6 +2115,8 @@
                 <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
                 <push-to-remote>[Push to remote]</push-to-remote>
                 <pull-from-remote>[Pull from remote]</pull-from-remote>
+                <navigate-summary>[Navigate to Summary]</navigate-summary>
+                <navigate-new>[Navigate to New]</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>[Confirm Form Publish/Unpublish]</publish-confirmation>

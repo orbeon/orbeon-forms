@@ -124,8 +124,8 @@
 
             <xf:submission
                 id="read-remote-metadata"
-                xxf:username="instance()/username"
-                xxf:password="instance()/password"
+                xxf:username="{instance()/username}"
+                xxf:password="{instance()/password}"
                 method="get"
                 serialization="none"
                 resource="{$production-server-uri}/fr/service/persistence/form"
@@ -260,6 +260,8 @@
                         <xf:property name="base-uri" value="if ($local-read) then '' else $production-server-uri"/>
                         <xf:property name="app"      value="$app"/>
                         <xf:property name="form"     value="$form"/>
+                        <xf:property name="username" value="if ($local-read) then '' else instance()/username"/>
+                        <xf:property name="password" value="if ($local-read) then '' else instance()/password"/>
                     </xf:send>
 
                     <xf:action if="instance()/error = ''">
@@ -308,6 +310,8 @@
                 method="get"
                 serialization="none"
                 resource="{event('base-uri')}/fr/service/persistence/crud/{event('app')}/{event('form')}/form/form.xhtml"
+                xxf:username="{instance()/username}"
+                xxf:password="{instance()/password}"
                 replace="instance"
                 instance="fr-form"/>
 
@@ -479,7 +483,7 @@
                                                 </xf:item>
                                             </xf:select>
                                         </xh:td>
-                                        <xh:td>
+                                        <xh:td class="fr-status">
                                             <xf:output
                                                 ref=".[$ops = 'admin' and ($local-available or $local-unavailable)]"
                                                 class="label{if ($local-available) then ' label-success' else ''}"
@@ -489,7 +493,7 @@
                                                 class="label label-info"
                                                 value="$fr-resources/home/labels/library"/>
                                             <xf:output
-                                                ref=".[last-modified-time gt remote-last-modified-time]"
+                                                ref=".[adjust-dateTime-to-timezone(last-modified-time) gt adjust-dateTime-to-timezone(remote-last-modified-time)]"
                                                 class="label label-warning"
                                                 value="$fr-resources/home/labels/newer"/>
                                         </xh:td>
@@ -498,7 +502,7 @@
                                         <xf:output
                                                 ref="last-modified-time"
                                                 xxf:format="
-                                                    for $v in xs:dateTime(.)
+                                                    for $v in adjust-dateTime-to-timezone(xs:dateTime(.))
                                                         return
                                                             if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
                                                             then format-dateTime($v, $fr-resources/home/formats/within-day, xxf:lang(), (), ())
@@ -507,17 +511,17 @@
                                                             else format-dateTime($v, $fr-resources/home/formats/short-date, xxf:lang(), (), ())"/>
                                     </xh:td>
                                     <xf:group ref=".[$any-has-remote-admin]">
-                                        <xh:td>
+                                        <xh:td class="fr-status">
                                             <xf:output
                                                 ref=".[$ops = 'admin' and ($remote-available or $remote-unavailable)]"
                                                 class="label{if ($remote-available) then ' label-success' else ''}"
                                                 value="if ($remote-available) then $fr-resources/home/labels/available else $fr-resources/home/labels/unavailable"/>
                                             <xf:output
-                                                ref=".[form-name = 'library']"
+                                                ref=".[form-name = 'library' and ($remote-available or $remote-unavailable)]"
                                                 class="label label-info"
                                                 value="$fr-resources/home/labels/library"/>
                                             <xf:output
-                                                ref=".[remote-last-modified-time gt last-modified-time]"
+                                                ref=".[adjust-dateTime-to-timezone(remote-last-modified-time) gt adjust-dateTime-to-timezone(last-modified-time)]"
                                                 class="label label-warning"
                                                 value="$fr-resources/home/labels/newer"/>
                                         </xh:td>
@@ -525,7 +529,7 @@
                                             <xf:output
                                                 ref="remote-last-modified-time"
                                                 xxf:format="
-                                                    for $v in xs:dateTime(.)
+                                                    for $v in adjust-dateTime-to-timezone(xs:dateTime(.))
                                                         return
                                                             if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
                                                             then format-dateTime($v, $fr-resources/home/formats/within-day, xxf:lang(), (), ())
@@ -564,7 +568,7 @@
                 </xf:group>
             </fr:row>
             <fr:row>
-                <!--xxx <xf:output value="saxon:serialize(instance('fr-metadata'), 'xml')"/>-->
+                xxx <xf:output value="saxon:serialize(instance('fr-metadata'), 'xml')"/>
                 <fr:version/>
             </fr:row>
         </fr:view>

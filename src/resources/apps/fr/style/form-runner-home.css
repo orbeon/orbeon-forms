@@ -105,6 +105,9 @@
 .orbeon table .fr-home-select label .label {
   vertical-align: middle;
 }
+.orbeon table .fr-status {
+  width: 1px;
+}
 .orbeon table .fr-home-last-modified {
   white-space: nowrap;
 }

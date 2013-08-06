@@ -34,10 +34,11 @@ trait FormRunnerHome {
         def isLocalUnavailable  = local  exists (! _.available)
         def isRemoteUnavailable = remote exists (! _.available)
 
-        def isLocalAndRemote = local.isDefined && remote.isDefined
+        def isLocal = local.isDefined
+        def isRemote = remote.isDefined
 
-        def isLocalNewer  = isLocalAndRemote && local.get.time  > remote.get.time
-        def isRemoteNewer = isLocalAndRemote && remote.get.time > local.get.time
+        def isLocalNewer  = isLocal && isRemote && local.get.time  > remote.get.time
+        def isRemoteNewer = isLocal && isRemote && remote.get.time > local.get.time
     }
 
     private object Form {
@@ -111,10 +112,10 @@ trait FormRunnerHome {
         formsForSelection(selection, forms) forall (_.isRemoteAvailable)
 
     def canPublishLocalToRemote(selection: String, forms: SequenceIterator) =
-        formsForSelection(selection, forms) forall (_.isLocalAndRemote)
+        formsForSelection(selection, forms) forall (_.isLocal)
 
     def canPublishRemoteToLocal(selection: String, forms: SequenceIterator) =
-        formsForSelection(selection, forms) forall (_.isLocalAndRemote)
+        formsForSelection(selection, forms) forall (_.isRemote)
 
     def publish(xhtml: NodeInfo, toBaseURI: String, app: String, form: String, username: String, password: String, forceAttachments: Boolean): Unit =
         putWithAttachments(

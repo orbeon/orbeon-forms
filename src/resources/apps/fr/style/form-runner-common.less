@@ -49,8 +49,12 @@
     background-position: -120px -96px;
 }
 
-.fr-plain-checkbox-container {
+.narrow-td {
     width: 1px;                                             // So the column takes the minimum possible space
+}
+
+.fr-plain-checkbox-container {
+    .narrow-td();
     label {
         display: inline-block;                              // Override Bootstrap's block, so we can have a "label" next the checkbox
         margin: 0;

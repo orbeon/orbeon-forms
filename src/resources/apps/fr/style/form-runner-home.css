@@ -61,6 +61,9 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
+.narrow-td {
+  width: 1px;
+}
 .fr-plain-checkbox-container {
   width: 1px;
 }
@@ -105,10 +108,11 @@
 .orbeon table .fr-home-select label .label {
   vertical-align: middle;
 }
-.orbeon table .fr-status {
+.orbeon table .fr-home-status {
   width: 1px;
 }
-.orbeon table .fr-home-last-modified {
+.orbeon table .fr-home-modified {
+  width: 1px;
   white-space: nowrap;
 }
 .orbeon table .label {

@@ -468,18 +468,18 @@
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
                                         <xh:th class="{$drafts-class}"/>
                                         <xf:repeat ref="if ($show-created) then '' else ()">
-                                            <xh:th fr:sortable="false" fr:resizeable="true">
+                                            <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
                                             </xh:th>
                                         </xf:repeat>
                                         <xf:repeat ref="if ($show-last-modified) then '' else ()">
-                                            <xh:th fr:sortable="false" fr:resizeable="true">
+                                            <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/last-modified"/>
                                             </xh:th>
                                         </xf:repeat>
                                         <!-- Iterate through specially marked controls and derive resource id then resource -->
                                         <xf:repeat ref="instance('fr-search-instance')/query[@summary-field = 'true']" id="fr-summary-repeat-column-number">
-                                            <xh:th fr:sortable="false" fr:resizeable="true">
+                                            <xh:th>
                                                 <!-- Output showing as the header of the column -->
                                                 <xf:output mediatype="text/html" value="frf:htmlFieldLabel(@name, @html-label = 'true', $form-resources)"/>
                                             </xh:th>
@@ -520,11 +520,18 @@
                                                 </xh:td>
                                                 <!-- Why repeat and not group? -->
                                                 <xf:repeat ref="if ($show-created) then '' else ()">
-                                                    <xf:var name="created"
-                                                                value="if ($document/@created castable as xs:dateTime)
-                                                                       then format-dateTime(xs:dateTime($document/@created), $fr-resources/summary/formats/save-datetime, xxf:lang(), (), ())
-                                                                       else ."/>
-                                                    <xh:td>
+                                                    <xf:var
+                                                        name="created"
+                                                        value="
+                                                            for $v in adjust-dateTime-to-timezone(xs:dateTime($document/@created[. castable as xs:dateTime]))
+                                                                return
+                                                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
+                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+
+                                                    <xh:td class="fr-summary-created">
                                                         <xf:group ref=".[$edit-view != '']">
                                                             <xh:a href="{$current-document-href}" target="_blank">
                                                                 <xf:output value="$created"/>
@@ -537,11 +544,18 @@
                                                 </xf:repeat>
                                                 <!-- Why repeat and not group? -->
                                                 <xf:repeat ref="if ($show-last-modified) then '' else ()">
-                                                    <xf:var name="last-modified"
-                                                                value="if ($document/@last-modified castable as xs:dateTime)
-                                                                       then format-dateTime(xs:dateTime($document/@last-modified), $fr-resources/summary/formats/save-datetime, xxf:lang(), (), ())
-                                                                       else ."/>
-                                                    <xh:td>
+                                                    <xf:var
+                                                        name="last-modified"
+                                                        value="
+                                                            for $v in adjust-dateTime-to-timezone(xs:dateTime($document/@last-modified[. castable as xs:dateTime]))
+                                                                return
+                                                                    if (current-dateTime() - $v lt xs:dayTimeDuration('P1D'))
+                                                                    then format-dateTime($v, $fr-resources/common/formats/within-day, xxf:lang(), (), ())
+                                                                    else if (year-from-dateTime(current-dateTime()) = year-from-dateTime($v))
+                                                                    then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
+                                                                    else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
+
+                                                    <xh:td class="fr-summary-modified">
                                                         <xf:group ref=".[$edit-view != '']">
                                                             <xh:a href="{$current-document-href}" target="_blank">
                                                                 <xf:output value="$last-modified"/>

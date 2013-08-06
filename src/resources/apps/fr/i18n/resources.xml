@@ -13,6 +13,13 @@
   -->
 <resources>
     <resource xml:lang="en">
+        <common>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[MNn] [D]</day-this-year>
+                <short-date>[M01]/[D01]/[Y01]</short-date>
+            </formats>
+        </common>
         <components>
             <labels>
                 <open-section>Show Section</open-section>
@@ -59,7 +66,7 @@
                 <summary-title>Summary</summary-title>
                 <delete-confirmation>Confirm Deletion</delete-confirmation>
                 <created>Created</created>
-                <last-modified>Last Modified</last-modified>
+                <last-modified>Modified</last-modified>
                 <selected>Selected</selected>
                 <refresh>This operation will refresh the page</refresh>
                 <toc>Table of Contents</toc>
@@ -258,7 +265,7 @@
                 <local>Local</local>
                 <remote>Remote</remote>
                 <form-identification>Form Identification</form-identification>
-                <last-modified>Last Modified</last-modified>
+                <last-modified>Modified</last-modified>
             </titles>
             <messages>
                 <no-forms>You don't have access to any deployed forms.</no-forms>
@@ -272,14 +279,16 @@
                 <username>Username</username>
                 <password>Password</password>
             </labels>
-            <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
-                <day-this-year>[MNn] [D]</day-this-year>
-                <short-date>[M01]/[D01]/[Y01]</short-date>
-            </formats>
         </home>
     </resource>
     <resource xml:lang="fr">
+        <common>
+            <formats>
+                <within-day>[H01]:[m01] [P]</within-day>
+                <day-this-year>[D] [MNn]</day-this-year>
+                <short-date>[D01]/[M01]/[Y01]</short-date>
+            </formats>
+        </common>
         <components>
             <labels>
                 <open-section>Montrer section</open-section>
@@ -329,7 +338,7 @@
                 <summary-title>Sommaire</summary-title>
                 <delete-confirmation>Confirmer la suppression</delete-confirmation>
                 <created>Création</created>
-                <last-modified>Dernière modification</last-modified>
+                <last-modified>Modification</last-modified>
                 <selected>Sélection</selected>
                 <refresh>Cette opération rafraichit la page</refresh>
                 <toc>Table des matières</toc>
@@ -543,14 +552,16 @@
                 <username>Nom d'utilisateur</username>
                 <password>Mot de passe</password>
             </labels>
+        </home>
+    </resource>
+    <resource xml:lang="es">
+        <common>
             <formats>
                 <within-day>[H01]:[m01] [P]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
-        </home>
-    </resource>
-    <resource xml:lang="es">
+        </common>
         <components>
             <labels>
                 <open-section>Mostrar Sección</open-section>
@@ -591,7 +602,7 @@
                 <summary-title>Resumen</summary-title>
                 <delete-confirmation>Confirma Eliminación</delete-confirmation>
                 <created>Creado</created>
-                <last-modified>Fecha de modificación</last-modified>
+                <last-modified>Modificación</last-modified>
                 <selected>Seleccionado</selected>
                 <refresh>Este botón actualizará la página</refresh>
                 <toc>Tabla de contenidos</toc>
@@ -786,7 +797,7 @@
                 <local>[Local]</local>
                 <remote>[Remote]</remote>
                 <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Last Modified]</last-modified>
+                <last-modified>[Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -800,14 +811,16 @@
                 <username>[Username]</username>
                 <password>[Password]</password>
             </labels>
+        </home>
+    </resource>
+    <resource xml:lang="no">
+        <common>
             <formats>
                 <within-day>[H01]:[m01] [P]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
-        </home>
-    </resource>
-    <resource xml:lang="no">
+        </common>
         <components>
             <labels>
                 <open-section>Åpne seksjon</open-section>
@@ -1041,7 +1054,7 @@
                 <local>[Local]</local>
                 <remote>[Remote]</remote>
                 <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Last Modified]</last-modified>
+                <last-modified>[Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1055,14 +1068,16 @@
                 <username>[Username]</username>
                 <password>[Password]</password>
             </labels>
+        </home>
+    </resource>
+    <resource xml:lang="ru">
+        <common>
             <formats>
                 <within-day>[H01]:[m01] [P]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
-        </home>
-    </resource>
-    <resource xml:lang="ru">
+        </common>
         <components>
             <labels>
                 <open-section>Показать раздел</open-section>
@@ -1294,7 +1309,7 @@
                 <local>[Local]</local>
                 <remote>[Remote]</remote>
                 <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Last Modified]</last-modified>
+                <last-modified>[Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1308,14 +1323,16 @@
                 <username>[Username]</username>
                 <password>[Password]</password>
             </labels>
+        </home>
+    </resource>
+    <resource xml:lang="it">
+        <common>
             <formats>
                 <within-day>[H01]:[m01] [P]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
-        </home>
-    </resource>
-    <resource xml:lang="it">
+        </common>
         <components>
             <labels>
                 <open-section>Mostra sezione</open-section>
@@ -1362,7 +1379,7 @@
                 <summary-title>Sommario</summary-title>
                 <delete-confirmation>Conferma cancella</delete-confirmation>
                 <created>Creato</created>
-                <last-modified>Ultimo modificato</last-modified>
+                <last-modified>Modificato</last-modified>
                 <selected>Selezionato</selected>
                 <refresh>Questa operazione aggiorna la pagina</refresh>
                 <toc>Tabella dei contenuti</toc>
@@ -1561,7 +1578,7 @@
                 <local>[Local]</local>
                 <remote>[Remote]</remote>
                 <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Last Modified]</last-modified>
+                <last-modified>[Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1575,14 +1592,16 @@
                 <username>[Username]</username>
                 <password>[Password]</password>
             </labels>
+        </home>
+    </resource>
+    <resource xml:lang="de">
+        <common>
             <formats>
                 <within-day>[H01]:[m01] [P]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
-        </home>
-    </resource>
-    <resource xml:lang="de">
+        </common>
         <components>
             <labels>
                 <open-section>Abschnitt anzeigen</open-section>
@@ -1827,7 +1846,7 @@
                 <local>[Local]</local>
                 <remote>[Remote]</remote>
                 <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Last Modified]</last-modified>
+                <last-modified>[Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -1841,14 +1860,16 @@
                 <username>[Username]</username>
                 <password>[Password]</password>
             </labels>
+        </home>
+    </resource>
+    <resource xml:lang="fi">
+        <common>
             <formats>
                 <within-day>[H01]:[m01] [P]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
-        </home>
-    </resource>
-    <resource xml:lang="fi">
+        </common>
         <components>
             <labels>
                 <open-section>Näytä lohko</open-section>
@@ -2093,7 +2114,7 @@
                 <local>[Local]</local>
                 <remote>[Remote]</remote>
                 <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Last Modified]</last-modified>
+                <last-modified>[Modified]</last-modified>
             </titles>
             <messages>
                 <no-forms>[You don't have access to any deployed forms.]</no-forms>
@@ -2107,11 +2128,6 @@
                 <username>[Username]</username>
                 <password>[Password]</password>
             </labels>
-            <formats>
-                <within-day>[H01]:[m01] [P]</within-day>
-                <day-this-year>[D] [MNn]</day-this-year>
-                <short-date>[D01]/[M01]/[Y01]</short-date>
-            </formats>
         </home>
     </resource>
 </resources>

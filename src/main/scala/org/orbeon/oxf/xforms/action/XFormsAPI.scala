@@ -316,9 +316,4 @@ object XFormsAPI {
         collectByErasedType[XFormsControl](containingDocument.getObjectByEffectiveId(controlId)) foreach {
             XFormsSetfocusAction.setfocus(_, inputOnly)
         }
-
-    // xxf:invalidate-instance
-    def invalidateInstance(resource: String): Unit = {
-        ???
-    }
 }

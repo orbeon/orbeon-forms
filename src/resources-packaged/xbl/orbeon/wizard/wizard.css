@@ -48,6 +48,9 @@
   background-repeat: no-repeat;
   background-position: -120px -96px;
 }
+.narrow-td {
+  width: 1px;
+}
 .fr-plain-checkbox-container {
   width: 1px;
 }

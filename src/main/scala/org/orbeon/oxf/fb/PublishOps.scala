@@ -44,10 +44,5 @@ trait PublishOps {
         }
 
         setfocus("fb-publish-dialog")
-
-        // Try to invalidate shared instances with the given resource URI so that the deployed form will be
-        // re-read by Form Runner. This works only if Form Builder is in the same webapp as the Form Runner
-        // running the deployed form.
-        //invalidateInstance()
     }
 }

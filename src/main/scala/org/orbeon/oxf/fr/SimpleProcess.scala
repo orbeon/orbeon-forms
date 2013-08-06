@@ -387,8 +387,7 @@ trait XFormsActions {
     def AllowedXFormsActions = Map[String, Action](
         "xf:send"     → tryXFormsSend,
         "xf:dispatch" → tryXFormsDispatch,
-        "xf:show"     → tryShowDialog,
-        "dialog"      → tryShowDialog
+        "xf:show"     → tryShowDialog
     )
 
     def tryXFormsSend(params: ActionParams): Try[Any] =
@@ -505,7 +504,7 @@ trait FormRunnerActions {
     def tryErrorMessage(params: ActionParams): Try[Any] =
         Try(FormRunner.errorMessage(messageFromResourceOrInline(params)))
 
-    // TODO: Use dialog("fr-submission-result-dialog")
+    // TODO: Use xf:show("fr-submission-result-dialog")
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {
             show("fr-submission-result-dialog", Map(

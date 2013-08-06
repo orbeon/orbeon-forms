@@ -86,7 +86,10 @@
                             </sql:query>
                             <sql:result-set>
                                 <sql:row-iterator>
-                                    <sql:get-column-value column="xml" type="odt:xmlFragment"/>
+                                    <row>
+                                        <sql:get-column-value column="xml" type="odt:xmlFragment"/>
+                                        <last-modified-time><sql:get-column-value column="last_modified_time" type="xs:dateTime"/></last-modified-time>
+                                    </row>
                                 </sql:row-iterator>
                             </sql:result-set>
                         </sql:execute>
@@ -103,9 +106,10 @@
             <xsl:stylesheet version="2.0" exclude-result-prefixes="#all">
                 <xsl:template match="/">
                     <forms>
-                        <xsl:for-each select="/sql-out/xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata">
+                        <xsl:for-each select="/sql-out/row">
                             <form>
-                                <xsl:copy-of select="*" copy-namespaces="no"/>
+                                <xsl:copy-of select="xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*" copy-namespaces="no"/>
+                                <xsl:copy-of select="last-modified-time"/>
                             </form>
                         </xsl:for-each>
                     </forms>

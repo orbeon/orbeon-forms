@@ -57,7 +57,10 @@
                             </sql:query>
                             <sql:result-set>
                                 <sql:row-iterator>
-                                    <sql:get-column-value column="metadata" type="odt:xmlFragment"/>
+                                    <row>
+                                        <sql:get-column-value column="metadata" type="odt:xmlFragment"/>
+                                        <last-modified-time><sql:get-column-value column="last_modified_time" type="xs:dateTime"/></last-modified-time>
+                                    </row>
                                 </sql:row-iterator>
                             </sql:result-set>
                         </sql:execute>
@@ -73,9 +76,10 @@
         <p:input name="data" href="#sql-out"/>
         <p:input name="config">
             <forms xsl:version="2.0">
-                <xsl:for-each select="/sql-out/metadata">
+                <xsl:for-each select="/sql-out/row">
                     <form>
-                        <xsl:copy-of select="*"/>
+                        <xsl:copy-of select="metadata/*"/>
+                        <xsl:copy-of select="last-modified-time"/>
                     </form>
                 </xsl:for-each>
             </forms>

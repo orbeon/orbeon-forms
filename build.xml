@@ -498,6 +498,7 @@
             <fileset dir="${resources.dir}">
                 <include name="apps/fr/**/*.*"/>
                 <exclude name="apps/fr/persistence/oracle/**/*.*"/>
+                <exclude name="apps/fr/persistence/db2/**/*.*"/>
                 <exclude name="apps/fr/alfresco/**/*.*"/>
                 <exclude name="apps/fr/print/print-pdf-template.xpl"/>
                 <exclude name="apps/fr/style/bootstrap-src/**/*.*"/>

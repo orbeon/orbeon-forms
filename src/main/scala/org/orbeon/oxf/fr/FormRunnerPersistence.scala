@@ -182,7 +182,6 @@ trait FormRunnerPersistence {
             collectAttachments(data, fromBasePath, toBasePath, forceAttachments)
 
         // Save all attachments
-        // - also pass a "valid" argument with whether the data was valid
         def saveAttachments(): Unit =
             uploadHolders zip afterURLs foreach { case (holder, resource) ⇒
                 sendThrowOnError("fr-create-update-attachment-submission", Map(
@@ -200,8 +199,6 @@ trait FormRunnerPersistence {
             }
 
         // Save XML document
-        // - always store form data as "data.xml"
-        // - also pass a "valid" argument with whether the data was valid
         def saveData() =
             sendThrowOnError("fr-create-update-submission", Map(
                 "holder"   → Some(data.rootElement),

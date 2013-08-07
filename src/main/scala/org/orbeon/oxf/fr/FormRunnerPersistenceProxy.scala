@@ -136,7 +136,7 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
     private def proxyPublishedFormsMetadata(request: Request, response: Response, app: Option[String], form: Option[String], path: String): Unit = {
         val propertySet = Properties.instance.getPropertySet
 
-        // TODO: Use new property that determines active providers.
+        // TODO: Use new property that determines active providers; see issue [#1186](http://goo.gl/IskU63)
         val providers = {
             val providersPrefix = "oxf.fr.persistence.provider"
             val properties = (app, form) match {

@@ -62,7 +62,7 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
             case DataPath(path, app, form, _, _, _)        ⇒ proxyRequest(request, response, app, form, "data", path)
             case DataCollectionPath(path, app, form)       ⇒ proxyRequest(request, response, app, form, "data", path)
             case SearchPath(path, app, form)               ⇒ proxyRequest(request, response, app, form, "data", path)
-            case PublishedFormsMetadataPath(path, _, _, _) ⇒ proxyPublishedFormsMetadata(request, response, path)
+            case PublishedFormsMetadataPath(path, app, _, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
             case _ ⇒ throw new OXFException("Unsupported path: " + incomingPath)
         }
     }
@@ -133,13 +133,20 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
      * Proxies the request to every configured persistence layer to get the list of the forms,
      * and aggregates the results.
      */
-    private def proxyPublishedFormsMetadata(request: Request, response: Response, path: String): Unit = {
+    private def proxyPublishedFormsMetadata(request: Request, response: Response, app: Option[String], form: Option[String], path: String): Unit = {
         val propertySet = Properties.instance.getPropertySet
 
         // TODO: Use new property that determines active providers.
         val providers = {
-            // All the oxf.fr.persistence.provider.*.*.form properties, removing the data-only mappings
-            val properties = propertySet propertiesStartsWith "oxf.fr.persistence.provider" filterNot (_ endsWith ".data")
+            val providersPrefix = "oxf.fr.persistence.provider"
+            val properties = (app, form) match {
+                case (Some(appName), Some(formName)) ⇒
+                    // Get the specific provider for this app/form
+                    Seq(providersPrefix + "." + appName + "." + formName + ".form")
+                case _ ⇒
+                    // Get all the oxf.fr.persistence.provider.*.*.form properties
+                    propertySet.propertiesStartsWith("oxf.fr.persistence.provider").filterNot(_ endsWith ".data")
+            }
             // Value of the property is the name of a provider, e.g. oracle-finance, oracle-hr
             properties map propertySet.getString distinct
         }

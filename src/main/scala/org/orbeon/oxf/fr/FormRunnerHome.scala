@@ -55,10 +55,11 @@ trait FormRunnerHome {
         }
     }
 
-    private def filterForms(forms: SequenceIterator, p: NodeInfo ⇒ Boolean = _ ⇒ true) =
-        asScalaIterator(forms) collect {
-            case form: NodeInfo if p(form) ⇒ Form(form)
-        }
+    private def collectNodes(forms: SequenceIterator) =
+        asScalaIterator(forms) collect { case form: NodeInfo ⇒ form }
+
+    private def collectForms(forms: SequenceIterator, p: NodeInfo ⇒ Boolean = _ ⇒ true) =
+        asScalaIterator(forms) collect { case form: NodeInfo if p(form) ⇒ Form(form) }
 
     private def formsForSelection(selection: String, forms: SequenceIterator) = {
 
@@ -67,7 +68,7 @@ trait FormRunnerHome {
         def formIsSelected(form: NodeInfo) =
             appFormsSet((form / "application-name" stringValue) → (form / "form-name" stringValue))
 
-        filterForms(forms, formIsSelected)
+        collectForms(forms, formIsSelected)
     }
     
     def isLocal(form: NodeInfo)  = Form(form).local.isDefined
@@ -83,22 +84,22 @@ trait FormRunnerHome {
     def isRemoteNewer(form: NodeInfo) = Form(form).isRemoteNewer
 
     def canSelectUnpublishedLocal(selection: String, forms: SequenceIterator) =
-        filterForms(forms) exists (_.isLocalUnavailable)
+        collectForms(forms) exists (_.isLocalUnavailable)
 
     def canSelectPublishedLocal(selection: String, forms: SequenceIterator) =
-        filterForms(forms) exists (_.isLocalAvailable)
+        collectForms(forms) exists (_.isLocalAvailable)
 
     def canSelectUnpublishedRemote(selection: String, forms: SequenceIterator) =
-        filterForms(forms) exists (_.isRemoteUnavailable)
+        collectForms(forms) exists (_.isRemoteUnavailable)
 
     def canSelectPublishedRemote(selection: String, forms: SequenceIterator) =
-        filterForms(forms) exists (_.isRemoteAvailable)
+        collectForms(forms) exists (_.isRemoteAvailable)
 
     def canSelectLocalNewer(selection: String, forms: SequenceIterator) =
-        filterForms(forms) exists (_.isLocalNewer)
+        collectForms(forms) exists (_.isLocalNewer)
 
     def canSelectRemoteNewer(selection: String, forms: SequenceIterator) =
-        filterForms(forms) exists (_.isRemoteNewer)
+        collectForms(forms) exists (_.isRemoteNewer)
 
     def canPublishLocal(selection: String, forms: SequenceIterator) =
         formsForSelection(selection, forms) forall (_.isLocalUnavailable)

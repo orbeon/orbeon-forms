@@ -35,7 +35,14 @@
         <!-- FR Home page XForms model -->
         <xf:model id="fr-form-model" xxf:xpath-analysis="true">
 
-            <xf:var name="production-server-uri" value="frf:dropTrailingSlash(normalize-space(xxf:property('oxf.fr.production-server-uri')))"/>
+            <!-- Read and normalize property only if we are the PE version -->
+            <xf:var
+                xmlns:version="java:org.orbeon.oxf.common.Version"
+                name="production-server-uri"
+                value="if (version:isPE())
+                       then for $p in frf:dropTrailingSlash(normalize-space(xxf:property('oxf.fr.production-server-uri')))
+                            return if ($p) then $p else ()
+                       else ()"/>
 
             <!-- Entry point -->
             <xf:action event="xforms-ready fr-initialize">
@@ -57,9 +64,15 @@
             <xf:instance id="fr-form-instance">
                 <ui>
                     <selection/>
+
                     <error/>
-                    <any-has-admin/>
-                    <any-has-remote-admin/>
+
+                    <initializing>true</initializing>
+                    <remote-successful>false</remote-successful>
+                    <any-has-admin-permission/>
+                    <!-- NOTE: At this point, we don't have information about the remote forms permissions. So we just
+                         assume that we have the same permission that we have local forms. -->
+                    <!--<any-has-remote-admin-permission/>-->
 
                     <local-unpublish-action/>
                     <local-publish-action/>
@@ -82,17 +95,18 @@
                 </ui>
             </xf:instance>
 
-            <xf:var name="any-has-admin"        value="any-has-admin = 'true'"/>
-            <xf:var name="any-has-remote-admin" value="any-has-remote-admin = 'true'"/>
+            <xf:var name="selection"                value="xxf:split(selection)"/>
+            <xf:var name="any-has-admin-permission" value="any-has-admin-permission = 'true'"/>
+            <xf:var name="remote-successful"        value="remote-successful = 'true'"/>
 
             <!-- Binds for admin tasks -->
-            <xf:bind ref="instance('fr-form-instance')[$any-has-admin]">
-                <xf:bind ref="local-unpublish-action"  readonly="not(normalize-space(../selection) and frf:canUnpublishLocal(../selection, $forms))"/>
-                <xf:bind ref="local-publish-action"    readonly="not(normalize-space(../selection) and frf:canPublishLocal(../selection, $forms))"/>
-                <xf:bind ref="remote-unpublish-action" readonly="not(normalize-space(../selection) and frf:canUnpublishRemote(../selection, $forms))"/>
-                <xf:bind ref="remote-publish-action"   readonly="not(normalize-space(../selection) and frf:canPublishRemote(../selection, $forms))"/>
-                <xf:bind ref="local-to-remote-action"  readonly="not(normalize-space(../selection) and frf:canPublishLocalToRemote(../selection, $forms))"/>
-                <xf:bind ref="remote-to-local-action"  readonly="not(normalize-space(../selection) and frf:canPublishRemoteToLocal(../selection, $forms))"/>
+            <xf:bind ref="instance('fr-form-instance')[$any-has-admin-permission]">
+                <xf:bind ref="local-unpublish-action"  readonly="not(exists($selection) and frf:canUnpublishLocal(../selection, $forms))"/>
+                <xf:bind ref="local-publish-action"    readonly="not(exists($selection) and frf:canPublishLocal(../selection, $forms))"/>
+                <xf:bind ref="remote-unpublish-action" readonly="not(exists($selection) and frf:canUnpublishRemote(../selection, $forms))"/>
+                <xf:bind ref="remote-publish-action"   readonly="not(exists($selection) and frf:canPublishRemote(../selection, $forms))"/>
+                <xf:bind ref="local-to-remote-action"  readonly="not($remote-successful and exists($selection) and frf:canPublishLocalToRemote(../selection, $forms))"/>
+                <xf:bind ref="remote-to-local-action"  readonly="not(exists($selection) and frf:canPublishRemoteToLocal(../selection, $forms))"/>
                 <xf:bind ref="summary-action"          readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateSummary(../selection, $forms))"/>
                 <xf:bind ref="new-action"              readonly="not(count(xxf:split(../selection)) = 1 and frf:canNavigateNew(../selection, $forms))"/>
                 
@@ -124,6 +138,7 @@
                 replace="instance"
                 targetref="instance('fr-metadata-local')">
                 <xf:delete event="xforms-submit" ref="instance('fr-metadata-local')/node()"/>
+                <xf:setvalue event="xforms-submit-done" ref="instance()/initializing">false</xf:setvalue>
             </xf:submission>
 
             <xf:submission
@@ -136,6 +151,7 @@
                 replace="instance"
                 targetref="instance('fr-metadata-remote')">
                 <xf:delete event="xforms-submit" ref="instance('fr-metadata-remote')/node()"/>
+                <xf:setvalue event="xforms-submit-done" ref="instance()/remote-successful">true</xf:setvalue>
             </xf:submission>
 
             <xf:action event="store-credentials" type="xpath">
@@ -147,15 +163,17 @@
 
                 <xf:delete ref="instance('fr-metadata')/*"/>
 
+                <xf:var name="temp" value="xxf:element('forms')"/>
+
                 <!-- Insert local data -->
-                <xf:insert context="instance('fr-metadata')" origin="instance('fr-metadata-local')/*"/>
+                <xf:insert context="$temp" origin="instance('fr-metadata-local')/*"/>
                 <xf:delete ref="instance('fr-metadata-local')/*"/>
 
                 <!-- Join remote data if present -->
                 <xf:action iterate="instance('fr-metadata-remote')/*">
 
                     <xf:var name="remote" value="."/>
-                    <xf:var name="local"  value="instance('fr-metadata')/*[application-name = $remote/application-name and form-name = $remote/form-name]"/>
+                    <xf:var name="local"  value="$temp/*[application-name = $remote/application-name and form-name = $remote/form-name]"/>
 
                     <xf:var
                         name="remote-elements"
@@ -171,7 +189,7 @@
 
                     <xf:insert
                         if="empty($local)"
-                        context="instance('fr-metadata')"
+                        context="$temp"
                         ref="*"
                         origin="xxf:element('form', ($remote/application-name, $remote/form-name, $remote-elements))"/>
 
@@ -179,7 +197,7 @@
                 <xf:delete ref="instance('fr-metadata-remote')/*"/>
 
                 <!-- Annotate with permissions and remove -->
-                <xf:action iterate="instance('fr-metadata')/form">
+                <xf:action iterate="$temp/form">
 
                     <xf:var
                         name="has-admin-permissions"
@@ -215,12 +233,15 @@
                         ref="."/>
                 </xf:action>
 
+                <xf:insert
+                    context="instance('fr-metadata')"
+                    origin="xxf:sort($temp/form, if (last-modified-time) then xs:dateTime(last-modified-time) else xs:dateTime(remote-last-modified-time), 'text', 'descending')"/>
+
                 <!-- Only show admin ops column if at least one form has op -->
                 <xf:var name="has-admin"        value="saxon:expression('xxf:split(@operations) = ''admin''')"/>
                 <xf:var name="has-remote-admin" value="saxon:expression('exists(remote-last-modified-time)')"/>
 
-                <xf:setvalue ref="instance()/any-has-admin"        value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
-                <xf:setvalue ref="instance()/any-has-remote-admin" value="instance()/any-has-admin = true() and xxf:exists(instance('fr-metadata')/form, $has-remote-admin)"/>
+                <xf:setvalue ref="instance()/any-has-admin-permission" value="xxf:exists(instance('fr-metadata')/form, $has-admin)"/>
             </xf:action>
 
             <xf:instance id="fr-remote-metadata"><forms/></xf:instance>
@@ -242,7 +263,7 @@
                 <xf:property name="message"
                              value="xxf:format-message($fr-resources/home/messages/publish-confirmation, (
                                         if (event('xxf:type') = ('confirm-local-unpublish', 'confirm-remote-unpublish')) then 1 else 0,
-                                        count(xxf:split(selection))
+                                        count($selection)
                                     ))"/>
             </xxf:show>
 
@@ -255,7 +276,7 @@
                 <xf:var name="force-attachments"   value="event('xxf:type') = ('local-to-remote', 'remote-to-local')"/>
                 <!-- Iterate until there is an error -->
                 <xf:setvalue ref="error"/>
-                <xf:action iterate="xxf:split(selection)" if="instance()/error = ''">
+                <xf:action iterate="$selection" if="instance()/error = ''">
 
                     <xf:var name="app"  value="xxf:split(., '/')[1]"/>
                     <xf:var name="form" value="xxf:split(., '/')[2]"/>
@@ -330,12 +351,13 @@
         <fr:view fluid="true">
             <fr:navbar/>
             <fr:row>
-                <xf:group ref=".[empty($forms)]">
+                <!-- Make sure not to show during initialization otherwise the alert appears at the top behind the modal dialog -->
+                <xf:group ref=".[empty($forms) and instance()/initializing = 'false']">
                     <xf:output class="alert" value="$fr-resources/home/messages/no-forms"/>
                 </xf:group>
                 <xf:group ref=".[exists($forms)]">
 
-                    <xf:group ref=".[$any-has-admin]" class="btn-toolbar" xmlns="http://www.w3.org/1999/xhtml" xxf:element="div">
+                    <xf:group ref=".[$any-has-admin-permission]" class="btn-toolbar" xmlns="http://www.w3.org/1999/xhtml" xxf:element="div">
                         <div class="btn-group">
 
                             <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -441,13 +463,13 @@
                                 <li class="{if (xxf:readonly(summary-action)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="summary-action" id="fr-summary-button">
                                         <xf:label ref="$fr-resources/home/buttons/navigate-summary"/>
-                                        <xf:load event="DOMActivate" resource="/fr/{xxf:split(instance()/selection, '/')[1]}/{xxf:split(instance()/selection, '/')[2]}/summary"/>
+                                        <xf:load event="DOMActivate" resource="/fr/{xxf:split($selection[1], '/')[1]}/{xxf:split($selection[1], '/')[2]}/summary"/>
                                     </xf:trigger>
                                 </li>
                                 <li class="{if (xxf:readonly(new-action)) then 'disabled' else ()}">
                                     <xf:trigger appearance="minimal" ref="summary-action" id="fr-new-button">
                                         <xf:label ref="$fr-resources/home/buttons/navigate-new"/>
-                                        <xf:load event="DOMActivate" resource="/fr/{xxf:split(instance()/selection, '/')[1]}/{xxf:split(instance()/selection, '/')[2]}/new"/>
+                                        <xf:load event="DOMActivate" resource="/fr/{xxf:split($selection[1], '/')[1]}/{xxf:split($selection[1], '/')[2]}/new"/>
                                     </xf:trigger>
                                 </li>
                             </ul>
@@ -461,19 +483,19 @@
 
                     <xh:table class="table table-bordered table-condensed table-striped table-hover">
                         <xh:thead>
-                            <xf:group ref=".[$any-has-remote-admin]">
+                            <xf:group ref=".[$remote-successful]">
                                 <xh:th/>
                                 <xh:th colspan="2"><xf:output value="$fr-resources/home/titles/local"/></xh:th>
                                 <xh:th colspan="2"><xf:output value="$fr-resources/home/titles/remote"/></xh:th>
                                 <xh:th colspan="3"><xf:output value="$fr-resources/home/titles/form-identification"/></xh:th>
                             </xf:group>
                             <xh:tr>
-                                <xf:group ref=".[$any-has-admin]">
+                                <xf:group ref=".[$any-has-admin-permission]">
                                     <xh:th/>
                                     <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                 </xf:group>
                                 <xh:th><xf:output value="$fr-resources/home/titles/last-modified"/></xh:th>
-                                <xf:group ref=".[$any-has-remote-admin]">
+                                <xf:group ref=".[$remote-successful]">
                                     <xh:th><xf:output value="$fr-resources/home/titles/status"/></xh:th>
                                     <xh:th><xf:output value="$fr-resources/home/titles/last-modified"/></xh:th>
                                 </xf:group>
@@ -496,7 +518,7 @@
                                                                            then concat('/fr/', application-name, '/', form-name, '/', if ($can-navigate-summary) then 'summary' else 'new')
                                                                            else ()"/>
                                 <xh:tr>
-                                    <xf:group ref=".[$any-has-admin]">
+                                    <xf:group ref=".[$any-has-admin-permission]">
                                         <xh:td class="fr-home-select">
                                             <xf:select
                                                 appearance="full"
@@ -535,7 +557,7 @@
                                                             then format-dateTime($v, $fr-resources/common/formats/day-this-year, xxf:lang(), (), ())
                                                             else format-dateTime($v, $fr-resources/common/formats/short-date, xxf:lang(), (), ())"/>
                                     </xh:td>
-                                    <xf:group ref=".[$any-has-remote-admin]">
+                                    <xf:group ref=".[$remote-successful]">
                                         <xh:td class="fr-home-status">
                                             <xf:output
                                                 ref=".[$ops = 'admin' and ($remote-available or $remote-unavailable)]"

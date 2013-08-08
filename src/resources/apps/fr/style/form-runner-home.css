@@ -80,7 +80,8 @@
 .fr-plain-checkbox-container label .label {
   vertical-align: middle;
 }
-.orbeon .row .alert {
+.orbeon .row .alert,
+.orbeon .row-fluid .alert {
   display: block;
   margin: 0;
 }

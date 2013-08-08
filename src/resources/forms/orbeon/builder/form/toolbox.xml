@@ -57,7 +57,7 @@
                 </xf:action>
             </xf:trigger>
             <!-- Reload components -->
-            <xf:trigger appearance="minimal" class="fb-reload-components-trigger">
+            <xf:trigger appearance="minimal" class="fb-reload-components-trigger" xxf:modal="true">
                 <xf:label>
                     <xh:img src="/apps/fr/style/images/silk/arrow_refresh_small.png" alt="{$form-resources/reload-components/label}" title="{$form-resources/reload-components/label}"/>
                 </xf:label>

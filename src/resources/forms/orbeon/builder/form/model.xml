@@ -409,7 +409,7 @@
     <xf:submission id="fb-load-toolbox" serialization="none"
                        method="get" resource="/fr/service/custom/orbeon/builder/toolbox?application={event('app')}&amp;form={event('form')}"
                        replace="instance" instance="fb-components-instance"
-                       xxf:readonly="true" xxf:cache="true">>
+                       xxf:readonly="true" xxf:cache="true">
 
         <!-- Annotate form when the toolbox is loaded. This is needed to ensure the XBL for section templates is updated.
              NOTE: The data in fr-form-instance must be up to date! -->

@@ -5363,8 +5363,8 @@
         </select>
         <dialog-form-settings>
             <label>Lomakeasetukset</label>
-            <save-as>Tallenna nimellä…</save-as>
-            <open><label>[Form settings]</label></open>
+            <save-as>Tallenna nimellä</save-as>
+            <open><label>Lomakeasetukset</label></open>
             <stats>Lomatilastot</stats>
             <sections>Lohkot</sections>
             <repeats>Toistot</repeats>
@@ -5375,10 +5375,10 @@
         </dialog-form-settings>
         <dialog-control-details>
             <label>Kontrolliyksityiskohdat</label>
-            <tab-base><label>[Basic Settings]</label></tab-base>
-            <tab-validations><label>[Validations and Alerts]</label></tab-validations>
-            <tab-formulas><label>[Formulas]</label></tab-formulas>
-            <tab-help><label>[Help Message]</label></tab-help>
+            <tab-base><label>Perusasetukset</label></tab-base>
+            <tab-validations><label>Vahvistukset ja hälytykset</label></tab-validations>
+            <tab-formulas><label>Kaavat</label></tab-formulas>
+            <tab-help><label>Ohjeviesti</label></tab-help>
             <control-name>
                 <label>Kontrollin nimi</label>
                 <alert>Nimi on virheellinen tai se on jo käytössä</alert>
@@ -5459,7 +5459,7 @@
                         <type label="Päivä">gDay</type>
                     </choices>
                     <choices>
-                        <label>[XML Types]</label>
+                        <label>XML-tyypit</label>
                         <type label="">normalizedString</type>
                         <type label="">token</type>
                         <type label="">language</type>
@@ -5534,18 +5534,18 @@
                 <hint>Viesti näytetään, kun kontrollidata on väärää tai puuttuu</hint>
             </alert>
             <default-alert>
-                <label>[Default alert message]</label>
-                <hint>[Active when there is not a more specific alert message]</hint>
+                <label>Oletushälytysviesti</label>
+                <hint>Näytetään tilanteissa joissa ei ole tarkempaa hälytysviestiä</hint>
             </default-alert>
             <use-global-alert>
-                <label>[Use global default alert message]</label>
+                <label>Käytä yleistä oletushälytysviestiä</label>
             </use-global-alert>
             <use-default-alert>
-                <label>[Use default alert message]</label>
+                <label>Käytä oletushälytysviestiä</label>
             </use-default-alert>
-            <validation-type><label>[Validation Type]</label></validation-type>
-            <validation-details><label>V[alidation Details]</label></validation-details>
-            <level><label>[Level]</label></level>
+            <validation-type><label>Vahvistamisen tyyppi</label></validation-type>
+            <validation-details><label>Vahvistamisen tiedot</label></validation-details>
+            <level><label>Taso</label></level>
         </dialog-control-details>
         <dialog-section-details>
             <label>Lohkon yksityiskohdat</label>
@@ -5916,14 +5916,14 @@
             <message>
                 <div>
                     <p>Tämä toiminto on saatavilla vain Orbeon-lomakkeiden PE-versiossa.</p>
-                    <p>[For more information, please visit the <a href="http://www.orbeon.com/download" target="_blank">Orbeon web site</a>.]</p>
+                    <p>Lisätietoa löydät <a href="http://www.orbeon.com/download" target="_blank">Orbeon www-sivuilta</a>.</p>
                 </div>
             </message>
         </dialog-pe>
         <dialog-custom-xml>
             <label>Mukauta XML</label>
             <mode-label>Käyttäjien lisäämä informaatio säilötään XML-dokumentissa:</mode-label>
-            <mode-automatic>Anna Form Builderin generoida XML minu varten</mode-automatic>
+            <mode-automatic>Anna Form Builderin generoida XML minua varten</mode-automatic>
             <mode-custom>Hankin mukautetun XML-dokumentin</mode-custom>
         </dialog-custom-xml>
         <dialog-permissions>
@@ -5933,11 +5933,11 @@
             <permissions>Käyttöoikeudet</permissions>
             <operations>Operaatiot</operations>
             <anyone>Kuka tahansa</anyone>
-            <owner>[Owner]</owner>
-            <group-members>[Group members]</group-members>
-            <create>[Create]</create>
-            <read>[Read]</read>
-            <update>[Update]</update>
+            <owner>Omistaja</owner>
+            <group-members>Ryhmän jäsenet</group-members>
+            <create>Luo</create>
+            <read>Lue</read>
+            <update>Päivitä</update>
             <delete>Poista</delete>
         </dialog-permissions>
         <!-- Messages -->
@@ -5950,7 +5950,7 @@
             <delete-resources>Haluatko varmasti poistaa kaikki kieliä varten olevat resurssit?</delete-resources>
             <delete-service>Haluatko varmasti poistaa palvelun</delete-service>
             <delete-action>Haluatko varmasti poistaa toiminnon</delete-action>
-            <controls-will-be-deleted>[{0,choice,0#No controls|1#1 control|1&lt;{0,number,integer} controls} will be deleted.]</controls-will-be-deleted>
+            <controls-will-be-deleted>{0,choice,0#Ei ohjaimia|1#1 ohjain|1&lt;{0,number,integer} ohjainta} poistetaan.</controls-will-be-deleted>
             <publish-form>Haluatko varmasti julkaista tämän lomakkeen? Tämä teko syrjäyttää olemassaolevan lomakkeen seuraavilla ominaisuuksilla:</publish-form>
             <publish-success>Lomake julkaistiin onnistuneesti. {0,choice,0#Liitteitä ei julkaistu|1#1 liite julkaistiin|1&lt;{0,number,integer} liitettä julkaistiin}.</publish-success>
             <publish-error>Lomaketta julkaistaessa ilmeni virhe.</publish-error>
@@ -5958,8 +5958,8 @@
             <new-metadata-output>Ole hyvä ja toimita sovelluksen sekä lomakkeesi nimi. Näitä tietoja käytetään lomakkeesi tunnistamiseen (voit muuttaa näitä myöhemmin):</new-metadata-output>
             <edit-metadata-output/>
             <save-as-metadata-output>Syötä uusi nimi sekä sovellukselle että lomakkeelle. Näitä käytetään tämän lomakkeen kopiota varten:</save-as-metadata-output>
-            <xpath-errors>[There {0,choice,1#is one XPath error|1&lt;are {0,number,integer} XPath errors} in your form.]</xpath-errors>
-            <lhha-checkbox>[Mark this checkbox if you'd like to type HTML tags]</lhha-checkbox>
+            <xpath-errors>Lomakkeestasi löytyi {0,choice,1#yksi XPath virhe|1&lt; {0,number,integer} XPath virhettä}.</xpath-errors>
+            <lhha-checkbox>Merkkaa tämä valintaruutu jos haluat kirjoittaa HTML-tageja</lhha-checkbox>
         </messages>
         <template>
             <untitled-form>Nimetön lomake</untitled-form>

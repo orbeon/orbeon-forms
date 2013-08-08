@@ -99,6 +99,11 @@
                             <month>Month</month>
                             <day>Day</day>
                         </resource>
+						<resource xml:lang="fi">
+                            <year>Vuosi</year>
+                            <month>Kuukausi</month>
+                            <day>Päivä</day>
+                        </resource>
                         <resource xml:lang="fr">
                             <year>Année</year>
                             <month>Mois</month>

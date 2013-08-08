@@ -61,7 +61,7 @@
                 <xf:instance id="orbeon-resources" xxf:readonly="true">
                     <resources>
                         <resource xml:lang="en"><download>Download</download></resource>
-                        <resource xml:lang="fi"><download>[Download]</download></resource>
+                        <resource xml:lang="fi"><download>Lataa</download></resource>
                         <resource xml:lang="fr"><download>Télécharger</download></resource>
                         <resource xml:lang="de"><download>Herunterladen</download></resource>
                         <resource xml:lang="it"><download>Scaricare</download></resource>

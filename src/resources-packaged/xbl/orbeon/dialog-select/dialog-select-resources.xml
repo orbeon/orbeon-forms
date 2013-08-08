@@ -22,6 +22,16 @@
         <add>Add</add>
         <remove>Remove</remove>
     </resource>
+	<resource xml:lang="fi">
+        <select>...</select>
+        <title>Valinta</title>
+        <available>Vapaa</available>
+        <selected>Valittu</selected>
+        <confirm>Vahvista</confirm>
+        <cancel>Keskeytä</cancel>
+        <add>Lisää</add>
+        <remove>Poista</remove>
+    </resource>
     <resource xml:lang="fr">
         <select>...</select>
         <title>Sélection</title>

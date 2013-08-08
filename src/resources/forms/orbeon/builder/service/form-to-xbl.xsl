@@ -114,21 +114,8 @@
         <xsl:attribute name="{name()}" select="concat('if ($fr-mode = (''new'', ''test'')) then (', ., ') else .')"/>
     </xsl:template>
 
-    <!-- When copying actions, update references to instance and resources -->
-    <xsl:template match="xf:setvalue/@ref[starts-with(., 'instance(''fr-form-instance'')/*')] |
-                         xf:setvalue/@value[starts-with(., 'instance(''fr-form-instance'')/*')]" mode="filter-actions">
-        <xsl:attribute name="{name()}" select="concat('instance(''fr-form-instance'')', substring-after(., 'instance(''fr-form-instance'')/*'))"/>
-    </xsl:template>
-    <xsl:template match="xxf:variable[@name = 'control-resources'] | xf:var[@name = 'control-resources']" mode="filter-actions">
-        <!-- Original is `$fr-form-resources` -->
-        <!-- NOTE: We duplicate the logic to access current resources, which is not optimal. This could be fixed with
-             `xf:function`, or by using a `xxf:resource()` to access localized resources.
-             See also: https://github.com/orbeon/orbeon-forms/issues/932 -->
-        <xf:var name="control-resources"
-                value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]/*[name() = $control-name]"/>
-    </xsl:template>
-
     <!-- When copying actions, update references to xforms-ready and fr-form-model -->
+    <!-- The action implementation is handled in actions.xsl. -->
     <xsl:template match="@*:event[p:split() = 'xforms-ready']" mode="filter-actions">
         <xsl:attribute name="{name(.)}" select="(fr:value-except(p:split(), 'xforms-ready'), 'xforms-model-construct-done')"/>
     </xsl:template>

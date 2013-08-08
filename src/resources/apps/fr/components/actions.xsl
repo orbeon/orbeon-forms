@@ -33,20 +33,39 @@
         do not contain an implementation of the actions and only the parameters are present. See also:
 
          - annotate.xpl
+         - form-to-xbl.xsl
          - https://github.com/orbeon/orbeon-forms/issues/1019
      -->
 
-    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
+    <!-- Gather top-level model as well as models within section templates -->
+    <xsl:variable
+        name="action-models-ids"
+        select="$fr-form-model-id, /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
+
+    <!-- Whether $context is within a section template -->
+    <xsl:function name="fr:in-section-template" as="xs:string">
+        <xsl:param name="context" as="element()"/>
+        <xsl:value-of select="exists($context/ancestor::xbl:implementation)"/>
+    </xsl:function>
+
+    <!-- The path is different depending on whether we are within a section template or not.
+         See https://github.com/orbeon/orbeon-forms/issues/1190 -->
+    <xsl:function name="fr:instance-path" as="xs:string">
+        <xsl:param name="context" as="element()"/>
+        <xsl:value-of select="concat('instance(''fr-form-instance'')/', if (fr:in-section-template($context)) then '' else '*/')"/>
+    </xsl:function>
+
+    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-service-value-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'path')]"/>
             <!-- Set value -->
-            <xf:setvalue ref="$path" value="instance('fr-form-instance')/*/*[name() = $control-name]"/>
+            <xf:setvalue ref="$path" value="{fr:instance-path(.)}*[name() = $control-name]"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
+    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-database-service-value-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
@@ -54,27 +73,38 @@
             <!-- Set value and escape single quotes -->
             <xf:setvalue xmlns:sql="http://orbeon.org/oxf/xml/sql"
                          ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                         value="concat('''', replace(instance('fr-form-instance')/*/*[name() = $control-name], '''', ''''''), '''')"/>
+                         value="concat('''', replace({{fr:instance-path(.)}}*[name() = $control-name], '''', ''''''), '''')"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
+    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-set-control-value-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'control-value')]"/>
             <!-- Set value -->
-            <xf:setvalue ref="instance('fr-form-instance')/*/*[name() = $control-name]" value="$control-value"/>
+            <xf:setvalue ref="{fr:instance-path(.)}*[name() = $control-name]" value="$control-value"/>
         </xsl:copy>
     </xsl:template>
 
-    <xsl:template match="/xh:html/xh:head/xf:model[generate-id() = $fr-form-model-id]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
+    <xsl:template match="/xh:html/xh:head//xf:model[generate-id() = $action-models-ids]/xf:action[ends-with(@id, '-binding')]//xf:action[p:has-class('fr-itemset-action')]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]"/>
             <!-- Set itemset -->
-            <xf:var name="control-resources" model="fr-resources-model" value="$fr-form-resources/*[name() = $control-name]"/>
+            <xsl:choose>
+                <xsl:when test="fr:in-section-template(.)">
+                    <!-- NOTE: We duplicate the logic to access current resources, which is not optimal.
+                         See also: https://github.com/orbeon/orbeon-forms/issues/932 -->
+                    <xf:var name="control-resources"
+                            value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]/*[name() = $control-name]"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xf:var name="control-resources" model="fr-resources-model" value="$fr-form-resources/*[name() = $control-name]"/>
+                </xsl:otherwise>
+            </xsl:choose>
+
             <xf:delete ref="$control-resources/item"/>
             <xf:action iterate="$response-items">
                 <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/@value}"/>

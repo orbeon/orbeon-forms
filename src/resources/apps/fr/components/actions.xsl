@@ -49,7 +49,7 @@
     </xsl:function>
 
     <!-- The path is different depending on whether we are within a section template or not.
-         See https://github.com/orbeon/orbeon-forms/issues/1190 -->
+         See: https://github.com/orbeon/orbeon-forms/issues/1190 -->
     <xsl:function name="fr:instance-path" as="xs:string">
         <xsl:param name="context" as="element()"/>
         <xsl:value-of select="concat('instance(''fr-form-instance'')/', if (fr:in-section-template($context)) then '' else '*/')"/>
@@ -93,25 +93,33 @@
             <!-- Keep parameters but override implementation  -->
             <xsl:apply-templates select="(*:variable | *:var)[@name = ('control-name', 'response-items')]"/>
             <!-- Set itemset -->
-            <xsl:choose>
-                <xsl:when test="fr:in-section-template(.)">
-                    <!-- NOTE: We duplicate the logic to access current resources, which is not optimal.
-                         See also: https://github.com/orbeon/orbeon-forms/issues/932 -->
-                    <xf:var name="control-resources"
-                            value="instance('fr-form-resources')/(resource[@xml:lang = xxf:instance('fr-language-instance')], resource[1])[1]/*[name() = $control-name]"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xf:var name="control-resources" model="fr-resources-model" value="$fr-form-resources/*[name() = $control-name]"/>
-                </xsl:otherwise>
-            </xsl:choose>
 
-            <xf:delete ref="$control-resources/item"/>
+            <!-- Find resource container for all languages, as we are not yet able to handle an internationalized
+                 service response. See: https://github.com/orbeon/orbeon-forms/issues/691 -->
+            <xf:var name="resource-holders"
+                    value="xxf:instance('fr-form-resources')/resource/*[name() = $control-name]"/>
+
+            <xf:delete ref="$resource-holders/item"/>
+
+            <!-- First language -->
+            <!-- PERF: Optimize this in a single insert. -->
             <xf:action iterate="$response-items">
                 <xf:var name="item-label" value="{.//(*:variable | *:var)[@name = ('item-label')]/@value}"/>
                 <xf:var name="item-value" value="{.//(*:variable | *:var)[@name = ('item-value')]/@value}"/>
-                <xf:insert ref="$control-resources/*"
-                           origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
+                <xf:insert
+                    context="$resource-holders[1]"
+                    ref="*"
+                    origin="xxf:element('item', (xxf:element('label', xs:string($item-label)), xxf:element('value', xs:string($item-value))))"/>
             </xf:action>
+
+            <!-- Other languages -->
+            <xf:action iterate="$resource-holders[position() gt 1]">
+                <xf:insert
+                    context="."
+                    ref="*"
+                    origin="$resource-holders[1]/item"/>
+            </xf:action>
+
             <!-- Filter item values that are out of range -->
             <!-- See: https://github.com/orbeon/orbeon-forms/issues/1019 -->
             <!-- NOTE: We guess whether the control is a select or select1 based on the element name. One exception is
@@ -122,14 +130,14 @@
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
                         ref="$bind"
-                        value="string-join(xxf:split($bind)[. = $control-resources/item/value/string()], ' ')"/>
+                        value="string-join(xxf:split($bind)[. = $resource-holders[1]/item/value/string()], ' ')"/>
                 </xf:action>
             </xf:action>
             <xf:action if="$element-name = ('select1', 'autocomplete') or ends-with($element-name, '-select1')">
                 <xf:action iterate="xxf:bind(concat($control-name, '-bind'))">
                     <xf:var name="bind" value="."/>
                     <xf:setvalue
-                        if="not(string($bind) = $control-resources/item/value)"
+                        if="not(string($bind) = $resource-holders[1]/item/value)"
                         ref="$bind"/>
                 </xf:action>
             </xf:action>

@@ -32,6 +32,7 @@
         <!-- Orbeon Form Builder Component Metadata -->
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dropdown Date</display-name>
+            <display-name lang="es">Calendario Desplegable</display-name>
             <display-name lang="fi">Päivämäärän pudotusvalikko</display-name>
             <display-name lang="fr">Date avec menus</display-name>
             <display-name lang="ru">Дата выпадающим меню</display-name>
@@ -98,6 +99,11 @@
                             <year>Year</year>
                             <month>Month</month>
                             <day>Day</day>
+                        </resource>
+                        <resource xml:lang="es">
+                            <year>Año</year>
+                            <month>Mes</month>
+                            <day>Día</day>
                         </resource>
 						<resource xml:lang="fi">
                             <year>Vuosi</year>

@@ -27,6 +27,7 @@
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Typed Controls</display-name>
+        <display-name lang="es">Controles Tipados</display-name>
         <display-name lang="fi">Kirjoitetut kontrollit</display-name>
         <display-name lang="fr">Contrôles typés</display-name>
         <display-name lang="ru">Типизированные элементы</display-name>
@@ -37,6 +38,7 @@
     <xbl:binding id="fb-input-email" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Email Address</display-name>
+            <display-name lang="es">Email</display-name>
             <display-name lang="fi">Sähköpostiosoite</display-name>
             <display-name lang="fr">Adresse email</display-name>
             <display-name lang="ru">Адрес e-mail</display-name>

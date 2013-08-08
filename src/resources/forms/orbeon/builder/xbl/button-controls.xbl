@@ -27,6 +27,7 @@
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Buttons</display-name>
+        <display-name lang="es">Botones</display-name>
         <display-name lang="fi">Painikkeet</display-name>
         <display-name lang="fr">Boutons</display-name>
         <display-name lang="ru">[Buttons]</display-name>
@@ -37,6 +38,7 @@
     <xbl:binding id="fb-trigger" element="xf|trigger">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Button</display-name>
+            <display-name lang="es">Botón</display-name>
             <display-name lang="fi">Painike</display-name>
             <display-name lang="fr">Bouton</display-name>
             <display-name lang="ru">Кнопка</display-name>
@@ -60,6 +62,7 @@
     <xbl:binding id="fb-trigger-minimal" element="xf|trigger[appearance='minimal']">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Link Button</display-name>
+            <display-name lang="es">Botón Hipervínculo</display-name>
             <display-name lang="fi">Linkitä painike</display-name>
             <display-name lang="fr">Bouton lien</display-name>
             <display-name lang="ru">Кнопка-ссылка</display-name>
@@ -79,50 +82,5 @@
             </template>
         </metadata>
     </xbl:binding>
-
-    <!-- Not considered useful as of 2012-04-12 as the standard button looks good
-    <xbl:binding id="fb-button" element="fr|button">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Standardized Button</display-name>
-            <display-name lang="fi">Standardisoitu painike</display-name>
-            <display-name lang="fr">Bouton standardisé</display-name>
-            <display-name lang="ru">Стандартная кнопка</display-name>
-            <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/button.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/button.png</large-icon>
-            </icon>
-            <template xmlns="">
-                <fr:button id="">
-                    <xf:label ref=""/>
-                    <xf:help ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:alert ref=""/>
-                </fr:button>
-            </template>
-        </metadata>
-    </xbl:binding>
-    -->
-
-    <!-- Not fully working in Form Builder as of 2012-11-09
-    <xbl:binding id="fb-slider" element="xf|range">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Slider</display-name>
-            <display-name lang="fi">Vierityspalkki</display-name>
-            <display-name lang="fr">Curseur</display-name>
-            <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/timeline_marker.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/timeline_marker.png</large-icon>
-            </icon>
-            <template xmlns="">
-                <xf:range id="" ref="" xmlns="">
-                    <xf:label ref=""/>
-                    <xf:hint ref=""/>
-                    <xf:help ref=""/>
-                    <xf:alert ref=""/>
-                </xf:range>
-            </template>
-        </metadata>
-    </xbl:binding>
-    -->
 
 </xbl:xbl>

@@ -27,6 +27,7 @@
 
     <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
         <display-name lang="en">Selection Controls</display-name>
+        <display-name lang="es">Controles de Selección</display-name>
         <display-name lang="fi">Valintakontrollit</display-name>
         <display-name lang="fr">Contrôles de sélection</display-name>
         <display-name lang="ru">Элементы выбора</display-name>
@@ -37,6 +38,7 @@
     <xbl:binding id="fb-input-select1-minimal" element="xf|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Dropdown Menu</display-name>
+            <display-name lang="es">Menú Desplegable</display-name>
             <display-name lang="fi">Pudotusvalikko</display-name>
             <display-name lang="fr">Menu déroulant</display-name>
             <display-name lang="ru">Выпадающий список</display-name>
@@ -71,6 +73,7 @@
     <xbl:binding id="fb-input-select1-full" element="xf|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Radio Buttons</display-name>
+            <display-name lang="es">Botones de Opción</display-name>
             <display-name lang="fi">Radiopainikkeet</display-name>
             <display-name lang="fr">Boutons radio</display-name>
             <display-name lang="ru">Радио-кнопки</display-name>
@@ -101,6 +104,7 @@
     <xbl:binding id="fb-input-select-full" element="xf|select">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Checkboxes</display-name>
+            <display-name lang="es">Casillas de Verificación</display-name>
             <display-name lang="fi">Valintaruudut</display-name>
             <display-name lang="fr">Cases à cocher</display-name>
             <display-name lang="ru">Галочки</display-name>
@@ -131,6 +135,7 @@
     <xbl:binding id="fb-input-select1-compact" element="xf|select1">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Scrollable List</display-name>
+            <display-name lang="es">Lista Desplegable</display-name>
             <display-name lang="fi">Vieritettävä lista</display-name>
             <display-name lang="fr">Liste défilante</display-name>
             <display-name lang="ru">Один из контейнера</display-name>
@@ -161,6 +166,7 @@
     <xbl:binding id="fb-input-boolean" element="xf|input">
         <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
             <display-name lang="en">Boolean Input</display-name>
+            <display-name lang="es">Entrada Booleana</display-name>
             <display-name lang="fi">Boolean-syöttäminen</display-name>
             <display-name lang="fr">Champ Booléen</display-name>
             <display-name lang="ru">[Boolean Input]</display-name>
@@ -183,93 +189,5 @@
             </templates>
         </metadata>
     </xbl:binding>
-
-    <!-- Standard HTML control considered harmful as of 2012-07-16 (use fr:box-select instead)
-    <xbl:binding id="fb-input-select-compact" element="xf|select">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Multi List Box</display-name>
-            <display-name lang="fi">Monipudotuslista</display-name>
-            <display-name lang="fr">Liste multiple</display-name>
-            <display-name lang="ru">Несколько из контейнера</display-name>
-            <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/listbox.png</small-icon>
-                <large-icon>/forms/orbeon/builder/images/listbox.png</large-icon>
-            </icon>
-            <editors static-itemset="true"/>
-            <templates>
-                <view>
-                    <xf:select id="" appearance="compact" ref="" xmlns="">
-                        <xf:label ref=""/>
-                        <xf:hint ref=""/>
-                        <xf:help ref=""/>
-                        <xf:alert ref=""/>
-                        <xf:itemset ref="">
-                            <xf:label ref="label"/>
-                            <xf:value ref="value"/>
-                        </xf:itemset>
-                    </xf:select>
-                </view>
-            </templates>
-        </metadata>
-    </xbl:binding>
-    -->
-
-    <!-- Not considered useful as of 2012-04-12 as the trees are on-level only
-    <xbl:binding id="fb-input-select1-tree" element="xf|select1">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Single Selection Tree</display-name>
-            <display-name lang="fi">Yksittäinen valintapuu</display-name>
-            <display-name lang="fr">Arbre sél. simple</display-name>
-            <display-name lang="ru">Один из дерева</display-name>
-            <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
-                <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
-            </icon>
-            <editors static-itemset="true"/>
-            <templates>
-                <view>
-                    <xf:select1 id="" appearance="xxf:tree" ref="" xmlns="">
-                        <xf:label ref=""/>
-                        <xf:hint ref=""/>
-                        <xf:help ref=""/>
-                        <xf:alert ref=""/>
-                        <xf:itemset ref="">
-                            <xf:label ref="label"/>
-                            <xf:value ref="value"/>
-                        </xf:itemset>
-                    </xf:select1>
-                </view>
-            </templates>
-        </metadata>
-    </xbl:binding>
-
-    <xbl:binding id="fb-input-select-tree" element="xf|select">
-        <metadata xmlns="http://orbeon.org/oxf/xml/form-builder">
-            <display-name lang="en">Multi Selection Tree</display-name>
-            <display-name lang="fi">Monivalintapuu</display-name>
-            <display-name lang="fr">Arbre sél. multiple</display-name>
-            <display-name lang="ru">Несколько из дерева</display-name>
-            <icon lang="en">
-                <small-icon>/forms/orbeon/builder/images/tree_mode.gif</small-icon>
-                <large-icon>/forms/orbeon/builder/images/tree_mode.gif</large-icon>
-            </icon>
-            <editors static-itemset="true"/>
-            <templates>
-                <view>
-                    <xf:select id="" appearance="xxf:tree" ref="" xmlns="">
-                        <xf:label ref=""/>
-                        <xf:hint ref=""/>
-                        <xf:help ref=""/>
-                        <xf:alert ref=""/>
-                        <xf:itemset ref="">
-                            <xf:label ref="label"/>
-                            <xf:value ref="value"/>
-                        </xf:itemset>
-                    </xf:select>
-                </view>
-            </templates>
-        </metadata>
-    </xbl:binding>
-    -->
 
 </xbl:xbl>

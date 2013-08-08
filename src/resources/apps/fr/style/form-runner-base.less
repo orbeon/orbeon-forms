@@ -243,10 +243,12 @@
         // Don't show label, help, hint for controls inside a repeat-table which repeats over a single row only (they
         // are shown in the column header). But only do this for the top-level control within a cell.
         &.fr-repeat-single-row {
-            td > .fr-grid-content > * {
-                &> .xforms-label { display: none }
-                &> .xforms-help { display: none }
-                &> .xforms-hint { display: none }
+             td, td > .fb-hover {
+                &> .fr-grid-content > * {
+                    &> .xforms-label { display: none }
+                    &> .xforms-help { display: none }
+                    &> .xforms-hint { display: none }
+                }
             }
         }
 

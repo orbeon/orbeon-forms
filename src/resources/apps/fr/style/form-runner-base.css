@@ -311,13 +311,16 @@
   width: 2em;
   padding: 3px;
 }
-.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-label {
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-label,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-label {
   display: none;
 }
-.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-help {
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-help,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-help {
   display: none;
 }
-.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-hint {
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-hint,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-hint {
   display: none;
 }
 .orbeon .fr-repeat-table tr th .xforms-label {

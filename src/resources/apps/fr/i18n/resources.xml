@@ -1350,7 +1350,7 @@
                 <section-name>Nome della sezione</section-name>
             </labels>
         </components>
-	    <untitled-form>Modulo senza nome</untitled-form>
+        <untitled-form>Modulo senza nome</untitled-form>
         <errors>
             <summary-title>Il suo modulo {1,choice,
                 0#non contiene avvisi|
@@ -1415,7 +1415,7 @@
                 <delete-confirmation>Sei sicuro di volere cancellare uno o più moduli? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
-		        <draft>Bozza</draft>
+                <draft>Bozza</draft>
                 <language-choice>Seleziona lingua</language-choice>
                 <form-choice>Seleziona un modulo</form-choice>
                 <free-search>Ricerca libera</free-search>
@@ -1475,8 +1475,8 @@
                 <submit-dialog-close-window>Chiudi finestra</submit-dialog-close-window>
 
                 <!-- Warning dialog -->
-	                <validation-dialog-review>Recensione</validation-dialog-review>
-	                <validation-dialog-continue>Continua</validation-dialog-continue>
+                <validation-dialog-review>Recensione</validation-dialog-review>
+                <validation-dialog-continue>Continua</validation-dialog-continue>
             </buttons>
             <messages>
                 <save-success>Il documento è stato salvato!</save-success>
@@ -1492,8 +1492,8 @@
                 <validation-dialog-title>Elenco dei messaggi di convalida del modulo</validation-dialog-title>
                 <validation-dialog-message>Il suo modulo {1,choice,
                     0#non contiene avvisi|
-	                1#'{0,choice,0#contiene un errore|1#contiene un avvertimento|2#contiene un avviso|3#contiene un avviso}'|
-	                1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}. È possibile ricontrollare il modulo oppure procedere.</validation-dialog-message>
+                    1#'{0,choice,0#contiene un errore|1#contiene un avvertimento|2#contiene un avviso|3#contiene un avviso}'|
+                    1&lt;contiene {1,number,integer} '{0,choice,0#errori|1#avvertimenti|2#avvisi|3#avvisi}'}. È possibile ricontrollare il modulo oppure procedere.</validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Clickare per aprire il documento. Le informazioni saranno mostrati nel modo in cui erano quando hai salvato il documento.</saved-locally-open>
                 <upload-in-progress>Ci sono operazioni di caricamento in corso. Si prega di provare quando il file è caricato o cancellato completamente.</upload-in-progress>
@@ -1546,9 +1546,8 @@
                         <li>Fai click sul pulsante per aprire che apparirà per confirmare.</li>
                     </ul>
                     <p>
-                        <b>AVVISO:</b> Le dati ancora non sono salvate sul server. Se lo cancelli
-			sarà perso.
-			</p>
+                        <b>AVVISO:</b> Le dati ancora non sono salvate sul server. Se lo cancelli sarà perso.
+                    </p>
                 </div>
             </dialog-body>
         </save-locally>
@@ -1621,7 +1620,7 @@
                 <section-name>Abschnittsname</section-name>
             </labels>
         </components>
-	    <untitled-form>Formular ohne Namen</untitled-form>
+        <untitled-form>Formular ohne Namen</untitled-form>
         <errors>
             <summary-title>Ihr Formular {1,choice,
                 0#enthält keine Hinweise|
@@ -1686,7 +1685,7 @@
                 <delete-confirmation>Sind Sie sicher, dass Sie ein oder mehrere Formulare löschen wollen? [Note that when deleting a saved document, the corresponding drafts are deleted as well.]</delete-confirmation>
             </messages>
             <labels>
-		        <draft>Entwurf</draft>
+                <draft>Entwurf</draft>
                 <language-choice>Sprachauswahl</language-choice>
                 <form-choice>Wählen Sie ein Formular</form-choice>
                 <free-search>Freie Suche</free-search>
@@ -1763,8 +1762,8 @@
                 <validation-dialog-title>Überblick über Meldungen zur Formularvalidierung</validation-dialog-title>
                 <validation-dialog-message>Ihr Formular enthält {1,choice,
                     0#keine Hinweise|
-	                1#'{0,choice,0#einen Fehler|1#eine Warnung|2#einen Hinweis|3#einen Hinweis}'|
-	                1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Hinweise|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
+                    1#'{0,choice,0#einen Fehler|1#eine Warnung|2#einen Hinweis|3#einen Hinweis}'|
+                    1&lt; {1,number,integer} '{0,choice,0#Fehler|1#Warnungen|2#Hinweise|3#Hinweise}'}. Sie können das Formular nochmals überprüfen, oder fortfahren.</validation-dialog-message>
                 <buttons-message/>
                 <saved-locally-open>Klicken Sie hier, um das Dokument zu öffnen. Die Inhalte werden so angezeigt, wie abgespeichert.</saved-locally-open>
                 <upload-in-progress>Es werden im Moment schon Dateien hochgeladen. Bitte versuchen Sie es sobald die Dateien erfolgreich hochgeladen wurden.</upload-in-progress>

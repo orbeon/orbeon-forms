@@ -39,7 +39,7 @@
 
         <fb:metadata>
             <fb:display-name lang="en">Image Annotation</fb:display-name>
-			<fb:display-name lang="fi">Kuvakommentti</fb:display-name>
+            <fb:display-name lang="fi">Kuvakommentti</fb:display-name>
             <fb:display-name lang="fr">Annotation d'image</fb:display-name>
             <fb:display-name lang="ru">[Image Annotation]</fb:display-name>
             <fb:display-name lang="de">Bearbeitbares Bild</fb:display-name>
@@ -84,7 +84,7 @@
                             <canvas-not-supported>To do image annotations, your browser needs to support the HTML5 canvas</canvas-not-supported>
                             <annotated-image>Annotated image</annotated-image>
                         </resource>
-						<resource xml:lang="fi">
+                        <resource xml:lang="fi">
                             <canvas-not-supported>Voidakseni tehdä kuvakommentointia tulee selaimen tukea HTML5:n canvas-elementtiä</canvas-not-supported>
                             <annotated-image>Kommentoitu kuva</annotated-image>
                         </resource>

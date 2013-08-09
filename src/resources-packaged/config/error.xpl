@@ -41,14 +41,14 @@
 
     <!-- Apply theme -->
     <p:processor name="oxf:url-generator">
-		<p:input name="config" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme.error')))"/>
-		<p:output name="data" id="theme"/>
-	</p:processor>
+        <p:input name="config" href="aggregate('config', #request#xpointer(p:property('oxf.epilogue.theme.error')))"/>
+        <p:output name="data" id="theme"/>
+    </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#document"/>
         <p:input name="request" href="#request"/>
-		<p:input name="config" href="#theme"/>
+        <p:input name="config" href="#theme"/>
         <p:output name="data" id="themed"/>
     </p:processor>
 

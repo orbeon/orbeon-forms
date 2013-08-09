@@ -23,7 +23,7 @@
         <xh:title>Test xf:select1 with appearance full and HTML lables</xh:title>
         <xf:model>
             <xf:instance id="main-instance">
-				<drinks only-caffeinated="false">
+                <drinks only-caffeinated="false">
                     <drink id="1">
                         <name>Beer</name>
                         <img>images/beer.png</img>
@@ -59,39 +59,39 @@
                     name: "Test xf:select1 with appearance full and HTML lables",
                     
                     getSelect: function(controlId) {
-					        var control = YAHOO.util.Dom.get(controlId);
-					        return control.getElementsByTagName("select")[0];
-					},
-					
-					testSelect1HTMLInLabels: function() {
-						ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        	// Do nothing
+                            var control = YAHOO.util.Dom.get(controlId);
+                            return control.getElementsByTagName("select")[0];
+                    },
+
+                    testSelect1HTMLInLabels: function() {
+                        ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
+                            // Do nothing
                         }, function() {
                             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e0").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
                             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e1").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
                             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e2").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
                             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get(YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e3").parentNode).getElementsByTagName('img').length > 0, "img in label selected");
                         });
-					},
+                    },
 
                     testSelect1UpdateSelection: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        	var setToCoffee = YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e1");
-				        	setToCoffee.click();
+                            var setToCoffee = YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e1");
+                            setToCoffee.click();
                         }, function() {
                             YAHOO.util.Assert.isTrue(this.getSelect("select1-compact").options[1].selected, "coffee is selected");
                         });
                     },
-					
+
 
                     testSelect1CompactUpdateSelection: function() {
                         ORBEON.util.Test.executeCausingAjaxRequest(this, function() {
-                        	// Set value in list to Diet Coke
-							var select1Id = "select1-compact";
-							var select1Control = YAHOO.util.Dom.get(select1Id);
-							var select1List = this.getSelect(select1Id);
-							ORBEON.xforms.Controls.setCurrentValue(select1Control, select1List.options[3].value);
-							ORBEON.xforms.Events.change({target: select1Control});
+                            // Set value in list to Diet Coke
+                            var select1Id = "select1-compact";
+                            var select1Control = YAHOO.util.Dom.get(select1Id);
+                            var select1List = this.getSelect(select1Id);
+                            ORBEON.xforms.Controls.setCurrentValue(select1Control, select1List.options[3].value);
+                            ORBEON.xforms.Events.change({target: select1Control});
                         }, function() {
                             YAHOO.util.Assert.isTrue(YAHOO.util.Dom.get("select1" + XF_LHHAI_SEPARATOR + "e3").checked, "Diet coke is selected");
                         });
@@ -115,7 +115,7 @@
         </xh:style>
     </xh:head>
     <xh:body>
-    	<xh:p>
+        <xh:p>
             <xf:input ref="@only-caffeinated">
                 <xf:label>Only caffeinated</xf:label>
             </xf:input>

@@ -51,7 +51,7 @@
                                         <xs:attribute name="code" type="xs:integer" use="required"/>
                                     </xs:restriction>
                                 </xs:simpleContent>
-                            </xs:complexType>	
+                            </xs:complexType>
                         </xs:schema>
                     </xf:model>
                 </xh:head>

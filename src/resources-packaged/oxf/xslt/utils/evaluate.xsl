@@ -12,9 +12,9 @@
   The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
   -->
 <xsl:stylesheet version="2.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:function="http://www.orbeon.com/xslt-function"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:function="http://www.orbeon.com/xslt-function"
     xmlns:evaluator="java:org.orbeon.saxon.sxpath.XPathEvaluator"
     xmlns:context="java:org.orbeon.saxon.sxpath.IndependentContext"
     xmlns:expression="java:org.orbeon.saxon.sxpath.XPathExpression"
@@ -28,7 +28,7 @@
        - @param namespaces  A sequence of namespaces, which prefix can be used
                             in the XPath expression
       -->
-	<xsl:function name="function:evaluate" as="item()*">
+    <xsl:function name="function:evaluate" as="item()*">
         <xsl:param name="node" as="node()"/>
         <xsl:param name="select" as="xs:string"/>
         <xsl:param name="namespaces" as="node()*"/>
@@ -43,6 +43,6 @@
 
         <xsl:variable name="expression" select="evaluator:create-expression($evaluator, $select)"/>
         <xsl:sequence select="expression:evaluate($expression, $node)"/>
-	</xsl:function>
+    </xsl:function>
 
 </xsl:stylesheet>

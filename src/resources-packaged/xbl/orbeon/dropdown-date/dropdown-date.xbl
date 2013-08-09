@@ -105,7 +105,7 @@
                             <month>Mes</month>
                             <day>Día</day>
                         </resource>
-						<resource xml:lang="fi">
+                        <resource xml:lang="fi">
                             <year>Vuosi</year>
                             <month>Kuukausi</month>
                             <day>Päivä</day>

@@ -80,7 +80,7 @@
               <xf:setvalue ref="/equation/result" value="0"/>
               <xf:setvalue ref="/equation/screen" value="0"/>
               <xf:setvalue ref="/equation/screenbuffer" value="0"/>
-	      <xf:toggle ev:event="DOMActivate" case="add"/>
+              <xf:toggle ev:event="DOMActivate" case="add"/>
             </xf:action>
           </xf:trigger>
         </td>
@@ -89,7 +89,7 @@
         <td>
           <xf:trigger>
             <xf:label>MC</xf:label>
-            <xf:action ev:event="DOMActivate">	
+            <xf:action ev:event="DOMActivate">
             <xf:setvalue ref="/equation/memory" value="0"/>
             </xf:action>
           </xf:trigger>
@@ -127,7 +127,7 @@
             <xf:action ev:event="DOMActivate">
               <xf:setvalue ref="/equation/first" value="/equation/screen"/>
               <xf:setvalue ref="/equation/screenbuffer" value="0"/>
-	      <xf:toggle ev:event="DOMActivate" case="divide"/>
+              <xf:toggle ev:event="DOMActivate" case="divide"/>
             </xf:action>
           </xf:trigger>
         </td>
@@ -163,7 +163,7 @@
             </xf:action>
           </xf:trigger>
         </td>
-	<td>
+        <td>
           <xf:trigger>
             <xf:label>6</xf:label>
             <xf:action ev:event="DOMActivate">
@@ -172,13 +172,13 @@
             </xf:action>
           </xf:trigger>
         </td>
-	<td>
+        <td>
           <xf:trigger>
             <xf:label>*</xf:label>
             <xf:action ev:event="DOMActivate">
               <xf:setvalue ref="/equation/first" value="/equation/screen"/>
               <xf:setvalue ref="/equation/screenbuffer" value="0"/>
-	      <xf:toggle ev:event="DOMActivate" case="multiply"/>
+              <xf:toggle ev:event="DOMActivate" case="multiply"/>
             </xf:action>
           </xf:trigger>
         </td>
@@ -226,7 +226,7 @@
             <xf:action ev:event="DOMActivate">
               <xf:setvalue ref="/equation/first" value="/equation/screen"/>
               <xf:setvalue ref="/equation/screenbuffer" value="0"/>
-	      <xf:toggle ev:event="DOMActivate" case="subtract"/>
+              <xf:toggle ev:event="DOMActivate" case="subtract"/>
             </xf:action>
           </xf:trigger>
         </td>
@@ -274,7 +274,7 @@
         <xf:action ev:event="DOMActivate">
           <xf:setvalue ref="/equation/first" value="/equation/screen"/>
           <xf:setvalue ref="/equation/screenbuffer" value="0"/>
-	  <xf:toggle ev:event="DOMActivate" case="add"/>
+          <xf:toggle ev:event="DOMActivate" case="add"/>
         </xf:action>
       </xf:trigger>
       </td>
@@ -290,7 +290,7 @@
             <xf:setvalue ref="/equation/screenbuffer" value="0"/>
             </xf:action>
           </xf:trigger>
-	</xf:case>
+        </xf:case>
         <xf:case id="subtract">
           <xf:trigger>
             <xf:label>=</xf:label>
@@ -301,7 +301,7 @@
             <xf:setvalue ref="/equation/screenbuffer" value="0"/>
             </xf:action>
           </xf:trigger>
-	</xf:case>
+        </xf:case>
         <xf:case id="multiply">
           <xf:trigger>
             <xf:label>=</xf:label>
@@ -312,7 +312,7 @@
             <xf:setvalue ref="/equation/screenbuffer" value="0"/>
             </xf:action>
           </xf:trigger>
-	</xf:case>
+        </xf:case>
         <xf:case id="divide">
           <xf:trigger>
             <xf:label>=</xf:label>
@@ -323,7 +323,7 @@
             <xf:setvalue ref="/equation/screenbuffer" value="0"/>
             </xf:action>
           </xf:trigger>
-	</xf:case>
+        </xf:case>
       </xf:switch>
      </td>
       </tr>

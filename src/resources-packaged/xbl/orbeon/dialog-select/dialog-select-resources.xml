@@ -22,7 +22,7 @@
         <add>Add</add>
         <remove>Remove</remove>
     </resource>
-	<resource xml:lang="fi">
+    <resource xml:lang="fi">
         <select>...</select>
         <title>Valinta</title>
         <available>Vapaa</available>

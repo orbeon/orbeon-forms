@@ -740,8 +740,8 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
             <xxf:dynamic-state>
-		        <dynamic-state/>
-		    </xxf:dynamic-state>
+                <dynamic-state/>
+            </xxf:dynamic-state>
             <xxf:action>
                 <xxf:control-values>
                     <xxf:control id="output1">4fd0b215276ef12f2b3e4c8ecac2811498b656fc</xxf:control>

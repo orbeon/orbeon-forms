@@ -304,10 +304,10 @@
             instance="fr-search-drafts-response"/>
     <xf:instance id="fr-search-drafts-request">
         <search>
-        	<drafts>only</drafts>
-        	<page-size>10</page-size>
-        	<page-number>1</page-number>
-        	<lang>en</lang>
+            <drafts>only</drafts>
+            <page-size>10</page-size>
+            <page-number>1</page-number>
+            <lang>en</lang>
         </search>
     </xf:instance>
     <xf:instance id="fr-search-drafts-response"><dummy/></xf:instance>

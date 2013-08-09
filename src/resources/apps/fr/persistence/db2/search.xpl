@@ -166,7 +166,7 @@
                                         created, last_modified_time, document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
-					                        , XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
+                                            , XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
                                         , username, groupname
                                         <xsl:if test="$support-auto-save">, draft</xsl:if>

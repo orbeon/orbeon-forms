@@ -245,9 +245,10 @@
         &.fr-repeat-single-row {
              td, td > .fb-hover {
                 &> .fr-grid-content > * {
-                    &> .xforms-label { display: none }
-                    &> .xforms-help { display: none }
-                    &> .xforms-hint { display: none }
+                    &> .xforms-label,
+                    &> .xforms-help,
+                    &> .xforms-hint
+                        { display: none }
                 }
             }
         }

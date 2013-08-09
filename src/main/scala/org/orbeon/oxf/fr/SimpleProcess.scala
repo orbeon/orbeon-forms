@@ -215,7 +215,7 @@ object SimpleProcess extends FormRunnerActions with XFormsActions with Logging {
     // Main entry point for starting a literal process
     def runProcess(scope: String, process: String): Try[Any] = {
         implicit val logger = containingDocument.getIndentedLogger("process")
-        withDebug("running process", Seq("process" → process)) {
+        withDebug("process: running", Seq("process" → process)) {
             // Scope the process (for suspend/resume)
             withEmptyStack(scope) {
                 beforeProcess() flatMap { _ ⇒
@@ -244,7 +244,7 @@ object SimpleProcess extends FormRunnerActions with XFormsActions with Logging {
         val parsedProcess = ProcessParser.parseProcess(processStackDyn.value.get.scope, process)
 
         if (parsedProcess.action.isEmpty) {
-            debug("empty process, canceling process")
+            debug("process: empty process, canceling process")
             Success(())
         } else {
 
@@ -252,11 +252,16 @@ object SimpleProcess extends FormRunnerActions with XFormsActions with Logging {
             var programCounter = 0
 
             def runAction(action: ActionAst) =
-                withDebug("running action", Seq("action" → action.toString)) {
+                withDebug("process: running action", Seq("action" → action.toString)) {
                     // Push and pop the stack frame (for suspend/resume)
-                    withStackFrame(process, programCounter) {
-                        AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
-                    }
+                    val result =
+                        withStackFrame(process, programCounter) {
+                            AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
+                        }
+
+                    debugResults(Seq("result" → (if (result.isSuccess) "success" else "failure")))
+
+                    result
                 }
 
             // Interpret process recursively
@@ -268,16 +273,16 @@ object SimpleProcess extends FormRunnerActions with XFormsActions with Logging {
                     val newTried =
                         nextCombinator.combinator match {
                             case ThenCombinator ⇒
-                                debug("combining with then", Seq("action" → nextAction.toString))
+                                debug("process: combining with then", Seq("action" → nextAction.toString))
                                 tried flatMap (_ ⇒ runAction(nextAction))
                             case RecoverCombinator ⇒
-                                debug("combining with recover", Seq("action" → nextAction.toString))
+                                debug("process: combining with recover", Seq("action" → nextAction.toString))
                                 tried recoverWith {
                                     case t: ControlThrowable ⇒
-                                        debug("rethrowing ControlThrowable")
+                                        debug("process: rethrowing ControlThrowable")
                                         throw t
                                     case NonFatal(t) ⇒
-                                        debug("recovering", Seq("throwable" → OrbeonFormatter.format(t)))
+                                        debug("process: recovering", Seq("throwable" → OrbeonFormatter.format(t)))
                                         runAction(nextAction)
                                 }
                         }

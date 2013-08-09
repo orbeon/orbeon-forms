@@ -114,6 +114,10 @@
   overflow: auto;
   background: white;
 }
+.orbeon .fr-summary-table-div .alert {
+  display: block;
+  margin: 0;
+}
 .orbeon .fr-summary-table-div table {
   margin-bottom: 0;
   max-width: none;

@@ -461,7 +461,7 @@
                         <div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'Y'])"/>
                             <xf:var name="drafts-class" value="string-join(('fr-summary-repeat-draft', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
-                            <xh:table width="940px" class="table table-bordered table-condensed">
+                            <xh:table class="table table-bordered table-condensed">
                                 <!-- scrollable="horizontal" width="940px" -->
                                 <xh:thead>
                                     <xh:tr>
@@ -707,11 +707,25 @@
 
                 <xf:group model="fr-form-model" class="fr-buttons">
 
-                    <xf:var name="global-operations"    value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
-                    <xf:var name="documents-selected"   value="xxf:split(instance('fr-selection-instance'))"/>
-                    <xf:var name="documents-operations" value="instance('fr-summary-instance')/document[@name = $documents-selected]/@operations"/>
-                    <xf:var name="documents-can-view"   value="empty($documents-operations[not(xxf:split() = ('*', 'read'))])"/>
-                    <xf:var name="documents-can-delete" value="empty($documents-operations[not(xxf:split() = ('*', 'delete'))])"/>
+                    <!-- These are the permissions granted to the current user based on the current roles. Because we
+                         are not the Detail page, fr-authorized-operations does not contain permissions from the
+                         persistence layer. -->
+                    <xf:var
+                        name="global-operations"
+                        value="xxf:split(xxf:instance('fr-authorized-operations'))"/>
+
+                    <xf:var
+                        name="documents-selected"
+                        value="instance('fr-summary-instance')/document[concat(if (@draft = 'Y') then 'draft' else 'data', '/', @name) = xxf:split(instance('fr-selection-instance'))]"/>
+
+                    <!-- Take into account the global operations but also the operations returned by the persistence
+                         layer for each selected form. This can only add to permissions, for example if the user is the
+                         document owner. -->
+                    <!-- TODO: If the user pages, then the <document> for the given selection is no longer there, and
+                         therefore the operations not available. Should store the operations associated with each
+                         selected document too, otherwise less documents might be found. -->
+                    <xf:var name="documents-can-view"   value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'read'))])"/>
+                    <xf:var name="documents-can-delete" value="empty($documents-selected[not(distinct-values(($global-operations, xxf:split(@operations))) = ('*', 'delete'))])"/>
 
                     <xf:var name="new-visible"          value="$global-operations = ('*', 'create')"/>
                     <xf:var name="view-enabled"         value="property('xxf:noscript') or (count($documents-selected)  = 1 and $documents-can-view)"/>

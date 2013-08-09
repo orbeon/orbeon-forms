@@ -206,6 +206,18 @@
         <help-icon>
             <label>Edit Help</label>
         </help-icon>
+        <new-button>
+            <label>&lt;i class="icon-plus"/&gt; New</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Test</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Publish</label>
+        </publish-button>
+        <save-as-button>
+            <label>Save as…</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Add</label>
@@ -232,15 +244,6 @@
         <delete>
             <label>Delete</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Test</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Publish</label>
-        </publish>
-        <save-as>
-            <label>Save as…</label>
-        </save-as>
         <or>
             <label>or</label>
         </or>
@@ -1059,6 +1062,18 @@
         <help-icon>
             <label>Editer l'aide</label>
         </help-icon>
+        <new-button>
+            <label>&lt;i class="icon-plus"/&gt; Nouveau</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Tester</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Publier</label>
+        </publish-button>
+        <save-as-button>
+            <label>Enregistrer sous…</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Ajouter</label>
@@ -1085,15 +1100,6 @@
         <delete>
             <label>Supprimer</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Tester</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Publier</label>
-        </publish>
-        <save-as>
-            <label>Enregistrer sous…</label>
-        </save-as>
         <or>
             <label>ou</label>
         </or>
@@ -1909,6 +1915,18 @@
         <help-icon>
             <label>Rediger hjelpetekst</label>
         </help-icon>
+        <new-button>
+            <label>[&lt;i class="icon-plus"/&gt; New]</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Test</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Publiser…</label>
+        </publish-button>
+        <save-as-button>
+            <label>[Save as…]</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Legg til</label>
@@ -1935,15 +1953,6 @@
         <delete>
             <label>Slett</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Test</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Publiser…</label>
-        </publish>
-        <save-as>
-            <label>[Save as…]</label>
-        </save-as>
         <or>
             <label>eller</label>
         </or>
@@ -2759,6 +2768,18 @@
         <help-icon>
             <label>Редактировать справку</label>
         </help-icon>
+        <new-button>
+            <label>&lt;i class="icon-plus"/&gt; Новая</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Тестировать</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Публиковать</label>
+        </publish-button>
+        <save-as-button>
+            <label>Сохр.копию</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Добавить</label>
@@ -2785,15 +2806,6 @@
         <delete>
             <label>Удалить</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Тестировать</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Публиковать</label>
-        </publish>
-        <save-as>
-            <label>Сохр.копию</label>
-        </save-as>
         <or>
             <label>или</label>
         </or>
@@ -3608,6 +3620,18 @@
         <help-icon>
             <label>Modifica aiuto</label>
         </help-icon>
+        <new-button>
+            <label>&lt;i class="icon-plus"/&gt; Nuovo</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Prova</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Pubblica</label>
+        </publish-button>
+        <save-as-button>
+            <label>Salva con nome...</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Aggiungi</label>
@@ -3634,15 +3658,6 @@
         <delete>
             <label>Cancella</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Prova</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Pubblica</label>
-        </publish>
-        <save-as>
-            <label>Salva con nome...</label>
-        </save-as>
         <or>
             <label>o</label>
         </or>
@@ -4462,6 +4477,18 @@
         <help-icon>
             <label>Hilfstext editieren</label>
         </help-icon>
+        <new-button>
+            <label>&lt;i class="icon-plus"/&gt; Neu</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Test</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Veröffentlichen</label>
+        </publish-button>
+        <save-as-button>
+            <label>Speichern als…</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Hinzufügen</label>
@@ -4488,15 +4515,6 @@
         <delete>
             <label>Löschen</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Test</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Veröffentlichen</label>
-        </publish>
-        <save-as>
-            <label>Speichern als…</label>
-        </save-as>
         <or>
             <label>oder</label>
         </or>
@@ -5320,6 +5338,18 @@
         <help-icon>
             <label>Muokkaa Ohje</label>
         </help-icon>
+        <new-button>
+            <label>&lt;i class="icon-plus"/&gt; Uusi</label>
+        </new-button>
+        <test-button>
+            <label>&lt;i class="icon-cog"/&gt; Testaa</label>
+        </test-button>
+        <publish-button>
+            <label>&lt;i class="icon-globe"/&gt; Julkaise</label>
+        </publish-button>
+        <save-as-button>
+            <label>Tallenna nimellä…</label>
+        </save-as-button>
         <!-- Common -->
         <add>
             <label>Lisää</label>
@@ -5346,15 +5376,6 @@
         <delete>
             <label>Poista</label>
         </delete>
-        <test>
-            <label>&lt;i class="icon-cog"/&gt; Testaa</label>
-        </test>
-        <publish>
-            <label>&lt;i class="icon-globe"/&gt; Julkaise</label>
-        </publish>
-        <save-as>
-            <label>Tallenna nimellä…</label>
-        </save-as>
         <or>
             <label>tai</label>
         </or>

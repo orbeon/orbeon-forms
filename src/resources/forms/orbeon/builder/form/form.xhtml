@@ -96,10 +96,17 @@
                 <!-- Somewhere meaningful to go to -->
                 <fr:summary-button/>
 
+                <xf:trigger>
+                    <xf:label mediatype="text/html" value="$form-resources/new-button/label"/>
+                    <xf:action ev:event="DOMActivate">
+                        <xf:load resource="/fr/orbeon/builder/new"/>
+                    </xf:action>
+                </xf:trigger>
+
                 <!-- Test form -->
                 <xf:group model="fr-error-summary-model" id="fb-test-button-group">
                     <xf:trigger id="fb-test-button">
-                        <xf:label mediatype="text/html" value="$form-resources/test/label"/>
+                        <xf:label mediatype="text/html" value="$form-resources/test-button/label"/>
                         <xf:action ev:event="DOMActivate">
                             <xxf:script>
                                 <!-- Reset the displayed page as the iframe might show the result from a previous test -->
@@ -117,7 +124,7 @@
                 <!-- Publish form -->
                 <xf:group model="fr-persistence-model" ref="instance('fr-triggers-instance')/publish">
                     <xf:trigger id="fb-publish-button" ref=".">
-                        <xf:label mediatype="text/html" value="$form-resources/publish/label"/>
+                        <xf:label mediatype="text/html" value="$form-resources/publish-button/label"/>
                         <xf:action ev:event="DOMActivate">
                             <xxf:show dialog="fb-publish-dialog"/>
                         </xf:action>
@@ -132,7 +139,7 @@
                 <!--<xf:trigger id="fr-save-as-button" ref="instance('fb-triggers-instance')/save-as">-->
                     <!--<xf:label>-->
                         <!--<xh:img width="16" height="16" src="/apps/fr/style/images/silk/database_add.png" alt=""/>-->
-                        <!--<xf:output value="$form-resources/save-as/label"/>-->
+                        <!--<xf:output value="$form-resources/save-as-button/label"/>-->
                     <!--</xf:label>-->
                     <!--<xf:action ev:event="DOMActivate">-->
                         <!--&lt;!&ndash; Open the dialog in "save-as" mode &ndash;&gt;-->

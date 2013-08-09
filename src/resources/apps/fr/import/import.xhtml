@@ -274,9 +274,12 @@
                             <fr:tr>
                                 <fr:td>
                                     <!-- Progress status -->
-                                    <xf:output value="format-number(instance('fr-batch-stats')/progress, '###%')">
+                                    <xf:group>
                                         <xf:label>Validating:</xf:label>
-                                    </xf:output>
+                                        <xh:div class="progress progress-striped">
+                                            <xh:div class="bar" style="width: {format-number(instance('fr-batch-stats')/progress, '###%')}"/>
+                                        </xh:div>
+                                    </xf:group>
                                 </fr:td>
                                 <fr:td>
                                     <xf:output value="for $ds in instance('fr-batch-stats')/eta return
@@ -285,7 +288,7 @@
                                                           xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
                                                                              (hours-from-duration($d), minutes-from-duration($d), round(seconds-from-duration($d))))
                                                         else '-'">
-                                        <xf:label>ETA</xf:label>
+                                        <xf:label>ETA:</xf:label>
                                     </xf:output>
                                 </fr:td>
                                 <fr:td>
@@ -420,11 +423,14 @@
 
                                 <fr:tr>
                                     <fr:td>
-                                        <xf:output value="format-number(if (instance('fr-batch-stats')/total != 0)
-                                                            then xs:decimal(instance('fr-batch-stats')/processed) div xs:decimal(instance('fr-batch-stats')/total)
-                                                            else 0, '###%')">
+                                        <xf:group>
                                             <xf:label>Importing:</xf:label>
-                                        </xf:output>
+                                            <xh:div class="progress progress-striped">
+                                                <xh:div class="bar" style="width: {format-number(if (instance('fr-batch-stats')/total != 0)
+                                                                                                 then xs:decimal(instance('fr-batch-stats')/processed) div xs:decimal(instance('fr-batch-stats')/total)
+                                                                                                 else 0, '###%')}"/>
+                                            </xh:div>
+                                        </xf:group>
                                     </fr:td>
                                     <fr:td>
                                         <xf:output value="for $ds in instance('fr-batch-stats')/eta return
@@ -433,7 +439,7 @@
                                                               xxf:format-message('{0,choice,0#|0&lt;{0, number, integer} hours} {1,choice,0#|0&lt;{1, number, integer} minutes} {2,choice,0#|0&lt;{2, number, integer} seconds}',
                                                                                  (hours-from-duration($d), minutes-from-duration($d), round(seconds-from-duration($d))))
                                                             else '-'">
-                                            <xf:label>ETA</xf:label>
+                                            <xf:label>ETA:</xf:label>
                                         </xf:output>
                                     </fr:td>
                                     <fr:td>

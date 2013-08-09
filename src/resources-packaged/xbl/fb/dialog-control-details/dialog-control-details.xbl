@@ -102,6 +102,7 @@
 
                 <!-- Read help -->
                 <xf:setvalue ref="$i/help"  value="fbf:getControlHelpOrEmpty($i/control-name)"/>
+                <xf:setvalue ref="$i/help/@isHTML"  value="if (fbf:isControlLHHAHTMLMediatype($form, $i/control-name, 'help')) then 'true' else ''"/>
 
                 <!-- Remove all namespace nodes on the root element and insert those from the external xf:bind. This
                      allows scoping namespaces for XPath expressions validated with xxf:xpath2. -->
@@ -139,6 +140,7 @@
                     <xf:setvalue ref="$control/saxon:eval(saxon:expression($xforms-control/@ref, $xforms-control/@ref))" value="$bound-node"/>
                 </xf:action>
 
+
                 <xf:action type="xpath">
                     (: Write alerts and constraints :)
                     fbf:writeAlertsAndValidationsAsXML($form, $i/control-name, $i/default-alert/alert, $i/validations/validation),
@@ -146,7 +148,8 @@
                     for $mip in ('relevant', 'readonly', 'calculate', 'default') return
                         fbf:updateMip($form, $i/control-name, $mip, $i/*[name() = $mip]),
                     (: Write help :)
-                    fbf:setControlHelp($i/control-name, $i/help)
+                    fbf:setControlHelp($i/control-name, $i/help),
+                    fbf:setControlLHHAMediatype($form, $i/control-name, 'help', $i/help/@isHTML = 'true')
                 </xf:action>
             </xbl:handler>
         </xbl:handlers>
@@ -175,7 +178,7 @@
                         <calculate/>
                         <default/>
 
-                        <help/>
+                        <help isHTML=""/>
                     </local>
                 </xf:instance>
 
@@ -497,8 +500,19 @@
                         <fr:grid id="help-grid">
                             <xh:tr>
                                 <xh:td>
+                                    <xf:select ref="help/@isHTML" appearance="full">
+                                        <xf:item>
+                                            <xf:value>true</xf:value>
+                                            <xf:label>Use HTML</xf:label>
+                                        </xf:item>
+                                    </xf:select>
                                     <!-- Help message -->
-                                    <xf:textarea ref="help">
+                                    <xf:var name="is-html" value="help/@isHTML = 'true'"/>
+                                    <fr:tinymce ref="help[$is-html]">
+                                        <xf:label ref="$resources/dialog-control-details/help/label"/>
+                                        <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
+                                    </fr:tinymce>
+                                    <xf:textarea ref="help[not($is-html)]">
                                         <xf:label ref="$resources/dialog-control-details/help/label"/>
                                         <xf:hint  ref="$resources/dialog-control-details/help/hint"/>
                                     </xf:textarea>

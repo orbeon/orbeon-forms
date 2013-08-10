@@ -1,5 +1,724 @@
-ParseError: Syntax Error on line 252 in /Users/avernet/Dropbox/Work/Product/src/resources/apps/fr/style/form-runner-base.less:252:21
-251                         { display: none }
-252                      { display: none }
-253                      { display: none }
+/**
+ * Copyright (C) 2010 Orbeon, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify it under the terms of the
+ * GNU Lesser General Public License as published by the Free Software Foundation; either version
+ * 2.1 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details.
+ *
+ * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+.clearfix {
+  *zoom: 1;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.clearfix:after {
+  clear: both;
+}
+.hide-text {
+  font: 0/0 a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+}
+.input-block-level {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.fr-border {
+  padding: 0;
+  margin-bottom: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+}
+.help-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  *margin-right: .3em;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url(bootstrap/img/glyphicons-halflings.png);
+  background-repeat: no-repeat;
+  background-position: -120px -96px;
+}
+.narrow-td {
+  width: 1px;
+}
+.fr-plain-checkbox-container {
+  width: 1px;
+}
+.fr-plain-checkbox-container label {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+.fr-plain-checkbox-container label input[type="checkbox"] {
+  float: none;
+  margin: 0;
+}
+.fr-plain-checkbox-container label .label {
+  vertical-align: middle;
+}
+.orbeon {
+  /* ***** Utilities ************************************************************************************************** */
 
+  /* ***** Portlet reset *********************************************************************************************** */
+
+  /* ***** XForms Controls ******************************************************************************************** */
+
+  /* ***** General Layout ********************************************************************************************* */
+
+  /* ***** Repeats **************************************************************************************************** */
+
+  /* ***** Dialogs **************************************************************************************************** */
+
+  /* ***** Sections *************************************************************************************************** */
+
+  /* ***** Grids ****************************************************************************************************** */
+
+  /* ***** View, PDF, email ******************************************************************************************* */
+
+}
+.orbeon .navbar .fr-status-icons {
+  display: block;
+  float: left;
+}
+.orbeon .navbar .fr-status-icons i {
+  margin-left: 5px;
+}
+.orbeon .navbar .badge {
+  margin-left: 5px;
+}
+.orbeon .fr-body {
+  display: block;
+}
+.orbeon .fr-body h2 {
+  margin-top: 0;
+}
+.orbeon .fr-clear {
+  clear: both;
+}
+.orbeon .fr-clear-container {
+  *zoom: 1;
+}
+.orbeon .fr-clear-container:before,
+.orbeon .fr-clear-container:after {
+  display: table;
+  content: "";
+  line-height: 0;
+}
+.orbeon .fr-clear-container:after {
+  clear: both;
+}
+.orbeon .orbeon-portlet-body {
+  font: 13px/1.231 arial, helvetica, clean, sans-serif;
+  *font-size: small;
+  *font: x-small;
+}
+.orbeon .xforms-noscript .xforms-help {
+  display: block;
+  margin: 0 0 0 .5em;
+}
+.orbeon .xforms-noscript .fr-section-title .fr-section-label button.btn-link {
+  color: #555555;
+  font-size: inherit;
+  *font-size: 20px;
+}
+.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help {
+  display: inline;
+}
+.orbeon .xforms-noscript .fr-section-title .fr-section-label .xforms-help-anchor {
+  display: none;
+}
+.orbeon .xforms-noscript .xforms-help-panel {
+  display: block;
+  width: auto;
+  padding: 0 1em;
+}
+.orbeon .xforms-noscript .xforms-help-panel .xforms-help-group {
+  margin: 0 0 0.5em;
+}
+.orbeon .xforms-noscript .xforms-help-panel .xforms-label {
+  display: inline;
+}
+.orbeon .xforms-noscript .xforms-help-panel .xforms-help {
+  display: none;
+}
+.orbeon .xforms-noscript .fr-help-back {
+  margin-left: 0.5em;
+}
+.orbeon .xforms-noscript .fr-mode-view .xforms-help,
+.orbeon .xforms-noscript .fr-mode-pdf .xforms-help,
+.orbeon .xforms-noscript .fr-mode-email .xforms-help {
+  display: none;
+}
+.orbeon .xforms-alert,
+.orbeon .xforms-alert.xforms-active {
+  display: none;
+}
+.orbeon .xforms-visited > .xforms-alert.xforms-active,
+.orbeon .xforms-visited.xforms-alert.xforms-active {
+  display: block;
+  clear: both;
+  margin-top: .2em;
+  margin-left: 0;
+  height: auto;
+  width: auto;
+  padding: 1px;
+  font-weight: normal;
+  font-size: inherit;
+  text-indent: 0;
+  background-image: none;
+  white-space: normal;
+}
+.orbeon .xforms-visited > .xforms-alert.xforms-active > ul,
+.orbeon .xforms-visited.xforms-alert.xforms-active > ul {
+  margin-bottom: 0;
+  list-style-type: square;
+}
+.orbeon .xforms-hint {
+  display: block;
+  margin-top: .2em;
+  margin-left: 0;
+  width: 100%;
+}
+.orbeon.xforms-enable-hint-as-tooltip .xforms-hint {
+  display: none;
+}
+.orbeon .xforms-trigger button,
+.orbeon .xforms-trigger input {
+  white-space: nowrap;
+}
+.orbeon button.btn-link {
+  text-decoration: underline;
+  font-size: inherit;
+  padding: 0 0 2px 0;
+}
+.orbeon .xforms-type-boolean input {
+  background: none;
+  border: none;
+}
+.orbeon .xforms-upload-info {
+  display: block;
+  width: 100%;
+  padding: 2px 2px 2px 18px;
+  background: url(images/silk/attach.png ) no-repeat left center;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.orbeon .xforms-help-panel-message {
+  padding: .5em 0;
+  margin-bottom: .5em;
+  border-bottom: 2px solid #ddddee;
+}
+.orbeon .fr-language-choice,
+.orbeon .fr-noscript-choice,
+.orbeon .fr-goto-content,
+.orbeon .fr-status-icons {
+  margin-right: 10px;
+}
+.orbeon .fr-language-choice .xforms-label,
+.orbeon .fr-noscript-choice .xforms-label,
+.orbeon .fr-goto-content .xforms-label,
+.orbeon .fr-status-icons .xforms-label {
+  display: inline;
+  margin-right: 5px;
+}
+.orbeon .fr-noscript-icon {
+  display: none;
+}
+.orbeon .xforms-noscript .fr-noscript-icon {
+  display: inline;
+}
+.orbeon .fr-message-success {
+  display: block;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+}
+.orbeon .xbl-fr-error-summary .fr-error-summary-body {
+  padding: 0 10px;
+}
+.orbeon .xbl-fr-error-summary .fr-error-title {
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  *width: 97.5%;
+}
+.orbeon .xbl-fr-error-summary .fr-error-list {
+  padding-top: 10px;
+  margin-top: 0;
+}
+.orbeon .fr-explanation {
+  padding: 10px;
+}
+.orbeon .fr-buttons {
+  display: block;
+  float: right;
+  padding-left: 10px;
+  padding-right: 10px;
+  /* Space between the image and the text in a button, only for the buttons bar
+           (not other buttons in the form which might contain just an image) */
+
+}
+.orbeon .fr-buttons .fr-buttons-message div {
+  display: inline;
+}
+.orbeon .fr-buttons .xforms-trigger button img {
+  margin-right: 10px;
+}
+.orbeon .fr-buttons .xforms-trigger button,
+.orbeon .fr-buttons .xforms-trigger input {
+  width: 9.5em;
+  *width: 9em;
+}
+.orbeon .fr-buttons .fr-collapse-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-expand-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-refresh-button.xforms-trigger button {
+  min-width: 2em;
+  width: 2em;
+  padding: 0;
+}
+.orbeon .fr-buttons .fr-collapse-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-expand-all-button.xforms-trigger button,
+.orbeon .fr-buttons .fr-refresh-button.xforms-trigger button {
+  min-width: 2em;
+  width: 2em;
+  padding: 3px;
+}
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-label,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-label,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-help,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-help,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fr-grid-content > * > .xforms-hint,
+.orbeon .fr-repeat-table.fr-repeat-single-row td > .fb-hover > .fr-grid-content > * > .xforms-hint {
+  display: none;
+}
+.orbeon .fr-repeat-table tr th .xforms-label {
+  display: block;
+}
+.orbeon .fr-repeat-table tr th .xforms-help {
+  margin-top: 4px;
+}
+.orbeon .fr-repeat-table .fr-repeat-column-trigger {
+  width: 25px;
+  text-align: center;
+  vertical-align: middle;
+}
+.orbeon .fr-repeat-table .fr-repeat-column-trigger i {
+  margin: 0;
+  display: block;
+}
+.orbeon .fr-repeat-table .fr-repeat-column-trigger span i {
+  *margin-left: 0px;
+}
+.orbeon .fr-repeat-table .fr-repeat-column-trigger button {
+  display: block;
+  margin: auto;
+}
+.orbeon .fr-repeat-table i.disabled {
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+}
+.orbeon .xforms-dialog {
+  width: 500px;
+}
+.orbeon .xforms-dialog .bd p {
+  margin: 0.5em 0 0.5em 0;
+}
+.orbeon .xforms-dialog .fr-dialog-icon {
+  float: left;
+  margin-right: 2em;
+  margin-left: 1em;
+  padding-bottom: 1em;
+}
+.orbeon .xforms-dialog .fr-dialog-buttons {
+  text-align: right;
+  padding: 10px 5px 0 5px;
+  margin-top: 5px;
+  border-top: 2px solid #ddddee;
+  clear: both;
+}
+.orbeon .xforms-dialog.fr-submission-result-dialog {
+  width: 500px;
+}
+.orbeon .xbl-fr-section {
+  display: block;
+}
+.orbeon .xbl-fr-section .fr-section-title .xforms-help {
+  float: left;
+  margin-top: 11px;
+  margin-right: 5px;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  *margin-right: .3em;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url(bootstrap/img/glyphicons-halflings.png);
+  background-repeat: no-repeat;
+  background-position: -120px -96px;
+}
+.orbeon .xbl-fr-section .fr-section-open-close img {
+  margin-right: 0;
+}
+.orbeon .xbl-fr-section .fr-section-open-close {
+  padding: 0 7px 0 7px;
+}
+.orbeon .xbl-fr-section .fr-section-content {
+  display: block;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.orbeon .fr-captcha {
+  display: block;
+  padding: 0;
+  margin-bottom: 10px;
+  background-color: #f5f5f5;
+  border: 1px solid #e3e3e3;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  border-radius: 6px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  text-align: right;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha,
+.orbeon .fr-captcha .xbl-fr-simple-captcha {
+  display: inline-block;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha > .xforms-label,
+.orbeon .fr-captcha .xbl-fr-simple-captcha > .xforms-label,
+.orbeon .fr-captcha .xbl-fr-recaptcha > .xforms-alert,
+.orbeon .fr-captcha .xbl-fr-simple-captcha > .xforms-alert {
+  display: none;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha {
+  display: inline-block;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha #recaptcha_response_field {
+  font-size: 13px;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha .recaptchatable {
+  border: none !important;
+}
+.orbeon .fr-captcha .xbl-fr-recaptcha .recaptchatable .recaptcha_image_cell {
+  background-color: transparent !important;
+}
+.orbeon .fr-grid {
+  table-layout: fixed;
+  width: 100%;
+  margin-bottom: 10px;
+}
+.orbeon .fr-grid thead tr th {
+  text-align: left;
+}
+.orbeon .fr-grid tbody tr td {
+  vertical-align: top;
+  width: auto;
+  /*overflow: hidden*/
+  /* Removed as this looks like a hack and combined with the position: relative in FB, which we need for the
+                                                                       absolute positioning of the cell editors, this crops overlays, in particular the date picker */
+
+}
+.orbeon .fr-grid .xforms-help {
+  float: left;
+  margin-top: 4px;
+  margin-right: 3px;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  *margin-right: .3em;
+  line-height: 14px;
+  vertical-align: text-top;
+  background-image: url(bootstrap/img/glyphicons-halflings.png);
+  background-repeat: no-repeat;
+  background-position: -120px -96px;
+}
+.orbeon .fr-grid .xforms-label {
+  margin-top: 2px;
+  margin-bottom: 4px;
+  overflow: hidden;
+  zoom: 1;
+}
+.orbeon .fr-grid select,
+.orbeon .fr-grid textarea,
+.orbeon .fr-grid input[type="text"],
+.orbeon .fr-grid input[type="password"],
+.orbeon .fr-grid input[type="datetime"],
+.orbeon .fr-grid input[type="datetime-local"],
+.orbeon .fr-grid input[type="date"],
+.orbeon .fr-grid input[type="month"],
+.orbeon .fr-grid input[type="time"],
+.orbeon .fr-grid input[type="week"],
+.orbeon .fr-grid input[type="number"],
+.orbeon .fr-grid input[type="email"],
+.orbeon .fr-grid input[type="url"],
+.orbeon .fr-grid input[type="search"],
+.orbeon .fr-grid input[type="tel"],
+.orbeon .fr-grid input[type="color"],
+.orbeon .fr-grid .uneditable-input {
+  width: 100%;
+  *padding: 2px;
+  *width: 98%;
+}
+.orbeon .fr-grid .xforms-textarea textarea {
+  width: 100%;
+}
+.orbeon .fr-grid input[type="file"] {
+  width: auto;
+  *width: 98%;
+}
+.orbeon .fr-grid .xbl-fr-autocomplete .xforms-input input {
+  width: 140px;
+}
+.orbeon .fr-grid .xbl-fr-inplace-input {
+  width: 100%;
+}
+.orbeon .fr-grid .xbl-fr-inplace-input input {
+  width: 100%;
+  *width: 98%;
+}
+.orbeon .fr-grid .xforms-mediatype-text-html textarea {
+  height: 10.1em;
+}
+.orbeon .fr-grid .xforms-input input.xforms-type-date,
+.orbeon .fr-grid .xforms-input input.xforms-type-time {
+  width: 7.5em;
+}
+.orbeon .fr-grid .xforms-type-boolean input {
+  width: auto;
+}
+.orbeon .fr-grid .xforms-mediatype-image {
+  width: 100%;
+  overflow: auto;
+  display: block;
+}
+.orbeon .fr-grid .xforms-mediatype-image {
+  *padding-bottom: 17px;
+  *overflow-y: hidden;
+}
+.orbeon .fr-grid .xforms-mediatype-image img {
+  display: block;
+}
+.orbeon .fr-grid .fr-grid-content .xforms-trigger button,
+.orbeon .fr-grid .fr-grid-content .xforms-trigger input {
+  margin-top: 1.72em;
+}
+.orbeon .fr-grid .fr-grid-content .xforms-trigger button,
+.orbeon .fr-grid .fr-grid-content .yui-button .xforms-trigger input {
+  margin-top: 0;
+}
+.orbeon .fr-grid .fr-grid-content {
+  padding: 4px;
+  *padding-right: 6px;
+  *zoom: 1;
+}
+.orbeon .fr-repeat-table .fr-grid-content {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.orbeon #fr-view {
+  margin-bottom: 10px;
+  /* Specify a width for the autocomplete text field so it doesn't that the whole width of the viewport on IE6/7.
+           http://wiki.orbeon.com/forms/doc/contributor-guide/browser#TOC-Width-property-inside-an-absolutely */
+
+}
+.orbeon #fr-view .xbl-fr-autocomplete .fr-autocomplete-container .yui-ac .fr-autocomplete-search .xforms-input-input {
+  *width: 13em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content img.xforms-input-input {
+  *width: auto;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-date,
+.orbeon #fr-view .fr-grid td .fr-grid-content .xforms-input input.xforms-type-time {
+  *width: 6.3em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2em select {
+  width: 2em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-3em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-3em select {
+  width: 3em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4em select {
+  width: 4em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-5em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-5em select {
+  width: 5em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-7em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-7em select {
+  width: 7em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-10em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-10em select {
+  width: 10em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-12em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-12em select {
+  width: 12em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-15em input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-15em select {
+  width: 15em;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-100pc input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-100pc select {
+  width: 100%;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-2digits select {
+  width: 29px;
+}
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits input.xforms-input-input,
+.orbeon #fr-view .fr-grid td .fr-grid-content .fr-width-4digits select {
+  width: 43px;
+}
+.orbeon .xforms-textarea pre {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  white-space: -moz-pre-wrap;
+  white-space: pre-wrap;
+  *white-space: normal;
+  word-break: normal;
+}
+.orbeon .fr-mode-view .xforms-hint,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-hint,
+.orbeon .fr-mode-view .fr-mode-email .xforms-hint {
+  display: none;
+}
+.orbeon .fr-mode-view .xforms-alert,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-alert,
+.orbeon .fr-mode-view .fr-mode-email .xforms-alert {
+  display: none;
+}
+.orbeon .fr-mode-view .fr-section-title img,
+.orbeon .fr-mode-view .fr-mode-pdf .fr-section-title img,
+.orbeon .fr-mode-view .fr-mode-email .fr-section-title img {
+  display: none;
+}
+.orbeon .fr-mode-view .xforms-help,
+.orbeon .fr-mode-view .fr-mode-pdf .xforms-help,
+.orbeon .fr-mode-view .fr-mode-email .xforms-help {
+  display: none;
+}
+.orbeon .fr-mode-view .fr-grid-content .xforms-control,
+.orbeon .fr-mode-view .fr-grid-content .fr-component-group {
+  margin-top: 0;
+}
+.orbeon .fr-mode-view .fr-repeat-multiple-rows {
+  border-top: none;
+}
+.orbeon .fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row {
+  display: none;
+}
+@media print {
+  html body form.xforms-initially-hidden {
+    display: block;
+  }
+  style {
+    display: none;
+  }
+  noscript {
+    display: none;
+  }
+  .orbeon #xforms-form .fr-status-icons,
+  .orbeon #xforms-form .xforms-loading-loading,
+  .orbeon #xforms-form .xforms-upload-remove,
+  .orbeon #xforms-form .xbl-fr-attachment .xforms-output-appearance-xxforms-download,
+  .orbeon #xforms-form .xforms-help,
+  .orbeon #xforms-form .fr-section-title .xforms-help,
+  .orbeon #xforms-form .xforms-hint,
+  .orbeon #xforms-form .fr-buttons {
+    display: none;
+  }
+  .orbeon #xforms-form .xforms-upload-info {
+    background: transparent none repeat scroll 0 0;
+    padding-left: 2px;
+  }
+  .orbeon #xforms-form select[multiple],
+  .orbeon #xforms-form .xforms-select1-appearance-compact select,
+  .orbeon #xforms-form .xforms-select-appearance-compact select {
+    height: auto;
+  }
+  .orbeon #xforms-form .clearfix:before,
+  .orbeon #xforms-form .clearfix:after,
+  .orbeon #xforms-form .row:before,
+  .orbeon #xforms-form .row:after,
+  .orbeon #xforms-form .row-fluid:before,
+  .orbeon #xforms-form .row-fluid:after,
+  .orbeon #xforms-form .container:before,
+  .orbeon #xforms-form .container:after,
+  .orbeon #xforms-form .container-fluid:before,
+  .orbeon #xforms-form .container-fluid:after,
+  .orbeon #xforms-form .dl-horizontal:before,
+  .orbeon #xforms-form .dl-horizontal:after,
+  .orbeon #xforms-form .controls-row:before,
+  .orbeon #xforms-form .controls-row:after,
+  .orbeon #xforms-form .form-actions:before,
+  .orbeon #xforms-form .form-actions:after,
+  .orbeon #xforms-form .form-horizontal .control-group:before,
+  .orbeon #xforms-form .form-horizontal .control-group:after,
+  .orbeon #xforms-form .nav-tabs:before,
+  .orbeon #xforms-form .nav-pills:before,
+  .orbeon #xforms-form .nav-tabs:after,
+  .orbeon #xforms-form .nav-pills:after,
+  .orbeon #xforms-form .tabbable:before,
+  .orbeon #xforms-form .tabbable:after,
+  .orbeon #xforms-form .navbar-inner:before,
+  .orbeon #xforms-form .navbar-inner:after,
+  .orbeon #xforms-form .navbar-form:before,
+  .orbeon #xforms-form .navbar-form:after,
+  .orbeon #xforms-form .pager:before,
+  .orbeon #xforms-form .pager:after,
+  .orbeon #xforms-form .modal-footer:before,
+  .orbeon #xforms-form .modal-footer:after,
+  .orbeon #xforms-form .thumbnails:before,
+  .orbeon #xforms-form .thumbnails:after,
+  .orbeon #xforms-form .navbar-inner:before,
+  .orbeon #xforms-form .navbar-inner:after {
+    display: block;
+  }
+  .orbeon #xforms-form .input-append,
+  .orbeon #xforms-form .input-prepend,
+  .orbeon #xforms-form .btn-group,
+  .orbeon #xforms-form .btn-toolbar {
+    font-size: .5px;
+  }
+}
+@page  {
+  @bottom-center {
+    content: counter(page) " / " counter(pages);
+  }
+}

@@ -54,8 +54,9 @@ $ ->
                             title: lhhaEl.text()
                         methods.push('tooltip')
                     if lhhaEl.hasClass('xforms-appearance-popover')
+                        beforeLastColumn = $(controlEl).closest('td').next().is('*')
                         controlEl.popover
-                            placement: 'right',
+                            placement: if beforeLastColumn then 'right' else 'left',
                             trigger: 'manual',
                             title: controlEl.find('.xforms-label').text()
                             content: lhhaEl.text()

@@ -207,13 +207,26 @@
             <!-- 2. Check for authorized operations -->
             <xf:action ev:event="xforms-model-construct-done">
 
-                <!-- Send a "Not Found" error if the for is not available -->
+                <!-- Send a "Not Found" error if the form is not available -->
                 <xf:action if="$source-form-metadata/available = 'false'" type="xpath">frf:sendError(404)</xf:action>
 
+                <!-- Similar code in persistence-model.xml, but that code is disabled for the Summary page -->
                 <xf:var name="ops" value="frf:javaAuthorizedOperationsBasedOnRoles($source-form-metadata/permissions)"/>
                 <xf:setvalue ref="xxf:instance('fr-authorized-operations')" value="string-join($ops, ' ')"/>
-                <!-- Send an "Unauthorized" error if the user is unauthorized -->
-                <xf:action if="not(xxf:property('oxf.fr.support-owner-group')) and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">frf:sendError(403)</xf:action>
+
+                <!-- Whether the current user is anonymous -->
+                <xf:var name="anonymous" value="normalize-space(xxf:get-request-header('orbeon-username')) = ''"/>
+
+                <xf:message level="xxf:log-debug">
+                    AUTHORIZED OPERATIONS ON FORM (SUMMARY MODE): <xf:output value="string-join($ops, ' ')"/>
+                </xf:message>
+
+                <!-- Send an "Unauthorized" error if the user is unauthorized. But if we support owner/group
+                     permissions, we still give access to the page, as some form data might give permissions. Except if
+                     we are anonymous: in this case, we know that we won't get any extra permissions from the data. -->
+                <xf:action if="($anonymous or not(xxf:property('oxf.fr.support-owner-group'))) and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">
+                    frf:sendError(403)
+                </xf:action>
             </xf:action>
 
             <!-- 3. Rest of initialization -->

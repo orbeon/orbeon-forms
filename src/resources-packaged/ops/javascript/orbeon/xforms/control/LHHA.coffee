@@ -12,33 +12,53 @@ $ ->
             el.addClass('xforms-hidden')
             el.addClass(appearance)
 
-    # Keep track of whether a tooltip is shown and this is because a control got the focus
-    # - used to diactivate hiding/showing tooltip based on mouse movements
-    tooltipShownBecauseOfFocus = false
+    State =
 
-    $('.fr-body').on 'mouseenter mouseleave focusin focusout', '.xforms-control', (event) ->
-        controlEl = $(event.target).closest('.xforms-control')
-        lhhaEls = controlEl.find('.xforms-appearance-tooltip, .xforms-appearance-popover')
-        controlHasTooltipPopover = lhhaEls.is('*')
-        if controlHasTooltipPopover
-            TooltipPopover.init(controlEl, lhhaEls)
-            if ! tooltipShownBecauseOfFocus
-                if event.type == 'mouseenter' then TooltipPopover.show(controlEl)
-                if event.type == 'mouseleave' then TooltipPopover.hide(controlEl, event)
-            if event.type == 'focusin'
-                TooltipPopover.show(controlEl)
-                tooltipShownBecauseOfFocus = true
-            if event.type == 'focusout'
-                TooltipPopover.hide(controlEl, event)
-                tooltipShownBecauseOfFocus = false
+        # Keep track of whether a tooltip is shown and this is because a control got the focus
+        # - used to diactivate hiding/showing tooltip based on mouse movements
+        tooltipShownBecauseOfFocus: false
+
+        # Keep track of the control for which we've last shown the tooltip/popover
+        # - used not to re-show tooltip/popover, which causes blinks
+        # - used to be able to hide popover on mouseleave for the popover
+        tooltipPopoverShownForControlEl: null
+
+    Events =
+
+        onControl: (event) ->
+            controlEl = $(event.target).closest('.xforms-control')
+            lhhaEls = controlEl.find('.xforms-appearance-tooltip, .xforms-appearance-popover')
+            controlHasTooltipPopover = lhhaEls.is('*')
+            if controlHasTooltipPopover
+                TooltipPopover.init(controlEl, lhhaEls)
+                if ! State.tooltipShownBecauseOfFocus
+                    if event.type == 'mouseenter'
+                        TooltipPopover.show(controlEl)
+                    if event.type == 'mouseleave'
+                        # Allow mouse to be on popover, e.g. to click on link
+                        mouseOnPopover = $('.popover:hover').is('*')
+                        TooltipPopover.hide(controlEl, event) if ! mouseOnPopover
+                if event.type == 'focusin'
+                    TooltipPopover.show(controlEl)
+                    State.tooltipShownBecauseOfFocus = true
+                if event.type == 'focusout'
+                    TooltipPopover.hide(controlEl, event)
+                    State.tooltipShownBecauseOfFocus = false
+
+        onPopover: (event) ->
+            if ! State.tooltipShownBecauseOfFocus
+                TooltipPopover.hide(State.tooltipPopoverShownForControlEl, event)
+
+    $('.fr-body').on('mouseenter mouseleave focusin focusout', '.xforms-control', Events.onControl)
+    $('body'    ).on('mouseleave'                            , '.popover'       , Events.onPopover)
 
     # Facade for Bootstrap's Tooltip component
     # - ensures we don't show an already visible tooltip, which would make it "blink"
     TooltipPopover =
+
         DataPrefix: 'xforms-tooltip-popover-'
         Initialized: @DataPrefix + 'initialized'
         Methods: @DataPrefix + 'methods'
-        _tooltipPopoverShownForControlEl: null
 
         # Create the underlying Bootstrap tooltip (but don't show it just yet)
         init: (controlEl, lhhaEls) ->
@@ -66,11 +86,11 @@ $ ->
         # Show tooltip for control
         # - but don't show if the tooltip is alrady shown for this control
         show: (controlEl) ->
-            sameControl = controlEl.is(@_tooltipPopoverShownForControlEl)
+            sameControl = controlEl.is(State.tooltipPopoverShownForControlEl)
             if ! sameControl
-                @_callMethods(@_tooltipPopoverShownForControlEl, 'hide') if @_tooltipPopoverShownForControlEl?
+                @_callMethods(State.tooltipPopoverShownForControlEl, 'hide') if State.tooltipPopoverShownForControlEl?
                 @_callMethods(controlEl, 'show')
-                @_tooltipPopoverShownForControlEl = controlEl
+                State.tooltipPopoverShownForControlEl = controlEl
 
         # Hide tooltip for control
         # - but don't hide if the element we're going to (if any) is the same as the current one
@@ -80,7 +100,7 @@ $ ->
             sameControl = controlEl.is(toControlEl)
             if ! sameControl
                 @_callMethods(controlEl, 'hide')
-                @_tooltipPopoverShownForControlEl = null
+                State.tooltipPopoverShownForControlEl = null
 
         _callMethods: (controlEl, arg) ->
             methods = controlEl.data(@Methods)

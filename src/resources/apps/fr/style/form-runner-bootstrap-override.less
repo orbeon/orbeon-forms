@@ -127,11 +127,16 @@ body.orbeon {
         &> .xforms-trigger.xforms-readonly { cursor: auto; }
         a { text-decoration: none; }
 
+        // NOTE: Updated for Bootstrap 2.3.2
+        >a, >span {
+            padding: 8px 12px;
+        }
+
         // Reset rules that can be applied by external Bootstrap .pagination a rule
         span a {
             padding: 0;
             border: none;
-            line-height: (@baseLineHeight * 2) - 2;
+            line-height: @baseLineHeight;
         }
     }
 
@@ -227,14 +232,21 @@ body.orbeon {
     // Dropdowns
     // ---------
 
-    .dropdown-menu a {
+    .dropdown-menu > li > span > a {
+        display: block;
+        padding: 3px 20px;
+        clear: both;
+        font-weight: normal;
+        line-height: @baseLineHeight;
+        color: @dropdownLinkColor;
+        white-space: nowrap;
         text-decoration: none;
     }
 
     // Hover state
     // -----------
-    .dropdown-menu li > span > a:hover,
-    .dropdown-menu li > span > a:focus,
+    .dropdown-menu > li > span > a:hover,
+    .dropdown-menu > li > span > a:focus,
     .dropdown-submenu:hover > a {
       text-decoration: none;
       color: @dropdownLinkColorHover;
@@ -244,8 +256,8 @@ body.orbeon {
 
     // Active state
     // ------------
-    .dropdown-menu .active > span > a,
-    .dropdown-menu .active > span > a:hover {
+    .dropdown-menu > .active > span > a,
+    .dropdown-menu > .active > span > a:hover {
       color: @dropdownLinkColorHover;
       text-decoration: none;
       outline: 0;
@@ -256,12 +268,12 @@ body.orbeon {
     // Disabled state
     // --------------
     // Gray out text and ensure the hover state remains gray
-    .dropdown-menu .disabled > span > a,
-    .dropdown-menu .disabled > span > a:hover {
+    .dropdown-menu > .disabled > span > a,
+    .dropdown-menu > .disabled > span > a:hover {
       color: @grayLight;
     }
     // Nuke hover effects
-    .dropdown-menu .disabled > span > a:hover {
+    .dropdown-menu > .disabled > span > a:hover {
       text-decoration: none;
       background-color: transparent;
       background-image: none;

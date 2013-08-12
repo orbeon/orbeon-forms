@@ -184,10 +184,14 @@ body.orbeon {
 .orbeon .pagination ul > li a {
   text-decoration: none;
 }
+.orbeon .pagination ul > li > a,
+.orbeon .pagination ul > li > span {
+  padding: 8px 12px;
+}
 .orbeon .pagination ul > li span a {
   padding: 0;
   border: none;
-  line-height: 38px;
+  line-height: 20px;
 }
 .orbeon .input-append .add-on,
 .orbeon .input-prepend .add-on {
@@ -264,11 +268,18 @@ body.orbeon {
   background-color: transparent;
   cursor: default;
 }
-.orbeon .dropdown-menu a {
+.orbeon .dropdown-menu > li > span > a {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 20px;
+  color: #333333;
+  white-space: nowrap;
   text-decoration: none;
 }
-.orbeon .dropdown-menu li > span > a:hover,
-.orbeon .dropdown-menu li > span > a:focus,
+.orbeon .dropdown-menu > li > span > a:hover,
+.orbeon .dropdown-menu > li > span > a:focus,
 .orbeon .dropdown-submenu:hover > a {
   text-decoration: none;
   color: #ffffff;
@@ -282,8 +293,8 @@ body.orbeon {
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
 }
-.orbeon .dropdown-menu .active > span > a,
-.orbeon .dropdown-menu .active > span > a:hover {
+.orbeon .dropdown-menu > .active > span > a,
+.orbeon .dropdown-menu > .active > span > a:hover {
   color: #ffffff;
   text-decoration: none;
   outline: 0;
@@ -297,11 +308,11 @@ body.orbeon {
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
 }
-.orbeon .dropdown-menu .disabled > span > a,
-.orbeon .dropdown-menu .disabled > span > a:hover {
+.orbeon .dropdown-menu > .disabled > span > a,
+.orbeon .dropdown-menu > .disabled > span > a:hover {
   color: #999999;
 }
-.orbeon .dropdown-menu .disabled > span > a:hover {
+.orbeon .dropdown-menu > .disabled > span > a:hover {
   text-decoration: none;
   background-color: transparent;
   background-image: none;

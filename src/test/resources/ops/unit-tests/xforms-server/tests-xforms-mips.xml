@@ -785,15 +785,38 @@
                                      required="true()"
                                      type="xs:integer"/>
                     </xf:model>
+                    <xf:model id="model2">
+                        <xf:instance id="instance2">
+                            <instance>
+                                <foo/>
+                                <bar>43</bar>
+                            </instance>
+                        </xf:instance>
+                        <xf:bind id="foo-bind2" ref="foo"
+                                     xxf:default="42"
+                                     relevant=". = 86"
+                                     calculate="xs:integer(../bar) * 2"
+                                     readonly="false()"
+                                     required="true()"
+                                     type="xs:integer"/>
+                    </xf:model>
                 </xh:head>
                 <xh:body>
-                    <xf:output id="output-relevant" value="xxf:evaluate-bind-property('foo-bind', 'relevant')"/>
-                    <xf:output id="output-readonly" value="xxf:evaluate-bind-property('foo-bind', 'readonly')"/>
-                    <xf:output id="output-required" value="xxf:evaluate-bind-property('foo-bind', 'required')"/>
-                    <xf:output id="output-type" value="xxf:evaluate-bind-property('foo-bind', 'type')"/>
-                    <xf:output id="output-constraint" value="xxf:evaluate-bind-property('foo-bind', 'constraint')"/>
-                    <xf:output id="output-calculate" value="xxf:evaluate-bind-property('foo-bind', 'calculate')"/>
-                    <xf:output id="output-default" value="xxf:evaluate-bind-property('foo-bind', 'xxf:default')"/>
+                    <xf:output id="output-relevant"    value="xxf:evaluate-bind-property('foo-bind', 'relevant')"/>
+                    <xf:output id="output-readonly"    value="xxf:evaluate-bind-property('foo-bind', 'readonly')"/>
+                    <xf:output id="output-required"    value="xxf:evaluate-bind-property('foo-bind', 'required')"/>
+                    <xf:output id="output-type"        value="xxf:evaluate-bind-property('foo-bind', 'type')"/>
+                    <xf:output id="output-constraint"  value="xxf:evaluate-bind-property('foo-bind', 'constraint')"/>
+                    <xf:output id="output-calculate"   value="xxf:evaluate-bind-property('foo-bind', 'calculate')"/>
+                    <xf:output id="output-default"     value="xxf:evaluate-bind-property('foo-bind', 'xxf:default')"/>
+
+                    <xf:output id="output-relevant2"   value="xxf:evaluate-bind-property('foo-bind2', 'relevant')"/>
+                    <xf:output id="output-readonly2"   value="xxf:evaluate-bind-property('foo-bind2', 'readonly')"/>
+                    <xf:output id="output-required2"   value="xxf:evaluate-bind-property('foo-bind2', 'required')"/>
+                    <xf:output id="output-type2"       value="xxf:evaluate-bind-property('foo-bind2', 'type')"/>
+                    <xf:output id="output-constraint2" value="xxf:evaluate-bind-property('foo-bind2', 'constraint')"/>
+                    <xf:output id="output-calculate2"  value="xxf:evaluate-bind-property('foo-bind2', 'calculate')"/>
+                    <xf:output id="output-default2"    value="xxf:evaluate-bind-property('foo-bind2', 'xxf:default')"/>
                 </xh:body>
             </xh:html>
         </input>
@@ -803,6 +826,12 @@
                     <dynamic-state>
                         <instances>
                             <instance id="instance" model-id="model">
+                                <instance>
+                                    <foo>86</foo>
+                                    <bar>43</bar>
+                                </instance>
+                            </instance>
+                            <instance id="instance2" model-id="model2">
                                 <instance>
                                     <foo>86</foo>
                                     <bar>43</bar>
@@ -819,6 +848,12 @@
                         <xxf:control id="output-type">xs:integer</xxf:control>
                         <xxf:control id="output-calculate">86</xxf:control>
                         <xxf:control id="output-default">42</xxf:control>
+                        <xxf:control id="output-relevant2">true</xxf:control>
+                        <xxf:control id="output-readonly2">false</xxf:control>
+                        <xxf:control id="output-required2">true</xxf:control>
+                        <xxf:control id="output-type2">xs:integer</xxf:control>
+                        <xxf:control id="output-calculate2">86</xxf:control>
+                        <xxf:control id="output-default2">42</xxf:control>
                     </xxf:control-values>
                 </xxf:action>
             </xxf:event-response>

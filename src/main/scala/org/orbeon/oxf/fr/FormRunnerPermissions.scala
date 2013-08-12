@@ -27,7 +27,7 @@ trait FormRunnerPermissions {
     val PropertyPrefix = "oxf.fr.authentication."
 
     val MethodPropertyName                  = PropertyPrefix + "method"
-    val ContainerRolesPropertyName          = PropertyPrefix + "container.roles" // NOTE: this could be inferred from form-builder-permissions.xml, right?
+    val ContainerRolesPropertyName          = PropertyPrefix + "container.roles"
     val HeaderUsernamePropertyName          = PropertyPrefix + "header.username"
     val HeaderRolesPropertyName             = PropertyPrefix + "header.roles"
     val HeaderGroupPropertyName             = PropertyPrefix + "header.group"

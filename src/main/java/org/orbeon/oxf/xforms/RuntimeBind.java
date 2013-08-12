@@ -39,6 +39,10 @@ public class RuntimeBind implements XFormsObject {
         return binds.containingDocument;
     }
 
+    public XFormsModel model() {
+        return binds.model;
+    }
+
     // To work around Scala compiler bug ("error: not found: value BindTree") when accessing staticBind directly
     public NamespaceMapping namespaceMapping() {
         return staticBind.namespaceMapping();

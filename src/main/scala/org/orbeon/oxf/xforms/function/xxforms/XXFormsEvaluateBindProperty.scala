@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2007 Orbeon, Inc.
+ * Copyright (C) 2010 Orbeon, Inc.
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the
  * GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -13,26 +13,20 @@
  */
 package org.orbeon.oxf.xforms.function.xxforms
 
+import org.orbeon.oxf.xforms.RuntimeBind
 import org.orbeon.oxf.xforms.function.{FunctionSupport, XFormsFunction}
 import org.orbeon.saxon.expr.XPathContext
-import org.orbeon.oxf.xforms.RuntimeBind
-import org.orbeon.saxon.om.{EmptyIterator, ListIterator, SequenceIterator}
+import org.orbeon.saxon.om.Item
 
-/**
- * The xxf:bind() function.
- */
-class XXFormsBind extends XFormsFunction with FunctionSupport {
-
-    override def iterate(xpathContext: XPathContext): SequenceIterator = {
+class XXFormsEvaluateBindProperty extends XFormsFunction with FunctionSupport {
+    override def evaluateItem(xpathContext: XPathContext): Item = {
 
         implicit val ctx = xpathContext
 
-        val bindId = stringArgument(0)
+        val bindId   = stringArgument(0)
+        val mipQName = getQNameFromExpression(xpathContext, arguments(1))
 
-        context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, context.contextStack.getCurrentSingleItem) match {
-            case bind: RuntimeBind ⇒ new ListIterator(bind.nodeset)
-            case _ ⇒ EmptyIterator.getInstance
-        }
+        Option(context.container.resolveObjectByIdInScope(getSourceEffectiveId, bindId, context.contextStack.getCurrentSingleItem)) collect
+            { case bind: RuntimeBind ⇒ bind.model.getBinds.evaluateBindByType(bind, 1, mipQName) } orNull
     }
 }
-

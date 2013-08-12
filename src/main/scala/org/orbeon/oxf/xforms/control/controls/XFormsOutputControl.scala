@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms.control.controls
 import collection.JavaConverters._
 import org.apache.commons.lang3.StringUtils
 import org.dom4j.Element
-import org.dom4j.QName
 import org.orbeon.oxf.externalcontext.ServletURLRewriter
 import org.orbeon.oxf.externalcontext.URLRewriter
 import org.orbeon.oxf.util.NetUtils
@@ -48,7 +47,6 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
 
     // Optional format and mediatype
     private def format = Option(staticControl) flatMap (_.format)
-    private def mediatypeAttribute = Option(staticControl) flatMap (_.mediatype)
 
     // Value attribute
     private val valueAttribute = element.attributeValue(VALUE_QNAME)
@@ -88,12 +86,12 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME)) {
                 // Download appearance
                 // NOTE: Never put timestamp for downloads otherwise browsers may cache the file to download which is not
-                proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatypeAttribute)
-            } else if (mediatypeAttribute exists (_.startsWith("image/"))) {
+                proxyValueIfNeeded(internalValue, "", filename, fileMediatype orElse mediatype)
+            } else if (mediatype exists (_.startsWith("image/"))) {
                 // Image mediatype
                 // Use dummy image as default value so that client always has something to load
-                proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, mediatypeAttribute)
-            } else if (mediatypeAttribute exists (_ == "text/html")) {
+                proxyValueIfNeeded(internalValue, DUMMY_IMAGE_URI, filename, mediatype)
+            } else if (mediatype exists (_ == "text/html")) {
                 // HTML mediatype
                 internalValue
             } else {
@@ -174,7 +172,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
         }
 
     override def getRelevantEscapedExternalValue =
-        if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatypeAttribute exists (_.startsWith("image/")))) {
+        if (getAppearances.contains(XXFORMS_DOWNLOAD_APPEARANCE_QNAME) || (mediatype exists (_.startsWith("image/")))) {
             val externalValue = getExternalValue
             if (StringUtils.isNotBlank(externalValue)) {
                 // External value is not blank, rewrite as absolute path. Two cases:
@@ -184,7 +182,7 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             } else
                 // Empty value, return as is
                 externalValue
-        } else if (mediatypeAttribute exists (_ == "text/html"))
+        } else if (mediatype exists (_ == "text/html"))
             // Rewrite the HTML value with resolved @href and @src attributes
             XFormsControl.getEscapedHTMLValue(getLocationData, getExternalValue)
         else
@@ -192,14 +190,11 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             getExternalValue
 
     override def getNonRelevantEscapedExternalValue =
-        if (mediatypeAttribute exists (_.startsWith("image/")))
+        if (mediatype exists (_.startsWith("image/")))
             // Return rewritten URL of dummy image URL
             XFormsUtils.resolveResourceURL(containingDocument, element, DUMMY_IMAGE_URI, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
         else
             super.getNonRelevantEscapedExternalValue
-
-    def getMediatypeAttribute = mediatypeAttribute.orNull
-    def getValueAttribute = valueAttribute
 
     // If we have both @ref and @value, read the type
     // XForms doesn't specify this as of XForms 2.0, but we already read the other MIPs so it makes sense.

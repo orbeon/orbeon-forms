@@ -46,7 +46,9 @@ $ ->
                     State.tooltipShownBecauseOfFocus = false
 
         onPopover: (event) ->
-            if ! State.tooltipShownBecauseOfFocus
+            # Also test on popover being shown, as by the time we get the mouseleave on the popover,
+            # it might have been hidden for some other reason
+            if ! State.tooltipShownBecauseOfFocus && State.tooltipPopoverShownForControlEl?
                 TooltipPopover.hide(State.tooltipPopoverShownForControlEl, event)
 
     $('.fr-body').on('mouseenter mouseleave focusin focusout', '.xforms-control', Events.onControl)

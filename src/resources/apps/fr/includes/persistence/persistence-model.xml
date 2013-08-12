@@ -184,7 +184,7 @@
         <!-- Compute authorized operations -->
         <xf:var name="from-persistence" value="instance('fr-authorized-operations')/@from-persistence"/>
         <xf:var name="ops" value="if (exists($from-persistence))
-                                  then tokenize($from-persistence, '\s')
+                                  then xxf:split($from-persistence)
                                   else frf:javaAuthorizedOperationsBasedOnRoles(xxf:instance('fr-form-metadata')/permissions)"/>
 
         <xf:setvalue
@@ -192,7 +192,7 @@
             value="string-join($ops, ' ')"/>
 
         <xf:message level="xxf:log-debug">
-            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="$ops"/>
+            AUTHORIZED OPERATIONS ON FORM (DETAIL MODES): <xf:output value="string-join($ops, ' ')"/>
         </xf:message>
 
         <!-- If user can't perform the required operations, deny access to this page -->

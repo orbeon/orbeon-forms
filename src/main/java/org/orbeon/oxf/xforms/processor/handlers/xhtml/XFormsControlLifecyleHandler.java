@@ -234,22 +234,22 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
 
     protected void handleLabel() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.LABEL), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.LABEL, getControl(), isTemplate(), false);
     }
 
     protected void handleAlert() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.ALERT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.ALERT, getControl(), isTemplate(), false);
     }
 
     protected void handleHint() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.HINT), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HINT, getControl(), isTemplate(), false);
     }
 
     protected void handleHelp() throws SAXException {
         // May be overridden by subclasses
-        handleLabelHintHelpAlert(getStaticLHHAAttributes(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, getControl(), isTemplate(), false);
+        handleLabelHintHelpAlert(getStaticLHHA(getPrefixedId(), LHHAC.HELP), getEffectiveId(), getForEffectiveId(getEffectiveId()), LHHAC.HELP, getControl(), isTemplate(), false);
     }
 
     // Must be overridden by subclasses
@@ -291,7 +291,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         }
 
         // Get attributes
-        final AttributesImpl newAttributes = getAttributes(attributes, classes.toString(), effectiveId);
+        final AttributesImpl newAttributes = getIdClassXHTMLAttributes(attributes, classes.toString(), effectiveId);
 
         // Add extension attributes in no namespace if possible
         if (xformsControl != null) {

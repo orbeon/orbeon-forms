@@ -111,7 +111,7 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
         final Attributes labelHintHelpAlertAttributes;
         {
             final String forPrefixedId = XFormsUtils.getPrefixedId(controlEffectiveId);
-            final AttributesImpl tempAttributes = getStaticLHHAAttributes(forPrefixedId, lhhaType);
+            final AttributesImpl tempAttributes = XMLUtils.getSAXAttributes(getStaticLHHA(forPrefixedId, lhhaType).element());
             
             if (tempAttributes != null)
             	updateID(tempAttributes, controlEffectiveId, lhhaType);

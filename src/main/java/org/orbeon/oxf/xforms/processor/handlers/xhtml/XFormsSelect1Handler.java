@@ -253,7 +253,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                     if (value == null) {
                                         assert item.hasChildren();
                                         final String itemClasses = getItemClasses(item, null);
-                                        final AttributesImpl optGroupAttributes = getAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+                                        final AttributesImpl optGroupAttributes = getIdClassXHTMLAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
                                         if (label != null)
                                             optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
                                         
@@ -408,7 +408,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
         // xhtml:span enclosing input and label
         final String itemClasses = getItemClasses(item, isSelected ? "xforms-selected" : "xforms-deselected");
-        final AttributesImpl spanAttributes = getAttributes(containingDocument, reusableAttributes, XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+        final AttributesImpl spanAttributes = getIdClassXHTMLAttributes(containingDocument, reusableAttributes, XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to span
         addItemAttributes(item, spanAttributes);
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, spanAttributes);
@@ -479,7 +479,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                    boolean isMultiple, Item item) throws SAXException {
 
         final String itemClasses = getItemClasses(item, null);
-        final AttributesImpl optionAttributes = getAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
+        final AttributesImpl optionAttributes = getIdClassXHTMLAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to option
         addItemAttributes(item, optionAttributes);
         optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.externalValue());

@@ -27,6 +27,7 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler._
 import XFormsBaseHandlerXHTML._
 import XFormsConstants._
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait
 
 /**
  * Handle xf:input.
@@ -132,7 +133,10 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                         }
                         // Q: Not sure why we duplicate the appearances here. As of 2011-10-27, removing this
                         // makes the minimal date picker fail on the client. We should be able to remove this.
-                        appendAppearances(elementAnalysis, inputClasses)
+                        elementAnalysis match {
+                            case a: AppearanceTrait ⇒ a.encodeAndAppendAppearances(inputClasses)
+                            case _ ⇒
+                        }
                     } else {
                         reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "")
                     }

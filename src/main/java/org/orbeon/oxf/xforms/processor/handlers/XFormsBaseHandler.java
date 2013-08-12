@@ -128,11 +128,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
         }
     }
 
-    protected AttributesImpl getAttributes(Attributes elementAttributes, String classes, String effectiveId) {
-        return getAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveId);
+    protected AttributesImpl getIdClassXHTMLAttributes(Attributes elementAttributes, String classes, String effectiveId) {
+        return getIdClassXHTMLAttributes(containingDocument, reusableAttributes, elementAttributes, classes, effectiveId);
     }
 
-    protected static AttributesImpl getAttributes(XFormsContainingDocument containingDocument, AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String effectiveId) {
+    protected static AttributesImpl getIdClassXHTMLAttributes(XFormsContainingDocument containingDocument, AttributesImpl reusableAttributes, Attributes elementAttributes, String classes, String effectiveId) {
         reusableAttributes.clear();
 
         // Copy "id"
@@ -240,14 +240,11 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 		return attributes;
 	}
 
-    protected AttributesImpl getStaticLHHAAttributes(String controlPrefixedId, XFormsBaseHandler.LHHAC lhhaType) {
-        final LHHAAnalysis lhhaAnalysis;
+    protected LHHAAnalysis getStaticLHHA(String controlPrefixedId, XFormsBaseHandler.LHHAC lhhaType) {
         final StaticStateGlobalOps globalOps = containingDocument.getStaticOps();
         if (lhhaType == LHHAC.ALERT)
-            lhhaAnalysis = globalOps.getAlerts(controlPrefixedId).head(); // for alerts, take the first one, but does this make sense?
+            return globalOps.getAlerts(controlPrefixedId).head(); // for alerts, take the first one, but does this make sense?
         else
-            lhhaAnalysis = globalOps.getLHH(controlPrefixedId, lhhaType.name().toLowerCase());
-
-        return XMLUtils.getSAXAttributes(lhhaAnalysis.element());
+            return globalOps.getLHH(controlPrefixedId, lhhaType.name().toLowerCase());
     }
 }

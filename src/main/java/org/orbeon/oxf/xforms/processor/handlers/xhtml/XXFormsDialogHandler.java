@@ -70,7 +70,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String divQName = XMLUtils.buildQName(xhtmlPrefix, "div");
         final ContentHandler contentHandler = handlerContext.getController().getOutput();
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getAttributes(attributes, classes.toString(), effectiveDialogId));
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, getIdClassXHTMLAttributes(attributes, classes.toString(), effectiveDialogId));
 
         // Child xhtml:div for label
         reusableAttributes.clear();

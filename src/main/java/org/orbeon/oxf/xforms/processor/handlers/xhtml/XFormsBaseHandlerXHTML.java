@@ -14,12 +14,12 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;
+import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.analysis.model.StaticBind;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
@@ -174,7 +174,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
             }
         }
         // Classes for appearances
-        appendAppearances(elementAnalysis, sb);
+        if (elementAnalysis instanceof AppearanceTrait)
+            ((AppearanceTrait) elementAnalysis).encodeAndAppendAppearances(sb);
         {
             // Class for mediatype
             final String mediatypeValue = controlAttributes.getValue("mediatype");
@@ -208,22 +209,6 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected static void appendAppearances(ElementAnalysis elementAnalysis, StringBuilder sb) {
-        for (final QName appearance : XFormsControl.jAppearances(elementAnalysis)) {
-            if (sb.length() > 0)
-                sb.append(' ');
-            sb.append("xforms-");
-            sb.append(elementAnalysis.element().getName());
-            sb.append("-appearance-");
-            // Allow xxf:* and *
-            if (XFormsConstants.XXFORMS_NAMESPACE_URI.equals(appearance.getNamespace().getURI()))
-                sb.append("xxforms-");
-            else if (!"".equals(appearance.getNamespace().getURI()))
-                throw new ValidationException("Invalid appearance namespace URI: " + appearance.getNamespace().getURI(), elementAnalysis.locationData());
-            sb.append(appearance.getName());
-        }
-    }
-
     protected StringBuilder appendControlUserClasses(Attributes controlAttributes, XFormsControl control, StringBuilder sb) {
         // @class
         final String attributeValue = controlAttributes.getValue("class");
@@ -254,122 +239,19 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
         return sb;
     }
 
-    protected void handleLabelHintHelpAlert(Attributes attributes, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
+    protected void handleLabelHintHelpAlert(LHHAAnalysis lhhaAnalysis, String targetControlEffectiveId, String forEffectiveId, XFormsBaseHandler.LHHAC lhhaType, XFormsControl control, boolean isTemplate, boolean isExternal) throws SAXException {
 
-        // NOTE: We used to not handle alerts and help in read-only mode. We now prefer to controls this with CSS.
+        final AttributesImpl staticLHHAAttributes = XMLUtils.getSAXAttributes(lhhaAnalysis.element());
+
         final boolean isLabel = lhhaType == LHHAC.LABEL;
         final boolean isHelp = lhhaType == LHHAC.HELP;
         final boolean isHint = lhhaType == LHHAC.HINT;
         final boolean isAlert = lhhaType == LHHAC.ALERT;
 
-        final String labelHintHelpAlertValue;
-        final boolean mustOutputHTMLFragment;
-        if (control != null) {
-            // Get actual value from control
-            if (isLabel) {
-                labelHintHelpAlertValue = control.getLabel();
-                mustOutputHTMLFragment = control.isHTMLLabel();
-            } else if (isHelp) {
-                // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
-                // case because it is stored as escaped HTML within a <label> element.
-                labelHintHelpAlertValue = control.getEscapedHelp();
-                mustOutputHTMLFragment = false;
-            } else if (isHint) {
-                labelHintHelpAlertValue = control.getHint();
-                mustOutputHTMLFragment = control.isHTMLHint();
-            } else if (isAlert) {
-                labelHintHelpAlertValue = control.getAlert();
-                mustOutputHTMLFragment = control.isHTMLAlert();
-            } else {
-                throw new IllegalStateException("Illegal type requested");
-            }
-        } else {
-            // Placeholder
-            labelHintHelpAlertValue = null;
-            mustOutputHTMLFragment = false;
-        }
-
-        final String elementName;
-        {
-            if (isLabel) {
-                elementName = handlerContext.getLabelElementName();
-            } else if (isHelp) {
-                elementName = handlerContext.getHelpElementName();
-            } else if (isHint) {
-                elementName = handlerContext.getHintElementName();
-            } else if (isAlert) {
-                elementName = handlerContext.getAlertElementName();
-            } else {
-                throw new IllegalStateException("Illegal type requested");
-            }
-        }
-
-        if (attributes != null || isAlert) {
+        if (staticLHHAAttributes != null || isAlert) {
             // If no attributes were found, there is no such label / help / hint / alert
 
-            final StringBuilder classes = new StringBuilder(30);
-
-            // Put user classes first if any
-            if (attributes != null) {
-                final String userClass = attributes.getValue("class");
-                if (userClass != null)
-                    classes.append(userClass);
-            }
-
-            // Mark alert as active if needed
-            if (isAlert) {
-                if (control instanceof XFormsSingleNodeControl) {
-                    final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
-                    final scala.Option<StaticBind.ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
-
-                    if (constraintLevel.isDefined()) {
-                        if (classes.length() > 0)
-                            classes.append(' ');
-                        classes.append("xforms-active");
-                    }
-
-                    // Constraint classes are placed on the control if the alert is not external
-                    if (isExternal)
-                        addConstraintClasses(classes, constraintLevel);
-                }
-            }
-
-            // Handle visibility
-            // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
-            if (control != null) {
-                if (isAlert || isLabel) {
-                    // Allow empty labels and alerts
-                    if (!control.isRelevant()) {
-                        if (classes.length() > 0)
-                            classes.append(' ');
-                        classes.append("xforms-disabled");
-                    }
-                } else {
-                    // For help and hint, consider "non-relevant" if empty
-                    final boolean isHintHelpRelevant = control.isRelevant() && StringUtils.isNotEmpty(labelHintHelpAlertValue);
-                    if (!isHintHelpRelevant) {
-                        if (classes.length() > 0)
-                            classes.append(' ');
-                        classes.append("xforms-disabled");
-                    }
-                }
-            } else if (!isTemplate || isHelp) {
-                // Null control outside of template OR help within template
-                if (classes.length() > 0)
-                    classes.append(' ');
-                classes.append("xforms-disabled");
-            }
-
-            // LHHA name
-            if (classes.length() > 0)
-                classes.append(' ');
-            classes.append("xforms-");
-            classes.append(lhhaType.name().toLowerCase());
-
-            final String lhhaClasses = classes.toString();
-
-            final boolean isNoscript = handlerContext.isNoScript();
-            if (isNoscript && isHelp) {
+            if (handlerContext.isNoScript() && isHelp) {
                 if (control != null) {
 
                     final ContentHandler contentHandler = handlerContext.getController().getOutput();
@@ -386,9 +268,114 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName);
                 }
             } else {
+
+                final String labelHintHelpAlertValue;
+                final boolean mustOutputHTMLFragment;
+                if (control != null) {
+                    // Get actual value from control
+                    if (isLabel) {
+                        labelHintHelpAlertValue = control.getLabel();
+                        mustOutputHTMLFragment = control.isHTMLLabel();
+                    } else if (isHelp) {
+                        // NOTE: Special case here where we get the escaped help to facilitate work below. Help is a special
+                        // case because it is stored as escaped HTML within a <label> element.
+                        labelHintHelpAlertValue = control.getEscapedHelp();
+                        mustOutputHTMLFragment = false;
+                    } else if (isHint) {
+                        labelHintHelpAlertValue = control.getHint();
+                        mustOutputHTMLFragment = control.isHTMLHint();
+                    } else if (isAlert) {
+                        labelHintHelpAlertValue = control.getAlert();
+                        mustOutputHTMLFragment = control.isHTMLAlert();
+                    } else {
+                        throw new IllegalStateException("Illegal type requested");
+                    }
+                } else {
+                    // Placeholder
+                    labelHintHelpAlertValue = null;
+                    mustOutputHTMLFragment = false;
+                }
+
+                final String elementName;
+                {
+                    if (isLabel) {
+                        elementName = handlerContext.getLabelElementName();
+                    } else if (isHelp) {
+                        elementName = handlerContext.getHelpElementName();
+                    } else if (isHint) {
+                        elementName = handlerContext.getHintElementName();
+                    } else if (isAlert) {
+                        elementName = handlerContext.getAlertElementName();
+                    } else {
+                        throw new IllegalStateException("Illegal type requested");
+                    }
+                }
+
+                final StringBuilder classes = new StringBuilder(30);
+
+                // Put user classes first if any
+                if (staticLHHAAttributes != null) {
+                    final String userClass = staticLHHAAttributes.getValue("class");
+                    if (userClass != null)
+                        classes.append(userClass);
+                }
+
+                // Mark alert as active if needed
+                if (isAlert) {
+                    if (control instanceof XFormsSingleNodeControl) {
+                        final XFormsSingleNodeControl singleNodeControl = (XFormsSingleNodeControl) control;
+                        final scala.Option<StaticBind.ValidationLevel> constraintLevel = singleNodeControl.alertLevel();
+
+                        if (constraintLevel.isDefined()) {
+                            if (classes.length() > 0)
+                                classes.append(' ');
+                            classes.append("xforms-active");
+                        }
+
+                        // Constraint classes are placed on the control if the alert is not external
+                        if (isExternal)
+                            addConstraintClasses(classes, constraintLevel);
+                    }
+                }
+
+                // Handle visibility
+                // TODO: It would be great to actually know about the relevance of help, hint, and label. Right now, we just look at whether the value is empty
+                if (control != null) {
+                    if (isAlert || isLabel) {
+                        // Allow empty labels and alerts
+                        if (!control.isRelevant()) {
+                            if (classes.length() > 0)
+                                classes.append(' ');
+                            classes.append("xforms-disabled");
+                        }
+                    } else {
+                        // For help and hint, consider "non-relevant" if empty
+                        final boolean isHintHelpRelevant = control.isRelevant() && StringUtils.isNotEmpty(labelHintHelpAlertValue);
+                        if (!isHintHelpRelevant) {
+                            if (classes.length() > 0)
+                                classes.append(' ');
+                            classes.append("xforms-disabled");
+                        }
+                    }
+                } else if (!isTemplate || isHelp) {
+                    // Null control outside of template OR help within template
+                    if (classes.length() > 0)
+                        classes.append(' ');
+                    classes.append("xforms-disabled");
+                }
+
+                // LHHA name
+                if (classes.length() > 0)
+                    classes.append(' ');
+                classes.append("xforms-");
+                classes.append(lhhaType.name().toLowerCase());
+
                 // We handle null attributes as well because we want a placeholder for "alert" even if there is no xf:alert
-                final Attributes newAttributes = (attributes != null) ? attributes : new AttributesImpl();
-                outputLabelFor(handlerContext, getAttributes(newAttributes, lhhaClasses, null), targetControlEffectiveId,
+                final Attributes newAttributes = (staticLHHAAttributes != null) ? staticLHHAAttributes : new AttributesImpl();
+
+                lhhaAnalysis.encodeAndAppendAppearances(classes);
+
+                outputLabelFor(handlerContext, getIdClassXHTMLAttributes(newAttributes, classes.toString(), null), targetControlEffectiveId,
                         forEffectiveId, lhhaType, elementName, labelHintHelpAlertValue, mustOutputHTMLFragment, isExternal);
             }
         }

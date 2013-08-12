@@ -37,7 +37,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
         this.elementQName = XMLUtils.buildQName(xhtmlPrefix, elementName)
 
         val classes = "xxforms-dynamic-control"
-        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getAttributes(attributes, classes, effectiveId))
+        contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, elementName, elementQName, getIdClassXHTMLAttributes(attributes, classes, effectiveId))
         handlerContext.pushComponentContext(prefixedId)
 
         if (! handlerContext.isTemplate) {

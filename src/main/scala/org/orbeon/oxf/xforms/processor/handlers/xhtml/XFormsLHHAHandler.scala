@@ -99,7 +99,7 @@ class XFormsLHHAHandler extends XFormsBaseHandlerXHTML(false, false) {
                                 // Not a label, so no need to determine @for
                                 null
 
-                        handleLabelHintHelpAlert(XMLUtils.getSAXAttributes(lhhaAnalysis.element), targetControlEffectiveId, forEffectiveId, lhhaType, xformsControl.orNull, isTemplate, true)
+                        handleLabelHintHelpAlert(lhhaAnalysis, targetControlEffectiveId, forEffectiveId, lhhaType, xformsControl.orNull, isTemplate, true)
 
                     case _ ⇒
                         // Don't output markup for the LHHA

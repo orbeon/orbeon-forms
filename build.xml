@@ -155,8 +155,8 @@
 
         <include name="rhino-1.7R2.jar"/>
 
-        <include name="flying-saucer-core-9.0.2-20130125.jar"/>
-        <include name="flying-saucer-pdf-9.0.2-20130125.jar"/>
+        <include name="flying-saucer-core-9.0.2-20130812.jar"/>
+        <include name="flying-saucer-pdf-9.0.2-20130812.jar"/>
         <include name="flying-saucer-dependency-itext-2.1.7.jar"/>
         <include name="itext-bcmail-jdk14-138.jar"/>
         <include name="itext-bcprov-jdk14-138.jar"/>

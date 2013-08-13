@@ -1791,8 +1791,10 @@ ORBEON.xforms.Controls = {
         if (byId != null)
             return byId;
 
-        // Search just under the control element, excluding elements with an id, as they might be for another control
-        var lhhaElements = $(control).children('.xforms-' + lhhaType + ':not([id])');
+        // Search just under the control element, excluding elements with an LHHA id, as they might be for a nested
+        // control if we are a grouping control. Test on XF_LHHAI_SEPARATOR as e.g. portals might add their own id.
+        // See: https://github.com/orbeon/orbeon-forms/issues/1206
+        var lhhaElements = $(control).children('.xforms-' + lhhaType).filter(function() { return this.id.indexOf(XF_LHHAI_SEPARATOR) == -1 });
         return (lhhaElements.length > 0) ? lhhaElements.get(0) : null;
     },
 

@@ -355,8 +355,8 @@ body {
   overflow-y: auto;
   padding: 0;
 }
-.orbeon .fb-dialog-itemsets .xbl-fr-grid table {
-  background-color: white;
+.orbeon .fb-dialog-itemsets .xbl-fr-grid > * {
+  background-color: #ffffff;
 }
 .orbeon .fb-dialog-itemsets .fr-grid-2-columns .xforms-input input {
   width: 13em;
@@ -450,8 +450,8 @@ body {
   overflow-y: auto;
   padding: 0;
 }
-.orbeon .fb-dialog-control-details .tab-pane table {
-  background-color: white;
+.orbeon .fb-dialog-control-details .tab-pane > * {
+  background-color: #ffffff;
 }
 .orbeon .fb-dialog-control-details .fr-grid-validations .fr-grid-col-1 {
   width: 140px;

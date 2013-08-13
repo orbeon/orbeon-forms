@@ -54,9 +54,15 @@
             this.myEditor.onChange.add(_.bind(this.clientToServer, this));
 
             // Render the component when visible (see https://github.com/orbeon/orbeon-forms/issues/172)
+            // - unfortunately, we need to use polling; can't use Ajax response e.g. if in Bootstrap tab, as
+            //   in FB Control Settings dialog
             var renderIfVisible = _.bind(function() {
-                if ($(tinyMceDiv).width() == 0) Events.runOnNext(Events.ajaxResponseProcessedEvent, renderIfVisible);
-                else this.myEditor.render();
+                if ($(tinyMceDiv).width() == 0) {
+                    var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
+                    _.delay(renderIfVisible, shortDelay);
+                } else {
+                    this.myEditor.render();
+                }
             }, this);
             renderIfVisible();
         },

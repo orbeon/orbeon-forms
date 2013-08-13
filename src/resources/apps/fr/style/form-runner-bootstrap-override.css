@@ -148,6 +148,16 @@ body.orbeon {
   *height: 24px;
   *line-height: 24px;
 }
+.orbeon input[type="submit"],
+.orbeon input[type="reset"],
+.orbeon input[type="button"] {
+  background-image: none;
+}
+.orbeon input[type="submit"]:hover,
+.orbeon input[type="reset"]:hover,
+.orbeon input[type="button"]:hover {
+  background-image: none;
+}
 .orbeon input[type="file"] {
   height: auto;
   line-height: normal;

@@ -89,6 +89,16 @@ body.orbeon {
         *line-height: @controlsHeight - 2 * 2px;
     }
 
+    // Liferay adds background images which don't mix well with Bootstrap
+    input[type="submit"],
+    input[type="reset"],
+    input[type="button"] {
+        background-image: none;
+        &:hover {
+            background-image: none;
+        }
+    }
+
     input[type="file"] {
         height: auto;                   // Don't specify a height because with FF the button is not native
         line-height: normal;            // Fix alignment of the "Choose file" button and "No file chosen" text on Chrome

@@ -61,20 +61,13 @@ TooltipPopover =
                     methods.push('tooltip')
                 if lhhaEl.hasClass('xforms-appearance-popover')
                     beforeLastColumn = $(controlEl).closest('td').next().is('*')
+                    placement = if beforeLastColumn then 'right' else 'left'
                     controlEl.popover
-                        placement: if beforeLastColumn then 'right' else 'left',
+                        placement: placement
                         trigger: 'manual',
-                        title: controlEl.find('.xforms-label').text()
                         content: lhhaEl.text()
                         html: true
-                        container:'.popover-container'
-                        template: do ->
-                            # Set max-width of popover to be the width of the remaining columns
-                            # - use 90% thereof, so if over controls, we can still get a hint of their presence
-                            defaultTemplate = $($.fn.popover.defaults.template)
-                            maxWidth = 0.9 * (controlEl.closest('table').width() - controlEl.closest('td').width())
-                            defaultTemplate.attr('style', "max-width: #{maxWidth}px")
-                            $('<div>').append(defaultTemplate).html()
+                        container:'.popover-container-' + placement
                     methods.push('popover')
             controlEl.data(@Methods, methods)
 
@@ -119,5 +112,7 @@ $ ->
     $('.fr-body').on('mouseenter mouseleave focusin focusout', '.xforms-control', Events.onControl)
     $('body'    ).on('mouseleave'                            , '.popover'       , Events.onPopover)
 
-    $('#xforms-form').append('<div class="popover-container">')
+    # Patch Bootstrap
+    $.fn.popover.Constructor.prototype.arrow = ->
+        this.$arrow = this.$arrow || this.tip().find(".arrow")
 

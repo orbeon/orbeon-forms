@@ -121,6 +121,8 @@
             <xsl:attribute name="class" select="string-join(('orbeon', concat('xforms-', if ($is-inline-hints) then 'disable' else 'enable', '-hint-as-tooltip'), 'xforms-disable-alert-as-tooltip', @class), ' ')"/>
             <xsl:apply-templates select="@* except @class"/>
             <xf:group model="fr-form-model" id="fr-view" class="container{if ($fluid) then '-fluid' else ''} fr-view{concat(' fr-mode-', $mode)}" xxf:element="div">
+                <xh:div class="popover-container-right"/>
+                <xh:div class="popover-container-left"/>
                 <xsl:apply-templates select="if ($is-detail and not($is-form-builder)) then $default-page-template else node()"/>
                 <xsl:call-template name="fr-hidden-controls"/>
                 <xsl:call-template name="fr-dialogs"/>

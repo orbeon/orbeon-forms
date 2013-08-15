@@ -43,9 +43,9 @@
         select="$fr-form-model-id, /xh:html/xh:head/xbl:xbl/xbl:binding/xbl:implementation/xf:model/generate-id()"/>
 
     <!-- Whether $context is within a section template -->
-    <xsl:function name="fr:in-section-template" as="xs:string">
+    <xsl:function name="fr:in-section-template" as="xs:boolean">
         <xsl:param name="context" as="element()"/>
-        <xsl:value-of select="exists($context/ancestor::xbl:implementation)"/>
+        <xsl:sequence select="exists($context/ancestor::xbl:implementation)"/>
     </xsl:function>
 
     <!-- The path is different depending on whether we are within a section template or not.

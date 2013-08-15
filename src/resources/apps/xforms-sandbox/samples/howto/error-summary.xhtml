@@ -31,7 +31,7 @@
                     <type>Mobile</type>
                 </phone>
             </xf:instance>
-            <xf:action ev:event="xforms-model-construct-done" iterate="for $i in (1 to 3) return .">
+            <xf:action ev:event="xforms-model-construct-done" iterate="1 to 3">
                 <xf:insert context="instance('user-info')" ref="phone" origin="instance('phone-template')"/>
             </xf:action>
 
@@ -102,14 +102,14 @@
                 </xf:group>
         
                 <xh:div class="buttons">
-                    <fr:button>
+                    <xf:trigger>
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/silk/add.png"/>
                             <xh:span>Add phone</xh:span>
                         </xf:label>
                         <xf:insert context="." ref="phone" origin="instance('phone-template')" ev:event="DOMActivate"/>
-                    </fr:button>
-                    <fr:button>
+                    </xf:trigger>
+                    <xf:trigger>
                         <xf:label>
                             <xh:img src="/apps/fr/style/images/silk/disk.png"/>
                             <xh:span>Save</xh:span>
@@ -125,7 +125,7 @@
                                 <xf:toggle case="save-failure"/>
                             </xf:action>
                         </xf:action>
-                    </fr:button>
+                    </xf:trigger>
                     <xf:switch>
                         <xf:case/>
                         <xf:case id="save-failure">Your data could not saved; please check the form for errors.</xf:case>

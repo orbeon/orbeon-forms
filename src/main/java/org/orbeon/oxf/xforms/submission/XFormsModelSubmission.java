@@ -681,10 +681,10 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         if (connectionResult != null) {
             // Handle response
             final Replacer replacer;
-            if (connectionResult.dontHandleResponse) {
+            if (connectionResult.dontHandleResponse()) {
                 // Always return a replacer even if it does nothing, this way we don't have to deal with null
                 replacer = new NoneReplacer(this, containingDocument);
-            } else if (NetUtils.isSuccessCode(connectionResult.statusCode)) {
+            } else if (NetUtils.isSuccessCode(connectionResult.statusCode())) {
                 // Successful response
                 if (connectionResult.hasContent()) {
                     // There is a body
@@ -716,7 +716,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
                     // xforms-submit-done"
                     replacer = new NoneReplacer(this, containingDocument);
                 }
-            } else if (connectionResult.statusCode == 302 || connectionResult.statusCode == 301) {
+            } else if (connectionResult.statusCode() == 302 || connectionResult.statusCode() == 301) {
                 // Got a redirect
 
                 // Currently we don't know how to handle a redirect for replace != "all"
@@ -728,7 +728,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
 
             } else {
                 // Error code received
-                throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                throw new XFormsSubmissionException(this, "xf:submission for submission id: " + id + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
                         new XFormsSubmitErrorEvent(this, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
             }
 

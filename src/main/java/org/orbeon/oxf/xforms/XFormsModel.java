@@ -676,8 +676,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
 
             try {
                 // Handle connection errors
-                if (connectionResult.statusCode != 200) {
-                    throw new OXFException("Got invalid return code while loading instance: " + absoluteURLString + ", " + connectionResult.statusCode);
+                if (connectionResult.statusCode() != 200) {
+                    throw new OXFException("Got invalid return code while loading instance: " + absoluteURLString + ", " + connectionResult.statusCode());
                 }
 
                 // TODO: Handle validating and XInclude!
@@ -685,10 +685,10 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                 // Read result as XML
                 // TODO: use submission code
                 if (!instance.readonly()) {
-                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
+                    instanceDocument = TransformerUtils.readDom4j(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), false, true);
                 } else {
                     instanceDocument = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration(),
-                            connectionResult.getResponseInputStream(), connectionResult.resourceURI, false, true);
+                            connectionResult.getResponseInputStream(), connectionResult.resourceURI(), false, true);
                 }
             } finally {
                 // Clean-up

@@ -71,7 +71,7 @@ class Connection(
 
                 connectionResult.statusCode = 200
                 connectionResult.responseHeaders = urlConnection.getHeaderFields
-                connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(urlConnection))
+                connectionResult.setLastModified(urlConnection)
                 connectionResult.setResponseContentType(urlConnection.getContentType, "application/xml")
                 connectionResult.setResponseInputStream(urlConnection.getInputStream)
 
@@ -163,7 +163,7 @@ class Connection(
                 // Get response information
                 connectionResult.statusCode = httpURLConnection.getResponseCode
                 connectionResult.responseHeaders = httpURLConnection.getHeaderFields
-                connectionResult.setLastModified(NetUtils.getLastModifiedAsLong(httpURLConnection))
+                connectionResult.setLastModified(httpURLConnection)
                 connectionResult.setResponseContentType(httpURLConnection.getContentType, "application/xml")
                 connectionResult.setResponseInputStream(httpURLConnection.getInputStream)
 

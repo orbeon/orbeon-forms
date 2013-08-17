@@ -210,19 +210,6 @@ public class NetUtils {
      *
      * This handles the (broken at some point in the Java libraries) case of the file: protocol.
      *
-     * @return last modified timestamp, null if le 0
-     */
-    public static Long getLastModifiedAsLong(URLConnection urlConnection) {
-        final long connectionLastModified = getLastModified(urlConnection);
-        // Zero and negative values often have a special meaning, make sure to normalize here
-        return connectionLastModified <= 0 ? null : connectionLastModified;
-    }
-
-    /**
-     * Get the last modification date of an open URLConnection.
-     *
-     * This handles the (broken at some point in the Java libraries) case of the file: protocol.
-     *
      * @return last modified timestamp "as is"
      */
     public static long getLastModified(URLConnection urlConnection) {

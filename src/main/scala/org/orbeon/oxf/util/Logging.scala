@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.util
 
+import org.apache.log4j.Level
+
 // More Scala-friendly indented logger API
 trait Logging {
 
@@ -33,6 +35,11 @@ trait Logging {
     def debug(message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
         if (logger.isDebugEnabled)
             logger.logDebug("", message, flattenTuples(parameters): _*)
+
+    // Debug with optional parameters
+    def log(logLevel: Level, message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(implicit logger: IndentedLogger) =
+        if (logger.isDebugEnabled)
+            logger.log(logLevel, "", message, flattenTuples(parameters): _*)
 
     // Debug block with optional parameters
     def withDebug[T](message: ⇒ String, parameters: ⇒ Seq[(String, String)] = Seq())(body: ⇒ T)(implicit logger: IndentedLogger): T =

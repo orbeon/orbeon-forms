@@ -392,15 +392,15 @@ public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
                     = Connection.jApply("GET", submissionURL, credentials, null, headers, true, false, indentedLogger).connect(true);
 
                 // Throw if connection failed (this is caught by the caller)
-                if (connectionResult.statusCode != 200)
-                    throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.statusCode);
+                if (connectionResult.statusCode() != 200)
+                    throw new OXFException("Got invalid return code while loading URI: " + urlString + ", " + connectionResult.statusCode());
 
                 // Read connection into SAXStore
                 documentSAXStore = new SAXStore();
-                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI, documentSAXStore, XMLUtils.ParserConfiguration.PLAIN, true);
+                XMLUtils.inputStreamToSAX(connectionResult.getResponseInputStream(), connectionResult.resourceURI(), documentSAXStore, XMLUtils.ParserConfiguration.PLAIN, true);
 
                 // Obtain last modified
-                lastModifiedLong = connectionResult.getLastModified();
+                lastModifiedLong = connectionResult.getLastModifiedJava();
             }
 
             // Cache document and last modified

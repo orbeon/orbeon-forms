@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms.submission;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.ConnectionResult;
 import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.SecureUtils;
@@ -28,7 +27,6 @@ import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.om.VirtualNode;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.concurrent.Callable;
 
 /**
@@ -265,17 +263,9 @@ public class CacheableSubmission extends BaseSubmission {
                 return true;
             }
         };
-        connectionResult.statusCode = 200;
-        connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
-        connectionResult.setLastModified(null);
+        connectionResult.setStatusCodeJava(200);
         connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
-        connectionResult.dontHandleResponse = false;
-        try {
-            connectionResult.setResponseInputStream(new ByteArrayInputStream(new byte[] {}));
-        } catch (IOException e) {
-            // Should not happen
-            throw new OXFException(e);
-        }
+        connectionResult.setResponseInputStream(new ByteArrayInputStream(new byte[] {}));
         return connectionResult;
     }
 }

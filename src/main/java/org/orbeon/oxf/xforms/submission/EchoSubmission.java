@@ -54,11 +54,8 @@ public class EchoSubmission extends BaseSubmission {
 
         // Do as if we are receiving a regular XML response
         final ConnectionResult connectionResult = new ConnectionResult(p2.actionOrResource);
-        connectionResult.statusCode = 200;
-        connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
-        connectionResult.setLastModified(null);
+        connectionResult.setStatusCodeJava(200);
         connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);// should we use actualRequestMediatype instead?
-        connectionResult.dontHandleResponse = false;
         connectionResult.setResponseInputStream(new ByteArrayInputStream(sp.messageBody));
 
         // Obtain replacer

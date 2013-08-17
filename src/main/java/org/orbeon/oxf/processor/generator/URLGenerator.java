@@ -846,12 +846,12 @@ public class URLGenerator extends ProcessorImpl {
                 return -1;
             // Otherwise, try URLConnection
             openConnection();
-            return connectionResult.statusCode;
+            return connectionResult.statusCode();
         }
 
         public Long getValidity() throws IOException {
             openConnection();
-            return isFailureStatusCode() ? null : connectionResult.getLastModified();
+            return isFailureStatusCode() ? null : connectionResult.getLastModifiedJava();
         }
 
         public Long getConditional(Long lastModified) throws IOException {

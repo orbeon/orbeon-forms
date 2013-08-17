@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms.event.events
 
 import collection.JavaConverters._
-import java.util.{List ⇒ JList}
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.event.XFormsEvent
@@ -33,7 +32,7 @@ import scala.util.control.NonFatal
 trait SubmitResponseEvent extends XFormsEvent {
 
     def connectionResult: Option[ConnectionResult]
-    final def headers = connectionResult flatMap (c ⇒ Option(c) map (_.responseHeaders)) map (_.asScala)
+    final def headers = connectionResult map (_.responseHeaders)
 
     override implicit def indentedLogger = containingDocument.getIndentedLogger(XFormsModelSubmission.LOGGING_CATEGORY)
     override def lazyProperties = getters(this, SubmitResponseEvent.Getters)
@@ -50,7 +49,7 @@ private object SubmitResponseEvent {
     // response or if there were no headers. Each element has a local name of header with no namespace URI and
     // two child elements, name and value, whose string contents are the name and value of the header,
     // respectively."
-    def headersDocument(headersOpt: Option[collection.Map[String, JList[String]]]): Option[DocumentInfo] =
+    def headersDocument(headersOpt: Option[Iterable[(String, List[String])]]): Option[DocumentInfo] =
         headersOpt filter (_.nonEmpty) map { headers ⇒
             val sb = new StringBuilder
             sb.append("<headers>")
@@ -58,7 +57,7 @@ private object SubmitResponseEvent {
                 sb.append("<header><name>")
                 sb.append(XMLUtils.escapeXMLMinimal(name))
                 sb.append("</name>")
-                for (value ← values.asScala) {
+                for (value ← values) {
                     sb.append("<value>")
                     sb.append(XMLUtils.escapeXMLMinimal(value))
                     sb.append("</value>")

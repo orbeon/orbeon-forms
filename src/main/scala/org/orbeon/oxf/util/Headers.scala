@@ -18,7 +18,7 @@ import collection.breakOut
 object Headers {
 
     // These headers are connection headers and must never be forwarded (content-length is handled separately below)
-    private val HeadersToFilterOut = Set("transfer-encoding", "connection", "host")
+    private val HeadersToFilterOut = Set("transfer-encoding", "connection", "host", "set-cookie")
 
     // See: https://groups.google.com/d/msg/scala-sips/wP6dL8nIAQs/TUfwXWWxkyMJ
     // Q: Doesn't Scala already have such a type?

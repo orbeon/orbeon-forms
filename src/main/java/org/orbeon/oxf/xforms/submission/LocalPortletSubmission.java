@@ -27,7 +27,6 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.net.URI;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 /**
@@ -155,7 +154,7 @@ public class LocalPortletSubmission extends BaseSubmission {
                     status[0] = true;
 
                     // TODO: can we put this in the Replacer?
-                    if (connectionResult.dontHandleResponse)
+                    if (connectionResult.dontHandleResponse())
                         containingDocument.setGotSubmissionReplaceAll();
 
                     // Obtain replacer, deserialize and update status

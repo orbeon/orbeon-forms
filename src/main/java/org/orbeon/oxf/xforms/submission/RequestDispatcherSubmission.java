@@ -169,7 +169,7 @@ public class RequestDispatcherSubmission extends BaseSubmission {
                     status[0] = true;
 
                     // TODO: can we put this in the Replacer?
-                    if (connectionResult.dontHandleResponse)
+                    if (connectionResult.dontHandleResponse())
                         containingDocument.setGotSubmissionReplaceAll();
 
                     // Obtain replacer, deserialize and update status

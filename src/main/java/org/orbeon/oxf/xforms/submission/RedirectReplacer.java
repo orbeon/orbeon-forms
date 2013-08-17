@@ -46,7 +46,7 @@ public class RedirectReplacer extends BaseReplacer {
         connectionResult.forwardHeaders(response);
 
         // Forward redirect
-        response.setStatus(connectionResult.statusCode);
+        response.setStatus(connectionResult.statusCode());
 
         return null;
     }

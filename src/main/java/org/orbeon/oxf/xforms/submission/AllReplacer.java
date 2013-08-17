@@ -47,20 +47,20 @@ public class AllReplacer extends BaseReplacer {
         replace(connectionResult, replaceAllResponse);
         // Update status code if it was updated on the response
         if (replaceAllResponse.getStatus() > 0)
-            connectionResult.statusCode = replaceAllResponse.getStatus();
+            connectionResult.setStatusCodeJava(replaceAllResponse.getStatus());
 
         // Success: "the event xforms-submit-done may be dispatched with appropriate context information"
         // Error: "either the document is replaced with an implementation-specific indication of an error or submission
         // processing concludes after dispatching xforms-submit-error with appropriate context information, including an
         // error-type of resource-error"
         if (! p.isDeferredSubmissionSecondPass) {
-            if (NetUtils.isSuccessCode(connectionResult.statusCode))
+            if (NetUtils.isSuccessCode(connectionResult.statusCode()))
                 return submission.sendSubmitDone(connectionResult);
             else
                 // Here we dispatch xforms-submit-error upon getting a non-success error code, even though the response has
                 // already been written out. This gives the form author a chance to do something in cases the response is
                 // buffered, for example do a sendError().
-                throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
+                throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
                         new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
         } else {
             // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document

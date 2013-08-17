@@ -29,7 +29,6 @@ import org.orbeon.oxf.xml.XMLUtils;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 public abstract class BaseSubmission implements Submission {
@@ -139,151 +138,144 @@ public abstract class BaseSubmission implements Submission {
         if (!resource.startsWith("/"))
             throw new OXFException("Action does not start with a '/': " + resource);
 
-        try {
+        final String httpMethod = p.actualHttpMethod;
 
-            final String httpMethod = p.actualHttpMethod;
+        // Case of empty body
+        if (messageBody == null)
+            messageBody = new byte[0];
 
-            // Case of empty body
-            if (messageBody == null)
-                messageBody = new byte[0];
+        // Destination context path is the context path of the current request, or the context path implied by the new URI
+        final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
 
-            // Destination context path is the context path of the current request, or the context path implied by the new URI
-            final String destinationContextPath = isDefaultContext ? "" : isContextRelative ? externalContext.getRequest().getContextPath() : NetUtils.getFirstPathElement(resource);
+        // Determine headers
+        final scala.collection.immutable.Map<String, String[]> headers =
+            Connection.buildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
 
-            // Determine headers
-            final scala.collection.immutable.Map<String, String[]> headers =
-                Connection.buildConnectionHeadersWithSOAP(httpMethod, null, actualRequestMediatype, encoding, customHeaderNameValues, headerNames, indentedLogger);
+        // Create requestAdapter depending on method
+        final LocalRequest requestAdapter;
+        final String effectiveResourceURI;
+        final String rootAdjustedResourceURI;
+        {
+            if (Connection.requiresRequestBody(httpMethod)) {
+                // Simulate a POST or PUT
+                effectiveResourceURI = resource;
 
-            // Create requestAdapter depending on method
-            final LocalRequest requestAdapter;
-            final String effectiveResourceURI;
-            final String rootAdjustedResourceURI;
-            {
-                if (Connection.requiresRequestBody(httpMethod)) {
-                    // Simulate a POST or PUT
-                    effectiveResourceURI = resource;
+                // Log request body
+                if (indentedLogger.isDebugEnabled() && isLogBody())
+                    Connection.logRequestBody(indentedLogger, actualRequestMediatype, messageBody);
 
-                    // Log request body
-                    if (indentedLogger.isDebugEnabled() && isLogBody())
-                        Connection.logRequestBody(indentedLogger, actualRequestMediatype, messageBody);
+                rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
+                if (rootAdjustedResourceURI == null)
+                    throw new OXFException("Action must start with a servlet context path: " + resource);
 
-                    rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
-                    if (rootAdjustedResourceURI == null)
-                        throw new OXFException("Action must start with a servlet context path: " + resource);
-
-                    requestAdapter = new LocalRequest(
-                        externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod,
-                        messageBody, headers);
-                } else {
-                    // Simulate a GET or DELETE
-                    {
-                        final StringBuilder updatedActionStringBuilder = new StringBuilder(resource);
-                        if (queryString != null) {
-                            if (resource.indexOf('?') == -1)
-                                updatedActionStringBuilder.append('?');
-                            else
-                                updatedActionStringBuilder.append('&');
-                            updatedActionStringBuilder.append(queryString);
-                        }
-                        effectiveResourceURI = updatedActionStringBuilder.toString();
+                requestAdapter = new LocalRequest(
+                    externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod,
+                    messageBody, headers);
+            } else {
+                // Simulate a GET or DELETE
+                {
+                    final StringBuilder updatedActionStringBuilder = new StringBuilder(resource);
+                    if (queryString != null) {
+                        if (resource.indexOf('?') == -1)
+                            updatedActionStringBuilder.append('?');
+                        else
+                            updatedActionStringBuilder.append('&');
+                        updatedActionStringBuilder.append(queryString);
                     }
-
-                    rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
-                    if (rootAdjustedResourceURI == null)
-                        throw new OXFException("Action must start with a servlet context path: " + resource);
-
-                    requestAdapter = new LocalRequest(
-                        externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod, headers);
+                    effectiveResourceURI = updatedActionStringBuilder.toString();
                 }
+
+                rootAdjustedResourceURI = isDefaultContext || isContextRelative ? effectiveResourceURI : NetUtils.removeFirstPathElement(effectiveResourceURI);
+                if (rootAdjustedResourceURI == null)
+                    throw new OXFException("Action must start with a servlet context path: " + resource);
+
+                requestAdapter = new LocalRequest(
+                    externalContext, indentedLogger, destinationContextPath, rootAdjustedResourceURI, httpMethod, headers);
             }
+        }
 
-            if (indentedLogger.isDebugEnabled())
-                indentedLogger.logDebug("", "dispatching request",
-                            "method", httpMethod,
-                            "mediatype", actualRequestMediatype,
-                            "context path", destinationContextPath,
-                            "effective resource URI (original)", effectiveResourceURI,
-                            "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
+        if (indentedLogger.isDebugEnabled())
+            indentedLogger.logDebug("", "dispatching request",
+                        "method", httpMethod,
+                        "mediatype", actualRequestMediatype,
+                        "context path", destinationContextPath,
+                        "effective resource URI (original)", effectiveResourceURI,
+                        "effective resource URI (relative to servlet root)", rootAdjustedResourceURI);
 
-            // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
-            final ExternalContext.Response effectiveResponse = !p.isReplaceAll ? null : response;
+        // Reason we use a Response passed is for the case of replace="all" when XFormsContainingDocument provides a Response
+        final ExternalContext.Response effectiveResponse = !p.isReplaceAll ? null : response;
 
-            final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
-                @Override
-                public void close() {
-                    final boolean nullInputStream = getResponseInputStream() == null;
+        final ConnectionResult connectionResult = new ConnectionResult(effectiveResourceURI) {
+            @Override
+            public void close() {
+                final boolean nullInputStream = getResponseInputStream() == null;
 
-                    // Try to close input stream
-                    super.close();
+                // Try to close input stream
+                super.close();
 
-                    // Case of isReplaceAll where forwarded resource writes to the response directly
-                    if (nullInputStream) {
-                        // Try to obtain, flush and close the stream to work around WebSphere issue
+                // Case of isReplaceAll where forwarded resource writes to the response directly
+                if (nullInputStream) {
+                    // Try to obtain, flush and close the stream to work around WebSphere issue
+                    try {
+                        if (effectiveResponse != null) {
+                            final OutputStream os = effectiveResponse.getOutputStream();
+                            os.flush();
+                            os.close();
+                        }
+                    } catch (IllegalStateException e) {
+                        indentedLogger.logDebug("", "IllegalStateException caught while closing OutputStream after forward");
                         try {
                             if (effectiveResponse != null) {
-                                final OutputStream os = effectiveResponse.getOutputStream();
-                                os.flush();
-                                os.close();
+                                final PrintWriter writer = effectiveResponse.getWriter();
+                                writer.flush();
+                                writer.close();
                             }
-                        } catch (IllegalStateException e) {
-                            indentedLogger.logDebug("", "IllegalStateException caught while closing OutputStream after forward");
-                            try {
-                                if (effectiveResponse != null) {
-                                    final PrintWriter writer = effectiveResponse.getWriter();
-                                    writer.flush();
-                                    writer.close();
-                                }
-                            } catch (IllegalStateException f) {
-                                indentedLogger.logDebug("", "IllegalStateException caught while closing Writer after forward");
-                            } catch (IOException f) {
-                                indentedLogger.logDebug("", "IOException caught while closing Writer after forward");
-                            }
-                        } catch (IOException e) {
-                            indentedLogger.logDebug("", "IOException caught while closing OutputStream after forward");
+                        } catch (IllegalStateException f) {
+                            indentedLogger.logDebug("", "IllegalStateException caught while closing Writer after forward");
+                        } catch (IOException f) {
+                            indentedLogger.logDebug("", "IOException caught while closing Writer after forward");
                         }
+                    } catch (IOException e) {
+                        indentedLogger.logDebug("", "IOException caught while closing OutputStream after forward");
                     }
                 }
-            };
-            if (p.isReplaceAll) {
-                final AllReplacer.ReplaceAllResponse replaceAllResponse = new AllReplacer.ReplaceAllResponse(effectiveResponse);
-                submissionProcess.process(requestAdapter, replaceAllResponse);
-                if (replaceAllResponse.getStatus() > 0)
-                    connectionResult.statusCode = replaceAllResponse.getStatus();
-                connectionResult.dontHandleResponse = true;
-
-                // Here we cause dispatch xforms-submit-error upon getting a non-success error code, even though the
-                // response has already been written out. This gives the form author a chance to do something in cases
-                // the response is buffered, for example do a sendError().
-                // HOWEVER: We don't do this
-                if (! p.isDeferredSubmissionSecondPass) {
-                    if (! NetUtils.isSuccessCode(connectionResult.statusCode) && ! p.isDeferredSubmissionSecondPass)
-                        throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode, "processing submission response",
-                                new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
-                } else {
-                    // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document
-                    // lock, see XFormsServer.
-                }
-            } else {
-                // We must intercept the reply
-                final ResponseAdapter responseAdapter = new ResponseAdapter(response);
-                submissionProcess.process(requestAdapter, responseAdapter);
-
-                // Get response information that needs to be forwarded
-
-                // NOTE: Here, the resultCode is not propagated from the included resource
-                // when including Servlets. Similarly, it is not possible to obtain the
-                // included resource's content type or headers. Because of this we should not
-                // use an optimized submission from within a servlet.
-                connectionResult.statusCode = responseAdapter.getResponseCode();
-                connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
-                connectionResult.setResponseInputStream(responseAdapter.getInputStream());
-                connectionResult.responseHeaders = ConnectionResult.EMPTY_HEADERS_MAP;
-                connectionResult.setLastModified(null);
             }
+        };
+        if (p.isReplaceAll) {
+            final AllReplacer.ReplaceAllResponse replaceAllResponse = new AllReplacer.ReplaceAllResponse(effectiveResponse);
+            submissionProcess.process(requestAdapter, replaceAllResponse);
+            if (replaceAllResponse.getStatus() > 0)
+                connectionResult.setStatusCodeJava(replaceAllResponse.getStatus());
+            connectionResult.setDontHandleResponseJava();
 
-            return connectionResult;
-        } catch (IOException e) {
-            throw new OXFException(e);
+            // Here we cause dispatch xforms-submit-error upon getting a non-success error code, even though the
+            // response has already been written out. This gives the form author a chance to do something in cases
+            // the response is buffered, for example do a sendError().
+            // HOWEVER: We don't do this
+            if (! p.isDeferredSubmissionSecondPass) {
+                if (! NetUtils.isSuccessCode(connectionResult.statusCode()) && ! p.isDeferredSubmissionSecondPass)
+                    throw new XFormsSubmissionException(submission, "xf:submission for submission id: " + submission.getId() + ", error code received when submitting instance: " + connectionResult.statusCode(), "processing submission response",
+                            new XFormsSubmitErrorEvent(submission, XFormsSubmitErrorEvent.RESOURCE_ERROR(), connectionResult));
+            } else {
+                // Two reasons: 1. We don't want to modify the document state 2. This can be called outside of the document
+                // lock, see XFormsServer.
+            }
+        } else {
+            // We must intercept the reply
+            final ResponseAdapter responseAdapter = new ResponseAdapter(response);
+            submissionProcess.process(requestAdapter, responseAdapter);
+
+            // Get response information that needs to be forwarded
+
+            // NOTE: Here, the resultCode is not propagated from the included resource
+            // when including Servlets. Similarly, it is not possible to obtain the
+            // included resource's content type or headers. Because of this we should not
+            // use an optimized submission from within a servlet.
+            connectionResult.setStatusCodeJava(responseAdapter.getResponseCode());
+            connectionResult.setResponseContentType(XMLUtils.XML_CONTENT_TYPE);
+            connectionResult.setResponseInputStream(responseAdapter.getInputStream());
         }
+
+        return connectionResult;
     }
 }

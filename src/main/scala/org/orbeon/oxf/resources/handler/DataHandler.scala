@@ -28,6 +28,6 @@ object DataHandler extends URLStreamHandler {
 
         def connect() = ()
         override val getContentType = decoded.contentType
-        override def getInputStream = new ByteArrayInputStream(decoded.bytes)
+        override val getInputStream = new ByteArrayInputStream(decoded.bytes)
     }
 }

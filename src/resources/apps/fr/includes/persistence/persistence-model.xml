@@ -448,30 +448,33 @@
         serialization="{instance('fr-send-submission-params')/@serialization}"
         ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
         replace="all">
-        <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
-        <xf:action event="xforms-submit">
-            <xf:action iterate="instance('fr-send-submission-params')/@*">
-                <xf:setvalue ref="." value="event(name(context()))"/>
-            </xf:action>
-            <xf:setvalue ref="instance('fr-send-submission-params')/@serialization"
-                         value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
-        </xf:action>
     </xf:submission>
+
+    <xf:submission id="fr-send-submission-none"
+        resource="{instance('fr-send-submission-params')/@uri}"
+        relevant="{instance('fr-send-submission-params')/@prune}"
+        validate="false"
+        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
+        method="{instance('fr-send-submission-params')/@method}"
+        serialization="{instance('fr-send-submission-params')/@serialization}"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        replace="none"/>
 
     <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
     <xf:instance id="fr-send-submission-params">
         <params uri="" prune="" annotate="" method="" content="" serialization=""/>
     </xf:instance>
-
-    <xf:submission id="fr-send-submission-none"
-        resource="{event('uri')}"
-        relevant="{event('prune')}"
-        validate="false"
-        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
-        method="{event('method')}"
-        serialization="{if (event('method') = 'get') then 'none' else 'application/xml'}"
-        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
-        replace="none"/>
+    <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
+        <xf:action iterate="instance('fr-send-submission-params')/@*">
+            <xf:setvalue
+                ref="."
+                value="for $value in event(name(context()))
+                       (: Evaluate all properties as AVTs in the context of the main form data :)
+                       return xxf:instance('fr-form-instance')/xxf:evaluate-avt($value)"/>
+        </xf:action>
+        <xf:setvalue ref="instance('fr-send-submission-params')/@serialization"
+                     value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
+    </xf:action>
 
     <!-- Call email service -->
     <xf:submission id="fr-email-service-submission"

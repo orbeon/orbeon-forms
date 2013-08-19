@@ -42,9 +42,10 @@ object DataURLDecoder {
             else
                 None
 
+        // See: https://github.com/orbeon/orbeon-forms/issues/1065
         val decodedData =
             if (isBase64)
-                Base64.decodeBase64(URLCodec.decodeUrl(data))
+                Base64.decodeBase64(data)
             else
                 URLCodec.decodeUrl(data)
 

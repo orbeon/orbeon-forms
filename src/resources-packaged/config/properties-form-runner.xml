@@ -177,7 +177,7 @@
     <property as="xs:string"  name="oxf.fr.detail.process.save-import.*.*"                      value='save'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-review.*.*"         value='abort'/>
     <property as="xs:string"  name="oxf.fr.detail.process.validation-dialog-continue.*.*"       value='resume'/>
-    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                         value='save("draft")'/>
+    <property as="xs:string"  name="oxf.fr.detail.process.autosave.*.*"                         value='save(draft = "true")'/>
 
     <!-- Reusable processes -->
     <property as="xs:string"  name="oxf.fr.detail.process.require-uploads.*.*"                  value='pending-uploads recover (error-message("upload-in-progress") then success)'/>

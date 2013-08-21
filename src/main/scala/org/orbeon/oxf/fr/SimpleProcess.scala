@@ -48,7 +48,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     override def beforeProcess() = Try(setvalue(pdfURLInstanceRootElement, ""))
 
     override def processError(t: Throwable) =
-        tryErrorMessage(List(Some("resource") → "process-error"))
+        tryErrorMessage(Map(Some("resource") → "process-error"))
 
     def writeSuspendedProcess(process: String) =
         setvalue(topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement, process)
@@ -126,19 +126,19 @@ trait XFormsActions {
 
     def tryXFormsSend(params: ActionParams): Try[Any] =
         Try {
-            val submission = params.toMap.get(Some("submission")) orElse params.toMap.get(None)
+            val submission = paramByNameOrDefault(params, "submission")
             submission foreach (sendThrowOnError(_))
         }
 
     def tryXFormsDispatch(params: ActionParams): Try[Any] =
         Try {
-            val eventName = params.toMap.get(Some("name")) orElse params.toMap.get(None)
+            val eventName = paramByNameOrDefault(params, "name")
             eventName foreach (dispatch(_, "fr-form-model"))
         }
 
     def tryShowDialog(params: ActionParams): Try[Any] =
         Try {
-            val dialogName = params.toMap.get(Some("dialog")) orElse params.toMap.get(None)
+            val dialogName = paramByNameOrDefault(params, "dialog")
             dialogName foreach (show(_))
         }
 }
@@ -179,7 +179,7 @@ trait FormRunnerActions {
     // Validate form data and fail if invalid
     def tryValidate(params: ActionParams): Try[Any] =
         Try {
-            val level = params.toMap.get(Some("level")) orElse params.toMap.get(None) map LevelByName getOrElse ErrorLevel
+            val level = paramByNameOrDefault(params, "level") map LevelByName getOrElse ErrorLevel
 
             if (countValidationsByLevel(level) > 0)
                 throw new OXFException(s"Data has failed constraints for level ${level.name}")
@@ -188,7 +188,7 @@ trait FormRunnerActions {
     def trySaveAttachmentsAndData(params: ActionParams): Try[Any] =
         Try {
             val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
-            val isDraft = params.toMap.get(None).exists(_ == "draft")
+            val isDraft = paramByName(params, "draft").exists(_ == "true")
 
             // Notify that the data is about to be saved
             dispatch(name = "fr-data-save-prepare", targetId = "fr-form-model")
@@ -224,19 +224,18 @@ trait FormRunnerActions {
             ))
         }
 
-    private def messageFromResourceOrInline(params: ActionParams) = {
-        def resourceKey  = params.toMap.get(Some("resource")) orElse params.toMap.get(None)
-        def fromResource = resourceKey map (k ⇒ currentFRResources \ "detail" \ "messages" \ k stringValue)
-        def fromInline   = params.toMap.get(Some("message"))
+    private def messageFromResourceOrParam(params: ActionParams) = {
+        def fromResource = paramByNameOrDefault(params, "resource") map (k ⇒ currentFRResources \ "detail" \ "messages" \ k stringValue)
+        def fromParam    = paramByName(params, "message")
 
-        fromResource orElse fromInline get
+        fromResource orElse fromParam get
     }
 
     def trySuccessMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.successMessage(messageFromResourceOrInline(params)))
+        Try(FormRunner.successMessage(messageFromResourceOrParam(params)))
 
     def tryErrorMessage(params: ActionParams): Try[Any] =
-        Try(FormRunner.errorMessage(messageFromResourceOrInline(params)))
+        Try(FormRunner.errorMessage(messageFromResourceOrParam(params)))
 
     // TODO: Use xf:show("fr-submission-result-dialog")
     def tryShowResultDialog(params: ActionParams): Try[Any] =
@@ -257,41 +256,51 @@ trait FormRunnerActions {
             // NOTE: As of 2013-05-15, email-form.xpl recreates the PDF anyway, which is wasteful
 //            implicit val formRunnerParams = FormRunnerParams()
 //            if (booleanFormRunnerProperty("oxf.fr.email.attach-pdf"))
-//                tryCreatePDFIfNeeded(Map()).get
+//                tryCreatePDFIfNeeded(EmptyActionParams).get
 
             sendThrowOnError("fr-email-service-submission")
         }
 
+    // Defaults except for "uri"
+    private val DefaultSendParameters = Map(
+        "method"   → "post",
+        "prune"    → "true",
+        "annotate" → "",
+        "replace"  → "none",
+        "content"  → "xml"
+    )
+
+    private val SendParameterKeys = List("uri") ++ DefaultSendParameters.keys
+
     def trySend(params: ActionParams): Try[Any] =
         Try {
-            val prefix = params.toMap.get(Some("property")) getOrElse params.toMap.get(None)
 
             implicit val formRunnerParams @ FormRunnerParams(app, form, document, _) = FormRunnerParams()
 
-            // Defaults except for "uri"
-            val Defaults = Map(
-                "method"   → "post",
-                "prune"    → "true",
-                "annotate" → "",
-                "replace"  → "none",
-                "content"  → "xml"
-            )
+            val propertyPrefixOpt = paramByNameOrDefault(params, "property")
+
+            def findParamValue(name: String) = {
+
+                def fromParam    = paramByName(params, name)
+                def fromProperty = propertyPrefixOpt flatMap (prefix ⇒ formRunnerProperty(prefix + "." + name))
+                def fromDefault  = DefaultSendParameters.get(name)
+
+                fromParam orElse fromProperty orElse fromDefault
+            }
 
             val propertiesAsPairs =
-                Seq("uri") ++ Defaults.keys map (key ⇒ key → (formRunnerProperty(prefix + "." + key) orElse Defaults.get(key)))
+                SendParameterKeys map (key ⇒ key → findParamValue(key))
 
             // Append query parameters to the URL
-            val withUpdatedURI =
+            val propertiesAsMap =
                 propertiesAsPairs map {
                     case ("uri", Some(uri)) ⇒ "uri" → Some(appendQueryString(uri, s"app=$app&form=$form&document=${document.get}&valid=$dataValid"))
                     case other              ⇒ other
-                }
-
-            val propertiesAsMap = withUpdatedURI.toMap
+                } toMap
 
             // Create PDF if needed
-            if (stringOptionToSet(propertiesAsMap("content")) exists (x ⇒  Set("pdf", "pdf-url")(x)))
-                tryCreatePDFIfNeeded(Nil).get
+            if (stringOptionToSet(propertiesAsMap("content")) exists Set("pdf", "pdf-url"))
+                tryCreatePDFIfNeeded(EmptyActionParams).get
 
             // TODO: Remove duplication once @replace is an AVT
             val replace = if (propertiesAsMap.get("replace") exists (_ == Some("all"))) "all" else "none"
@@ -312,10 +321,10 @@ trait FormRunnerActions {
             // ambiguity, we'll need to parse named parameters.
             def isAbsolute(s: String) = s.startsWith("/") || NetUtils.urlHasProtocol(s)
 
-            def fromParams = params.toMap.get(Some("uri")) orElse (params.toMap.get(None) filter isAbsolute)
+            def fromParams = params.get(Some("uri")) orElse (params.get(None) filter isAbsolute)
 
             def fromProperties = {
-                val property =  params.toMap.get(Some("property")) orElse (params.toMap.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
+                val property =  params.get(Some("property")) orElse (params.get(None) filterNot isAbsolute) getOrElse "oxf.fr.detail.close.uri"
                 formRunnerProperty(property)
             }
 

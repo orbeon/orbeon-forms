@@ -19,7 +19,7 @@ object ProcessParser extends Parser {
     // AST
     sealed trait ExprNode { def serialize: String }
 
-    case class ActionNode(name: String, params: List[(Option[String], String)]) extends ExprNode {
+    case class ActionNode(name: String, params: Map[Option[String], String]) extends ExprNode {
 
         private def serializeParams =
             if (params.isEmpty) "" else params map {
@@ -69,7 +69,7 @@ object ProcessParser extends Parser {
 
     def Action: Rule1[ActionNode] = rule {
         Name ~ optional("(" ~ OptWhiteSpace ~ zeroOrMore(Param, ", ") ~ OptWhiteSpace ~ ")") ~~>
-            ((name, params) ⇒ ActionNode(name, params.getOrElse(Nil)))
+            ((name, params) ⇒ ActionNode(name, params.getOrElse(Nil).toMap))
     }
 
     def Condition: Rule1[ConditionNode] = rule {
@@ -83,7 +83,7 @@ object ProcessParser extends Parser {
 
     def Name: Rule1[String] = rule { group(NameStart ~ zeroOrMore(NameAfter)) ~> identity }
     def NameStart: Rule0    = rule { "a" - "z" | "A" - "Z" | "-" | "_" }
-    def NameAfter: Rule0    = rule { NameStart | "0" - "9" }
+    def NameAfter: Rule0    = rule { NameStart | "0" - "9" | ":" }
 
     def Param: Rule1[(Option[String], String)] = rule {
         optional(OptWhiteSpace ~ Name ~ OptWhiteSpace ~ "=") ~ OptWhiteSpace ~ ValueString ~~> (_ → _)

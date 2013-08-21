@@ -28,8 +28,10 @@ import util.{Success, Try}
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {
 
-    type ActionParams = List[(Option[String], String)]
+    type ActionParams = Map[Option[String], String]
     type Action       = ActionParams ⇒ Try[Any]
+
+    val EmptyActionParams: ActionParams = Map.empty
 
     // Must be overridden by implementation
     def findProcessByName(scope: String, name: String): Option[String]
@@ -43,6 +45,12 @@ trait ProcessInterpreter extends Logging {
     def extensionActions: Traversable[(String, Action)] = Nil
     def beforeProcess(): Try[Any] = Try(())
     def afterProcess():  Try[Any] = Try(())
+
+    def paramByName(params: ActionParams, name: String) =
+        params.get(Some(name))
+
+    def paramByNameOrDefault(params: ActionParams, name: String) =
+        params.get(Some(name)) orElse params.get(None)
 
     private object ProcessRuntime {
 
@@ -105,7 +113,7 @@ trait ProcessInterpreter extends Logging {
                 withDebug("process: running action", Seq("action" → action.toString)) {
                     // Push and pop the stack frame (for suspend/resume)
                     val result =
-                        AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(List(Some("name") → action.name))) apply action.params
+                        AllAllowedActions.get(action.name) getOrElse ((_: ActionParams) ⇒ tryProcess(Map(Some("name") → action.name))) apply action.params
 
                     debugResults(Seq("result" → (if (result.isSuccess) "success" else "failure")))
 
@@ -221,7 +229,7 @@ trait ProcessInterpreter extends Logging {
 
     // Run a sub-process
     def tryProcess(params: ActionParams): Try[Any] =
-        Try(params.toMap.get(Some("name")) getOrElse params.toMap.apply(None)) map
+        Try(paramByNameOrDefault(params, "name").get) map
         (rawProcessByName(processStackDyn.value.get.scope, _)) flatMap
         runSubProcess
 
@@ -230,7 +238,7 @@ trait ProcessInterpreter extends Logging {
         writeSuspendedProcess(serializeContinuation)
         Success()
     } flatMap
-        (_ ⇒ trySuccess(Nil))
+        (_ ⇒ trySuccess(EmptyActionParams))
 
     // Resume a process
     def tryResume(params: ActionParams): Try[Any] = {

@@ -13,7 +13,6 @@ object ProcessParser extends Parser {
 
     val CombinatorsByName = Seq(ThenCombinator, RecoverCombinator) map (c ⇒ c.name → c) toMap
 
-    // Serialization
     private def quote(s: String) =
         "\"" + StringEscapeUtils.escapeJava(s) + "\""
 

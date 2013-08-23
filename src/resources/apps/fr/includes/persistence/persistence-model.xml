@@ -36,7 +36,7 @@
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
     <!-- Autosave disabled with Form Builder, see https://github.com/orbeon/orbeon-forms/issues/1169 -->
     <xf:var name="autosave-enabled" value="xxf:property('oxf.fr.support-autosave')
-                                           and exists(xxf:get-remote-user())
+                                           and normalize-space(xxf:get-request-header('orbeon-username')) != ''
                                            and $mode = ('new', 'edit')
                                            and not($is-fb)"/>
     <xf:var name="autosave-delay"   value="xxf:property(string-join(('oxf.fr.detail.autosave-delay', $app, $form), '.'))"/>

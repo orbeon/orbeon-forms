@@ -19,7 +19,7 @@ ORBEON.xforms.XBL.declareClass(YAHOO.xbl.fr.WPaint, "xbl-fr-wpaint");
 YAHOO.xbl.fr.WPaint.prototype =
 
     init: ->
-        @annotationEl = $(@container).find('.fr-wpaint-annotation')
+        @annotationEl = $(@container).find('.fr-wpaint-annotation img')
         @imageEl      = $(@container).find('.fr-wpaint-image img')
         @wpaintElA    = $(@container).find('.fr-wpaint-container-a')
         @wpaintElB    = $(@container).find('.fr-wpaint-container-b')

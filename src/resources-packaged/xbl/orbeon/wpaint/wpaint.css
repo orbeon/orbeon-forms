@@ -22,7 +22,7 @@
   visibility: hidden;
   position: absolute;
 }
-.orbeon .xbl-fr-wpaint .fr-wpaint-annotation {
+.orbeon .xbl-fr-wpaint .xforms-output.fr-wpaint-annotation {
   display: none;
 }
 .orbeon .xbl-fr-wpaint .xforms-upload-info {

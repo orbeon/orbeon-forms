@@ -114,7 +114,7 @@
                         <xsl:for-each select="/sql-out/row">
                             <form>
                                 <xsl:copy-of select="xh:html/xh:head/xf:model/xf:instance[@id = 'fr-form-metadata']/metadata/*" copy-namespaces="no"/>
-                                <xsl:copy-of select="last-modified-time"/>
+                                <xsl:copy-of select="last-modified-time" copy-namespaces="no"/>
                             </form>
                         </xsl:for-each>
                     </forms>

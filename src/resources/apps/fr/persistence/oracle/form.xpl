@@ -78,8 +78,8 @@
             <forms xsl:version="2.0">
                 <xsl:for-each select="/sql-out/row">
                     <form>
-                        <xsl:copy-of select="metadata/*"/>
-                        <xsl:copy-of select="last-modified-time"/>
+                        <xsl:copy-of select="metadata/*" copy-namespaces="no"/>
+                        <xsl:copy-of select="last-modified-time" copy-namespaces="no"/>
                     </form>
                 </xsl:for-each>
             </forms>

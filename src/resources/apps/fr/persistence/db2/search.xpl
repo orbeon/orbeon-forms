@@ -181,8 +181,7 @@
                                                     and data.form = latest.form
                                                     and data.document_id = latest.document_id
                                                     and data.deleted = 'N'
-                                                    <!-- Q: MySQL search.xpl has this, is it absent from DB2 on purpose? -->
-                                                    <!--<xsl:if test="$support-auto-save"> and data.draft = 'N'</xsl:if>-->
+                                                    <xsl:if test="$support-auto-save"> and data.draft = 'N'</xsl:if>
                                                     <xsl:copy-of select="f:search-conditions(/)"/>
                                                     <xsl:copy-of select="f:owner-group-condition('data')"/>
                                             )

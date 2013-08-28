@@ -46,9 +46,9 @@ class FormRunnerRequestFilter extends RequestFilter {
             val liferayUserRolesHeaders =
                 for {
                     (name, value) ← Map(
-                        "email" → user.getEmailAddress,
+                        "email"     → user.getEmailAddress,
                         "full-name" → user.getFullName,
-                        "roles" → (user.getRoles map (_.getName) toArray)
+                        "roles"     → (user.getRoles map (_.getName) toArray)
                     )
                     if value != null
                 } yield {

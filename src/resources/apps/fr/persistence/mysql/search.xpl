@@ -129,39 +129,28 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:include href="../common-owner-group.xsl"/>
+
+                <xsl:variable name="permissions"              select="doc('input:form')/forms/form/permissions"/>
+                <xsl:variable name="search-operations"        select="('*', 'read', 'update', 'delete')"/>
+                <xsl:variable name="search-permissions"       select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
+                <xsl:variable name="support-auto-save"        as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
+                <xsl:variable name="include-drafts"           as="xs:boolean" select="$support-auto-save     and (empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
+                <xsl:variable name="include-non-drafts"       as="xs:boolean" select="not($support-auto-save) or (empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
+
+                <!-- Are we authorized to see all the data based because of our role? -->
+                <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xsl:variable name="authorized-based-on-role" select="$operations-from-role = $search-operations"/>
+
+                <!-- Are we authorized to see data if we are the owner / group member? -->
+                <xsl:variable name="authorized-if-owner" select="exists($search-permissions[owner])"/>
+                <xsl:variable name="authorized-if-group-member" select="exists($search-permissions[group-member])"/>
+
                 <xsl:template match="/">
-
-                    <xsl:variable name="permissions"              select="doc('input:form')/forms/form/permissions"/>
-                    <xsl:variable name="search-operations"        select="('*', 'read', 'update', 'delete')"/>
-                    <xsl:variable name="search-permissions"       select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
-                    <xsl:variable name="support-auto-save"        as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
-                    <xsl:variable name="include-drafts"           as="xs:boolean" select="$support-auto-save     and (empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
-                    <xsl:variable name="include-non-drafts"       as="xs:boolean" select="not($support-auto-save) or (empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
-
-                    <!-- Are we authorized to see all the data based because of our role? -->
-                    <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
-                    <xsl:message select="$operations-from-role"/>
-                    <xsl:variable name="authorized-based-on-role" select="$operations-from-role = $search-operations"/>
-
-                    <!-- Are we authorized to see data if we are the owner / group member? -->
-                    <xsl:variable name="authorized-if-owner" select="exists($search-permissions[owner])"/>
-                    <xsl:variable name="authorized-if-group-member" select="exists($search-permissions[group-member])"/>
 
                     <sql:config>
                         <documents>
                             <sql:connection>
                                 <sql:datasource><xsl:value-of select="doc('input:request')/request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
-
-                                <!-- Condition on owner / group -->
-                                <xsl:variable name="owner-group-condition">
-                                    <xsl:if test="$owner-group and not($authorized-based-on-role)">
-                                        and (
-                                            <xsl:if test="$authorized-if-owner">data.username = <sql:param type="xs:string" select="/search/@orbeon-username"/></xsl:if>
-                                            <xsl:if test="$authorized-if-owner and $authorized-if-group-member"> or </xsl:if>
-                                            <xsl:if test="$authorized-if-group-member">data.groupname = <sql:param type="xs:string" select="/search/@orbeon-group"/></xsl:if>
-                                        )
-                                    </xsl:if>
-                                </xsl:variable>
 
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
@@ -196,26 +185,8 @@
                                                     and data.document_id = latest.document_id
                                                     and data.deleted = 'N'
                                                     <xsl:if test="$support-auto-save"> and data.draft = 'N'</xsl:if>
-                                                    <!-- Conditions on searchable columns -->
-                                                    <xsl:for-each select="/search/query[@path and normalize-space() != '']">
-                                                        <xsl:choose>
-                                                            <xsl:when test="@match = 'exact'">
-                                                                <!-- Exact match -->
-                                                                and extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')
-                                                                = '<xsl:value-of select="f:escape-sql(.)"/>'
-                                                            </xsl:when>
-                                                            <xsl:otherwise>
-                                                                <!-- Substring, case-insensitive match -->
-                                                                and lower(extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>'))
-                                                                like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
-                                                            </xsl:otherwise>
-                                                        </xsl:choose>
-                                                    </xsl:for-each>
-                                                    <!-- Condition for free text search -->
-                                                    <xsl:if test="/search/query[empty(@path) and normalize-space() != '']">
-                                                         and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
-                                                    </xsl:if>
-                                                    <xsl:copy-of select="$owner-group-condition"/>
+                                                    <xsl:copy-of select="f:search-conditions(/)"/>
+                                                    <xsl:copy-of select="f:owner-group-condition('data')"/>
                                             )
                                         </xsl:if>
                                         <xsl:if test="$include-non-drafts and $include-drafts">
@@ -244,6 +215,8 @@
                                                                 and d2.document_id = d1.document_id
                                                         ) = 0
                                                     </xsl:if>
+                                                    <xsl:copy-of select="f:search-conditions(/)"/>
+                                                    <xsl:copy-of select="f:owner-group-condition('d1')"/>
                                             )
                                         </xsl:if>
                                     ) mysql1
@@ -278,7 +251,7 @@
                                                         <xsl:if test="$support-auto-save">, draft</xsl:if>
                                                     )
                                                     and deleted = 'N'
-                                                    <xsl:copy-of select="$owner-group-condition"/>
+                                                    <xsl:copy-of select="f:owner-group-condition('data')"/>
                                             ) total,
                                             (
                                                 select count(*) from (<xsl:copy-of select="$query"/>) a
@@ -339,6 +312,40 @@
                         <xsl:value-of select="namespace-uri-for-prefix(., $query)"/>
                         <xsl:text>" </xsl:text>
                     </xsl:for-each>
+                </xsl:function>
+                <!-- Condition on owner / group -->
+                <xsl:function name="f:owner-group-condition">
+                    <xsl:param name="table" as="xs:string"/>
+                    <xsl:if test="$owner-group and not($authorized-based-on-role)">
+                        and (
+                            <xsl:if test="$authorized-if-owner"><xsl:value-of select="$table"/>.username = <sql:param type="xs:string" select="/search/@orbeon-username"/></xsl:if>
+                            <xsl:if test="$authorized-if-owner and $authorized-if-group-member"> or </xsl:if>
+                            <xsl:if test="$authorized-if-group-member"><xsl:value-of select="$table"/>.groupname = <sql:param type="xs:string" select="/search/@orbeon-group"/></xsl:if>
+                        )
+                    </xsl:if>
+                </xsl:function>
+                <!-- Search conditions -->
+                <xsl:function name="f:search-conditions">
+                    <xsl:param name="search" as="document-node()"/>
+                    <!-- Conditions on searchable columns -->
+                    <xsl:for-each select="$search/search/query[@path and normalize-space() != '']">
+                        <xsl:choose>
+                            <xsl:when test="@match = 'exact'">
+                                <!-- Exact match -->
+                                and extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')
+                                = '<xsl:value-of select="f:escape-sql(.)"/>'
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <!-- Substring, case-insensitive match -->
+                                and lower(extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>'))
+                                like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
+                    <!-- Condition for free text search -->
+                    <xsl:if test="$search/search/query[empty(@path) and normalize-space() != '']">
+                         and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
+                    </xsl:if>
                 </xsl:function>
             </xsl:stylesheet>
         </p:input>

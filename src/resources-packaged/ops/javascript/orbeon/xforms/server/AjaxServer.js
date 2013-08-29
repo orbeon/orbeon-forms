@@ -647,7 +647,15 @@
                 //      When it happens, responseXML may be the HTML document, so we also test on the root element being 'html'
                 //      But, surprisingly, responseText only contains the text inside the body, i.e. &lt;xxf:event-response ...
                 //      So here we "unescape" the text inside <body>
-                var xmlString = o.responseText.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+                // HOWEVER: If, by any chance, there is some trailing stuff after the closing </html>, as in
+                //      </xhtml><script/>, then, with FF and IE, we get &lt;/xxf:event-response&gt;<script/> and then
+                //      XML parsing fails. Some company proxies might insert scripts this way, so we better make sure
+                //      to parse only xxf:event-response.
+                var fragment =
+                    o.responseText.substring(
+                        o.responseText.indexOf("&lt;xxf:event-response"),
+                        o.responseText.indexOf("&lt;/xxf:event-response&gt;") + "&lt;/xxf:event-response&gt;".length);
+                var xmlString = fragment.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
                 responseXML = ORBEON.util.Dom.stringToDom(xmlString);
             } else {
                 // Regular Ajax response

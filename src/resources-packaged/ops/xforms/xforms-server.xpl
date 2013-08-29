@@ -132,6 +132,7 @@
                         <xsl:output name="xml" method="xml" omit-xml-declaration="yes" indent="no"/>
                         <xsl:template match="/">
                             <html>
+                                <head/>
                                 <body>
                                     <xsl:value-of select="saxon:serialize(/, 'xml')"/>
                                 </body>

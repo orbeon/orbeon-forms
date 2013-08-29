@@ -234,7 +234,9 @@
     <property as="xs:boolean" name="oxf.fr.support-owner-group"                                 value="false"/>
     <property as="xs:boolean" name="oxf.fr.support-autosave"                                    value="false"/>
 
+    <!-- For global pages like the Form Runner Home page, restrict list of languages to those that have full support -->
     <property as="xs:string"  name="oxf.fr.available-languages"                                 value="en fr it de"/>
-    <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="en fr it de"/>
+    <!-- For forms, don't restrict the list of languages by default: https://github.com/orbeon/orbeon-forms/issues/1223 -->
+    <property as="xs:string"  name="oxf.fr.available-languages.*.*"                             value="*"/>
 
 </properties>

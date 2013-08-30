@@ -133,7 +133,8 @@ trait XFormsActions {
     def tryXFormsDispatch(params: ActionParams): Try[Any] =
         Try {
             val eventName = paramByNameOrDefault(params, "name")
-            eventName foreach (dispatch(_, "fr-form-model"))
+            val eventTargetId = paramByName(params, "targetid") getOrElse "fr-form-model"
+            eventName foreach (dispatch(_, eventTargetId))
         }
 
     def tryShowDialog(params: ActionParams): Try[Any] =

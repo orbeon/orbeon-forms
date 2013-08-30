@@ -25,12 +25,13 @@
         xmlns:secure="java:org.orbeon.oxf.util.SecureUtils"
         xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
 
-    <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')" as="element()"/>
-    <xf:var name="app"        value="$parameters/app" as="xs:string"/>
-    <xf:var name="form"       value="$parameters/form" as="xs:string"/>
-    <xf:var name="is-fb"      value="$app = 'orbeon' and $form = 'builder'"/>
-    <xf:var name="document"   value="$parameters/document"/>
-    <xf:var name="mode"       value="$parameters/mode"/>
+    <xf:var name="parameters"       value="xxf:instance('fr-parameters-instance')"/>
+    <xf:var name="app"              value="$parameters/app/string()"/>
+    <xf:var name="form"             value="$parameters/form/string()"/>
+    <xf:var name="document-element" value="$parameters/document"/>
+    <xf:var name="document"         value="$document-element/string()"/>
+    <xf:var name="mode"             value="$parameters/mode/string()"/>
+    <xf:var name="is-fb"            value="$app = 'orbeon' and $form = 'builder'"/>
 
     <xf:var name="persistence-instance" value="instance('fr-persistence-instance')"/>
     <xf:var name="autosave" value="$persistence-instance/autosave"/>
@@ -61,7 +62,7 @@
 
             <!-- Create random document id if none is provided. This is the default for 'new', but a missing id is also
                  allowed for 'edit', 'view', etc., when data is posted to the page. -->
-            <xf:setvalue if="$is-new-id" ref="$document" value="secure:randomHexId()"/>
+            <xf:setvalue if="$is-new-id" ref="$document-element" value="secure:randomHexId()"/>
 
             <!-- Case of 'new' mode where we load the initial data via a service -->
             <xf:var name="new-from-service" value="$mode = ('new', 'test') and xxf:property(string-join(('oxf.fr.detail.new.service.enable', $app, $form), '.'))"/>
@@ -242,7 +243,7 @@
     </xf:action>
 
     <!-- New document operation -->
-    <xf:setvalue event="fr-new-document" ref="$document" value="secure:randomHexId()"/>
+    <xf:setvalue event="fr-new-document" ref="$document-element" value="secure:randomHexId()"/>
 
     <!-- Delete operation -->
     <xf:action event="fr-delete-data">

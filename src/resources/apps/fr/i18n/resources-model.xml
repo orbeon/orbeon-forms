@@ -78,6 +78,11 @@
         <xf:action type="xpath">
             xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))
         </xf:action>
+
+        <!-- So that model variables are updated in case another model uses them -->
+        <xf:rebuild/>
+        <xf:recalculate/>
+        <xf:revalidate/>
     </xf:action>
 
     <!-- Respond to language change in the UI -->

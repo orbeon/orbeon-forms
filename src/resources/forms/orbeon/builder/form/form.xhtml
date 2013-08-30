@@ -177,14 +177,14 @@
                                 <xf:label><xh:i class="icon-wrench icon-white" title="{$form-resources/dialog-form-settings/open/label}"/></xf:label>
                                 <xf:action ev:event="DOMActivate">
                                     <!-- Open the dialog in "edit" mode -->
-                                    <xf:dispatch name="fb-show-dialog" targetid="dialog-form-settings">
-                                        <xf:property name="app" value="xxf:bind('application-name-bind')"/>
-                                        <xf:property name="form" value="xxf:bind('form-name-bind')"/>
-                                        <xf:property name="title" value="xxf:bind('title-bind')"/>
+                                    <xxf:show dialog="dialog-form-settings">
+                                        <xf:property name="app"         value="xxf:bind('application-name-bind')"/>
+                                        <xf:property name="form"        value="xxf:bind('form-name-bind')"/>
+                                        <xf:property name="title"       value="xxf:bind('title-bind')"/>
                                         <xf:property name="description" value="xxf:bind('description-bind')"/>
-                                        <xf:property name="logo" value="xxf:bind('logo-bind')"/>
-                                        <xf:property name="mode" value="'edit'"/>
-                                    </xf:dispatch>
+                                        <xf:property name="logo"        value="xxf:bind('logo-bind')"/>
+                                        <xf:property name="mode"        value="'edit'"/>
+                                    </xxf:show>
                                 </xf:action>
                             </xf:trigger>
 

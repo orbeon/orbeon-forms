@@ -292,6 +292,10 @@
         </xf:model>
         <!-- This model handles document persistence -->
         <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>
+        <!-- This model handles i18n resources -->
+        <!-- NOTE: Place after fr-persistence-model, as it needs the list of available form languages, but before
+             fr-form-model, as that model needs the language set. -->
+        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->
         <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
 
@@ -332,10 +336,6 @@
             <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
 
         </xsl:copy>
-
-        <!-- This model handles i18n resources -->
-        <!-- NOTE: Place after fr-form-model, as it needs the list of available form languages. -->
-        <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
 
         <xsl:if test="not($is-noscript)">
             <!-- Handle checking dirty status -->

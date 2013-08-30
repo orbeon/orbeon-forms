@@ -35,6 +35,11 @@
 
       id="fr-form-model">
 
+    <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
+    <xf:var name="app"        value="$parameters/app/string()"/>
+    <xf:var name="form"       value="$parameters/form/string()"/>
+    <xf:var name="mode"       value="$parameters/mode/string()"/>
+
     <!-- Public variable pointing to the current language -->
     <xf:var name="fb-lang" value="instance('fb-language-instance')"/>
 
@@ -93,8 +98,13 @@
             value="$resources/resource[1]/@xml:lang"/>
     </xf:action>
 
+    <!-- Initialization entry point. Form data must be ready and the Form Runner language must have been set. -->
+    <xf:action ev:event="xforms-model-construct-done" if="not($mode = ('summary', 'home')) and $app != '*' and $form != '*'">
+        <xf:dispatch name="fb-data-ready" targetid="fr-form-model"/>
+    </xf:action>
+
     <!-- Mode != "new": annotate loaded data and copy it to fb-form-instance -->
-    <xf:action ev:event="fr-data-ready" if="not(xxf:instance('fr-parameters-instance')/mode = 'new')">
+    <xf:action ev:event="fb-data-ready" if="not($mode = 'new')">
 
         <!-- Load toolbox if mode is not new. This also annotates the form when loading is done via fr-annotate-data. -->
         <xf:var
@@ -117,14 +127,14 @@
     </xf:action>
 
     <!-- Mode = "new": just annotate template -->
-    <xf:action ev:event="fr-data-ready" if="xxf:instance('fr-parameters-instance')/mode = 'new'">
+    <xf:action ev:event="fb-data-ready" if="$mode = 'new'">
 
         <!-- Point to template -->
         <xf:var name="template" value="instance('fr-form-instance')"/>
 
-        <!-- Set language in all @xml:lang on template -->
+        <!-- Set language in all blank @xml:lang on template -->
         <xf:setvalue
-            iterate="$template//@xml:lang"
+            iterate="$template//@xml:lang[normalize-space() = '']"
             ref="."
             value="xxf:instance('fr-language-instance')"/>
 
@@ -146,35 +156,35 @@
     </xf:action>
 
     <!-- Run the rest of the initialization. Do this in separate action so that model variables are up to date. -->
-    <xf:action ev:event="fr-data-ready">
+    <xf:action ev:event="fb-data-ready">
 
         <!-- NOTE: $fb-lang has already been set by fr-annotate-data above -->
 
         <!-- Check permissions if there are roles -->
         <xf:var name="has-roles" value="not(xxf:instance('fb-permissions')/@has-roles = 'false')"/>
         <xf:action if="$has-roles">
-            <xf:var name="app"         value="xxf:bind('application-name-bind')"/>
-            <xf:var name="form"        value="xxf:bind('form-name-bind')"/>
-            <xf:var name="permissions" value="xxf:instance('fb-permissions')"/>
+            <xf:var name="metadata-app"  value="xxf:bind('application-name-bind')"/>
+            <xf:var name="metadata-form" value="xxf:bind('form-name-bind')"/>
+            <xf:var name="permissions"   value="xxf:instance('fb-permissions')"/>
 
-            <xf:action if="xxf:instance('fr-parameters-instance')/mode = 'new'">
+            <xf:action if="$mode = 'new'">
                 <!-- New form -->
                 <xf:action if="not($permissions/app/@name = '*')">
                     <!-- Set default value for app if we only support specific app names -->
-                    <xf:setvalue ref="$app" value="$permissions/app[1]/@name"/>
+                    <xf:setvalue ref="$metadata-app" value="$permissions/app[1]/@name"/>
 
                     <xf:action if="not($permissions/app[1]/form/@name = '*')">
                         <!-- Set default value for form if we only support specific form names -->
-                        <xf:setvalue ref="$form" value="$permissions/app[1]/form[1]/@name"/>
+                        <xf:setvalue ref="$metadata-form" value="$permissions/app[1]/form[1]/@name"/>
                     </xf:action>
                 </xf:action>
             </xf:action>
-            <xf:action if="not(xxf:instance('fr-parameters-instance')/mode = 'new')">
+            <xf:action if="not($mode = 'new')">
                 <!-- Existing form -->
 
                 <!-- If roles don't match then access is unauthorized. See similar logic in FR. -->
                 <xf:action if="not(   exists($permissions/app[@name = '*'])
-                                   or exists($permissions/app[@name = $app]/form[@name = ('*', $form)]))">
+                                   or exists($permissions/app[@name = $metadata-app]/form[@name = ('*', $metadata-form)]))">
                     frf:sendError(403)
                 </xf:action>
             </xf:action>
@@ -210,10 +220,11 @@
     <!-- Form is ready -->
     <xf:action ev:event="xforms-ready">
         <!-- Open form settings if mode is "new" -->
-        <xf:var name="is-new" value="xxf:instance('fr-parameters-instance')/mode = 'new'" as="xs:boolean"/>
-        <xf:dispatch if="$is-new" ev:event="DOMActivate" name="fb-show-dialog" targetid="dialog-form-settings">
-            <xf:property name="mode" value="'new'"/>
-        </xf:dispatch>
+        <xxf:show if="$mode = 'new'" dialog="dialog-form-settings">
+            <xf:property name="mode"        value="'new'"/>
+            <xf:property name="title"       value="xxf:bind('title-bind')"/>
+            <xf:property name="description" value="xxf:bind('description-bind')"/>
+        </xxf:show>
     </xf:action>
 
     <!-- Annotated form instance -->
@@ -272,7 +283,7 @@
     <xf:bind ref="instance('fb-triggers-instance')">
         <!-- Condition for disabling Save as… button -->
         <!-- HACK: Not sure why, but if we don't put a calculate here (which is useless), then the readonly is not evaluated on recalculate -->
-        <xf:bind ref="save-as" readonly="xxf:instance('fr-parameters-instance')/mode != 'edit'" calculate="xxf:instance('fr-parameters-instance')/mode"/>
+        <xf:bind ref="save-as" readonly="$mode != 'edit'" calculate="$mode"/>
     </xf:bind>
 
     <!-- HACK: Bind has inter-model dependency -->

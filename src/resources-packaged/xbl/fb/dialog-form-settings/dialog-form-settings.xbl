@@ -28,13 +28,15 @@
     <xbl:binding id="fb-dialog-form-settings" element="fb|dialog-form-settings">
         <xbl:handlers>
             <!-- Handler to open dialog -->
-            <xbl:handler event="fb-show-dialog" phase="target">
+            <xbl:handler event="fb-show-dialog xxforms-dialog-open" phase="target">
                 <!-- Clear local values -->
                 <xf:setvalue iterate="*[not(*)]" ref="."/>
                 <!-- Save event context information in local instance -->
-                <xf:setvalue iterate="'app', 'form', 'title', 'description', 'mode'"
+                <xf:setvalue
+                    iterate="'app', 'form', 'title', 'description', 'mode'"
                     ref="instance()/*[name() = context()]" value="event(context())"/>
-                <!-- -->
+
+                <!-- FIXME: Have caller pass the info instead? -->
                 <xf:setvalue if="$app-chooser = 'output'" ref="app" value="xxf:instance('fb-permissions')/app/@name"/>
                 <xxf:show dialog="dialog"/>
             </xbl:handler>

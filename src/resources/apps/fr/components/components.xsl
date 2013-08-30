@@ -86,6 +86,7 @@
     <xsl:variable name="error-summary-bottom" select="normalize-space($error-summary) = ('', 'bottom', 'both')" as="xs:boolean"/>
 
     <xsl:variable name="view-appearance" as="xs:string" select="(p:property(string-join(('oxf.fr.detail.view.appearance', $app, $form), '.')), 'full')[1]"/>
+    <xsl:variable name="custom-model"    as="xs:anyURI?" select="p:property(string-join(('oxf.fr.detail.model.custom', $app, $form), '.'))"/>
 
     <xsl:variable name="is-rendered" select="doc('input:request')/request/request-path = '/xforms-renderer'" as="xs:boolean"/>
     <xsl:variable name="url-base-for-requests" select="if ($is-rendered) then substring-before(doc('input:request')/request/request-uri, '/xforms-renderer') else ''" as="xs:string"/>
@@ -327,13 +328,18 @@
             <!-- Variable exposing all the user roles -->
             <xf:var name="fr-roles" value="frf:orbeonRolesAsString()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
             <!-- Variable exposing the form mode -->
-            <xf:var name="fr-mode" value="string(xxf:instance('fr-parameters-instance')/mode)"/>
+            <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode/string()"/>
 
             <!-- Bind to set the form instance read-only when necessary -->
             <xf:bind ref="instance('fr-form-instance')" readonly="$fr-mode = ('view', 'pdf', 'email')"/>
 
             <!-- Focus to the first control supporting input on load -->
             <xf:setfocus ev:event="xforms-ready" control="fr-form-group" input-only="true"/>
+
+            <!-- Custom XForms model content to include -->
+            <xsl:if test="normalize-space($custom-model)">
+                <xsl:copy-of select="doc($custom-model)/*/node()"/>
+            </xsl:if>
 
         </xsl:copy>
 

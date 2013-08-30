@@ -73,7 +73,7 @@
             <!-- Set value and escape single quotes -->
             <xf:setvalue xmlns:sql="http://orbeon.org/oxf/xml/sql"
                          ref="/sql:config/sql:query/sql:param[xs:integer($parameter)]/(@value | @select)[1]"
-                         value="concat('''', replace({fr:instance-path(.)}*[name() = $control-name], '''', ''''''), '''')"/>
+                         value="concat('''', replace(string({fr:instance-path(.)}*[name() = $control-name]), '''', ''''''), '''')"/>
         </xsl:copy>
     </xsl:template>
 

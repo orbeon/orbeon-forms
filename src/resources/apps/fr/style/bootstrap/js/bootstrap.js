@@ -1202,7 +1202,7 @@
             tp = {top: pos.top - actualHeight, left: pos.left + pos.width / 2 - actualWidth / 2}
             break
           case 'left':
-            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left - actualWidth}
+            tp = {top: pos.top + pos.height / 2 - actualHeight / 2, right: pos.right + pos.width}
             break
           case 'right':
             tp = {top: pos.top + pos.height / 2 - actualHeight / 2, left: pos.left + pos.width}
@@ -1222,9 +1222,12 @@
         , actualHeight
         , delta
         , replace
+        , offsetParent = $tip.offsetParent()
 
+      if (offset.left)  offset.left  = offset.left  - offsetParent.offset().left
+      if (offset.right) offset.right = offset.right - $('body').width() + offsetParent.offset().left + offsetParent.width()
       $tip
-        .offset(offset)
+        .css(offset)
         .addClass(placement)
         .addClass('in')
 
@@ -1312,10 +1315,12 @@
 
   , getPosition: function () {
       var el = this.$element[0]
-      return $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
+      var pos = $.extend({}, (typeof el.getBoundingClientRect == 'function') ? el.getBoundingClientRect() : {
         width: el.offsetWidth
       , height: el.offsetHeight
-      }, this.$element.offset())
+      }, this.$element.offset());
+      pos.right = $(window).width() - pos.left - pos.width
+      return pos
     }
 
   , getTitle: function () {

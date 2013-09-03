@@ -315,6 +315,9 @@ body {
 .orbeon .xforms-dialog .xbl-fr-alert-dialog-message .xforms-label:after {
   content: none;
 }
+.orbeon .xforms-dialog fieldset {
+  padding: 0;
+}
 .orbeon .fb-dialog-form-settings {
   width: 600px;
 }

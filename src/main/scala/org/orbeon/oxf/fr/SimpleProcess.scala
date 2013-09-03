@@ -191,8 +191,11 @@ trait FormRunnerActions {
             val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
             val isDraft = paramByName(params, "draft").exists(_ == "true")
 
+            val PersistenceModel = "fr-persistence-model"
+            val FormModel        = "fr-form-model"
+
             // Notify that the data is about to be saved
-            dispatch(name = "fr-data-save-prepare", targetId = "fr-form-model")
+            dispatch(name = "fr-data-save-prepare", targetId = FormModel)
 
             // Save
             val (beforeURLs, afterURLs) = putWithAttachments(
@@ -208,18 +211,24 @@ trait FormRunnerActions {
             // If we were in new mode, now we must be in edit mode
             setvalue(parametersInstance.rootElement \ "mode", "edit")
 
-            // HACK: Force this before cleaning the status because we do a setvalue just before calling the submission
-            recalculate("fr-persistence-model")
-            refresh("fr-persistence-model")
+            // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
+            // before calling the submission
+            recalculate(PersistenceModel)
+            revalidate(PersistenceModel)
+            refresh(PersistenceModel)
 
             // Mark data clean
-            val persistenceInstanceRoot = topLevelInstance("fr-persistence-model", "fr-persistence-instance").get.rootElement
+            val persistenceInstanceRoot = topLevelInstance(PersistenceModel, "fr-persistence-instance").get.rootElement
             val saveStatus = if (isDraft) Seq() else persistenceInstanceRoot \ "data-status"
             val autoSaveStatus = persistenceInstanceRoot \ "autosave" \ "status"
             (saveStatus ++ autoSaveStatus) foreach (setvalue(_, "clean"))
 
-            // Notify that the data is saved
-            dispatch(name = "fr-data-save-done", targetId = "fr-form-model", properties = Map(
+            // Manual dependency HACK: RR fr-form-model as we have changed mode
+            recalculate(FormModel)
+            revalidate(FormModel)
+
+            // Notify that the data is saved (2013-09-03: used by FB only)
+            dispatch(name = "fr-data-save-done", targetId = FormModel, properties = Map(
                 "before-urls" → Some(beforeURLs),
                 "after-urls"  → Some(afterURLs)
             ))

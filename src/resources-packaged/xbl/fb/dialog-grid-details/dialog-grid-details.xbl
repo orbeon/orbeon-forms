@@ -147,28 +147,22 @@
                             <xh:div class="fr-grid-content">
                                 <!-- Control name -->
                                 <xf:input ref="$local/grid-name" incremental="true" id="fb-edit-details-control-name-input">
-                                    <xf:label>
-                                        <xh:img src="/apps/fr/style/images/silk/tag_blue.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-grid-details/grid-name/label"/></xf:label>
+                                    <xf:label value="$resources/dialog-grid-details/grid-name/label"/>
                                     <xf:alert ref="$resources/dialog-grid-details/grid-name/alert"/>
-                                    <xf:hint ref="$resources/dialog-grid-details/grid-name/hint"/>
+                                    <xf:hint  ref="$resources/dialog-grid-details/grid-name/hint"/>
                                 </xf:input>
                                 <!-- Relevant -->
                                 <xf:input ref="relevant" incremental="true">
-                                    <xf:label>
-                                        <xh:img src="/apps/fr/style/images/silk/eye.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-grid-details/visibility/label"/></xf:label>
+                                    <xf:label value="$resources/dialog-grid-details/visibility/label"/>
                                     <xf:alert ref="$resources/dialog-grid-details/visibility/alert"/>
-                                    <xf:hint ref="$resources/dialog-grid-details/visibility/hint"/>
+                                    <xf:hint  ref="$resources/dialog-grid-details/visibility/hint"/>
                                 </xf:input>
                                 <!-- Readonly -->
                                 <!--
                                 <xf:input ref="readonly" incremental="true">
-                                    <xf:label>
-                                        <xh:img src="/apps/fr/style/images/silk/key.png" alt="" title=""/>
-                                        <xf:output value="$resources/dialog-grid-details/readonly/label"/></xf:label>
+                                    <xf:label value="$resources/dialog-grid-details/readonly/label"/>
                                     <xf:alert ref="$resources/dialog-grid-details/readonly/alert"/>
-                                    <xf:hint ref="$resources/dialog-grid-details/readonly/hint"/>
+                                    <xf:hint  ref="$resources/dialog-grid-details/readonly/hint"/>
                                 </xf:input>
                                 -->
                                 <!-- Min -->

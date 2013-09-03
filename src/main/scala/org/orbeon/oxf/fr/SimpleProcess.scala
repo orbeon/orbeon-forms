@@ -40,7 +40,7 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
     override def extensionActions = AllowedFormRunnerActions ++ AllowedXFormsActions
 
     // All XPath runs in the context of the main form instance's root element
-    def xpathContext = topLevelInstance("fr-form-model", "fr-form-instance") map (_.rootElement) orNull
+    def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
 
     // NOTE: Clear the PDF URL *before* the process, because if we clear it after, it will be already cleared during the
     // second pass of a two-pass submission.
@@ -51,10 +51,10 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
         tryErrorMessage(Map(Some("resource") → "process-error"))
 
     def writeSuspendedProcess(process: String) =
-        setvalue(topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement, process)
+        setvalue(topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement, process)
 
     def readSuspendedProcess =
-        topLevelInstance("fr-persistence-model", "fr-processes-instance").get.rootElement.stringValue
+        topLevelInstance(PersistenceModel, "fr-processes-instance").get.rootElement.stringValue
 
     // Search first in properties, then try legacy workflow-send
     def findProcessByName(scope: String, name: String) = {
@@ -133,7 +133,7 @@ trait XFormsActions {
     def tryXFormsDispatch(params: ActionParams): Try[Any] =
         Try {
             val eventName = paramByNameOrDefault(params, "name")
-            val eventTargetId = paramByName(params, "targetid") getOrElse "fr-form-model"
+            val eventTargetId = paramByName(params, "targetid") getOrElse FormModel
             eventName foreach (dispatch(_, eventTargetId))
         }
 
@@ -190,9 +190,6 @@ trait FormRunnerActions {
         Try {
             val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
             val isDraft = paramByName(params, "draft").exists(_ == "true")
-
-            val PersistenceModel = "fr-persistence-model"
-            val FormModel        = "fr-form-model"
 
             // Notify that the data is about to be saved
             dispatch(name = "fr-data-save-prepare", targetId = FormModel)
@@ -251,7 +248,7 @@ trait FormRunnerActions {
     def tryShowResultDialog(params: ActionParams): Try[Any] =
         Try {
             show("fr-submission-result-dialog", Map(
-                "fr-content" → Some(topLevelInstance("fr-persistence-model", "fr-create-update-submission-response").get.rootElement)
+                "fr-content" → Some(topLevelInstance(PersistenceModel, "fr-create-update-submission-response").get.rootElement)
             ))
         }
 
@@ -364,12 +361,12 @@ trait FormRunnerActions {
             tryNavigateTo
 
     // Visit/unvisit controls
-    def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = "fr-error-summary-model"))
-    def tryUnvisitAll(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-unvisit-all", targetId = "fr-error-summary-model"))
+    def tryVisitAll(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-visit-all",   targetId = ErrorSummaryModel))
+    def tryUnvisitAll(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-unvisit-all", targetId = ErrorSummaryModel))
 
     // Collapse/expand sections
-    def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = "fr-sections-model"))
-    def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = "fr-sections-model"))
+    def tryCollapseSections(params: ActionParams): Try[Any] = Try(dispatch(name = "fr-collapse-all", targetId = SectionsModel))
+    def tryExpandSections(params: ActionParams)  : Try[Any] = Try(dispatch(name = "fr-expand-all",   targetId = SectionsModel))
 
     // Navigate the wizard to the previous page
     def tryWizardPrev(params: ActionParams): Try[Any] =
@@ -379,7 +376,7 @@ trait FormRunnerActions {
     def tryWizardNext(params: ActionParams): Try[Any] =
         Try (dispatch(name = "fr-next", targetId = "fr-view-wizard"))
 
-    def pdfURLInstanceRootElement = topLevelInstance("fr-persistence-model", "fr-pdf-url-instance").get.rootElement
+    def pdfURLInstanceRootElement = topLevelInstance(PersistenceModel, "fr-pdf-url-instance").get.rootElement
 
     def tryCreatePDFIfNeeded(params: ActionParams): Try[Any] =
         Try{

@@ -32,6 +32,13 @@ trait FormRunnerBaseOps {
     val XBL = XBL_NAMESPACE_URI
     val FR = "http://orbeon.org/oxf/xml/form-runner"
 
+    val ParametersModel   = "fr-parameters-model"
+    val PersistenceModel  = "fr-persistence-model"
+    val ResourcesModel    = "fr-resources-model"
+    val FormModel         = "fr-form-model"
+    val ErrorSummaryModel = "fr-error-summary-model"
+    val SectionsModel     = "fr-sections-model"
+
     // Get an id based on a name
     // NOTE: The idea as of 2011-06-21 is that we support reading indiscriminately the -control, -grid
     // suffixes, whatever type of actual control they apply to. The idea is that in the end we might decide to just use
@@ -50,7 +57,7 @@ trait FormRunnerBaseOps {
     def findFRBodyElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:body" \\ (XF → "group") filter (_.attClasses("fb-body")) head
 
     // Get the form model
-    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, "fr-form-model")) head
+    def findModelElement(inDoc: NodeInfo) = inDoc.getDocumentRoot \ * \ "*:head" \ "*:model" filter (hasIdValue(_, FormModel)) head
 
     // Find an xf:instance element
     def instanceElement(inDoc: NodeInfo, id: String) =
@@ -98,13 +105,13 @@ trait FormRunnerBaseOps {
     def appendQueryString(urlString: String, queryString: String) = NetUtils.appendQueryString(urlString, queryString)
 
     // Return specific Form Runner instances
-    def formInstance         = topLevelInstance("fr-form-model",          "fr-form-instance")          get
-    def parametersInstance   = topLevelInstance("fr-parameters-model",    "fr-parameters-instance")    get
-    def errorSummaryInstance = topLevelInstance("fr-error-summary-model", "fr-error-summary-instance") get
-    def persistenceInstance  = topLevelInstance("fr-persistence-model",   "fr-persistence-instance")   get
+    def formInstance         = topLevelInstance(FormModel,         "fr-form-instance")          get
+    def parametersInstance   = topLevelInstance(ParametersModel,   "fr-parameters-instance")    get
+    def errorSummaryInstance = topLevelInstance(ErrorSummaryModel, "fr-error-summary-instance") get
+    def persistenceInstance  = topLevelInstance(PersistenceModel,  "fr-persistence-instance")   get
 
-    def currentFRResources   = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-fr-resources"))
-    def currentFormResources = asNodeInfo(topLevelModel("fr-resources-model").get.getVariable("fr-form-resources"))
+    def currentFRResources   = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-fr-resources"))
+    def currentFormResources = asNodeInfo(topLevelModel(ResourcesModel).get.getVariable("fr-form-resources"))
 
     // Whether the form has a captcha
     def hasCaptcha = formRunnerProperty("oxf.fr.detail.captcha")(FormRunnerParams()) exists Set("reCAPTCHA", "SimpleCaptcha")

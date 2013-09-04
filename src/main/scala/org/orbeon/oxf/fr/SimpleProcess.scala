@@ -206,7 +206,9 @@ trait FormRunnerActions {
             )
 
             // If we were in new mode, now we must be in edit mode
-            setvalue(parametersInstance.rootElement \ "mode", "edit")
+            val modeElement = parametersInstance.rootElement \ "mode"
+            if (modeElement.stringValue == "new")
+                setvalue(modeElement, "edit")
 
             // Manual dependency HACK: RR fr-persistence-model before updating the status because we do a setvalue just
             // before calling the submission

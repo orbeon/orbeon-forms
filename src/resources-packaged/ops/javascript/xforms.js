@@ -773,7 +773,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 },
                 // mm/dd/yyyy (American style) or dd/mm/yyyy (European style)
-                {   re: /^(\d{1,2}).(\d{1,2}).(\d{2,4})$/,
+                // Support separators: ".", "/", "-", and single space
+                {   re: /^(\d{1,2})[./\-\s](\d{1,2})[./\-\s](\d{2,4})$/,
                     handler: function(bits) {
                         var d;
                         if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
@@ -787,7 +788,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 },
                 // mm/dd (American style without year) or dd/mm (European style without year)
-                {   re: /^(\d{1,2}).(\d{1,2})$/,
+                // Support separators: ".", "/", "-", and single space
+                {   re: /^(\d{1,2})[./\-\s](\d{1,2})$/,
                     handler: function(bits) {
                         var d;
                         if (ORBEON.util.Properties.formatInputDate.get().indexOf("[D") == 0) {
@@ -801,7 +803,8 @@ var DEFAULT_LOADING_TEXT = "Loading...";
                     }
                 },
                 // yyyy-mm-dd (ISO style)
-                {   re: /(^\d{4})-(\d{1,2})-(\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
+                // But also support separators: ".", "/", "-", and single space
+                {   re: /(^\d{4})[./\-\s](\d{1,2})[./\-\s](\d{1,2})(Z|([+-]\d{2}:\d{2}))?$/, // allow for optional trailing timezone
                     handler: function(bits) {
                         return ORBEON.util.DateTime._newDate(ORBEON.util.DateTime._parseYear(bits[1]), parseInt(bits[2], 10) - 1, parseInt(bits[3], 10));
                     }

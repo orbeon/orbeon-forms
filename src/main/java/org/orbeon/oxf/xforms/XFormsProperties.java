@@ -531,6 +531,10 @@ public class XFormsProperties {
         return getBooleanProperty(containingDocument, NOSCRIPT_PROPERTY);
     }
 
+    public static String getDateFormatInput(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, DATE_FORMAT_INPUT_PROPERTY);
+    }
+
     // == Helpers ======================================================================================================
 
     public static Object getProperty(XFormsContainingDocument containingDocument, String propertyName) {

@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import scala.util.control.NonFatal
 import org.orbeon.oxf.common.OXFException
-import org.orbeon.saxon.om.NodeInfo
+import org.orbeon.saxon.om.{SequenceIterator, NodeInfo}
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.util.{NetUtils, ScalaUtils}
 import collection.JavaConverters._
@@ -205,5 +205,6 @@ trait FormRunnerPermissions {
         request.getHeaderValuesMap.asScala.getOrElse("orbeon-roles", Array.empty[String]) toSet
     }
 
-    def orbeonRolesAsString: String = orbeonRoles mkString " "
+    def orbeonRolesSequence: SequenceIterator =
+        orbeonRoles.iterator map stringToStringValue
 }

@@ -326,7 +326,7 @@
             <xsl:apply-templates select="node()"/>
 
             <!-- Variable exposing all the user roles -->
-            <xf:var name="fr-roles" value="frf:orbeonRolesAsString()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
+            <xf:var name="fr-roles" value="frf:orbeonRolesSequence()" xmlns:frf="java:org.orbeon.oxf.fr.FormRunner"/>
             <!-- Variable exposing the form mode -->
             <xf:var name="fr-mode" value="xxf:instance('fr-parameters-instance')/mode/string()"/>
 

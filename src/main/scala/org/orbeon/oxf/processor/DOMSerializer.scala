@@ -14,10 +14,8 @@
 package org.orbeon.oxf.processor
 
 import org.dom4j.Document
-import org.dom4j.io.DOMWriter
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.util.XPathCache
-import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.saxon.om.DocumentInfo
 import org.w3c.dom.{Document ⇒ W3CDocument }
 
@@ -38,16 +36,6 @@ class DOMSerializer extends ProcessorImpl {
      */
     def findInputLastModified(pipelineContext: PipelineContext): Long =
         findInputLastModified(pipelineContext, getInputByName(INPUT_DATA), false)
-
-    @deprecated("use runGetDocument", "4.0")
-    def getDocument(pipelineContext: PipelineContext): Document =
-        pipelineContext.getAttribute(this).asInstanceOf[Document]
-
-    @deprecated("use runGetW3CDocument", "4.0")
-    def getW3CDocument(pipelineContext: PipelineContext): W3CDocument = {
-        val writer = new DOMWriter(XMLUtils.createDocument.getClass)
-        writer.write(getDocument(pipelineContext))
-    }
 
     override def start(pipelineContext: PipelineContext): Unit = {
         // Q: should use Context instead?

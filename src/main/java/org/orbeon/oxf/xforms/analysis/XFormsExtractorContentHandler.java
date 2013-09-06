@@ -151,7 +151,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             assert baseURI != null;
             elementStack.push(new XMLElementDetails(null, new URI(null, null, baseURI, null), null, null, startScope, false));
         } catch (URISyntaxException e) {
-            throw new ValidationException(e, new LocationData(locator));
+            throw new ValidationException(e, LocationData.createIfPresent(locator));
         }
     }
 
@@ -275,9 +275,8 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         // Handle location data
         if (locationData == null && locator != null && mustOutputFirstElement) {
             final String systemId = locator.getSystemId();
-            if (systemId != null) {
+            if (systemId != null)
                 locationData = new LocationData(systemId, locator.getLineNumber(), locator.getColumnNumber());
-            }
         }
 
         // Check for XForms or extension namespaces
@@ -307,7 +306,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                     // Resolve
                     newBase = parentElementDetails.xmlBase.resolve(new URI(xmlBaseAttribute)).normalize();// normalize to remove "..", etc.
                 } catch (URISyntaxException e) {
-                    throw new ValidationException("Error creating URI from: '" + parentElementDetails + "' and '" + xmlBaseAttribute + "'.", e, new LocationData(locator));
+                    throw new ValidationException("Error creating URI from: '" + parentElementDetails + "' and '" + xmlBaseAttribute + "'.", e, LocationData.createIfPresent(locator));
                 }
             } else {
                 newBase = parentElementDetails.xmlBase;
@@ -390,15 +389,15 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 if (isXXForms) {
                     // Check that we are getting a valid xxf:* element
                     if (! XFormsConstants.ALLOWED_XXFORMS_ELEMENTS.contains(localname) && ! XFormsActions.isAction(QName.get(localname, XFormsConstants.XXFORMS_NAMESPACE)))
-                        throw new ValidationException("Invalid extension element in XForms document: " + qName, new LocationData(locator));
+                        throw new ValidationException("Invalid extension element in XForms document: " + qName, LocationData.createIfPresent(locator));
                 } else if (isEXForms) {
                     // Check that we are getting a valid exf:* element
                     if (! XFormsConstants.ALLOWED_EXFORMS_ELEMENTS.contains(localname))
-                        throw new ValidationException("Invalid eXForms element in XForms document: " + qName, new LocationData(locator));
+                        throw new ValidationException("Invalid eXForms element in XForms document: " + qName, LocationData.createIfPresent(locator));
                 } else if (isXBL) {
                     // Check that we are getting a valid xbl:* element
                     if (! XFormsConstants.ALLOWED_XBL_ELEMENTS.contains(localname))
-                        throw new ValidationException("Invalid XBL element in XForms document: " + qName, new LocationData(locator));
+                        throw new ValidationException("Invalid XBL element in XForms document: " + qName, LocationData.createIfPresent(locator));
                 }
 
                 // Preserve as is the content of labels, etc., instances, and schemas

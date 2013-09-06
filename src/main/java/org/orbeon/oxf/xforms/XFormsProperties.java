@@ -297,6 +297,8 @@ public class XFormsProperties {
     private static final String DEBUG_LOG_XPATH_ANALYSIS_PROPERTY = XFORMS_PROPERTY_PREFIX + "debug.log-xpath-analysis";
     private static final String DEBUG_REQUEST_STATS_PROPERTY      = XFORMS_PROPERTY_PREFIX + "debug.log-request-stats";
 
+    private static final String LOCATION_MODE_PROPERTY = XFORMS_PROPERTY_PREFIX + "location-mode";
+
     // == Global properties ============================================================================================
     /**
      * Return a PropertyDefinition given a property name.
@@ -408,6 +410,10 @@ public class XFormsProperties {
 
     public static int getRetryDelayIncrement() {
         return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_DELAY_INCREMENT, ((Integer) getPropertyDefinition(RETRY_DELAY_INCREMENT).defaultValue).intValue());
+    }
+
+    public static boolean isLocationData() {
+        return Properties.instance().getPropertySet().getBoolean(LOCATION_MODE_PROPERTY, false);
     }
 
     // == XForms document properties ===================================================================================

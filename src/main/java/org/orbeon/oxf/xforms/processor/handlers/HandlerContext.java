@@ -136,7 +136,7 @@ public class HandlerContext {
 
         // TEMP: in this case, we should probably map our own prefix, or set
         // the default namespace and restore it on children elements
-        throw new ValidationException("No prefix found for HTML namespace", new LocationData(controller.getLocator()));
+        throw new ValidationException("No prefix found for HTML namespace", LocationData.createIfPresent(controller.getLocator()));
     }
 
     private String findFormattingPrefix() {
@@ -227,8 +227,7 @@ public class HandlerContext {
      * @return  LocationData, null if no Locator was found
      */
     public LocationData getLocationData() {
-        final Locator locator = getController().getLocator();
-        return (locator == null) ? null : new LocationData(locator);
+        return LocationData.createIfPresent(getController().getLocator());
     }
 
     public String getIdPrefix() {

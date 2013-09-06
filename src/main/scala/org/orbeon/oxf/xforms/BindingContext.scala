@@ -18,7 +18,8 @@ import java.util.{List ⇒ JList, Map ⇒ JMap, HashMap ⇒ JHashMap}
 import org.dom4j.Element
 import collection.JavaConverters._
 import org.orbeon.saxon.om.{NodeInfo, ValueRepresentation, Item}
-import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData}
+import org.orbeon.oxf.xml.dom4j.LocationData
+import org.orbeon.oxf.xforms.analysis.ElementAnalysis
 
 // Represent the XPath binding of an XForms object (control, action, etc.)
 case class BindingContext(
@@ -63,13 +64,12 @@ case class BindingContext(
     }
 
     // Create a copy with a new variable in scope
-    def pushVariable(variableElement: Element, name: String, value: ValueRepresentation, scope: Scope) = {
+    def pushVariable(variableElement: ElementAnalysis, name: String, value: ValueRepresentation, scope: Scope) = {
 
         def ancestorOrSelfInScope(scope: Scope) =
             new AncestorIterator(includeSelf = true) find (_.scope == scope) getOrElse (throw new IllegalStateException)
 
-        val locationData = new ExtendedLocationData(variableElement.getData.asInstanceOf[LocationData], "pushing variable binding", variableElement)
-        new BindingContext(this, ancestorOrSelfInScope(scope), variableElement, locationData, name, value, scope)
+        new BindingContext(this, ancestorOrSelfInScope(scope), variableElement.element, variableElement.locationData, name, value, scope)
     }
 
     // Java callers

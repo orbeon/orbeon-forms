@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXParseException;
 
@@ -20,7 +21,6 @@ import javax.xml.transform.SourceLocator;
 
 public class LocationData {
 
-    private String publicID;
     private String systemID;
     private int line;
     private int col;
@@ -33,7 +33,6 @@ public class LocationData {
 
     public LocationData(Locator locator) {
         if (locator != null) {
-            publicID = locator.getPublicId();
             systemID = locator.getSystemId();
             line = locator.getLineNumber();
             col = locator.getColumnNumber();
@@ -42,7 +41,6 @@ public class LocationData {
 
     public LocationData(SourceLocator sourceLocator) {
         if (sourceLocator != null) {
-            publicID = sourceLocator.getPublicId();
             systemID = sourceLocator.getSystemId();
             line = sourceLocator.getLineNumber();
             col = sourceLocator.getColumnNumber();
@@ -50,14 +48,12 @@ public class LocationData {
     }
 
     public LocationData(SAXParseException exception) {
-        publicID = exception.getPublicId();
         systemID = exception.getSystemId();
         line = exception.getLineNumber();
         col = exception.getColumnNumber();
     }
 
     public String getSystemID() { return systemID; }
-    public String getPublicID() { return publicID; }
     public int getLine() { return line; }
     public int getCol() { return col; }
 
@@ -88,5 +84,18 @@ public class LocationData {
             sb.append(getSystemID());
         }
         return sb.toString();
+    }
+
+    public static LocationData createIfPresent(Locator locator) {
+        if (locator != null) {
+            final String filename = locator.getSystemId();
+            final int line = locator.getLineNumber();
+
+            if (StringUtils.isNotBlank(filename) && line != -1)
+                return new LocationData(filename, line, locator.getColumnNumber());
+            else
+                return null;
+        } else
+            return null;
     }
 }

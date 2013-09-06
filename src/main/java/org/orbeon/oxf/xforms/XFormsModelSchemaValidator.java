@@ -152,7 +152,7 @@ public class XFormsModelSchemaValidator {
         }
 
         public void error(final Locator[] locators, final String message, final Exception exception) {
-            final LocationData locationData = locators.length > 0 ? new LocationData(locators[0]) : null;
+            final LocationData locationData = locators.length > 0 ? LocationData.createIfPresent(locators[0]) : null;
             throw new SchemaValidationException(message, exception, locationData);
         }
 

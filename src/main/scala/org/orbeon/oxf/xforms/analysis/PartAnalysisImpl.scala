@@ -113,7 +113,7 @@ class PartAnalysisImpl(
 
         assert(containerScope ne null)
 
-        val locationData = new ExtendedLocationData(controlElement.getData.asInstanceOf[LocationData], "gathering static control information", controlElement)
+        val locationData = ElementAnalysis.createLocationData(controlElement)
 
         // Check for mandatory id
         val controlStaticId = XFormsUtils.getElementId(controlElement)

@@ -32,7 +32,7 @@ public class ConstantLocator implements Locator {
     }
 
     public String getPublicId() {
-        return locationData.getPublicID();
+        return null;
     }
 
     public String getSystemId() {

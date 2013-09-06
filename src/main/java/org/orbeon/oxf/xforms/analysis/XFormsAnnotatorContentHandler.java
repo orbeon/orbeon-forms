@@ -48,6 +48,8 @@ import java.util.*;
  */
 public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
+    private final boolean keepLocationData = XFormsProperties.isLocationData();
+
     private XMLReceiver templateReceiver;
     private XMLReceiver extractorReceiver;
     private SAXStore templateSAXStore;
@@ -549,10 +551,6 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
         startPrefixMapping(true, prefix, uri);
     }
 
-    public Locator getDocumentLocator() {
-        return documentLocator;
-    }
-
     private Attributes getAttributesGatherNamespaces(String uriForDebug, String qNameForDebug, Attributes attributes, String[] newIdAttribute, final int idIndex) {
         final String rawId;
         if (isGenerateIds) {
@@ -571,7 +569,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // TODO: create Element to provide more location info?
                 if (metadata.idGenerator().isDuplicate(rawId))
                     throw new ValidationException("Duplicate id for XForms element: " + rawId,
-                        new ExtendedLocationData(new LocationData(getDocumentLocator()), "analyzing control element",
+                        new ExtendedLocationData(LocationData.createIfPresent(documentLocator), "analyzing control element",
                                 new String[] { "element", XMLUtils.saxElementToDebugString(uriForDebug, qNameForDebug, attributes), "id", rawId }));
             }
 
@@ -599,10 +597,12 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     public void setDocumentLocator(Locator locator) {
         this.documentLocator = locator;
 
-        if (templateReceiver != null)
-            templateReceiver.setDocumentLocator(locator);
-        if (extractorReceiver != null)
-            extractorReceiver.setDocumentLocator(locator);
+        if (keepLocationData) {
+            if (templateReceiver != null)
+                templateReceiver.setDocumentLocator(locator);
+            if (extractorReceiver != null)
+                extractorReceiver.setDocumentLocator(locator);
+        }
     }
 
     @Override

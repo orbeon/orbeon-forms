@@ -28,8 +28,7 @@ public class LocationSAXWriter extends SAXWriter {
     protected Locator loc = new Locator() {
 
         public String getPublicId() {
-            LocationData locationData = getLocationData();
-            return locationData == null ? null : locationData.getPublicID();
+            return null;
         }
 
         public String getSystemId() {

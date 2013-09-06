@@ -309,7 +309,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             private LocationData currentLocationData;
 
                             public String getPublicId() {
-                                return (currentLocationData != null) ? currentLocationData.getPublicID() : inputLocator.getPublicId();
+                                return null;
                             }
 
                             public String getSystemId() {

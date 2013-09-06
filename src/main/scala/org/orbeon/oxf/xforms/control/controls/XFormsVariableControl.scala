@@ -85,8 +85,8 @@ class XFormsVariableControl(container: XBLContainer, parent: XFormsControl, elem
         val bc = bindingContext
         getContextStack.setBinding(bc)
         if (parentRelevant) {
-            _bindingContextForChild     = bc.pushVariable(staticControl.element, staticControl.name, _value, staticControl.scope)
-            _bindingContextForFollowing = bc.parent.pushVariable(staticControl.element, staticControl.name, _value, staticControl.scope)
+            _bindingContextForChild     = bc.pushVariable(staticControl, staticControl.name, _value, staticControl.scope)
+            _bindingContextForFollowing = bc.parent.pushVariable(staticControl, staticControl.name, _value, staticControl.scope)
         } else {
             // If we are within a non-relevant container, don't even bother pushing variables
             val empty = BindingContext.empty(staticControl.element, staticControl.scope)

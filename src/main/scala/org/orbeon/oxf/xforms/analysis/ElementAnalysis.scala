@@ -486,7 +486,11 @@ object ElementAnalysis {
             Option(element.attributeValue(XFormsConstants.NODESET_QNAME))
 
     def createLocationData(element: Element): ExtendedLocationData =
-        if (element ne null) new ExtendedLocationData(element.getData.asInstanceOf[LocationData], "gathering static information", element) else null
+            element.getData match {
+                case data: LocationData if (element ne null) && (data.getSystemID ne null) && data.getLine != -1 ⇒
+                    new ExtendedLocationData(data, "gathering static information", element)
+                case _ ⇒ null
+            }
     
     /**
      * Get the value of an attribute containing a space-separated list of tokens as a set.

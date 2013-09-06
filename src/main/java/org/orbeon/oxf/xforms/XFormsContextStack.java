@@ -71,6 +71,8 @@ public class XFormsContextStack {
 //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
     private static final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) DUMMY_CONTEXT);
 
+    private final boolean keepLocationData = XFormsProperties.isLocationData();
+
     public final XBLContainer container;
     public final XFormsContainingDocument containingDocument;
 
@@ -219,7 +221,7 @@ public class XFormsContextStack {
         // further variables values could not be added. The method below temporarily adds more elements on the
         // stack but it is safer.
         getFunctionContext(sourceEffectiveId);
-        this.head = this.head.pushVariable(((ElementAnalysis) staticVariable).element(), variable.getVariableName(), variable.getVariableValue(this, sourceEffectiveId, true, handleNonFatal), newScope);
+        this.head = this.head.pushVariable((ElementAnalysis) staticVariable, variable.getVariableName(), variable.getVariableValue(this, sourceEffectiveId, true, handleNonFatal), newScope);
         returnFunctionContext();
 
         return this.head.variable().get();
@@ -268,10 +270,14 @@ public class XFormsContextStack {
 
         assert scope != null;
 
-        // Get location data for error reporting
-        final LocationData locationData = (bindingElement == null)
-                ? container.getLocationData()
-                : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
+        final LocationData locationData; {
+            if (keepLocationData)
+                locationData = (bindingElement == null)
+                    ? container.getLocationData()
+                    : new ExtendedLocationData((LocationData) bindingElement.getData(), "pushing XForms control binding", bindingElement);
+            else
+                locationData = null;
+        }
 
         try {
             // Handle scope

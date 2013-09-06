@@ -729,7 +729,6 @@
                 <start-new>[Start from scratch]</start-new>
             </drafts>
             <labels>
-                <language-choice>Idioma</language-choice>
                 <errors>Resumen de errores</errors>
                 <check-errors-in-form>Este formulario tiene errores</check-errors-in-form>
                 <error-details>Ver detalle de los errores</error-details>
@@ -1826,52 +1825,52 @@
             <buttons>
                 <unpublish>&lt;i class="icon-ban-circle"/&gt; Verbergen</unpublish>
                 <publish>&lt;i class="icon-globe"/&gt; Veröffentlichen</publish>
-                <cancel>[Cancel]</cancel>
-                <connect>[Connect]</connect>
-                <select>[Select]</select>
-                <operation>[Operation]</operation>
-                <all>[All]</all>
-                <none>[None]</none>
-                <unpublished-local>[Unpublished local forms]</unpublished-local>
-                <published-local>[Published local forms]</published-local>
-                <unpublished-remote>[Unpublished remote forms]</unpublished-remote>
-                <published-remote>[Published remote forms]</published-remote>
-                <newer-local>[Forms that are newer locally]</newer-local>
-                <newer-remote>[Forms that are newer remotely]</newer-remote>
-                <publish-local>[Publish local forms]</publish-local>
-                <unpublish-local>[Unpublish local forms]</unpublish-local>
-                <publish-remote>[Publish remote forms]</publish-remote>
-                <unpublish-remote>[Unpublish remote forms]</unpublish-remote>
-                <push-to-remote>[Push to remote]</push-to-remote>
-                <pull-from-remote>[Pull from remote]</pull-from-remote>
-                <navigate-summary>[Navigate to Summary]</navigate-summary>
-                <navigate-new>[Navigate to New]</navigate-new>
+                <cancel>abbrechen</cancel>
+                <connect>Verbinden</connect>
+                <select>Auswählen</select>
+                <operation>Operation</operation>
+                <all>Alle</all>
+                <none>Keine</none>
+                <unpublished-local>Formulare wurden lokal verborgen</unpublished-local>
+                <published-local>Formulare wurden lokal veröffentlicht</published-local>
+                <unpublished-remote>Formulare wurden am Produktivsystem verborgen</unpublished-remote>
+                <published-remote>Formulare wurden am Produktivsystem veröffentlicht</published-remote>
+                <newer-local>Formulare die lokal aktueller sind</newer-local>
+                <newer-remote>Formulare die am Produktivsystem neuer sind</newer-remote>
+                <publish-local>Veröffentliche die Formulare lokal</publish-local>
+                <unpublish-local>Verberge die Formulare lokal</unpublish-local>
+                <publish-remote>Veröffentliche die Formulare am Produktivsystem</publish-remote>
+                <unpublish-remote>Verberge die Formulare am Produktivsystem</unpublish-remote>
+                <push-to-remote>Sende ans Produktivsystem</push-to-remote>
+                <pull-from-remote>Hole vom Produktivsystem</pull-from-remote>
+                <navigate-summary>Gehe zu Liste</navigate-summary>
+                <navigate-new>Gehe zu Neu</navigate-new>
             </buttons>
             <titles>
                 <publish-confirmation>Bestätige veröffentlichen/ veröffentlichen rückgängig machen</publish-confirmation>
-                <credentials>[Remote Server Credentials]</credentials>
-                <status>[Status]</status>
+                <credentials>Produktivsystem Credentials</credentials>
+                <status>Status</status>
                 <app>Applikation</app>
                 <form>Formular</form>
                 <title>Titel</title>
                 <view>Ansehen</view>
                 <new>Neu</new>
-                <local>[Local]</local>
-                <remote>[Remote]</remote>
-                <form-identification>[Form Identification]</form-identification>
-                <last-modified>[Modified]</last-modified>
+                <local>Lokal</local>
+                <remote>Produktivsystem</remote>
+                <form-identification>Formular Identifikation</form-identification>
+                <last-modified>Verändert am</last-modified>
             </titles>
             <messages>
-                <no-forms>[You don't have access to any deployed forms.]</no-forms>
+                <no-forms>Sie haben keinen Zugang zu den bereitgestellten Formularen.</no-forms>
                 <publish-confirmation>Sind Sie sicher, dass {1,choice,1#Sie ein Formular|1&lt;{1,number,integer} die Formulare} {0,choice,0#veröffentlichen |1#nicht mehr öffentlich zugänglich haben} wollen?</publish-confirmation>
             </messages>
             <labels>
                 <available>Verfügbar</available>
                 <unavailable>Nicht verfügbar</unavailable>
                 <library>Bibliothek</library>
-                <newer>[Newer]</newer>
-                <username>[Username]</username>
-                <password>[Password]</password>
+                <newer>Neuer</newer>
+                <username>Benutzername</username>
+                <password>Passwort</password>
             </labels>
         </home>
     </resource>

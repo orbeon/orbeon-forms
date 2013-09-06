@@ -99,7 +99,8 @@
                         <!-- Grid table -->
                         <xh:table class="{'fr-grid',
                                           @class,
-                                          concat('fr-grid-', fbf:controlName(@id)),
+                                          (: Control name might not be available (unclear why normalize-space() is needed) :)
+                                          for $name in fbf:controlName(@id)[normalize-space()] return concat('fr-grid-', $name),
                                           if ($is-repeat)
                                                 then ('table', 'table-bordered', 'table-condensed', 'fr-repeat', 'fr-repeat-table',
                                                       if ($static-row-count le 1) then 'fr-repeat-single-row' else 'fr-repeat-multiple-rows')

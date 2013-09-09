@@ -71,7 +71,7 @@ public class XFormsContextStack {
 //    final List<Item> DEFAULT_CONTEXT = XFormsConstants.EMPTY_ITEM_LIST;
     private static final List<Item> DEFAULT_CONTEXT = Collections.singletonList((Item) DUMMY_CONTEXT);
 
-    private final boolean keepLocationData = XFormsProperties.isLocationData();
+    private final boolean keepLocationData = XFormsProperties.isKeepLocation();
 
     public final XBLContainer container;
     public final XFormsContainingDocument containingDocument;

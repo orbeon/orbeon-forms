@@ -25,7 +25,7 @@
     <property as="xs:string"  processor-name="oxf:builtin-saxon"        name="location-mode" value="smart"/>
     <property as="xs:string"  processor-name="oxf:unsafe-builtin-saxon" name="location-mode" value="smart"/>
 
-    <property as="xs:boolean" name="oxf.xforms.location-mode"                                value="true"/>
+    <property as="xs:string"  name="oxf.xforms.location-mode"                                value="smart"/>
 
     <property as="xs:boolean" name="oxf.xforms.minimal-resources"                            value="false"/>
     <property as="xs:boolean" name="oxf.xforms.combine-resources"                            value="false"/>

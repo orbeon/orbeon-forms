@@ -21,7 +21,6 @@ import org.orbeon.oxf.xforms.XFormsProperties;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
@@ -48,7 +47,7 @@ import java.util.*;
  */
 public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
-    private final boolean keepLocationData = XFormsProperties.isLocationData();
+    private final boolean keepLocationData = XFormsProperties.isKeepLocation();
 
     private XMLReceiver templateReceiver;
     private XMLReceiver extractorReceiver;

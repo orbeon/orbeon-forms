@@ -412,8 +412,8 @@ public class XFormsProperties {
         return Properties.instance().getPropertySet().getInteger(XFORMS_PROPERTY_PREFIX + RETRY_DELAY_INCREMENT, ((Integer) getPropertyDefinition(RETRY_DELAY_INCREMENT).defaultValue).intValue());
     }
 
-    public static boolean isLocationData() {
-        return Properties.instance().getPropertySet().getBoolean(LOCATION_MODE_PROPERTY, false);
+    public static boolean isKeepLocation() {
+        return ! Properties.instance().getPropertySet().getString(LOCATION_MODE_PROPERTY, "none").equals("none");
     }
 
     // == XForms document properties ===================================================================================

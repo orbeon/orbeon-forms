@@ -90,8 +90,9 @@ public class UtilsTest extends TestCase {
 
             InputStream is = resourceManager.getContentAsStream("/ops/unit-tests/company.xml");
 
-            Source source = new StreamSource(is);
-            LocationDocumentResult result = new LocationDocumentResult(resourceManager.getRealPath("/ops/unit-tests/company.xml"));
+            String path = resourceManager.getRealPath("/ops/unit-tests/company.xml");
+            Source source = new StreamSource(is, path);
+            LocationDocumentResult result = new LocationDocumentResult();
             transformer.transform(source, result);
 
             Document doc = result.getDocument();

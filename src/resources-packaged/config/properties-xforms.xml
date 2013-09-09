@@ -111,7 +111,7 @@
     <property as="xs:boolean" name="oxf.xforms.use-aria"                                    value="false"/>
     <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>     <!-- default will switch to true at some point -->
 
-    <property as="xs:boolean" name="oxf.xforms.location-mode"                               value="false"/>
+    <property as="xs:string"  name="oxf.xforms.location-mode"                               value="none"/>
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>

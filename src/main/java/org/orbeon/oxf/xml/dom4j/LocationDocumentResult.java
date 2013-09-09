@@ -26,12 +26,6 @@ public class LocationDocumentResult extends SAXResult {
         setHandler(locationSAXContentHandler);
     }
 
-    public LocationDocumentResult(String systemId) {
-        this();
-        setSystemId(systemId);
-    }
-
-
     public Document getDocument() {
         return locationSAXContentHandler.getDocument();
     }

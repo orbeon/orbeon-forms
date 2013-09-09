@@ -378,7 +378,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // Add global top-level XBL markup
         final scala.collection.Iterator<XBLBindings.Global> i = containingDocument.getStaticOps().getGlobals().values().iterator();
         while (i.hasNext())
-            XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().fullShadowTree());
+            XXFormsComponentHandler.processShadowTree(handlerContext.getController(), i.next().templateTree());
 
         // Close xhtml:form
         helper.endElement();

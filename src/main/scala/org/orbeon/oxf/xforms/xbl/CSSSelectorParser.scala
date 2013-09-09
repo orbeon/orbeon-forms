@@ -42,10 +42,12 @@ object CSSSelectorParser extends Parser {
     case class TypeSelector(prefix: Option[Option[String]], name: String) extends SimpleElementSelector
     case class UniversalSelector(prefix: Option[Option[String]]) extends SimpleElementSelector
 
+    case class AttributePredicate(op: String, value: String)
+
     trait Filter extends SelectorNode
     case class IdFilter(id: String) extends Filter
     case class ClassFilter(className: String) extends Filter
-    case class AttributeFilter(prefix: Option[Option[String]], ident: String, predicate: Option[(String, String)]) extends Filter
+    case class AttributeFilter(prefix: Option[Option[String]], ident: String, predicate: Option[AttributePredicate]) extends Filter
     case class NegationFilter(selector: SelectorNode) extends Filter
 
     trait Expr extends SelectorNode
@@ -78,7 +80,7 @@ object CSSSelectorParser extends Parser {
 
     // Rules
     def selectorsGroup: Rule1[List[Selector]] = rule {
-        zeroOrMore(selector, OptWhiteSpace ~ "," ~ OptWhiteSpace) ~ EOI
+        OptWhiteSpace ~ zeroOrMore(selector, OptWhiteSpace ~ "," ~ OptWhiteSpace) ~ EOI
     }
 
     def selector: Rule1[Selector] = rule {
@@ -123,7 +125,7 @@ object CSSSelectorParser extends Parser {
                 ("^=" | "$=" | "*=" | "=" | "~=" | "|=") ~> identity ~
                 OptWhiteSpace ~
                 (string | ident) ~
-                OptWhiteSpace
+                OptWhiteSpace ~~> AttributePredicate
             ) ~~> AttributeFilter ~
         "]"
     }

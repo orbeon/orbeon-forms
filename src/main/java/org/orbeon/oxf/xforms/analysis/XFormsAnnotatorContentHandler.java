@@ -45,9 +45,9 @@ import java.util.*;
  * ContentHandler (at least two separate outputs) are produced, one for the annotated output, another for the extracted
  * output.
  */
-public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
+public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandlerBase implements XMLReceiver {
 
-    private final boolean keepLocationData = XFormsProperties.isKeepLocation();
+    private final boolean keepLocationData   = XFormsProperties.isKeepLocation();
 
     private XMLReceiver templateReceiver;
     private XMLReceiver extractorReceiver;
@@ -63,6 +63,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     private int preserveLevel;
     private boolean inLHHA;         // whether we are in LHHA (meaningful only if inPreserve == true)
     private boolean inXBL;          // whether we are in xbl:xbl (meaningful only if inPreserve == true)
+    private boolean inXBLBinding;   // whether we are in the body of an XBL binding (meaningful only if inPreserve == true)
 
     private Locator documentLocator;
 
@@ -70,21 +71,6 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     private final boolean isGenerateIds;
 
     private NamespaceContext namespaceContext = new NamespaceContext();
-    private final List<String> xhtmlElementLocalnames = new ArrayList<String>();
-
-    // Name of container elements that require the use of separators for handling visibility
-    private static final Set<String> SEPARATOR_CONTAINERS = new HashSet<String>();
-    static {
-        SEPARATOR_CONTAINERS.add("table");
-        SEPARATOR_CONTAINERS.add("tbody");
-        SEPARATOR_CONTAINERS.add("thead");
-        SEPARATOR_CONTAINERS.add("tfoot");
-        SEPARATOR_CONTAINERS.add("tr");
-
-        SEPARATOR_CONTAINERS.add("ol");
-        SEPARATOR_CONTAINERS.add("ul");
-        SEPARATOR_CONTAINERS.add("dl");
-    }
 
     private final boolean hostLanguageAVTs = XFormsProperties.isHostLanguageAVTs(); // TODO: this should be obtained per document, but we only know about this in the extractor
     private final AttributesImpl reusableAttributes = new AttributesImpl();
@@ -126,22 +112,12 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         namespaceContext.startElement();
-
-        if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri))
-            xhtmlElementLocalnames.add(localname);
-
-        // Check for XForms or extension namespaces
-        final boolean isXForms = XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXXForms = XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isEXForms = XFormsConstants.EXFORMS_NAMESPACE_URI.equals(uri);
-        final boolean isXFormsOrExtension = isXForms || isXXForms || isEXForms;
-
-        final boolean isXBL = XFormsConstants.XBL_NAMESPACE_URI.equals(uri);
+        final StackElement stackElement = startElement(uri, localname);
 
         final int idIndex = attributes.getIndex("id");
 
         // Entering model or controls
-        if (!inXForms && isXFormsOrExtension) {
+        if (!inXForms && stackElement.isXFormsOrExtension()) {
             inXForms = true;
             xformsLevel = level;
         }
@@ -152,14 +128,14 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
             if (inLHHA) {
                 // Gather id and namespace information about content of LHHA
-                if (isXForms) {
+                if (stackElement.isXForms()) {
                     // Must be xf:output
                     attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
                 } else if (hostLanguageAVTs && hasAVT(attributes)) {
                     // Must be an AVT on an host language element
                     attributes = getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex);
                 }
-            } else if (inXBL && level - 1 == preserveLevel && isXBL && "binding".equals(localname)) {
+            } else if (inXBL && level - 1 == preserveLevel && stackElement.isXBL() && "binding".equals(localname)) {
                 // Gather binding information in xbl:xbl/xbl:binding
                 final String elementAttribute = attributes.getValue("element");
                 if (elementAttribute != null) {
@@ -170,7 +146,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             }
             // Output element
             startElement(true, uri, localname, qName, attributes);
-        } else if (isXFormsOrExtension) {
+        } else if (stackElement.isXFormsOrExtension()) {
             // This is an XForms element
 
             // TODO: can we restrain gathering ids / namespaces to only certain elements (all controls + elements with XPath expressions + models + instances)?
@@ -180,7 +156,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             final String xformsElementId = reusableStringArray[0];
 
             // Handle full update annotation
-            if (isXXForms && localname.equals("dynamic")) {
+            if (stackElement.isXXForms() && localname.equals("dynamic")) {
                 // Remember this subtree has a full update
 
                 putMark(xformsElementId);
@@ -203,7 +179,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", "for", htmlTitleElementId);
                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 startElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text", attributes);
-            } else if (("group".equals(localname) || "switch".equals(localname)) && isClosestXHTMLAncestorTableContainer()) {
+            } else if (("group".equals(localname) || "switch".equals(localname)) && doesParentRequireSeparatorAppearance()) {
                 // Closest xhtml:* ancestor is xhtml:table|xhtml:tbody|xhtml:thead|xhtml:tfoot|xhtml:tr
 
                 // Append the new xxf:separator appearance
@@ -212,9 +188,9 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
                         (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
                 startElement(true, uri, localname, qName, attributes);
-            } else if (isXForms && "repeat".equals(localname)) {
+            } else if (stackElement.isXForms() && "repeat".equals(localname)) {
                 // Add separator appearance
-                if (isClosestXHTMLAncestorTableContainer()) {
+                if (doesParentRequireSeparatorAppearance()) {
                     final String existingAppearance = attributes.getValue("appearance");
                     attributes = XMLUtils.addOrReplaceAttribute(attributes, "", "", XFormsConstants.APPEARANCE_QNAME.getName(),
                             (existingAppearance != null ? existingAppearance + " " : "") + XFormsConstants.XXFORMS_SEPARATOR_APPEARANCE_QNAME.getQualifiedName());
@@ -233,7 +209,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 // Leave element untouched (except for the id attribute)
                 startElement(true, uri, localname, qName, attributes);
             }
-        } else if (!isXBL && metadata.isXBLBindingCheckAutomaticBindings(uri, localname)) {
+        } else if (! stackElement.isXBL() && metadata.isXBLBindingCheckAutomaticBindings(uri, localname)) {
             // Element with a binding
 
             // Create a new id and update the attributes if needed
@@ -256,9 +232,10 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
             // Don't handle the content
             inPreserve = true;
+            inXBLBinding = true;
             preserveLevel = level;
 
-        } else if (isXBL) {
+        } else if (stackElement.isXBL()) {
             // This must be xbl:xbl (otherwise we will have isPreserve == true) or xbl:template
             assert localname.equals("xbl") || localname.equals("template") || localname.equals("handler");
             // NOTE: Still process attributes, because the annotator is used to process top-level <xbl:handler> as well.
@@ -376,7 +353,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             if (inXForms) {
                 // Preserve as is the content of labels, etc., instances, and schemas
                 // Within other xf: check for labels, xf:instance, and xs:schema
-                if (isXForms) {
+                if (stackElement.isXForms()) {
                     inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA || "instance".equals(localname)) {                                  // xf:instance
                         inPreserve = true;
@@ -389,8 +366,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
                 }
             } else {
                 // At the top-level: check for labels and xbl:xbl
-                final boolean isXBLXBL = isXBL && "xbl".equals(localname);
-                if (isXForms) {
+                final boolean isXBLXBL = stackElement.isXBL() && "xbl".equals(localname);
+                if (stackElement.isXForms()) {
                     inLHHA = XFormsConstants.LABEL_HINT_HELP_ALERT_ELEMENT.contains(localname); // labels, etc. may contain XHTML
                     if (inLHHA) {
                         inPreserve = true;
@@ -410,6 +387,8 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     @Override
     public void endElement(String uri, String localname, String qName) throws SAXException {
 
+        final StackElement stackElement = endElement();
+
         level--;
 
         if (inPreserve && level == preserveLevel) {
@@ -417,11 +396,12 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             inPreserve = false;
             inLHHA = false;
             inXBL = false;
+            inXBLBinding = false;
         }
 
         if (inXForms) {
 
-            if (!inPreserve && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && "repeat".equals(localname)) {
+            if (!inPreserve && stackElement.isXForms() && "repeat".equals(localname)) {
                 // Close xf:repeat-iteration
                 endElement(true, uri, localname + "-iteration", qName + "-iteration");
             }
@@ -467,7 +447,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             }
         }
 
-        if (inTitle && XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) && "output".equals(localname)) {
+        if (inTitle && stackElement.isXForms() && "output".equals(localname)) {
             // Closing xf:output within xhtml:title
             endElement(true, XFormsConstants.XXFORMS_NAMESPACE_URI, "text", "xxf:text");
             endPrefixMapping(true, "xxforms");// for resolving appearance
@@ -477,18 +457,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             endElement(true, uri, localname, qName);
         }
 
-        if (XMLConstants.XHTML_NAMESPACE_URI.equals(uri))
-            xhtmlElementLocalnames.remove(xhtmlElementLocalnames.size() - 1);
-
         namespaceContext.endElement();
-    }
-
-    private boolean isClosestXHTMLAncestorTableContainer() {
-        if (xhtmlElementLocalnames.size() > 0) {
-            final String closestXHTMLElementLocalname = xhtmlElementLocalnames.get(xhtmlElementLocalnames.size() - 1);
-            return SEPARATOR_CONTAINERS.contains(closestXHTMLElementLocalname);
-        }
-        return false;
     }
 
     private boolean hasAVT(Attributes attributes) {
@@ -620,25 +589,31 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
             extractorReceiver.endDocument();
     }
 
-    private final boolean isKeepHead() {
-        return true;
+    private final boolean isOutputToTemplate() {
         // TODO: Fix endElement() then enable below
-//        return !(inHead && inXForms && !inTitle);
+        return templateReceiver != null && ! inXBLBinding;// && ! (inHead && inXForms && ! inTitle);
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-        if (templateReceiver != null && isKeepHead())
-            templateReceiver.characters(ch, start, length);
-        if (extractorReceiver != null)
-            extractorReceiver.characters(ch, start, length);
+        if (length > 0) {
+            if (isOutputToTemplate())
+                templateReceiver.characters(ch, start, length);
+            if (extractorReceiver != null)
+                extractorReceiver.characters(ch, start, length);
+        }
+    }
+
+    @Override
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+        // ignore, should not happen
     }
 
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
         if (inPreserve) {
             // Preserve comments within e.g. instances
-            if (templateReceiver != null && isKeepHead())
+            if (isOutputToTemplate())
                 templateReceiver.processingInstruction(target, data);
             if (extractorReceiver != null)
                 extractorReceiver.processingInstruction(target, data);
@@ -649,16 +624,17 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
     public void comment(char[] ch, int start, int length) throws SAXException {
         if (inPreserve) {
             // Preserve comments within e.g. instances
-            if (templateReceiver != null && isKeepHead())
+            if (isOutputToTemplate())
                 templateReceiver.comment(ch, start, length);
             if (extractorReceiver != null)
                 extractorReceiver.comment(ch, start, length);
         }
     }
 
+
     private void startElement(boolean outputToTemplate, String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
         if (outputToTemplate) {
-            if (templateReceiver != null && isKeepHead())
+            if (isOutputToTemplate())
                 templateReceiver.startElement(namespaceURI, localName, qName, atts);
 
             if (extractorReceiver != null)
@@ -668,7 +644,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     private void endElement(boolean outputToTemplate, String namespaceURI, String localName, String qName) throws SAXException {
         if (outputToTemplate) {
-            if (templateReceiver != null && isKeepHead())
+            if (isOutputToTemplate())
                 templateReceiver.endElement(namespaceURI, localName, qName);
 
             if (extractorReceiver != null)
@@ -678,7 +654,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     private void startPrefixMapping(boolean outputToTemplate, String prefix, String uri) throws SAXException {
         if (outputToTemplate) {
-            if (templateReceiver != null && isKeepHead())
+            if (isOutputToTemplate())
                 templateReceiver.startPrefixMapping(prefix, uri);
 
             if (extractorReceiver != null)
@@ -688,7 +664,7 @@ public class XFormsAnnotatorContentHandler extends XMLReceiverAdapter {
 
     public void endPrefixMapping(boolean outputToTemplate, String prefix) throws SAXException {
         if (outputToTemplate) {
-            if (templateReceiver != null && isKeepHead())
+            if (isOutputToTemplate())
                 templateReceiver.endPrefixMapping(prefix);
 
             if (extractorReceiver != null)

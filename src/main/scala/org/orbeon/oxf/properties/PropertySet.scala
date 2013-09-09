@@ -87,7 +87,7 @@ class PropertySet {
     }
 
     // Return all the properties starting with the given name
-    def propertiesStartsWith(name: String): Seq[String] = {
+    def propertiesStartsWith(name: String): List[String] = {
         
         val result = mutable.Buffer[String]()
         

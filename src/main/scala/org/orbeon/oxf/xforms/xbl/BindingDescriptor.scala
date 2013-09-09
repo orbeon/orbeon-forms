@@ -67,8 +67,8 @@ object BindingDescriptor {
                             Some(TypeSelector(Some(Some(prefix)), localname)),
                             List(
                                 // TODO: Support appearance and mediatype
-                                //AttributeFilter(None, "appearance", Some(("=", appearance))),
-                                //AttributeFilter(None, "mediatype", Some(("=", mediatype))),
+                                //AttributeFilter(None, "appearance", Some(AttributePredicate("=", appearance))),
+                                //AttributeFilter(None, "mediatype", Some(AttributePredicate("=", mediatype))),
                                 FunctionalPseudoClassFilter("xxf-type", List(StringExpr(datatype)))
                             )
                         ),

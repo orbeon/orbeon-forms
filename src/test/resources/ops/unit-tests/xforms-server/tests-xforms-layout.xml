@@ -1867,8 +1867,8 @@
                     <xh:link rel="stylesheet" href="/foobar2.foobar" type="text/x-foobar"/>
                     <xh:script class="xforms-baseline" src="/cs1.cs" type="text/coffeescript"/>
                     <xh:script src="/cs2.cs" type="text/coffeescript"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-89574b046e069a16542fbcf0f0e1bb0283ce3b24.css" type="text/css" media="all"/>
-                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-4c1da45e028aea995bd6d6126c38e8cb376aa195.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-b42188301ca2449d8870868af1f59c41249754bf.css" type="text/css" media="all"/>
+                    <xh:link rel="stylesheet" href="/xforms-server/orbeon-622c8994102de9821b3d3bed503c742b8dab732d.css" type="text/css" media="all"/>
                     <xh:style>.red { color: red }</xh:style>
                     <xh:link rel="stylesheet" href="http://example.org/style.css"/>
                     <xh:link rel="stylesheet" href="/css5.css" f:url-norewrite="true"/>
@@ -1876,8 +1876,8 @@
                     <xh:style type="text/css">.blue { color: blue }</xh:style>
                 </xh:head>
                 <xh:body>
-                    <xh:script type="text/javascript" src="/xforms-server/orbeon-21654f0da78743b83a6e8c062db2ea191c7db2f1.js"/>
-                    <xh:script type="text/javascript" src="/xforms-server/orbeon-3fb834bac960ffe5afd47bc1429bf62c1a9a3367.js"/>
+                    <xh:script type="text/javascript" src="/xforms-server/orbeon-fef951f1be577d60aea2cc922215892188020a36.js"/>
+                    <xh:script type="text/javascript" src="/xforms-server/orbeon-183854d1a36b84dfcab1deee4c8efe3ac8fd9f08.js"/>
                     <xh:script src="http://example.org/script.js" type="text/javascript"/>
                     <xh:script>function foo()</xh:script>
                     <xh:script xmlns:f="http://orbeon.org/oxf/xml/formatting" src="/js5.js" type="text/javascript" f:url-norewrite="true"></xh:script>

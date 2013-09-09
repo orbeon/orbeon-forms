@@ -70,8 +70,8 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
         assert(! model.part.isTopLevel)
 
         // First annotate tree
-        val (annotatedTree, _) =
-            model.part.xblBindings.annotateSubtree(
+        val annotatedTree =
+            model.part.xblBindings.annotateSubtree1(
                 None,
                 Dom4jUtils.createDocumentCopyParentNamespaces(rawBindElement),
                 model.scope,
@@ -79,8 +79,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
                 XXBLScope.inner,
                 model.containerScope,
                 hasFullUpdate = false,
-                ignoreRoot = false,
-                needCompact = false)
+                ignoreRoot = false)
 
         // Add new bind to parent
         bindsById(parentId).addBind(annotatedTree.getRootElement, precedingId)

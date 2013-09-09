@@ -630,7 +630,7 @@
                         <xxf:control id="my-autocomplete≡show-suggestions-button" class="fr-autocomplete-show-suggestions-button" label="&lt;img alt=&quot;&quot; src=&quot;/orbeon/xbl/orbeon/autocomplete/down-arrow.png&quot;&gt;"/>
                         <xxf:control id="my-autocomplete≡itemset" class="fr-autocomplete-dynamic-itemset">true</xxf:control>
                         <xxf:attribute for="my-autocomplete≡itemset" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-autocomplete≡xf-68" class="xbl-fr-autocomplete-max-results-displayed"/>
+                        <xxf:control id="my-autocomplete≡xf-68" class="xbl-fr-autocomplete-max-results-displayed">10</xxf:control>
                         <xxf:attribute for="my-autocomplete≡xf-68" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-autocomplete≡select1" class="fr-autocomplete-select1">One</xxf:control>
                         <xxf:attribute for="my-autocomplete≡select1" name="style">display: none</xxf:attribute>

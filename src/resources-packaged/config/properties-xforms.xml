@@ -14,6 +14,11 @@
 <properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xmlns:oxf="http://www.orbeon.com/oxf/processors"
             xmlns:xi="http://www.w3.org/2001/XInclude"
+            xmlns:xh="http://www.w3.org/1999/xhtml"
+            xmlns:xf="http://www.w3.org/2002/xforms"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xbl="http://www.w3.org/ns/xbl"
+            xmlns:xxbl="http://orbeon.org/oxf/xml/xbl"
             xmlns:fr="http://orbeon.org/oxf/xml/form-runner">
 
     <!-- Whether to encrypt (encode) item values by default -->
@@ -114,6 +119,41 @@
     <property as="xs:boolean" name="oxf.xforms.xforms11-switch"                             value="false"/>     <!-- default will switch to true at some point -->
 
     <property as="xs:string"  name="oxf.xforms.location-mode"                               value="none"/>
+
+    <!-- Whitespace handling for XForms documents -->
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.default"                     value="normalize"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.normalize"                   value="
+                                                                                                xf|model,
+                                                                                                xbl|xbl"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.preserve"                    value="
+                                                                                                xf|instance > *,
+                                                                                                xf|var,
+                                                                                                xf|setvalue,
+                                                                                                xf|value,
+                                                                                                xxf|sequence,
+                                                                                                xxf|script,
+                                                                                                xf|action:not([type=xpath]),
+                                                                                                xs|schema"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.base.collapse"                    value="
+                                                                                                xf|label,
+                                                                                                xf|help,
+                                                                                                xf|hint,
+                                                                                                xf|alert,
+                                                                                                xf|message,
+                                                                                                xbl|template,
+                                                                                                xxbl|global"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.default"                     value="normalize"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.normalize"                   value="
+                                                                                                xh|html"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.preserve"                    value="
+                                                                                                xh|pre,
+                                                                                                xh|textarea,
+                                                                                                xh|script,
+                                                                                                xh|style,
+                                                                                                xh|template"/>
+    <property as="xs:string"  name="oxf.xforms.whitespace.html.collapse"                    value="
+                                                                                                xh|title,
+                                                                                                xh|body"/>
 
     <!-- Properties for XBL components which will eventually be moved inside the component to keep encapsulation -->
     <property as="xs:string"  name="oxf.xforms.xbl.fr.map.key"                              value=""/>

@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.xbl
 
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.dom4j.{Element, Document}
+import org.orbeon.oxf.xml.SAXStore
 
 case class ConcreteBinding(
     abstractBinding: AbstractBinding,
@@ -22,7 +23,7 @@ case class ConcreteBinding(
     outerScope: Scope,                  // this binding's outer scope
     handlers: Seq[Element],             // annotated event handler elements
     models: Seq[Element],               // annotated implementation model elements
-    fullShadowTree: Document,           // with full content, e.g. XHTML
+    templateTree: SAXStore,             // template with relevant markup for output, including XHTML when needed
     compactShadowTree: Document         // without full content, only the XForms controls
 ) {
     require(abstractBinding.bindingId.isDefined, "missing id on XBL binding for " + Dom4jUtils.elementToDebugString(abstractBinding.bindingElement))

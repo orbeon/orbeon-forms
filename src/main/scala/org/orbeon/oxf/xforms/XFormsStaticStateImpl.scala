@@ -29,8 +29,8 @@ import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate
 import xbl.Scope
 import org.dom4j.{Element, Document}
-import org.orbeon.oxf.util.{StringReplacer, NumberUtils}
-import org.orbeon.oxf.util.ScalaUtils.{stringOptionToSet, nonEmptyOrNone}
+import org.orbeon.oxf.util.{Whitespace, StringReplacer, NumberUtils}
+import org.orbeon.oxf.util.ScalaUtils.stringOptionToSet
 
 class XFormsStaticStateImpl(
         val encodedState: String,
@@ -165,6 +165,7 @@ object XFormsStaticStateImpl {
             part
         })
 
+    // Used by xxf:dynamic and unit tests.
     private def createFromDocument[T](formDocument: Document, startScope: Scope, create: (Document, String, Metadata, AnnotatedTemplate) ⇒ T): (SAXStore, T) = {
         val identity = TransformerUtils.getIdentityTransformerHandler
 
@@ -183,7 +184,7 @@ object XFormsStaticStateImpl {
         }
 
         // Extractor with prefix
-        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractorContentHandler(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false) {
+        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractorContentHandler(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
             override def startXFormsOrExtension(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
                 val staticId = attributes.getValue("id")
                 if (staticId ne null) {
@@ -198,7 +199,22 @@ object XFormsStaticStateImpl {
         }
 
         // Read the input through the annotator and gather namespace mappings
-        TransformerUtils.writeDom4j(formDocument, new Annotator(new Extractor(new TeeXMLReceiver(identity, digestContentHandler))))
+        TransformerUtils.writeDom4j(
+            formDocument,
+            new WhitespaceXMLReceiver(
+                new Annotator(
+                    new Extractor(
+                        new WhitespaceXMLReceiver(
+                            new TeeXMLReceiver(identity, digestContentHandler),
+                            Whitespace.defaultBasePolicy,
+                            Whitespace.basePolicyMatcher
+                        )
+                    )
+                ),
+                Whitespace.defaultHTMLPolicy,
+                Whitespace.htmlPolicyMatcher
+            )
+        )
 
         // Get static state document and create static state object
         val staticStateXML = documentResult.getDocument
@@ -298,6 +314,6 @@ object XFormsStaticStateImpl {
         // If an existing state is passed in, use it, otherwise encode from XML, encrypting if necessary.
         // NOTE: We do compress the result as we think we can afford this for the static state (probably not so for the dynamic state).
         def asBase64 =
-            XFormsUtils.encodeXML(xmlDocument, compress = true, encrypt = isClientStateHandling, location = true)
+            XFormsUtils.encodeXML(xmlDocument, true, isClientStateHandling, true) // compress = true, encrypt = isClientStateHandling, location = true
     }
 }

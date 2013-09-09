@@ -21,10 +21,7 @@ import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
-import org.orbeon.oxf.util.IndentedLogger;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.util.StringBuilderWriter;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.Metadata;
 import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
@@ -309,7 +306,28 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             //
             this.template = AnnotatedTemplate.applyJava(new SAXStore());
             readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,
-                    new XFormsAnnotatorContentHandler(this.template.saxStore(), new XFormsExtractorContentHandler(extractorOutput, metadata, template, ".", XFormsConstants.XXBLScope.inner, true, false), metadata));
+                new WhitespaceXMLReceiver(
+                    new XFormsAnnotatorContentHandler(
+                        this.template.saxStore(),
+                        new XFormsExtractorContentHandler(
+                            new WhitespaceXMLReceiver(
+                                    extractorOutput,
+                                    Whitespace.defaultBasePolicy(),
+                                    Whitespace.basePolicyMatcher()
+                            ),
+                            metadata,
+                            template,
+                            ".",
+                            XFormsConstants.XXBLScope.inner,
+                            true,
+                            false,
+                            false
+                        ),
+                        metadata
+                    ),
+                    Whitespace.defaultHTMLPolicy(),
+                    Whitespace.htmlPolicyMatcher()
+                ));
 
             this.staticStateDocument = documentResult.getDocument();
             this.staticStateDigest = computeDigest ? NumberUtils.toHexString(digestReceiver.getResult()) : null;
@@ -407,5 +425,4 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             }
         }
     }
-
 }

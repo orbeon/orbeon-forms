@@ -234,8 +234,8 @@ trait ModelBinds {
     private var bindTree = new LazyConstant(new BindTree(selfModel, Dom4j.elements(selfModel.element, XFORMS_BIND_QNAME), isCustomMIP))
 
     private def annotateSubTree(rawElement: Element) = {
-        val (annotatedTree, _) =
-            part.xblBindings.annotateSubtree(
+        val annotatedTree =
+            part.xblBindings.annotateSubtree1(
                 None,
                 Dom4jUtils.createDocumentCopyParentNamespaces(rawElement),
                 scope,
@@ -243,8 +243,7 @@ trait ModelBinds {
                 XXBLScope.inner,
                 containerScope,
                 hasFullUpdate = false,
-                ignoreRoot = false,
-                needCompact = false)
+                ignoreRoot = false)
 
         annotatedTree
     }

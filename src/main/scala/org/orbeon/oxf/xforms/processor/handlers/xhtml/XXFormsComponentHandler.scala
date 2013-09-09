@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.dom4j.Document
 import org.xml.sax.{Locator, Attributes}
-import org.orbeon.oxf.xml.{XMLUtils, EmbeddedDocumentXMLReceiver, TransformerUtils, ElementHandlerController}
+import org.orbeon.oxf.xml._
 import java.lang.StringBuilder
 
 
@@ -52,10 +52,8 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
         handlerContext.pushComponentContext(prefixedId)
 
-        // Process shadow content if present
-        val shadowTree = binding.fullShadowTree
-        if (shadowTree ne null)
-            XXFormsComponentHandler.processShadowTree(controller, shadowTree)
+        // Process shadow content
+        XXFormsComponentHandler.processShadowTree(controller, binding.templateTree)
     }
 
     protected override def handleControlEnd(uri: String, localname: String, qName: String, attributes: Attributes, effectiveId: String, control: XFormsControl) =
@@ -72,13 +70,13 @@ class XXFormsComponentHandler extends XFormsControlLifecyleHandler(false) {
 
 object XXFormsComponentHandler {
 
-    def processShadowTree(controller: ElementHandlerController, shadowTree: Document): Unit = {
+    def processShadowTree(controller: ElementHandlerController, templateTree: SAXStore): Unit = {
         // Tell the controller we are providing a new body
         controller.startBody()
 
         // Forward shadow content to handler
         // TODO: would be better to handle inclusion and namespaces using XIncludeProcessor facilities instead of custom code
-        TransformerUtils.writeDom4j(shadowTree, new EmbeddedDocumentXMLReceiver(controller) {
+        templateTree.replay(new EmbeddedDocumentXMLReceiver(controller) {
 
             var level = 0
 

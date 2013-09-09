@@ -58,7 +58,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
 
                         // Add part globals
                         nested.partAnalysis.getGlobals.values foreach { global ⇒
-                            XXFormsComponentHandler.processShadowTree(handlerContext.getController, global.fullShadowTree)
+                            XXFormsComponentHandler.processShadowTree(handlerContext.getController, global.templateTree)
                         }
 
                         handlerContext.popPartAnalysis()

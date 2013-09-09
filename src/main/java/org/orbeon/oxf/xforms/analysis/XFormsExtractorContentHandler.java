@@ -101,6 +101,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private final AnnotatedTemplate templateUnderConstruction;
     private final Metadata metadata;
     private final boolean ignoreRootElement;
+    private final boolean outputSingleTemplate;
 
     private static class XMLElementDetails {
         public final String id;
@@ -137,7 +138,8 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             String baseURI,
             XFormsConstants.XXBLScope startScope,
             boolean isTopLevel,
-            boolean ignoreRootElement) {
+            boolean ignoreRootElement, // NOTE: unused as of 2013-10-11
+            boolean outputSingleTemplate) {
 
         super(xmlReceiver);
 
@@ -145,6 +147,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         this.metadata = metadata;
         this.templateUnderConstruction = templateUnderConstruction;
         this.ignoreRootElement = ignoreRootElement;
+        this.outputSingleTemplate = outputSingleTemplate;
 
         // Create xml:base stack
         try {
@@ -155,12 +158,13 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         }
     }
 
+    @Override
     public void startDocument() throws SAXException {
         super.startDocument();
     }
 
     private void outputFirstElementIfNeeded() throws SAXException {
-        if (mustOutputFirstElement) {
+        if (! outputSingleTemplate && mustOutputFirstElement) {
             final AttributesImpl attributesImpl = new AttributesImpl();
 
             // Add location information
@@ -182,94 +186,99 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         }
     }
 
+    @Override
     public void endDocument() throws SAXException {
 
-        outputFirstElementIfNeeded();
-        super.endElement("", "root", "root");
+        if (! outputSingleTemplate) {
 
-        // Output non-default properties
-        {
-            final PropertySet propertySet = Properties.instance().getPropertySet();
-            for (Iterator i = XFormsProperties.getPropertyDefinitionEntryIterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String propertyName = (String) currentEntry.getKey();
-                final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
+            outputFirstElementIfNeeded();
+            super.endElement("", "root", "root");
 
-                final Object defaultPropertyValue = propertyDefinition.defaultValue; // value can be String, Boolean, Integer
-                final Object actualPropertyValue = properties.get(propertyName); // value can be String, Boolean, Integer
-                if (actualPropertyValue == null) {
-                    // Property not defined in the document, try to obtain from global properties
-                    final Object globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue);
+            // Output non-default properties
+            {
+                final PropertySet propertySet = Properties.instance().getPropertySet();
+                for (Iterator i = XFormsProperties.getPropertyDefinitionEntryIterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String propertyName = (String) currentEntry.getKey();
+                    final XFormsProperties.PropertyDefinition propertyDefinition = (XFormsProperties.PropertyDefinition) currentEntry.getValue();
 
-                    // If the global property is different from the default, add it
-                    if (!globalPropertyValue.equals(defaultPropertyValue)) {
-                        propertyDefinition.validate(globalPropertyValue, locationData);
-                        properties.put(propertyName, globalPropertyValue);
+                    final Object defaultPropertyValue = propertyDefinition.defaultValue; // value can be String, Boolean, Integer
+                    final Object actualPropertyValue = properties.get(propertyName); // value can be String, Boolean, Integer
+                    if (actualPropertyValue == null) {
+                        // Property not defined in the document, try to obtain from global properties
+                        final Object globalPropertyValue = propertySet.getObject(XFormsProperties.XFORMS_PROPERTY_PREFIX + propertyName, defaultPropertyValue);
+
+                        // If the global property is different from the default, add it
+                        if (!globalPropertyValue.equals(defaultPropertyValue)) {
+                            propertyDefinition.validate(globalPropertyValue, locationData);
+                            properties.put(propertyName, globalPropertyValue);
+                        }
+
+                    } else {
+                        // Property defined in the document
+
+                        // If the property is identical to the default, remove it
+                        if (actualPropertyValue.equals(defaultPropertyValue))
+                            properties.remove(propertyName);
+                        else
+                            propertyDefinition.validate(actualPropertyValue, locationData);
                     }
+                }
 
-                } else {
-                    // Property defined in the document
+                // Create attributes
+                final AttributesImpl newAttributes = new AttributesImpl();
+                for (final Map.Entry<String, Object> currentEntry : properties.entrySet()) {
+                    final String propertyName = currentEntry.getKey();
+                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxf:" + propertyName, ContentHandlerHelper.CDATA, currentEntry.getValue().toString());
+                }
 
-                    // If the property is identical to the default, remove it
-                    if (actualPropertyValue.equals(defaultPropertyValue))
-                        properties.remove(propertyName);
-                    else
-                        propertyDefinition.validate(actualPropertyValue, locationData);
+                super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                super.startElement("", "properties", "properties", newAttributes);
+                super.endElement("", "properties", "properties");
+                super.endPrefixMapping("xxforms");
+            }
+
+            if (isTopLevel) {
+                // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
+                final AttributesImpl newAttributes = new AttributesImpl();
+                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(metadata.idGenerator().getCurrentId()));
+                final String lastIdName = LAST_ID_QNAME.getName();
+                super.startElement("", lastIdName, lastIdName, newAttributes);
+                super.endElement("", lastIdName, lastIdName);
+
+                // TODO: It's not good to serialize this right here, since we have a live SAXStore anyway used to create the
+                // static state and since the serialization is only needed if the static state is serialized. In other
+                // words, serialization of the template should be lazy.
+
+                // Remember the template (and marks if any) if:
+                // - we are in noscript mode and told to store the template statically
+                // - OR if there are top-level marks
+                final boolean isStoreNoscriptTemplate =
+                    templateUnderConstruction != null &&
+                    XFormsStaticStateImpl.isNoscriptJava(properties) &&
+                    XFormsProperties.NOSCRIPT_TEMPLATE_STATIC_VALUE.equals(XFormsStaticStateImpl.<String>getPropertyJava(properties, XFormsProperties.NOSCRIPT_TEMPLATE));
+
+                if (isStoreNoscriptTemplate || metadata.hasTopLevelMarks()) {
+                    final String templateName = "template";
+                    super.startElement("", templateName, templateName, new AttributesImpl());
+
+                    // NOTE: At this point, the template has just received endDocument(), so is no longer under under
+                    // construction and can be serialized safely.
+                    final String templateString = templateUnderConstruction.asBase64();
+                    super.characters(templateString.toCharArray(), 0, templateString.length());
+
+                    super.endElement("", templateName, templateName);
                 }
             }
 
-            // Create attributes
-            final AttributesImpl newAttributes = new AttributesImpl();
-            for (final Map.Entry<String, Object> currentEntry : properties.entrySet()) {
-                final String propertyName = currentEntry.getKey();
-                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxf:" + propertyName, ContentHandlerHelper.CDATA, currentEntry.getValue().toString());
-            }
-
-            super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
-            super.startElement("", "properties", "properties", newAttributes);
-            super.endElement("", "properties", "properties");
-            super.endPrefixMapping("xxforms");
+            super.endElement("", "static-state", "static-state");
         }
 
-        if (isTopLevel) {
-            // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
-            final AttributesImpl newAttributes = new AttributesImpl();
-            newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(metadata.idGenerator().getCurrentId()));
-            final String lastIdName = LAST_ID_QNAME.getName();
-            super.startElement("", lastIdName, lastIdName, newAttributes);
-            super.endElement("", lastIdName, lastIdName);
-
-            // TODO: It's not good to serialize this right here, since we have a live SAXStore anyway used to create the
-            // static state and since the serialization is only needed if the static state is serialized. In other
-            // words, serialization of the template should be lazy.
-
-            // Remember the template (and marks if any) if:
-            // - we are in noscript mode and told to store the template statically
-            // - OR if there are top-level marks
-            final boolean isStoreNoscriptTemplate =
-                templateUnderConstruction != null &&
-                XFormsStaticStateImpl.isNoscriptJava(properties) &&
-                XFormsProperties.NOSCRIPT_TEMPLATE_STATIC_VALUE.equals(XFormsStaticStateImpl.<String>getPropertyJava(properties, XFormsProperties.NOSCRIPT_TEMPLATE));
-
-            if (isStoreNoscriptTemplate || metadata.hasTopLevelMarks()) {
-                final String templateName = "template";
-                super.startElement("", templateName, templateName, new AttributesImpl());
-
-                // NOTE: At this point, the template has just received endDocument(), so is no longer under under
-                // construction and can be serialized safely.
-                final String templateString = templateUnderConstruction.asBase64();
-                super.characters(templateString.toCharArray(), 0, templateString.length());
-
-                super.endElement("", templateName, templateName);
-            }
-        }
-
-        super.endElement("", "static-state", "static-state");
         super.endDocument();
     }
 
+    @Override
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
         namespaceContext.startElement();
 
         // Handle location data
@@ -461,8 +470,8 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         }
     }
 
+    @Override
     public void endElement(String uri, String localname, String qName) throws SAXException {
-
         level--;
 
         // Check for XForms or extension namespaces
@@ -513,28 +522,36 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
         namespaceContext.endElement();
     }
 
-    public void characters(char[] chars, int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) throws SAXException {
         if (inPreserve) {
-            super.characters(chars, start, length);
+            super.characters(ch, start, length);
         } else if (! inForeign) {
             // TODO: we must not output characters here if we are not directly within an XForms element
             // See: https://github.com/orbeon/orbeon-forms/issues/493
             if (inXFormsOrExtension) // TODO: check this: only keep spaces within XForms elements that require it in order to reduce the size of the static state
-                super.characters(chars, start, length);
+                super.characters(ch, start, length);
         }
     }
 
+    @Override
+    public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
+        // ignore, should not happen
+    }
+
+    @Override
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         namespaceContext.startPrefixMapping(prefix, uri);
         if (inXFormsOrExtension)
             super.startPrefixMapping(prefix, uri);
     }
 
+    @Override
     public void endPrefixMapping(String s) throws SAXException {
         if (inXFormsOrExtension)
             super.endPrefixMapping(s);
     }
 
+    @Override
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;
         super.setDocumentLocator(locator);
@@ -580,14 +597,16 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
     @Override
     public void comment(char[] ch, int start, int length) throws SAXException {
-        if (inPreserve)
+        if (inPreserve) {
             super.comment(ch, start, length);
+        }
     }
 
     @Override
     public void processingInstruction(String target, String data) throws SAXException {
-        if (inPreserve)
+        if (inPreserve) {
             super.processingInstruction(target, data);
+        }
     }
 
     private void handleProperties(Attributes attributes) {

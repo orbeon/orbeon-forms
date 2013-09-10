@@ -690,7 +690,7 @@ additional terms may apply.&lt;br clear="none"/&gt;&lt;/div&gt;</htmlarea>
                                 </fr:us-phone>
                             </xh:td>
                             <xh:td>
-                                <fr:number id="number-control" grouping-separator="," digits-after-decimal="0" decimal-separator="." bind="number-bind" class="fr-width-10em" suffix="m/s">
+                                <fr:number id="number-control" digits-after-decimal="0" bind="number-bind" class="fr-width-10em" suffix="m/s">
                                     <xf:label ref="$form-resources/number/label"/>
                                     <xf:hint ref="$form-resources/number/hint"/>
                                 </fr:number>

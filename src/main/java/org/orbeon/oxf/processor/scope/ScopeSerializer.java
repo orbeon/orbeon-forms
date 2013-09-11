@@ -15,13 +15,22 @@ package org.orbeon.oxf.processor.scope;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+import java.util.Map;
 
 public class ScopeSerializer extends ScopeProcessorBase {
 
+    private boolean isNull = false;
 
     public ScopeSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SCOPE_CONFIG_NAMESPACE_URI));
@@ -33,7 +42,21 @@ public class ScopeSerializer extends ScopeProcessorBase {
         final ScopeStore store = readCacheInputAsObject(context, getInputByName(INPUT_DATA), new CacheableInputReader<ScopeStore>() {
             public ScopeStore read(PipelineContext context, ProcessorInput input) {
                 final SAXStore saxStore = new SAXStore();
-                readInputAsSAX(context, input, saxStore);
+                // Output filter to check if this is the null document
+                final XMLReceiver filter = new SimpleForwardingXMLReceiver(saxStore) {
+                    private boolean root = true;
+
+                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+                        super.startElement(uri, localname, qName, attributes);
+                        if (root) {
+                            isNull = uri.equals("") && localname.equals("null") && "true".equals(attributes.getValue(XMLConstants.XSI_URI, "nil"));
+                            root = false;
+                        }
+                    }
+
+                };
+
+                readInputAsSAX(context, input, filter);
                 return new ScopeStore(saxStore, getInputKey(context, input), getInputValidity(context, input));
             }
         });
@@ -41,17 +64,25 @@ public class ScopeSerializer extends ScopeProcessorBase {
         // Read config
         final ContextConfig config = readConfig(context);
 
-        // Store into context
         final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        // Find the map for the scope
+        Map<String, Object> map = null;
         if (config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT) {
-            externalContext.getRequest().getAttributesMap().put(config.getKey(), store);
+            map = externalContext.getRequest().getAttributesMap();
         } else if (config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT) {
             if (config.getSessionScope() == -1)
-                externalContext.getSession(true).getAttributesMap().put(config.getKey(), store);
+                map = externalContext.getSession(true).getAttributesMap();
             else
-                externalContext.getSession(true).getAttributesMap(config.getSessionScope()).put(config.getKey(), store);
+                map = externalContext.getSession(true).getAttributesMap(config.getSessionScope());
         } else if (config.getContextType() == ScopeProcessorBase.APPLICATION_CONTEXT) {
-            externalContext.getWebAppContext().getAttributesMap().put(config.getKey(), store);
+            map = externalContext.getWebAppContext().getAttributesMap();
         }
+        // Delete when null, otherwise store...
+        if (isNull) {
+            map.remove(config.getKey());
+        } else {
+            map.put(config.getKey(), store);
+        }
+
     }
 }

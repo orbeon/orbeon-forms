@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import com.drew.imaging.jpeg.JpegSegmentData;
 import com.drew.imaging.jpeg.JpegSegmentReader;
+import com.drew.imaging.jpeg.JpegSegmentType;
+import com.drew.lang.StreamReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.MetadataException;
@@ -305,13 +308,11 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
 
     private static void outputMetadata(ContentHandlerHelper helper, Metadata metadata, String elementName) throws MetadataException {
         if (metadata.getDirectoryCount() > 0) {
-            for (Iterator j = metadata.getDirectoryIterator(); j.hasNext();) {
-                Directory directory = (Directory) j.next();
+            for (Directory directory: metadata.getDirectories()) {
 
                 helper.startElement(elementName, new String[]{"name", directory.getName()});
 
-                for (Iterator k = directory.getTagIterator(); k.hasNext();) {
-                    Tag tag = (Tag) k.next();
+                for (Tag tag: directory.getTags()) {
                     helper.startElement(TAG_ELEMENT);
                     helper.element("id", tag.getTagType());
                     helper.element("name", tag.getTagName());
@@ -320,7 +321,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                 }
                 // TODO: Should do something with this?
                 if (directory.hasErrors()) {
-                    for (Iterator k = directory.getErrors(); k.hasNext();) {
+                    for (String error: directory.getErrors()) {
                         //System.out.println("ERROR: " + k.next());
                     }
                 }
@@ -416,6 +417,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
             return basicInfo;
         }
 
+
         public void setBasicInfo(boolean basicInfo) {
             this.basicInfo = basicInfo;
         }
@@ -430,7 +432,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
 
                 if (contentType.equals("image/jpeg")) {
 
-                    JpegSegmentReader segmentReader = new JpegSegmentReader(is);
+                    JpegSegmentData segmentData = JpegSegmentReader.readSegments(new StreamReader(is), null);
 
                     // Basic info: content-type, size and comment
                     if (config.isBasicInfo()) {
@@ -438,7 +440,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                         helper.startElement("basic-info");
                         helper.element("content-type", contentType);
 
-                        byte[] startOfFrameSegment = segmentReader.readSegment(JpegSegmentReader.SEGMENT_SOF0);
+                        byte[] startOfFrameSegment = segmentData.getSegment(JpegSegmentType.SOF0);
                         if (startOfFrameSegment != null) {
                             // Big-endian, unsigned encoding
                             int width = NumberUtils.readShortBigEndian(startOfFrameSegment, 3) & 0xffff;
@@ -446,7 +448,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                             helper.element("width", width);
                             helper.element("height", height);
                         }
-                        byte[] commentSegment = segmentReader.readSegment((byte) 0xfe);
+                        byte[] commentSegment = segmentData.getSegment(JpegSegmentType.COM);
                         if (commentSegment != null)
                             helper.element("comment", new String(commentSegment), "iso-8859-1"); // probably just ASCII
 
@@ -454,19 +456,19 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                     }
                     // Exif info
                     if (config.isExifInfo()) {
-                        byte[] exifSegment = segmentReader.readSegment(JpegSegmentReader.SEGMENT_APP1);
+                        byte[] exifSegment = segmentData.getSegment(JpegSegmentType.APP1);
                         if (exifSegment != null) {
                             Metadata metadata = new Metadata();
-                            new ExifReader(exifSegment).extract(metadata);
+                            new ExifReader().extract(exifSegment, metadata, JpegSegmentType.APP1);
                             outputMetadata(helper, metadata, EXIF_ELEMENT);
                         }
                     }
                     // IPTC info
                     if (config.isIptcInfo()) {
-                        byte[] iptcSegment = segmentReader.readSegment(JpegSegmentReader.SEGMENT_APPD);
+                        byte[] iptcSegment = segmentData.getSegment(JpegSegmentType.APPD);
                         if (iptcSegment != null) {
                             Metadata metadata = new Metadata();
-                            new IptcReader(iptcSegment).extract(metadata);
+                            new IptcReader().extract(iptcSegment, metadata, JpegSegmentType.APPD);
                             outputMetadata(helper, metadata, IPTC_ELEMENT);
                         }
                     }

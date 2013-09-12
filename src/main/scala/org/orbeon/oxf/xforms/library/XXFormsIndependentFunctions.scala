@@ -171,5 +171,10 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
             Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE),
             Arg(ITEM_TYPE, ALLOWS_ZERO_OR_MORE)
         )
+
+        Fun("image-metadata", classOf[XXFormsImageMetadata], op = 0, min = 2, ITEM_TYPE, ALLOWS_ZERO_OR_MORE,
+            Arg(ITEM_TYPE, EXACTLY_ONE),
+            Arg(STRING, EXACTLY_ONE)
+        )
     }
 }

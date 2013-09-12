@@ -2281,4 +2281,37 @@
         </output>
     </test>
 
+    <test description="xxf:image-metadata()" name="oxf:pipeline">
+        <input name="config" href="wrap-xforms-state.xpl"/>
+        <input name="document">
+            <xh:html xmlns:xh="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms">
+                <xh:head>
+                    <xf:model id="model">
+                        <xf:instance id="instance">
+                            <file>oxf:/org/orbeon/oxf/util/hs-2010-13-a-web.jpg</file>
+                        </xf:instance>
+                        <xf:bind ref="." constraint="abs(xs:decimal(xxf:image-metadata(., 'width')) div xs:decimal(xxf:image-metadata(., 'height')) - 1) le 0.1"/>
+                    </xf:model>
+                </xh:head>
+                <xh:body>
+                    <xf:output id="output1" value="xf:valid(.)"/>
+                    <xf:output id="output2" value="string-join(for $i in ('width', 'height', 'mediatype') return concat($i, ': ', string(xxf:image-metadata(., $i))), ' | ')"/>
+                </xh:body>
+            </xh:html>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state/>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="output1">true</xxf:control>
+                        <xxf:control id="output2">width: 400 | height: 368 | mediatype: image/jpeg</xxf:control>
+                    </xxf:control-values>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

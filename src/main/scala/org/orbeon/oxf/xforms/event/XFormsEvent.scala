@@ -21,8 +21,7 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xml.XMLUtils.buildExplodedQName
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.om._
-import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
-import org.orbeon.oxf.util.XPathCache
+import org.orbeon.scaxon.XML._
 
 /**
  * Base class for all DOM events.
@@ -143,17 +142,6 @@ object XFormsEvent {
     def getters[E <: XFormsEvent](e: E, m: Map[String, E ⇒ Option[Any]]): PropertyGetter = new PropertyGetter {
         def isDefinedAt(name: String) = m.isDefinedAt(name)
         def apply(name: String)       = m(name)(e)
-    }
-
-    // Convert a Java object to a Saxon Item using the Saxon API
-    private val anyToItem = new StandardObjectConverter(new SaxonXQDataFactory {
-        def getConfiguration = XPathCache.getGlobalConfiguration
-    }).convertToItem(_: Any)
-
-    // Convert a Java object to a Saxon Item but keep unchanged if already an Item
-    private val anyToItemIfNeeded: Any ⇒ Item = _ match {
-        case i: Item ⇒ i
-        case a ⇒ anyToItem(a)
     }
 
     import SingletonIterator.makeIterator

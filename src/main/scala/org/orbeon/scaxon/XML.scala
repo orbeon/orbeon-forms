@@ -36,6 +36,7 @@ import org.orbeon.oxf.util.XPathCache
 import annotation.tailrec
 import collection._
 import org.orbeon.oxf.pipeline.api.XMLReceiver
+import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 
 object XML {
 
@@ -456,6 +457,17 @@ object XML {
         findChild(Some(context), tokens)
     }
 
+    // Convert a Java object to a Saxon Item using the Saxon API
+    val anyToItem = new StandardObjectConverter(new SaxonXQDataFactory {
+        def getConfiguration = XPathCache.getGlobalConfiguration
+    }).convertToItem(_: Any)
+
+    // Convert a Java object to a Saxon Item but keep unchanged if already an Item
+    val anyToItemIfNeeded: Any ⇒ Item = _ match {
+        case i: Item ⇒ i
+        case a ⇒ anyToItem(a)
+    }
+
     // Other implicits
     implicit def itemToItemSeq(item: Item) = Seq(item)
     implicit def nodeInfoToNodeInfoSeq(node: NodeInfo) = if (node ne null) Seq(node) else Seq()// TODO: don't take null
@@ -505,6 +517,9 @@ object XML {
     def stringToStringValue(s: String) = StringValue.makeStringValue(s)
 
     implicit def saxonIteratorToItem(i: SequenceIterator): Item = i.next()
+
+    implicit def asStringSequenceIterator(i: Iterator[String]): SequenceIterator =
+        asSequenceIterator(i map stringToStringValue)
 
     implicit def asSequenceIterator(i: Iterator[Item]) = new SequenceIterator {
 

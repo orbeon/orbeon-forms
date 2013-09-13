@@ -2256,7 +2256,6 @@
                     </xf:model>
                 </xh:head>
                 <xh:body>
-                    'foo bar'/xxf:split(), foo/@bar/xxf:split(), xxf:split('foo bar'), xxf:split('foo-bar_baz', '-_')
                     <xf:output id="output1" value="string-join(xxf:split(' foo  bar   baz '), ' - ')"/>
                     <xf:output id="output2" value="string-join(xxf:split('foo$bar_baz', '$_'), ' - ')"/>
                     <xf:output id="output3" value="string-join(element[1]/xxf:split(), ' - ')"/>

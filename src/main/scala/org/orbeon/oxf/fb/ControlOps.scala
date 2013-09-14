@@ -227,7 +227,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     // Rename holders with the given name
     def findRenameHolders(inDoc: NodeInfo, oldName: String, newName: String) =
         findHolders(inDoc, oldName) foreach
-            (rename(_, oldName, newName))
+            (rename(_, newName))
 
     // Find or create a data holder for the given hierarchy of names
     private def ensureDataHolder(root: NodeInfo, holders: Seq[(() ⇒ NodeInfo, Option[String])]) = {
@@ -305,7 +305,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
     // Update a mip for the given control, grid or section id
     // The bind is created if needed
-    def updateMip(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String) {
+    def updateMip(inDoc: NodeInfo, controlName: String, mipName: String, mipValue: String): Unit = {
 
         require(Model.AllMIPNames(mipName))
         val mipQName = convertMIP(mipName)
@@ -315,32 +315,46 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             // Get or create the bind element
             val bind = ensureBinds(inDoc, findContainerNames(control) :+ controlName)
 
-            val isTypeString =
-                if (mipName == "type") {
+            val namespaceMapping =
+                if (mipName == "type") scopeNamespaceMappingIfNeeded(bind, mipValue) else None
 
-                    val (prefix, _)       = parseQName(mipValue)
-                    val existingNSMapping = bind.namespaceMappings.toMap.get(prefix) map (prefix → _)
-
-                    // If there is no mapping and the schema prefix matches the prefix and a uri is found for the
-                    // schema, then insert a new mapping. We place it on the top-level bind so we don't have to insert
-                    // it repeatedly.
-                    if (existingNSMapping.isEmpty && findSchemaPrefix(inDoc) == Some(prefix))
-                        findSchemaNamespace(inDoc) foreach
-                            (uri ⇒ insert(into = findTopLevelBind(inDoc).toList, origin = namespaceInfo(prefix, uri)))
-
-                    // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
-                    // expressions and types could use it. So for now the mapping is never collected.
-
-                    existingNSMapping.isDefined && Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(resolveQName(bind, mipValue))
-                } else
-                    false
+            // NOTE: It's hard to remove the namespace mapping once it's there, as in theory lots of
+            // expressions and types could use it. So for now the mapping is never garbage collected.
+            val isStringType =
+                namespaceMapping.isDefined &&
+                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(resolveQName(bind, mipValue))
 
             // Create/update or remove attribute
             nonEmptyOrNone(mipValue) match {
-                case Some(value) if ! isTypeString ⇒ ensureAttribute(bind, mipQName, value)
+                case Some(value) if ! isStringType ⇒ ensureAttribute(bind, mipQName, value)
                 case _ ⇒ delete(bind \@ mipQName)
             }
         }
+    }
+
+    def scopeNamespaceMappingIfNeeded(bind: NodeInfo, qNameValue: String): Option[(String, String)] = {
+
+        val (prefix, _) = parseQName(qNameValue)
+
+        def existingNSMapping = bind.namespaceMappings.toMap.get(prefix) map (prefix →)
+
+        def newNSMapping = {
+            // If there is no mapping and the schema prefix matches the prefix and a uri is found for the
+            // schema, then insert a new mapping. We place it on the top-level bind so we don't have to insert
+            // it repeatedly.
+            val newURI =
+                if (findSchemaPrefix(bind) == Some(prefix))
+                    findSchemaNamespace(bind)
+                else
+                    None
+
+            newURI map { uri ⇒
+                insert(into = findTopLevelBind(bind).toList, origin = namespaceInfo(prefix, uri))
+                prefix → uri
+            }
+        }
+
+        existingNSMapping orElse newNSMapping
     }
 
     // Get the value of a MIP attribute if present

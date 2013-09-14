@@ -24,6 +24,7 @@ import org.orbeon.oxf.xml.Dom4j
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.xbl.XBLResources.HeadElement
 import org.orbeon.oxf.xforms.analysis.model.ThrowawayInstance
+import collection.JavaConverters._
 
 // Holds details of an xbl:xbl/xbl:binding
 case class AbstractBinding(
@@ -143,13 +144,8 @@ object AbstractBinding {
         val global = Option(bindingElement.element(XXBL_GLOBAL_QNAME)) map
             (Dom4jUtils.createDocumentCopyParentNamespaces(_, true))
 
-        new AbstractBinding(qNameMatch(bindingElement), bindingElement, lastModified, bindingId, scripts, styles, handlers, modelElements, global)
+        new AbstractBinding(directBindingQName(bindingElement), bindingElement, lastModified, bindingId, scripts, styles, handlers, modelElements, global)
     }
-
-    // From a binding element, extract the @element CSS-style selectors and return a QName
-    // So: fr|section → fr:section
-    def elementQualifiedName(bindingElement: Element) =
-        bindingElement.attributeValue(ELEMENT_QNAME).replace('|', ':')
 
     // Find a cached abstract binding or create and cache a new one
     def findOrCreate(
@@ -158,7 +154,7 @@ object AbstractBinding {
             lastModified: Long,
             scripts: Seq[HeadElement]): AbstractBinding = {
 
-        val qName = qNameMatch(bindingElement)
+        val qName = directBindingQName(bindingElement)
 
         path flatMap (BindingCache.get(_, qName, lastModified)) match {
             case Some(cachedBinding) ⇒
@@ -172,6 +168,7 @@ object AbstractBinding {
         }
     }
 
-    private def qNameMatch(bindingElement: Element) =
-        Dom4jUtils.extractTextValueQName(bindingElement, elementQualifiedName(bindingElement), true)
+    // Parse the selector and return the first direct binding binding
+    private def directBindingQName(bindingElement: Element) =
+        BindingDescriptor.findDirectBinding(bindingElement.attributeValue(ELEMENT_QNAME), Dom4jUtils.getNamespaceContext(bindingElement).asScala.toMap).get
 }

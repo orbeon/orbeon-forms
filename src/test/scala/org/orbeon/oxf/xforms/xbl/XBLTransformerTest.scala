@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms.xbl
 
-import junit.framework.TestCase
 import org.scalatest.junit.AssertionsForJUnit
+import org.junit.Test
 
-class XBLTransformerTest extends TestCase with AssertionsForJUnit {
+class XBLTransformerTest extends AssertionsForJUnit {
 
-    def testCSSToXPath(): Unit = {
+    @Test def testCSSToXPath(): Unit = {
 
         val expected = Seq(
             "foo|a"                                     → "descendant-or-self::foo:a",

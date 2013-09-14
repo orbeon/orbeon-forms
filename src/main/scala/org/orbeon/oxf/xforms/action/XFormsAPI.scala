@@ -135,21 +135,23 @@ object XFormsAPI {
         deleteInfos.asScala map (_.nodeInfo)
     }
 
-    // Rename an element or attribute node
+    // Rename an element or attribute
+    // - if the name hasn't changed, don't do anything
+    // - if the node is an element, its content is placed back into the renamed element
     // NOTE: This should be implemented as a core XForms action (see also XQuery updates)
-    def rename(nodeInfo: NodeInfo, oldName: String, newName: String) {
-
+    def rename(nodeInfo: NodeInfo, newName: QName): Unit = {
         require(nodeInfo ne null)
         require(Set(ELEMENT_NODE, ATTRIBUTE_NODE)(nodeInfo.getNodeKind.toShort))
 
+        val oldName: QName = nodeInfo.qname
         if (oldName != newName) {
             val newNodeInfo = nodeInfo.getNodeKind match {
-                case ELEMENT_NODE ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
-                case ATTRIBUTE_NODE ⇒  attributeInfo(newName, attValueOption(nodeInfo).get)
+                case ELEMENT_NODE   ⇒ elementInfo(newName, (nodeInfo \@ @*) ++ (nodeInfo \ Node))
+                case ATTRIBUTE_NODE ⇒ attributeInfo(newName, attValueOption(nodeInfo).get)
                 case _ ⇒ throw new IllegalArgumentException
             }
 
-            insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo)
+            insert(into = nodeInfo parent *, after = nodeInfo, origin = newNodeInfo).head
             delete(nodeInfo)
         }
     }

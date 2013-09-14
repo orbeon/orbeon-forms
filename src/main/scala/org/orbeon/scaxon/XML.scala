@@ -363,6 +363,14 @@ object XML {
         def precedingElement = nodeInfo precedingSibling * headOption
         def followingElement = nodeInfo followingSibling * headOption
 
+        def prefix       = nodeInfo.getPrefix
+        def localname    = nodeInfo.getLocalPart
+        def name         = nodeInfo.getDisplayName
+        def qname        = (nodeInfo.getURI, nodeInfo.getLocalPart)
+        def namespaceURI = {
+            val uri = nodeInfo.getURI
+            if (uri eq null) "" else uri
+        }
         def stringValue = nodeInfo.getStringValue
 
         def hasIdValue(id: String) = nodeInfo /@ "id" === id

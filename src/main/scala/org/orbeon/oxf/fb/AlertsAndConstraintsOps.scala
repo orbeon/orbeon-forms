@@ -20,10 +20,12 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis._
-import org.dom4j.QName
-import org.orbeon.oxf.xforms.action.XFormsAPI.{insert, delete, setvalue}
+import org.dom4j.{Namespace, QName}
+import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.Model._
 import scala.xml.Elem
+import org.orbeon.oxf.xforms.xbl.BindingDescriptor
+import org.orbeon.oxf.xml.XMLUtils
 
 trait AlertsAndConstraintsOps extends ControlOps {
 
@@ -209,29 +211,55 @@ trait AlertsAndConstraintsOps extends ControlOps {
     case class DatatypeValidation(level: ValidationLevel, builtinType: Option[String], schemaType: Option[String], required: Boolean) extends Validation {
 
         def write(inDoc: NodeInfo, controlName: String): Unit = {
-            val datatype =
-                this match {
-                    case DatatypeValidation(_, Some(builtinType), _, required) ⇒
-                        // If a builtin type, we just have a local name
-                        val nsURI =
-                            if (XFormsTypeNames(builtinType) || ! required && XFormsVariationTypeNames(builtinType))
-                                XF
-                            else
-                                XS
 
-                        val bind   = findBindByName(inDoc, controlName).get // require the bind
-                        val prefix = bind.prefixesForURI(nsURI).head        // mapping must be in scope
+            val components = asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-                        prefix + ':' + builtinType
-                    case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
-                        // Schema type OTOH comes with a prefix if needed
-                        schemaType
-                    case _ ⇒
-                        // No type specified, should not happen, but if it does we remove the type MIP
-                        ""
-                }
+            val datatypeQName = datatype(inDoc, controlName)
 
-            updateMip(inDoc, controlName, "type", datatype)
+            // Rename control element if needed when the datatype changes
+            for {
+                control        ← findControlByName(inDoc, controlName)
+                oldDatatype    ← DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
+                newDatatype    ← datatypeQName
+                if oldDatatype != newDatatype
+                newElementName ← BindingDescriptor.newElementName(control.qname, oldDatatype, newDatatype, components)
+            } locally {
+                rename(control, newElementName)
+            }
+
+            val datatypeString =
+                datatypeQName map { qName ⇒ XMLUtils.buildQName(qName.getNamespacePrefix, qName.getName) } getOrElse ""
+
+            updateMip(inDoc, controlName, "type", datatypeString)
+        }
+
+        def datatype(inDoc: NodeInfo, controlName: String) = {
+
+            // Bind must be present
+            val bind = findBindByName(inDoc, controlName).get
+
+            this match {
+                case DatatypeValidation(_, Some(builtinType), _, required) ⇒
+                    // If a builtin type, we just have a local name
+                    val nsURI =
+                        if (XFormsTypeNames(builtinType) || ! required && XFormsVariationTypeNames(builtinType))
+                            XF
+                        else
+                            XS
+
+                    // Namespace mapping must be in scope
+                    val prefix = bind.prefixesForURI(nsURI).head
+
+                    Some(new QName(builtinType, new Namespace(prefix, nsURI)))
+                case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
+                    // Schema type OTOH comes with a prefix if needed
+                    scopeNamespaceMappingIfNeeded(bind, schemaType) map {
+                        case (prefix, uri) ⇒ new QName(parseQName(schemaType)._2, new Namespace(prefix, uri))
+                    }
+                case _ ⇒
+                    // No type specified, should not happen, but if it does we remove the type MIP
+                    None
+            }
         }
 
         def toXML(forLang: String): Elem =

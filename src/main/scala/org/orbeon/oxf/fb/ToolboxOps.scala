@@ -385,7 +385,7 @@ object ToolboxOps {
                         renameControlByElement(control, newName)
 
                         (xvc \ "holder" \ *) ++ (xvc \ "resources" \ "resource" \ *) foreach
-                            (rename(_, requestedName, newName))
+                            (rename(_, newName))
 
                         (xvc \ "bind" \ * headOption) foreach
                             (renameBindByElement(_, newName))

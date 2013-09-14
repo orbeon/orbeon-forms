@@ -34,7 +34,7 @@ class XXFormsImageMetadata extends XFormsFunction with FunctionSupport {
 
         def createStream(content: String) =
             if (NetUtils.urlHasProtocol(content))
-                URLFactory.createURL(content).openConnection().getInputStream
+                URLFactory.createURL(content).openStream()
             else
                 new ByteArrayInputStream(Base64.decodeBase64(content))
 

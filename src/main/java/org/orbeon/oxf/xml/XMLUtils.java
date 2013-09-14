@@ -322,7 +322,7 @@ public class XMLUtils {
                 logger.warn("XML entity resolver for public id: " + publicId + " is accessing external entity via HTTP: " + url.toExternalForm());
             }
 
-            is.setByteStream(url.openConnection().getInputStream());
+            is.setByteStream(url.openStream());
             return is;
         }
     }

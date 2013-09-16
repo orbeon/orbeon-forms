@@ -56,7 +56,7 @@
 
     <!-- Search -->
     <service path="/fr/service/mysql/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/mysql/search.xpl"/>
+             view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->
     <service path="/fr/service/mysql/form(/([^/]+)(/([^/]+))?)?"
@@ -74,7 +74,7 @@
 
     <!-- Search -->
     <service path="/fr/service/db2/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/db2/search.xpl"/>
+             view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->
     <service path="/fr/service/db2/form(/([^/]+)(/([^/]+))?)?"

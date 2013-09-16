@@ -97,13 +97,25 @@
                     </xsl:copy>
                 </xsl:template>
 
-                <!-- Hacky rewrite of the XPath to support both short (xh, xf) and long (xhtml, xforms) prefixes
-                     See: https://github.com/orbeon/orbeon-forms/issues/598 -->
+                <!-- Support long prefixes for backward compatibility -->
                 <xsl:template match="query/@path">
+                    <!-- Depends on the database:
+                         - In MySQL matching is done on the prefix (not the namespace URI), so for MySQL we create XPath
+                           with "expression with the xh: prefix" | "expression with the xhtml: prefix"
+                         - On Oracle and DB2, we can use any prefix we want, and the database goes by the associated
+                           namespace URI; here we normalize the request to always use the xh prefix, so we later only
+                           need to define the namespace for that prefix -->
                     <xsl:attribute name="path" select="
-                        if (starts-with(., 'xhtml:')) then
-                            concat('/*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
-                        else concat('/*/', .)"/>
+                        if (/search/provider = 'mysql') then
+                            if (starts-with(., 'xh:')) then
+                                concat('/*/', ., ' | /*/', replace(replace(., 'xh:', 'xhtml:'), 'xf:', 'xforms:'))
+                            else if (starts-with(., 'xhtml:')) then
+                                concat('/*/', ., ' | /*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
+                            else concat('/*/', .)
+                        else
+                            if (starts-with(., 'xhtml:')) then
+                                concat('/*/', replace(replace(., 'xhtml:', 'xh:'), 'xforms:', 'xf:'))
+                            else concat('/*/', .)"/>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
@@ -155,7 +167,12 @@
                                         created, last_modified_time, document_id
                                         <!-- Go over detail columns and extract data from XML -->
                                         <xsl:for-each select="/search/query[@path]">
-                                            , XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()') detail_<xsl:value-of select="position()"/>
+                                            <xsl:choose>
+                                                <xsl:when test="/search/provider = 'mysql' ">, extractValue(xml,    '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
+                                                <xsl:when test="/search/provider = 'oracle'">, extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')</xsl:when>
+                                                <xsl:when test="/search/provider = 'db2'   ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
+                                            </xsl:choose>
+                                            detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
                                         , username, groupname
                                         <xsl:if test="$support-auto-save">, draft</xsl:if>
@@ -252,7 +269,11 @@
                                             ) total,
                                             (
                                                 select count(*) from (<xsl:copy-of select="$query"/>) a
-                                            ) search_total from sysibm.sysdummy1
+                                            ) search_total
+                                        <xsl:if test="/search/provider = 'db2'">
+                                            <!-- Only needed on DB2 -->
+                                            from sysibm.sysdummy1
+                                        </xsl:if>
                                     </sql:query>
                                     <sql:result-set>
                                         <sql:row-iterator>
@@ -264,12 +285,24 @@
                                 <!-- Get details -->
                                 <sql:execute>
                                     <sql:query>
+                                        <!-- DB2 technique for paging from http://stackoverflow.com/a/3885220/5295 -->
+                                        <xsl:variable name="start-offset-zero-based" select="(/search/page-number - 1) * /search/page-size"/>
                                         select *
-                                          from ( select
-                                          a.*, cast(r.rownum+1 as char) rnum
-                                              from (SELECT 0 as rownum from sysibm.sysdummy1) r, ( <xsl:copy-of select="$query"/> ) a
-                                              LIMIT <xsl:value-of select="/search/page-number * /search/page-size"/> ) v
-                                        where rnum  > <xsl:value-of select="(/search/page-number - 1) * /search/page-size"/>
+                                        from
+                                            (
+                                                select a.*
+                                                       <xsl:if test="/search/provider = 'db2'">, row_number() over() rnum</xsl:if>
+                                                from ( <xsl:copy-of select="$query"/> ) a
+                                                <xsl:if test="/search/provider = 'mysql'">
+                                                    limit <xsl:value-of select="$start-offset-zero-based"/>,
+                                                          <xsl:value-of select="/search/page-size"/>
+                                                </xsl:if>
+                                            ) v
+                                        <xsl:if test="/search/provider = 'db2'">
+                                            where rnum
+                                                between <xsl:value-of select="$start-offset-zero-based + 1"/>
+                                                and     <xsl:value-of select="$start-offset-zero-based + /search/page-size"/>
+                                        </xsl:if>
                                     </sql:query>
                                     <sql:result-set>
                                         <sql:row-iterator>
@@ -329,18 +362,38 @@
                         <xsl:choose>
                             <xsl:when test="@match = 'exact'">
                                 <!-- Exact match -->
-                                and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>
-                                = "<xsl:value-of select="f:escape-sql(.)"/>"]')
+                                <xsl:choose>
+                                    <xsl:when test="$search/search/provider = 'mysql'">
+                                        and extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                    </xsl:when>
+                                    <xsl:when test="$search/search/provider = 'db2'">
+                                        and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/> = "<xsl:value-of select="f:escape-sql(.)"/>"]')
+                                    </xsl:when>
+                                </xsl:choose>
                             </xsl:when>
                             <xsl:otherwise>
                                 <!-- Substring -->
-                                and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
+                                <xsl:choose>
+                                    <xsl:when test="$search/search/provider = 'mysql'">
+                                        and lower(extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                    </xsl:when>
+                                    <xsl:when test="$search/search/provider = 'db2'">
+                                        and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
+                                    </xsl:when>
+                                </xsl:choose>
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:for-each>
                     <!-- Condition for free text search -->
                     <xsl:if test="$search/search/query[empty(@path) and normalize-space() != '']">
-                        and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
+                        <xsl:choose>
+                            <xsl:when test="$search/search/provider = 'mysql'">
+                                and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
+                            </xsl:when>
+                            <xsl:when test="$search/search/provider = 'db2'">
+                                and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")
+                            </xsl:when>
+                        </xsl:choose>
                     </xsl:if>
                 </xsl:function>
             </xsl:stylesheet>

@@ -29,7 +29,7 @@
     </p:processor>
 
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/[^/]+/search/([^/^.]+)/([^/^.]+)</config></p:input>
+        <p:input name="config"><config>/fr/service/([^/]+)/search/([^/^.]+)/([^/^.]+)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
@@ -47,8 +47,9 @@
                 <xsl:template match="/search">
                     <xsl:variable name="groups" select="doc('input:matcher-groups')/result/group" as="element(group)+"/>
                     <xsl:copy>
-                        <app><xsl:value-of select="$groups[1]"/></app>
-                        <form><xsl:value-of select="$groups[2]"/></form>
+                        <provider><xsl:value-of select="$groups[1]"/></provider>
+                        <app><xsl:value-of select="$groups[2]"/></app>
+                        <form><xsl:value-of select="$groups[3]"/></form>
                         <xsl:apply-templates/>
                     </xsl:copy>
                 </xsl:template>

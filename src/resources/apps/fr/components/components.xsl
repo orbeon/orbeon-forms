@@ -71,6 +71,8 @@
     <xsl:variable name="hide-buttons-bar" select="p:property(string-join(('oxf.fr.detail.hide-buttons-bar', $app, $form), '.'))" as="xs:boolean?"/>
     <xsl:variable name="css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.uri', $app, $form), '.'))))" as="xs:string*"/>
     <xsl:variable name="custom-css-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.css.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
+    <xsl:variable name="js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.uri', $app, $form), '.'))))" as="xs:string*"/>
+    <xsl:variable name="custom-js-uri" select="p:split(normalize-space(p:property(string-join(('oxf.fr.js.custom.uri', $app, $form), '.'))))" as="xs:string*"/>
     <xsl:variable name="bottom-buttons-property" select="if ($mode = 'view') then 'oxf.fr.detail.buttons.view' else 'oxf.fr.detail.buttons'"/>
     <xsl:variable name="bottom-buttons" select="p:split(p:property(string-join(($bottom-buttons-property, $app, $form), '.')))" as="xs:string*"/>
     <xsl:variable name="inner-buttons" select="p:split(p:property(string-join(('oxf.fr.detail.buttons.inner', $app, $form), '.')))" as="xs:string*"/>
@@ -152,7 +154,7 @@
                            )"/>
             </xh:title>
 
-            <!-- Form Runner CSS stylesheets -->
+            <!-- Form Runner CSS (standard and custom) -->
             <xsl:for-each select="$css-uri, $custom-css-uri">
                 <xh:link rel="stylesheet" href="{.}" type="text/css" media="all"/>
             </xsl:for-each>
@@ -167,53 +169,11 @@
             <!-- Process the rest -->
             <xsl:apply-templates select="node() except (xh:title | xh:link | xh:style)"/>
 
-            <!-- For IE debugging -->
-            <!--<xh:script language="javascript" type="text/javascript" src="/ops/firebug/firebug.js"/>-->
-            <!--<xh:script language="javascript" type="text/javascript" src="http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js"/>-->
-
-            <!-- Script to enable scrolling within iframes with Firefox >= 4, due to this bug:
-                 https://bugzilla.mozilla.org/show_bug.cgi?id=638598 -->
-            <!-- TODO XXX: form-runner.js -->
-            <xsl:if test="$has-toc and not($is-noscript)">
-                <xh:script type="text/javascript">
-                    <![CDATA[
-                    if (YAHOO.env.ua.gecko >= 2) { // Firefox 4 and higher
-                        YAHOO.util.Event.onDOMReady(function() {
-
-                            // Only initialize if there is a parent window with same origin
-                            var parentWithSameOrigin = false;
-                            try {
-                                if (window.parent != window && window.parent.scrollTo)
-                                    parentWithSameOrigin = true;
-                            } catch (e) {}
-
-                            if (parentWithSameOrigin) {
-                                // Find toc
-                                var toc = document.getElementsByClassName("fr-toc")[0];
-                                if (toc) {
-
-                                    // Listener for clicks on toc links
-                                    var onClick = function(event) {
-                                        var eventObserver = this; // "the Event Utility automatically adjusts the execution scope so that this refers to the DOM element to which the event was attached"
-                                        var linkTarget = document.getElementById(eventObserver.getAttribute("href").substring(1));
-                                        if (linkTarget)
-                                            window.parent.scrollTo(0, YAHOO.util.Dom.getY(linkTarget) + YAHOO.util.Dom.getY(window.frameElement));
-                                    };
-
-                                    // Find all toc links starting with a non-empty fragment, and add the listener to them
-                                    var as = toc.getElementsByTagName("a");
-                                    for (var i = 0; i < as.length; i++) {
-                                        var a = as[i];
-                                        var href = a.getAttribute("href");
-                                        if (href && href[0] == "#" && href[1])
-                                            YAHOO.util.Event.addListener(a, "click", onClick);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                    ]]>
-                </xh:script>
+            <!-- Form Runner JavaScript (standard and custom) -->
+            <xsl:if test="not($is-noscript)">
+                <xsl:for-each select="$js-uri, $custom-js-uri">
+                    <xh:script type="text/javascript" src="{.}"/>
+                </xsl:for-each>
             </xsl:if>
         </xsl:copy>
     </xsl:template>

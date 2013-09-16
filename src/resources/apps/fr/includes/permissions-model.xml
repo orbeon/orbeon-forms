@@ -11,6 +11,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
+<!-- NOTE: This is a Form Builder feature, but the Home and Summary pages depend on it. -->
 <xf:model id="fb-permissions-model"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:xf="http://www.w3.org/2002/xforms"

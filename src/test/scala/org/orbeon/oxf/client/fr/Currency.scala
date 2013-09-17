@@ -30,16 +30,14 @@ trait Currency extends MustMatchersForJUnit with FormRunnerOps {
             _ ← clickOn(LinkTextQuery("Typed Controls"))
         }()
 
-        def enterValueCheckRounded() = for {
+        def enterCheck(input: String, result: String) = for {
             _ ← clickOn(currencyInput)
-            _ ← textField(currencyInput).value = "0.9998"
+            _ ← textField(currencyInput).value = input
             _ ← clickOn(emailInput)
-            _ ← assert(textField(currencyInput).value === "1.00")
+            _ ← assert(textField(currencyInput).value === result)
         }()
 
-        // First time, checking the server rounds the value
-        enterValueCheckRounded()
-        // Second time, checking that even if the XForms value isn't changed, the client puts the previous XForms value
-        enterValueCheckRounded()
+        enterCheck(".9", "0.90")
+        enterCheck(".9998", ".9998")
     }
 }

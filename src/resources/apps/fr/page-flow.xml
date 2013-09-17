@@ -52,7 +52,7 @@
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <service path="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
-             model="persistence/mysql/crud.xpl"/>
+             model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
     <service path="/fr/service/mysql/search/([^/^.]+)/([^/^.]+)"
@@ -70,7 +70,7 @@
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <service path="/fr/service/db2/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
-             model="persistence/db2/crud.xpl"/>
+             model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
     <service path="/fr/service/db2/search/([^/^.]+)/([^/^.]+)"

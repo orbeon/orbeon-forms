@@ -42,7 +42,7 @@
         <p:output name="data" id="request"/>
     </p:processor>
     <p:processor name="oxf:regexp">
-        <p:input name="config"><config>/fr/service/db2/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data|draft)/(([^/]+)/([^/]+))?)</config></p:input>
+        <p:input name="config"><config>/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/((form)/([^/]+)|(data|draft)/(([^/]+)/([^/]+))?)</config></p:input>
         <p:input name="data" href="#request#xpointer(/request/request-path)"/>
         <p:output name="data" id="matcher-groups"/>
     </p:processor>
@@ -63,21 +63,22 @@
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
                 <groupname><xsl:value-of select="$request/headers/header[name = 'orbeon-group']/value"/></groupname>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
-                <app><xsl:value-of select="$matcher-groups[1]"/></app>
-                <form><xsl:value-of select="$matcher-groups[2]"/></form>
-                <xsl:variable name="type" as="xs:string" select="concat($matcher-groups[4], $matcher-groups[6])"/>
+                <provider><xsl:value-of select="$matcher-groups[1]"/></provider>
+                <app><xsl:value-of select="$matcher-groups[2]"/></app>
+                <form><xsl:value-of select="$matcher-groups[3]"/></form>
+                <xsl:variable name="type" as="xs:string" select="concat($matcher-groups[5], $matcher-groups[7])"/>
                 <type><xsl:value-of select="$type"/></type>
-                <xsl:if test="$type = ('data', 'draft') and $matcher-groups[8] != ''">                             <!-- Document id is only used for data; might be missing for operations over a collection -->
-                    <document-id><xsl:value-of select="$matcher-groups[8]"/></document-id>
+                <xsl:if test="$type = ('data', 'draft') and $matcher-groups[9] != ''">                             <!-- Document id is only used for data; might be missing for operations over a collection -->
+                    <document-id><xsl:value-of select="$matcher-groups[9]"/></document-id>
                 </xsl:if>
-                <xsl:if test="$type = 'form' or $matcher-groups[9] != ''">                              <!-- Filename isn't present for operations over an app/form collection -->
-                    <filename><xsl:value-of select="if ($type = ('data', 'draft')) then $matcher-groups[9] else $matcher-groups[5]"/></filename>
+                <xsl:if test="$type = 'form' or $matcher-groups[10] != ''">                              <!-- Filename isn't present for operations over an app/form collection -->
+                    <filename><xsl:value-of select="if ($type = ('data', 'draft')) then $matcher-groups[10] else $matcher-groups[6]"/></filename>
                 </xsl:if>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
-        <p:output name="data" id="request-description"/>
+        <p:output name="data" id="request-description" debug="request-description"/>
     </p:processor>
 
     <p:processor name="oxf:null-serializer">

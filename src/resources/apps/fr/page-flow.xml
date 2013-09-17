@@ -61,7 +61,7 @@
     <!-- Deployed forms services -->
     <service path="/fr/service/mysql/form(/([^/]+)(/([^/]+))?)?"
              default-submission="persistence/form-instance.xml"
-             view="persistence/mysql/form.xpl">
+             view="persistence/relational/form.xpl">
         <setvalue ref="/*/app" matcher-group="2"/>
         <setvalue ref="/*/form" matcher-group="4"/>
     </service>
@@ -79,7 +79,7 @@
     <!-- Deployed forms services -->
     <service path="/fr/service/db2/form(/([^/]+)(/([^/]+))?)?"
              default-submission="persistence/form-instance.xml"
-             view="persistence/db2/form.xpl">
+             view="persistence/relational/form.xpl">
         <setvalue ref="/*/app" matcher-group="2"/>
         <setvalue ref="/*/form" matcher-group="4"/>
     </service>

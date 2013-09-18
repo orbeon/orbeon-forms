@@ -62,7 +62,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
     private final org.orbeon.oxf.xforms.analysis.model.Submission staticSubmission;
     private final String id;
     private final Element submissionElement;
-    
+
     private final XBLContainer container;
     private final XFormsContainingDocument containingDocument;
 
@@ -933,7 +933,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             final String preemptiveAuthentication = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuthentication);
             final String domain = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
 
-            if (username == null)
+            if (username == null || "".equals(username))
                 credentials = null;
             else
                 credentials = new Connection.Credentials(username, password, preemptiveAuthentication, domain);

@@ -142,9 +142,8 @@
                 <xsl:variable name="permissions"              select="doc('input:form')/forms/form/permissions"/>
                 <xsl:variable name="search-operations"        select="('*', 'read', 'update', 'delete')"/>
                 <xsl:variable name="search-permissions"       select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
-                <xsl:variable name="support-auto-save"        as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
-                <xsl:variable name="include-drafts"           as="xs:boolean" select="$support-auto-save     and (empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
-                <xsl:variable name="include-non-drafts"       as="xs:boolean" select="not($support-auto-save) or (empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
+                <xsl:variable name="include-drafts"           as="xs:boolean" select="(empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
+                <xsl:variable name="include-non-drafts"       as="xs:boolean" select="(empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
 
                 <!-- Are we authorized to see all the data based because of our role? -->
                 <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
@@ -174,8 +173,7 @@
                                             </xsl:choose>
                                             detail_<xsl:value-of select="position()"/>
                                         </xsl:for-each>
-                                        , username, groupname
-                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                        , username, groupname, draft
                                     from
                                     (
                                         <xsl:if test="$include-non-drafts">
@@ -188,7 +186,7 @@
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
-                                                            <xsl:if test="$support-auto-save"> and draft = 'N'</xsl:if>
+                                                            and draft = 'N'
                                                         group by app, form, document_id
                                                     ) latest
                                                 where
@@ -198,7 +196,7 @@
                                                     and data.form = latest.form
                                                     and data.document_id = latest.document_id
                                                     and data.deleted = 'N'
-                                                    <xsl:if test="$support-auto-save"> and data.draft = 'N'</xsl:if>
+                                                    and data.draft = 'N'
                                                     <xsl:copy-of select="f:search-conditions(/)"/>
                                                     <xsl:copy-of select="f:owner-group-condition('data')"/>
                                             )
@@ -247,22 +245,19 @@
                                                 where
                                                     (
                                                         app, form, document_id,
-                                                        last_modified_time
-                                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                        last_modified_time, draft
                                                     )
                                                     in
                                                     (
                                                         select
                                                             app, form, document_id,
-                                                            max(last_modified_time) last_modified_time
-                                                            <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                            max(last_modified_time) last_modified_time, draft
                                                         from orbeon_form_data
                                                         where
                                                             app = <sql:param type="xs:string" select="/search/app"/>
                                                             and form = <sql:param type="xs:string" select="/search/form"/>
-                                                            <xsl:if test="$support-auto-save and /search/@orbeon-username = ''"> and draft = 'N'</xsl:if>
-                                                        group by app, form, document_id
-                                                        <xsl:if test="$support-auto-save">, draft</xsl:if>
+                                                            <xsl:if test="/search/@orbeon-username = ''"> and draft = 'N'</xsl:if>
+                                                        group by app, form, document_id, draft
                                                     )
                                                     and deleted = 'N'
                                                     <xsl:copy-of select="f:owner-group-condition('data')"/>
@@ -312,7 +307,7 @@
                                                 <document-id><sql:get-column-value column="document_id"/></document-id>
                                                 <username><sql:get-column-value column="username"/></username>
                                                 <groupname><sql:get-column-value column="groupname"/></groupname>
-                                                <xsl:if test="$support-auto-save"><draft><sql:get-column-value column="draft"/></draft></xsl:if>
+                                                <draft><sql:get-column-value column="draft"/></draft>
                                                 <xsl:for-each select="/search/query[@path]">
                                                     <detail><sql:get-column-value column="detail_{position()}"/></detail>
                                                 </xsl:for-each>
@@ -415,7 +410,6 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
                 <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
-                <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
 
                 <!-- Move total and search-total as attribute -->
                 <xsl:template match="documents">
@@ -427,10 +421,7 @@
                 <!-- Move created, last-modified, and name as attributes -->
                 <!-- Add wrapping details element -->
                 <xsl:template match="document">
-                    <document created="{created}" last-modified="{last-modified}" name="{document-id}" operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
-                        <xsl:if test="$support-auto-save">
-                            <xsl:attribute name="draft" select="draft"/>
-                        </xsl:if>
+                    <document created="{created}" last-modified="{last-modified}" draft="{draft}" name="{document-id}" operations="{frf:javaAllAuthorizedOperations($permissions, string(username), string(groupname))}">
                         <details>
                             <xsl:for-each select="detail">
                                 <detail>

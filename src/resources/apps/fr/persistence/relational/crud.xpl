@@ -97,9 +97,8 @@
                         <sql-out>
                             <sql:connection>
                                 <xsl:copy-of select="/request/sql:datasource"/>
-                                        <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
-                                        <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
-                                        <xsl:variable name="draft" as="xs:string" select="if (/request/type = 'draft') then 'Y' else 'N'"/>
+                                <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
+                                <xsl:variable name="draft" as="xs:string" select="if (/request/type = 'draft') then 'Y' else 'N'"/>
                                 <xsl:variable name="is-attachment" as="xs:boolean" select="not(ends-with(/request/filename, '.xml') or ends-with(/request/filename, '.xhtml'))"/>
                                 <xsl:variable name="table-name" as="xs:string" select="concat(
                                             if ($is-data-draft) then 'orbeon_form_data' else 'orbeon_form_definition',
@@ -117,7 +116,7 @@
                                             and form = <sql:param type="xs:string" select="/request/form"/>
                                             <xsl:if test="$is-data-draft">
                                                 and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                <xsl:if test="$support-auto-save">and draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                and draft = '<xsl:value-of select="$draft"/>'
                                             </xsl:if>
                                             <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                             and last_modified_time = (
@@ -126,7 +125,7 @@
                                                 and form = <sql:param type="xs:string" select="/request/form"/>
                                                 <xsl:if test="$is-data-draft">
                                                     and document_id = <sql:param type="xs:string" select="/request/document-id"/>
-                                                    <xsl:if test="$support-auto-save">and draft = '<xsl:value-of select="$draft"/>'</xsl:if>
+                                                    and draft = '<xsl:value-of select="$draft"/>'
                                                 </xsl:if>
                                                 <xsl:if test="$is-attachment">and file_name = <sql:param type="xs:string" select="/request/filename"/></xsl:if>
                                             )
@@ -264,7 +263,6 @@
                                 <result>
                                     <sql:connection>
                                         <xsl:copy-of select="/request/sql:datasource"/>
-                                        <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
                                         <xsl:variable name="is-data-draft" as="xs:boolean" select="/request/type = ('data', 'draft')"/>
                                         <xsl:variable name="has-document-id" as="xs:boolean" select="exists(/request/document-id)"/>
                                         <xsl:variable name="table-name" as="xs:string" select="if ($is-data-draft) then 'orbeon_form_data' else 'orbeon_form_definition'"/>
@@ -280,7 +278,7 @@
                                                             app, form,
                                                             <xsl:if test="$is-data-draft">document_id,</xsl:if>
                                                             deleted,
-                                                            <xsl:if test="$is-data-draft and $support-auto-save">draft, </xsl:if>
+                                                            <xsl:if test="$is-data-draft">draft, </xsl:if>
                                                             xml
                                                             <xsl:if test="$is-data-draft">, username, groupname</xsl:if>
                                                         )
@@ -291,7 +289,7 @@
                                                         d.app, d.form,
                                                         <xsl:if test="$is-data-draft">d.document_id,</xsl:if>
                                                         'Y',
-                                                        <xsl:if test="$is-data-draft and $support-auto-save">'N', </xsl:if>
+                                                        <xsl:if test="$is-data-draft">'N', </xsl:if>
                                                         d.xml
                                                         <xsl:if test="$is-data-draft">, d.username, d.groupname</xsl:if>
                                                     from
@@ -318,7 +316,7 @@
                                         <!-- Delete drafts in the following two cases:
                                              - data is deleted, in which case we don't want to keep corresponding drafts
                                              - a draft is explicitly deleted, which can be done from the summary page -->
-                                        <xsl:if test="$support-auto-save and /request/type = ('data', 'draft')">
+                                        <xsl:if test="/request/type = ('data', 'draft')">
                                             <xsl:variable name="delete-where">
                                                 where
                                                     app = <sql:param type="xs:string" select="/request/app"/>
@@ -397,7 +395,6 @@
                                 <result>
                                     <sql:connection>
                                         <xsl:copy-of select="/root/request/sql:datasource"/>
-                                        <xsl:variable name="support-auto-save" as="xs:boolean" select="xpl:property('oxf.fr.support-autosave')"/>
                                         <xsl:variable name="is-data-draft" as="xs:boolean" select="/root/request/type = ('data', 'draft')"/>
                                         <xsl:variable name="draft" as="xs:string" select="if (/root/request/type = 'draft') then 'Y' else 'N'"/>
                                         <xsl:variable name="is-attachment" as="xs:boolean" select="not(/root/request/content-type = ('application/xml', 'text/xml') or ends-with(/root/request/content-type, '+xml'))"/>
@@ -414,7 +411,7 @@
                                                     app, form,
                                                     <xsl:if test="$is-data-draft">document_id,</xsl:if>
                                                     deleted
-                                                    <xsl:if test="$is-data-draft and $support-auto-save">, draft</xsl:if>
+                                                    <xsl:if test="$is-data-draft">, draft</xsl:if>
                                                     <xsl:if test="$is-attachment">, file_name, file_content</xsl:if>
                                                     <xsl:if test="not($is-attachment)">, xml</xsl:if>
                                                     <xsl:if test="$is-data-draft">, username, groupname</xsl:if>
@@ -428,7 +425,7 @@
                                                     <sql:param type="xs:string" select="/root/request/form"/>,
                                                     <xsl:if test="$is-data-draft"><sql:param type="xs:string" select="/root/request/document-id"/>,</xsl:if>
                                                     'N'
-                                                    <xsl:if test="$is-data-draft and $support-auto-save">
+                                                    <xsl:if test="$is-data-draft">
                                                         , '<xsl:value-of select="$draft"/>'
                                                     </xsl:if>
                                                     <xsl:if test="$is-attachment">
@@ -445,7 +442,7 @@
                                                 )
                                             </sql:update>
                                         </sql:execute>
-                                        <xsl:if test="$support-auto-save and /root/request/type = 'data' and not($is-attachment)">
+                                        <xsl:if test="/root/request/type = 'data' and not($is-attachment)">
                                             <!--If we saved a "normal" document (not a draft), delete any draft document and draft attachments -->
                                             <xsl:variable name="delete-where">
                                                 where
@@ -457,7 +454,7 @@
                                             <sql:execute><sql:update>delete from orbeon_form_data        <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
                                             <sql:execute><sql:update>delete from orbeon_form_data_attach <xsl:copy-of select="$delete-where"/></sql:update></sql:execute>
                                         </xsl:if>
-                                        <xsl:if test="$support-auto-save and /root/request/type = 'draft'">
+                                        <xsl:if test="/root/request/type = 'draft'">
                                             <!-- If we just saved a draft, older drafts (if any) for the same app/form/document-id/file-name -->
                                             <sql:execute>
                                                 <sql:update>

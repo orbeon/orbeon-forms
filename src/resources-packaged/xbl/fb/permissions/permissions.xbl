@@ -86,12 +86,10 @@
                     <!-- Clean UI permissions -->
                     <xf:delete ref="$ui/permissions/*"/>
                     <xf:insert context="$ui/permissions" origin="instance('permission-template')"/>
-                    <xf:action if="xxf:property('oxf.fr.support-owner-group')">
-                        <xf:insert context="$ui/permissions" nodeset="*" origin="instance('permission-template')"/>
-                        <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:attribute('for', 'owner')"/>
-                        <xf:insert context="$ui/permissions" nodeset="*" origin="instance('permission-template')"/>
-                        <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:attribute('for', 'group-members')"/>
-                    </xf:action>
+                    <xf:insert context="$ui/permissions" nodeset="*" origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:attribute('for', 'owner')"/>
+                    <xf:insert context="$ui/permissions" nodeset="*" origin="instance('permission-template')"/>
+                    <xf:insert context="$ui/permissions/permission[last()]" origin="xxf:attribute('for', 'group-members')"/>
 
                     <!-- Populate UI permissions based metadata -->
                     <xf:action if="$has-permissions">

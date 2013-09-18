@@ -224,7 +224,7 @@
                 <!-- Send an "Unauthorized" error if the user is unauthorized. But if we support owner/group
                      permissions, we still give access to the page, as some form data might give permissions. Except if
                      we are anonymous: in this case, we know that we won't get any extra permissions from the data. -->
-                <xf:action if="($anonymous or not(xxf:property('oxf.fr.support-owner-group'))) and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">
+                <xf:action if="$anonymous and not($ops = ('*', 'read', 'update', 'delete'))" type="xpath">
                     frf:sendError(403)
                 </xf:action>
             </xf:action>

@@ -163,17 +163,12 @@
                                 <!-- Query that returns all the search results, which we will reuse in multiple places -->
                                 <xsl:variable name="query">
                                     select
-                                        created, last_modified_time, document_id
-                                        <!-- Go over detail columns and extract data from XML -->
-                                        <xsl:for-each select="/search/query[@path]">
-                                            <xsl:choose>
-                                                <xsl:when test="/search/provider = 'mysql' ">, extractValue(xml,    '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
-                                                <xsl:when test="/search/provider = 'oracle'">, extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')</xsl:when>
-                                                <xsl:when test="/search/provider = 'db2'   ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
-                                            </xsl:choose>
-                                            detail_<xsl:value-of select="position()"/>
-                                        </xsl:for-each>
-                                        , username, groupname, draft
+                                        d.created, d.last_modified_time, d.document_id, d.xml, d.username, d.groupname, d.draft,
+                                        <xsl:if test="/search/provider = ('oracle', 'db2')">row_number() over (order by d.created desc) row_number</xsl:if>
+                                        <xsl:if test="/search/provider = 'mysql'">
+                                            <!-- MySQL lacks row_number, see http://stackoverflow.com/a/1895127/5295 -->
+                                            @rownum := @rownum + 1 row_number
+                                        </xsl:if>
                                     from
                                     (
                                         <xsl:if test="$include-non-drafts">
@@ -231,8 +226,9 @@
                                                     <xsl:copy-of select="f:owner-group-condition('d1')"/>
                                             )
                                         </xsl:if>
-                                    ) mysql1
-                                    order by created desc
+                                    ) d
+                                    <xsl:if test="/search/provider = 'mysql'">, (select @rownum := 0) r</xsl:if>
+                                    order by d.created desc
                                 </xsl:variable>
 
                                 <!-- Get total number of document in collection for this app/form
@@ -280,24 +276,25 @@
                                 <!-- Get details -->
                                 <sql:execute>
                                     <sql:query>
-                                        <!-- DB2 technique for paging from http://stackoverflow.com/a/3885220/5295 -->
-                                        <xsl:variable name="start-offset-zero-based" select="(/search/page-number - 1) * /search/page-size"/>
-                                        select *
+                                        select created, last_modified_time, document_id, username, groupname, draft
+                                            <!-- Go over detail columns and extract data from XML -->
+                                            <xsl:for-each select="/search/query[@path]">
+                                                <xsl:choose>
+                                                    <xsl:when test="/search/provider = 'mysql' ">, extractValue(xml,    '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'oracle'">, extractValue(xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')</xsl:when>
+                                                    <xsl:when test="/search/provider = 'db2'   ">, XMLQUERY('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>/text()')</xsl:when>
+                                                </xsl:choose>
+                                                detail_<xsl:value-of select="position()"/>
+                                            </xsl:for-each>
                                         from
                                             (
-                                                select a.*
-                                                       <xsl:if test="/search/provider = 'db2'">, row_number() over() rnum</xsl:if>
+                                                select *
                                                 from ( <xsl:copy-of select="$query"/> ) a
-                                                <xsl:if test="/search/provider = 'mysql'">
-                                                    limit <xsl:value-of select="$start-offset-zero-based"/>,
-                                                          <xsl:value-of select="/search/page-size"/>
-                                                </xsl:if>
-                                            ) v
-                                        <xsl:if test="/search/provider = 'db2'">
-                                            where rnum
-                                                between <xsl:value-of select="$start-offset-zero-based + 1"/>
-                                                and     <xsl:value-of select="$start-offset-zero-based + /search/page-size"/>
-                                        </xsl:if>
+                                                where row_number
+                                                    <xsl:variable name="start-offset-zero-based" select="(/search/page-number - 1) * /search/page-size"/>
+                                                    between <xsl:value-of select="$start-offset-zero-based + 1"/>
+                                                    and     <xsl:value-of select="$start-offset-zero-based + /search/page-size"/>
+                                            ) a
                                     </sql:query>
                                     <sql:result-set>
                                         <sql:row-iterator>

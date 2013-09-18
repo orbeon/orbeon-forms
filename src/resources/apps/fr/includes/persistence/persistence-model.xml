@@ -394,7 +394,7 @@
         <triggers xmlns="">
             <strict-submit/>
             <can-update/>
-            <can-read/>
+            <can-access-summary/>
             <pdf/>
             <other/>
             <!-- TODO: Move out, this is Form Builder-specific -->
@@ -413,19 +413,17 @@
                  readonly="not(property('xxf:noscript'))
                            and (xxf:instance('fr-error-summary-instance')/valid = false() or xxf:pending-uploads() > 0)"/>
 
-        <!-- Conditions for disabling workflow buttons -->
+        <!-- Conditions for disabling buttons -->
         <xf:bind ref="can-update"
                  relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'update')"/>
-
-        <xf:bind ref="can-read"
-                 relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')"/>
-
+        <!-- Show summary button if users have the read permission (obviously), but also if they are logged in, as in
+             that case they might be able to see data based on ownership -->
+        <xf:bind ref="can-access-summary"
+                 relevant="xxf:split(instance('fr-authorized-operations')) = ('*', 'read')
+                           or normalize-space(xxf:get-request-header('orbeon-username')) != ''"/>
         <xf:bind ref="pdf"
                  readonly="xxf:property(string-join(('oxf.fr.detail.pdf.disable-if-invalid', $app, $form), '.'))
-                           and exf:readonly(../strict-submit)"
-                 relevant="exf:relevant(../can-read)"/>
-
-        <!-- Condition for disabling Publish button -->
+                           and exf:readonly(../strict-submit)"/>
         <!-- TODO: Move out, this is Form Builder-specific -->
         <xf:bind ref="publish"
                  readonly="not($persistence-instance/data-status = 'clean')

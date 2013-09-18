@@ -40,8 +40,8 @@
             name="{$button-name}"
             ref="xxf:instance('fr-triggers-instance')/{if ($button-name = ('edit', 'workflow-edit'))
                                                        then 'can-update'
-                                                       else if ($button-name = ('summary', 'review', 'workflow-review'))
-                                                       then 'can-read'
+                                                       else if ($button-name = 'summary')
+                                                       then 'can-access-summary'
                                                        else if ($button-name = 'wizard-prev')
                                                        then 'xxf:binding(''fr-wizard-prev'')'
                                                        else if ($button-name = 'wizard-next')

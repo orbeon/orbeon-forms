@@ -433,7 +433,10 @@
                                                         , <sql:param type="xs:anyURI" sql-type="blob" select="/root/request/body" />
                                                     </xsl:if>
                                                     <xsl:if test="not($is-attachment)">
-                                                        , <sql:param type="odt:xmlFragment" sql-type="clob" select="/root/request/document/*" />
+                                                        ,
+                                                            <xsl:if test="/root/request/provider = 'oracle'">XMLType(</xsl:if>
+                                                            <sql:param type="odt:xmlFragment" sql-type="clob" select="/root/request/document/*" />
+                                                            <xsl:if test="/root/request/provider = 'oracle'">)</xsl:if>
                                                     </xsl:if>
                                                     <xsl:if test="$is-data-draft">
                                                         , <sql:param type="xs:string" select="{if (exists(/root/existing/username))  then '/root/existing/username'  else '/root/request/username'}"/>

@@ -38,15 +38,20 @@
     <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|data/([^/]+/[^/]+)?))"
-             model="persistence/oracle/crud.xpl"/>
+    <service path="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+             model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
     <service path="/fr/service/oracle/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/oracle/search.xpl"/>
+             view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/oracle/form" view="persistence/oracle/form.xpl"/>
+    <service path="/fr/service/oracle/form(/([^/]+)(/([^/]+))?)?"
+             default-submission="persistence/form-instance.xml"
+             view="persistence/relational/form.xpl">
+        <setvalue ref="/*/app" matcher-group="2"/>
+        <setvalue ref="/*/form" matcher-group="4"/>
+    </service>
 
     <!-- ==== Custom MySQL-based persistence services =========================================================== -->
 

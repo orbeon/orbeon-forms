@@ -142,9 +142,9 @@
                              calculate="if (normalize-space() = '' and $initial-app-value) then $initial-app-value else ."/>
                 <!-- Adjust value for form if there is an app constraint and a form constraint -->
                 <xf:bind ref="$form-query" readonly="false()"
-                             calculate="(for $a in xxf:instance('fb-permissions')/app[@name = $app-query]
-                                             return for $current in . return if ($a/form[@name = ($current, '*')]) then .
-                                                 else $a/form[1]/@name, .)[1]"/>
+                         calculate="(for $a in xxf:instance('fb-permissions')/app[@name = $app-query]
+                                         return for $current in . return if ($a/form[@name = ($current, '*')]) then .
+                                             else $a/form[1]/@name, .)[1]"/>
                 <!-- Force exact query match if there is an app constraint -->
                 <xf:bind ref="$app-query/@match" readonly="false()" calculate="if ($initial-app-value) then 'exact' else ."/>
                 <!-- Force exact query match if there is a form constraint -->

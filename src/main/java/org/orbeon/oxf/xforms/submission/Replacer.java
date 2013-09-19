@@ -24,6 +24,7 @@ public interface Replacer {
                      XFormsModelSubmission.SecondPassParameters p2) throws Exception;
 
     // NOTE: replace() is allowed to throw exceptions, including XFormsSubmissionException
+    // NOTE: Can return null. Ouch!
     Runnable replace(ConnectionResult connectionResult,
                      XFormsModelSubmission.SubmissionParameters p,
                      XFormsModelSubmission.SecondPassParameters p2) throws IOException;

@@ -572,7 +572,8 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
         return new Runnable() {
             public void run() {
                 try {
-                    finalSubmitDoneOrErrorRunnable.run();
+                    if (finalSubmitDoneOrErrorRunnable != null)
+                        finalSubmitDoneOrErrorRunnable.run();
                 } finally {
                     // Close only after the submission result has run
                     submissionResult.close();

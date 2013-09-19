@@ -90,31 +90,6 @@ object XML {
     def namespace(prefix: String, uri: String): Namespace = Dom4jUtils.createNamespace(prefix, uri)
     def namespaceInfo(prefix: String, uri: String): NodeInfo = wrapper.wrap(namespace(prefix, uri))
 
-    // Like XPath resolve-QName()
-    def resolveQName(elementInfo: NodeInfo, lexicalQName: String): QName = {
-
-        val checker = Name10Checker.getInstance
-        val resolver = new InscopeNamespaceResolver(elementInfo)
-
-        val structuredQName = StructuredQName.fromLexicalQName(lexicalQName, true, checker, resolver)
-        QName.get(lexicalQName, structuredQName.getNamespaceURI)
-    }
-
-    // Like XPath name()
-    def name(nodeInfo: NodeInfo) = nodeInfo.getDisplayName
-
-    // Like XPath local-name()
-    def localname(nodeInfo: NodeInfo) = nodeInfo.getLocalPart
-
-    // Return a qualified name as a (namespace uri, local name) pair
-    def qname(nodeInfo: NodeInfo) = (nodeInfo.getURI, nodeInfo.getLocalPart)
-
-    // Like XPath namespace-uri()
-    def namespaceURI(nodeInfo: NodeInfo) = {
-        val uri = nodeInfo.getURI
-        if (uri eq null) "" else uri
-    }
-
     // Parse the given qualified name and return the separated prefix and local name
     def parseQName(lexicalQName: String) = {
         val checker = Name10Checker.getInstance
@@ -364,13 +339,26 @@ object XML {
         def followingElement = nodeInfo followingSibling * headOption
 
         def prefix       = nodeInfo.getPrefix
+
+        // Like XPath local-name(), name(), namespace-uri(), resolve-QName()
         def localname    = nodeInfo.getLocalPart
         def name         = nodeInfo.getDisplayName
-        def qname        = (nodeInfo.getURI, nodeInfo.getLocalPart)
         def namespaceURI = {
             val uri = nodeInfo.getURI
             if (uri eq null) "" else uri
         }
+        def resolveQName(lexicalQName: String): QName = {
+
+            val checker = Name10Checker.getInstance
+            val resolver = new InscopeNamespaceResolver(nodeInfo)
+
+            val structuredQName = StructuredQName.fromLexicalQName(lexicalQName, true, checker, resolver)
+            QName.get(lexicalQName, structuredQName.getNamespaceURI)
+        }
+
+        // Return a qualified name as a (namespace uri, local name) pair
+        def qname = (nodeInfo.getURI, nodeInfo.getLocalPart)
+
         def stringValue = nodeInfo.getStringValue
 
         def hasIdValue(id: String) = nodeInfo /@ "id" === id

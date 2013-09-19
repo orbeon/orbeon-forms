@@ -42,9 +42,9 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(findModelElement(doc).getDisplayName === "xf:model")
             assert(hasIdValue(findModelElement(doc), "fr-form-model"))
 
-            assert(name(formInstanceRoot(doc) parent * head) === "xf:instance")
+            assert((formInstanceRoot(doc) parent * head).name === "xf:instance")
 
-            assert(qname(findFRBodyElement(doc)) === (XF → "group"))
+            assert(findFRBodyElement(doc).qname === (XF → "group"))
         }
 
     @Test def nameAndId(): Unit =
@@ -55,7 +55,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             assert(controlName(bindId(Control1)) === Control1)
 
             // Find control element
-            assert(qname(findControlByName(doc, Control1).get) === (XF → "input"))
+            assert(findControlByName(doc, Control1).get.qname === (XF → "input"))
             assert(hasIdValue(findControlByName(doc, Control1).get, controlId(Control1)))
         }
 
@@ -63,7 +63,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(TemplateDoc) { doc ⇒
 
             // Find bind element
-            assert(qname(findBindByName(doc, Control1).get) === (XF → "bind"))
+            assert(findBindByName(doc, Control1).get.qname === (XF → "bind"))
             assert(hasIdValue(findBindByName(doc, Control1).get, bindId(Control1)))
 
             // Check content of value holder
@@ -84,12 +84,12 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
         withActionAndFBDoc(TemplateDoc) { doc ⇒
             ensureBinds(doc, Seq(Section1, Control2))
 
-            assert(qname(findBindByName(doc, Control2).get) === (XF → "bind"))
+            assert(findBindByName(doc, Control2).get.qname === (XF → "bind"))
             assert(hasIdValue(findBindByName(doc, Control2).get, bindId(Control2)))
 
             ensureBinds(doc, Seq(Section2, "grid-1", Control3))
 
-            assert(qname(findBindByName(doc, Control3).get) === (XF → "bind"))
+            assert(findBindByName(doc, Control3).get.qname === (XF → "bind"))
             assert(hasIdValue(findBindByName(doc, Control3).get, bindId(Control3)))
         }
 
@@ -107,8 +107,8 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
 
             val containers = findAncestorContainers(firstTd)
 
-            assert(localname(containers(0)) === "grid")
-            assert(localname(containers(1)) === "section")
+            assert(containers(0).localname === "grid")
+            assert(containers(1).localname === "section")
 
             assert(findContainerNames(firstTd) === Seq("section-1"))
         }
@@ -146,7 +146,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
             // NOTE: We should maybe just compare the XML for holders, binds, and resources
             val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
             if (! isCustomInstance)
-                assert(name(dataHolder.head precedingSibling * head) === "control-1")
+                assert((dataHolder.head precedingSibling * head).name === "control-1")
 
             val controlBind = findBindByName(doc, newControlName).get
             assert(hasIdValue(controlBind, bindId(newControlName)))
@@ -180,7 +180,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 // NOTE: We should maybe just compare the XML for holders, binds, and resources
                 val dataHolder = assertDataHolder(doc, containerNames.last, isCustomInstance)
                 if (! isCustomInstance)
-                    assert(name(dataHolder.head precedingSibling * head) === "control-1")
+                    assert((dataHolder.head precedingSibling * head).name === "control-1")
 
                 val controlBind = findBindByName(doc, newRepeatName).get
                 assert(hasIdValue(controlBind, bindId(newRepeatName)))
@@ -212,7 +212,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 val dataHolder = assertDataHolder(doc, newControlName, isCustomInstance)
                 if (! isCustomInstance) {
                     assert(dataHolder.head precedingSibling * isEmpty)
-                    assert(name(dataHolder.head parent * head) === newRepeatName)
+                    assert((dataHolder.head parent * head).name === newRepeatName)
                 }
 
                 val controlBind = findBindByName(doc, newControlName).get
@@ -226,7 +226,7 @@ class FormBuilderFunctionsTest extends DocumentTestBase with FormBuilderSupport 
                 if (! isCustomInstance) {
                     assert(templateHolder.isDefined)
                     assert(templateHolder.get precedingSibling * isEmpty)
-                    assert(name(templateHolder.get parent * head) === newRepeatName)
+                    assert((templateHolder.get parent * head).name === newRepeatName)
                 } else {
                     assert(templateHolder.isEmpty)
                 }

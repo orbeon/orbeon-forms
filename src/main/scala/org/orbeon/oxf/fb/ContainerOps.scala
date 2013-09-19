@@ -34,7 +34,7 @@ trait ContainerOps extends ControlOps {
     // Find all siblings of the given element with the given name, excepting the given element
     def findSiblingsWithName(element: NodeInfo, siblingName: String) =
         element parent * child * filter
-                (name(_) == siblingName) filterNot
+                (_.name == siblingName) filterNot
                 (_ == element)
 
     // Return all the container controls in the view

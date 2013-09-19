@@ -56,7 +56,7 @@ object Index {
                 inSummary   = control.attClasses("fr-summary"),
                 xpath       = binds map (_.attValue("ref") + "[1]") mkString "/",
                 xsType      = (bindForControl \@ "type" map (_.stringValue)).headOption getOrElse "xs:string",
-                control     = localname(control),
+                control     = control.localname,
                 htmlLabel   = hasHTMLMediatype(control \ (XF → "label"))
              )
         }

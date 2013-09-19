@@ -136,7 +136,7 @@ trait FormRunnerPermissions {
             (permissionsElement \ "permission")
                 .filter(p ⇒
                     (p \ * isEmpty) ||                                       // Only consider permissions with no constraints (unnecessary line for clarity)
-                    (p \ * forall (localname(_) == "user-role")))            // … or with only `user-role` constraints
+                    (p \ * forall (_.localname == "user-role")))             // … or with only `user-role` constraints
                 .filter(p ⇒
                     p \ "user-role" forall (r ⇒                              // If we have user-role constraints, they must all pass
                         ScalaUtils.split((r \@ "any-of").stringValue)        // Constraint is satisfied if user has at least one of the roles
@@ -159,7 +159,7 @@ trait FormRunnerPermissions {
                 .filter(_ == dataUserInfo)
                 // If it does, return the operation the owner or group-member can perform
                 .map(_ ⇒ (permissionsElement \ "permission")
-                    .filter(p ⇒ p \ * forall (localname(_) == condition))
+                    .filter(p ⇒ p \ * forall (_.localname == condition))
                     .flatMap(permissionOperations))
                 .getOrElse(Seq.empty)
         }

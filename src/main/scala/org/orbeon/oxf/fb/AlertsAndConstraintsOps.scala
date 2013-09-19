@@ -281,7 +281,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
                 typeMIP match {
                     case Some(typ) ⇒
 
-                        val qName = resolveQName(bind, typ)
+                        val qName = bind.resolveQName(typ)
 
                         val isBuiltinType   = Set(XF, XS)(qName.getNamespaceURI)
                         val isRequired      = qName.getNamespaceURI == XS

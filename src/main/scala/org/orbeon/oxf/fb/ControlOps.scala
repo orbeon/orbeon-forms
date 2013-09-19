@@ -76,14 +76,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
         val td = controlElement parent * head
         val grid = findAncestorContainers(td).head
-        assert(localname(grid) == "grid")
+        assert(grid.localname == "grid")
 
         // First check within the current grid as well as the grid itself
         val preceding = td preceding "*:td"
         val precedingInGrid = preceding intersect (grid descendant "*:td")
 
         val nameInGridOption = precedingInGrid :+ grid flatMap
-            { case td if localname(td) == "td" ⇒ td \ *; case other ⇒ other } flatMap
+            { case td if td.localname == "td" ⇒ td \ *; case other ⇒ other } flatMap
                 (getControlNameOption(_).toSeq) headOption
 
         // Return that if found, otherwise find before the current grid
@@ -196,8 +196,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
 
         // Set xf:label, xf:hint, xf:help and xf:alert @ref if present
         // FIXME: This code is particularly ugly!
-        controlElement \ * filter (e ⇒ LHHANames(localname(e))) map
-            (e ⇒ (e \@ "ref", localname(e))) filter
+        controlElement \ * filter (e ⇒ LHHANames(e.localname)) map
+            (e ⇒ (e \@ "ref", e.localname)) filter
                 (_._1 nonEmpty) filter { e ⇒
                     val ref = e._1.stringValue
                     ref.isEmpty || ref.startsWith("$form-resources")
@@ -241,10 +241,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
                     for {
                         parent ← parents
                     } yield
-                        parent \ * filter (name(_) == name(holder)) match {
+                        parent \ * filter (_.name == holder.name) match {
                             case Seq() ⇒
                                 // No holder exists so insert one
-                                insert(into = parent, after = parent \ * filter (name(_) == precedingHolderName.getOrElse("")), origin = holder)
+                                insert(into = parent, after = parent \ * filter (_.name == precedingHolderName.getOrElse("")), origin = holder)
                             case existing ⇒
                                 // At least one holder exists (can be more than one for repeats)
                                 existing
@@ -289,7 +289,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             formResourcesRoot \ "resource" foreach (resource ⇒ {
                 val lang = (resource \@ "*:lang").stringValue
                 val holder = resourceHoldersMap.get(lang) getOrElse resourceHolders(0)._2
-                insert(into = resource, after = resource \ * filter (name(_) == precedingControlName.getOrElse("")), origin = holder)
+                insert(into = resource, after = resource \ * filter (_.name == precedingControlName.getOrElse("")), origin = holder)
             })
         }
 
@@ -322,7 +322,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             // expressions and types could use it. So for now the mapping is never garbage collected.
             val isStringType =
                 namespaceMapping.isDefined &&
-                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(resolveQName(bind, mipValue))
+                Set(XS_STRING_QNAME, XFORMS_STRING_QNAME)(bind.resolveQName(mipValue))
 
             // Create/update or remove attribute
             nonEmptyOrNone(mipValue) match {
@@ -395,7 +395,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def bindAttributesTemplate(binding: NodeInfo) = {
         val metadata = binding \ "*:metadata"
         val typeFromDatatype = ("", "type") → ((metadata \ "*:datatype" map (_.stringValue) headOption) getOrElse "xs:string")
-        val bindAttributes = metadata \ "*:templates" \ "*:bind" \@ @* map (att ⇒ qname(att) →  att.stringValue)
+        val bindAttributes = metadata \ "*:templates" \ "*:bind" \@ @* map (att ⇒ att.qname →  att.stringValue)
 
         typeFromDatatype +: bindAttributes filterNot
             { case ((uri, local), value) ⇒ local == "type" && value == "xs:string" } map // TODO: assume literal 'xs:' prefix (should resolve namespace)
@@ -406,7 +406,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
     def binding(controlElement: NodeInfo) =
         asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")) map asNodeInfo find (b ⇒
             viewTemplate(b) match {
-                case Some(viewTemplate) ⇒ qname(viewTemplate) == qname(controlElement)
+                case Some(viewTemplate) ⇒ viewTemplate.qname == controlElement.qname
                 case _ ⇒ false
             })
 
@@ -438,14 +438,14 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         // Get QName from the bind, using xs:string if no type is found
         val controlTypeQName =
             bind \@ "type" headOption match {
-                case Some(tpe) ⇒ resolveQName(bind, tpe.stringValue)
+                case Some(tpe) ⇒ bind.resolveQName(tpe.stringValue)
                 case None ⇒ stringQName
             }
 
         // Support both xs:foo and xf:foo as they are considered to be equivalent when looking up the metadata. So
         // here we ignore the namespace URI to achieve this (could be more restrictive if needed).
         val controlTypeLocalname = controlTypeQName.getName
-        val controlQName = qname(control)
+        val controlQName = control.qname
         val controlAppearanceOption = appearanceOption(control)
 
         // Get matching xbl:bindings
@@ -455,7 +455,7 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             val typeLocalname = bindAttributesTemplate(binding) self "type" map (_ stringValue) headOption
 
             // Control name and template name must match
-            (template exists (qname(_) == controlQName)) &&
+            (template exists (_.qname == controlQName)) &&
             // Appearance must match
             (template exists (appearanceOption(_) == controlAppearanceOption)) &&
             // Type local names must match if present

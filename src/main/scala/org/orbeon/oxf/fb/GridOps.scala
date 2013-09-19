@@ -404,7 +404,7 @@ trait GridOps extends ContainerOps {
             grid     ← findContainingRepeat(descendantOrSelf, includeSelf = true)
             gridName ← getControlNameOption(grid)
             root     ← templateRoot(descendantOrSelf, gridName)
-            holder   ← root descendantOrSelf * find (name(_) == controlName)
+            holder   ← root descendantOrSelf * find (_.name == controlName)
         } yield
             holder
 

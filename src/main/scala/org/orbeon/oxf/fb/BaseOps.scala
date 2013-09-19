@@ -68,7 +68,7 @@ trait BaseOps extends Logging {
             def canUseIndex = fbInstance.documentInfo == root
 
             val elementIds  = if (canUseIndex) elementIdsFromIndex else elementIdsFromXPath
-            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (localname(_) + suffix) else Seq()
+            val instanceIds = if (useInstance) formInstanceRoot(root) \\ * map (_.localname + suffix) else Seq()
 
             elementIds ++ instanceIds
         }
@@ -108,9 +108,9 @@ trait BaseOps extends Logging {
         debug(message, Seq("doc" → TransformerUtils.tinyTreeToString(inDoc.getDocumentRoot)))
 
     def insertElementsImposeOrder(into: Seq[NodeInfo], origin: Seq[NodeInfo], order: Seq[String]): Seq[NodeInfo] = {
-        val name            = localname(origin(0))
+        val name            = origin(0).localname
         val namesUntil      = (order takeWhile (_ != name)) :+ name toSet
-        val elementsBefore  = into child * filter (e ⇒ namesUntil(localname(e)))
+        val elementsBefore  = into child * filter (e ⇒ namesUntil(e.localname))
 
         insert(into = into, after = elementsBefore, origin = origin)
     }

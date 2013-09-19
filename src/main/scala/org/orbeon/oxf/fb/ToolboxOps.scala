@@ -58,7 +58,7 @@ object ToolboxOps {
                             val firstElementCSSName = (binding \@ "element" stringValue) split "," head
                             val elementQName = firstElementCSSName.replace('|', ':')
 
-                            val controlElement = insert(into = gridTd, origin = elementInfo(resolveQName(binding, elementQName))).head
+                            val controlElement = insert(into = gridTd, origin = elementInfo(binding.resolveQName(elementQName))).head
                             insert(into = controlElement, origin = lhhaTemplate \ *)
                             controlElement
                     }
@@ -79,7 +79,7 @@ object ToolboxOps {
                     else
                         elementInfo(newControlName)
 
-                val lhhaNames = newControlElement \ * map localname filter LHHAResourceNamesToInsert
+                val lhhaNames = newControlElement \ * map (_.localname) filter LHHAResourceNamesToInsert
                 val resourceHolder = elementInfo(newControlName, lhhaNames map (elementInfo(_)))
 
                 // Insert data and resource holders

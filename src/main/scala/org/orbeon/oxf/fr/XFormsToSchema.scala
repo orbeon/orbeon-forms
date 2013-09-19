@@ -18,9 +18,6 @@ import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.scaxon.XML._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import xml._
@@ -113,7 +110,7 @@ class XFormsToSchema extends XFormsToSomething {
             val repeatGrid = control(bind, "*:grid") filter (_ \@ "repeat" === "true")
             Some(BindInfo(
                 elemName = bind \@ ("ref" || "nodeset"),
-                elemType = (bind \@ "type").headOption map (_.stringValue) map (resolveQName(bind, _)) filterNot Set(XS_STRING_QNAME, XFORMS_STRING_QNAME),
+                elemType = (bind \@ "type").headOption map (_.stringValue) map bind.resolveQName filterNot Set(XS_STRING_QNAME, XFORMS_STRING_QNAME),
                 repeated = repeatGrid nonEmpty,
                 min = repeatGrid.toSeq \@ "min",
                 max = repeatGrid.toSeq \@ "max"

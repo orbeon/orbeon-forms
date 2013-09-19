@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.sql;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Node;
 import org.jaxen.*;
 import org.orbeon.oxf.common.OXFException;
@@ -216,7 +217,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     private FunctionContext functionContext = new FunctionContext() {
         public Function getFunction(String namespaceURI, String prefix, String localName) throws UnresolvableException {
 
-            String fullName = (namespaceURI == null || "".equals(namespaceURI))
+            String fullName = StringUtils.isEmpty(namespaceURI)
                     ? localName : "{" + namespaceURI + "}" + localName;
 
             for (int i = currentFunctions.size() - 1; i >= 0; i--) {

@@ -934,7 +934,7 @@ public class XFormsModelSubmission extends XFormsModelSubmissionBase implements 
             final String preemptiveAuthentication = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsPreemptiveAuthentication);
             final String domain = XFormsUtils.resolveAttributeValueTemplates(containingDocument,  p.xpathContext, p.refNodeInfo, avtXXFormsDomain);
 
-            if (username == null || "".equals(username))
+            if (StringUtils.isEmpty(username))
                 credentials = null;
             else
                 credentials = new Connection.Credentials(username, password, preemptiveAuthentication, domain);

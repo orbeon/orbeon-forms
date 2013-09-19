@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml;
 
+import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -149,9 +150,9 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
     }
 
     private void checkName(String uri, String localname, String qname) {
-        if (localname == null || "".equals(localname))
+        if (StringUtils.isEmpty(localname))
             throw new ValidationException("Empty local name in SAX event. QName: " + qname, new LocationData(locator));
-        if (qname == null || "".equals(qname))
+        if (StringUtils.isEmpty(qname))
             throw new ValidationException("Empty qualified name in SAX event. Localname: " + localname + "; QName: " + qname, new LocationData(locator));
         if (uri == null)
             throw new ValidationException("Null URI. Localname: " + localname, new LocationData(locator));

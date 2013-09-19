@@ -137,10 +137,10 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
                 Class clazz = null;
 
                 if ("oracle".equalsIgnoreCase(productName)) {
-                    // Try Tomcat 5/6
+                    // Try Tomcat delegate
                     try {
                         getClass().getClassLoader().loadClass("org.apache.tomcat.dbcp.dbcp.DelegatingPreparedStatement");
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcat5Delegate");
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcatDelegate");
                         SQLProcessor.logger.info("Using Oracle Tomcat 5 delegate.");
                     } catch (Throwable t) {
                         // Ignore

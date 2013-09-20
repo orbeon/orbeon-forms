@@ -35,58 +35,22 @@
         <setvalue ref="/*/form" matcher-group="4"/>
     </service>
 
-    <!-- ==== Built-in Oracle-based persistence services =========================================================== -->
+    <!-- ==== Built-in Oracle, MySQL, and DB2 persistence services =========================================================== -->
 
     <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/oracle/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+    <service path="/fr/service/(oracle|mysql|db2)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
              model="persistence/relational/crud.xpl"/>
 
     <!-- Search -->
-    <service path="/fr/service/oracle/search/([^/^.]+)/([^/^.]+)"
+    <service path="/fr/service/(oracle|mysql|db2)/search/([^/^.]+)/([^/^.]+)"
              view="persistence/relational/search.xpl"/>
 
     <!-- Deployed forms services -->
-    <service path="/fr/service/oracle/form(/([^/]+)(/([^/]+))?)?"
+    <service path="/fr/service/(oracle|mysql|db2)/form(/([^/]+)(/([^/]+))?)?"
              default-submission="persistence/form-instance.xml"
              view="persistence/relational/form.xpl">
-        <setvalue ref="/*/app" matcher-group="2"/>
-        <setvalue ref="/*/form" matcher-group="4"/>
-    </service>
-
-    <!-- ==== Custom MySQL-based persistence services =========================================================== -->
-
-    <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/mysql/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
-             model="persistence/relational/crud.xpl"/>
-
-    <!-- Search -->
-    <service path="/fr/service/mysql/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/relational/search.xpl"/>
-
-    <!-- Deployed forms services -->
-    <service path="/fr/service/mysql/form(/([^/]+)(/([^/]+))?)?"
-             default-submission="persistence/form-instance.xml"
-             view="persistence/relational/form.xpl">
-        <setvalue ref="/*/app" matcher-group="2"/>
-        <setvalue ref="/*/form" matcher-group="4"/>
-    </service>
-
-    <!-- ==== Custom DB2-based persistence services =========================================================== -->
-
-    <!-- Create, Read, Update and Delete operations (id provided) -->
-    <service path="/fr/service/db2/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
-             model="persistence/relational/crud.xpl"/>
-
-    <!-- Search -->
-    <service path="/fr/service/db2/search/([^/^.]+)/([^/^.]+)"
-             view="persistence/relational/search.xpl"/>
-
-    <!-- Deployed forms services -->
-    <service path="/fr/service/db2/form(/([^/]+)(/([^/]+))?)?"
-             default-submission="persistence/form-instance.xml"
-             view="persistence/relational/form.xpl">
-        <setvalue ref="/*/app" matcher-group="2"/>
-        <setvalue ref="/*/form" matcher-group="4"/>
+        <setvalue ref="/*/app" matcher-group="3"/>
+        <setvalue ref="/*/form" matcher-group="5"/>
     </service>
 
     <!-- ==== Built-in resource manager-based persistence services ================================================= -->

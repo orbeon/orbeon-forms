@@ -460,7 +460,13 @@
 
                     <xf:group ref="instance('fr-summary-instance')" xxf:update="full">
 
-                        <xf:group ref="instance('fr-paging-instance')[search-total != total]" class="fr-summary-search-count">
+                        <!-- Don't show information about count if we only have one page, or if we're just showing drafts
+                             (in that case, even if we have more than one page we don't care about the number of documents
+                             not shown because they are not drafts) -->
+                        <xf:var name="show-partial-search" value="
+                            instance('fr-paging-instance')/(search-total != total)
+                            and not(xxf:get-request-parameter('drafts-for-never-saved-document') = 'true')"/>
+                        <xf:group ref=".[$show-partial-search]" class="fr-summary-search-count">
                             <xf:output value="$fr-resources/summary/search/returned-1"/>
                             <xf:output value="instance('fr-paging-instance')/search-total"/>
                             <xf:output value="$fr-resources/summary/paging/of"/>

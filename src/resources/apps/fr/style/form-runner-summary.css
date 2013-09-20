@@ -141,7 +141,7 @@
 .orbeon .fr-summary-table-div th {
   white-space: nowrap;
 }
-.orbeon .fr-summary-table-div .fr-summary-repeat-draft,
+.orbeon .fr-summary-table-div .fr-summary-repeat-labels,
 .orbeon .fr-summary-table-div .fr-summary-created,
 .orbeon .fr-summary-table-div .fr-summary-modified {
   width: 1px;

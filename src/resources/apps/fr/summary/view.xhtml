@@ -473,7 +473,8 @@
 
                         <div class="fr-summary-table-div">
                             <xf:var name="have-drafts" value="exists(document[@draft = 'Y'])"/>
-                            <xf:var name="drafts-class" value="string-join(('fr-summary-repeat-draft', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
+                            <xf:var name="have-read-only" value="exists(document[not(xxf:split(@operations) = ('*', 'update'))])"/>
+                            <xf:var name="labels-class" value="string-join(('fr-summary-repeat-labels', if ($have-drafts) then () else 'xforms-hidden'), ' ')"/>
                             <!-- One column for each detail -->
                             <xf:var name="positions" value="instance('fr-search-instance')/query[@name and @summary-field = 'true']/(count(preceding-sibling::query[@name]) + 1)"/>
 
@@ -482,7 +483,7 @@
                                 <xh:thead>
                                     <xh:tr>
                                         <xh:th class="fr-summary-repeat-selection-checkbox"/>
-                                        <xh:th class="{$drafts-class}"/>
+                                        <xh:th class="{$labels-class}"/>
                                         <xf:repeat ref="if ($show-created) then '' else ()">
                                             <xh:th>
                                                 <xf:output value="$fr-resources/summary/titles/created"/>
@@ -535,8 +536,9 @@
                                                         </xf:item>
                                                     </xf:select>
                                                 </xh:td>
-                                                <xh:td class="{$drafts-class}">
+                                                <xh:td class="{$labels-class}">
                                                     <xf:output ref="if ($document/@draft = 'Y') then . else ()" value="$fr-resources/summary/labels/draft" class="label"/>
+                                                    <xf:output ref="if (not(xxf:split($document/@operations) = ('*', 'update'))) then . else ()" value="$fr-resources/summary/labels/read-only" class="label"/>
                                                 </xh:td>
                                                 <!-- Why repeat and not group? -->
                                                 <xf:repeat ref="if ($show-created) then '' else ()">

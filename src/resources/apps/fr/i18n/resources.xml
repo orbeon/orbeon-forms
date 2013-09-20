@@ -93,6 +93,7 @@
             </messages>
             <labels>
                 <draft>Draft</draft>
+                <read-only>Read-only</read-only>
                 <language-choice>Choose language</language-choice>
                 <form-choice>Choose a Form</form-choice>
                 <free-search>Free Search</free-search>
@@ -367,6 +368,7 @@
             </messages>
             <labels>
                 <draft>Brouillons</draft>
+                <read-only>Lecture seule</read-only>
                 <language-choice>Choix de la langue</language-choice>
                 <form-choice>Choisisez un formulaire</form-choice>
                 <free-search>Recherche libre</free-search>
@@ -633,6 +635,7 @@
             </messages>
             <labels>
                 <draft>Borradores</draft>
+                <read-only>De sólo lectura</read-only>
                 <language-choice>Seleccione Idioma</language-choice>
                 <form-choice>Seleccione Formulario</form-choice>
                 <free-search>Búsqueda Libre</free-search>
@@ -893,6 +896,7 @@
             </messages>
             <labels>
                 <draft>[Draft]</draft>
+                <read-only>[Read-only]</read-only>
                 <language-choice>Velg språk</language-choice>
                 <form-choice>Velg et skjema</form-choice>
                 <free-search>Fritekstsøk</free-search>
@@ -1152,6 +1156,7 @@
             </messages>
             <labels>
                 <draft>черновик</draft>
+                <read-only>[Read-only]</read-only>
                 <language-choice>Выберите язык</language-choice>
                 <form-choice>Выберите форму</form-choice>
                 <free-search>Поиск</free-search>
@@ -1415,6 +1420,7 @@
             </messages>
             <labels>
                 <draft>Bozza</draft>
+                <read-only>[Read-only]</read-only>
                 <language-choice>Seleziona lingua</language-choice>
                 <form-choice>Seleziona un modulo</form-choice>
                 <free-search>Ricerca libera</free-search>
@@ -1685,6 +1691,7 @@
             </messages>
             <labels>
                 <draft>Entwurf</draft>
+                <read-only>[Read-only]</read-only>
                 <language-choice>Sprachauswahl</language-choice>
                 <form-choice>Wählen Sie ein Formular</form-choice>
                 <free-search>Freie Suche</free-search>
@@ -1955,6 +1962,7 @@
             </messages>
             <labels>
                 <draft>Luonnos</draft>
+                <read-only>[Read-only]</read-only>
                 <language-choice>Valitse kieli</language-choice>
                 <form-choice>Valitse taulukko</form-choice>
                 <free-search>Vapaa haku</free-search>

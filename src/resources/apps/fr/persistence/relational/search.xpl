@@ -355,10 +355,10 @@
                                 <!-- Exact match -->
                                 <xsl:choose>
                                     <xsl:when test="$search/search/provider = 'mysql'">
-                                        and extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                        and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
-                                        and extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
+                                        and extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>') = '<xsl:value-of select="f:escape-sql(.)"/>'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'db2'">
                                         and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/> = "<xsl:value-of select="f:escape-sql(.)"/>"]')
@@ -369,10 +369,10 @@
                                 <!-- Substring -->
                                 <xsl:choose>
                                     <xsl:when test="$search/search/provider = 'mysql'">
-                                        and lower(extractValue(data.xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                        and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'oracle'">
-                                        and lower(extractValue(data.xml, '/*/<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
+                                        and lower(extractValue(xml, '<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>', '<xsl:value-of select="f:namespaces(.)"/>')) like '%<xsl:value-of select="lower-case(f:escape-sql(.))"/>%'
                                     </xsl:when>
                                     <xsl:when test="$search/search/provider = 'db2'">
                                         and XMLEXISTS ('declare namespace xh="http://www.w3.org/1999/xhtml";declare namespace xf="http://www.w3.org/2002/xforms";$XML/*[contains(lower-case(<xsl:value-of select="f:escape-sql(f:escape-lang(@path, /*/lang))"/>),"<xsl:value-of select="f:escape-sql(lower-case(.))"/>")]')
@@ -388,7 +388,7 @@
                                 and data.xml like <sql:param type="xs:string" select="concat('%', /search/query[not(@path)], '%')"/>
                             </xsl:when>
                             <xsl:when test="$search/search/provider = 'oracle'">
-                                and contains(data.xml, <sql:param select="f:escape-sql(concat('%', replace(/search/query[not(@path)], '_', '\\_'), '%'))"/>) > 0
+                                and contains(xml, '<xsl:value-of select="f:escape-sql(concat('%', replace($search/search/query[not(@path)], '_', '\\_'), '%'))"/>') > 0
                             </xsl:when>
                             <xsl:when test="$search/search/provider = 'db2'">
                                 and xmlexists('$XML//*[contains(upper-case(text()), upper-case($textSearch))]' passing CAST( <sql:param type="xs:string" select="concat('', /search/query[not(@path)], '')"/> AS VARCHAR(2000)) as "textSearch")

@@ -2,6 +2,7 @@
 <project version="4">
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/src/main/scala/org/orbeon/oxf/fr/relational/ReindexProcessor.scala" dialect="MySQL" />
+    <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/db2-4_3.sql" dialect="DB2" />
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/mysql-4_3-to-4_4.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/mysql-4_3.sql" dialect="MySQL" />
     <file url="file://$PROJECT_DIR$/src/resources/apps/fr/persistence/relational/ddl/mysql-4_4.sql" dialect="MySQL" />

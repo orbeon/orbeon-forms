@@ -310,7 +310,7 @@
 
             <!-- Don't display language selector if there is only one language -->
             <!-- NOTE: Resolve model here, as for now model within XBL component won't resolve -->
-            <xf:group id="fr-language-selector" model="fr-resources-model" ref=".[count($available-languages) gt 1]">
+            <xf:group id="fr-language-selector" model="fr-resources-model" ref=".[count($available-languages) gt 1 and normalize-space(xxf:get-request-header('orbeon-liferay-language')) = '']">
                 <fr:link-select1 ref="$fr-selector-lang">
                     <xf:itemset ref="$available-languages">
                         <xf:label ref="(xxf:instance('fr-languages-instance')/language[@code = context()]/@native-name, context())[1]"/>

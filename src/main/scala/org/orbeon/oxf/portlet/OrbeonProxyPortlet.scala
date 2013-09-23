@@ -26,6 +26,7 @@ import collection.breakOut
 import com.liferay.portal.util.PortalUtil
 import java.util.{Enumeration ⇒ JEnumeration}
 import scala.util.control.NonFatal
+import com.liferay.portal.kernel.language.LanguageUtil
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -68,11 +69,18 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
         getHttpServletRequest flatMap (f ⇒ Option(f(request)))
 
     // Immutable information about an outgoing request
-    case class RequestDetails(content: Option[Content], session: PortletSession, url: String, namespace: String, headers: Seq[(String, String)], params: Seq[(String, String)])
+    case class RequestDetails(
+        content: Option[Content],
+        session: PortletSession,
+        url: String,
+        namespace: String,
+        headers: Seq[(String, String)],
+        params: Seq[(String, String)]
+    )
 
     object RequestDetails {
 
-        def apply(request: PortletRequest, content: Option[Content], session: PortletSession, url: String, namespace: String): RequestDetails = {
+        def apply(request: PortletRequest, content: Option[Content], url: String, namespace: String): RequestDetails = {
 
             def headerPairs =
                 for {
@@ -98,10 +106,15 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 } yield
                     pair
 
-            RequestDetails(content, session, url, namespace, headersToForward.toList, paramsToForward)
+            // E.g. en_US. Pass this as fr-language to Form Runner.
+            val language = nonEmptyOrNone(LanguageUtil.getLanguageId(request))
+            def languageHeader =  language map ("Orbeon-Liferay-Language" →)
+
+            RequestDetails(content, request.getPortletSession(true), url, namespace, headersToForward.toList ++ languageHeader.toList, paramsToForward)
         }
     }
 
+    private val FormRunnerHome = """/fr/(\?(.*))?""".r
     private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
     private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
 
@@ -141,10 +154,10 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private def directServeResource(request: ResourceRequest, response: ResourceResponse): Unit = {
         val resourceId = request.getResourceID
-        val url = buildFormRunnerURL(getPreference(request, FormRunnerURL), resourceId)
+        val url = buildFormRunnerURL(getPreference(request, FormRunnerURL), resourceId, embeddable = false)
 
         val namespace = response.getNamespace
-        val connection = connectURL(RequestDetails(request, contentFromRequest(request, namespace), request.getPortletSession(true), url, namespace))
+        val connection = connectURL(RequestDetails(request, contentFromRequest(request, namespace), url, namespace))
 
         useAndClose(connection.getInputStream) { is ⇒
             propagateResponseHeaders(connection, response)
@@ -156,33 +169,39 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
 
     private def createRequestDetails(request: PortletRequest, namespace: String): RequestDetails = {
         // Determine URL based on preferences and request
-        val url = {
-            val pathParameter = request.getParameter(WSRPURLRewriter.PathParameterName)
+        val path = {
 
-            if (pathParameter == "/xforms-server-submit")
-                // XForms server submit
-                buildFormRunnerURL(getPreference(request, FormRunnerURL), pathParameter)
-            else {
-                // Form Runner path
-                def filterAction(action: String) =
-                    if (getPreference(request, ReadOnly) == "true" && action == "edit") "view" else action
+            def pathParameterOpt =
+                Option(request.getParameter(WSRPURLRewriter.PathParameterName))
 
-                val (appName, formName, action, documentId, query) = pathParameter match {
-                    // Incoming path is Form Runner path without document id
-                    case FormRunnerPath(appName, formName, action, _, query) ⇒ (appName, formName, filterAction(action), None, Option(query))
-                    // Incoming path is Form Runner path with document id
-                    case FormRunnerDocumentPath(appName, formName, action, documentId, _, query) ⇒ (appName, formName, filterAction(action), Some(documentId), Option(query))
-                    // No incoming path, use preferences
-                    case null ⇒ (getPreference(request, AppName), getPreference(request, FormName), getPreference(request, Action), None, None)
-                    // Unsupported path
-                    case otherPath ⇒ throw new PortletException("Unsupported path: " + otherPath)
-                }
+            def defaultPath =
+                if (getPreference(request, Page) == "home")
+                    buildFormRunnerHomePath(None)
+                else
+                    buildFormRunnerPath(getPreference(request, AppName), getPreference(request, FormName), getPreference(request, Page), None, None)
 
-                buildFormRunnerURL(getPreference(request, FormRunnerURL), appName, formName, action, documentId, query)
+            def filterAction(action: String) =
+                if (getPreference(request, ReadOnly) == "true" && action == "edit") "view" else action
+
+            pathParameterOpt getOrElse defaultPath match {
+                case path @ "/xforms-server-submit" ⇒
+                    path
+                // Incoming path is Form Runner path without document id
+                case FormRunnerPath(appName, formName, action, _, query) ⇒
+                    buildFormRunnerPath(appName, formName, filterAction(action), None, Option(query))
+                // Incoming path is Form Runner path with document id
+                case FormRunnerDocumentPath(appName, formName, action, documentId, _, query) ⇒
+                    buildFormRunnerPath(appName, formName, filterAction(action), Some(documentId), Option(query))
+                // Incoming path is Form Runner Home page
+                case FormRunnerHome(_, query) ⇒
+                    buildFormRunnerHomePath(Option(query))
+                // Unsupported path
+                case otherPath ⇒
+                    throw new PortletException("Unsupported path: " + otherPath)
             }
         }
 
-        RequestDetails(request, contentFromRequest(request, namespace), request.getPortletSession(true), url, namespace)
+        RequestDetails(request, contentFromRequest(request, namespace), buildFormRunnerURL(getPreference(request, FormRunnerURL), path, embeddable = true), namespace)
     }
 
     private def contentFromRequest(request: PortletRequest, namespace: String): Option[Content] = {
@@ -317,11 +336,12 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             case _ ⇒
         }
 
-    private def buildFormRunnerURL(baseURL: String, app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
-        dropTrailingSlash(baseURL) + "/fr/" + app + "/" + form + "/" + action +
-            (documentId map ("/" + _) getOrElse "") +
-            (query map ("?" + _ + "&") getOrElse "?") + "orbeon-embeddable=true"
+    private def buildFormRunnerPath(app: String, form: String, action: String, documentId: Option[String], query: Option[String]) =
+        NetUtils.appendQueryString("/fr/" + app + "/" + form + "/" + action + (documentId map ("/" +) getOrElse ""), query getOrElse "")
 
-    private def buildFormRunnerURL(baseURL: String, path: String) =
-        dropTrailingSlash(baseURL) + path
+    private def buildFormRunnerHomePath(query: Option[String]) =
+        NetUtils.appendQueryString("/fr/", query getOrElse "")
+
+    private def buildFormRunnerURL(baseURL: String, path: String, embeddable: Boolean) =
+        NetUtils.appendQueryString(dropTrailingSlash(baseURL) + path, if(embeddable) "orbeon-embeddable=true" else "")
 }

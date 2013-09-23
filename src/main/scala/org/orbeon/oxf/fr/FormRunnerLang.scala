@@ -19,8 +19,9 @@ import org.orbeon.oxf.util.NetUtils
 import org.orbeon.saxon.om.Item
 import collection.JavaConverters._
 import org.orbeon.oxf.pipeline.api.ExternalContext.Request
-import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.externalcontext.ExternalContextOps._
 
+// NOTE: Language is currently assumed to be only the plain language part, e.g. "en", "it", "zh".
 trait FormRunnerLang {
 
     import FormRunner._
@@ -77,7 +78,7 @@ trait FormRunnerLang {
     // Public for unit tests
     def getDefaultLang(appForm: Option[AppForm]): String = {
         val suffix = appForm.toList flatMap (_.toList)
-        Option(properties.getString("oxf.fr.default-language" :: suffix mkString ".")) getOrElse "en"
+        Option(properties.getString("oxf.fr.default-language" :: suffix mkString ".")) map  cleanLanguage getOrElse "en"
     }
 
     // Return a predicate telling whether a language is allowed based on properties. If app/form are specified, then the
@@ -85,7 +86,7 @@ trait FormRunnerLang {
     // Public for unit tests
     def isAllowedLang(appForm: Option[AppForm]): String ⇒ Boolean = {
         val suffix = appForm.toList flatMap (_.toList)
-        val set    = stringOptionToSet(Option(properties.getString("oxf.fr.available-languages" :: suffix mkString ".")))
+        val set    = stringOptionToSet(Option(properties.getString("oxf.fr.available-languages" :: suffix mkString "."))) map cleanLanguage
         // If none specified via property or property contains a wildcard, all languages are considered available
         if (set.isEmpty || set("*")) _ ⇒ true else set
     }
@@ -95,14 +96,21 @@ trait FormRunnerLang {
     def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
         val request = NetUtils.getExternalContext.getRequest
 
-        def fromRequest = Option(request.getParameterMap.get(LanguageParam)) flatMap (_.lift(0)) map (_.toString)
+        def fromHeader  = request.getFirstHeader("orbeon-liferay-language") map cleanLanguage
+        def fromRequest = request.getFirstHeader(LanguageParam) map cleanLanguage
         def fromSession = stringFromSession(request, LanguageParam)
 
         nonEmptyOrNone(requestedLang) orElse
+            fromHeader orElse
             fromRequest orElse
             fromSession orElse
             Option(getDefaultLang(appForm))
     }
+
+    // Support e.g. en_US with underscore, but normalize to en-US and only keep the language part for now. Later we can
+    // support country/variant etc. See Java Locale and comments in XXFormsFormatMessage.
+    private def cleanLanguage(lang: String) =
+        split[List](lang, "-_").head
 
     private def selectLangUseDefault(appForm: Option[AppForm], requestedLang: Option[String], availableLangs: List[String]) = {
         def matchingLanguage = availableLangs intersect requestedLang.toList headOption

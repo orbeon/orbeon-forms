@@ -16,31 +16,76 @@ package org.orbeon.oxf.portlet
 import org.orbeon.oxf.util.ScalaUtils._
 import javax.portlet._
 import org.apache.log4j.Logger
+import scala.xml.Elem
 
 // Preference editor for the proxy portlet
 trait ProxyPortletEdit extends GenericPortlet {
 
     implicit def logger: Logger
+    
+    case class NameLabel(name: String, label: String)
 
-    sealed trait Preference { val name: String }
-    case object FormRunnerURL extends Preference { val name = "form-runner-url" }
-    case object AppName       extends Preference { val name = "app-name" }
-    case object FormName      extends Preference { val name = "form-name" }
-    case object Action        extends Preference { val name = "action" }
-    case object ReadOnly      extends Preference { val name = "read-only" }
+    sealed trait ControlType { def render(pref: Pref, value: String): Elem }
 
-    private val PreferenceLabels = Seq(
-        FormRunnerURL → "Form Runner URL",
-        AppName       → "Form Runner app name",
-        FormName      → "Form Runner form name",
-        Action        → "Form Runner action",
-        ReadOnly      → "Read-Only access"
+    case object InputControl extends ControlType {
+        def render(pref: Pref, value: String) =
+            <label>{pref.nameLabel.label}
+                <input type="text" name={pref.nameLabel.name} value={value}/>
+            </label>
+    }
+
+    case object CheckboxControl extends ControlType {
+        def render(pref: Pref, value: String) =
+            <label>{pref.nameLabel.label}
+                {
+                    val template = <input type="checkbox" name={pref.nameLabel.name} value="true" checked="checked"/>
+                    if (value == "true") template else template.copy(attributes = template.attributes.remove("checked"))
+                }
+            </label>
+    }
+    
+    case class SelectControl(nameLabels: List[NameLabel]) extends ControlType {
+        def render(pref: Pref, value: String) =
+            <label>{pref.nameLabel.label}
+                <select name={pref.nameLabel.name}>
+                    {
+                        for (nameLabel ← nameLabels) yield {
+                            val template = <option value={nameLabel.name} selected="selected">{nameLabel.label}</option>
+                            if (value == nameLabel.name) template else template.copy(attributes = template.attributes.remove("selected"))
+                        }
+                    }
+                </select>
+            </label>
+    }
+
+    sealed trait Pref { val tpe: ControlType; val nameLabel: NameLabel }
+
+    val PageNameLabels = List(
+        NameLabel("home", "Home Page"),
+        NameLabel("summary", "Summary Page"),
+        NameLabel("new", "New Page")
+    )
+
+    case object FormRunnerURL        extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-runner-url", "Form Runner URL") }
+    case object AppName              extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("app-name", "Form Runner app name") }
+    case object FormName             extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-name", "Form Runner form name") }
+    case object ReadOnly             extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("read-only", "Readonly access") }
+    case object SendLiferayLanguage  extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-language", "Send Liferay language") }
+    case object Page                 extends Pref { val tpe = new SelectControl(PageNameLabels); val nameLabel = NameLabel("action", "Form Runner page") }
+
+    val AllPreferences = Seq(
+        Page,
+        FormRunnerURL,
+        AppName,
+        FormName,
+        ReadOnly,
+        SendLiferayLanguage
     )
 
     // Return the value of the preference if set, otherwise the value of the initialization parameter
     // NOTE: We should be able to use portlet.xml portlet-preferences/preference, but somehow this doesn't work properly
-    def getPreference(request: PortletRequest, pref: Preference) =
-        request.getPreferences.getValue(pref.name, getPortletConfig.getInitParameter(pref.name))
+    def getPreference(request: PortletRequest, pref: Pref) =
+        request.getPreferences.getValue(pref.nameLabel.name, getPortletConfig.getInitParameter(pref.nameLabel.name))
 
     // Very simple preferences editor
     override def doEdit(request: RenderRequest, response: RenderResponse): Unit =
@@ -50,19 +95,26 @@ trait ProxyPortletEdit extends GenericPortlet {
             response.getWriter write
                 <div>
                     <style>
-                        .orbeon-pref-form label {{display: block; font-weight: bold}}
-                        .orbeon-pref-form input {{display: block; width: 20em }}
+                        .orbeon-pref-form label {{ display: block; clear:both; font-weight: bold }}
+                        .orbeon-pref-form input[type=text] {{ display: block; width: 300px; margin-bottom: 10px }}
+                        .orbeon-pref-form input[type=checkbox] {{ float: left; margin-right: 6px; margin-bottom: 10px }}
+                        .orbeon-pref-form select {{ display: block; width: auto; margin-bottom: 10px }}
+                        .orbeon-pref-form hr {{ clear: both }}
+                        .orbeon-pref-form fieldset {{ padding-bottom: 0 }}
                     </style>
                     <form action={response.createActionURL.toString} method="post" class="orbeon-pref-form">
-                        {
-                            for ((pref, label) ← PreferenceLabels) yield
-                                <label>{label}: <input name={pref.name} value={getPreference(request, pref)}/></label>
-                        }
-                        <hr/>
-                        <p>
-                            <button name="save" value="save">Save</button>
-                            <button name="cancel" value="cancel">Cancel</button>
-                        </p>
+                        <fieldset>
+                            <legend>Form Runner Portlet Settings</legend>
+                            {
+                                for (pref ← AllPreferences) yield
+                                    pref.tpe.render(pref, getPreference(request, pref))
+                            }
+                            <hr/>
+                            <div>
+                                <button name="save"   value="save">Save</button>
+                                <button name="cancel" value="cancel">Cancel</button>
+                            </div>
+                        </fieldset>
                     </form>
                 </div>.toString
         }
@@ -72,10 +124,11 @@ trait ProxyPortletEdit extends GenericPortlet {
         withRootException("view action", new PortletException(_)) {
             request.getParameter("save") match {
                 case "save" ⇒
-                    def setPreference(pref: Preference, value: String) = request.getPreferences.setValue(pref.name, value)
+                    def setPreference(pref: Pref, value: String) =
+                        request.getPreferences.setValue(pref.nameLabel.name, value)
 
-                    for ((pref, label) ← PreferenceLabels)
-                        setPreference(pref, request.getParameter(pref.name))
+                    for (pref ← AllPreferences)
+                        setPreference(pref, request.getParameter(pref.nameLabel.name))
 
                     request.getPreferences.store()
                 case _ ⇒

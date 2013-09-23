@@ -26,6 +26,10 @@
             <name>read-only</name>
             <value>false</value>
         </init-param>
+        <init-param>
+            <name>send-liferay-language</name>
+            <value>false</value>
+        </init-param>
         
         <supports>
             <mime-type>text/html</mime-type>

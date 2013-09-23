@@ -32,7 +32,7 @@ import java.util.*;
 public class Utils {
 
     /**
-     * Evalutate a sequence a statements, and insert the result of the
+     * Evaluate a sequence a statements, and insert the result of the
      * evaluation the given parent node at the given position.
      */
     public static void insert(LocationData locationData, Node parent, int position, Object toInsert) {

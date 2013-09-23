@@ -139,6 +139,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
 
+                <xsl:import href="sql-utils.xsl"/>
                 <xsl:variable name="permissions"              select="doc('input:form')/forms/form/permissions"/>
                 <xsl:variable name="search-operations"        select="('*', 'read', 'update', 'delete')"/>
                 <xsl:variable name="search-permissions"       select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
@@ -315,25 +316,6 @@
                         </documents>
                     </sql:config>
                 </xsl:template>
-                <xsl:function name="f:escape-lang">
-                    <xsl:param name="text" as="xs:string"/>
-                    <xsl:param name="lang" as="xs:string"/>
-                    <xsl:value-of select="replace($text, '\[@xml:lang = \$fb-lang\]', concat('[@xml:lang = ''', f:escape-sql($lang), ''']'))"/>
-                </xsl:function>
-                <xsl:function name="f:escape-sql">
-                    <xsl:param name="text" as="xs:string"/>
-                    <xsl:value-of select="replace($text, '''', '''''')"/>
-                </xsl:function>
-                <xsl:function name="f:namespaces">
-                    <xsl:param name="query" as="element(query)"/>
-                    <xsl:for-each select="in-scope-prefixes($query)">
-                        <xsl:text>xmlns:</xsl:text>
-                        <xsl:value-of select="."/>
-                        <xsl:text>="</xsl:text>
-                        <xsl:value-of select="namespace-uri-for-prefix(., $query)"/>
-                        <xsl:text>" </xsl:text>
-                    </xsl:for-each>
-                </xsl:function>
                 <!-- Condition on owner / group -->
                 <xsl:function name="f:owner-group-condition">
                     <xsl:param name="table" as="xs:string"/>

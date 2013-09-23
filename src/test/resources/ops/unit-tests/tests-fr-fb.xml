@@ -52,7 +52,7 @@
         </input>
         <input name="config">
             <xsl:stylesheet version="2.0" xmlns:f="http//www.orbeon.com/function" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-                <xsl:import href="/apps/fr/persistence/oracle/sql-utils.xsl"/>
+                <xsl:import href="/apps/fr/persistence/relational/sql-utils.xsl"/>
                 <xsl:template match="/*">
                     <xsl:copy><xsl:apply-templates/></xsl:copy>
                 </xsl:template>

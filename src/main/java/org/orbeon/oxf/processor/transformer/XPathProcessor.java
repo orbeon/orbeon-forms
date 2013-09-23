@@ -17,7 +17,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.tree.DefaultProcessingInstruction;
 import org.dom4j.tree.DefaultText;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -34,7 +33,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.SAXException;
 
 import java.util.HashMap;
@@ -84,7 +82,7 @@ public class XPathProcessor extends ProcessorImpl {
                     final String baseURI = (locationData == null) ? null : locationData.getSystemID();
                     xpath = XPathCache.getXPathExpression(documentInfo.getConfiguration(), documentInfo,
                             config.getExpression(), config.getNamespaces(), null, org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), baseURI, locationData);
-                    List<Object> results = xpath.evaluateToJava();
+                    List<Object> results = xpath.evaluateToJavaReturnToPool();
                     xmlReceiver.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because
                     // we potentially output several root nodes. This works because the XPathProcessor is always
@@ -97,13 +95,8 @@ public class XPathProcessor extends ProcessorImpl {
                         streamResult(context, xmlReceiver, result, locationData);
                     }
                     xmlReceiver.endDocument();
-                } catch (XPathException xpe) {
-                    throw new OXFException(xpe);
                 } catch (SAXException e) {
                     throw new ValidationException(e, locationData);
-                } finally{
-                    if(xpath != null)
-                        xpath.returnToPool();
                 }
             }
         };

@@ -308,23 +308,19 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     operation != null && operation.select != null
                                                             ? operation.selectNamespaceContext : null, getLocationData());
 
-                                            try {
-                                                for (Iterator i = expr.evaluateToJava().iterator(); i.hasNext();) {
+                                            for (Iterator i = expr.evaluateToJavaReturnToPool().iterator(); i.hasNext();) {
 
-                                                    // Create document with node from SOAP envelope
-                                                    final Object result = i.next();
-                                                    if (result instanceof Element) {
-                                                        locationSAXWriter.write((Element) result);
-                                                    } else if (result instanceof Document) {
-                                                        locationSAXWriter.write(((Document) result).getRootElement());
-                                                    } else if (result instanceof Text) {
-                                                        locationSAXWriter.write((Text) result);
-                                                    } else {
-                                                        throw new OXFException("Unsupported result from select expression: '" + result.getClass() + "'");
-                                                    }
+                                                // Create document with node from SOAP envelope
+                                                final Object result = i.next();
+                                                if (result instanceof Element) {
+                                                    locationSAXWriter.write((Element) result);
+                                                } else if (result instanceof Document) {
+                                                    locationSAXWriter.write(((Document) result).getRootElement());
+                                                } else if (result instanceof Text) {
+                                                    locationSAXWriter.write((Text) result);
+                                                } else {
+                                                    throw new OXFException("Unsupported result from select expression: '" + result.getClass() + "'");
                                                 }
-                                            } finally {
-                                                if (expr != null) expr.returnToPool();
                                             }
                                         }
 

@@ -24,6 +24,8 @@ import org.orbeon.saxon.value.BooleanValue
 import org.orbeon.scaxon.XML._
 import scala.util.control.{NonFatal, ControlThrowable, Breaks}
 import util.{Success, Try}
+import org.orbeon.saxon.functions.FunctionLibrary
+import org.orbeon.oxf.util.XPath.FunctionContext
 
 // Independent process interpreter
 trait ProcessInterpreter extends Logging {
@@ -37,6 +39,8 @@ trait ProcessInterpreter extends Logging {
     def findProcessByName(scope: String, name: String): Option[String]
     def processError(t: Throwable): Unit
     def xpathContext: Item
+    def xpathFunctionLibrary: FunctionLibrary
+    def xpathFunctionContext: FunctionContext
     def writeSuspendedProcess(process: String): Unit
     def readSuspendedProcess: String
     implicit def logger: IndentedLogger
@@ -155,7 +159,7 @@ trait ProcessInterpreter extends Logging {
             def runCondition(condition: ConditionNode) = {
                 val ConditionNode(xpath, thenBranch, elseBranch) = condition
                 Try {
-                    evalOne(xpathContext, "boolean(" + xpath + ")").asInstanceOf[BooleanValue].getBooleanValue
+                    evalOne(xpathContext, "boolean(" + xpath + ")", functionContext = xpathFunctionContext)(xpathFunctionLibrary).asInstanceOf[BooleanValue].getBooleanValue
                 } flatMap { cond ⇒
                     if (cond)
                         runExpr(thenBranch)

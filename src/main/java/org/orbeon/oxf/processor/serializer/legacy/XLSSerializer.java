@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.trans.XPathException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,17 +71,9 @@ public class XLSSerializer extends HttpBinarySerializer {
 
             int sheetIndex = 0;
 
-            PooledXPathExpression expr = null;
-            List<Object> nodes = null;
-            try {
-                expr = XPathCache.getXPathExpression(wrapper.getConfiguration(), wrapper, "/workbook/sheet", getLocationData());
-                nodes = expr.evaluateToJava();
-            } catch (XPathException e) {
-                throw new OXFException(e);
-            } finally {
-                if (expr != null)
-                    expr.returnToPool();
-            }
+            PooledXPathExpression expr = XPathCache.getXPathExpression(wrapper.getConfiguration(), wrapper, "/workbook/sheet", getLocationData());
+            List<Object> nodes = expr.evaluateToJavaReturnToPool();
+
             for (Iterator i = nodes.iterator(); i.hasNext();) {
 
                 final Element sheetElement = (Element) i.next();
@@ -140,15 +131,8 @@ public class XLSSerializer extends HttpBinarySerializer {
                         // Set cell value
                         PooledXPathExpression expr = XPathCache.getXPathExpression(
                                 wrapper.getConfiguration(), wrapper.wrap(sheetElement), "string(" + sourceXPath + ")", getLocationData());
-                        String newValue;
-                        try {
-                            newValue = (String) expr.evaluateSingle();
-                        } catch (XPathException e) {
-                            throw new OXFException(e);
-                        } finally {
-                            if (expr != null)
-                                expr.returnToPool();
-                        }
+                        String newValue = (String) expr.evaluateSingleToJavaReturnToPoolOrNull();
+
                         if (newValue == null) {
                             throw new OXFException("Nothing matches the XPath expression '"
                                     + sourceXPath + "' in the input document");

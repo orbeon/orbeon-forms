@@ -33,7 +33,6 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.trans.XPathException;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -71,13 +70,7 @@ public class XLSGenerator extends ProcessorImpl {
                                 requestDocument.getConfiguration(), requestDocument,
                                 "/request/parameters/parameter[1]/value", getLocationData());
 
-                        final Element valueElement;
-                        try {
-                             valueElement = (Element) expr.evaluateSingle();
-                        } finally{
-                            if (expr != null)
-                                expr.returnToPool();
-                        }
+                        final Element valueElement = (Element) expr.evaluateSingleToJavaReturnToPoolOrNull();
                         
                         if (valueElement == null) throw new OXFException(NO_FILE);
                         String type = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);
@@ -108,8 +101,6 @@ public class XLSGenerator extends ProcessorImpl {
                         ( d, "xls generator output", DOMGenerator.ZeroValidity
                           , DOMGenerator.DefaultContext );
                     domGenerator.createOutput(OUTPUT_DATA).read(context, xmlReceiver);
-                } catch (XPathException xpe) {
-                    throw new OXFException(xpe);
                 } catch (IOException e) {
                     throw new OXFException(e);
                 }

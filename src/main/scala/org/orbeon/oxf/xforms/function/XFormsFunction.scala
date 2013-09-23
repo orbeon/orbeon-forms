@@ -49,7 +49,7 @@ abstract class XFormsFunction extends SystemFunction {
     override def preEvaluate(visitor: ExpressionVisitor) = this
 
     def context(implicit xpathContext: XPathContext) =
-        PooledXPathExpression.getFunctionContext(xpathContext).asInstanceOf[XFormsFunction.Context]
+        XPath.functionContext map (_.asInstanceOf[XFormsFunction.Context]) orNull
 
     def getControls(implicit xpathContext: XPathContext)      = context.controls
     def getXBLContainer(implicit xpathContext: XPathContext)  = context.container

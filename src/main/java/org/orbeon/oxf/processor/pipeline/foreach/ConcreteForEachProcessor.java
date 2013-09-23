@@ -211,7 +211,7 @@ public class ConcreteForEachProcessor extends ProcessorImpl {
         private final Iterator iterator;
 
         public ElementIterator(PooledXPathExpression expression) throws XPathException {
-            this.iterator = expression.iterate();
+            this.iterator = expression.iterateReturnJavaObjects();
         }
 
         public boolean hasNext() {

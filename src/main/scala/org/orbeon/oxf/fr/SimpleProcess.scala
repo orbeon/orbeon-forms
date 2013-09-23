@@ -19,12 +19,13 @@ import collection.mutable.ListBuffer
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{NetUtils, Logging}
+import org.orbeon.oxf.util.{XPath, NetUtils, Logging}
 import org.orbeon.oxf.xforms.XFormsProperties
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.analysis.model.StaticBind._
 import org.orbeon.scaxon.XML._
 import util.Try
+import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
 
 // Implementation of simple processes
 //
@@ -41,6 +42,8 @@ object SimpleProcess extends ProcessInterpreter with FormRunnerActions with XFor
 
     // All XPath runs in the context of the main form instance's root element
     def xpathContext = topLevelInstance(FormModel, "fr-form-instance") map (_.rootElement) orNull
+    def xpathFunctionLibrary = XFormsFunctionLibrary
+    def xpathFunctionContext = XPath.functionContext.orNull
 
     // NOTE: Clear the PDF URL *before* the process, because if we clear it after, it will be already cleared during the
     // second pass of a two-pass submission.

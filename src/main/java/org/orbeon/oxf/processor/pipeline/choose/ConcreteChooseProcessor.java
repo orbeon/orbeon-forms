@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor.pipeline.choose;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.OutputCacheKey;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.XMLReceiver;
@@ -28,7 +27,6 @@ import org.orbeon.oxf.xml.NamespaceMapping;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
-import org.orbeon.saxon.trans.XPathException;
 
 import java.util.*;
 
@@ -170,16 +168,8 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 selectedBranch = branchIndex;
                 break;
             }
-            // Try to cache the XPath expressions
-//            String xpathExpression = "boolean(" + condition + ")";
-//            XPath xpath = XPathCache.createCacheXPath(context, xpathExpression);
-//
-//            xpath.setFunctionContext(new OXFFunctionContext());
-//            xpath.setNamespaceContext((NamespaceContext) branchNamespaces.get(branchIndex));
-//            if (((Boolean) xpath.evaluate(refNode)).booleanValue()) {
-//                selectedBranch = branchIndex;
-//                break;
-//            }
+            // LATER: Try to cache the XPath expressions.
+
             // Lazily read input in case there is only a p:otherwise
             if (hrefDocumentInfo == null) {
                 final Configuration configuration = XPathCache.getGlobalConfiguration();
@@ -188,26 +178,16 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             PooledXPathExpression expression = null;
             final NamespaceMapping namespaces = branchNamespaces.get(branchIndex);
 
+            // NOTE: We used to catch an XPath exception here to add location data, but Java doesn't allow us to do this
+            // anymore without adding an annotation in the Scala code, which we don't want to do. Anyway, the location
+            // data was not that of the branch. Forgoing the extra location data right now.
+            expression = XPathCache.getXPathExpression(hrefDocumentInfo.getConfiguration(),
+                    hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null,
+                    org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
 
-            try {
-                expression = XPathCache.getXPathExpression(hrefDocumentInfo.getConfiguration(),
-                        hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null,
-                        org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
-
-                if (((Boolean) expression.evaluateSingle()).booleanValue()) {
-                    selectedBranch = branchIndex;
-                    break;
-                }
-            } catch (XPathException e) {
-                if (logger.isDebugEnabled())
-                    logger.debug("Choose: condition evaluation failed for condition: " + condition + " at " + branchProcessors.get(branchIndex));// TODO: location should be that of branch
-                throw new ValidationException("Choose: condition evaluation failed for condition: " + condition, e, locationData);// TODO: location should be that of branch
-            } finally {
-                try {
-                    if (expression != null) expression.returnToPool();
-                } catch (Exception e) {
-                    throw new OXFException(e);
-                }
+            if (((Boolean) expression.evaluateSingleToJavaReturnToPoolOrNull()).booleanValue()) {
+                selectedBranch = branchIndex;
+                break;
             }
         }
 
@@ -222,7 +202,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
         } else {
 
             // Initialize variables depending on selected branch
-            final Processor selectedBranchProcessor = (Processor) branchProcessors.get(selectedBranch);
+            final Processor selectedBranchProcessor = branchProcessors.get(selectedBranch);
             final Map<String, ProcessorInput> selectedBranchInputs = branchInputs.get(selectedBranch);
             state.selectedBranchOutputs = branchOutputs.get(selectedBranch);
 

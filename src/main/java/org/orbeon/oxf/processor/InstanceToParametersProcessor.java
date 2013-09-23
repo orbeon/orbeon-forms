@@ -77,11 +77,8 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         PooledXPathExpression xpath = XPathCache.getXPathExpression(instanceWrapper.getConfiguration(),
                                 instanceWrapper.wrap(instance), excludeRef,
                                 new NamespaceMapping(Dom4jUtils.getNamespaceContextNoDefault(paramElement)), getLocationData());
-                        try {
-                            markedNodes.add(xpath.evaluateSingle());
-                        } finally {
-                            if (xpath != null) xpath.returnToPool();
-                        }
+
+                        markedNodes.add(xpath.evaluateSingleToJavaReturnToPoolOrNull());
                     }
 
                     // See if all nodes are marked

@@ -99,7 +99,7 @@ object XPathCache {
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
-                variableToValueMap, functionLibrary, baseURI, false, locationData)
+                variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateKeepNodeInfo(functionContext)
@@ -127,7 +127,7 @@ object XPathCache {
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
-                variableToValueMap, functionLibrary, baseURI, false, locationData)
+                variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateKeepItems(functionContext)
@@ -151,10 +151,10 @@ object XPathCache {
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
-                variableToValueMap, functionLibrary, baseURI, false, locationData)
+                variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
-            xpathExpression.evaluateSingleKeepItems(functionContext)
+            xpathExpression.evaluateSingleKeepItemOrNull(functionContext)
         }
     }
 
@@ -176,7 +176,7 @@ object XPathCache {
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap,
-                functionLibrary, baseURI, false, locationData)
+                functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
             xpathExpression.evaluateAsExtent(functionContext)
@@ -219,10 +219,10 @@ object XPathCache {
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap,
-                functionLibrary, baseURI, false, locationData)
+                functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
-            xpathExpression.evaluateSingleKeepNodeInfo(functionContext)
+            xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)
         }
     }
 
@@ -268,10 +268,10 @@ object XPathCache {
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, xpathString, namespaceMapping,
                 variableToValueMap,
-                functionLibrary, baseURI, true, locationData)
+                functionLibrary, baseURI, isAVT = true, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
-            Option(xpathExpression.evaluateSingleKeepNodeInfo(functionContext)) map (_.toString) orNull
+            Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString) orNull
         }
     }
 
@@ -308,10 +308,10 @@ object XPathCache {
         val xpathExpression =
             getXPathExpression(
                 getGlobalConfiguration, contextItems, contextPosition, "string((" + xpathString + ")[1])",
-                namespaceMapping, variableToValueMap, functionLibrary, baseURI, false, locationData)
+                namespaceMapping, variableToValueMap, functionLibrary, baseURI, isAVT = false, locationData)
 
         withEvaluation(xpathString, xpathExpression, locationData, reporter) {
-            Option(xpathExpression.evaluateSingleKeepNodeInfo(functionContext)) map (_.toString) orNull
+            Option(xpathExpression.evaluateSingleKeepNodeInfoOrNull(functionContext)) map (_.toString) orNull
         }
     }
 
@@ -343,7 +343,7 @@ object XPathCache {
         getXPathExpression(
             configuration, Seq(contextItem).asJava, 1, xpathString, namespaceMapping,
             variableToValueMap, functionLibrary, baseURI,
-            false, locationData)
+            isAVT = false, locationData)
 
     private def getXPathExpression(
             configuration: Configuration,
@@ -354,7 +354,7 @@ object XPathCache {
             variableToValueMap: JMap[String, ValueRepresentation],
             functionLibrary: FunctionLibrary,
             baseURI: String,
-            isAvt: Boolean,
+            isAVT: Boolean,
             locationData: LocationData): PooledXPathExpression = {
         try {
             // Find pool from cache
@@ -390,7 +390,7 @@ object XPathCache {
 
             // Add this to the key as evaluating "name" as XPath or as AVT is very different!
             cacheKeyString.append('|')
-            cacheKeyString.append(isAvt.toString)
+            cacheKeyString.append(isAVT.toString)
 
             // TODO: Add baseURI to cache key (currently, baseURI is pretty much unused)
 
@@ -398,7 +398,7 @@ object XPathCache {
                 val cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString.toString)
                 var pool = cache.findValid(cacheKey, validity).asInstanceOf[ObjectPool[PooledXPathExpression]]
                 if (pool eq null) {
-                    pool = createXPathPool(configuration, xpathString, namespaceMapping, variableNames, functionLibrary, baseURI, isAvt, locationData)
+                    pool = createXPathPool(configuration, xpathString, namespaceMapping, variableNames, functionLibrary, baseURI, isAVT, locationData)
                     cache.add(cacheKey, validity, pool)
                 }
                 // Get object from pool
@@ -424,13 +424,13 @@ object XPathCache {
             variableNames: List[String],
             functionLibrary: FunctionLibrary,
             baseURI: String,
-            isAvt: Boolean,
+            isAVT: Boolean,
             locationData: LocationData): ObjectPool[PooledXPathExpression] = {
 
         // TODO: pool should have at least one hard reference
         val factory = new XPathCachePoolableObjectFactory(
             configurationOrDefault(xpathConfiguration), xpathString, namespaceMapping, variableNames,
-            functionLibrary, baseURI, isAvt, locationData)
+            functionLibrary, baseURI, isAVT, locationData)
         val pool = new SoftReferenceObjectPool(factory)
         factory.pool = pool
         pool
@@ -439,10 +439,10 @@ object XPathCache {
     def createPoolableXPathExpression(
             independentContext: IndependentContext,
             xpathString: String,
-            isAvt: Boolean,
+            isAVT: Boolean,
             pool: ObjectPool[PooledXPathExpression],
             variables: JMap[String, XPathVariable]): PooledXPathExpression =
-        new PooledXPathExpression(compileExpressionWithStaticContext(independentContext, xpathString, isAvt), pool, variables)
+        new PooledXPathExpression(compileExpressionWithStaticContext(independentContext, xpathString, isAVT), pool, variables)
 
     // Not sure if/when configuration can be null, but it shouldn't be
     private def configurationOrDefault(configuration: Configuration) =
@@ -455,7 +455,7 @@ object XPathCache {
             variableNames: List[String],
             functionLibrary: FunctionLibrary,
             baseURI: String,
-            isAvt: Boolean,
+            isAVT: Boolean,
             locationData: LocationData)
         extends BasePoolableObjectFactory[PooledXPathExpression] {
 
@@ -496,10 +496,10 @@ object XPathCache {
             if (functionLibrary ne null)
                 independentContext.getFunctionLibrary.asInstanceOf[FunctionLibraryList].libraryList.asInstanceOf[JList[FunctionLibrary]].add(0, functionLibrary)
             
-            createPoolableXPathExpression(independentContext, xpathString, isAvt, pool, variables.toMap.asJava)
+            createPoolableXPathExpression(independentContext, xpathString, isAVT, pool, variables.toMap.asJava)
         }
 
-        override def destroyObject(o: PooledXPathExpression): Unit = o.destroy()
+        override def destroyObject(o: PooledXPathExpression): Unit = ()
     }
 
     private def withEvaluation[T](xpathString: String, xpathExpression: PooledXPathExpression, locationData: LocationData, reporter: Reporter)(body: ⇒ T): T =

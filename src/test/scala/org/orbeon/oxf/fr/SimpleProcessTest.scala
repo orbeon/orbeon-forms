@@ -33,6 +33,8 @@ class SimpleProcessTest extends ResourceManagerTestBase with AssertionsForJUnit 
         def findProcessByName(scope: String, name: String): Option[String] = None
         def processError(t: Throwable) = ()
         var xpathContext: Item = null
+        val xpathFunctionLibrary = null
+        def xpathFunctionContext = null
 
         // Just store the continuation locally
         def writeSuspendedProcess(process: String) = _suspendedProcess = Some(process)

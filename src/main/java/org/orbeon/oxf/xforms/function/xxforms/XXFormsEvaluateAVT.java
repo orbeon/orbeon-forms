@@ -30,7 +30,7 @@ public class XXFormsEvaluateAVT extends XFormsFunction {
         {
             // Prepare expression
             final PooledXPathExpression xpathExpression = prepareExpression(xpathContext, argument[0], true);
-            avtExpression = xpathExpression.prepareExpression(newXPathContext, PooledXPathExpression.getFunctionContext(xpathContext));
+            avtExpression = xpathExpression.prepareExpression(newXPathContext);
         }
 
         return avtExpression.iterate(newXPathContext);

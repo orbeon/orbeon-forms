@@ -27,7 +27,6 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.trans.XPathException;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -122,15 +121,7 @@ public class ValueOfCopyOfInterpreter extends SQLProcessor.InterpreterContentHan
                         // TODO: use XPathCache.evaluateAsString()
                         PooledXPathExpression expr = XPathCache.getXPathExpression(
                                 wrapper.getConfiguration(), wrapper.wrap(result), "string(.)", null);
-                        String stringValue;
-                        try {
-                            stringValue = (String) expr.evaluateSingle();
-                        } catch (XPathException e) {
-                            throw new OXFException(e);
-                        } finally {
-                            if (expr != null)
-                                expr.returnToPool();
-                        }
+                        String stringValue = (String) expr.evaluateSingleToJavaReturnToPoolOrNull();
                         output.characters(stringValue.toCharArray(), 0, stringValue.length());
                     } else {
                         LocationSAXWriter saxw = new LocationSAXWriter();

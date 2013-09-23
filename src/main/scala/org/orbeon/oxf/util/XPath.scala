@@ -23,7 +23,7 @@ import org.orbeon.saxon.om._
 import java.util.{List ⇒ JList}
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, ExtendedLocationData, LocationData}
 import org.orbeon.saxon.value.{Value, AtomicValue}
-import org.orbeon.oxf.common.{OrbeonLocationException, ValidationException}
+import org.orbeon.oxf.common.OrbeonLocationException
 import org.orbeon.saxon.Configuration
 import javax.xml.transform.{TransformerException, Source, URIResolver}
 import org.orbeon.oxf.resources.URLFactory
@@ -33,7 +33,7 @@ import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.apache.commons.lang3.StringUtils._
 import org.orbeon.oxf.xforms.XFormsContainingDocument
 import util.Try
-import scala.util.control.NonFatal
+import util.control.NonFatal
 
 object XPath {
 
@@ -45,6 +45,15 @@ object XPath {
 
     // To resolve a variable
     type VariableResolver = (StructuredQName, Item) ⇒ ValueRepresentation
+
+    // Context accessible during XPath evaluation
+    private val xpathContextDyn = new DynamicVariable[FunctionContext]
+
+    def withFunctionContext[T](functionContext: FunctionContext)(thunk: ⇒ T): T = {
+        xpathContextDyn.withValue(functionContext) {
+            thunk
+        }
+    }
 
     // Compiled expression with source information
     case class CompiledExpression(expression: XPathExpression, string: String, locationData: LocationData)
@@ -104,6 +113,9 @@ object XPath {
         }
     }
 
+    // Return the currently scoped function context if any
+    def functionContext = xpathContextDyn.value
+
     // Return either a NodeInfo for nodes, a native Java value for atomic values, or null
     def evaluateSingle(
             contextItems: JList[Item],
@@ -124,16 +136,16 @@ object XPath {
             val dynamicContext = xpathExpression.createDynamicContext(contextItem, position)
             val xpathContext = dynamicContext.getXPathContextObject.asInstanceOf[XPathContextMajor]
 
-            // Pass dynamic data to controller
-            xpathContext.getController.setUserData("", classOf[PooledXPathExpression].getName, functionContext)
             xpathContext.getController.setUserData(classOf[ShareableXPathStaticContext].getName, "variableResolver", variableResolver)
 
-            val iterator = xpathExpression.iterate(dynamicContext)
-            iterator.next() match {
-                case atomicValue: AtomicValue ⇒ Value.convertToJava(atomicValue)
-                case nodeInfo: NodeInfo       ⇒ nodeInfo
-                case null                     ⇒ null
-                case _                        ⇒ throw new IllegalStateException // Saxon guarantees that an Item is either AtomicValue or NodeInfo
+            withFunctionContext(functionContext) {
+                val iterator = xpathExpression.iterate(dynamicContext)
+                iterator.next() match {
+                    case atomicValue: AtomicValue ⇒ Value.convertToJava(atomicValue)
+                    case nodeInfo: NodeInfo       ⇒ nodeInfo
+                    case null                     ⇒ null
+                    case _                        ⇒ throw new IllegalStateException // Saxon guarantees that an Item is either AtomicValue or NodeInfo
+                }
             }
         }
     }

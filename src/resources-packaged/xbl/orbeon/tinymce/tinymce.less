@@ -13,7 +13,6 @@
  */
 
 .xbl-fr-tinymce {
-    &.xforms-readonly {
-        .mceToolbar, .mceStatusbar { display: none }	/* Hide the toolbar and status bar when readonly */
-    }
+    &.xforms-readonly { .mceToolbar, .mceStatusbar { display: none } }  // Hide the toolbar and status bar when readonly
+    .xbl-fr-tinymce-div { min-width: 1px }                              // So we can use jQuery's :visible selector
 }

@@ -57,11 +57,11 @@
             // - unfortunately, we need to use polling; can't use Ajax response e.g. if in Bootstrap tab, as
             //   in FB Control Settings dialog
             var renderIfVisible = _.bind(function() {
-                if ($(tinyMceDiv).width() == 0) {
+                if ($(tinyMceDiv).is(':visible')) {
+                    this.myEditor.render();
+                } else {
                     var shortDelay = ORBEON.util.Properties.internalShortDelay.get();
                     _.delay(renderIfVisible, shortDelay);
-                } else {
-                    this.myEditor.render();
                 }
             }, this);
             renderIfVisible();

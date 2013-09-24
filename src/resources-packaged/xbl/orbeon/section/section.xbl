@@ -51,7 +51,7 @@
                     <xsl:variable name="collapse" select="not(@collapse = 'false')"/>
                     <xsl:variable name="animate" select="not(@animate = 'false')"/>
 
-                    <xsl:variable name="initially-open" as="xs:boolean" select="$mode = 'view' or not(@open = 'false')"/>
+                    <xsl:variable name="initially-open" as="xs:boolean" select="$mode = ('view', 'pdf') or not(@open = 'false')"/>
 
                     <!-- Section content area -->
                     <xf:group appearance="xxf:internal" xxbl:scope="outer">

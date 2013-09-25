@@ -6,6 +6,7 @@ create table orbeon_form_definition (
     last_modified_by   varchar(255),
     app                varchar(255),
     form               varchar(255),
+    form_version       int not null,
     deleted            char(1) not null,
     xml                mediumtext
 )   engine = InnoDB;
@@ -16,6 +17,7 @@ create table orbeon_form_definition_attach (
     last_modified_by   varchar(255),
     app                varchar(255),
     form               varchar(255),
+    form_version       int not null,
     deleted            char(1) not null,
     file_name          varchar(255),
     file_content       longblob
@@ -29,6 +31,7 @@ create table orbeon_form_data (
     groupname          varchar(255),
     app                varchar(255),
     form               varchar(255),
+    form_version       int not null,
     document_id        varchar(255),
     draft              char(1) not null,
     deleted            char(1) not null,
@@ -43,6 +46,7 @@ create table orbeon_form_data_attach (
     groupname          varchar(255),
     app                varchar(255),
     form               varchar(255),
+    form_version       int not null,
     document_id        varchar(255),
     draft              char(1) not null,
     deleted            char(1) not null,

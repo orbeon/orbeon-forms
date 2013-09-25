@@ -32,6 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -72,6 +73,7 @@ import java.util.StringTokenizer;
 abstract class AbstractRewrite extends ProcessorImpl {
 
     static final String SCRIPT_ELT = "script";
+    static final String OBJECT_ELT = "object";
     static final String ACTION_ATT = "action";
     static final String METHOD_ATT = "method";
     static final String HREF_ATT = "href";
@@ -163,6 +165,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
          */
         private java.nio.CharBuffer charactersBuf;
 
+        private final ArrayList<Boolean> fObjectParent = new ArrayList<Boolean>();
+
         /**
          * Calls super( ... ) and initializes wsrprewriteMatcher with "wsrp_rewrite"
          *
@@ -223,7 +227,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 throws SAXException {
             State2 ret = null;
             done :
-            if ("object".equals(lnam)) {
+            if (OBJECT_ELT.equals(lnam)) {
 
                 final String codebaseAttribute = atts.getValue("", "codebase");
                 final String classidAttribute = atts.getValue("", "classid");
@@ -231,7 +235,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 final String usemapAttribute = atts.getValue("", "usemap");
                 final String archiveAttribute = atts.getValue("", "archive");// space-separated
 
-                if (classidAttribute == null && codebaseAttribute == null && dataAttribute == null && usemapAttribute == null) break done;
+                if (classidAttribute == null && codebaseAttribute == null && dataAttribute == null && usemapAttribute == null && archiveAttribute == null) break done;
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
@@ -325,6 +329,49 @@ abstract class AbstractRewrite extends ProcessorImpl {
             return ret;
         }
 
+        /**
+         * Handle xhtml:param
+         */
+        private State2 handleParam
+        (final String ns, final String lnam
+        		, final String qnam, final Attributes atts)
+        				throws SAXException {
+        	State2 ret = null;
+        	final boolean inObject = fObjectParent.size() >= 2 && fObjectParent.get(fObjectParent.size() - 2).booleanValue();
+        	done :
+    		if (inObject && "param".equals(lnam)) {
+    			
+    			final String nameAttribute = atts.getValue("", "name");
+    			final String valueAttribute = atts.getValue("", "value");
+    			
+    			if (nameAttribute == null || valueAttribute == null) break done;
+    			
+    			ret = this;
+    			final AttributesImpl newAtts = XMLUtils.getAttributesFromDefaultNamespace(atts);
+    			
+    			if ("archive".equals(nameAttribute.trim()))
+    			{
+    				final StringTokenizer st = new StringTokenizer(valueAttribute, ",");
+    				final StringBuilder sb = new StringBuilder(valueAttribute.length() * 2);
+    				boolean first = true;
+    				while (st.hasMoreTokens()) {
+    					final String currentArchive = st.nextToken().trim();
+    					final String newArchive = response.rewriteResourceURL(currentArchive, ExternalContext.Response.REWRITE_MODE_ABSOLUTE_PATH_OR_RELATIVE);
+    					if (!first) {
+    						sb.append(' ');
+    					}
+    					sb.append(newArchive);
+    					first = false;
+    				}
+    				final int idx = newAtts.getIndex("", "value");
+    				newAtts.setValue(idx, sb.toString());
+    			}
+    			
+    			xmlReceiver.startElement(ns, lnam, qnam, newAtts);
+    		}
+        	return ret;
+        }
+        
         /**
          * Handler for {http://www.w3.org/1999/xhtml}a.  Assumes namespace test has already
          * happened.  Implements :
@@ -577,6 +624,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         @Override
         protected void endElementStart(final String ns, final String lnam, final String qnam)
                 throws SAXException {
+        	fObjectParent.remove(fObjectParent.size() - 1);
             flushCharacters();
             super.endElementStart(ns, lnam, qnam);
         }
@@ -622,7 +670,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * </ul>
          */
         protected State startElementStart(final String ns, final String lnam, final String qnam, Attributes atts) throws SAXException {
-
+        	fObjectParent.add(Boolean.valueOf(OBJECT_ELT.equals(lnam) && XMLConstants.XHTML_NAMESPACE_URI.equals(ns)));
+        	
             final int noRewriteIndex = atts.getIndex(XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT);
             final String noRewriteValue = atts.getValue(noRewriteIndex);
             State ret = null;
@@ -696,6 +745,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     ret = handleApplet(ns, lnam, qnam, atts);
                     if (ret != null) break done;
 
+                    ret = handleParam(ns, lnam, qnam, atts);
+                    if (ret != null) break done;
+                    
                     // Not valid in HTML, but useful for e.g. Dojo contentPane
                     ret = handleEltWithResource("div", HREF_ATT, ns, lnam, qnam, atts);
                     if (ret != null) break done;

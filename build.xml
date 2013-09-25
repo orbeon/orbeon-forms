@@ -744,6 +744,7 @@
                         <fileset dir="${build.test-classes.dir}">
                             <include name="org/orbeon/oxf/**/*Test.class"/>
                             <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
+                            <exclude name="org/orbeon/oxf/fr/persistence/DDLTest*.class"    if="skip.database"/>
                         </fileset>
                     </batchtest>
 
@@ -913,10 +914,11 @@
 
     <target name="orbeon-dist" depends="orbeon-dist-checksum"/>
 
-    <target name="skip-selenium">
+    <target name="skip-selenium-database">
         <property name="skip.selenium" value="true"/>
+        <property name="skip.database" value="true"/>
     </target>
-    <target name="teamcity-release" depends="skip-selenium, clean, test, orbeon-dist"/>
+    <target name="teamcity-release" depends="skip-selenium-database, clean, test, orbeon-dist"/>
 
     <target name="teamcity-rsync" depends="teamcity-release">
 

@@ -33,15 +33,6 @@ object RelationalUtils {
         useAndClose(dataSource.getConnection)(block)
     }
 
-    implicit class ResultSetIterator(statement: PreparedStatement) extends Iterator[ResultSet] {
-        val resultSet: ResultSet = statement.executeQuery()
-        def hasNext = resultSet.next()
-        def next() = resultSet
-        // Override default toString, which calls hasNext(), and thus advances the result set, causing issue when
-        // using the debugger
-        override def toString = "[Iterator]"
-    }
-
     /**
      * For cases where we can't use `setString` on a prepared statement
      * - Apache Commons Lang had a `StringEscapeUtils.escapeSql` [1] but it has been deprecated in Commons Lang 3 [2]

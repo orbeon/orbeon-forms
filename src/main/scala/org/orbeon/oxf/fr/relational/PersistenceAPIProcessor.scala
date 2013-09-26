@@ -21,6 +21,7 @@ import org.orbeon.oxf.fr.relational.RelationalUtils._
 import org.orbeon.scaxon.XML._
 import java.sql.Timestamp
 import org.orbeon.scaxon.XML
+import scala.collection.mutable.ListBuffer
 
 /**
  * Implementation of the persistence API for relational databases.
@@ -84,14 +85,16 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                             statement
                         }
 
-                        (for (resultSet ← getDocumentsStatement) yield
-                            DocumentMetadata(
-                                dataId       = resultSet.getInt      ("data_id"),
-                                documentId   = resultSet.getString   ("document_id"),
-                                created      = resultSet.getTimestamp("created"),
-                                lastModified = resultSet.getTimestamp("last_modified")
+                        val documentsResultSet = getDocumentsStatement.executeQuery()
+                        val documents = ListBuffer[DocumentMetadata]()
+                        while (documentsResultSet.next())
+                            documents += DocumentMetadata(
+                                dataId       = documentsResultSet.getInt      ("data_id"),
+                                documentId   = documentsResultSet.getString   ("document_id"),
+                                created      = documentsResultSet.getTimestamp("created"),
+                                lastModified = documentsResultSet.getTimestamp("last_modified")
                             )
-                        ).toSeq
+                        documents
                     }
 
                     /**
@@ -122,12 +125,15 @@ class PersistenceAPIProcessor extends ProcessorImpl {
                             getValues.setString(documentsMetadata.length + index + 1, control)
 
                         // Build tuples from result-set
-                        val values = (getValues map (resultSet ⇒ Value(
-                            resultSet.getInt   ("data_id"),
-                            resultSet.getString("control"),
-                            resultSet.getInt   ("pos"),
-                            resultSet.getString("val")
-                        ))).toSeq
+                        val resultSet = getValues.executeQuery()
+                        var values = ListBuffer[Value]()
+                        while (resultSet.next())
+                            values += Value(
+                                resultSet.getInt   ("data_id"),
+                                resultSet.getString("control"),
+                                resultSet.getInt   ("pos"),
+                                resultSet.getString("val")
+                            )
                         values groupBy (_.dataId) mapValues (_.groupBy(_.control))
                     }
 

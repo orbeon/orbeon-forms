@@ -17,7 +17,6 @@ import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.pipeline.api.PipelineContext
 import org.orbeon.oxf.xml.{NamespaceMapping, XMLConstants, TransformerUtils}
 import javax.xml.transform.stream.StreamSource
-import org.orbeon.oxf.fr.relational.RelationalUtils.ResultSetIterator
 import org.orbeon.oxf.util._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner
@@ -58,7 +57,7 @@ class ReindexProcessor extends ProcessorImpl {
             connection.prepareStatement("delete from orbeon_i_current").execute()
             connection.prepareStatement("delete from orbeon_i_control_text").execute()
 
-            // Get current data
+            // Get all the row from orbeon_form_data that are "latest" and not deleted
             val currentData = connection.prepareStatement(
                 """select   id, created, last_modified, username, app, form, document_id, xml
                   |  from   orbeon_form_data
@@ -70,16 +69,17 @@ class ReindexProcessor extends ProcessorImpl {
                   |         )
                   |   and   deleted = 'N'
                   |order by app, form
-                  |""".stripMargin)
+                  |""".stripMargin).executeQuery()
 
             // Info on indexed controls for a given app/form
             case class FormIndexedControls(app: String, form: String, indexedControls: Seq[IndexedControl])
 
             // Go through each data document
-            // - using a foldLeft, so we can pass indexed controls along in the iteration, and thus avoid recomputing them
-            currentData.foldLeft[Option[FormIndexedControls]](None)((prevIndexedControls, resultSet) ⇒ {
-                val app  = resultSet.getString("app")
-                val form = resultSet.getString("form")
+            // - we keep track of the indexed controls along in the iteration, and thus avoid recomputing them
+            var prevIndexedControls: Option[FormIndexedControls] = None
+            while (currentData.next()) {
+                val app  = currentData.getString("app")
+                val form = currentData.getString("form")
 
                 // Get indexed controls for current app/form
                 val indexedControls: Seq[IndexedControl] = prevIndexedControls match {
@@ -103,11 +103,11 @@ class ReindexProcessor extends ProcessorImpl {
                       |           (data_id, document_id, created, last_modified, username, app, form)
                       |    values (?, ?, ?, ?, ?, ?, ?)
                     """.stripMargin)
-                insert.setInt      (1, resultSet.getInt      ("id"))
-                insert.setString   (2, resultSet.getString   ("document_id"))
-                insert.setTimestamp(3, resultSet.getTimestamp("created"))
-                insert.setTimestamp(4, resultSet.getTimestamp("last_modified"))
-                insert.setString   (5, resultSet.getString   ("username"))
+                insert.setInt      (1, currentData.getInt      ("id"))
+                insert.setString   (2, currentData.getString   ("document_id"))
+                insert.setTimestamp(3, currentData.getTimestamp("created"))
+                insert.setTimestamp(4, currentData.getTimestamp("last_modified"))
+                insert.setString   (5, currentData.getString   ("username"))
                 insert.setString   (6, app)
                 insert.setString   (7, form)
                 insert.execute()
@@ -116,7 +116,7 @@ class ReindexProcessor extends ProcessorImpl {
                 // - using lazy, as we might not need the data, if there are no controls to index
                 // - return root element, as XPath this is the node XPath expressions are relative to
                 lazy val dataRootElement: NodeInfo = {
-                    val dataClob = resultSet.getClob("xml")
+                    val dataClob = currentData.getClob("xml")
                     val source = new StreamSource(dataClob.getCharacterStream)
                     val document = TransformerUtils.readTinyTree(XPathCache.getGlobalConfiguration, source, false)
                     document \\ * head
@@ -138,8 +138,8 @@ class ReindexProcessor extends ProcessorImpl {
                               |           (data_id, username, app, form, control, pos, val)
                               |    values (?, ?, ?, ?, ?, ?, ?)
                             """.stripMargin)
-                        insert.setInt      (1, resultSet.getInt("id"))
-                        insert.setString   (2, resultSet.getString("username"))
+                        insert.setInt      (1, currentData.getInt("id"))
+                        insert.setString   (2, currentData.getString("username"))
                         insert.setString   (3, app)
                         insert.setString   (4, form)
                         insert.setString   (5, control.name)
@@ -150,8 +150,8 @@ class ReindexProcessor extends ProcessorImpl {
                 }
 
                 // Pass current indexed controls to the next iteration
-                Some(FormIndexedControls(app, form, indexedControls))
-            })
+                prevIndexedControls = Some(FormIndexedControls(app, form, indexedControls))
+            }
         }
     }
 

@@ -82,6 +82,6 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     @Test def createAndUpgradeTest(): Unit = {
         val updateDDL = withNewDatabase(sqlToDDL(_, readSQL(s"$Base/mysql-4_3.sql") ++ readSQL(s"$Base/mysql-4_3-to-4_4.sql")))
         val createDDL = withNewDatabase(sqlToDDL(_, readSQL(s"$Base/mysql-4_4.sql")))
-        updateDDL === createDDL
+        assert(updateDDL === createDDL)
     }
 }

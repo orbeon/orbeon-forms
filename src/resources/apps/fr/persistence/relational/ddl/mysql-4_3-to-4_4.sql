@@ -24,7 +24,18 @@ alter table orbeon_form_data_attach
     add    form_version                       int            after form,
     add    draft                              char(1)        after document_id;
 
-update      orbeon_form_data        set draft = 'N';
-update      orbeon_form_data_attach set draft = 'N';
-alter table orbeon_form_data        change draft draft char(1) not null;
-alter table orbeon_form_data_attach change draft draft char(1) not null;
+update      orbeon_form_definition        set form_version = 1;
+update      orbeon_form_definition_attach set form_version = 1;
+update      orbeon_form_data              set form_version = 1, draft = 'N';
+update      orbeon_form_data_attach       set form_version = 1, draft = 'N';
+
+alter table orbeon_form_definition
+    change form_version   form_version        int not null;
+alter table orbeon_form_definition_attach
+    change form_version   form_version        int not null;
+alter table orbeon_form_data
+    change form_version   form_version        int not null,
+    change draft          draft               char(1) not null;
+alter table orbeon_form_data_attach
+    change form_version   form_version        int not null,
+    change draft          draft               char(1) not null;

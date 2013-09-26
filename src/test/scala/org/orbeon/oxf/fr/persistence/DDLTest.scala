@@ -13,65 +13,75 @@
  */
 package org.orbeon.oxf.fr.persistence
 
-import java.sql.DriverManager
-import org.junit.{After, Before, Test}
+import java.io.{StringWriter, InputStreamReader}
+import java.sql.{Statement, DriverManager}
+import org.junit.Test
+import org.orbeon.oxf.resources.URLFactory
+import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.ScalaUtils._
 import org.scalatest.junit.AssertionsForJUnit
-import org.orbeon.oxf.resources.URLFactory
-import java.io.{StringWriter, InputStreamReader, OutputStreamWriter}
-import org.orbeon.oxf.test.ResourceManagerTestBase
+import scala.collection.mutable.ListBuffer
 
 class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     val Base = "oxf:/apps/fr/persistence/relational/ddl"
 
     // Execute statements
-    def asRoot(updates: Seq[String]): Unit = asUser("root", None, updates)
-    def asOrbeon(updates: Seq[String]): Unit = asUser("orbeon_test", Some("orbeon_test"), updates)
-    def asUser(user: String, database: Option[String], updates: Seq[String]): Unit = {
+    def asRoot  [T](block: Statement ⇒ T): T = asUser("root", None, block)
+    def asOrbeon[T](block: Statement ⇒ T): T = asUser("orbeon_test", Some("orbeon_test"), block)
+    def asUser[T](user: String, database: Option[String], block: Statement ⇒ T): T = {
         val databaseString = database getOrElse ""
-        useAndClose(DriverManager.getConnection(s"jdbc:mysql://localhost/$databaseString?user=$user")) { connection ⇒
-            val statement = connection.createStatement()
-            updates foreach statement.executeUpdate
+        val url = s"jdbc:mysql://localhost/$databaseString?user=$user"
+        useAndClose(DriverManager.getConnection(url)) { connection ⇒
+            block(connection.createStatement())
         }
     }
 
     // Reads a sequence semicolon-separated of statements from a text file
-    def readStatements(url: String): Seq[String] = {
+    def readSQL(url: String): Seq[String] = {
         val inputStream = URLFactory.createURL(url).openStream()
         val reader = new InputStreamReader(inputStream)
         val writer = new StringWriter
         copyReader(reader, writer)
-        val statements = writer.toString.split(";")
-        statements map (_.trim) filter (_.nonEmpty)
+        val sql = writer.toString.split(";")
+        sql map (_.trim) filter (_.nonEmpty)
     }
 
-    def withNewDatabase(block: ⇒ Unit) {
+    def withNewDatabase[T](block: Statement ⇒ T): T = {
         try {
-            asRoot(Seq(
+            val createUserAndDatabase = Seq(
                 "create user orbeon_test",
                 "create database orbeon_test",
                 "grant all privileges on orbeon_test.* to orbeon_test@localhost"
-            ))
-            block
+            )
+            asRoot(createUserAndDatabase foreach _.executeUpdate)
+            asOrbeon(block)
         } finally {
-            asRoot(Seq(
+            val dropUserAndDatabase = Seq(
                 "drop user orbeon_test",
                 "drop database orbeon_test"
-            ))
+            )
+            asRoot(dropUserAndDatabase foreach _.executeUpdate)
         }
+    }
+
+    // Runs the SQL, and returns the DDL for the tables as defined in the database
+    def sqlToDDL(statement: Statement, sql: Seq[String]): Map[String, String] = {
+        sql foreach statement.executeUpdate
+        val tableNames = ListBuffer[String]()
+        val tablesResultSet = statement.executeQuery("show tables")
+        while (tablesResultSet.next()) tableNames += tablesResultSet.getString(1)
+        tableNames.map { tableName ⇒
+            val tableResultSet = statement.executeQuery(s"show create table $tableName")
+            tableResultSet.next()
+            val tableDDL = tableResultSet.getString(2)
+            (tableName, tableDDL)
+        }.toMap
     }
 
     @Test def createAndUpgradeTest(): Unit = {
-        withNewDatabase {
-            asOrbeon(readStatements(s"$Base/mysql-4_3.sql"))
-            asOrbeon(readStatements(s"$Base/mysql-4_3-to-4_4.sql"))
-        }
-    }
-
-    @Test def createLatest(): Unit = {
-        withNewDatabase {
-            asOrbeon(readStatements(s"$Base/mysql-4_4.sql"))
-        }
+        val updateDDL = withNewDatabase(sqlToDDL(_, readSQL(s"$Base/mysql-4_3.sql") ++ readSQL(s"$Base/mysql-4_3-to-4_4.sql")))
+        val createDDL = withNewDatabase(sqlToDDL(_, readSQL(s"$Base/mysql-4_4.sql")))
+        updateDDL === createDDL
     }
 }

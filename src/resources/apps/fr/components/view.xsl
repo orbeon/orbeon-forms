@@ -343,18 +343,8 @@
                         </xf:trigger>
                     </xf:group>
                     <!-- React to activation of both triggers -->
-                    <xf:action ev:event="DOMActivate">
-                        <!-- Send submission -->
-                        <xsl:choose>
-                            <xsl:when test="$mode = 'summary'">
-                                <!-- Submission for summary mode -->
-                                <xf:send submission="fr-edit-switch-script-summary-submission"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <!-- Submission for other modes -->
-                                <xf:send submission="fr-edit-switch-script-submission"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                    <xf:action ev:event="DOMActivate" type="xpath" xmlns:process="java:org.orbeon.oxf.fr.SimpleProcess">
+                        process:runProcess('oxf.fr.detail.process', 'toggle-noscript')
                     </xf:action>
                 </xf:group>
             </xh:div>

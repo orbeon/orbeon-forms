@@ -95,8 +95,8 @@ trait FormRunnerLang {
     def findRequestedLang(appForm: Option[AppForm], requestedLang: String): Option[String] = {
         val request = NetUtils.getExternalContext.getRequest
 
-        def fromRequest = Option(request.getParameterMap.get("fr-language")) flatMap (_.lift(0)) map (_.toString)
-        def fromSession = stringFromSession(request, "fr-language")
+        def fromRequest = Option(request.getParameterMap.get(LanguageParam)) flatMap (_.lift(0)) map (_.toString)
+        def fromSession = stringFromSession(request, LanguageParam)
 
         nonEmptyOrNone(requestedLang) orElse
             fromRequest orElse
@@ -114,7 +114,7 @@ trait FormRunnerLang {
 
     private def stringFromSession(request: Request, name: String) =
         Option(request.getSession(false)) flatMap
-            (s ⇒ Option(s.getAttributesMap.get("fr-language"))) map {
+            (s ⇒ Option(s.getAttributesMap.get(LanguageParam))) map {
                 case item: Item ⇒ item.getStringValue
                 case other ⇒ other.toString
             }

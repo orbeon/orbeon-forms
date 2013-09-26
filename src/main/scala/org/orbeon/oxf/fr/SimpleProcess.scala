@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr
 
-import FormRunner._
+import FormRunner.{splitQueryDecodeParams ⇒ _, recombineQuery ⇒ _, _}
 import ProcessParser._
 import collection.mutable.ListBuffer
 import org.apache.commons.lang3.StringUtils
@@ -163,6 +163,7 @@ trait FormRunnerActions {
         "review"           → tryNavigateToReview,
         "edit"             → tryNavigateToEdit,
         "summary"          → tryNavigateToSummary,
+        "toggle-noscript"  → tryToggleNoscript,
         "visit-all"        → tryVisitAll,
         "unvisit-all"      → tryUnvisitAll,
         "expand-all"       → tryExpandSections,
@@ -220,9 +221,8 @@ trait FormRunnerActions {
             refresh(PersistenceModel)
 
             // Mark data clean
-            val persistenceInstanceRoot = topLevelInstance(PersistenceModel, "fr-persistence-instance").get.rootElement
-            val saveStatus = if (isDraft) Seq() else persistenceInstanceRoot \ "data-status"
-            val autoSaveStatus = persistenceInstanceRoot \ "autosave" \ "status"
+            val saveStatus = if (isDraft) Seq() else persistenceInstance.rootElement \ "data-status"
+            val autoSaveStatus = persistenceInstance.rootElement \ "autosave" \ "status"
             (saveStatus ++ autoSaveStatus) foreach (setvalue(_, "clean"))
 
             // Manual dependency HACK: RR fr-form-model as we have changed mode
@@ -275,11 +275,12 @@ trait FormRunnerActions {
 
     // Defaults except for "uri"
     private val DefaultSendParameters = Map(
-        "method"   → "post",
-        "prune"    → "true",
-        "annotate" → "",
-        "replace"  → "none",
-        "content"  → "xml"
+        "method"     → "post",
+        "prune"      → "true",
+        "annotate"   → "",
+        "replace"    → "none",
+        "content"    → "xml",
+        "parameters" → "app form document valid"
     )
 
     private val SendParameterKeys = List("uri") ++ DefaultSendParameters.keys
@@ -303,10 +304,20 @@ trait FormRunnerActions {
             val propertiesAsPairs =
                 SendParameterKeys map (key ⇒ key → findParamValue(key))
 
+            val paramsToAppend =
+                stringOptionToSet(findParamValue("parameters")).toList
+
+            def paramValuesToAppend = paramsToAppend collect {
+                case name @ "app"      ⇒ name → app
+                case name @ "form"     ⇒ name → form
+                case name @ "document" ⇒ name → document.get
+                case name @ "valid"    ⇒ name → dataValid.toString
+            }
+
             // Append query parameters to the URL
             val propertiesAsMap =
                 propertiesAsPairs map {
-                    case ("uri", Some(uri)) ⇒ "uri" → Some(appendQueryString(uri, s"app=$app&form=$form&document=${document.get}&valid=$dataValid"))
+                    case ("uri", Some(uri)) ⇒ "uri" → Some(recombineQuery(uri, paramValuesToAppend))
                     case other              ⇒ other
                 } toMap
 
@@ -319,8 +330,52 @@ trait FormRunnerActions {
             sendThrowOnError(s"fr-send-submission-$replace", propertiesAsMap)
         }
 
+    private val TestCommonParams = List[(String, () ⇒ Boolean)](
+        NoscriptParam   → (() ⇒ XFormsProperties.isNoscript(containingDocument)),
+        EmbeddableParam → (() ⇒ containingDocument.getRequestParameters.get(EmbeddableParam) map (_.head) exists (_ == "true"))
+    )
+
+    private val CommonParamNames = TestCommonParams map (_._1) toSet
+
+    // Automatically append fr-noscript and orbeon-embeddable when needed, unless they are already specified
+    // NOTE: We don't need to pass fr-language to most submissions, as the current language is kept in the session.
+    // Heuristic: We append only if the URL doesn't have a protocol. This might not always be a right guess.
+    private def appendCommonFormRunnerParameters(pathQuery: String) =
+        if (! NetUtils.urlHasProtocol(pathQuery)) {
+
+            val (path, params) = splitQueryDecodeParams(pathQuery)
+
+            val newParams =
+                for {
+                    (name, currentValue) ← TestCommonParams
+                    valueFromPath        = params collectFirst { case (`name`, v) ⇒ v == "true" }
+                    effectiveValue       = valueFromPath getOrElse currentValue.apply
+                    if effectiveValue
+                } yield
+                    name → "true"
+
+            recombineQuery(path, newParams ::: (params filterNot (p ⇒ CommonParamNames(p._1))))
+        } else
+            pathQuery
+
     private def tryNavigateTo(path: String): Try[Any] =
-        Try(load(path, progress = false))
+        Try(load(appendCommonFormRunnerParameters(path), progress = false))
+
+    private def tryChangeMode(path: String): Try[Any] =
+        Try {
+            // Set data-safe-override as we know we are not losing data upon navigation
+            setvalue(persistenceInstance.rootElement \ "data-safe-override", "true")
+
+            Map[Option[String], String](
+                Some("uri")        → appendCommonFormRunnerParameters(path),
+                Some("method")     → "post",
+                Some("prune")      → "false",
+                Some("replace")    → "all",
+                Some("content")    → "xml",
+                Some("parameters") → ""
+            )
+        } flatMap
+            trySend
 
     // Navigate to a URL specified in parameters or indirectly in properties
     // If no URL is specified, the action fails
@@ -340,23 +395,30 @@ trait FormRunnerActions {
                 formRunnerProperty(property)
             }
 
-            // Try to automatically append fr-noscript
-            // Heuristic: We append it only if the URL doesn't have a protocol. This might not always be a right guess.
-            def appendNoscriptIfNeeded(s: String) =
-                if (XFormsProperties.isNoscript(containingDocument) && ! NetUtils.urlHasProtocol(s))
-                    appendQueryString(s, "fr-noscript=true")
-                else
-                    s
-
-            fromParams orElse fromProperties flatMap nonEmptyOrNone map appendNoscriptIfNeeded get
+            fromParams orElse fromProperties flatMap nonEmptyOrNone get
         } flatMap
             tryNavigateTo
 
     def tryNavigateToReview(params: ActionParams): Try[Any] =
-        Try(sendThrowOnError("fr-workflow-review-submission"))
+        Try {
+            val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
+            s"/fr/$app/$form/view/$document"
+        } flatMap
+            tryChangeMode
 
     def tryNavigateToEdit(params: ActionParams): Try[Any] =
-        Try(sendThrowOnError("fr-workflow-edit-submission"))
+        Try {
+            val FormRunnerParams(app, form, Some(document), _) = FormRunnerParams()
+            s"/fr/$app/$form/edit/$document"
+        } flatMap
+            tryChangeMode
+
+    def tryToggleNoscript(params: ActionParams): Try[Any] =
+        Try {
+            val FormRunnerParams(app, form, Some(document), mode) = FormRunnerParams()
+            s"/fr/$app/$form/$mode/$document?$NoscriptParam=${(! XFormsProperties.isNoscript(containingDocument)).toString}"
+        } flatMap
+            tryChangeMode
 
     def tryNavigateToSummary(params: ActionParams): Try[Any]  =
         Try {
@@ -384,7 +446,7 @@ trait FormRunnerActions {
     def pdfURLInstanceRootElement = topLevelInstance(PersistenceModel, "fr-pdf-url-instance").get.rootElement
 
     def tryCreatePDFIfNeeded(params: ActionParams): Try[Any] =
-        Try{
+        Try {
             // Only create if not available yet
             if (StringUtils.isBlank(pdfURLInstanceRootElement.stringValue))
                 sendThrowOnError("fr-pdf-service-submission")

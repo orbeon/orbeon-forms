@@ -258,7 +258,7 @@
              fr-form-model, as that model needs the language set. -->
         <xi:include href="oxf:/apps/fr/i18n/resources-model.xml" xxi:omit-xml-base="true"/>
         <!-- This model handles navigation functionality -->
-        <xi:include href="oxf:/apps/fr/includes/navigation-model.xml" xxi:omit-xml-base="true"/>
+        <xi:include href="oxf:/apps/fr/includes/pdf-model.xml" xxi:omit-xml-base="true"/>
 
         <!-- This model supports Form Runner rendered through the xforms-renderer -->
         <xf:model id="fr-xforms-renderer-model">

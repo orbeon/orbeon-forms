@@ -67,6 +67,11 @@ trait XXFormsIndependentFunctions extends OrbeonFunctionLibrary {
         )
     
         Fun("get-remote-user", classOf[XXFormsGetRemoteUser], 0, 0, STRING, ALLOWS_ZERO_OR_ONE)
+
+        Fun("append-query-params", classOf[XXFormsAppendQueryParams], op = 0, min = 2, STRING, EXACTLY_ONE,
+            Arg(STRING, EXACTLY_ONE),
+            Arg(STRING, ALLOWS_ZERO_OR_MORE)
+        )
     
         Fun("is-user-in-role", classOf[XXFormsIsUserInRole], 0, 1, BOOLEAN, EXACTLY_ONE,
             Arg(STRING, EXACTLY_ONE)

@@ -1,0 +1,38 @@
+<!--
+  Copyright (C) 2010 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xf:model id="fr-pdf-model"
+          xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
+    <xf:var name="parameters" value="xxf:instance('fr-parameters-instance')"/>
+
+    <!-- Don't use xxf:target="_blank" because this requires popups to be enabled e.g. in Firefox -->
+    <!-- NOTE: This is the detail page's PDF button (not the summary page's) -->
+    <xf:submission id="fr-pdf-submission"
+        relevant="false"
+        validate="false"
+        method="post"
+        replace="all"
+        ref="xxf:instance('fr-form-instance')"
+        resource="/fr/{$parameters/app}/{$parameters/form}/pdf/{$parameters/document}{xxf:append-query-params('', for $l in event('fr-language')[normalize-space()] return ('fr-remember-language=false', concat('fr-language=', $l)))}"
+        xxf:show-progress="false"/>
+
+    <!-- Open PDF for the current form data (dispatch from XPL) -->
+    <xf:action event="fr-open-pdf">
+        <xf:send submission="fr-pdf-submission">
+            <xf:property name="fr-language" value="event('fr-language')"/>
+        </xf:send>
+    </xf:action>
+
+</xf:model>

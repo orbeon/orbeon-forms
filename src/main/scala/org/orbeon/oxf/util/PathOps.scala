@@ -32,13 +32,21 @@ trait PathOps {
             (url.substring(0, index), Some(url.substring(index + 1)))
     }
 
+    def splitQueryDecodeParams(url: String): (String, List[(String, String)]) = {
+        val index = url.indexOf('?')
+        if (index == -1)
+            (url, Nil)
+        else
+            (url.substring(0, index), decodeSimpleQuery(url.substring(index + 1)))
+    }
+
     // Recombine a path/query and parameters into a resulting URL
     def recombineQuery(pathQuery: String, params: Seq[(String, String)]) =
         pathQuery + (if (params.isEmpty) "" else (if (pathQuery.contains("?")) "&" else "?") + encodeSimpleQuery(params))
 
-    // Decode a query string into a sequence of pairs
+    // Decode a query string into a list of pairs
     // We assume that there are no spaces in the input query
-    def decodeSimpleQuery(query: String): Seq[(String, String)] =
+    def decodeSimpleQuery(query: String): List[(String, String)] =
         for {
             nameValue      ← query.split('&').toList
             if nameValue.nonEmpty
@@ -53,9 +61,9 @@ trait PathOps {
 
     // Get the first query parameter value for the given name
     def getFirstQueryParameter(url: String, name: String) = {
-        val query = splitQuery(url)._2 map decodeSimpleQuery getOrElse Seq()
+        val (_, params) = splitQueryDecodeParams(url)
 
-        query find (_._1 == name) map { case (k, v) ⇒ v }
+        params collectFirst { case (`name`, v) ⇒ v }
     }
 
     // Encode a sequence of pairs to a query string

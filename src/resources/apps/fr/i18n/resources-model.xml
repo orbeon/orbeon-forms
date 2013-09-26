@@ -74,8 +74,8 @@
                         if ($app != '*') then $lang else $fr-lang,
                         instance('fr-fr-resources')/resource/@xml:lang/string())"/>
 
-        <!-- Save current form language into the session -->
-        <xf:action type="xpath">
+        <!-- Save current form language into the session unless fr-remember-language=false -->
+        <xf:action type="xpath" if="not(xxf:get-request-parameter('fr-remember-language') = 'false')">
             xxf:set-session-attribute('fr-language', string(if ($app != '*') then $lang else $fr-lang))
         </xf:action>
 

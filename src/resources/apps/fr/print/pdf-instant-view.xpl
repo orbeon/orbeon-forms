@@ -51,7 +51,9 @@
                 <xxf:sequence/>
                 <!-- Event is authorized explicitly in view/edit modes -->
                 <xxf:action>
-                    <xxf:event name="fr-open-pdf" source-control-id="fr-navigation-model"/>
+                    <xxf:event name="fr-open-pdf" source-control-id="fr-pdf-model">
+                        <xxf:property name="fr-language"><xsl:value-of select="p:get-request-parameter('fr-language')"/></xxf:property>
+                    </xxf:event>
                 </xxf:action>
             </xxf:event-request>
         </p:input>

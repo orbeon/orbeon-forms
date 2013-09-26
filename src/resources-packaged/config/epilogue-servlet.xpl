@@ -71,7 +71,7 @@
                                  href="aggregate('config', #request#xpointer(for $app in tokenize(/request/request-path, '/')[2] return
                                             for $is-embeddable in
                                                 p:property('oxf.epilogue.embeddable')
-                                                    or /request/parameters/parameter[name = ('orbeon-embeddable', 'orbeon-portlet')]/value = 'true' return
+                                                    or /request/parameters/parameter[name = 'orbeon-embeddable']/value = 'true' return
                                             for $is-renderer in
                                                 p:get-request-attribute('oxf.xforms.renderer.deployment', 'text/plain') = ('separate', 'integrated') return
                                             for $app-style in concat('oxf:/apps/', $app, if ($is-embeddable) then '/theme-embeddable.xsl' else '/theme.xsl') return

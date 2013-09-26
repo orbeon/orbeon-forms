@@ -481,6 +481,12 @@
                      value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
     </xf:action>
 
+    <!-- Reset data-safe-override after completion -->
+    <xf:setvalue
+        event="xforms-submit-done xforms-submit-error"
+        observer="fr-send-submission-all fr-send-submission-none"
+        ref="$persistence-instance/data-safe-override"/>
+
     <!-- Call email service -->
     <xf:submission id="fr-email-service-submission"
         resource="/fr/service/{$app}/{$form}/email/{$document}?fr-language={xxf:instance('fr-language-instance')}{if (property('xxf:noscript')) then '&amp;fr-noscript=true' else ''}"

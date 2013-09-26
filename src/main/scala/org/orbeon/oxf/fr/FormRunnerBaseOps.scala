@@ -32,6 +32,10 @@ trait FormRunnerBaseOps {
     val XBL = XBL_NAMESPACE_URI
     val FR = "http://orbeon.org/oxf/xml/form-runner"
 
+    val NoscriptParam     = "fr-noscript"
+    val LanguageParam     = "fr-language"
+    val EmbeddableParam   = "orbeon-embeddable"
+
     val ParametersModel   = "fr-parameters-model"
     val PersistenceModel  = "fr-persistence-model"
     val ResourcesModel    = "fr-resources-model"

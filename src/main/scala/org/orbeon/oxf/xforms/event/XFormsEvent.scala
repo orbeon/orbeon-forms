@@ -36,8 +36,8 @@ import org.orbeon.scaxon.XML._
  * - the reason we use lazyProperties is that we had trouble passing a PropertyGetter with a reference to this to the
  *   constructor!
  * - all property values are Java values or Seq of Java values
- * - for Java/Scala consumers, use property[T
- * - for XPath consumers, use propertyAsIterator
+ * - for Java/Scala consumers, use property[T]
+ * - for XPath consumers, use getAttribute
  * - PropertyGetter is used instead of a plain Map because:
  *   - it allows for values to be computed dynamically, so we don't compute all property values unnecessarily
  *   - it is a PartialFunction so PropertyGetter can be easily composed with orElse

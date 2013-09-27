@@ -13,11 +13,10 @@
  */
 package org.orbeon.oxf.xforms.event.events
 
-import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xforms.control.{XFormsValueControl, XFormsControl}
 import org.orbeon.oxf.xforms.event.XFormsEventTarget
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.event.XFormsEvent._
-import org.orbeon.oxf.xforms.BindNode
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{InfoLevel, WarningLevel, ValidationLevel, ErrorLevel}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind
 
@@ -105,7 +104,16 @@ class XXFormsUnvisitedEvent(target: XFormsEventTarget, properties: PropertyGette
 
 class XFormsValueChangeEvent(target: XFormsEventTarget, properties: PropertyGetter)
     extends XFormsUIEvent(XFORMS_VALUE_CHANGED, target.asInstanceOf[XFormsControl], properties) {
-    def this(target: XFormsEventTarget) = this(target, EmptyGetter)
+    def this(target: XFormsEventTarget) = this(target, XFormsValueChangeEvent.properties(target))
+}
+
+private object XFormsValueChangeEvent {
+
+    val XXFValue = xxformsName("value")
+
+    def properties(target: XFormsEventTarget): PropertyGetter = {
+        case XXFValue ⇒ Option(target) collect { case v: XFormsValueControl ⇒ v.getValue }
+    }
 }
 
 class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: PropertyGetter)
@@ -114,12 +122,12 @@ class XXFormsConstraintsChangedEvent(target: XFormsEventTarget, properties: Prop
         this(target, XXFormsConstraintsChangedEvent.properties(level, previous, current))
 }
 
-object XXFormsConstraintsChangedEvent {
+private object XXFormsConstraintsChangedEvent {
 
-    private def constraintsForLevel(current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) =
+    def constraintsForLevel(current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) =
         current filter (_.level == level) map (_.id)
 
-    private def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) = {
+    def diffConstraints(previous: List[StaticBind#ConstraintXPathMIP], current: List[StaticBind#ConstraintXPathMIP], level: ValidationLevel) = {
         val previousIds = previous.map(_.id).toSet
         constraintsForLevel(current, level) filterNot previousIds
     }

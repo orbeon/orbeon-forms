@@ -29,6 +29,8 @@ import org.orbeon.scaxon.XML._
 import collection.JavaConverters._
 import scala.collection.mutable
 import XPath._
+import scala.util.control.NonFatal
+import org.orbeon.oxf.common.OXFException
 
 class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[PooledXPathExpression], variables: ju.Map[String, XPathVariable]) {
 
@@ -165,6 +167,7 @@ class PooledXPathExpression(expression: XPathExpression, pool: ObjectPool[Pooled
      */
     def evaluateSingleToJavaReturnToPoolOrNull: AnyRef =
         try singleItemToJavaOrNull(evaluate().next())
+        catch { case NonFatal(e) ⇒ throw new OXFException(e) } // so Java callers can catch a RuntimeException
         finally returnToPool()
 
     private def evaluate(): SequenceIterator = {

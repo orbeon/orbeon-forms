@@ -175,19 +175,21 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 final Configuration configuration = XPathCache.getGlobalConfiguration();
                 hrefDocumentInfo = readCacheInputAsTinyTree(pipelineContext, configuration, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
             }
-            PooledXPathExpression expression = null;
-            final NamespaceMapping namespaces = branchNamespaces.get(branchIndex);
 
-            // NOTE: We used to catch an XPath exception here to add location data, but Java doesn't allow us to do this
-            // anymore without adding an annotation in the Scala code, which we don't want to do. Anyway, the location
-            // data was not that of the branch. Forgoing the extra location data right now.
-            expression = XPathCache.getXPathExpression(hrefDocumentInfo.getConfiguration(),
+            try {
+                final NamespaceMapping namespaces = branchNamespaces.get(branchIndex);
+                final PooledXPathExpression expression = XPathCache.getXPathExpression(hrefDocumentInfo.getConfiguration(),
                     hrefDocumentInfo, "boolean(" + condition + ")", namespaces, null,
                     org.orbeon.oxf.pipeline.api.FunctionLibrary.instance(), null, locationData);// TODO: location should be that of branch
 
-            if (((Boolean) expression.evaluateSingleToJavaReturnToPoolOrNull()).booleanValue()) {
-                selectedBranch = branchIndex;
-                break;
+                if (((Boolean) expression.evaluateSingleToJavaReturnToPoolOrNull()).booleanValue()) {
+                    selectedBranch = branchIndex;
+                    break;
+                }
+            } catch (Exception e) {
+                if (logger.isDebugEnabled())
+                    logger.debug("Choose: condition evaluation failed for condition: " + condition + " at " + branchProcessors.get(branchIndex));// TODO: location should be that of branch
+                throw new ValidationException("Choose: condition evaluation failed for condition: " + condition, e, locationData);// TODO: location should be that of branch
             }
         }
 

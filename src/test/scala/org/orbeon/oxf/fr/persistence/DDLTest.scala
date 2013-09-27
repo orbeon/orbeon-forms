@@ -28,7 +28,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
     // Execute statements
     def asRoot  [T](block: Statement ⇒ T): T = asUser("root", None, block)
-    def asOrbeon[T](block: Statement ⇒ T): T = asUser("orbeon_test", Some("orbeon_test"), block)
+    def asOrbeon[T](block: Statement ⇒ T): T = asUser("orbeon_ddl", Some("orbeon_ddl"), block)
     def asUser[T](user: String, database: Option[String], block: Statement ⇒ T): T = {
         val databaseString = database getOrElse ""
         val url = s"jdbc:mysql://localhost/$databaseString?user=$user"
@@ -50,16 +50,16 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit {
     def withNewDatabase[T](block: Statement ⇒ T): T = {
         try {
             val createUserAndDatabase = Seq(
-                "create user orbeon_test",
-                "create database orbeon_test",
-                "grant all privileges on orbeon_test.* to orbeon_test@localhost"
+                "create user orbeon_ddl",
+                "create database orbeon_ddl",
+                "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost"
             )
             asRoot(createUserAndDatabase foreach _.executeUpdate)
             asOrbeon(block)
         } finally {
             val dropUserAndDatabase = Seq(
-                "drop user orbeon_test",
-                "drop database orbeon_test"
+                "drop user orbeon_ddl",
+                "drop database orbeon_ddl"
             )
             asRoot(dropUserAndDatabase foreach _.executeUpdate)
         }

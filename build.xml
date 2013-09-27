@@ -24,12 +24,12 @@
     <property name="war.classes" value="${war.inf}/classes"/>
     <property name="war.lib" value="${war.inf}/lib"/>
     <property name="rsync.dir" value="${build.dir}/rsync"/>
-
     <property name="src.dir" location="src"/>
-
     <property name="saxon.jar" value="saxon-9-1-0-8_orbeon_20130503.jar"/>
-
     <property name="catalina.home" value=""/>
+    <property name="mysql.driver" value="com.mysql.jdbc.Driver"/>
+    <property name="mysql.url"    value="jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF8"/>
+    <property name="mysql.jar"    value="lib/mysql-connector-java-5.1.12-bin.jar"/>
 
     <!-- Scala tasks -->
     <!-- http://www.scala-lang.org/node/98 -->
@@ -701,10 +701,21 @@
                 <if>
                     <not><isset property="skip.selenium"/></not>
                     <then>
+                        <!-- Create user and database used by Tomcat -->
+                        <sql driver="${mysql.driver}" url="${mysql.url}" userid="root" password="">
+                            <classpath><pathelement location="${mysql.jar}"/></classpath>
+                            create user     orbeon_tomcat;
+                            create database orbeon_tomcat;
+                        </sql>
                         <!-- Uncompress Tomcat -->
                         <if>
                             <not><available file="build/apache-tomcat-${tomcat-version}"/></not>
                             <then><unzip src="lib/test/apache-tomcat-${tomcat-version}.zip" dest="build"/></then>
+                        </if>
+                        <!-- Put MySQL driver in Tomcat's lib -->
+                        <if>
+                            <not><available file="build/apache-tomcat-${tomcat-version}/lib/${mysql.jar}"/></not>
+                            <then><copy file="${mysql.jar}" todir="build/apache-tomcat-${tomcat-version}/lib"/></then>
                         </if>
                         <!-- Run -->
                         <java jar="build/apache-tomcat-${tomcat-version}/bin/bootstrap.jar" fork="true">
@@ -793,6 +804,12 @@
                             <jvmarg value="-Dcatalina.home=build/apache-tomcat-${tomcat-version}"/>
                             <arg line="stop"/>
                         </java>
+                        <!-- Drop MySQL user and database used by Tomcat -->
+                        <sql driver="${mysql.driver}" url="${mysql.url}" userid="root" password="">
+                            <classpath><pathelement location="${mysql.jar}"/></classpath>
+                            drop user     orbeon_tomcat;
+                            drop database orbeon_tomcat;
+                        </sql>
                     </then>
                 </if>
             </sequential>

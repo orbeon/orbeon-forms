@@ -110,7 +110,7 @@
                                                 else ()}">
                             <!-- Colgroup to make column sizing with CSS easier -->
                             <xh:colgroup>
-                                <xsl:if test="$is-repeat">
+                                <xsl:if test="$is-repeat and not($readonly)">
                                     <xh:col class="fr-repeat-column-trigger" xxf:control="true" ref="$repeat-context[not($view-mode)]"/>
                                 </xsl:if>
                                 <xsl:for-each select="$grid-rows[1]/*:td">

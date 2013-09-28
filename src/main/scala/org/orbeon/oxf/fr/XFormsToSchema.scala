@@ -13,26 +13,22 @@
  */
 package org.orbeon.oxf.fr
 
-import org.orbeon.oxf.pipeline.api.{ExternalContext, XMLReceiver, PipelineContext}
-import org.orbeon.oxf.util._
-import org.orbeon.oxf.xml._
-import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
-import org.orbeon.scaxon.XML._
-import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
-import xml._
-import xml.Attribute
 import org.dom4j.QName
 import org.orbeon.oxf.common.{Version, OXFException}
+import org.orbeon.oxf.pipeline.api.{ExternalContext, XMLReceiver, PipelineContext}
+import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
+import org.orbeon.oxf.xforms.control.XFormsComponentControl
+import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.processor.XFormsToSomething
 import org.orbeon.oxf.xforms.processor.XFormsToSomething.Stage2CacheableState
-import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
-import org.orbeon.oxf.xforms.control.XFormsComponentControl
-import xml.Text
-import xml.NamespaceBinding
-import org.orbeon.scaxon.XML
+import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
+import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
+import org.orbeon.oxf.xml._
+import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
+import org.orbeon.scaxon.XML.{Attribute ⇒ _, Text ⇒ _, _}
+import xml._
 
 /**
  *  Supported:
@@ -67,30 +63,30 @@ class XFormsToSchema extends XFormsToSomething {
         Version.instance.requirePEFeature("XForms schema generator service")
 
         // Read form and library
-        val ec = NetUtils.getExternalContext
-        val SchemaPath(appName, formName) = ec.getRequest.getRequestPath
+        val SchemaPath(appName, formName) = NetUtils.getExternalContext.getRequest.getRequestPath
+
         val formSource = FormRunner.readPublishedForm(appName, formName).get
-        val library = Libraries(FormRunner.readPublishedForm("orbeon", "library"), FormRunner.readPublishedForm(appName, "library"))
+        val libraries  = Libraries(FormRunner.readPublishedForm("orbeon", "library"), FormRunner.readPublishedForm(appName, "library"))
 
         // Compute root xs:element
-        val rootBind = formSource \ "*:html" \ "*:head" \ "*:model" \ "*:bind" head
-        val resolve = containingDocument.getControls.getCurrentControlTree.getRoot.resolve(_: String)
-        val rootXsElement: Elem = handleBind(library, resolve, rootBind)
+        val rootBind   = FormRunner.findTopLevelBind(formSource).get
+        val resolve    = containingDocument.getControls.getCurrentControlTree.getRoot.resolve(_: String)
+        val rootXsElem = handleBind(libraries, resolve, rootBind)
 
         // Import XForms schema if necessary
         val schema =
             <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 {
-                    val hasXFormsNamespace = rootXsElement.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
+                    val hasXFormsNamespace = rootXsElem.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
                     if (hasXFormsNamespace)
                         <xs:import namespace="http://www.w3.org/2002/xforms"
                                    schemaLocation="http://www.w3.org/MarkUp/Forms/2007/XForms-11-Schema.xsd"/>
                 }
-                { rootXsElement }
+                { rootXsElem }
             </xs:schema>
 
         // Send result to output
-        XML.elemToSAX(schema, xmlReceiver)
+        elemToSAX(schema, xmlReceiver)
     }
 
     // Recursive function generating an xs:element from an xf:bind
@@ -99,21 +95,22 @@ class XFormsToSchema extends XFormsToSomething {
         case class BindInfo(elemName: String, elemType: Option[QName], repeated: Boolean, min: Option[String], max: Option[String])
 
         // Returns control corresponding to a bind, with a given name (e.g. *:grid)
-        def control(bind: NodeInfo, controlName: String): Option[NodeInfo] = {
+        def findControlNodeForBind(bind: NodeInfo, controlName: String): Option[NodeInfo] = {
             val bindId: String = bind \@ "id"
-            bind.rootElement \\ controlName filter (_ \@ "bind" === bindId) headOption
+            bind.rootElement \\ controlName find (_.attValue("bind") == bindId)
         }
 
         // Extract information from bind
         object RootBind { def unapply(bind: NodeInfo): Boolean = bind parent "*:model" nonEmpty }
         object Bind { def unapply(bind: NodeInfo): Option[BindInfo] = {
-            val repeatGrid = control(bind, "*:grid") filter (_ \@ "repeat" === "true")
+            val repeatGridNode = findControlNodeForBind(bind, "*:grid") filter (_.attValue("repeat") == "true") toList
+
             Some(BindInfo(
                 elemName = bind \@ ("ref" || "nodeset"),
                 elemType = (bind \@ "type").headOption map (_.stringValue) map bind.resolveQName filterNot Set(XS_STRING_QNAME, XFORMS_STRING_QNAME),
-                repeated = repeatGrid nonEmpty,
-                min = repeatGrid.toSeq \@ "min",
-                max = repeatGrid.toSeq \@ "max"
+                repeated = repeatGridNode nonEmpty,
+                min      = repeatGridNode \@ "min",
+                max      = repeatGridNode \@ "max"
             ))
         }}
 
@@ -137,74 +134,102 @@ class XFormsToSchema extends XFormsToSomething {
                 // Optional min/max attributes
                 def attrDefault(value: Option[String], name: String, default: String) =
                     if (repeated) Some(attr(name, value getOrElse default)) else None
+
                 val minAttr = attrDefault(min, "minOccurs", "0")
                 val maxAttr = attrDefault(max, "maxOccurs", "unbounded")
 
                 // For controls with an itemset, generate a xs:simpleType
-                val xformsObject = resolve(elemName + "-control")
-                val itemset = xformsObject collectFirst { case select1: XFormsSelect1Control if select1.isRelevant ⇒ select1.getItemset }
-                val itemsetValues = itemset.toSeq flatMap (_.children) map (_.value) toSeq
-                val simpleType = if (itemsetValues.length == 0) Seq() else {
-                    <xs:simpleType>
-                        <xs:restriction base="xs:string">
-                            { itemsetValues map (value ⇒ <xs:enumeration value={value}/>) }
-                        </xs:restriction>
-                    </xs:simpleType>
-                }
+                val simpleTypeRestrictionElemOpt =
+                    for {
+                        itemset       ← resolve(elemName + "-control") collectFirst { case s: XFormsSelect1Control if s.isRelevant ⇒ s.getItemset }
+                        itemsetValues = itemset.children map (_.value)
+                        if itemsetValues.nonEmpty
+                    } yield
+                        <xs:simpleType>
+                            <xs:restriction base="xs:string">
+                                { itemsetValues map (value ⇒ <xs:enumeration value={value}/>) }
+                            </xs:restriction>
+                        </xs:simpleType>
 
                 // Build element with optional attributes and new namespace
-                val xsElem = <xs:element name={elemName}>{ simpleType }</xs:element>
+                val xsElem       = <xs:element name={elemName}>{ simpleTypeRestrictionElemOpt.toList }</xs:element>
                 val xsElemWithNS = typeNamespaceBinding map (_(xsElem.scope)) map (s ⇒ xsElem.copy(scope = s)) getOrElse xsElem
-                val attributes = typeAttr ++ minAttr ++ maxAttr
+                val attributes   = typeAttr ++ minAttr ++ maxAttr
+
                 attributes.foldLeft(xsElemWithNS)(_ % _)
             }
         }
 
-        def matchesComponent(uri: String) = ComponentNS.findFirstIn(uri).isDefined
-
-        // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from the library
-        // If there are no children, and this is a section template, return the nestedContainer for the XBL component
-        val (childBinds, newResolve) = bind \ * match {
+        // Get children of bind, or if there aren't any see if this is a component, in which case we get the binds from
+        // the library.
+        val (childrenBinds, newResolve) = bind \ * match {
             case Nil ⇒
-                val section = control(bind, "*:section")
-                val component = section.toSeq \ * find (e ⇒ matchesComponent(e.getURI))
-                val binds = {
-                    val library = component map (_.getURI) flatMap {
-                        case ComponentNS("orbeon") ⇒ libraries.orbeon
-                        case _ ⇒ libraries.app
-                    }
-                    val libraryRootBind = library.toSeq \ "*:html" \ "*:head" \ "*:model" \ "*:bind"
-                    val componentBind = libraryRootBind \ "*:bind" filter (_ \@ "name" === component.get.getLocalPart)
-                    componentBind \ "*:bind"
+                // No children for this bind, but there might be a section template associated with this bind
+
+                def matchesComponentURI(uri: String) =
+                    ComponentNS.findFirstIn(uri).isDefined
+
+                def findComponentNodeForSection(sectionNode: NodeInfo) =
+                    sectionNode child * find (e ⇒ matchesComponentURI(e.getURI))
+
+                // NOTE: This also returns None if we can't find the library. Is this the best thing to do?
+                def findComponentBindNodes(componentNode: NodeInfo) = {
+                    def libraryDocumentOpt =
+                        componentNode.getURI match {
+                            case ComponentNS("orbeon") ⇒ libraries.orbeon
+                            case _                     ⇒ libraries.app
+                        }
+
+                    def componentBindOpt(rootBind: NodeInfo) =
+                        rootBind \ "*:bind" find (_.attValue("name") == componentNode.getLocalPart)
+
+                    for {
+                        libraryDocument ← libraryDocumentOpt
+                        libraryRootBind ← FormRunner.findTopLevelBind(libraryDocument)
+                        componentBind   ← componentBindOpt(libraryRootBind)
+                    } yield
+                        componentBind \ "*:bind"
                 }
 
-                def newResolve(component: NodeInfo) = {
+                // We want a new resolver as what's inside the section template component is in inner scope
+                def resolverForSectionComponent(sectionStaticId: String) = {
 
-                    def asComponent(o: Option[AnyRef]) = o collect { case c: XFormsComponentControl ⇒ c }
+                    def asComponent(o: Option[XFormsObject]) =
+                        o collect { case c: XFormsComponentControl ⇒ c } get
 
                     // Find the concrete section component (fr:section)
-                    val sectionComponent = {
-                        val sectionName = xsElem.attributes("name").head.text
-                        asComponent(resolve(sectionName + "-control")).get
-                    }
+                    val frSectionComponent = asComponent(resolve(sectionStaticId))
 
                     // Find the concrete section template component (component:foo)
+                    // A bit tricky because there might not be an id on the component element:
+                    // <component:eid xmlns:component="http://orbeon.org/oxf/xml/form-builder/component/orbeon/library"/>
                     val sectionTemplateComponent = {
-                        val sectionTemplateElementOpt = sectionComponent.staticControl.descendants find (c ⇒ matchesComponent(c.element.getNamespaceURI))
-                        asComponent(sectionTemplateElementOpt flatMap (e ⇒ sectionComponent.resolve(e.staticId))).get
+                        val sectionTemplateElementOpt = frSectionComponent.staticControl.descendants find (c ⇒ matchesComponentURI(c.element.getNamespaceURI))
+                        asComponent(sectionTemplateElementOpt flatMap (e ⇒ frSectionComponent.resolve(e.staticId)))
                     }
 
                     // Return the inner resolver function
                     sectionTemplateComponent.innerRootControl.resolve(_: String)
                 }
 
-                (binds, component map newResolve getOrElse resolve)
-            case children ⇒ (children, resolve)
+                // Combine everything together
+                def findSectionTemplateBindsAndResolver =
+                    for {
+                        sectionNode     ← findControlNodeForBind(bind, "*:section")
+                        componentNode   ← findComponentNodeForSection(sectionNode)
+                        sectionStaticId = sectionNode.attValue("id")
+                    } yield
+                        (findComponentBindNodes(componentNode) getOrElse Nil, resolverForSectionComponent(sectionStaticId))
+
+                findSectionTemplateBindsAndResolver getOrElse (Nil, resolve)
+
+            case children ⇒
+                (children, resolve)
         }
 
         // Recurse on children if any
-        childBinds flatMap (handleBind(libraries, newResolve, _)) match {
-            case Nil ⇒ xsElem
+        childrenBinds flatMap (handleBind(libraries, newResolve, _)) match {
+            case Nil     ⇒ xsElem
             case xsElems ⇒ xsElem.copy(child = <xs:complexType><xs:sequence> { xsElems } </xs:sequence></xs:complexType>)
         }
     }

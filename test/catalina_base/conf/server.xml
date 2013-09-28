@@ -31,7 +31,7 @@
                         validationQuery="select 1 from dual"
                         testOnBorrow="true"
                         username="orbeon_tomcat"
-                        password="orbeon_tomcat"
+                        password=""
                         url="jdbc:mysql://localhost:3306/orbeon_tomcat?useUnicode=true&amp;characterEncoding=UTF8"/>
                 </Context>
             </Host>

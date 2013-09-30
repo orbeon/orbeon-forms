@@ -274,6 +274,11 @@ public class Dom4jUtils {
         return saxReader.read(inputStream, uri);
     }
 
+    public static Document readDom4j(InputStream inputStream) throws SAXException, DocumentException {
+        final SAXReader saxReader = createSAXReader(XMLUtils.ParserConfiguration.PLAIN);
+        return saxReader.read(inputStream);
+    }
+
     /**
      * Removes the elements and text inside the given element, but not the attributes or namespace
      * declarations on the element.
@@ -318,7 +323,7 @@ public class Dom4jUtils {
             throw new OXFException("Should never happen");
         return builder.toString();
     }
-    
+
     private static boolean isTextOrCDATA(Node node) {
         return (node instanceof Text) || (node instanceof CDATA);
     }
@@ -383,15 +388,15 @@ public class Dom4jUtils {
 
     public static DocumentSource getDocumentSource(final Document d) {
         /*
-         * Saxon's error handler is expensive for the service it provides so we just use our 
+         * Saxon's error handler is expensive for the service it provides so we just use our
          * singleton instead.
-         * 
-         * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the 
-         * handling of a single request to '/' in the examples app. i.e. The trace below was 
+         *
+         * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the
+         * handling of a single request to '/' in the examples app. i.e. The trace below was
          * responsible for creating 200k of garbage during the handing of a single request to '/'.
-         * 
+         *
          * delta: 213408 live: 853632 alloc: 4497984 trace: 380739 class: byte[]
-         * 
+         *
          * TRACE 380739:
          * java.nio.HeapByteBuffer.<init>(HeapByteBuffer.java:39)
          * java.nio.ByteBuffer.allocate(ByteBuffer.java:312)
@@ -408,7 +413,7 @@ public class Dom4jUtils {
          * org.orbeon.saxon.IdentityTransformer.transform(IdentityTransformer.java:31)
          * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:453)
          * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:423)
-         * org.orbeon.oxf.processor.generator.DOMGenerator.<init>(DOMGenerator.java:93)         
+         * org.orbeon.oxf.processor.generator.DOMGenerator.<init>(DOMGenerator.java:93)
          *
          * Before mod
          *

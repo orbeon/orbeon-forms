@@ -706,6 +706,7 @@
                             <classpath><pathelement location="${mysql.jar}"/></classpath>
                             create user     orbeon_tomcat;
                             create database orbeon_tomcat;
+                            grant all privileges on orbeon_tomcat.* to orbeon_tomcat@localhost;
                         </sql>
                         <!-- Uncompress Tomcat -->
                         <if>

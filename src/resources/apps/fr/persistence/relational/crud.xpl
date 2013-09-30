@@ -275,7 +275,7 @@
                                                         (
                                                             <!-- TODO: This list of columns only works for the data (not form definition) table -->
                                                             created, last_modified_time, last_modified_by,
-                                                            app, form,
+                                                            app, form, form_version,
                                                             <xsl:if test="$is-data-draft">document_id,</xsl:if>
                                                             deleted,
                                                             <xsl:if test="$is-data-draft">draft, </xsl:if>
@@ -286,7 +286,7 @@
                                                         d.created,
                                                         <sql:param type="xs:dateTime" select="/request/timestamp"/>,
                                                         <sql:param type="xs:string" select="/request/username"/>,
-                                                        d.app, d.form,
+                                                        d.app, d.form, 1,
                                                         <xsl:if test="$is-data-draft">d.document_id,</xsl:if>
                                                         'Y',
                                                         <xsl:if test="$is-data-draft">'N', </xsl:if>
@@ -408,7 +408,7 @@
                                                     created,
                                                     last_modified_time,
                                                     last_modified_by,
-                                                    app, form,
+                                                    app, form, form_version,
                                                     <xsl:if test="$is-data-draft">document_id,</xsl:if>
                                                     deleted
                                                     <xsl:if test="$is-data-draft">, draft</xsl:if>
@@ -423,6 +423,7 @@
                                                     <sql:param type="xs:string" select="/root/request/username"/>,
                                                     <sql:param type="xs:string" select="/root/request/app"/>,
                                                     <sql:param type="xs:string" select="/root/request/form"/>,
+                                                    1,
                                                     <xsl:if test="$is-data-draft"><sql:param type="xs:string" select="/root/request/document-id"/>,</xsl:if>
                                                     'N'
                                                     <xsl:if test="$is-data-draft">

@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms.function.xxforms
 import org.orbeon.oxf.test.DocumentTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class XXFormsLHHATest extends DocumentTestBase with AssertionsForJUnit {
 

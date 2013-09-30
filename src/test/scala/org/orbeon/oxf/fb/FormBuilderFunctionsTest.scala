@@ -19,6 +19,7 @@ import org.orbeon.oxf.fb.ToolboxOps._
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xforms.control.XFormsControl
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.saxon.dom4j.{NodeWrapper, DocumentWrapper}
 import org.orbeon.saxon.om._
 import org.orbeon.scaxon.XML._

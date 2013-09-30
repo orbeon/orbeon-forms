@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.action.XFormsAPI._
 import org.orbeon.oxf.xml.TransformerUtils
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.scaxon.XML._
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -37,31 +38,31 @@ class FormRunnerFunctionsTest extends DocumentTestBase with AssertionsForJUnit {
         assert(TransformerUtils.tinyTreeToString(obd) ===
             """<headers><header><name>Orbeon-City-Uri</name><value>http://en.wikipedia.org/wiki/S%C3%A3o_Paulo</value></header><header><name>Orbeon-City-Name</name><value>São Paulo</value></header><header><name>Orbeon-Population</name><value>11244369</value></header></headers>""")
     }
-    
+
     @Test def language(): Unit = {
-        
+
         val app  = "acme"
         val form = "order"
-        
+
         // oxf.fr.default-language not set so "en" is the default
         assert("en" === getDefaultLang(getAppForm(app, form)))
-        
+
         // oxf.fr.available-languages not set so all languages are allowed
         assert(isAllowedLang(getAppForm(app, form))("en"))
         assert(isAllowedLang(getAppForm(app, form))("foo"))
-        
+
         // Requested language
         assert(Some("en") === findRequestedLang(getAppForm(app, form), null))
         assert(Some("en") === findRequestedLang(getAppForm(app, form), "   "))
-        
+
         assert(Some("es") === findRequestedLang(getAppForm(app, form), "es"))
         assert(Some("en") === findRequestedLang(getAppForm(app, form), "en"))
-        
+
         NetUtils.getExternalContext.getRequest.getSession(true).getAttributesMap.put("fr-language", "fr")
-        
+
         assert(Some("fr") === findRequestedLang(getAppForm(app, form), null))
         assert(Some("it") === findRequestedLang(getAppForm(app, form), "it"))
-        
+
         // Language selector
         assert(Seq("en", "fr", "it") === getFormLangSelection(app, form, Seq("fr", "it", "en").asJava).asScala)
         assert(Seq("fr", "it", "es") === getFormLangSelection(app, form, Seq("fr", "it", "es").asJava).asScala)

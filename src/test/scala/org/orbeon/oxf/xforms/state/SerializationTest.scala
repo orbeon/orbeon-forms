@@ -24,6 +24,7 @@ import collection.JavaConverters._
 import org.junit.{Assume, Test}
 import org.orbeon.oxf.common.Version
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -55,7 +56,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         // Compare
         assert(Dom4j.compareDocumentsIgnoreNamespacesInScope(simpleDoc, deserializedDoc))
     }
-    
+
     @Test def saxStoreWithMarks() {
 
         // Transform to SAXStore while collecting marks
@@ -69,7 +70,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
                 super.startElement(uri, localname, qName, attributes)
             }
         })
-        
+
         val serializedBytes = toByteSeq(saxStore)
         val deserializedSAXStore = fromByteSeq[SAXStore](serializedBytes)
 
@@ -101,7 +102,7 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         val deserialized = fromByteSeq[DynamicState](serializedBytes)
         assert(serialized === deserialized)
     }
-    
+
     @Test def template() {
 
         Assume.assumeTrue(Version.isPE) // only test this feature if we are the PE version
@@ -196,18 +197,18 @@ class SerializationTest extends DocumentTestBase with AssertionsForJUnit {
         val serialized = doc.getStaticState.encodedState
         val restored = XFormsStaticStateImpl.restore(None, serialized)
         val restoredXML = restored.staticStateDocument.xmlDocument
-        
+
         // Compare expected/actual XML representation of the static state
         assert(Dom4j.compareDocumentsIgnoreNamespacesInScope(staticStateXML, restoredXML))
-        
+
         // Check other aspects of the restored state
         val part = restored.topLevelPart
         assert(part.hasControls)
-        
+
         val models = part.getModelsForScope(part.startScope)
         assert(models.size === 1)
         assert(models(0).instances.head._2.staticId === "instance")
-        
+
         assert(part.getControlAnalysis("input") ne null)
         assert(part.getControlAnalysis("trigger") ne null)
     }

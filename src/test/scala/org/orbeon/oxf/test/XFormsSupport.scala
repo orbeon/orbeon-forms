@@ -95,16 +95,6 @@ trait XFormsSupport extends MockitoSugar {
         getObject(controlId).asInstanceOf[XFormsSelect1Control].getItemset.getJSONTreeInfo(null, null)
 
     // Automatically convert between Scala Elem andDom4j Document/Element
-    implicit def elemToDocument(e: Elem)    = Dom4jUtils.readDom4j(e.toString)
-    implicit def elemToElement(e: Elem)     = Dom4jUtils.readDom4j(e.toString).getRootElement
-    implicit def elementToElem(e: JElement) = XML.loadString(Dom4jUtils.domToString(e))
-
-//    implicit def elemToDocumentWrapper(e: Elem) = new DocumentWrapper(elemToDocument(e), null, XPathCache.getGlobalConfiguration)
-
-//    // TODO: There is probably a better way to write these conversions
-    implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]): Seq[JElement] = seq map elemToElement toList
-    implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[JElement]): Seq[Elem]  = seq map elementToElem toList
-
     protected def getControl(controlId: String)           = getObject(controlId).asInstanceOf[XFormsControl]
     protected def getSingleNodeControl(controlId: String) = getObject(controlId).asInstanceOf[XFormsSingleNodeControl]
     protected def getValueControl(controlId: String)      = getObject(controlId).asInstanceOf[XFormsValueControl]

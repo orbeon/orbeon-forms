@@ -19,6 +19,7 @@ import org.scalatest.junit._
 import org.orbeon.oxf.test.DocumentTestBase
 import collection.mutable.LinkedHashMap
 import collection.JavaConverters._
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class HeadersTest extends DocumentTestBase with AssertionsForJUnit {
 

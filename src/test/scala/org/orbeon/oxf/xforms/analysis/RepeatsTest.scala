@@ -17,6 +17,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.scalatest.junit.AssertionsForJUnit
 import org.junit.Test
 import org.orbeon.oxf.xforms.control.Controls
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class RepeatsTest extends DocumentTestBase with AssertionsForJUnit {
 

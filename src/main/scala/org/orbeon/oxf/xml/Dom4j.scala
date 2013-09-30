@@ -22,6 +22,7 @@ import collection.JavaConverters._
 import org.orbeon.saxon.value.Whitespace
 import collection.mutable.Buffer
 import annotation.tailrec
+import scala.xml.{XML, Elem}
 
 object Dom4j {
 
@@ -145,4 +146,14 @@ object Dom4j {
 
         insertIfNeeded(root, path.iterator)
     }
+
+    implicit def elemToDocument(e: Elem)    = Dom4jUtils.readDom4j(e.toString)
+    implicit def elemToElement(e: Elem)     = Dom4jUtils.readDom4j(e.toString).getRootElement
+    implicit def elementToElem(e: Element) = XML.loadString(Dom4jUtils.domToString(e))
+
+//    implicit def elemToDocumentWrapper(e: Elem) = new DocumentWrapper(elemToDocument(e), null, XPathCache.getGlobalConfiguration)
+
+//    // TODO: There is probably a better way to write these conversions
+    implicit def scalaElemSeqToDom4jElementSeq(seq: Traversable[Elem]): Seq[Element] = seq map elemToElement toList
+    implicit def dom4jElementSeqToScalaElemSeq(seq: Traversable[Element]): Seq[Elem]  = seq map elementToElem toList
 }

@@ -20,6 +20,8 @@ import org.junit.{Assume, Test}
 import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xml.Dom4j
 import org.dom4j.Element
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
+import org.orbeon.oxf.xml.Dom4j.elemToElement
 
 class ClientEventsTest extends DocumentTestBase with AssertionsForJUnit {
 

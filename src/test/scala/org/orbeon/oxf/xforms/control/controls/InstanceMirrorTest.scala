@@ -19,6 +19,7 @@ import org.orbeon.oxf.test.DocumentTestBase
 import org.orbeon.oxf.xforms.control.controls.InstanceMirror._
 import org.scalatest.junit.AssertionsForJUnit
 import org.orbeon.oxf.xforms.XFormsConstants.COMPONENT_SEPARATOR
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
 
@@ -43,7 +44,7 @@ class InstanceMirrorTest extends DocumentTestBase with AssertionsForJUnit {
                                 <xh:body/>
                             </xh:html>
                         </xf:instance>
-                        
+
                         <xf:instance id="my-instance" xxf:exclude-result-prefixes="#all">
                             <instance xmlns=""/>
                         </xf:instance>

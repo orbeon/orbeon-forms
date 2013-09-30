@@ -19,6 +19,7 @@ import org.orbeon.oxf.test.{DocumentTestBase, XFormsSupport}
 import org.orbeon.oxf.xforms.analysis.model.StaticBind.{InfoLevel, WarningLevel, ErrorLevel}
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmissionBase
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 
 class AlertLevelsTest extends DocumentTestBase with XFormsSupport {
 

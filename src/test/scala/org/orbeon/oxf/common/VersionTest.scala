@@ -13,19 +13,18 @@
  */
 package org.orbeon.oxf.common
 
+import java.security.SignatureException
 import junit.framework.Assert._
 import org.dom4j.Document
 import org.junit.Test
 import org.orbeon.oxf.common.PEVersion._
+import org.orbeon.oxf.processor.validation.SchemaValidationException
 import org.orbeon.oxf.test.ResourceManagerTestBase
 import org.orbeon.oxf.util.DateUtils
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils
+import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.scalatest.junit.AssertionsForJUnit
 import util.Try
-import xml.Elem
-import java.security.SignatureException
-import org.orbeon.oxf.processor.validation.SchemaValidationException
 
 class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
 
@@ -128,8 +127,6 @@ class VersionTest extends ResourceManagerTestBase with AssertionsForJUnit {
             assert(out.buildAfterSubscriptionEnd === license.isBuildAfterSubscriptionEnd)
         }
     }
-
-    implicit def elemToDocument(e: Elem) = Dom4jUtils.readDom4j(e.toString)
 
     private def tryLicenseInfo(license: Document) = (
         Try(license)

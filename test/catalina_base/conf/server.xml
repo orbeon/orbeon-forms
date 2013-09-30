@@ -24,7 +24,7 @@
                   unpackWARs="true" autoDeploy="false"
                   xmlValidation="false" xmlNamespaceAware="false">
                 <Context path="/orbeon" docBase="../../../build/orbeon-war-tomcat" reloadable="false" override="true" allowLinking="true" crossContext="true">
-                    <Resource name="jdbc/mysql" auth="Container" type="javax.sql.DataSource"
+                    <Resource name="jdbc/mysql_test" auth="Container" type="javax.sql.DataSource"
                         initialSize="3" maxActive="10" maxIdle="20" maxWait="30000"
                         driverClassName="com.mysql.jdbc.Driver"
                         poolPreparedStatements="true"

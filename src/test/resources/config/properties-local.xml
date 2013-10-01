@@ -1,0 +1,11 @@
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
+
+    <property as="xs:NMTOKENS" name="oxf.xforms.logging.debug"
+                               value="document model submission submission-details submission-body submission-details
+                                      control event action analysis submission-details server server-body html
+                                      analysis-xbl-tree resources"/>
+
+</properties>

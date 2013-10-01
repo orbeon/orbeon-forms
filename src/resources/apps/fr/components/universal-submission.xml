@@ -15,7 +15,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
 
-    <!-- TODO: Remove duplication once @replace is an AVT -->
+    <!-- TODO: Remove duplication when https://github.com/orbeon/orbeon-forms/issues/1302 is fixed -->
     <xf:submission id="fr-send-submission-all"
         resource="{instance('fr-send-submission-params')/@uri}"
         relevant="{instance('fr-send-submission-params')/@prune}"

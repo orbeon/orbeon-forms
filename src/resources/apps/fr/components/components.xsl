@@ -301,6 +301,10 @@
                 <xsl:copy-of select="doc($custom-model)/*/node()"/>
             </xsl:if>
 
+            <!-- "Universal" submission. We scope this in fr-form-model so that variables are accessible with
+                 xxf:evaluate-avt(). See https://github.com/orbeon/orbeon-forms/issues/1300 -->
+            <xsl:copy-of select="doc('universal-submission.xml')/*/node()"/>
+
         </xsl:copy>
 
         <xsl:if test="not($is-noscript)">

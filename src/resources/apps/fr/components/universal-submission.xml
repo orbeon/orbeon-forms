@@ -1,0 +1,62 @@
+<!--
+  Copyright (C) 2012 Orbeon, Inc.
+
+  This program is free software; you can redistribute it and/or modify it under the terms of the
+  GNU Lesser General Public License as published by the Free Software Foundation; either version
+  2.1 of the License, or (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+  -->
+<xf:model
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+
+    <!-- TODO: Remove duplication once @replace is an AVT -->
+    <xf:submission id="fr-send-submission-all"
+        resource="{instance('fr-send-submission-params')/@uri}"
+        relevant="{instance('fr-send-submission-params')/@prune}"
+        validate="false"
+        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
+        method="{instance('fr-send-submission-params')/@method}"
+        serialization="{instance('fr-send-submission-params')/@serialization}"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        replace="all">
+    </xf:submission>
+
+    <xf:submission id="fr-send-submission-none"
+        resource="{instance('fr-send-submission-params')/@uri}"
+        relevant="{instance('fr-send-submission-params')/@prune}"
+        validate="false"
+        xxf:annotate="{instance('fr-send-submission-params')/@annotate}"
+        method="{instance('fr-send-submission-params')/@method}"
+        serialization="{instance('fr-send-submission-params')/@serialization}"
+        ref="if (xxf:split(instance('fr-send-submission-params')/@content) = 'pdf-url') then instance('fr-pdf-url-instance') else xxf:instance('fr-form-instance')"
+        replace="none"/>
+
+    <!-- FIXME: Workaround for https://github.com/orbeon/orbeon-forms/issues/936 -->
+    <xf:instance id="fr-send-submission-params">
+        <params uri="" prune="" annotate="" method="" content="" serialization=""/>
+    </xf:instance>
+    <xf:action event="xforms-submit" observer="fr-send-submission-all fr-send-submission-none">
+        <xf:action iterate="instance('fr-send-submission-params')/@*">
+            <xf:setvalue
+                ref="."
+                value="for $value in event(name(context()))
+                       (: Evaluate all properties as AVTs in the context of the main form data :)
+                       return xxf:instance('fr-form-instance')/xxf:evaluate-avt($value)"/>
+        </xf:action>
+        <xf:setvalue ref="instance('fr-send-submission-params')/@serialization"
+                     value="if (event('method') = 'get') then 'none' else 'application/xml'"/>
+    </xf:action>
+
+    <!-- Reset data-safe-override after completion -->
+    <xf:setvalue
+        event="xforms-submit-done xforms-submit-error"
+        observer="fr-send-submission-all fr-send-submission-none"
+        ref="$persistence-instance/data-safe-override"/>
+
+</xf:model>

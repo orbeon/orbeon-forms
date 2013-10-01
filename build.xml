@@ -755,8 +755,9 @@
                     <batchtest>
                         <fileset dir="${build.test-classes.dir}">
                             <include name="org/orbeon/oxf/**/*Test.class"/>
-                            <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class" if="skip.selenium"/>
-                            <exclude name="org/orbeon/oxf/fr/persistence/DDLTest*.class"    if="skip.database"/>
+                            <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class"  if="skip.selenium"/>
+                            <exclude name="org/orbeon/oxf/fr/persistence/DDLTest*.class"     if="skip.database"/>
+                            <exclude name="org/orbeon/oxf/fr/persistence/RestApiTest*.class" if="skip.database"/>
                         </fileset>
                     </batchtest>
 

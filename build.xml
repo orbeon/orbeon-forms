@@ -697,7 +697,7 @@
     <target name="test" depends="test-expand-war, test-classes, test-classpath">
 
         <property name="tomcat-version" value="6.0.36"/>
-        <parallel>
+        <parallel failonany="true">
 
             <!-- Run Tomcat -->
             <sequential>
@@ -786,7 +786,6 @@
                     <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
                     <sysproperty key="oxf.test.config" value="oxf:/ops/unit-tests/tests.xml"/>
                 	<sysproperty key="java.io.tmpdir" value="build/temp/test"/>
-                	<sysproperty key="webdriver.chrome.driver" value="build/bin/chromedriver"/>
 
                     <!-- Some code uses the default time zone, which might different on different system, so we need to set it explicitly -->
                 	<sysproperty key="user.timezone" value="America/Los_Angeles"/>

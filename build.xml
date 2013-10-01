@@ -686,8 +686,11 @@
         <unzip src="${build.distrib.dir}/${versioned-name}.war" dest="${build.dir}/${project.name}-war-tomcat"/>
         <!-- Copy test resources -->
         <mkdir dir="${build.dir}/${project.name}-war-tomcat/WEB-INF/resources/apps/unit-tests"/>
-        <copy todir="${build.dir}/${project.name}-war-tomcat/WEB-INF/resources/apps/unit-tests">
-            <fileset dir="${src.dir}/test/resources/apps/unit-tests"/>
+        <copy todir="${build.dir}/${project.name}-war-tomcat/WEB-INF/resources">
+            <fileset dir="${src.dir}/test/resources/">
+                <include name="apps/unit-tests/**"/>
+                <include name="config/**"/>
+            </fileset>
         </copy>
     </target>
 
@@ -754,10 +757,11 @@
 
                     <batchtest>
                         <fileset dir="${build.test-classes.dir}">
-                            <include name="org/orbeon/oxf/**/*Test.class"/>
-                            <exclude name="org/orbeon/oxf/client/CombinedClientTest*.class"  if="skip.selenium"/>
-                            <exclude name="org/orbeon/oxf/fr/persistence/DDLTest*.class"     if="skip.database"/>
-                            <exclude name="org/orbeon/oxf/fr/persistence/RestApiTest*.class" if="skip.database"/>
+                            <!--<include name="org/orbeon/oxf/**/*Test.class"/>-->
+                            <!--<exclude name="org/orbeon/oxf/client/CombinedClientTest*.class"  if="skip.selenium"/>-->
+                            <!--<exclude name="org/orbeon/oxf/fr/persistence/DDLTest*.class"     if="skip.database"/>-->
+                            <!--<exclude name="org/orbeon/oxf/fr/persistence/RestApiTest*.class" if="skip.database"/>-->
+                            <include name="org/orbeon/oxf/fr/persistence/RestApiTest*.class"/>
                         </fileset>
                     </batchtest>
 

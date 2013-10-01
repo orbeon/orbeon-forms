@@ -33,7 +33,7 @@
     <xsl:import href="view.xsl"/>
     <xsl:import href="buttons.xsl"/>
     <xsl:import href="section.xsl"/><!-- pass global section properties to fr:section -->
-    <xsl:import href="repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
+    <xsl:import href="legacy-repeat.xsl"/> <!-- convert legacy fr:repeat to fr:grid -->
 
     <!-- Global variables -->
     <xsl:variable name="app" select="doc('input:instance')/*/app" as="xs:string"/>

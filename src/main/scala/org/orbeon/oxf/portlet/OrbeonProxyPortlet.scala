@@ -13,20 +13,20 @@
  */
 package org.orbeon.oxf.portlet
 
-import javax.portlet._
-import java.io._
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.Headers._
-import java.net.{HttpURLConnection, URL}
-import org.orbeon.oxf.xml.XMLUtils
-import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
-import org.orbeon.oxf.externalcontext.WSRPURLRewriter
 import collection.JavaConverters._
 import collection.breakOut
 import com.liferay.portal.util.PortalUtil
+import java.io._
+import java.net.{HttpURLConnection, URL}
 import java.util.{Enumeration ⇒ JEnumeration}
+import javax.portlet._
+import org.orbeon.oxf.externalcontext.WSRPURLRewriter
+import org.orbeon.oxf.portlet.liferay.LiferaySupport
+import org.orbeon.oxf.util.Headers._
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{LoggerFactory, NetUtils}
+import org.orbeon.oxf.xml.XMLUtils
 import scala.util.control.NonFatal
-import com.liferay.portal.kernel.language.LanguageUtil
 
 /**
  * Orbeon Forms Form Runner proxy portlet.
@@ -106,16 +106,41 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
                 } yield
                     pair
 
-            // E.g. en_US. Pass this as fr-language to Form Runner.
-            val language = nonEmptyOrNone(LanguageUtil.getLanguageId(request))
-            def languageHeader =  language map ("Orbeon-Liferay-Language" →)
+            val sendLanguage = getPreference(request, SendLiferayLanguage) == "true"
+            val sendUser     = getPreference(request, SendLiferayUser)     == "true"
 
-            RequestDetails(content, request.getPortletSession(true), url, namespace, headersToForward.toList ++ languageHeader.toList, paramsToForward)
+            // Language information
+            // NOTE: Format returned is e.g. "en_US" or "fr_FR".
+            def languageHeader =
+                if (sendLanguage)
+                    LiferaySupport.languageHeader(request)
+                else
+                    None
+
+            // User information
+            def userHeaders =
+                if (sendUser)
+                    for {
+                        servletRequest ← findServletRequest(request).toList
+                        (name, value)  ← LiferaySupport.userHeaders(servletRequest)
+                    } yield
+                        name → value
+                else
+                    Nil
+
+            RequestDetails(
+                content,
+                request.getPortletSession(true),
+                url,
+                namespace,
+                headersToForward.toList ++ languageHeader.toList ++ userHeaders,
+                paramsToForward
+            )
         }
     }
 
-    private val FormRunnerHome = """/fr/(\?(.*))?""".r
-    private val FormRunnerPath = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
+    private val FormRunnerHome         = """/fr/(\?(.*))?""".r
+    private val FormRunnerPath         = """/fr/([^/]+)/([^/]+)/(new|summary)(\?(.*))?""".r
     private val FormRunnerDocumentPath = """/fr/([^/]+)/([^/]+)/(new|edit|view)/([^/?]+)?(\?(.*))?""".r
 
     // Portlet render

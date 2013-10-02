@@ -71,6 +71,7 @@ trait ProxyPortletEdit extends GenericPortlet {
     case object FormName             extends Pref { val tpe = InputControl;                      val nameLabel = NameLabel("form-name", "Form Runner form name") }
     case object ReadOnly             extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("read-only", "Readonly access") }
     case object SendLiferayLanguage  extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-language", "Send Liferay language") }
+    case object SendLiferayUser      extends Pref { val tpe = CheckboxControl;                   val nameLabel = NameLabel("send-liferay-user", "Send Liferay user") }
     case object Page                 extends Pref { val tpe = new SelectControl(PageNameLabels); val nameLabel = NameLabel("action", "Form Runner page") }
 
     val AllPreferences = Seq(
@@ -79,7 +80,8 @@ trait ProxyPortletEdit extends GenericPortlet {
         AppName,
         FormName,
         ReadOnly,
-        SendLiferayLanguage
+        SendLiferayLanguage,
+        SendLiferayUser
     )
 
     // Return the value of the preference if set, otherwise the value of the initialization parameter

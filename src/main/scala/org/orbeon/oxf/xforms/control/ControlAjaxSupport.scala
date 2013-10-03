@@ -117,7 +117,7 @@ trait ControlAjaxSupport {
             val attributeValue = value2 getOrElse ""
             val attributesImpl = new AttributesImpl
 
-            addAttributeIfNeeded(attributesImpl, "for", effectiveId, isNewRepeatIteration, isDefaultValue = false)
+            addAttributeIfNeeded(attributesImpl, "for", XFormsUtils.namespaceId(containingDocument, effectiveId), isNewRepeatIteration, isDefaultValue = false)
             addAttributeIfNeeded(attributesImpl, "name", name, isNewRepeatIteration, isDefaultValue = false)
             ch.startElement("xxf", XXFORMS_NAMESPACE_URI, "attribute", attributesImpl)
             ch.text(attributeValue)

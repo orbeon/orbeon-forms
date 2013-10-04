@@ -146,7 +146,7 @@
                         <xh:div class="fr-grid">
                             <xh:div class="fr-grid-content">
                                 <!-- Control name -->
-                                <xf:input ref="$local/grid-name" incremental="true" id="fb-edit-details-control-name-input">
+                                <xf:input ref="$local/grid-name" incremental="true">
                                     <xf:label value="$resources/dialog-grid-details/grid-name/label"/>
                                     <xf:alert ref="$resources/dialog-grid-details/grid-name/alert"/>
                                     <xf:hint  ref="$resources/dialog-grid-details/grid-name/hint"/>

@@ -180,10 +180,10 @@
             <label>Insert Row Below</label>
         </insert-row-below-icon>
         <section-details-icon>
-            <label>Section Details</label>
+            <label>Section Settings</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>Grid Details</label>
+            <label>Grid Settings</label>
         </grid-details-icon>
         <move-up-icon>
             <label>Move Up</label>
@@ -437,7 +437,7 @@
             <level><label>Level</label></level>
         </dialog-control-details>
         <dialog-section-details>
-            <label>Section Details</label>
+            <label>Section Settings</label>
             <control-name>
                 <label>Section Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -455,7 +455,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>Grid Details</label>
+            <label>Grid Settings</label>
             <grid-name>
                 <label>Grid Name</label>
                 <alert>Name is already in use or incorrect</alert>
@@ -1036,10 +1036,10 @@
             <label>Insérer rangée dessous</label>
         </insert-row-below-icon>
         <section-details-icon>
-            <label>Détails de la section</label>
+            <label>Paramètres de la section</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>Détails de la grille</label>
+            <label>Paramètres de la grille</label>
         </grid-details-icon>
         <move-up-icon>
             <label>Déplacer vers le haut</label>
@@ -1288,7 +1288,7 @@
             <level><label>Niveau</label></level>
         </dialog-control-details>
         <dialog-section-details>
-            <label>Détails de la section</label>
+            <label>Paramètres de la section</label>
             <control-name>
                 <label>Nom de la section</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -1306,7 +1306,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>Détails de la grille</label>
+            <label>Paramètres de la grille</label>
             <grid-name>
                 <label>Nom de la grille</label>
                 <alert>Le nom est déjà utilisé ou incorrect</alert>
@@ -1892,7 +1892,7 @@
             <label>Seksjonsdetaljer</label>
         </section-details-icon>
         <grid-details-icon>
-            <label>[Grid Details]</label>
+            <label>[Grid Settings]</label>
         </grid-details-icon>
         <move-up-icon>
             <label>Flytt opp</label>
@@ -2160,7 +2160,7 @@
             </readonly>
         </dialog-section-details>
         <dialog-grid-details>
-            <label>[Grid Details]</label>
+            <label>[Grid Settings]</label>
             <grid-name>
                 <label>[Grid Name]</label>
                 <alert>[Name is already in use or incorrect]</alert>

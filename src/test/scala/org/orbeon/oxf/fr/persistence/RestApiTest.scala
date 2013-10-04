@@ -15,6 +15,7 @@ package org.orbeon.oxf.fr.persistence
 
 import org.dom4j.Document
 import org.junit.Test
+import org.orbeon.oxf.fr.relational.version._
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{TestSupport, ResourceManagerTestBase}
 import org.orbeon.oxf.util._
@@ -22,6 +23,7 @@ import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
 import scala.Some
+import scala.util.Try
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
@@ -47,12 +49,18 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         }
     }
 
-    private def http(url: String, method: String, body: Option[Document]): ConnectionResult = {
+    private def http(url: String, method: String, version: Version, body: Option[Document]): ConnectionResult = {
         val documentUrl = URLFactory.createURL(MySQLBase + url)
         val headers = {
-            val dataSourceHeader  = Some("orbeon-datasource" → Array("mysql_test"))
-            val contentTypeHeader = body map (_ ⇒ "content-type" → Array("application/xml"))
-            val myHeaders = Seq(dataSourceHeader, contentTypeHeader).flatten.toMap
+            val dataSourceHeader  = Some("Orbeon-Datasource" → Array("mysql_test"))
+            val contentTypeHeader = body map (_ ⇒ "Content-Type" → Array("application/xml"))
+            val versionHeader =  version match {
+                case Latest                  ⇒ None
+                case Next                    ⇒ Some("Orbeon-Form-Definition-Version" → Array("next"))
+                case Specific(version)       ⇒ Some("Orbeon-Form-Definition-Version" → Array(version.toString))
+                case ForDocument(documentId) ⇒ Some("Orbeon-For-Document-Id" → Array(documentId))
+            }
+            val myHeaders = Seq(dataSourceHeader, contentTypeHeader, versionHeader).flatten.toMap
             Connection.buildConnectionHeaders(None, myHeaders, Option(Connection.getForwardHeaders))
         }
         val messageBody = body map Dom4jUtils.domToString map (_.getBytes)
@@ -60,25 +68,53 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             loadState = true, logBody = false).connect(saveState = true)
     }
 
-    private def httpPut(url: String, body: Document): Unit = http(url, "PUT", Some(body)).close()
-    private def httpGet(url: String): Document = {
-        val connectionResult = http(url, "GET", None)
+    private def httpPut(url: String, version: Version, body: Document): Unit = http(url, "PUT", version, Some(body)).close()
+    private def httpGet(url: String, version: Version): Try[Document] = {
+        val connectionResult = http(url, "GET", version, None)
         val inputStream = connectionResult.getResponseInputStream
         try {
-            Dom4jUtils.readDom4j(inputStream)
+            Try(Dom4jUtils.readDom4j(inputStream))
         } finally {
             inputStream.close()
             connectionResult.close()
         }
     }
 
-    @Test def putGetTest(): Unit = {
+    // TODO: enabled once versioning is implemented
+    // @Test
+    def formDefinitionVersionTest(): Unit = {
         withOrbeonTables { connection =>
-            val dataURL = "/crud/a/a/data/123/data.xml"
-            val sent: Document = <gaga/>
-            httpPut(dataURL, sent)
-            val received = httpGet(dataURL)
-            assertXMLDocuments(sent, received)
+            val FormURL = "/crud/acme/address/form/form.xml"
+
+            // First time we put with "latest"
+            val first: Document = <gaga1/>
+            httpPut(FormURL, Latest, first)
+            assertXMLDocuments(first, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(first, httpGet(FormURL, Latest     ).get)
+            assert(httpGet(FormURL, Specific(2)).isFailure)
+
+            // Put again with "latest" updates the current version
+            val second: Document = <gaga2/>
+            httpPut(FormURL, Latest, second)
+            assertXMLDocuments(second, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(second, httpGet(FormURL, Latest     ).get)
+            assert(httpGet(FormURL, Specific(2)).isFailure)
+
+            // Put with "next" to get two versions
+            val third: Document = <gaga3/>
+            httpPut(FormURL, Next, third)
+            assertXMLDocuments(second, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
+            assert(httpGet(FormURL, Specific(3)).isFailure)
+
+            // Put a specific version
+            val fourth: Document = <gaga4/>
+            httpPut(FormURL, Specific(1), fourth)
+            assertXMLDocuments(fourth, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
+            assert(httpGet(FormURL, Specific(3)).isFailure)
         }
     }
 }

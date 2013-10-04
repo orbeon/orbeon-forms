@@ -47,7 +47,7 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedHeaders = initialHeaders ++ Map(
             "orbeon-username" → Seq("test@orbeon.com"),
-            "orbeon-roles" → Seq("manager", "employee")
+            "orbeon-roles"    → Seq("manager", "employee")
         )
 
         // NOTE: Use asInstanceOf because servlet API doesn't have generics

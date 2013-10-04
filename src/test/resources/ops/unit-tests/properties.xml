@@ -47,6 +47,7 @@
 
     <property as="xs:string"  name="oxf.fr.authentication.method"                           value="header"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.username"                  value="Orbeon-Liferay-User-Email"/>
+    <property as="xs:string"  name="oxf.fr.authentication.header.group"                     value="Orbeon-Liferay-User-Group-Name"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles"                     value="Orbeon-Liferay-User-Roles"/>
     <property as="xs:string"  name="oxf.fr.authentication.header.roles.property-name"       value=""/>
 

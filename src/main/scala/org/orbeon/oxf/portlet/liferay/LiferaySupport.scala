@@ -24,19 +24,21 @@ import org.orbeon.oxf.util.ScalaUtils._
 
 object LiferaySupport {
 
-    private val HeaderNamesGetters = List[(String, User ⇒ String)](
-        "Orbeon-Liferay-User-Id"          → (_.getUserId.toString),
-        "Orbeon-Liferay-User-Screen-Name" → (_.getScreenName),
-        "Orbeon-Liferay-User-Full-Name"   → (_.getFullName),
-        "Orbeon-Liferay-User-Email"       → (_.getEmailAddress),
-        "Orbeon-Liferay-Roles"            → (_.getRoles.asScala map (_.getName) mkString ", ")
+    private val HeaderNamesGetters = List[(String, User ⇒ List[String])](
+        "Orbeon-Liferay-User-Id"          → (u ⇒ Option(u.getUserId) map (_.toString) toList),
+        "Orbeon-Liferay-User-Screen-Name" → (u ⇒ Option(u.getScreenName).toList),
+        "Orbeon-Liferay-User-Full-Name"   → (u ⇒ Option(u.getFullName).toList),
+        "Orbeon-Liferay-User-Email"       → (u ⇒ Option(u.getEmailAddress).toList),
+        "Orbeon-Liferay-User-Group-Id"    → (u ⇒ Option(u.getGroup) map (_.getGroupId.toString) toList),
+        "Orbeon-Liferay-User-Group-Name"  → (u ⇒ Option(u.getGroup) map (_.getName) toList),
+        "Orbeon-Liferay-User-Roles"       → (u ⇒ u.getRoles.asScala map (_.getName) toList)
     )
 
-    def userHeaders(request: HttpServletRequest) =
+    // Return Liferay user, group and role information as headers. There can be multiple role headers.
+    def userHeaders(user: User): List[(String, String)] =
         for {
-            user       ← Option(PortalUtil.getUser(request)).toList
-            (name, fn) ← HeaderNamesGetters
-            value      ← Option(fn(user))
+            (name, getter) ← HeaderNamesGetters
+            value          ← getter(user)
         } yield
             name → value
 

@@ -121,10 +121,11 @@ class OrbeonProxyPortlet extends GenericPortlet with ProxyPortletEdit with Buffe
             def userHeaders =
                 if (sendUser)
                     for {
-                        servletRequest ← findServletRequest(request).toList
-                        (name, value)  ← LiferaySupport.userHeaders(servletRequest)
+                        request   ← findServletRequest(request).toList
+                        user      ← Option(PortalUtil.getUser(request)).toList
+                        nameValue ← LiferaySupport.userHeaders(user)
                     } yield
-                        name → value
+                        nameValue
                 else
                     Nil
 

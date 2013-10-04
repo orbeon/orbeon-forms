@@ -26,10 +26,10 @@ class FormRunnerRequestFilter extends RequestFilter {
 
         def getHeader(name: String) = servletRequest.getHeaders(name).asInstanceOf[JEnumeration[String]].toArray match {
             case Array() ⇒ None
-            case array ⇒ Some(array)
+            case array   ⇒ Some(array)
         }
 
-        val headers = FormRunner.getUserRolesAsHeaders(servletRequest, getHeader)
+        val headers = FormRunner.getUserRolesAsHeaders(servletRequest, getHeader).toMap
 
         trait CustomHeaders extends HttpServletRequestWrapper {
             override def getHeaderNames =

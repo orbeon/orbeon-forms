@@ -13,20 +13,22 @@
  */
 package org.orbeon.oxf.portlet.liferay
 
-import com.liferay.portal.util.PortalUtil
+import collection.JavaConverters._
+import collection.JavaConversions.asJavaEnumeration
 import com.liferay.portal.model.User
-import collection.JavaConversions._
-import javax.portlet.filter._
+import com.liferay.portal.util.PortalUtil
 import javax.portlet._
+import javax.portlet.filter._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.portlet.RequestFilter
+import org.orbeon.oxf.util.ScalaUtils
 
 /**
  * Custom request filter for Liferay.
  */
 class FormRunnerRequestFilter extends RequestFilter {
 
-    val prefix = "orbeon.liferay.user."
+    val Prefix = "orbeon.liferay.user."
 
     def amendRequest(portletRequest: PortletRequest): PortletRequest =
         // NOTE: request.getRemoteUser() can be configured in liferay-portlet.xml with user-principal-strategy to
@@ -34,37 +36,25 @@ class FormRunnerRequestFilter extends RequestFilter {
         // user.
         PortalUtil.getUser(PortalUtil.getHttpServletRequest(portletRequest)) match {
             case user: User ⇒ amendRequest(portletRequest, user)
-            case _ ⇒ portletRequest
+            case _          ⇒ portletRequest
         }
 
     def amendRequest(portletRequest: PortletRequest, user: User): PortletRequest = {
 
-        def mkHeaderName(name: String) = prefix + name split "[.-]" mkString "-" toLowerCase
-
         val headers = {
-            // 1. Get Liferay user details/roles
+            // 1. Get Orbeon-Liferay-User-* headers
+
+            // Get and lowercase user headers
             val liferayUserRolesHeaders =
-                for {
-                    (name, value) ← Map(
-                        "email"     → user.getEmailAddress,
-                        "full-name" → user.getFullName,
-                        "roles"     → (user.getRoles map (_.getName) toArray)
-                    )
-                    if value != null
-                } yield {
-                    // Return header tuple with header name in lowercase and with the "dash" convention
-                    mkHeaderName(name) → (value match {
-                        case array: Array[String] ⇒ array
-                        case value: String ⇒ Array(value)
-                    })
-                }
+                ScalaUtils.combineValues[String, String, Array](LiferaySupport.userHeaders(user)) map
+                    { case (name, value) ⇒ name.toLowerCase → value } toMap
 
             // 2. Get Orbeon-* headers
 
             // Get a header value first from the list of user/roles headers, then from the original request
             def getCombine(s: String) = {
                 def getCombine1(s: String) = liferayUserRolesHeaders.get(s)
-                def getCombine2(s: String) = portletRequest.getProperties(s).toArray match {
+                def getCombine2(s: String) = portletRequest.getProperties(s).asScala.toArray match {
                     case Array() ⇒ None
                     case array ⇒ Some(array)
                 }
@@ -79,7 +69,7 @@ class FormRunnerRequestFilter extends RequestFilter {
         // Wrap incoming request depending on request type and add to existing properties
         trait CustomProperties extends PortletRequestWrapper {
             override def getPropertyNames =
-                headers.keysIterator ++ super.getPropertyNames
+                asJavaEnumeration(headers.keysIterator ++ super.getPropertyNames.asScala)
 
             override def getProperty(name: String) =
                 headers.get(name) map (_.head) getOrElse super.getProperty(name)

@@ -97,9 +97,12 @@ trait FormRunnerPermissions {
                     case _ ⇒ Seq(value)
                 }
 
+                // Username and group: take the first header
                 val username = headerOption(HeaderUsernamePropertyName) map (_.head)
                 val group    = headerOption(HeaderGroupPropertyName) map (_.head)
-                val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap split1 flatMap (split2(_)))
+
+                // Roles: all headers with the given name are used, each header value is split, and result combined
+                val roles    = headerOption(HeaderRolesPropertyName) map (_ flatMap split1 flatMap split2)
 
                 (username, group, roles)
 
@@ -107,14 +110,12 @@ trait FormRunnerPermissions {
         }
     }
 
-    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): Map[String, Array[String]] = {
-
+    def getUserRolesAsHeaders(userRoles: UserRoles, getHeader: String ⇒ Option[Array[String]]): List[(String, Array[String])] = {
         val (username, group, roles) = getUserGroupRoles(userRoles, getHeader)
-        Seq(
-            username map ("orbeon-username" → Array(_)),
-            group    map ("orbeon-group"    → Array(_)),
-            roles    map ("orbeon-roles"    → _)
-        ).flatten.toMap
+
+        (username.toList map ("orbeon-username" → Array(_))) :::
+        (group.toList    map ("orbeon-group"    → Array(_))) :::
+        (roles.toList    map ("orbeon-roles" →))
     }
 
     /**

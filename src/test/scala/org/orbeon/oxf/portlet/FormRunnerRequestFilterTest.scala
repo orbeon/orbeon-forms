@@ -23,7 +23,7 @@ import org.scalatest.mock.MockitoSugar
 import javax.portlet.PortletRequest
 import javax.portlet.filter.PortletRequestWrapper
 import org.mockito.Mockito
-import com.liferay.portal.model.{Role, User}
+import com.liferay.portal.model.{Group, Role, User}
 import java.util.Arrays
 import collection.immutable.TreeMap
 
@@ -48,20 +48,32 @@ class FormRunnerRequestFilterTest extends ResourceManagerTestBase with Assertion
         val mockRoleEmployee = mock[Role]
         Mockito when mockRoleEmployee.getName thenReturn "employee"
 
+        val mockGroup = mock[Group]
+        Mockito when mockGroup.getGroupId thenReturn 42
+        Mockito when mockGroup.getName    thenReturn "universe"
+
         val mockUser = mock[User]
-        Mockito when mockUser.getEmailAddress thenReturn "test@orbeon.com"
+        Mockito when mockUser.getUserId       thenReturn 123
+        Mockito when mockUser.getScreenName   thenReturn "jsmith"
         Mockito when mockUser.getFullName     thenReturn "John Smith"
+        Mockito when mockUser.getEmailAddress thenReturn "test@orbeon.com"
         Mockito when mockUser.getRoles        thenReturn Arrays.asList(mockRoleManager, mockRoleEmployee)
+        Mockito when mockUser.getGroup        thenReturn mockGroup
 
         val amendedRequest = (new FormRunnerRequestFilter).amendRequest(mockRequest, mockUser)
 
         // NOTE: Use Seq or List but not Array for comparison, because Array's == doesn't work as expected in Scala
         val expectedProperties = initialProperties ++ Map(
-            "orbeon-liferay-user-email"     → Seq("test@orbeon.com"),
-            "orbeon-liferay-user-full-name" → Seq("John Smith"),
-            "orbeon-liferay-user-roles"     → Seq("manager", "employee"),
-            "orbeon-username"               → Seq("test@orbeon.com"),
-            "orbeon-roles"                  → Seq("manager", "employee")
+            "orbeon-liferay-user-id"          → Seq("123"),
+            "orbeon-liferay-user-screen-name" → Seq("jsmith"),
+            "orbeon-liferay-user-full-name"   → Seq("John Smith"),
+            "orbeon-liferay-user-email"       → Seq("test@orbeon.com"),
+            "orbeon-liferay-user-group-id"    → Seq("42"),
+            "orbeon-liferay-user-group-name"  → Seq("universe"),
+            "orbeon-liferay-user-roles"       → Seq("manager", "employee"),
+            "orbeon-username"                 → Seq("test@orbeon.com"),
+            "orbeon-group"                    → Seq("universe"),
+            "orbeon-roles"                    → Seq("manager", "employee")
         )
 
         val actualProperties = amendedRequest.getPropertyNames map (n ⇒ n → amendedRequest.getProperties(n).toList) toMap

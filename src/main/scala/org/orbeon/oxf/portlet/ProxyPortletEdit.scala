@@ -98,7 +98,7 @@ trait ProxyPortletEdit extends GenericPortlet {
                 <div>
                     <style>
                         .orbeon-pref-form label {{ display: block; clear:both; font-weight: bold }}
-                        .orbeon-pref-form input[type=text] {{ display: block; width: 300px; margin-bottom: 10px }}
+                        .orbeon-pref-form input[type=text] {{ display: block; width: 100%; margin-bottom: 10px }}
                         .orbeon-pref-form input[type=checkbox] {{ float: left; margin-right: 6px; margin-bottom: 10px }}
                         .orbeon-pref-form select {{ display: block; width: auto; margin-bottom: 10px }}
                         .orbeon-pref-form hr {{ clear: both }}

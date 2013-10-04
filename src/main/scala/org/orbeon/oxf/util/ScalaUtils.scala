@@ -122,8 +122,12 @@ object ScalaUtils extends PathOps {
                 throw newException(Exceptions.getRootThrowable(t))
         }
 
-    // Semi-standard pipe operator
-    implicit class PipeOps[A](val a: A) extends AnyVal { def |>[B](f: A ⇒ B) = f(a) }
+    implicit class PipeOps[A](val a: A) extends AnyVal {
+        // Semi-standard pipe operator
+        def |>[B] (f: A ⇒ B) = f(a)
+        // Kestrel / K Combinator (known as tap in Ruby/Underscore)
+        def |!>[B](f: A => Unit): A = { f(a); a }
+    }
 
     // Convert a string of tokens to a set
     def stringToSet(s: String)               = split[Set](s)

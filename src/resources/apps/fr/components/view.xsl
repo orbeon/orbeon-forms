@@ -105,6 +105,7 @@
                             <xsl:call-template name="fr-buttons-bar">
                                 <xsl:with-param name="buttons"           select="$inner-buttons" tunnel="yes"/>
                                 <xsl:with-param name="highlight-primary" select="false()"        tunnel="yes"/>
+                                <xsl:with-param name="inverse"           select="false()"        tunnel="yes"/>
                             </xsl:call-template>
                         </xsl:if>
                     </xsl:element>
@@ -569,9 +570,10 @@
     </xsl:template>
 
     <xsl:template match="fr:buttons-bar" name="fr-buttons-bar">
-        <!-- $bottom-buttons by default -->
-        <xsl:param name="buttons"           tunnel="yes" as="xs:string*" select="$bottom-buttons"/>
-        <xsl:param name="highlight-primary" tunnel="yes" as="xs:boolean" select="true()"/>
+        <!-- $bottom-buttons by default, except in test mode -->
+        <xsl:param name="buttons"           tunnel="yes" as="xs:string*" select="if ($mode != 'test') then $bottom-buttons else 'validate'"/>
+        <xsl:param name="highlight-primary" tunnel="yes" as="xs:boolean" select="$mode != 'test'"/>
+        <xsl:param name="inverse"           tunnel="yes" as="xs:boolean" select="$mode = 'test'"/>
         <!-- Buttons -->
         <xsl:if test="not($hide-buttons-bar)">
             <xh:span class="fr-buttons">
@@ -583,13 +585,6 @@
                         <!-- Copy all the content -->
                         <xsl:apply-templates select="$custom-buttons/node()"/>
                     </xsl:when>
-                    <!-- Test mode: validate button -->
-                    <xsl:when test="$mode = 'test'">
-                        <xsl:variable name="b" as="node()*">
-                            <fr:validate-button appearance="xxf:inverse"/>
-                        </xsl:variable>
-                        <xsl:apply-templates select="$b"/>
-                    </xsl:when>
                     <!-- Use requested buttons -->
                     <xsl:otherwise>
                         <!-- Message shown next to the buttons -->
@@ -600,10 +595,16 @@
                         <xsl:variable name="b" as="node()*">
                             <xsl:for-each select="$buttons">
                                 <xsl:variable name="is-primary" select="$highlight-primary and position() = last()"/>
+                                <!--<xsl:variable name="is-primary" select="false()"/>-->
                                 <xsl:element name="fr:{.}-button">
-                                    <xsl:if test="$is-primary">
-                                        <xsl:attribute name="appearance">xxf:primary</xsl:attribute>
-                                    </xsl:if>
+                                    <xsl:choose>
+                                        <xsl:when test="$inverse">
+                                            <xsl:attribute name="appearance">xxf:inverse</xsl:attribute>
+                                        </xsl:when>
+                                        <xsl:when test="$is-primary">
+                                            <xsl:attribute name="appearance">xxf:primary</xsl:attribute>
+                                        </xsl:when>
+                                    </xsl:choose>
                                 </xsl:element>
                                 <xsl:text> </xsl:text>
                             </xsl:for-each>

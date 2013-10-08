@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr.relational
 
 import org.orbeon.oxf.fr.relational.RelationalUtils._
 import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.fr.relational.version._
 import java.util
 import java.sql.Connection
 
@@ -32,8 +31,8 @@ object Rest {
     }
 
     def latestNonDeletedFormVersion(app: String, form: String)(implicit connection: Connection): Option[Int] = {
-        val maxVersion = (
-            connection.prepareStatement(
+        val maxVersion = {
+            val ps = connection.prepareStatement(
                 """select max(form_version)
                   |  from orbeon_form_definition
                   | where (last_modified_by, app, form, form_version) in
@@ -46,11 +45,11 @@ object Rest {
                   |       )
                   |   and deleted = 'N'
                 """.stripMargin)
-            |!> (_.setString(1, app))
-            |!> (_.setString(2, form))
-            |>  (_.executeQuery())
-            |!> (_.next())
-        )
+            ps.setString(1, app)
+            ps.setString(2, form)
+            val rs = ps.executeQuery()
+            rs.next(); rs
+        }
         val version = maxVersion.getInt(1)
         if (maxVersion.wasNull()) None else Some(version)
     }
@@ -63,10 +62,10 @@ object Rest {
             request.forAttachment option "_attach"
         ).flatten.mkString
 
-    case class FormRowInfo(created: util.Date)
-    case class DataRowInfo(created: util.Date, username: String, groupname: String)
+    case class FormRow(created: util.Date)
+    case class DataRow(created: util.Date, username: String, groupname: String)
 
-    def infoFromExistingRow(implicit connection: Connection, request: Request): Option[Either[FormRowInfo, DataRowInfo]] = {
+    def existingRow(implicit connection: Connection, request: Request): Option[Either[FormRow, DataRow]] = {
 
         // List of columns that identify a row
         val idColumns =
@@ -79,15 +78,14 @@ object Rest {
 
         def latest = latestNonDeletedFormVersion(request.app, request.form)
         val version = request.version match {
-            case Latest ⇒ latest.getOrElse(1)
-            case Next ⇒ latest.map(_ + 1).getOrElse(1)
-            case Specific(v) ⇒ v
+            case Latest         ⇒ latest.getOrElse(1)
+            case Next           ⇒ latest.map(_ + 1).getOrElse(1)
+            case Specific(v)    ⇒ v
             case ForDocument(_) ⇒ throw new IllegalStateException // Only supported when retrieving a form
         }
 
-        val position = Iterator.from(1)
-        val resultSet = (
-            connection.prepareStatement(
+        val resultSet = {
+            val ps = connection.prepareStatement(
                 s"""select created ${request.forData.option(", username , groupname").mkString}
                    |  from $tableName
                    | where (last_modified_time, $idColumns)
@@ -104,20 +102,21 @@ object Rest {
                    |       )
                    |       and deleted = 'N'
                  """.stripMargin)
-            |!> (_.setString(position.next(), request.app))
-            |!> (_.setString(position.next(), request.form))
-            |!> (_.setInt(position.next(), version))
-            |!> (_ |> (request.forData.option(_)) |> (_.map(_.setString(position.next(), request.documentId))))
-            |!> (_ |> (request.forAttachment.option(_)) |> (_.map(_.setString(position.next(), request.filename.get))))
-            |>  (_.executeQuery())
-        )
+            val position = Iterator.from(1)
+            ps.setString(position.next(), request.app)
+            ps.setString(position.next(), request.form)
+            ps.setInt(position.next(), version)
+            if (request.forData) ps.setString(position.next(), request.documentId)
+            if (request.forAttachment) ps.setString(position.next(), request.filename.get)
+            ps.executeQuery()
+        }
 
         // Build case case with first row of result
         resultSet.next() match {
             case true ⇒
                 val rowInfo = request.formOrData match {
-                    case Left(_)  ⇒ Some(Left(FormRowInfo(resultSet.getDate("created"))))
-                    case Right(_) ⇒ Some(Right(DataRowInfo(resultSet.getDate("created"),
+                    case Left(_)  ⇒ Some(Left(FormRow(resultSet.getDate("created"))))
+                    case Right(_) ⇒ Some(Right(DataRow(resultSet.getDate("created"),
                         resultSet.getString("username"), resultSet.getString("groupname"))))
                 }
                 // Query should return at most one row

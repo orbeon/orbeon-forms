@@ -80,7 +80,7 @@ object XFormsError {
             containingDocument.addServerError(ServerError(t))
         }
 
-        fatalOrNot(container, () ⇒ throw new OXFException(t), log _)
+        fatalOrNot(container, throw new OXFException(t), log())
     }
 
     def handleNonFatalSetvalueError(target: XFormsEventTarget, locationData: LocationData, reason: Reason): Unit = {
@@ -92,15 +92,15 @@ object XFormsError {
             containingDocument.addServerError(ServerError(reason.message, Option(locationData)))
         }
 
-        fatalOrNot(target.container, () ⇒ throw new OXFException(reason.message), log _)
+        fatalOrNot(target.container, throw new OXFException(reason.message), log())
     }
 
     // The error is non fatal only upon XForms updates OR for nested parts
-    private def fatalOrNot(container: XBLContainer, fatal: () ⇒ Any, nonFatal: () ⇒ Any) =
+    private def fatalOrNot(container: XBLContainer, fatal: ⇒ Any, nonFatal: ⇒ Any): Unit =
         if (container.getPartAnalysis.isTopLevel && container.getContainingDocument.isInitializing)
-            fatal()
+            fatal
         else
-            nonFatal()
+            nonFatal
 
     // Output the Ajax error panel with a placeholder for errors
     def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String): Unit =

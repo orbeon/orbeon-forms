@@ -126,7 +126,7 @@ object ScalaUtils extends PathOps {
         // Semi-standard pipe operator
         def |>[B] (f: A ⇒ B) = f(a)
         // Kestrel / K Combinator (known as tap in Ruby/Underscore)
-        def |!>[B](f: A => Unit): A = { f(a); a }
+        def |!>[B](f: A ⇒ Unit): A = { f(a); a }
     }
 
     // Convert a string of tokens to a set

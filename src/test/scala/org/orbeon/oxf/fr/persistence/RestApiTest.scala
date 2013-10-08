@@ -15,15 +15,16 @@ package org.orbeon.oxf.fr.persistence
 
 import org.dom4j.Document
 import org.junit.Test
-import org.orbeon.oxf.fr.relational.version._
+import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.resources.URLFactory
 import org.orbeon.oxf.test.{TestSupport, ResourceManagerTestBase}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xml.Dom4j.elemToDocument
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.scalatest.junit.AssertionsForJUnit
-import scala.Some
-import scala.util.Try
+import util.Try
+import ScalaUtils._
+import org.orbeon.oxf.fr.relational.{Specific, Next, Latest, Version}
 
 class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with DatabaseConnection with TestSupport {
 
@@ -31,7 +32,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[RestApiTest]), "")
 
     def withOrbeonTables[T](block: java.sql.Connection ⇒ T) {
-        asTomcat { connection =>
+        asTomcat { connection ⇒
             val statement = connection.createStatement
             try {
                 // Create tables
@@ -69,16 +70,12 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     }
 
     private def httpPut(url: String, version: Version, body: Document): Unit = http(url, "PUT", version, Some(body)).close()
-    private def httpGet(url: String, version: Version): Try[Document] = {
-        val connectionResult = http(url, "GET", version, None)
-        val inputStream = connectionResult.getResponseInputStream
-        try {
-            Try(Dom4jUtils.readDom4j(inputStream))
-        } finally {
-            inputStream.close()
-            connectionResult.close()
+    private def httpGet(url: String, version: Version): Try[Document] =
+        useAndClose(http(url, "GET", version, None)) { connectionResult ⇒
+            useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
+                Try(Dom4jUtils.readDom4j(inputStream))
+            }
         }
-    }
 
     // TODO: enabled once versioning is implemented
     // @Test

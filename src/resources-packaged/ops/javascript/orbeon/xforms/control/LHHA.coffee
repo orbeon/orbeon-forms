@@ -19,7 +19,7 @@ Events =
 
         lhhaEls = hintEl.add(helpEl)
 
-        if TooltipPopover.isTooltipOrPopover(lhhaEls, TooltipPopover.TooltipOrPopoverSelector)
+        if TooltipPopover.selfOrAncestor(lhhaEls, TooltipPopover.TooltipSelector + ', ' + TooltipPopover.PopoverSelector)
             TooltipPopover.init(controlEl, lhhaEls)
             if ! State.tooltipShownBecauseOfFocus
                 if event.type == 'mouseenter'
@@ -41,19 +41,19 @@ Events =
         if ! State.tooltipShownBecauseOfFocus && State.tooltipPopoverShownForControlEl?
             TooltipPopover.hide(State.tooltipPopoverShownForControlEl, event)
 
+DataPrefix = 'xforms-tooltip-popover-'
+
 # Facade for Bootstrap's Tooltip component
 # - ensures we don't show an already visible tooltip, which would make it "blink"
 TooltipPopover =
 
-    DataPrefix: 'xforms-tooltip-popover-'
-    Initialized: @DataPrefix + 'initialized'
-    Methods: @DataPrefix + 'methods'
+    Initialized: DataPrefix + 'initialized'
+    Methods: DataPrefix + 'methods'
 
     TooltipSelector: '.xforms-hint-appearance-tooltip, .xforms-help-appearance-tooltip'
     PopoverSelector: '.xforms-hint-appearance-popover, .xforms-help-appearance-popover'
-    TooltipOrPopoverSelector: '.xforms-hint-appearance-tooltip, .xforms-help-appearance-tooltip, .xforms-hint-appearance-popover, .xforms-help-appearance-popover'
 
-    isTooltipOrPopover: (lhhaEls, selector) ->
+    selfOrAncestor: (lhhaEls, selector) ->
         lhhaEls.is(selector) or lhhaEls.parents(selector).length > 0
 
     # Create the underlying Bootstrap tooltip (but don't show it just yet)
@@ -63,14 +63,14 @@ TooltipPopover =
             methods = []
             _.each lhhaEls, (lhhaEl) ->
                 lhhaEl = $(lhhaEl)
-                if TooltipPopover.isTooltipOrPopover(lhhaEl, @TooltipSelector)
+                if TooltipPopover.selfOrAncestor(lhhaEl, @TooltipSelector)
                     controlEl.tooltip
                         placement: 'bottom',
                         trigger: 'manual',
                         title: lhhaEl.text()
                         html: true
                     methods.push('tooltip')
-                if TooltipPopover.isTooltipOrPopover(lhhaEl, @PopoverSelector)
+                if TooltipPopover.selfOrAncestor(lhhaEl, @PopoverSelector)
                     beforeLastColumn = $(controlEl).closest('td').next().is('*')
                     placement = if beforeLastColumn then 'right' else 'left'
                     controlEl.popover

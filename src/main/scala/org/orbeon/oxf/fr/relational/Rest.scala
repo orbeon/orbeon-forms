@@ -20,13 +20,10 @@ import java.sql.Connection
 
 object Rest {
 
-    case class Request(app: String, form: String, filename: Option[String], version: Version, formOrData: Either[Request#Form, Request#Data]) {
-        case class Form()
-        case class Data(isDraft: Boolean, documentId: String)
-        def isDraft = Option(formOrData).collect { case Right(data) ⇒ data.isDraft }.get
-        def documentId = Option(formOrData).collect { case Right(data) ⇒ data.documentId }.get
-        def forForm = formOrData.isLeft
-        def forData = formOrData.isRight
+    case class Request(app: String, form: String, filename: Option[String], version: Version, dataPart: Option[Request#DataPart]) {
+        case class DataPart(isDraft: Boolean, documentId: String)
+        def forForm = ! dataPart.isDefined
+        def forData =   dataPart.isDefined
         def forAttachment = filename.isDefined
     }
 
@@ -96,8 +93,8 @@ object Rest {
                    |              where app  = ?
                    |                    and form = ?
                    |                    and form_version = ?
-                   |                    ${request.forData.option("and document_id = ?").mkString}
-                   |                    ${request.forAttachment.option("and file_name = ?").mkString}
+                   |                    ${if (request.forData)       "and document_id = ?" else ""}
+                   |                    ${if (request.forAttachment) "and file_name = ?"   else ""}
                    |           group by $idColumns
                    |       )
                    |       and deleted = 'N'
@@ -106,22 +103,21 @@ object Rest {
             ps.setString(position.next(), request.app)
             ps.setString(position.next(), request.form)
             ps.setInt(position.next(), version)
-            if (request.forData) ps.setString(position.next(), request.documentId)
+            if (request.forData)       ps.setString(position.next(), request.dataPart.get.documentId)
             if (request.forAttachment) ps.setString(position.next(), request.filename.get)
             ps.executeQuery()
         }
 
         // Build case case with first row of result
-        resultSet.next() match {
-            case true ⇒
-                val rowInfo = request.formOrData match {
-                    case Left(_)  ⇒ Some(Left(FormRow(resultSet.getDate("created"))))
-                    case Right(_) ⇒ Some(Right(DataRow(resultSet.getDate("created"),
-                        resultSet.getString("username"), resultSet.getString("groupname"))))
-                }
-                // Query should return at most one row
-                rowInfo ensuring (! resultSet.next())
-            case false ⇒ None
+        if (resultSet.next()) {
+            val rowInfo = if (request.forData) Some(Right(DataRow(resultSet.getDate("created"),
+                                                                  resultSet.getString("username"),
+                                                                  resultSet.getString("groupname"))))
+                          else                 Some(Left(FormRow(resultSet.getDate("created"))))
+            // Query should return at most one row
+            rowInfo ensuring (! resultSet.next())
+        } else {
+            None
         }
     }
 }

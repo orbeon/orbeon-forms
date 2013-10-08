@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.fr.relational
 
-import org.orbeon.oxf.fr.relational.RelationalUtils._
-import org.orbeon.oxf.util.ScalaUtils._
-import java.util
 import java.sql.Connection
+import java.util
+import org.orbeon.oxf.util.ScalaUtils._
 
-object Rest {
+object Crud {
 
     case class Request(app: String, form: String, filename: Option[String], version: Version, dataPart: Option[Request#DataPart]) {
         case class DataPart(isDraft: Boolean, documentId: String)

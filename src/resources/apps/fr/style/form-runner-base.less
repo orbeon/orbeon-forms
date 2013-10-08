@@ -128,17 +128,19 @@
         }
     }
 
-    // Display hints under each control
-    .xforms-hint {
+    // Inline hints: display hint under each control
+    .xforms-hint-appearance-inline .xforms-hint {
         display: block;
         margin-top: .2em;
         margin-left: 0;// used to have margin here but with new colors no margin seems better
         width: 100%;
     }
 
-    // Hide hints if tooltips are enabled
-    &.xforms-enable-hint-as-tooltip .xforms-hint {
-        display: none;
+    // Tooltip/popover hints: hide hint content
+    &.xforms-enable-hint-as-tooltip, .xforms-hint-appearance-tooltip, .xforms-hint-appearance-popover {
+        .xforms-hint {
+            display: none;
+        }
     }
 
     // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)

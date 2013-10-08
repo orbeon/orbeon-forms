@@ -196,7 +196,7 @@ body.orbeon {
 .orbeon .xforms-alert.xforms-active.xforms-info {
   color: #333333;
 }
-.orbeon .xforms-hint {
+.orbeon .xforms-hint-appearance-inline .xforms-hint {
   display: block;
   clear: both;
   font-size: smaller;

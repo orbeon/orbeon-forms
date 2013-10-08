@@ -1,7 +1,7 @@
 State =
 
     # Keep track of whether a tooltip is shown and this is because a control got the focus
-    # - used to diactivate hiding/showing tooltip based on mouse movements
+    # - used to deactivate hiding/showing tooltip based on mouse movements
     tooltipShownBecauseOfFocus: false
 
     # Keep track of the control for which we've last shown the tooltip/popover
@@ -13,9 +13,13 @@ Events =
 
     onControl: (event) ->
         controlEl = $(event.target).closest('.xforms-control')
-        lhhaEls = controlEl.find('.xforms-appearance-tooltip, .xforms-appearance-popover')
-        controlHasTooltipPopover = lhhaEls.is('*')
-        if controlHasTooltipPopover
+
+        hintEl = $(ORBEON.xforms.Controls.getControlLHHA(controlEl, "hint"))
+        helpEl = $(ORBEON.xforms.Controls.getControlLHHA(controlEl, "help"))
+
+        lhhaEls = hintEl.add(helpEl)
+
+        if TooltipPopover.isTooltipOrPopover(lhhaEls, TooltipPopover.TooltipOrPopoverSelector)
             TooltipPopover.init(controlEl, lhhaEls)
             if ! State.tooltipShownBecauseOfFocus
                 if event.type == 'mouseenter'
@@ -45,6 +49,13 @@ TooltipPopover =
     Initialized: @DataPrefix + 'initialized'
     Methods: @DataPrefix + 'methods'
 
+    TooltipSelector: '.xforms-hint-appearance-tooltip, .xforms-help-appearance-tooltip'
+    PopoverSelector: '.xforms-hint-appearance-popover, .xforms-help-appearance-popover'
+    TooltipOrPopoverSelector: '.xforms-hint-appearance-tooltip, .xforms-help-appearance-tooltip, .xforms-hint-appearance-popover, .xforms-help-appearance-popover'
+
+    isTooltipOrPopover: (lhhaEls, selector) ->
+        lhhaEls.is(selector) or lhhaEls.parents(selector).length > 0
+
     # Create the underlying Bootstrap tooltip (but don't show it just yet)
     init: (controlEl, lhhaEls) ->
         alreadyInitialized = controlEl.data(@Initialized) == 'true'
@@ -52,14 +63,14 @@ TooltipPopover =
             methods = []
             _.each lhhaEls, (lhhaEl) ->
                 lhhaEl = $(lhhaEl)
-                if lhhaEl.hasClass('xforms-appearance-tooltip')
+                if TooltipPopover.isTooltipOrPopover(lhhaEl, @TooltipSelector)
                     controlEl.tooltip
                         placement: 'bottom',
                         trigger: 'manual',
                         title: lhhaEl.text()
                         html: true
                     methods.push('tooltip')
-                if lhhaEl.hasClass('xforms-appearance-popover')
+                if TooltipPopover.isTooltipOrPopover(lhhaEl, @PopoverSelector)
                     beforeLastColumn = $(controlEl).closest('td').next().is('*')
                     placement = if beforeLastColumn then 'right' else 'left'
                     controlEl.popover
@@ -95,18 +106,6 @@ TooltipPopover =
         _.each methods, (method) -> controlEl[method].call(controlEl, arg)
 
 $ ->
-
-    # Change DOM as we expect the server to sent it to us, when implemented
-    # - LHHA shown as tooltip have the xforms-appearance-tooltip class
-    _.each $('.fr-body .xforms-control'), (control) ->
-        control = $(control)
-        selectorAppearance = _.pairs
-            '.xforms-hint': 'xforms-appearance-tooltip'
-            '.xforms-help': 'xforms-appearance-popover'
-        _.each selectorAppearance, ([selector, appearance]) ->
-            el = control.find(selector)
-            el.addClass('xforms-hidden')
-            el.addClass(appearance)
 
     # Register event listeners
     $('.fr-body').on('mouseenter mouseleave focusin focusout', '.xforms-control', Events.onControl)

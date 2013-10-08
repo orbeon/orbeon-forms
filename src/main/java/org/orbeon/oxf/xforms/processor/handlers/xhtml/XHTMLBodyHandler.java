@@ -21,6 +21,7 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
+import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
@@ -95,6 +96,13 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             });
         }
 
+        final StringBuilder sb = new StringBuilder("xforms-form");
+        sb.append(handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden");
+
+        // Hint/help appearance classes
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "hint", new QName(XFormsProperties.getHintAppearance(containingDocument)));
+        AppearanceTrait$.MODULE$.encodeAndAppendAppearance(sb, "help", new QName(XFormsProperties.getHelpAppearance(containingDocument)));
+
         // Create xhtml:form element
         // NOTE: Do multipart as well with portlet client to simplify the proxying so we don't have to re-encode parameters
         final boolean doMultipartPOST = containingDocument.getStaticOps().hasControlByName("upload") || isPortletClient;
@@ -102,7 +110,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
                 // Add id so that things work in portals
                 "id", XFormsUtils.getFormId(containingDocument),
                 // Regular classes
-                "class", "xforms-form" + (handlerContext.isNoScript() ? " xforms-noscript" : " xforms-initially-hidden"),
+                "class", sb.toString(),
                 // Submission parameters
                 "action", xformsSubmissionPath, "method", "POST",
                 // In noscript mode, don't add event handler

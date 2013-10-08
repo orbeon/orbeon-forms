@@ -51,6 +51,9 @@ public class XFormsProperties {
     public static final String HELP_ELEMENT_NAME_PROPERTY = "help-element";
     public static final String ALERT_ELEMENT_NAME_PROPERTY = "alert-element";
 
+    public static final String HINT_APPEARANCE_PROPERTY = "hint.appearance";
+    public static final String HELP_APPEARANCE_PROPERTY = "help.appearance";
+
     public static final String EXTERNAL_EVENTS_PROPERTY = "external-events";
     private static final String READONLY_PROPERTY = "readonly";
 
@@ -198,6 +201,8 @@ public class XFormsProperties {
             new PropertyDefinition(HINT_ELEMENT_NAME_PROPERTY, "span", false),
             new PropertyDefinition(HELP_ELEMENT_NAME_PROPERTY, "span", false),
             new PropertyDefinition(ALERT_ELEMENT_NAME_PROPERTY, "span", false),
+            new PropertyDefinition(HINT_APPEARANCE_PROPERTY, "inline", false),
+            new PropertyDefinition(HELP_APPEARANCE_PROPERTY, "dialog", false),
             new PropertyDefinition(EXTERNAL_EVENTS_PROPERTY, "", false),
             new PropertyDefinition(OPTIMIZE_GET_ALL_PROPERTY, true, false),
             new PropertyDefinition(OPTIMIZE_LOCAL_SUBMISSION_REPLACE_ALL_PROPERTY, true, false),
@@ -486,6 +491,14 @@ public class XFormsProperties {
 
     public static String getAlertElementName(XFormsContainingDocument containingDocument) {
         return getStringProperty(containingDocument, ALERT_ELEMENT_NAME_PROPERTY);
+    }
+
+    public static String getHintAppearance(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, HINT_APPEARANCE_PROPERTY);
+    }
+
+    public static String getHelpAppearance(XFormsContainingDocument containingDocument) {
+        return getStringProperty(containingDocument, HELP_APPEARANCE_PROPERTY);
     }
 
     public static boolean isStaticReadonlyAppearance(XFormsContainingDocument containingDocument) {

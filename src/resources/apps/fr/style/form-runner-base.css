@@ -197,13 +197,15 @@
   margin-bottom: 0;
   list-style-type: square;
 }
-.orbeon .xforms-hint {
+.orbeon .xforms-hint-appearance-inline .xforms-hint {
   display: block;
   margin-top: .2em;
   margin-left: 0;
   width: 100%;
 }
-.orbeon.xforms-enable-hint-as-tooltip .xforms-hint {
+.orbeon.xforms-enable-hint-as-tooltip .xforms-hint,
+.orbeon .xforms-hint-appearance-tooltip .xforms-hint,
+.orbeon .xforms-hint-appearance-popover .xforms-hint {
   display: none;
 }
 .orbeon .xforms-trigger button,

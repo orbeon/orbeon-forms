@@ -76,6 +76,8 @@
     <property as="xs:boolean" name="oxf.xforms.ajax.show-loading-icon"                      value="true"/>
     <property as="xs:integer" name="oxf.xforms.ajax.update.full.threshold"                  value="20"/>
     <property as="xs:boolean" name="oxf.xforms.gzip-state"                                  value="true"/>
+    <property as="xs:string"  name="oxf.xforms.hint.appearance"                             value="inline"/>
+    <property as="xs:string"  name="oxf.xforms.help.appearance"                             value="dialog"/>
 
     <property as="xs:boolean"  name="oxf.xforms.minimal-resources"                          value="true"/>
     <property as="xs:boolean"  name="oxf.xforms.combine-resources"                          value="true"/>

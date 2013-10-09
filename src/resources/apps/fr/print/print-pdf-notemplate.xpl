@@ -68,6 +68,14 @@
                 </xsl:template>
                 <!-- While we are at it filter out scripts as they won't be used -->
                 <xsl:template match="*:script | *:noscript"/>
+                <!-- See https://github.com/orbeon/orbeon-forms/issues/264 -->
+                <xsl:template match="*:a/@shape"/>
+                <!-- Remove anchors as links appear inline, see https://github.com/orbeon/orbeon-forms/issues/1288 -->
+                <xsl:template match="*:div[p:classes() = 'xforms-mediatype-text-html']//*:a">
+                    <span>
+                        <xsl:apply-templates select="@* except @shape | node()"/>
+                    </span>
+                </xsl:template>
                 <!-- These are unneeded and can make iText choke (values too long) -->
                 <xsl:template match="*:input[@type = 'hidden']"/>
                 <!-- Remove xforms-initially-hidden class on the form, normally removed by the script -->

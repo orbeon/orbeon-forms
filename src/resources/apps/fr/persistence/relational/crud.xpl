@@ -337,6 +337,20 @@
                 </p:when>
 
                 <!-- PUT -->
+                <p:when test="/*/method = 'PUTx'">
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data" href="aggregate('dummy')"/>
+                        <p:input name="config">
+                            <root xsl:version="2.0" xmlns:crud="java:org.orbeon.oxf.fr.relational.Crud">
+                                <xsl:value-of select="crud:put()"/>
+                            </root>
+                        </p:input>
+                        <p:output name="data" id="scala-put"/>
+                    </p:processor>
+                    <p:processor name="oxf:null-serializer">
+                        <p:input name="data" href="#scala-put"/>
+                    </p:processor>
+                </p:when>
                 <p:when test="/*/method = 'PUT'">
 
                     <!-- Query getting information about existing data for which we're creating a new row -->

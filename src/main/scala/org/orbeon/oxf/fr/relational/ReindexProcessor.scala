@@ -48,10 +48,9 @@ class ReindexProcessor extends ProcessorImpl {
 
     override def start(pipelineContext: PipelineContext) {
 
-        // Provider, e.g. "mysql", "oracle", inferred from the request path
         val ReindexPathRegex(provider) = NetUtils.getExternalContext.getRequest.getRequestPath
 
-        RelationalUtils.withConnection(provider) { connection ⇒
+        RelationalUtils.withConnection { connection ⇒
 
             // Clean index
             connection.prepareStatement("delete from orbeon_i_current").execute()

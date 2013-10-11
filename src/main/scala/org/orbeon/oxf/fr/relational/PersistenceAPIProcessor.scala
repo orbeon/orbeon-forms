@@ -35,8 +35,8 @@ class PersistenceAPIProcessor extends ProcessorImpl {
     override def createOutput(name: String): ProcessorOutput = {
         addOutput(name, new ProcessorOutputImpl(this, name) {
             def readImpl(pipelineContext: PipelineContext, xmlReceiver: XMLReceiver): Unit = {
-                val SearchPathRegex(provider, app, form) = NetUtils.getExternalContext.getRequest.getRequestPath
-                withConnection(provider) { connection ⇒
+                val SearchPathRegex(_, app, form) = NetUtils.getExternalContext.getRequest.getRequestPath
+                withConnection { connection ⇒
 
                     // <query> elements from request
                     val requestQueries = {

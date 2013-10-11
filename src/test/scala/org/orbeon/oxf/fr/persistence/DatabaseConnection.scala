@@ -24,14 +24,14 @@ trait DatabaseConnection {
 
     val Base = "oxf:/apps/fr/persistence/relational/ddl"
 
-    def asRoot  [T](block: Connection ⇒ T): T = asUser("root",          None,                  block)
-    def asOrbeon[T](block: Connection ⇒ T): T = asUser("orbeon_ddl",    Some("orbeon_ddl"),    block)
-    def asTomcat[T](block: Connection ⇒ T): T = asUser("orbeon_tomcat", Some("orbeon_tomcat"), block)
+    def asRoot  [T](block: Connection ⇒ T): T = asUser(user = "root"         , password = None                 , database = None,                  block)
+    def asOrbeon[T](block: Connection ⇒ T): T = asUser(user = "orbeon_ddl"   , password = Some("orbeon_ddl")   , database = Some("orbeon_ddl"),    block)
+    def asTomcat[T](block: Connection ⇒ T): T = asUser(user = "orbeon_tomcat", password = Some("orbeon_tomcat"), database = Some("orbeon_tomcat"), block)
 
-    private def asUser[T](user: String, database: Option[String], block: Connection ⇒ T): T = {
+    private def asUser[T](user: String, password: Option[String], database: Option[String], block: Connection ⇒ T): T = {
         val databaseString = database getOrElse ""
-        val url = s"jdbc:mysql://localhost/$databaseString?user=$user"
-        useAndClose(DriverManager.getConnection(url))(block)
+        val url = s"jdbc:mysql://localhost/$databaseString"
+        useAndClose(DriverManager.getConnection(url, user, password.getOrElse("")))(block)
     }
 
     // Reads a sequence semicolon-separated of statements from a text file

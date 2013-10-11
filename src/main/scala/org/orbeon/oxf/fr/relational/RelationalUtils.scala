@@ -15,18 +15,18 @@ package org.orbeon.oxf.fr.relational
 
 import java.sql.{ResultSet, Connection, PreparedStatement}
 import org.orbeon.oxf.properties.Properties
+import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import javax.naming.{Context, InitialContext}
 import javax.sql.DataSource
 import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.NetUtils
 
 object RelationalUtils {
 
-    def withConnection[T](provider: String)(block: Connection ⇒ T): T = {
+    def withConnection[T](block: Connection ⇒ T): T = {
         // Get connection to the database
         val dataSource = {
-            val propertySet = Properties.instance.getPropertySet
-            val datasourceProperty = Seq("oxf.fr.persistence", provider, "datasource") mkString "."
-            val datasource = propertySet.getString(datasourceProperty)
+            val datasource = NetUtils.getExternalContext.getRequest.getFirstHeader("orbeon-datasource").get
             val jndiContext = new InitialContext().lookup("java:comp/env/jdbc").asInstanceOf[Context]
             jndiContext.lookup(datasource).asInstanceOf[DataSource]
         }

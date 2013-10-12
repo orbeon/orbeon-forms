@@ -209,6 +209,10 @@ body.orbeon {
   *margin-top: 1px;
   *height: 20px;
 }
+.orbeon .input-append,
+.orbeon .input-prepend {
+  margin-bottom: 0;
+}
 .orbeon .fr-grid tr th label {
   margin: 0;
 }

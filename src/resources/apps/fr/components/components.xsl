@@ -250,6 +250,15 @@
                 </xsl:if>
                 <xf:dispatch name="fr-visit-all" targetid="error-summary-control-bottom"/>
             </xf:action>
+            <!-- The error summary must be notified when the language changes so that alerts/errors can be updated -->
+            <xf:action observer="fr-language-selector" event="xforms-value-changed">
+                <!-- Dispatch to the appropriate error summaries -->
+                <!-- Don't dispatch to top error-summary if not present; but always dispatch to bottom error summary as it is always included -->
+                <xsl:if test="$error-summary-top">
+                    <xf:dispatch name="fr-update-lang" targetid="error-summary-control-top"/>
+                </xsl:if>
+                <xf:dispatch name="fr-update-lang" targetid="error-summary-control-bottom"/>
+            </xf:action>
         </xf:model>
         <!-- This model handles document persistence -->
         <xi:include href="oxf:/apps/fr/includes/persistence/persistence-model.xml" xxi:omit-xml-base="true"/>

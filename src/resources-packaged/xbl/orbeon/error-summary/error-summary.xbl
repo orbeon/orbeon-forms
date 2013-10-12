@@ -60,6 +60,13 @@
                 <!-- Clear all errors in non-incremental mode -->
                 <xf:delete ref="instance('fr-snapshot-instance')/*"/>
             </xbl:handler>
+            <xbl:handler event="fr-update-lang" phase="target">
+                <!-- Update labels/alerts upon language change -->
+                <xf:action iterate="error">
+                    <xf:setvalue ref="@alert" value="xxf:alert(../@absolute-id)"/>
+                    <xf:setvalue ref="@label" value="xxf:label(../@absolute-id)"/>
+                </xf:action>
+            </xbl:handler>
         </xbl:handlers>
         <xbl:implementation>
             <xf:model id="fr-error-summary-model">

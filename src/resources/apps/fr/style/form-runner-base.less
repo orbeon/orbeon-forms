@@ -136,13 +136,6 @@
         width: 100%;
     }
 
-    // Tooltip/popover hints: hide hint content
-    &.xforms-enable-hint-as-tooltip, .xforms-hint-appearance-tooltip, .xforms-hint-appearance-popover {
-        .xforms-hint {
-            display: none;
-        }
-    }
-
     // Make sure text in trigger does not wrap (leads to non-native widget being used on Firefox)
     .xforms-trigger button, .xforms-trigger input { white-space: nowrap }
 
@@ -543,22 +536,17 @@
         word-break: normal;             // Boostrap overrides word-break
     }
 
-    .fr-mode-view {
-        .xforms-hint, .fr-mode-pdf .xforms-hint, .fr-mode-email .xforms-hint { display: none }
-        .xforms-alert, .fr-mode-pdf .xforms-alert, .fr-mode-email .xforms-alert { display: none }
+    .xforms-form { // make rule a bit stronger to make sure hints are hidden
+        .fr-mode-view, .fr-mode-pdf, .fr-mode-email {
+            .xforms-hint, .xforms-help, .xforms-alert { display: none }
+            .fr-section-title img { display: none }
 
-        .fr-section-title img,
-          .fr-mode-pdf .fr-section-title img,
-          .fr-mode-email .fr-section-title img { display: none }
-        .xforms-help,
-          .fr-mode-pdf .xforms-help,
-          .fr-mode-email .xforms-help { display: none }
-
-        // For those controls that still have a display: block in view mode, make sure there is no top margin
-        .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
-        .fr-repeat-multiple-rows {
-            .fr-dt-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
-            border-top: none;                           // Avoid double border at the top
+            // For those controls that still have a display: block in view mode, make sure there is no top margin
+            .fr-grid-content .xforms-control, .fr-grid-content .fr-component-group { margin-top: 0 }
+            .fr-repeat-multiple-rows {
+                .fr-dt-master-row { display: none }         // Hide the top header row, as we don't need the space for the *add* icon in view mode
+                border-top: none;                           // Avoid double border at the top
+            }
         }
     }
 }

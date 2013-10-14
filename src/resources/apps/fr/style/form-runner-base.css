@@ -203,11 +203,6 @@
   margin-left: 0;
   width: 100%;
 }
-.orbeon.xforms-enable-hint-as-tooltip .xforms-hint,
-.orbeon .xforms-hint-appearance-tooltip .xforms-hint,
-.orbeon .xforms-hint-appearance-popover .xforms-hint {
-  display: none;
-}
 .orbeon .xforms-trigger button,
 .orbeon .xforms-trigger input {
   white-space: nowrap;
@@ -628,34 +623,38 @@
   *white-space: normal;
   word-break: normal;
 }
-.orbeon .fr-mode-view .xforms-hint,
-.orbeon .fr-mode-view .fr-mode-pdf .xforms-hint,
-.orbeon .fr-mode-view .fr-mode-email .xforms-hint {
+.orbeon .xforms-form .fr-mode-view .xforms-hint,
+.orbeon .xforms-form .fr-mode-pdf .xforms-hint,
+.orbeon .xforms-form .fr-mode-email .xforms-hint,
+.orbeon .xforms-form .fr-mode-view .xforms-help,
+.orbeon .xforms-form .fr-mode-pdf .xforms-help,
+.orbeon .xforms-form .fr-mode-email .xforms-help,
+.orbeon .xforms-form .fr-mode-view .xforms-alert,
+.orbeon .xforms-form .fr-mode-pdf .xforms-alert,
+.orbeon .xforms-form .fr-mode-email .xforms-alert {
   display: none;
 }
-.orbeon .fr-mode-view .xforms-alert,
-.orbeon .fr-mode-view .fr-mode-pdf .xforms-alert,
-.orbeon .fr-mode-view .fr-mode-email .xforms-alert {
+.orbeon .xforms-form .fr-mode-view .fr-section-title img,
+.orbeon .xforms-form .fr-mode-pdf .fr-section-title img,
+.orbeon .xforms-form .fr-mode-email .fr-section-title img {
   display: none;
 }
-.orbeon .fr-mode-view .fr-section-title img,
-.orbeon .fr-mode-view .fr-mode-pdf .fr-section-title img,
-.orbeon .fr-mode-view .fr-mode-email .fr-section-title img {
-  display: none;
-}
-.orbeon .fr-mode-view .xforms-help,
-.orbeon .fr-mode-view .fr-mode-pdf .xforms-help,
-.orbeon .fr-mode-view .fr-mode-email .xforms-help {
-  display: none;
-}
-.orbeon .fr-mode-view .fr-grid-content .xforms-control,
-.orbeon .fr-mode-view .fr-grid-content .fr-component-group {
+.orbeon .xforms-form .fr-mode-view .fr-grid-content .xforms-control,
+.orbeon .xforms-form .fr-mode-pdf .fr-grid-content .xforms-control,
+.orbeon .xforms-form .fr-mode-email .fr-grid-content .xforms-control,
+.orbeon .xforms-form .fr-mode-view .fr-grid-content .fr-component-group,
+.orbeon .xforms-form .fr-mode-pdf .fr-grid-content .fr-component-group,
+.orbeon .xforms-form .fr-mode-email .fr-grid-content .fr-component-group {
   margin-top: 0;
 }
-.orbeon .fr-mode-view .fr-repeat-multiple-rows {
+.orbeon .xforms-form .fr-mode-view .fr-repeat-multiple-rows,
+.orbeon .xforms-form .fr-mode-pdf .fr-repeat-multiple-rows,
+.orbeon .xforms-form .fr-mode-email .fr-repeat-multiple-rows {
   border-top: none;
 }
-.orbeon .fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row {
+.orbeon .xforms-form .fr-mode-view .fr-repeat-multiple-rows .fr-dt-master-row,
+.orbeon .xforms-form .fr-mode-pdf .fr-repeat-multiple-rows .fr-dt-master-row,
+.orbeon .xforms-form .fr-mode-email .fr-repeat-multiple-rows .fr-dt-master-row {
   display: none;
 }
 @media print {

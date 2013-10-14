@@ -626,8 +626,8 @@ public class XFormsModel extends XFormsModelBase implements XFormsEventObserver,
                     throw new UnsupportedOperationException("<xf:instance src=\"\"> with relative path within a portlet");
 
                 // Use full resolved resource URL
-                // o absolute URL, e.g. http://example.org/instance.xml
-                // o absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
+                // - absolute URL, e.g. http://example.org/instance.xml
+                // - absolute path relative to server root, e.g. /orbeon/foo/bar/instance.xml
                 loadNonCachedExternalInstance(instance);
             }
         } catch (Exception e) {

@@ -37,8 +37,8 @@ public class XFormsTriggerControl extends XFormsSingleNodeFocusableControlBase {
 
     // NOTE: We used to make the trigger non-relevant if it was static-readonly. But this caused issues:
     //
-    // o at the time computeRelevant() is called, MIPs haven't been read yet
-    // o even if we specially read the readonly value from the binding here, then:
+    // - at the time computeRelevant() is called, MIPs haven't been read yet
+    // - even if we specially read the readonly value from the binding here, then:
     //   o the static-readonly control becomes non-relevant
     //   o therefore its readonly value becomes false (the default)
     //   o therefore isStaticReadonly() returns false!

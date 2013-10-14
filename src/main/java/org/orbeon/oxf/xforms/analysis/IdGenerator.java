@@ -44,8 +44,8 @@ public class IdGenerator {
 
     public String getNextId() {
         // Skip existing ids to handle these cases:
-        // o user uses attribute of the form xf-*
-        // o XBL copies id attributes from bound element, so within template the id may be of the form xf-*
+        // - user uses attribute of the form xf-*
+        // - XBL copies id attributes from bound element, so within template the id may be of the form xf-*
         String newId = AUTOMATIC_ID_PREFIX + currentId;
         while (ids.contains(newId)) {
             currentId++;

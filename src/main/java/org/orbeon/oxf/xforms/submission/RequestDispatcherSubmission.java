@@ -148,9 +148,9 @@ public class RequestDispatcherSubmission extends BaseSubmission {
         final String submissionEffectiveId = submission.getEffectiveId();
 
         // Pack external call into a Runnable so it can be run:
-        // o now and synchronously
-        // o now and asynchronously
-        // o later as a "foreground" asynchronous submission
+        // - now and synchronously
+        // - now and asynchronously
+        // - later as a "foreground" asynchronous submission
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
             public SubmissionResult call() throws Exception {
 

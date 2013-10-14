@@ -65,9 +65,9 @@ public class RegularSubmission extends BaseSubmission {
                 p2.credentials, sp.messageBody, headers, true, isLogBody(), detailsLogger);
 
         // Pack external call into a Callable so it can be run:
-        // o now and synchronously
-        // o now and asynchronously
-        // o later as a "foreground" asynchronous submission
+        // - now and synchronously
+        // - now and asynchronously
+        // - later as a "foreground" asynchronous submission
         final Callable<SubmissionResult> callable = new Callable<SubmissionResult>() {
             public SubmissionResult call() throws Exception {
 

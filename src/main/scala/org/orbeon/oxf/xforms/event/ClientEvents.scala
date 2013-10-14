@@ -396,8 +396,8 @@ object ClientEvents extends Logging {
     def processEvent(doc: XFormsContainingDocument, event: XFormsEvent) {
 
         // Check whether an event can be be dispatched to the given object. This only checks:
-        // o the the target is still live
-        // o that the target is not a non-relevant or readonly control
+        // - the the target is still live
+        // - that the target is not a non-relevant or readonly control
         def checkEventTarget(event: XFormsEvent): Boolean = {
             val eventTarget = event.targetObject
             val newReference = doc.getObjectByEffectiveId(eventTarget.getEffectiveId)
@@ -420,14 +420,14 @@ object ClientEvents extends Logging {
                 // We used to check simply by effective id, but this is not enough in some cases. We want to handle
                 // controls that just "move" in a repeat. Scenario:
                 //
-                // o repeat with 2 iterations has xf:input and xf:trigger
-                // o assume repeat is sorted on input value
-                // o use changes value in input and clicks trigger
-                // o client sends 2 events to server
-                // o client processes value change and sets new value
-                // o refresh takes place and causes reordering of rows
-                // o client processes DOMActivate on trigger, which now has moved position, e.g. row 2 to row 1
-                // o DOMActivate is dispatched to proper control (i.e. same as input was on)
+                // - repeat with 2 iterations has xf:input and xf:trigger
+                // - assume repeat is sorted on input value
+                // - use changes value in input and clicks trigger
+                // - client sends 2 events to server
+                // - client processes value change and sets new value
+                // - refresh takes place and causes reordering of rows
+                // - client processes DOMActivate on trigger, which now has moved position, e.g. row 2 to row 1
+                // - DOMActivate is dispatched to proper control (i.e. same as input was on)
                 //
                 // On the other hand, if the repeat iteration has disappeared, or was removed and recreated, the event is
                 // not dispatched.

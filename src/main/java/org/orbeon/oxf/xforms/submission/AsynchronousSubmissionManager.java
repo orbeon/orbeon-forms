@@ -89,8 +89,8 @@ public class AsynchronousSubmissionManager {
         final AsynchronousSubmissions asynchronousSubmissions = getAsynchronousSubmissions(true, getSessionKey(containingDocument));
 
         // NOTE: If we want to re-enable foreground async submissions, we must:
-        // o do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
-        // o OR provide an explicit hint on xf:submission
+        // - do a better detection: !(xf-submit-done/xf-submit-error listener) && replace="none"
+        // - OR provide an explicit hint on xf:submission
         asynchronousSubmissions.submit(new Callable<SubmissionResult>() {
 
             // Submission should not need an ExternalContext, but if it does we must provide access to a safe one

@@ -211,8 +211,8 @@ public class FileSerializer extends ProcessorImpl {
 
             // NOTE: Caching here is broken, so we never cache. This is what we should do in case
             // we want caching:
-            // o for a given file, store a hash of the content stored (or the input key?)
-            // o then when we check whether we need to modify the file, check against the key
+            // - for a given file, store a hash of the content stored (or the input key?)
+            // - then when we check whether we need to modify the file, check against the key
             //   AND the validity
 
             // Delete file if it exists, unless we append

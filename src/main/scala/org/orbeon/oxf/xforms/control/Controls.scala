@@ -308,8 +308,8 @@ object Controls {
                             this._partialFocusRepeatOption = partialFocusRepeatOption
 
                         // Remember newly created iterations so we don't recurse into them in startRepeatIteration()
-                        // o It is not needed to recurse into them because their bindings are up to date since they have just been created
-                        // o However they have not yet been evaluated. They will be evaluated at the same time the other controls are evaluated
+                        // - It is not needed to recurse into them because their bindings are up to date since they have just been created
+                        // - However they have not yet been evaluated. They will be evaluated at the same time the other controls are evaluated
                         // NOTE: don't call ControlTree.initializeRepeatIterationTree() here because refresh evaluates controls and dispatches events
                         this.newIterationsIds = newIterations map (_.getEffectiveId) toSet
                     case control ⇒

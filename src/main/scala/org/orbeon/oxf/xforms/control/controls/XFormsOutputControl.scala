@@ -176,8 +176,8 @@ class XFormsOutputControl(container: XBLContainer, parent: XFormsControl, elemen
             val externalValue = getExternalValue
             if (StringUtils.isNotBlank(externalValue)) {
                 // External value is not blank, rewrite as absolute path. Two cases:
-                // o URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
-                // o URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
+                // - URL is proxied:        /xforms-server/dynamic/27bf...  => [/context]/xforms-server/dynamic/27bf...
+                // - URL is default value:  /ops/images/xforms/spacer.gif   => [/context][/version]/ops/images/xforms/spacer.gif
                 XFormsUtils.resolveResourceURL(containingDocument, element, externalValue, URLRewriter.REWRITE_MODE_ABSOLUTE_PATH)
             } else
                 // Empty value, return as is

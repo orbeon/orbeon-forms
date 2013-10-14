@@ -294,10 +294,10 @@ public class ControlsComparator {
     private SAXStore.Mark getUpdateFullMark(XFormsControl control) {
         // Conditions:
         //
-        // o there is not already a full update in progress
-        // o we are in span layout OR we are using XXFormsDynamicControl
-        // o the control supports full Ajax updates
-        // o there is a mark for the given control
+        // - there is not already a full update in progress
+        // - we are in span layout OR we are using XXFormsDynamicControl
+        // - the control supports full Ajax updates
+        // - there is a mark for the given control
         //
         if (! withinFullUpdate() && (control instanceof XXFormsDynamicControl) && control.supportFullAjaxUpdates()) {
             return containingDocument.getStaticOps().getMark(control.getPrefixedId());
@@ -339,20 +339,20 @@ public class ControlsComparator {
 
             // Create the output SAX pipeline:
             //
-            // o perform URL rewriting
-            // o serialize to String
+            // - perform URL rewriting
+            // - serialize to String
             //
             // NOTE: we could possibly hook-up the standard epilogue here, which would:
             //
-            // o perform URL rewriting
-            // o apply the theme
-            // o serialize
+            // - perform URL rewriting
+            // - apply the theme
+            // - serialize
             //
             // But this would raise some issues:
             //
-            // o epilogue must match on xhtml:* instead of xhtml:html
-            // o themes must be modified to support XHTML fragments
-            // o serialization must output here, not to the ExternalContext OutputStream
+            // - epilogue must match on xhtml:* instead of xhtml:html
+            // - themes must be modified to support XHTML fragments
+            // - serialization must output here, not to the ExternalContext OutputStream
             //
             // So for now, perform simple steps here, and later this can be revisited.
             //

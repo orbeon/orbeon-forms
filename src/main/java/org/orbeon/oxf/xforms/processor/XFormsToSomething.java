@@ -75,8 +75,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             @Override
             public KeyValidity getLocalKeyValidity(PipelineContext pipelineContext, URIReferences uriReferences) {
                 // NOTE: As of 2010-03, caching of the output should never happen
-                // o more work is needed to make this work properly
-                // o not many use cases benefit
+                // - more work is needed to make this work properly
+                // - not many use cases benefit
                 return null;
             }
         };
@@ -93,8 +93,8 @@ abstract public class XFormsToSomething extends ProcessorImpl {
 
             // Return an input which handles dependencies
             // The system actually has two processors:
-            // o stage1 is the processor automatically inserted below for the purpose of handling dependencies
-            // o stage2 is the actual oxf:xforms-to-xhtml which actually does XForms processing
+            // - stage1 is the processor automatically inserted below for the purpose of handling dependencies
+            // - stage2 is the actual oxf:xforms-to-xhtml which actually does XForms processing
             final ProcessorInput originalInput = super.createInput(inputName);
             return new DependenciesProcessorInput(XFormsToSomething.this, inputName, originalInput) {
                 @Override
@@ -298,14 +298,14 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             //
             // Output of annotator is:
             //
-            // o annotated page template (TODO: this should not include model elements)
-            // o extractor
+            // - annotated page template (TODO: this should not include model elements)
+            // - extractor
             //
             // Output of extractor is:
             //
-            // o static state document
-            // o optionally: digest
-            // o optionally: debug output
+            // - static state document
+            // - optionally: digest
+            // - optionally: debug output
             //
             this.template = AnnotatedTemplate.applyJava(new SAXStore());
             readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,

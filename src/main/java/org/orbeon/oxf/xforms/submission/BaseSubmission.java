@@ -58,11 +58,11 @@ public abstract class BaseSubmission implements Submission {
             // NOTE: If the resource or service URL does not start with a protocol or with '/', the URL is resolved against
             // the request path, then against the service base. Example in servlet environment:
             //
-            // o action path: my/service
-            // o request URL: http://orbeon.com/orbeon/myapp/mypage
-            // o request path: /myapp/mypage
-            // o service base: http://services.com/myservices/
-            // o resulting service URL: http://services.com/myservices/myapp/my/service
+            // - action path: my/service
+            // - request URL: http://orbeon.com/orbeon/myapp/mypage
+            // - request path: /myapp/mypage
+            // - service base: http://services.com/myservices/
+            // - resulting service URL: http://services.com/myservices/myapp/my/service
 
             return XFormsUtils.resolveServiceURL(containingDocument, submission.getSubmissionElement(),
                     NetUtils.appendQueryString(resolvedActionOrResource, queryString),

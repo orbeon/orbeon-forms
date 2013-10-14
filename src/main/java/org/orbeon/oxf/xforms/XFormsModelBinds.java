@@ -487,16 +487,16 @@ public class XFormsModelBinds extends XFormsModelBindsBase {
 
         // Type MIP @type attribute is special:
         //
-        // o it is not an XPath expression
-        // o but because type validation can be expensive, we want to optimize that if we can
-        // o so requireModelMIPUpdate(Model.TYPE) actually means "do we need to update type validity"
+        // - it is not an XPath expression
+        // - but because type validation can be expensive, we want to optimize that if we can
+        // - so requireModelMIPUpdate(Model.TYPE) actually means "do we need to update type validity"
         //
         // xxf:xml and xxf:xpath2 also depend on requiredness, which is probably not a good idea. To handle
         // this condition (partially), if the same bind has @type and @required, we also reevaluate type validity if
         // requiredness has changed. Ideally:
         //
-        // o we would not depend on requiredness
-        // o but if we did, we should handle also the case where another bind is setting requiredness on the node
+        // - we would not depend on requiredness
+        // - but if we did, we should handle also the case where another bind is setting requiredness on the node
         //
         final boolean typeValidity;
         if (bind.typeQName != null) {

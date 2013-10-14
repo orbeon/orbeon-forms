@@ -337,8 +337,8 @@ public class OrbeonPortletXFormsFilter implements RenderFilter, ActionFilter, Re
             // because the behavior must be as if an action had occurred on a client, in which case the action URL would
             // already contain the new render parameters.
             // The bottom line is that we:
-            // o update the render parameter on the response so that they stick for future requests (see above)
-            // o make them available to the filtered portlet below
+            // - update the render parameter on the response so that they stick for future requests (see above)
+            // - make them available to the filtered portlet below
 
             // Copy existing render parameters
             this.updatedRenderParameters = new LinkedHashMap(super.getParameterMap());

@@ -193,8 +193,8 @@ public class PriorityResourceManagerImpl implements ResourceManager {
 //                // Here consider null as not found
 //                // The semantic is a bit different from the underlying managers, which have:
 //                //
-//                // o null: unsupported
-//                // o ResourceNotFoundException: supported by not found
+//                // - null: unsupported
+//                // - ResourceNotFoundException: supported by not found
 //                if (realPath == null)
 //                   throw new ResourceNotFoundException("Cannot read from file " + key);
 //                else

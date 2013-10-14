@@ -176,13 +176,13 @@ object PathMapXPathAnalysis {
                     case Some(baseAnalysis) if dependsOnFocus ⇒
                         // Expression depends on the context but the context doesn't have a pathmap
                         //
-                        // o if context is constant positive, context is a constant string
-                        // o if context is constant negative, we can't handle this
+                        // - if context is constant positive, context is a constant string
+                        // - if context is constant negative, we can't handle this
                         if (baseAnalysis.figuredOutDependencies) Some(stringPathmap) else None
                     case _ ⇒
                         // Start with a new PathMap if:
-                        // o we are at the top (i.e. does not have a context)
-                        // o or the expression does not depend on the focus
+                        // - we are at the top (i.e. does not have a context)
+                        // - or the expression does not depend on the focus
                         // NOTE: We used to test on DEPENDS_ON_CONTEXT_ITEM above, but any use of the focus would otherwise create
                         // a root context expression in PathMap, which is not right.
                         Some(new PathMap(expression, variablePathMaps, pathMapContext))

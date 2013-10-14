@@ -124,9 +124,9 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
             });
             // NOTE: we don't need $sequence here as HTML form posts are either:
             //
-            // o 2nd phase of replace="all" submission: we don't (and can't) retry
-            // o background upload: we don't want a sequence number as this run in parallel
-            // o noscript mode: we don't (and can't) retry
+            // - 2nd phase of replace="all" submission: we don't (and can't) retry
+            // - background upload: we don't want a sequence number as this run in parallel
+            // - noscript mode: we don't (and can't) retry
             //
             // NOTE: Keep empty static state and dynamic state until client is able to deal without them
             final String clientEncodedStaticState = XFormsStateManager.instance().getClientEncodedStaticState(containingDocument);

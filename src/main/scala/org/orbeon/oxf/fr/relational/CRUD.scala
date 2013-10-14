@@ -29,7 +29,7 @@ import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
 
-object Crud {
+object CRUD {
 
     case class Request(app: String, form: String, filename: Option[String], version: Version, dataPart: Option[Request#DataPart]) {
         case class DataPart(isDraft: Boolean, documentId: String)

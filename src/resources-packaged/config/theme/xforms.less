@@ -269,40 +269,45 @@
     }
 
     // xf:upload
-    .xforms-upload-state-empty {
-        .xforms-upload-info { display: none; }
-        .xforms-upload-progress { display: none; }
+    .xforms-upload {
+        &.xforms-upload-state-empty {
+            .xforms-upload-info { display: none; }
+            .xforms-upload-progress { display: none; }
+        }
+        &.xforms-upload-state-progress {
+            .xforms-upload-select { display: none; }
+            .xforms-upload-info { display: none; }
+        }
+        &.xforms-upload-state-file {
+            .xforms-upload-select { display: none; }
+            .xforms-upload-progress { display: none; }
+        }
+        .xforms-upload-mediatype { display: none }
+        .xforms-upload-size {
+            padding-left: 8px;
+            white-space: nowrap;
+        }
+        .xforms-upload-size:not(:empty) { // :not and :empty are IE9+
+            &:before { content: "(" }
+            &:after { content: ")" }
+        }
+        .xforms-upload-remove {
+            // Visually center
+            vertical-align: middle;
+            margin-top: -4px;
+            padding-left: 8px;
+            cursor: pointer;
+        }
+        .xforms-upload-progress {
+            .yui-pb, .xforms-upload-cancel { vertical-align: middle }
+            .xforms-upload-cancel { padding-left: .5em }
+            .yui-pb { display: inline-block; *display: inline; *zoom: 1 }
+        }
+
+        &.xforms-readonly {
+            .xforms-upload-remove, .xforms-upload-select { display: none }
+        }
     }
-    .xforms-upload-state-progress {
-        .xforms-upload-select { display: none; }
-        .xforms-upload-info { display: none; }
-    }
-    .xforms-upload-state-file {
-        .xforms-upload-select { display: none; }
-        .xforms-upload-progress { display: none; }
-    }
-    .xforms-upload-mediatype { display: none }
-    .xforms-upload-size {
-        padding-left: 8px;
-        white-space: nowrap;
-    }
-    .xforms-upload-size:not(:empty) { // :not and :empty are IE9+
-        &:before { content: "(" }
-        &:after { content: ")" }
-    }
-    .xforms-upload-remove {
-        // Visually center
-        vertical-align: middle;
-        margin-top: -4px;
-        padding-left: 8px;
-        cursor: pointer;
-    }
-    .xforms-upload-progress {
-        .yui-pb, .xforms-upload-cancel { vertical-align: middle }
-        .xforms-upload-cancel { padding-left: .5em }
-        .yui-pb { display: inline-block; *display: inline; *zoom: 1 }
-    }
-    .xforms-readonly .xforms-upload-remove { display: none }
 
     // Reasonable defaults for alignment of button content
     .xforms-trigger button {

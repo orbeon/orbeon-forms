@@ -270,56 +270,57 @@
   height: 20px;
   background: url(../../ops/images/xforms/slider-horizontal-thumb.png) no-repeat;
 }
-.orbeon .xforms-upload-state-empty .xforms-upload-info {
+.orbeon .xforms-upload.xforms-upload-state-empty .xforms-upload-info {
   display: none;
 }
-.orbeon .xforms-upload-state-empty .xforms-upload-progress {
+.orbeon .xforms-upload.xforms-upload-state-empty .xforms-upload-progress {
   display: none;
 }
-.orbeon .xforms-upload-state-progress .xforms-upload-select {
+.orbeon .xforms-upload.xforms-upload-state-progress .xforms-upload-select {
   display: none;
 }
-.orbeon .xforms-upload-state-progress .xforms-upload-info {
+.orbeon .xforms-upload.xforms-upload-state-progress .xforms-upload-info {
   display: none;
 }
-.orbeon .xforms-upload-state-file .xforms-upload-select {
+.orbeon .xforms-upload.xforms-upload-state-file .xforms-upload-select {
   display: none;
 }
-.orbeon .xforms-upload-state-file .xforms-upload-progress {
+.orbeon .xforms-upload.xforms-upload-state-file .xforms-upload-progress {
   display: none;
 }
-.orbeon .xforms-upload-mediatype {
+.orbeon .xforms-upload .xforms-upload-mediatype {
   display: none;
 }
-.orbeon .xforms-upload-size {
+.orbeon .xforms-upload .xforms-upload-size {
   padding-left: 8px;
   white-space: nowrap;
 }
-.orbeon .xforms-upload-size:not(:empty):before {
+.orbeon .xforms-upload .xforms-upload-size:not(:empty):before {
   content: "(";
 }
-.orbeon .xforms-upload-size:not(:empty):after {
+.orbeon .xforms-upload .xforms-upload-size:not(:empty):after {
   content: ")";
 }
-.orbeon .xforms-upload-remove {
+.orbeon .xforms-upload .xforms-upload-remove {
   vertical-align: middle;
   margin-top: -4px;
   padding-left: 8px;
   cursor: pointer;
 }
-.orbeon .xforms-upload-progress .yui-pb,
-.orbeon .xforms-upload-progress .xforms-upload-cancel {
+.orbeon .xforms-upload .xforms-upload-progress .yui-pb,
+.orbeon .xforms-upload .xforms-upload-progress .xforms-upload-cancel {
   vertical-align: middle;
 }
-.orbeon .xforms-upload-progress .xforms-upload-cancel {
+.orbeon .xforms-upload .xforms-upload-progress .xforms-upload-cancel {
   padding-left: 0.5em;
 }
-.orbeon .xforms-upload-progress .yui-pb {
+.orbeon .xforms-upload .xforms-upload-progress .yui-pb {
   display: inline-block;
   *display: inline;
   *zoom: 1;
 }
-.orbeon .xforms-readonly .xforms-upload-remove {
+.orbeon .xforms-upload.xforms-readonly .xforms-upload-remove,
+.orbeon .xforms-upload.xforms-readonly .xforms-upload-select {
   display: none;
 }
 .orbeon .xforms-trigger button img,

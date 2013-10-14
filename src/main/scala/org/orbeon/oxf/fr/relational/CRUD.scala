@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.sax.SAXSource
 import org.xml.sax.InputSource
+import javax.xml.transform.OutputKeys
 
 object CRUD {
 
@@ -180,6 +181,7 @@ object CRUD {
 
         def requestXML(): String = {
             val transformer = TransformerUtils.getXMLIdentityTransformer
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
             val writer = new StringBuilderWriter()
             val source = new SAXSource(XMLUtils.newXMLReader(XMLUtils.ParserConfiguration.PLAIN), new InputSource(requestInputStream))
             transformer.transform(source, new StreamResult(writer))

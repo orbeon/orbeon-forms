@@ -84,7 +84,7 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             // First time we put with "latest"
             val first: Document = <gaga1/>
             httpPut(FormURL, Latest, first)
-//            assertXMLDocuments(first, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(first, httpGet(FormURL, Specific(1)).get)
 //            assertXMLDocuments(first, httpGet(FormURL, Latest     ).get)
 //            assert(httpGet(FormURL, Specific(2)).isFailure)
 //

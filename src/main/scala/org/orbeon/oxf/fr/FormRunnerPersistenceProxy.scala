@@ -38,7 +38,7 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
  * - proxies GET, PUT, DELETE and POST to the appropriate persistence implementation
  * - sets persistence implementation headers
  */
-    class FormRunnerPersistenceProxy extends ProcessorImpl {
+class FormRunnerPersistenceProxy extends ProcessorImpl {
 
     private val FormPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/form/([^/]+))""".r
     private val DataPath                   = """/fr/service/persistence(/crud/([^/]+)/([^/]+)/(data|draft)/([^/]+)/([^/]+))""".r
@@ -164,6 +164,7 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
 
         // Aggregate and serialize
         // TODO: Add @operations="|admin" based on FB permissions. It is better if this is done in a centralized way.
+        // See https://github.com/orbeon/orbeon-forms/issues/1316
         val documentElement = elementInfo("forms")
         XFormsAPI.insert(into = documentElement, origin = formElements)
         TransformerUtils.getXMLIdentityTransformer.transform(documentElement, new StreamResult(response.getOutputStream))

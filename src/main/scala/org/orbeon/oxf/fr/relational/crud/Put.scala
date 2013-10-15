@@ -11,126 +11,62 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.fr.relational
+package org.orbeon.oxf.fr.relational.crud
 
-import java.sql.Connection
-import java.sql
-import org.orbeon.oxf.util.ScalaUtils._
-import org.orbeon.oxf.util.{StringBuilderWriter, ScalaUtils, NetUtils}
-import org.orbeon.oxf.externalcontext.ExternalContextOps._
-import scala.util.matching.Regex
 import java.io.ByteArrayOutputStream
-import java.nio.charset.Charset
-import javax.sql.rowset.serial.SerialClob
-import org.orbeon.oxf.processor.generator.RequestGenerator
-import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
-import javax.xml.transform.stream.StreamResult
-import javax.xml.transform.sax.SAXSource
-import org.xml.sax.InputSource
+import java.sql
+import java.sql.Connection
 import javax.xml.transform.OutputKeys
+import javax.xml.transform.sax.SAXSource
+import javax.xml.transform.stream.StreamResult
+import org.orbeon.oxf.fr.relational._
+import org.orbeon.oxf.pipeline.api.PipelineContext
+import org.orbeon.oxf.processor.generator.RequestGenerator
+import org.orbeon.oxf.util.ScalaUtils._
+import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
+import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
+import org.xml.sax.InputSource
+import scala.Some
 
-object CRUD {
-
-    case class Request(app: String, form: String, filename: Option[String], version: Version, dataPart: Option[Request#DataPart]) {
-        case class DataPart(isDraft: Boolean, documentId: String)
-        def forForm = ! dataPart.isDefined
-        def forData =   dataPart.isDefined
-        def forAttachment = filename.isDefined
-    }
-
-    def tableName(request: Request): String =
-        Seq(
-            Some("orbeon_form"),
-            request.forForm       option "_definition",
-            request.forData       option "_data",
-            request.forAttachment option "_attach"
-        ).flatten.mkString
-
-    private def latestNonDeletedFormVersion(connection: Connection, app: String, form: String): Option[Int] = {
-        val maxVersion = {
-            val ps = connection.prepareStatement(
-                """select max(form_version)
-                  |  from orbeon_form_definition
-                  | where (last_modified_by, app, form, form_version) in
-                  |       (
-                  |             select last_modified_time, app, form, form_version
-                  |               from orbeon_form_definition
-                  |              where app = ?
-                  |                    and form = ?
-                  |           group by app, form, form_version
-                  |       )
-                  |   and deleted = 'N'
-                """.stripMargin)
-            ps.setString(1, app)
-            ps.setString(2, form)
-            val rs = ps.executeQuery()
-            rs.next(); rs
-        }
-        val version = maxVersion.getInt(1)
-        if (maxVersion.wasNull()) None else Some(version)
-    }
-
-
-    private def httpRequest = NetUtils.getExternalContext.getRequest
-    private def headerValue(name: String): Option[String] = httpRequest.getFirstHeader(name)
-    private def requestUsername : Option[String] = headerValue("orbeon-username")
-    private def requestGroupname: Option[String] = headerValue("orbeon-groupname")
+trait Put extends Request with Common {
 
     private case class Row(created: sql.Date, username: Option[String], groupname: Option[String])
+    private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
-    private def existingRow(connection: Connection, request: Request): Option[Row] = {
-
-        // List of columns that identify a row
-        val idColumns =
-            Seq(
-                Some("app"), Some("form"),
-                request.forForm       option "form_version",
-                request.forData       option "document_id",
-                request.forAttachment option "file_name"
-            ).flatten.mkString(", ")
-
-        def latest = latestNonDeletedFormVersion(connection, request.app, request.form)
-        val table = tableName(request)
-        val version = request.version match {
-            case Latest         ⇒ latest.getOrElse(1)
-            case Next           ⇒ latest.map(_ + 1).getOrElse(1)
-            case Specific(v)    ⇒ v
-            case ForDocument(_) ⇒ throw new IllegalStateException // Only supported when retrieving a form
-        }
-
+        val idCols = idColumns(req)
+        val table = tableName(req)
         val resultSet = {
             val ps = connection.prepareStatement(
-                s"""select created ${request.forData.option(", username , groupname").mkString}
+                s"""select created ${req.forData.option(", username , groupname").mkString}
                    |  from $table
-                   | where (last_modified_time, $idColumns)
+                   | where (last_modified_time, $idCols)
                    |       in
                    |       (
-                   |             select max(last_modified_time) last_modified_time, $idColumns
+                   |             select max(last_modified_time) last_modified_time, $idCols
                    |               from $table
                    |              where app  = ?
                    |                    and form = ?
                    |                    and form_version = ?
-                   |                    ${if (request.forData)       "and document_id = ?" else ""}
-                   |                    ${if (request.forAttachment) "and file_name   = ?" else ""}
-                   |           group by $idColumns
+                   |                    ${if (req.forData)       "and document_id = ?" else ""}
+                   |                    ${if (req.forAttachment) "and file_name   = ?" else ""}
+                   |           group by $idCols
                    |       )
                    |       and deleted = 'N'
                  """.stripMargin)
             val position = Iterator.from(1)
-            ps.setString(position.next(), request.app)
-            ps.setString(position.next(), request.form)
-            ps.setInt(position.next(), version)
-            if (request.forData)       ps.setString(position.next(), request.dataPart.get.documentId)
-            if (request.forAttachment) ps.setString(position.next(), request.filename.get)
+            ps.setString(position.next(), req.app)
+            ps.setString(position.next(), req.form)
+            ps.setInt(position.next(), requestedFormVersion(connection, req))
+            if (req.forData)       ps.setString(position.next(), req.dataPart.get.documentId)
+            if (req.forAttachment) ps.setString(position.next(), req.filename.get)
             ps.executeQuery()
         }
 
         // Build case case with first row of result
         if (resultSet.next()) {
             val row = new Row(resultSet.getDate("created"),
-                                  if (request.forData) Some(resultSet.getString("username")) else None,
-                                  if (request.forData) Some(resultSet.getString("group"   )) else None)
+                                  if (req.forData) Some(resultSet.getString("username")) else None,
+                                  if (req.forData) Some(resultSet.getString("group"   )) else None)
             // Query should return at most one row
             assert(! resultSet.next())
             Some(row)
@@ -204,14 +140,11 @@ object CRUD {
         ps.executeUpdate()
     }
 
-    private val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
-
     def put(): Unit = {
-        val CrudFormPath(_, app, form, _) = NetUtils.getExternalContext.getRequest.getRequestPath
         RelationalUtils.withConnection { connection ⇒
-            val request = new Request(app, form, None, Latest, None)
-            val existing = existingRow(connection, request)
-            store(connection, request, existing)
+            val req = request
+            val existing = existingRow(connection, req)
+            store(connection, req, existing)
         }
     }
 }

@@ -69,7 +69,11 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             loadState = true, logBody = false).connect(saveState = true)
     }
 
-    private def httpPut(url: String, version: Version, body: Document): Unit = http(url, "PUT", version, Some(body)).close()
+    private def httpPut(url: String, version: Version, body: Document): Unit = {
+        Thread.sleep(2000)
+        http(url, "PUT", version, Some(body)).close()
+    }
+
     private def httpGet(url: String, version: Version): Try[Document] =
         useAndClose(http(url, "GET", version, None)) { connectionResult ⇒
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
@@ -103,13 +107,13 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
             assert(httpGet(FormURL, Specific(3)).isFailure)
 
-//            // Put a specific version
-//            val fourth: Document = <gaga4/>
-//            httpPut(FormURL, Specific(1), fourth)
-//            assertXMLDocuments(fourth, httpGet(FormURL, Specific(1)).get)
-//            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
-//            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
-//            assert(httpGet(FormURL, Specific(3)).isFailure)
+            // Put a specific version
+            val fourth: Document = <gaga4/>
+            httpPut(FormURL, Specific(1), fourth)
+            assertXMLDocuments(fourth, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
+            assert(httpGet(FormURL, Specific(3)).isFailure)
         }
     }
 }

@@ -15,7 +15,6 @@ package org.orbeon.oxf.fr.relational.crud
 
 import org.orbeon.oxf.fr.relational.RelationalUtils
 import org.orbeon.oxf.util.NetUtils
-import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 
 trait Get extends Request with Common {
@@ -26,8 +25,8 @@ trait Get extends Request with Common {
             val table = tableName(request)
             val idCols = idColumns(request)
 
-            val ps =
-                connection.prepareStatement(
+            val resultSet = {
+                val ps = connection.prepareStatement(
                     s"""select
                       |    last_modified_time,
                       |    ${if (req.forAttachment) "file_content" else "t.xml xml"}
@@ -45,22 +44,22 @@ trait Get extends Request with Common {
                       |                     ${if (req.forAttachment) "and file_name = ?"                 else ""}
                       |          )
                       |    and deleted = 'N'
-                      |""".stripMargin
-                ) |!> { ps ⇒
-                    val position = Iterator.from(1)
-                    ps.setString(position.next(), req.app)
-                    ps.setString(position.next(), req.form)
-                    if (req.forForm) ps.setInt(position.next(), requestedFormVersion(connection, req))
-                    if (req.forData) {
-                        ps.setString(position.next(), req.dataPart.get.documentId)
-                        ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
-                    }
-                    if (req.forAttachment) ps.setString(position.next(), req.filename.get)
-                }
+                      |""".stripMargin)
 
-            val rs = ps.executeQuery()
-            if (rs.next()) {
-                val xml = rs.getClob("xml")
+                val position = Iterator.from(1)
+                ps.setString(position.next(), req.app)
+                ps.setString(position.next(), req.form)
+                if (req.forForm) ps.setInt(position.next(), requestedFormVersion(connection, req))
+                if (req.forData) {
+                    ps.setString(position.next(), req.dataPart.get.documentId)
+                    ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
+                }
+                if (req.forAttachment) ps.setString(position.next(), req.filename.get)
+                ps.executeQuery()
+            }
+
+            if (resultSet.next()) {
+                val xml = resultSet.getClob("xml")
                 val response = NetUtils.getExternalContext.getResponse
                 NetUtils.copyStream(xml.getCharacterStream, response.getWriter)
             } else {

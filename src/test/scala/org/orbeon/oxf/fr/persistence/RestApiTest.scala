@@ -70,7 +70,6 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
     }
 
     private def httpPut(url: String, version: Version, body: Document): Unit = {
-        Thread.sleep(2000)
         http(url, "PUT", version, Some(body)).close()
     }
 
@@ -116,4 +115,5 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             assert(httpGet(FormURL, Specific(3)).isFailure)
         }
     }
+
 }

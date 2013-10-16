@@ -1,8 +1,8 @@
 alter database character set utf8 collate utf8_general_ci;
 
 create table orbeon_form_definition (
-    created            timestamp,
-    last_modified_time timestamp,
+    created            timestamp(6),
+    last_modified_time timestamp(6),
     last_modified_by   varchar(255),
     app                varchar(255),
     form               varchar(255),
@@ -12,8 +12,8 @@ create table orbeon_form_definition (
 )   engine = InnoDB;
 
 create table orbeon_form_definition_attach (
-    created            timestamp,
-    last_modified_time timestamp,
+    created            timestamp(6),
+    last_modified_time timestamp(6),
     last_modified_by   varchar(255),
     app                varchar(255),
     form               varchar(255),
@@ -24,8 +24,8 @@ create table orbeon_form_definition_attach (
 )   engine = InnoDB;
 
 create table orbeon_form_data (
-    created            timestamp,
-    last_modified_time timestamp,
+    created            timestamp(6),
+    last_modified_time timestamp(6),
     last_modified_by   varchar(255),
     username           varchar(255),
     groupname          varchar(255),
@@ -39,8 +39,8 @@ create table orbeon_form_data (
 )   engine = InnoDB;
 
 create table orbeon_form_data_attach (
-    created            timestamp,
-    last_modified_time timestamp,
+    created            timestamp(6),
+    last_modified_time timestamp(6),
     last_modified_by   varchar(255),
     username           varchar(255),
     groupname          varchar(255),

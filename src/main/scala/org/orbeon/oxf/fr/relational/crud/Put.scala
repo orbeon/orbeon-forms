@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr.relational.crud
 
 import java.io.ByteArrayOutputStream
 import java.sql
-import java.sql.Connection
+import java.sql.{Timestamp, Connection}
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.sax.SAXSource
 import javax.xml.transform.stream.StreamResult
@@ -30,7 +30,7 @@ import scala.Some
 
 trait Put extends Request with Common {
 
-    private case class Row(created: sql.Date, username: Option[String], groupname: Option[String])
+    private case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String])
     private def existingRow(connection: Connection, req: Request): Option[Row] = {
 
         val idCols = idColumns(req)
@@ -64,9 +64,9 @@ trait Put extends Request with Common {
 
         // Build case case with first row of result
         if (resultSet.next()) {
-            val row = new Row(resultSet.getDate("created"),
-                                  if (req.forData) Some(resultSet.getString("username")) else None,
-                                  if (req.forData) Some(resultSet.getString("group"   )) else None)
+            val row = new Row(resultSet.getTimestamp("created"),
+                              if (req.forData) Some(resultSet.getString("username")) else None,
+                              if (req.forData) Some(resultSet.getString("group"   )) else None)
             // Query should return at most one row
             assert(! resultSet.next())
             Some(row)
@@ -75,35 +75,35 @@ trait Put extends Request with Common {
         }
     }
 
-    def store(connection: Connection, request: Request, existingRow: Option[Row]): Unit = {
+    def store(connection: Connection, req: Request, existingRow: Option[Row]): Unit = {
 
-        val table = tableName(request)
+        val table = tableName(req)
         val ps = connection.prepareStatement(
             s"""insert into $table
                 (
                                                     created, last_modified_time, last_modified_by
                                                     , app, form, form_version
-                    ${if (request.forData)         ", document_id"             else ""}
+                    ${if (req.forData)         ", document_id"             else ""}
                                                     , deleted
-                    ${if (request.forData)         ", draft"                   else ""}
-                    ${if (request.forAttachment)   ", file_name, file_content" else ""}
-                    ${if (! request.forAttachment) ", xml"                     else ""}
-                    ${if (request.forData)         ", username, groupname"     else ""}
+                    ${if (req.forData)         ", draft"                   else ""}
+                    ${if (req.forAttachment)   ", file_name, file_content" else ""}
+                    ${if (! req.forAttachment) ", xml"                     else ""}
+                    ${if (req.forData)         ", username, groupname"     else ""}
                 )
                 values
                 (
                                                     ?, ?, ?
-                                                    , ?, ?, 1
-                    ${if (request.forData)         ", ?"    else ""}
+                                                    , ?, ?, ?
+                    ${if (req.forData)         ", ?"    else ""}
                                                     , 'N'
-                    ${if (request.forData)         ", ?"    else ""}
-                    ${if (request.forAttachment)   ", ?, ?" else ""}
-                    ${if (! request.forAttachment) ", ?"    else ""}
-                    ${if (request.forData)         ", ?, ?" else ""}
+                    ${if (req.forData)         ", ?"    else ""}
+                    ${if (req.forAttachment)   ", ?, ?" else ""}
+                    ${if (! req.forAttachment) ", ?"    else ""}
+                    ${if (req.forData)         ", ?, ?" else ""}
                 )""".stripMargin)
 
         val position = Iterator.from(1)
-        val now = new sql.Date(System.currentTimeMillis())
+        val now = new Timestamp(System.currentTimeMillis())
         val requestInputStream = {
             val bodyURL = RequestGenerator.getRequestBody(PipelineContext.get)
             NetUtils.uriToInputStream(bodyURL)
@@ -124,18 +124,19 @@ trait Put extends Request with Common {
             writer.toString
         }
 
-                                     ps.setDate  (position.next(), existingRow.map(_.created).getOrElse(now))
-                                     ps.setDate  (position.next(), now)
-                                     ps.setString(position.next(), requestUsername.getOrElse(null))
-                                     ps.setString(position.next(), request.app)
-                                     ps.setString(position.next(), request.form)
-        if (request.forData)         ps.setString(position.next(), request.dataPart.get.documentId)
-        if (request.forData)         ps.setString(position.next(), if (request.dataPart.get.isDraft) "Y" else "N")
-        if (request.forAttachment)   ps.setString(position.next(), request.filename.get)
-        if (request.forAttachment)   ps.setBytes (position.next(), requestBytes())
-        if (! request.forAttachment) ps.setString(position.next(), requestXML())
-        if (request.forData)         ps.setString(position.next(), existingRow.map(_.username .get).getOrElse(requestUsername .getOrElse(null)))
-        if (request.forData)         ps.setString(position.next(), existingRow.map(_.groupname.get).getOrElse(requestGroupname.getOrElse(null)))
+                                 ps.setTimestamp(position.next(), existingRow.map(_.created).getOrElse(now))
+                                 ps.setTimestamp(position.next(), now)
+                                 ps.setString(position.next(), requestUsername.getOrElse(null))
+                                 ps.setString(position.next(), req.app)
+                                 ps.setString(position.next(), req.form)
+                                 ps.setInt   (position.next(), requestedFormVersion(connection, req))
+        if (req.forData)         ps.setString(position.next(), req.dataPart.get.documentId)
+        if (req.forData)         ps.setString(position.next(), if (req.dataPart.get.isDraft) "Y" else "N")
+        if (req.forAttachment)   ps.setString(position.next(), req.filename.get)
+        if (req.forAttachment)   ps.setBytes (position.next(), requestBytes())
+        if (! req.forAttachment) ps.setString(position.next(), requestXML())
+        if (req.forData)         ps.setString(position.next(), existingRow.map(_.username .get).getOrElse(requestUsername .getOrElse(null)))
+        if (req.forData)         ps.setString(position.next(), existingRow.map(_.groupname.get).getOrElse(requestGroupname.getOrElse(null)))
 
         ps.executeUpdate()
     }

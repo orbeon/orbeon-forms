@@ -45,7 +45,20 @@ trait Request {
     val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
     def request: Request = {
         val CrudFormPath(_, app, form, _) = NetUtils.getExternalContext.getRequest.getRequestPath
-        new Request(app, form, None, Latest, None)
+        val version = {
+            val documentId = headerValue("orbeon-for-document-id")
+            documentId match {
+                case Some(id) ⇒ ForDocument(id)
+                case None ⇒
+                    val versionHeader = headerValue("orbeon-form-definition-version")
+                    versionHeader match {
+                        case None ⇒ Latest
+                        case Some("next") ⇒ Next
+                        case Some(v) ⇒ Specific(Integer.parseInt(v))
+                    }
+            }
+        }
+        new Request(app, form, None, version, None)
     }
 
 }

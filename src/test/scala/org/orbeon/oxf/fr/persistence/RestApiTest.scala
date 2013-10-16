@@ -95,14 +95,14 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             assertXMLDocuments(second, httpGet(FormURL, Latest     ).get)
             assert(httpGet(FormURL, Specific(2)).isFailure)
 
-//            // Put with "next" to get two versions
-//            val third: Document = <gaga3/>
-//            httpPut(FormURL, Next, third)
-//            assertXMLDocuments(second, httpGet(FormURL, Specific(1)).get)
-//            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
-//            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
-//            assert(httpGet(FormURL, Specific(3)).isFailure)
-//
+            // Put with "next" to get two versions
+            val third: Document = <gaga3/>
+            httpPut(FormURL, Next, third)
+            assertXMLDocuments(second, httpGet(FormURL, Specific(1)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
+            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
+            assert(httpGet(FormURL, Specific(3)).isFailure)
+
 //            // Put a specific version
 //            val fourth: Document = <gaga4/>
 //            httpPut(FormURL, Specific(1), fourth)

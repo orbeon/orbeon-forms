@@ -24,9 +24,9 @@ trait Common extends Request {
             val ps = connection.prepareStatement(
                 """select max(form_version)
                   |  from orbeon_form_definition
-                  | where (last_modified_by, app, form, form_version) in
+                  | where (last_modified_time, app, form, form_version) in
                   |       (
-                  |             select last_modified_time, app, form, form_version
+                  |             select max(last_modified_time) last_modified_time, app, form, form_version
                   |               from orbeon_form_definition
                   |              where app = ?
                   |                    and form = ?

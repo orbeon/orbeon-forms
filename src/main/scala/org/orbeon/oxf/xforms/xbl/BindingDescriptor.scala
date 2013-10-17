@@ -21,12 +21,13 @@ import scala.collection.JavaConverters._
 import org.orbeon.scaxon.XML._
 import org.orbeon.oxf.fr.FormRunner
 import org.orbeon.oxf.xforms.analysis.model.Model._
+import org.orbeon.css.CSSSelectorParser
 
 case class BindingDescriptor(elementName: QName, datatype: Option[QName], appearance: Option[String], mediatype: Option[String])
 
 object BindingDescriptor {
 
-    import org.orbeon.oxf.xforms.xbl.CSSSelectorParser._
+    import CSSSelectorParser._
 
     def parseAllSelectors(bindings: Seq[NodeInfo]): Map[QName, BindingDescriptor] = {
 

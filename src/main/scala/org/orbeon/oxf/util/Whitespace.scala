@@ -14,12 +14,13 @@
 package org.orbeon.oxf.util
 
 import collection.mutable
-import org.orbeon.oxf.xforms.xbl.CSSSelectorParser._
-import org.orbeon.oxf.xforms.xbl.CSSSelectorParser
+import org.orbeon.css.CSSSelectorParser
 import org.xml.sax.Attributes
 import org.orbeon.oxf.properties.Properties
 
 object Whitespace  {
+
+    import CSSSelectorParser._
 
     sealed trait Policy { val name: String }
     case object Preserve  extends Policy { val name = "preserve"  }

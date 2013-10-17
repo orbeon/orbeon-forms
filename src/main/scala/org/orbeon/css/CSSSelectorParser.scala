@@ -11,10 +11,10 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.xbl
+package org.orbeon.css
 
-import org.parboiled.scala._
 import org.parboiled.errors.{ErrorUtils, ParsingException}
+import org.parboiled.scala._
 
 // CSS 3 selector parser based on the grammar specified at: http://www.w3.org/TR/css3-selectors/
 //

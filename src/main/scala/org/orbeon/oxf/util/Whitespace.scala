@@ -98,11 +98,10 @@ object Whitespace  {
 
         val propertySet = Properties.instance.getPropertySet
         
-        def whitespacePropertyDontAssociate(scope: String, policy: String) = {
-            Option(propertySet.getProperty(scope + '.' + policy)) map {
-                property ⇒ property.namespaces → property.value.toString
-            }
-        }
+        def whitespacePropertyDontAssociate(scope: String, policy: String) = (
+            Option(propertySet.getProperty(scope + '.' + policy))
+            map (property ⇒ property.namespaces → property.value.toString)
+        )
 
         // NOTE: Not ideal if no whitespace property is present, there won't be any caching associated with properties.
         def whitespacePolicyAssociateIfPossible[T](scope: String, evaluate: ⇒ T): T = (
@@ -115,9 +114,7 @@ object Whitespace  {
         def matchersForPolicy(policy: Policy): List[Matcher] =
             whitespacePropertyDontAssociate(scope, policy.name) map {
                 case (ns, value) ⇒
-                    val selectors = CSSSelectorParser.parseSelectors(value)
-
-                    selectors collect {
+                    CSSSelectorParser.parseSelectors(value) collect {
                         case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), Nil) ⇒
                             ElementMatcher(ns(prefix) → localname)
                         case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), List((ChildCombinator, ElementWithFiltersSelector(Some(UniversalSelector(None)), Nil)))) ⇒
@@ -129,7 +126,6 @@ object Whitespace  {
                         case _ ⇒
                             throw new IllegalArgumentException(s"Unrecognized whitespace policy: $value")
                     }
-
             } getOrElse
                 Nil
 

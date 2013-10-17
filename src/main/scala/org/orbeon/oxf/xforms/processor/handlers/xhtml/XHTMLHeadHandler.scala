@@ -21,7 +21,7 @@ import org.orbeon.oxf.xforms.XFormsProperties._
 import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.processor.XFormsFeatures
 import org.orbeon.oxf.xforms.xbl.XBLResources
-import org.orbeon.oxf.xml.{ContentHandlerHelper, XMLConstants}
+import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLConstants}
 import org.xml.sax.helpers.AttributesImpl
 import collection.JavaConverters._
 import state.XFormsStateManager
@@ -36,7 +36,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
 
     // Output an element
     private def outputElement(
-            helper: ContentHandlerHelper,
+            helper: XMLReceiverHelper,
             xhtmlPrefix: String,
             attributesImpl: AttributesImpl,
             getElementDetails: (Option[String], Option[String]) ⇒ (String, Array[String])
@@ -49,14 +49,14 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
         val (elementName, attributes) = getElementDetails(resource, cssClass)
 
         attributesImpl.clear()
-        ContentHandlerHelper.populateAttributes(attributesImpl, attributes)
+        XMLReceiverHelper.populateAttributes(attributesImpl, attributes)
         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, elementName, attributesImpl)
         // output content only if present
         content foreach helper.text
         helper.endElement()
     }
 
-    override def outputCSSResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl): Unit = {
+    override def outputCSSResources(helper: XMLReceiverHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl): Unit = {
 
         // Function to output either a <link> or <style> element
         def outputCSSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
@@ -78,7 +78,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             minimal)
     }
 
-    override def outputJavaScriptResources(helper: ContentHandlerHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl): Unit = {
+    override def outputJavaScriptResources(helper: XMLReceiverHelper, xhtmlPrefix: String, minimal: Boolean, attributesImpl: AttributesImpl): Unit = {
 
         // Function to output either a <script> element
         def outputJSElement = outputElement(helper, xhtmlPrefix, attributesImpl,
@@ -97,7 +97,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
             minimal)
     }
 
-    override def outputConfigurationProperties(helper: ContentHandlerHelper, xhtmlPrefix: String, versionedResources: Boolean): Unit = {
+    override def outputConfigurationProperties(helper: XMLReceiverHelper, xhtmlPrefix: String, versionedResources: Boolean): Unit = {
 
         // Gather all static properties that need to be sent to the client
         val staticProperties = containingDocument.getStaticState.getNonDefaultProperties filter
@@ -180,7 +180,7 @@ class XHTMLHeadHandler extends XHTMLHeadHandlerBase {
 
 object XHTMLHeadHandler {
 
-    def outputScripts(helper: ContentHandlerHelper, scripts: Iterable[(String, String)]) =
+    def outputScripts(helper: XMLReceiverHelper, scripts: Iterable[(String, String)]) =
         for ((clientName, body) ← scripts) {
             helper.text("\nfunction " + clientName + "(event) {\n")
             helper.text(body)

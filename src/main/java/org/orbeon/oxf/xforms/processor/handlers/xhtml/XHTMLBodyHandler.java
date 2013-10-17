@@ -16,7 +16,8 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xforms.processor.handlers.NullElementHandler;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;
@@ -25,14 +26,10 @@ import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait$;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xforms.processor.handlers.NullContentHandler;
 import org.orbeon.oxf.xforms.processor.handlers.NullHandler;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.xbl.XBLBindings;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -43,7 +40,7 @@ import scala.collection.Seq;
  */
 public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
-    private ContentHandlerHelper helper;
+    private XMLReceiverHelper helper;
 
 //    private String formattingPrefix;
 
@@ -63,7 +60,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
         // Start xhtml:body
         final XMLReceiver xmlReceiver = handlerContext.getController().getOutput();
         xmlReceiver.startElement(uri, localname, qName, attributes);
-        helper = new ContentHandlerHelper(xmlReceiver);
+        helper = new XMLReceiverHelper(xmlReceiver);
 
         final String htmlPrefix = XMLUtils.prefixFromQName(qName);
 
@@ -330,7 +327,7 @@ public class XHTMLBodyHandler extends XFormsBaseHandlerXHTML {
 
         // xf:repeat
         controller.registerHandler(XFormsRepeatHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat", ANY_MATCHER);
-        controller.registerHandler(NullContentHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat-iteration", ANY_MATCHER);
+        controller.registerHandler(NullElementHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "repeat-iteration", ANY_MATCHER);
 
         // xf:secret
         controller.registerHandler(XFormsSecretHandler.class.getName(), XFormsConstants.XFORMS_NAMESPACE_URI, "secret", ANY_MATCHER);

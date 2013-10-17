@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.analysis.ChildrenBuilderTrait
 import org.orbeon.oxf.xforms.analysis.StaticStateContext
 import org.orbeon.oxf.xforms.event.XFormsEvents._
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler.LAST_ID_QNAME
+import org.orbeon.oxf.xforms.analysis.XFormsExtractor.LAST_ID_QNAME
 
 /**
  * Single root container for the entire controls hierarchy.

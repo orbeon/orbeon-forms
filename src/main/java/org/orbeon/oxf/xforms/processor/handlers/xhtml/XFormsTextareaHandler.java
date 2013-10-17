@@ -47,7 +47,7 @@ public class XFormsTextareaHandler extends XFormsControlLifecyleHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (!isStaticReadonly(textareaControl)) {
                 final String textareaQName = XMLUtils.buildQName(xhtmlPrefix, "textarea");
-                containerAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
+                containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);
 
                 // Handle accessibility attributes
                 handleAccessibilityAttributes(attributes, containerAttributes);

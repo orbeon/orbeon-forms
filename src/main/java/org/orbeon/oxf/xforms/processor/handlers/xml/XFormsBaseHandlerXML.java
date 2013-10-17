@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsValueControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -50,10 +50,10 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
             {
             	XFormsValueControl valueControl = (XFormsValueControl) control;
             	if (valueControl.getValue() != null) {
-            		newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "value", XFormsConstants.XXFORMS_PREFIX + ":value", ContentHandlerHelper.CDATA, ((XFormsValueControl) control).getValue());
+            		newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "value", XFormsConstants.XXFORMS_PREFIX + ":value", XMLReceiverHelper.CDATA, ((XFormsValueControl) control).getValue());
             	}
             	if (valueControl.getExternalValue() != null) {
-            		newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "external-value", XFormsConstants.XXFORMS_PREFIX + ":external-value", ContentHandlerHelper.CDATA, ((XFormsValueControl) control).getExternalValue());
+            		newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "external-value", XFormsConstants.XXFORMS_PREFIX + ":external-value", XMLReceiverHelper.CDATA, ((XFormsValueControl) control).getExternalValue());
             	}
             }
         }
@@ -134,6 +134,6 @@ public abstract class XFormsBaseHandlerXML extends XFormsBaseHandler {
     }
 
     void updateID(AttributesImpl attributes, String effectiveId, LHHAC lhhac) {
-    	attributes.setAttribute(attributes.getIndex("id"),"", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(lhhac)));
+    	attributes.setAttribute(attributes.getIndex("id"),"", "id", "id", XMLReceiverHelper.CDATA, getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(lhhac)));
     }
 }

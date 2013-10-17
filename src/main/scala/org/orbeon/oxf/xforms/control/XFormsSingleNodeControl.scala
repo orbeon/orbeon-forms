@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms._
 import org.orbeon.oxf.xforms.analysis.controls.SingleNodeTrait
 import org.orbeon.oxf.xforms.control.controls.XFormsUploadControl
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.saxon.om.Item
@@ -285,7 +285,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
     override def setFocus(inputOnly: Boolean): Boolean = Focus.focusWithEvents(this)
 
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {
+    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) {
         assert(attributesImpl.getLength == 0)
 
         val control1 = other.asInstanceOf[XFormsSingleNodeControl]
@@ -335,7 +335,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         var added = false
 
         def addAttribute(name: String, value: String) = {
-            attributesImpl.addAttribute("", name, name, ContentHandlerHelper.CDATA, value)
+            attributesImpl.addAttribute("", name, name, XMLReceiverHelper.CDATA, value)
             added = true
         }
 
@@ -356,7 +356,7 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         added
     }
 
-    protected def outputValueElement(ch: ContentHandlerHelper, valueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String) {
+    protected def outputValueElement(ch: XMLReceiverHelper, valueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String) {
 
         // Create element with text value
         val value = valueControl.getEscapedExternalValue

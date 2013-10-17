@@ -23,7 +23,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.webapp.ProcessorService;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -47,7 +47,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                 // Get top throwable
                 Throwable throwable = (Throwable) context.getAttribute(ProcessorService.Throwable());
 
-                final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                final XMLReceiverHelper helper = new XMLReceiverHelper(xmlReceiver);
                 helper.startDocument();
                 helper.startElement("exceptions");
 
@@ -69,7 +69,7 @@ public class ExceptionGenerator extends ProcessorImpl {
         return output;
     }
 
-    public static void addThrowable(ContentHandlerHelper helper, Throwable throwable, boolean stackTrace) {
+    public static void addThrowable(XMLReceiverHelper helper, Throwable throwable, boolean stackTrace) {
         helper.startElement("exception");
 
         helper.element("type", throwable.getClass().getName());
@@ -99,7 +99,7 @@ public class ExceptionGenerator extends ProcessorImpl {
         helper.endElement();
     }
 
-    public static void addLocationData(ContentHandlerHelper helper, List locationDataList) {
+    public static void addLocationData(XMLReceiverHelper helper, List locationDataList) {
         if (locationDataList != null) {
             for (Iterator i = locationDataList.iterator(); i.hasNext();) {
                 final LocationData locationData = (LocationData) i.next();

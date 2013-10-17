@@ -20,7 +20,7 @@ import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.SAXException;
 
 import java.sql.Connection;
@@ -51,18 +51,18 @@ public class ListInitializedTables extends SimpleProcessor {
             ResultSet tables = metaData.getTables(null, null, "ORBEON_%", null);
 
             // Send the result as XML, outputting one row per table
-            ContentHandlerHelper contentHandlerHelper = new ContentHandlerHelper(xmlReceiver);
-            contentHandlerHelper.startDocument();
-            contentHandlerHelper.startElement("tables");
+            XMLReceiverHelper receiverHelper = new XMLReceiverHelper(xmlReceiver);
+            receiverHelper.startDocument();
+            receiverHelper.startElement("tables");
             while (tables.next()) {
-                contentHandlerHelper.startElement("table");
-                contentHandlerHelper.startElement("name");
-                contentHandlerHelper.text(tables.getString("TABLE_NAME"));
-                contentHandlerHelper.endElement();
-                contentHandlerHelper.endElement();
+                receiverHelper.startElement("table");
+                receiverHelper.startElement("name");
+                receiverHelper.text(tables.getString("TABLE_NAME"));
+                receiverHelper.endElement();
+                receiverHelper.endElement();
             }
-            contentHandlerHelper.endElement();
-            contentHandlerHelper.endDocument();
+            receiverHelper.endElement();
+            receiverHelper.endDocument();
         } catch (Exception e) {
             throw new OXFException(e);
         }

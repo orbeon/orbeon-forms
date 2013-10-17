@@ -44,7 +44,7 @@ import java.util.Map;
  *       o Handle single node vs. all nodes
  *       o Handle duplicate expressions (e.g. /a/b/c added several times)
  */
-public class XPathContentHandler implements XMLReceiver {
+public class XPathXMLReceiver implements XMLReceiver {
 
     private Map expressions;
     private List expressionsList;
@@ -66,7 +66,7 @@ public class XPathContentHandler implements XMLReceiver {
         public SAXStore result;
     }
 
-    public XPathContentHandler() {
+    public XPathXMLReceiver() {
     }
 
     public boolean addExpresssion(String xpathExpression, boolean nodeSet) {

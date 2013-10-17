@@ -26,7 +26,7 @@ import org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleJDBC4Delegate;
 import org.orbeon.oxf.processor.sql.delegates.SQLProcessorStandardDelegate;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xml.DeferredXMLReceiver;
-import org.orbeon.oxf.xml.XPathContentHandler;
+import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
@@ -50,7 +50,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
 
     private PipelineContext pipelineContext;
     private Node input;
-    private XPathContentHandler xpathContentHandler;
+    private XPathXMLReceiver xpathReceiver;
     private DeferredXMLReceiver output;
     private NamespaceSupport namespaceSupport;
 
@@ -350,12 +350,12 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         this.datasource = datasource;
     }
 
-    public XPathContentHandler getXPathContentHandler() {
-        return xpathContentHandler;
+    public XPathXMLReceiver getXPathContentHandler() {
+        return xpathReceiver;
     }
 
-    public void setXPathContentHandler(XPathContentHandler xpathContentHandler) {
-        this.xpathContentHandler = xpathContentHandler;
+    public void setXPathContentHandler(XPathXMLReceiver xpathReceiver) {
+        this.xpathReceiver = xpathReceiver;
     }
 
     public DeferredXMLReceiver getOutput() {

@@ -32,7 +32,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -147,7 +147,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
                 ds.setCaseSensitive(config.isCaseSensitive());
 
                 // Set the event listener
-                final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                final XMLReceiverHelper helper = new XMLReceiverHelper(xmlReceiver);
                 ds.setEventListener(new DirectoryScanner.EventListener() {
 
                     private List<String> pathNames = new ArrayList<String>();
@@ -306,7 +306,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
         return output;
     }
 
-    private static void outputMetadata(ContentHandlerHelper helper, Metadata metadata, String elementName) throws MetadataException {
+    private static void outputMetadata(XMLReceiverHelper helper, Metadata metadata, String elementName) throws MetadataException {
         if (metadata.getDirectoryCount() > 0) {
             for (Directory directory: metadata.getDirectories()) {
 
@@ -423,7 +423,7 @@ public class DirectoryScannerProcessor extends ProcessorImpl {
         }
     }
 
-    private static void outputImageMetadata(ContentHandlerHelper helper, Config config, File file) throws Exception {
+    private static void outputImageMetadata(XMLReceiverHelper helper, Config config, File file) throws Exception {
         helper.startElement("image-metadata");
         InputStream is = new BufferedInputStream(new FileInputStream(file));
         try {

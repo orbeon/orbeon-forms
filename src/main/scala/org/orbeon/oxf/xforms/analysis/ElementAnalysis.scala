@@ -18,7 +18,7 @@ import model.Model
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils.{getElementId, maybeAVT}
 import org.dom4j.{QName, Element}
-import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper}
 import org.orbeon.oxf.xml.XMLConstants.XML_LANG_QNAME
 import org.orbeon.oxf.xml.dom4j.{Dom4jUtils, LocationData, ExtendedLocationData}
 import org.orbeon.oxf.xforms.xbl.Scope
@@ -192,7 +192,7 @@ abstract class ElementAnalysis(
         "name"              → element.attributeValue("name")
     )
     
-    def toXMLContent(helper: ContentHandlerHelper): Unit = {
+    def toXMLContent(helper: XMLReceiverHelper): Unit = {
         // Control binding and value analysis
         if (_bindingAnalyzed)
             getBindingAnalysis match {
@@ -213,7 +213,7 @@ abstract class ElementAnalysis(
             }
     }
     
-    final def toXML(helper: ContentHandlerHelper): Unit = {
+    final def toXML(helper: XMLReceiverHelper): Unit = {
         helper.startElement(localName, toXMLAttributes flatMap (t ⇒ Seq(t._1, t._2)) toArray)
         toXMLContent(helper)
         helper.endElement()

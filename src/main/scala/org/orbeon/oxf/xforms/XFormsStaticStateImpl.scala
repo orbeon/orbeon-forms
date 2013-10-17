@@ -55,7 +55,7 @@ class XFormsStaticStateImpl(
 
     // Delegation to top-level part
     def dumpAnalysis() = topLevelPart.dumpAnalysis()
-    def toXML(helper: ContentHandlerHelper) = topLevelPart.toXML(helper)
+    def toXML(helper: XMLReceiverHelper) = topLevelPart.toXML(helper)
 
     // Properties
     lazy val allowedExternalEvents = stringOptionToSet(Option(getProperty[String](P.EXTERNAL_EVENTS_PROPERTY)))
@@ -179,12 +179,12 @@ object XFormsStaticStateImpl {
         val prefix = startScope.fullPrefix
 
         // Annotator with prefix
-        class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotatorContentHandler(template, extractorReceiver, metadata) {
+        class Annotator(extractorReceiver: XMLReceiver) extends XFormsAnnotator(template, extractorReceiver, metadata) {
             protected override def rewriteId(id: String) = prefix + id
         }
 
         // Extractor with prefix
-        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractorContentHandler(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
+        class Extractor(xmlReceiver: XMLReceiver) extends XFormsExtractor(xmlReceiver, metadata, AnnotatedTemplate(template), ".", XXBLScope.inner, startScope.isTopLevelScope, false, false) {
             override def startXFormsOrExtension(uri: String, localname: String, attributes: Attributes, scope: XFormsConstants.XXBLScope) {
                 val staticId = attributes.getValue("id")
                 if (staticId ne null) {
@@ -271,7 +271,7 @@ object XFormsStaticStateImpl {
 
         // Return the last id generated
         def lastId: Int = {
-            val idElement = staticStateElement.element(XFormsExtractorContentHandler.LAST_ID_QNAME)
+            val idElement = staticStateElement.element(XFormsExtractor.LAST_ID_QNAME)
             require(idElement ne null)
             val lastId = XFormsUtils.getElementId(idElement)
             require(lastId ne null)

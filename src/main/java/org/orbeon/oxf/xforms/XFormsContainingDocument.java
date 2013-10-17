@@ -46,7 +46,7 @@ import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
 import org.orbeon.oxf.xforms.xbl.Scope;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
@@ -738,7 +738,7 @@ public class XFormsContainingDocument extends XBLContainer implements XFormsDocu
             return isMaxDelay;
         }
 
-        public void toSAX(ContentHandlerHelper ch, long currentTime) {
+        public void toSAX(XMLReceiverHelper ch, long currentTime) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "server-events",
                     new String[] {
                             "delay", Long.toString(getTime() - currentTime),

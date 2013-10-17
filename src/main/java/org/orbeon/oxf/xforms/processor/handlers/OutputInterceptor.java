@@ -157,10 +157,10 @@ public class OutputInterceptor extends ForwardingXMLReceiver {
 
         reusableAttributes.clear();
         if (id != null)
-            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, id);
+            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, id);
 
         if (classes != null)
-            reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, classes);
+            reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes);
 
         final String delimiterQName = XMLUtils.buildQName(delimiterPrefix, delimiterLocalName);
         contentHandler.startElement(delimiterNamespaceURI, delimiterLocalName, delimiterQName, reusableAttributes);

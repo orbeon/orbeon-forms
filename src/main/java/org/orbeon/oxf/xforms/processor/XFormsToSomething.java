@@ -18,14 +18,14 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
+import org.orbeon.oxf.xforms.analysis.XFormsAnnotator;
+import org.orbeon.oxf.xforms.analysis.XFormsExtractor;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.DependenciesProcessorInput;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xforms.analysis.Metadata;
-import org.orbeon.oxf.xforms.analysis.XFormsAnnotatorContentHandler;
-import org.orbeon.oxf.xforms.analysis.XFormsExtractorContentHandler;
 import org.orbeon.oxf.xforms.analysis.model.Instance;
 import org.orbeon.oxf.xforms.analysis.model.Model;
 import org.orbeon.oxf.xforms.state.AnnotatedTemplate;
@@ -307,9 +307,9 @@ abstract public class XFormsToSomething extends ProcessorImpl {
             this.template = AnnotatedTemplate.applyJava(new SAXStore());
             readInputAsSAX(pipelineContext, INPUT_ANNOTATED_DOCUMENT,
                 new WhitespaceXMLReceiver(
-                    new XFormsAnnotatorContentHandler(
+                    new XFormsAnnotator(
                         this.template.saxStore(),
-                        new XFormsExtractorContentHandler(
+                        new XFormsExtractor(
                             new WhitespaceXMLReceiver(
                                     extractorOutput,
                                     Whitespace.defaultBasePolicy(),

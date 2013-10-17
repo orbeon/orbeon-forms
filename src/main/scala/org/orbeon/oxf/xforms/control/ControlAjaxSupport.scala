@@ -19,8 +19,8 @@ import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.LinkedHashSet
 import AjaxSupport._
-import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper}
-import ContentHandlerHelper.CDATA
+import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
+import XMLReceiverHelper.CDATA
 import org.orbeon.oxf.util.ScalaUtils
 
 trait ControlAjaxSupport {
@@ -36,7 +36,7 @@ trait ControlAjaxSupport {
     // Whether the control support full Ajax updates
     def supportFullAjaxUpdates = true
 
-    def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) = ()
+    def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) = ()
 
     def addAjaxAttributes(attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean, other: XFormsControl) = {
         var added = false
@@ -108,7 +108,7 @@ trait ControlAjaxSupport {
     }
 
     // Output an xxf:attribute element for the given name and value extractor if the value has changed
-    final def outputAttributeElement(originalControl: XFormsControl, name: String, value: XFormsControl ⇒ String, isNewRepeatIteration: Boolean)(ch: ContentHandlerHelper): Unit = {
+    final def outputAttributeElement(originalControl: XFormsControl, name: String, value: XFormsControl ⇒ String, isNewRepeatIteration: Boolean)(ch: XMLReceiverHelper): Unit = {
 
         val value1 = Option(originalControl) map value
         val value2 = Some(this)              map value

@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -240,7 +240,7 @@ public class XFormsSwitchControl extends XFormsSingleNodeContainerControl {
     }
 
     @Override
-    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(XMLReceiverHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
         // Output regular diff
         super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree);

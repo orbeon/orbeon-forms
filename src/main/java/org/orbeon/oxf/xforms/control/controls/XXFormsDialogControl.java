@@ -26,7 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsFocusEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsDialogOpenEvent;
 import org.orbeon.oxf.xforms.state.ControlState;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.helpers.AttributesImpl;
 import scala.Tuple3;
 
@@ -191,7 +191,7 @@ public class XXFormsDialogControl extends XFormsNoSingleNodeContainerControl {
     }
 
     @Override
-    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other,
+    public void outputAjaxDiff(XMLReceiverHelper ch, XFormsControl other,
                                AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         // If needed, output basic diffs such as changes in class or LHHA

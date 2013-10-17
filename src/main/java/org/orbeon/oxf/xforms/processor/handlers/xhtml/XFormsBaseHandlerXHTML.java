@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.analysis.model.StaticBind;
 import org.orbeon.oxf.xforms.control.*;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -49,7 +49,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
     public static void outputDisabledAttribute(AttributesImpl newAttributes) {
         // @disabled="disabled"
         // HTML 4: @disabled supported on: input, button, select, optgroup, option, and textarea.
-        newAttributes.addAttribute("", "disabled", "disabled", ContentHandlerHelper.CDATA, "disabled");
+        newAttributes.addAttribute("", "disabled", "disabled", XMLReceiverHelper.CDATA, "disabled");
     }
 
     private void addConstraintClasses(StringBuilder sb, scala.Option<StaticBind.ValidationLevel> constraintLevel) {
@@ -260,8 +260,8 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
                     // <a href="#my-control-id-help">
 
                     final AttributesImpl aAttributes = new AttributesImpl();
-                    aAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#" + getLHHACId(containingDocument, targetControlEffectiveId, LHHAC_CODES.get(LHHAC.HELP)));
-                    aAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-help-anchor");
+                    aAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#" + getLHHACId(containingDocument, targetControlEffectiveId, LHHAC_CODES.get(LHHAC.HELP)));
+                    aAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-help-anchor");
 
                     final String aQName = XMLUtils.buildQName(xhtmlPrefix, "a");
                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, aAttributes);
@@ -407,7 +407,7 @@ public abstract class XFormsBaseHandlerXHTML extends XFormsBaseHandler {
 
         // Add @for attribute if specified and element is a label
         if (forEffectiveId != null && elementName.equals("label"))
-            newAttribute.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, forEffectiveId);
+            newAttribute.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, forEffectiveId);
 
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
         final String labelQName = XMLUtils.buildQName(xhtmlPrefix, elementName);

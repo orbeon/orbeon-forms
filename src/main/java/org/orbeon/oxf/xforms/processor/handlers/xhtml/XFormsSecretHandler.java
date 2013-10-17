@@ -44,9 +44,9 @@ public class XFormsSecretHandler extends XFormsControlLifecyleHandler {
             final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
             if (!isStaticReadonly(secretControl)) {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
-                containerAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "password");
-                containerAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);
-                containerAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA,
+                containerAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "password");
+                containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);
+                containerAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA,
                         handlerContext.isTemplate() || secretControl == null || secretControl.getExternalValue() == null ? "" : secretControl.getExternalValue());
 
                 // Handle accessibility attributes

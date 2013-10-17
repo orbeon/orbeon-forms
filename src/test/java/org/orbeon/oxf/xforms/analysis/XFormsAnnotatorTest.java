@@ -33,13 +33,13 @@ import java.util.List;
 
 import static junit.framework.Assert.*;
 
-public class XFormsAnnotatorContentHandlerTest extends ResourceManagerTestBase {
+public class XFormsAnnotatorTest extends ResourceManagerTestBase {
 
     @Test
     public void formNamespaceElements() {
 
         final Metadata metadata = new Metadata();
-        final XFormsAnnotatorContentHandler ch = new XFormsAnnotatorContentHandler(metadata);
+        final XFormsAnnotator ch = new XFormsAnnotator(metadata);
         XMLUtils.urlToSAX("oxf:/org/orbeon/oxf/xforms/processor/test-form.xml", ch, XMLUtils.ParserConfiguration.PLAIN, false);
 
         // Test that ns information is provided for those elements

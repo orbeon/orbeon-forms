@@ -143,12 +143,12 @@ class ResourcesAggregator extends ProcessorImpl {
                         override def endElement(uri: String, localname: String, qName: String) = {
 
                             lazy val xhtmlPrefix = XMLUtils.prefixFromQName(qName)
-                            lazy val helper = new ContentHandlerHelper(xmlReceiver)
+                            lazy val helper = new XMLReceiverHelper(xmlReceiver)
 
                             // Configurable function to output an element
                             def outputElement(getAttributes: String ⇒ Array[String], elementName: String)(resource: String) = {
                                 attributesImpl.clear()
-                                ContentHandlerHelper.populateAttributes(attributesImpl, getAttributes(resource))
+                                XMLReceiverHelper.populateAttributes(attributesImpl, getAttributes(resource))
                                 helper.element(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, elementName, attributesImpl)
                             }
 

@@ -24,7 +24,7 @@ import org.orbeon.oxf.xforms.model.DataModel
 import org.orbeon.oxf.xforms.xbl.XBLContainer
 import org.orbeon.oxf.xforms.{XFormsModelBinds, XFormsProperties}
 import org.orbeon.oxf.xml.XMLConstants._
-import org.orbeon.oxf.xml.{ContentHandlerHelper, NamespaceMapping}
+import org.orbeon.oxf.xml.{XMLReceiverHelper, NamespaceMapping}
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.saxon.value._
 import org.orbeon.oxf.xforms.analysis.ControlAnalysisFactory.ValueControl
@@ -221,7 +221,7 @@ trait XFormsValueControl extends XFormsSingleNodeControl {
         case _ ⇒ super.performDefaultAction(event)
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit): Unit =
+    override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit =
         super.toXML(helper, attributes) {
             helper.text(getExternalValue())
         }

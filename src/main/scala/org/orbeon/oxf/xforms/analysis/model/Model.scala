@@ -23,7 +23,7 @@ import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import java.lang.String
 import collection.mutable.LinkedHashMap
-import org.orbeon.oxf.xml.{Dom4j, ContentHandlerHelper}
+import org.orbeon.oxf.xml.{Dom4j, XMLReceiverHelper}
 import Model._
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -82,7 +82,7 @@ class Model(val staticStateContext: StaticStateContext, elem: Element, parent: O
         "analyzed-binds"               → figuredAllBindRefAnalysis.toString
     )
 
-    override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+    override def toXMLContent(helper: XMLReceiverHelper): Unit = {
         super.toXMLContent(helper)
         variablesToXML(helper)
         bindsToXML(helper)
@@ -113,7 +113,7 @@ trait ModelInstances {
     lazy val defaultInstancePrefixedId = Option(if (hasInstances) scope.fullPrefix + defaultInstanceStaticId else null)
     // TODO: instances on which MIPs depend
 
-    def instancesToXML(helper: ContentHandlerHelper): Unit = {
+    def instancesToXML(helper: XMLReceiverHelper): Unit = {
         // Output instances information
         def outputInstanceList(name: String, values: collection.Set[String]) {
             if (values.nonEmpty) {
@@ -170,7 +170,7 @@ trait ModelVariables {
         for (variable ← variablesSeq)
             variable.analyzeXPath()
 
-    def variablesToXML(helper: ContentHandlerHelper): Unit =
+    def variablesToXML(helper: XMLReceiverHelper): Unit =
         // Output variable information
         for (variable ← variablesSeq)
             variable.toXML(helper)
@@ -197,7 +197,7 @@ trait ModelEventHandlers {
     lazy val eventHandlers = descendants collect { case e: EventHandlerImpl ⇒ e }
     def jEventHandlers = eventHandlers.asJava
 
-    def handlersToXML(helper: ContentHandlerHelper) =
+    def handlersToXML(helper: XMLReceiverHelper) =
         eventHandlers foreach (_.toXML(helper))
 }
 
@@ -284,7 +284,7 @@ trait ModelBinds {
     def figuredAllBindRefAnalysis = bindTree().figuredAllBindRefAnalysis
 
     def analyzeBindsXPath() = bindTree().analyzeBindsXPath()
-    def bindsToXML(helper: ContentHandlerHelper) = bindTree().bindsToXML(helper)
+    def bindsToXML(helper: XMLReceiverHelper) = bindTree().bindsToXML(helper)
     def freeBindsTransientState() = bindTree().freeBindsTransientState()
 }
 

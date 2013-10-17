@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xml;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsCaseControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -49,7 +49,7 @@ public class XFormsCaseHandler extends XFormsControlLifecyleHandlerXML {
 	}
 	
 	protected void handleExtraAttributesForControlStart(AttributesImpl reusableAttributes, String effectiveId, XFormsControl control) { 
-		reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "visible", XFormsConstants.XXFORMS_PREFIX + ":visible", ContentHandlerHelper.CDATA, isCaseVisible(effectiveId)?"true":"false");
+		reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "visible", XFormsConstants.XXFORMS_PREFIX + ":visible", XMLReceiverHelper.CDATA, isCaseVisible(effectiveId)?"true":"false");
 	}
 	
 	private boolean isCaseVisible(String effectiveId) {

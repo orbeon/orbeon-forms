@@ -18,7 +18,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 import javax.portlet.PortletPreferences;
 import javax.portlet.PortletRequest;
@@ -44,7 +44,7 @@ public class PortletPreferencesGenerator extends ProcessorImpl {
                 final PortletRequest portletRequest = (PortletRequest) externalContext.getRequest().getNativeRequest();
                 final PortletPreferences preferences = portletRequest.getPreferences();
 
-                final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                final XMLReceiverHelper helper = new XMLReceiverHelper(xmlReceiver);
                 helper.startDocument();
                 helper.startElement("portlet-preferences");
 

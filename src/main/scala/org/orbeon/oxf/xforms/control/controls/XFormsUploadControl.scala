@@ -24,7 +24,7 @@ import org.xml.sax.helpers.AttributesImpl
 import java.io.File
 import org.orbeon.oxf.xforms.event.events._
 import XFormsUploadControl._
-import org.orbeon.oxf.xml.{ContentHandlerHelper, Dom4j}
+import org.orbeon.oxf.xml.{XMLReceiverHelper, Dom4j}
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.util.{SecureUtils, NetUtils}
 import org.orbeon.oxf.util.Multipart._

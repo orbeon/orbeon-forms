@@ -7,7 +7,7 @@ import analysis._
 import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.immutable.List
-import org.orbeon.oxf.xml.{ShareableXPathStaticContext, Dom4j, ContentHandlerHelper}
+import org.orbeon.oxf.xml.{ShareableXPathStaticContext, Dom4j, XMLReceiverHelper}
 import Model._
 import org.orbeon.oxf.util.{XPath ⇒ OrbeonXPath}
 import org.orbeon.oxf.xforms.library.XFormsFunctionLibrary
@@ -303,7 +303,7 @@ class StaticBind(
         "ref"     → ref.orNull
     )
 
-    override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+    override def toXMLContent(helper: XMLReceiverHelper): Unit = {
         super.toXMLContent(helper)
 
         // @ref analysis is handled by superclass

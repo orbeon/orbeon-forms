@@ -29,7 +29,7 @@ import java.util.Stack;
  *
  * TODO: check for duplicate attributes.
  */
-public class InspectingContentHandler extends ForwardingXMLReceiver {
+public class InspectingXMLReceiver extends ForwardingXMLReceiver {
 
     private Locator locator;
 
@@ -40,7 +40,7 @@ public class InspectingContentHandler extends ForwardingXMLReceiver {
 
     private NamespaceContext namespaceContext = new NamespaceContext();
 
-    public InspectingContentHandler(XMLReceiver xmlReceiver) {
+    public InspectingXMLReceiver(XMLReceiver xmlReceiver) {
         super(xmlReceiver);
     }
 

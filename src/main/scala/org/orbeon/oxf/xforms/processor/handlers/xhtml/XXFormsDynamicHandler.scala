@@ -45,7 +45,7 @@ class XXFormsDynamicHandler extends XFormsBaseHandler(false, false) {
                 case control: XXFormsDynamicControl ⇒
                     // Output new scripts upon update if any
                     if (! containingDocument.isInitializing && control.newScripts.nonEmpty) {
-                        val helper = new ContentHandlerHelper(contentHandler)
+                        val helper = new XMLReceiverHelper(contentHandler)
                         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", Array("type", "text/javascript"))
                         XHTMLHeadHandler.outputScripts(helper, control.newScripts map (script ⇒ script.clientName → script.body))
                         helper.endElement()

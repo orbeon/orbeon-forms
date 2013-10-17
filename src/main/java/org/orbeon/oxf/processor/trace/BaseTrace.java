@@ -17,7 +17,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TracingPipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
 import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 import java.util.*;
 
@@ -61,7 +61,7 @@ public abstract class BaseTrace implements Trace {
             return childrenCumulativeTime;
         }
 
-        public void toXML(PipelineContext pipelineContext, ContentHandlerHelper helper) {
+        public void toXML(PipelineContext pipelineContext, XMLReceiverHelper helper) {
 
             helper.startElement("node", new String[] {
                     "local-time", Long.toString(getLocalTime()),

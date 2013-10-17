@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils
 import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.control.XFormsControl.getEscapedHTMLValue
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLUtils.escapeXMLMinimal
 import org.orbeon.oxf.xml.dom4j.LocationData
 
@@ -69,7 +69,7 @@ object Item {
 
     // Represent a label
     case class Label(label: String, isHTML: Boolean) {
-        def streamAsHTML(ch: ContentHandlerHelper, locationData: LocationData): Unit =
+        def streamAsHTML(ch: XMLReceiverHelper, locationData: LocationData): Unit =
             if (isHTML)
                 streamHTMLFragment(ch.getXmlReceiver, label, locationData, "")
             else

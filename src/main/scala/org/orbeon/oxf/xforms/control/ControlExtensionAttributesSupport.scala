@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.control
 
 import org.dom4j.QName
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.XFormsConstants._
 
@@ -70,9 +70,9 @@ trait ControlExtensionAttributesSupport {
             if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)
             if value ne null
             localName = name.getName
-        } attributesImpl.addAttribute("", localName, localName, ContentHandlerHelper.CDATA, value)
+        } attributesImpl.addAttribute("", localName, localName, XMLReceiverHelper.CDATA, value)
 
-    final def addExtensionAttributesExceptClassAndAcceptForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: ContentHandlerHelper): Unit =
+    final def addExtensionAttributesExceptClassAndAcceptForAjax(originalControl: XFormsControl, namespaceURI: String, isNewlyVisibleSubtree: Boolean)(ch: XMLReceiverHelper): Unit =
         for {
             name ← staticControl.extensionAttributes.keys
             if name.getNamespaceURI == namespaceURI && ! StandardAttributesToFilterOnHandler(name)

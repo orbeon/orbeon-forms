@@ -245,7 +245,7 @@ public class XMLUtils {
             final org.dom4j.Attribute attribute = (org.dom4j.Attribute) i.next();
 
             result.addAttribute(attribute.getNamespaceURI(), attribute.getName(), attribute.getQualifiedName(),
-                    ContentHandlerHelper.CDATA, attribute.getValue());
+                    XMLReceiverHelper.CDATA, attribute.getValue());
         }
         return result;
     }
@@ -1068,7 +1068,7 @@ public class XMLUtils {
             // No existing class attribute
 
             // Add
-            attributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, attributeValue);
+            attributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, attributeValue);
         } else {
             // Existing attribute
             final String oldAttributeValue = attributes.getValue(oldAttributeIndex);
@@ -1092,7 +1092,7 @@ public class XMLUtils {
             if (uri.equals(attributeURI) && localname.equals(attributeLocalname)) {
                 // Found existing attribute
                 replaced = true;
-                newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
+                newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value);
             } else {
                 // Not a matched attribute
                 newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
@@ -1100,7 +1100,7 @@ public class XMLUtils {
         }
         if (!replaced) {
             // Attribute did not exist already so add it
-            newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), ContentHandlerHelper.CDATA, value);
+            newAttributes.addAttribute(uri, localname, XMLUtils.buildQName(prefix, localname), XMLReceiverHelper.CDATA, value);
         }
         return newAttributes;
     }
@@ -1180,12 +1180,12 @@ public class XMLUtils {
     }
 
     public interface DebugXML {
-        void toXML(ContentHandlerHelper helper);
+        void toXML(XMLReceiverHelper helper);
     }
 
     public static org.dom4j.Document createDebugRequestDocument(final DebugXML debugXML) {
         return createDocument(new DebugXML() {
-            public void toXML(ContentHandlerHelper helper) {
+            public void toXML(XMLReceiverHelper helper) {
                 wrapWithRequestElement(helper, debugXML);
             }
         });
@@ -1196,7 +1196,7 @@ public class XMLUtils {
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
-        final ContentHandlerHelper helper = new ContentHandlerHelper(new ForwardingXMLReceiver(identity) {
+        final XMLReceiverHelper helper = new XMLReceiverHelper(new ForwardingXMLReceiver(identity) {
             @Override
             public void startDocument() {}
             @Override
@@ -1214,7 +1214,7 @@ public class XMLUtils {
         return result.getDocument();
     }
 
-    public static void wrapWithRequestElement(ContentHandlerHelper helper, DebugXML debugXML) {
+    public static void wrapWithRequestElement(XMLReceiverHelper helper, DebugXML debugXML) {
         helper.startDocument();
 
         final ExternalContext externalContext = NetUtils.getExternalContext();

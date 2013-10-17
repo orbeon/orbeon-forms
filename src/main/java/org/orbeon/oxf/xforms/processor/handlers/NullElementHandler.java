@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers;
 
 import org.orbeon.oxf.xml.ElementHandler;
 
-public class NullContentHandler extends ElementHandler {
+public class NullElementHandler extends ElementHandler {
 
     public boolean isRepeating() {
         return false;

@@ -15,7 +15,7 @@ package org.orbeon.oxf.cache;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 import java.util.Iterator;
 import java.util.List;
@@ -84,7 +84,7 @@ public class InternalCacheKey extends CacheKey {
     }
 
     @Override
-    public void toXML(ContentHandlerHelper helper, Object validities) {
+    public void toXML(XMLReceiverHelper helper, Object validities) {
         final List validitiesList = (List) validities;
         final Iterator validitiesIterator = (validitiesList != null) ? validitiesList.iterator() : null;
 

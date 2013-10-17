@@ -48,7 +48,7 @@ object Metadata {
         val metadata = new Metadata(new IdGenerator(staticStateDocument.lastId))
 
         // Restore namespace mappings and ids
-        TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotatorContentHandler(metadata))
+        TransformerUtils.sourceToSAX(new DocumentSource(staticStateDocument.xmlDocument), new XFormsAnnotator(metadata))
 
         // Restore marks if there is a template
         template foreach { template ⇒

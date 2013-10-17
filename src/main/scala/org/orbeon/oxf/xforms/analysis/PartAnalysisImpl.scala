@@ -23,7 +23,7 @@ import org.orbeon.oxf.xforms.event.EventHandlerImpl
 import org.orbeon.oxf.xml.dom4j.{ExtendedLocationData, LocationData, Dom4jUtils}
 import collection.mutable.Buffer
 import org.orbeon.oxf.common.{Version, ValidationException}
-import org.orbeon.oxf.xml.{NamespaceMapping, ContentHandlerHelper, XMLUtils}
+import org.orbeon.oxf.xml.{NamespaceMapping, XMLReceiverHelper, XMLUtils}
 import org.orbeon.oxf.xforms.xbl.Scope
 import org.orbeon.oxf.util.Logging
 import org.orbeon.oxf.xforms.analysis.controls.{AttributeControl, LHHAAnalysis, RootControl}
@@ -254,7 +254,7 @@ class PartAnalysisImpl(
         freeTransientState()
     }
 
-    def toXML(helper: ContentHandlerHelper) =
+    def toXML(helper: XMLReceiverHelper) =
         controlAnalysisMap(startScope.prefixedIdForStaticId("#document")).toXML(helper)
 
     def dumpAnalysis() =

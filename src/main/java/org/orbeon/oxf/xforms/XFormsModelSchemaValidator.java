@@ -44,7 +44,6 @@ import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.validation.SchemaValidationException;
 import org.orbeon.oxf.resources.URLFactory;
@@ -52,7 +51,7 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -193,7 +192,7 @@ public class XFormsModelSchemaValidator {
         }
 
         @Override
-        public void toXML(ContentHandlerHelper helper, Object validities) {
+        public void toXML(XMLReceiverHelper helper, Object validities) {
             helper.element("url", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "url", urlString });
         }
     }

@@ -45,7 +45,7 @@ import java.util.*;
  * ContentHandler (at least two separate outputs) are produced, one for the annotated output, another for the extracted
  * output.
  */
-public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandlerBase implements XMLReceiver {
+public class XFormsAnnotator extends XFormsAnnotatorBase implements XMLReceiver {
 
     private final boolean keepLocationData   = XFormsProperties.isKeepLocation();
 
@@ -85,7 +85,7 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
      * @param extractorReceiver     extractor output (can be null for XBL for now)
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata) {
+    public XFormsAnnotator(XMLReceiver templateReceiver, XMLReceiver extractorReceiver, Metadata metadata) {
         this.templateReceiver = templateReceiver;
         this.extractorReceiver = extractorReceiver;
 
@@ -101,7 +101,7 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
      *
      * @param metadata              metadata to gather
      */
-    public XFormsAnnotatorContentHandler(Metadata metadata) {
+    public XFormsAnnotator(Metadata metadata) {
 
         // In this mode, all elements that need to have ids already have them, so set safe defaults
         this.metadata = metadata;
@@ -202,7 +202,7 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
                 // Start xf:repeat-iteration
                 // NOTE: Use xf:repeat-iteration instead of xxf:iteration so we don't have to deal with a new namespace
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, xformsElementId + "~iteration");
+                reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, xformsElementId + "~iteration");
                 final Attributes repeatIterationAttributes = getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, 0);
                 startElement(true, uri, localname + "-iteration", qName + "-iteration", repeatIterationAttributes);
             } else {
@@ -270,7 +270,7 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
                 // Create a new xf:group control which specifies the element name to use. Namespace mappings for the
                 // given QName must be in scope as that QName is the original element name.
                 final AttributesImpl newAttributes = new AttributesImpl(getAttributesGatherNamespaces(uri, qName, attributes, reusableStringArray, idIndex));
-                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxf:element", ContentHandlerHelper.CDATA, qName);
+                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "element", "xxf:element", XMLReceiverHelper.CDATA, qName);
 
                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
                 startElement(true, XFormsConstants.XFORMS_NAMESPACE_URI, "group", "xf:group", newAttributes);
@@ -307,11 +307,11 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
 
                                 final AttributesImpl newAttributes = (AttributesImpl) getAttributesGatherNamespaces(uri, qName, reusableAttributes, reusableStringArray, -1);
 
-                                newAttributes.addAttribute("", "for", "for", ContentHandlerHelper.CDATA, htmlElementId);
-                                newAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, attributeName);
-                                newAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, attributeValue);
+                                newAttributes.addAttribute("", "for", "for", XMLReceiverHelper.CDATA, htmlElementId);
+                                newAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, attributeName);
+                                newAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, attributeValue);
 
-                                newAttributes.addAttribute("", "for-name", "for-name", ContentHandlerHelper.CDATA, localname);
+                                newAttributes.addAttribute("", "for-name", "for-name", XMLReceiverHelper.CDATA, localname);
 
                                 // These extra attributes can be used alongside src/href attributes
                                 if ("src".equals(attributeName) || "href".equals(attributeName)) {
@@ -320,11 +320,11 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
                                     final String windowState = attributes.getValue(XMLConstants.OPS_FORMATTING_URI, "window-state");
 
                                     if (urlType != null)
-                                        newAttributes.addAttribute("", "url-type", "url-type", ContentHandlerHelper.CDATA, urlType);
+                                        newAttributes.addAttribute("", "url-type", "url-type", XMLReceiverHelper.CDATA, urlType);
                                     if (portletMode != null)
-                                        newAttributes.addAttribute("", "portlet-mode", "portlet-mode", ContentHandlerHelper.CDATA, "portlet-mode");
+                                        newAttributes.addAttribute("", "portlet-mode", "portlet-mode", XMLReceiverHelper.CDATA, "portlet-mode");
                                     if (windowState != null)
-                                        newAttributes.addAttribute("", "window-state", "window-state", ContentHandlerHelper.CDATA, "window-state");
+                                        newAttributes.addAttribute("", "window-state", "window-state", XMLReceiverHelper.CDATA, "window-state");
                                 }
 
                                 startPrefixMapping(true, "xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -433,7 +433,7 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
 
                     startPrefixMapping(true, inspectorPrefix, frURI);
                     reusableAttributes.clear();
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "orbeon-inspector");
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "orbeon-inspector");
                     final Attributes newAttributes = getAttributesGatherNamespaces(frURI, inspectorQName, reusableAttributes, reusableStringArray, 0);
                     startElement(true, frURI, inspectorLocal, inspectorQName, newAttributes);
                     endElement(true, frURI, inspectorLocal, inspectorQName);
@@ -527,7 +527,7 @@ public class XFormsAnnotatorContentHandler extends XFormsAnnotatorContentHandler
                 // Create a new "id" attribute, prefixing if needed
                 final AttributesImpl newAttributes = new AttributesImpl(attributes);
                 rawId = metadata.idGenerator().getNextId();
-                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, rawId);
+                newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, rawId);
                 attributes = newAttributes;
             } else {
                 // Keep existing id

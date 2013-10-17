@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
@@ -23,10 +23,7 @@ import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
 import org.orbeon.oxf.xforms.event.EventHandler;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.ElementHandlerController;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -63,7 +60,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
         // Open head element
         xmlReceiver.startElement(uri, localname, qName, attributes);
 
-        final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+        final XMLReceiverHelper helper = new XMLReceiverHelper(xmlReceiver);
         final String xhtmlPrefix = XMLUtils.prefixFromQName(qName); // current prefix for XHTML
 
         // Create prefix for combined resources if needed
@@ -116,15 +113,15 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
         }
     }
 
-    protected abstract void outputCSSResources(ContentHandlerHelper helper, String xhtmlPrefix,
+    protected abstract void outputCSSResources(XMLReceiverHelper helper, String xhtmlPrefix,
         boolean minimal, AttributesImpl attributesImpl);
 
-    protected abstract void outputJavaScriptResources(ContentHandlerHelper helper, String xhtmlPrefix,
+    protected abstract void outputJavaScriptResources(XMLReceiverHelper helper, String xhtmlPrefix,
         boolean minimal, AttributesImpl attributesImpl);
 
-    protected abstract void outputConfigurationProperties(ContentHandlerHelper helper, String xhtmlPrefix, boolean versionedResources);
+    protected abstract void outputConfigurationProperties(XMLReceiverHelper helper, String xhtmlPrefix, boolean versionedResources);
 
-    private void outputScriptDeclarations(ContentHandlerHelper helper, String xhtmlPrefix, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
+    private void outputScriptDeclarations(XMLReceiverHelper helper, String xhtmlPrefix, String focusElementId, List<XFormsContainingDocument.Message> messagesToRun, List<XXFormsDialogControl> dialogsToOpen) {
 
         if (containingDocument.getStaticOps().uniqueClientScripts().size() > 0 || focusElementId != null || messagesToRun != null || dialogsToOpen.size() > 0) {
             helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
@@ -205,7 +202,7 @@ public abstract class XHTMLHeadHandlerBase extends XFormsBaseHandlerXHTML {
         }
     }
 
-    private void outputJavaScriptInitialData(ContentHandlerHelper helper, String xhtmlPrefix, Map<String, Map<String, List<String>>> javaScriptControlsAppearancesMap) {
+    private void outputJavaScriptInitialData(XMLReceiverHelper helper, String xhtmlPrefix, Map<String, Map<String, List<String>>> javaScriptControlsAppearancesMap) {
         helper.startElement(xhtmlPrefix, XMLConstants.XHTML_NAMESPACE_URI, "script", new String[] {
                 "type", "text/javascript"});
 

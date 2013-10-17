@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.Scope
-import org.orbeon.oxf.xml.{ContentHandlerHelper, Dom4j}
+import org.orbeon.oxf.xml.{XMLReceiverHelper, Dom4j}
 
 trait ChildrenBuilderTrait extends ElementAnalysis {
 
@@ -87,7 +87,7 @@ trait ChildrenBuilderTrait extends ElementAnalysis {
         _children = buildChildren()
     }
 
-    override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+    override def toXMLContent(helper: XMLReceiverHelper): Unit = {
         super.toXMLContent(helper)
         children foreach (_.toXML(helper))
     }

@@ -24,9 +24,9 @@ import org.xml.sax.SAXException;
  *         sax events with the exception of start and end document. All other
  *         events are handled by the superclass
  */
-public class PdfMetadataContentHandler extends ForwardingXMLReceiver {
+public class PdfMetadataXMLReceiver extends ForwardingXMLReceiver {
 
-    public PdfMetadataContentHandler(XMLReceiver xmlReceiver) {
+    public PdfMetadataXMLReceiver(XMLReceiver xmlReceiver) {
         super(xmlReceiver);
     }
 

@@ -19,7 +19,7 @@ import org.dom4j.QName
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsTriggerControl
-import org.orbeon.oxf.xml.ContentHandlerHelper.CDATA
+import org.orbeon.oxf.xml.XMLReceiverHelper.CDATA
 import org.orbeon.oxf.xml.XMLConstants.XHTML_NAMESPACE_URI
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes

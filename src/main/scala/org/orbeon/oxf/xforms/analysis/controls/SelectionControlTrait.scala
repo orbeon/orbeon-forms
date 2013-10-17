@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.analysis.controls
 
 import collection.mutable.Stack
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.util.{ScalaUtils, XPathCache}
 import org.apache.commons.lang3.StringUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
@@ -138,7 +138,7 @@ trait SelectionControlTrait extends InputValueControl with SelectAppearanceTrait
         Some(combinedAnalysis)
     }
 
-    override def toXMLContent(helper: ContentHandlerHelper): Unit = {
+    override def toXMLContent(helper: XMLReceiverHelper): Unit = {
         super.toXMLContent(helper)
         if (_itemsetAnalyzed)
             getItemsetAnalysis match {

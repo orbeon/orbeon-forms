@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.Base64XMLReceiver;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XPathContentHandler;
+import org.orbeon.oxf.xml.XPathXMLReceiver;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -491,11 +491,11 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                                             throw new UnsupportedOperationException("Setting CLOB/BLOB requires a select attribute.");
 
                                         // Base64
-                                        XPathContentHandler xpathContentHandler = getInterpreterContext().getXPathContentHandler();
-                                        if (xpathContentHandler != null && xpathContentHandler.containsExpression(parameter.getSelect())) {
+                                        XPathXMLReceiver xpathReceiver = getInterpreterContext().getXPathContentHandler();
+                                        if (xpathReceiver != null && xpathReceiver.containsExpression(parameter.getSelect())) {
                                             // Handle streaming if possible
                                             OutputStream blobOutputStream = getInterpreterContext().getDelegate().getBlobOutputStream(stmt, index);
-                                            xpathContentHandler.selectContentHandler(parameter.getSelect(), new Base64XMLReceiver(blobOutputStream));
+                                            xpathReceiver.selectContentHandler(parameter.getSelect(), new Base64XMLReceiver(blobOutputStream));
                                             blobOutputStream.close();
                                         } else {
                                             String base64Value = XPathUtils.selectStringValue(currentNode, parameter.getSelect(), prefixesMap, variableContext, getInterpreterContext().getFunctionContext());

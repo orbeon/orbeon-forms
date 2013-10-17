@@ -17,7 +17,7 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -58,7 +58,7 @@ public class XFormsRepeatHandler extends XFormsControlLifecyleHandlerXML {
                 final boolean isCurrentIterationSelected = isRepeatSelected && i == currentRepeatIndex;
                 
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "selected", XFormsConstants.XXFORMS_PREFIX + ":selected", ContentHandlerHelper.CDATA, isCurrentIterationSelected?"true":"false");
+                reusableAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "selected", XFormsConstants.XXFORMS_PREFIX + ":selected", XMLReceiverHelper.CDATA, isCurrentIterationSelected?"true":"false");
             	contentHandler.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "iteration", XFormsConstants.XXFORMS_PREFIX + ":iteration", reusableAttributes);
                 
                 // Apply the content of the body for this iteration

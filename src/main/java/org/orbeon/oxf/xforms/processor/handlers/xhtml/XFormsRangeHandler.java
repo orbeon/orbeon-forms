@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XFormsRangeControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -63,14 +63,14 @@ public class XFormsRangeHandler extends XFormsControlLifecyleHandler {
     private AttributesImpl getThumbAttributes() {
         // Just set class
         reusableAttributes.clear();
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_THUMB_CLASS);
+        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, RANGE_THUMB_CLASS);
         return reusableAttributes;
     }
 
     protected AttributesImpl getBackgroundAttributes(String uri, String localname, Attributes attributes, String effectiveId, XFormsRangeControl xformsControl) {
         // Add custom class
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, true);
-        containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, RANGE_BACKGROUND_CLASS);
+        containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, RANGE_BACKGROUND_CLASS);
         return containerAttributes;
     }
 }

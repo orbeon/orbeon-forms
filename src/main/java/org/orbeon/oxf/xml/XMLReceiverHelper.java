@@ -23,7 +23,7 @@ import java.util.Stack;
 /**
  * Wrapper to an XML receiver. Provides more high-level methods to send events to a XML receiver.
  */
-public class ContentHandlerHelper {
+public class XMLReceiverHelper {
 
     public static final String CDATA = "CDATA";
     private Stack<ElementInfo> elements = new Stack<ElementInfo>();
@@ -42,7 +42,7 @@ public class ContentHandlerHelper {
         }
     }
 
-    public ContentHandlerHelper(XMLReceiver xmlReceiver) {
+    public XMLReceiverHelper(XMLReceiver xmlReceiver) {
         this.xmlReceiver = xmlReceiver;
     }
 
@@ -52,9 +52,9 @@ public class ContentHandlerHelper {
      * @param xmlReceiver       receiver to write to
      * @param validateStream    true if the stream must be validated by InspectingContentHandler
      */
-    public ContentHandlerHelper(XMLReceiver xmlReceiver, boolean validateStream) {
+    public XMLReceiverHelper(XMLReceiver xmlReceiver, boolean validateStream) {
         if (validateStream)
-            this.xmlReceiver = new InspectingContentHandler(xmlReceiver);
+            this.xmlReceiver = new InspectingXMLReceiver(xmlReceiver);
         else
             this.xmlReceiver = xmlReceiver;
     }

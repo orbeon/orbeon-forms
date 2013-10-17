@@ -14,7 +14,7 @@
 package org.orbeon.oxf.cache;
 
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -38,14 +38,14 @@ public abstract class CacheKey implements Serializable {
         return clazz.hashCode();
     }
 
-    public abstract void toXML(ContentHandlerHelper helper, Object validities);
+    public abstract void toXML(XMLReceiverHelper helper, Object validities);
 
     public static String toXMLString(CacheKey cacheKey, Object validities) {
         final TransformerXMLReceiver identity = TransformerUtils.getIdentityTransformerHandler();
         final LocationDocumentResult result = new LocationDocumentResult();
         identity.setResult(result);
 
-        final ContentHandlerHelper helper = new ContentHandlerHelper(identity);
+        final XMLReceiverHelper helper = new XMLReceiverHelper(identity);
         helper.startDocument();
         cacheKey.toXML(helper, validities);
         helper.endDocument();

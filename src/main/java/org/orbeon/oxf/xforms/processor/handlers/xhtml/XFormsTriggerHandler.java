@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -65,7 +65,7 @@ public abstract class XFormsTriggerHandler extends XFormsControlLifecyleHandler 
         if (containerAttributes.getValue("title") == null) {
             final String hintValue = control != null ? control.getHint() : null;
             if (hintValue != null)
-                containerAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, hintValue);
+                containerAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, hintValue);
         }
 
         // Handle accessibility attributes on <a>, <input> or <button>

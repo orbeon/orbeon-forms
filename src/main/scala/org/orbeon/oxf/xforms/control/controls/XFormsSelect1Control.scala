@@ -25,7 +25,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent
 import org.orbeon.oxf.xforms.itemset.{Itemset, XFormsItemUtils}
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData
 import org.xml.sax.helpers.AttributesImpl
 import collection.mutable
@@ -195,7 +195,7 @@ class XFormsSelect1Control(container: XBLContainer, parent: XFormsControl, eleme
         }
     }
 
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
+    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
 
         // Output regular diff
         super.outputAjaxDiff(ch, other, attributesImpl, isNewlyVisibleSubtree)

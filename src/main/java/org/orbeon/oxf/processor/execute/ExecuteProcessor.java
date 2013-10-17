@@ -21,7 +21,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
@@ -238,7 +238,7 @@ public class ExecuteProcessor extends ProcessorImpl {
     }
 
     private void outputResult(XMLReceiver xmlReceiver, State state) {
-        final ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+        final XMLReceiverHelper helper = new XMLReceiverHelper(xmlReceiver);
         helper.startDocument();
         helper.startElement("result");
         helper.text(state.result);

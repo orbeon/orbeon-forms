@@ -196,7 +196,7 @@ public class SQLProcessor extends ProcessorImpl {
 
             // Either read the whole input as a DOM, or try to serialize
             Node data = null;
-            XPathContentHandler xpathContentHandler = null;
+            XPathXMLReceiver xpathReceiver = null;
 
             // Check if the data input is connected
             boolean hasDataInput = getConnectedInputs().get(INPUT_DATA) != null;
@@ -210,12 +210,12 @@ public class SQLProcessor extends ProcessorImpl {
                 boolean useXPathContentHandler = false;
                 if (config.xpathExpressions.size() > 0) {
                     // Create XPath content handler
-                    final XPathContentHandler _xpathContentHandler = new XPathContentHandler();
+                    final XPathXMLReceiver _xpathReceiver = new XPathXMLReceiver();
                     // Add expressions and check whether we can try to stream
                     useXPathContentHandler = true;
                     for (Iterator i = config.xpathExpressions.iterator(); i.hasNext();) {
                         String expression = (String) i.next();
-                        boolean canStream = _xpathContentHandler.addExpresssion(expression, false);// FIXME: boolean nodeSet
+                        boolean canStream = _xpathReceiver.addExpresssion(expression, false);// FIXME: boolean nodeSet
                         if (!canStream) {
                             useXPathContentHandler = false;
                             break;
@@ -223,12 +223,12 @@ public class SQLProcessor extends ProcessorImpl {
                     }
                     // Finish setting up the XPathContentHandler
                     if (useXPathContentHandler) {
-                        _xpathContentHandler.setReadInputCallback(new Runnable() {
+                        _xpathReceiver.setReadInputCallback(new Runnable() {
                             public void run() {
-                                readInputAsSAX(context, INPUT_DATA, _xpathContentHandler);
+                                readInputAsSAX(context, INPUT_DATA, _xpathReceiver);
                             }
                         });
-                        xpathContentHandler = _xpathContentHandler;
+                        xpathReceiver = _xpathReceiver;
                     }
                 }
                 // If we can't stream, read everything in
@@ -248,7 +248,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
 
             // Replay the config SAX store through the interpreter
-            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, datasource, xpathContentHandler, xmlReceiver));
+            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, datasource, xpathReceiver, xmlReceiver));
         } catch (OXFException e) {
             throw e;
         } catch (Exception e) {
@@ -261,13 +261,13 @@ public class SQLProcessor extends ProcessorImpl {
         private SQLProcessorInterpreterContext interpreterContext;
         private NamespaceSupport namespaceSupport = new NamespaceSupport();
 
-        public RootInterpreter(PipelineContext context, PropertySet propertySet, Node input, Datasource datasource, XPathContentHandler xpathContentHandler, XMLReceiver output) {
+        public RootInterpreter(PipelineContext context, PropertySet propertySet, Node input, Datasource datasource, XPathXMLReceiver xpathReceiver, XMLReceiver output) {
             super(null, false);
             interpreterContext = new SQLProcessorInterpreterContext(propertySet);
             interpreterContext.setPipelineContext(context);
             interpreterContext.setInput(input);
             interpreterContext.setDatasource(datasource);
-            interpreterContext.setXPathContentHandler(xpathContentHandler);
+            interpreterContext.setXPathContentHandler(xpathReceiver);
             interpreterContext.setOutput(new DeferredXMLReceiverImpl(output));
             interpreterContext.setNamespaceSupport(namespaceSupport);
             addElementHandler(new ConfigInterpreter(interpreterContext), SQL_NAMESPACE_URI, "config");

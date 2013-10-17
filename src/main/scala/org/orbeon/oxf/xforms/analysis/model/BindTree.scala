@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms._
 import analysis._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.mutable.{LinkedHashSet, LinkedHashMap}
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 
 class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QName ⇒ Boolean) {
@@ -129,7 +129,7 @@ class BindTree(val model: Model, bindElements: Seq[Element], val isCustomMIP: QN
         }
     }
 
-    def bindsToXML(helper: ContentHandlerHelper): Unit =
+    def bindsToXML(helper: XMLReceiverHelper): Unit =
         // Output binds information
         if (topLevelBinds.nonEmpty) {
             helper.startElement("binds")

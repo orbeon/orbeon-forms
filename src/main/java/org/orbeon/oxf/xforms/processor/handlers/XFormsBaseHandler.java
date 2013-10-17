@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.controls.LHHAAnalysis;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.XFormsSingleNodeControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsAttributeControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.ElementHandler;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -118,13 +118,13 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             }
 
             if (value != null)
-                destAttributes.addAttribute("", "tabindex", "tabindex", ContentHandlerHelper.CDATA, value);
+                destAttributes.addAttribute("", "tabindex", "tabindex", XMLReceiverHelper.CDATA, value);
         }
         // Handle "accesskey"
         {
             final String value = srcAttributes.getValue("accesskey");
             if (value != null)
-                destAttributes.addAttribute("", "accesskey", "accesskey", ContentHandlerHelper.CDATA, value);
+                destAttributes.addAttribute("", "accesskey", "accesskey", XMLReceiverHelper.CDATA, value);
         }
     }
 
@@ -137,12 +137,12 @@ public abstract class XFormsBaseHandler extends ElementHandler {
 
         // Copy "id"
         if (effectiveId != null) {
-            reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, effectiveId));
+            reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsUtils.namespaceId(containingDocument, effectiveId));
         }
         // Create "class" attribute if necessary
         {
             if (classes != null && classes.length() > 0) {
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, classes);
+                reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes);
             }
         }
         // Copy attributes in the xhtml namespace to no namespace
@@ -150,7 +150,7 @@ public abstract class XFormsBaseHandler extends ElementHandler {
             if (XMLConstants.XHTML_NAMESPACE_URI.equals(elementAttributes.getURI(i))) {
                 final String name = elementAttributes.getLocalName(i);
                 if (!"class".equals(name)) {
-                    reusableAttributes.addAttribute("", name, name, ContentHandlerHelper.CDATA, elementAttributes.getValue(i));
+                    reusableAttributes.addAttribute("", name, name, XMLReceiverHelper.CDATA, elementAttributes.getValue(i));
                 }
             }
         }

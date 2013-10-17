@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.xqj.SaxonXQDataSource;
@@ -135,7 +135,7 @@ public class XQueryProcessor extends ProcessorImpl {
                 final ConfigContainer container = new ConfigContainer();
                 readInputAsSAX(pipelineContext, INPUT_CONFIG, container);
                 final ConfigContainer.Config config = container.config;
-                ContentHandlerHelper helper = new ContentHandlerHelper(xmlReceiver);
+                XMLReceiverHelper helper = new XMLReceiverHelper(xmlReceiver);
                 try {
                     if ("oracle".equals(config.vendor)) {
                         // Use JDBC as a workaround until we find out how to set the connection info in XQJ

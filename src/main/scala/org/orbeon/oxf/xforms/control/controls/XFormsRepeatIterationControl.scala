@@ -18,7 +18,7 @@ import org.dom4j.Element
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.xforms.analysis.controls.RepeatIterationControl
 import org.orbeon.oxf.xforms.control.{NoLHHATrait, XFormsControl, XFormsSingleNodeContainerControl}
@@ -92,16 +92,16 @@ class XFormsRepeatIterationControl(container: XBLContainer, parent: XFormsContro
         (other eq null) && ! isRelevant || (other ne null) && other.isRelevant != isRelevant
     }
 
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
+    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean): Unit = {
         assert(attributesImpl.getLength == 0)
         val repeatIterationControl1 = other.asInstanceOf[XFormsRepeatIterationControl]
         if (mustSendIterationUpdate(repeatIterationControl1)) {
             // Use the effective id of the parent repeat
-            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, parent.getEffectiveId)
+            attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, parent.getEffectiveId)
 
             // Relevance
-            attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA, isRelevant.toString)
-            attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, iterationIndex.toString)
+            attributesImpl.addAttribute("", XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XFormsConstants.RELEVANT_ATTRIBUTE_NAME, XMLReceiverHelper.CDATA, isRelevant.toString)
+            attributesImpl.addAttribute("", "iteration", "iteration", XMLReceiverHelper.CDATA, iterationIndex.toString)
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl)
         }
 

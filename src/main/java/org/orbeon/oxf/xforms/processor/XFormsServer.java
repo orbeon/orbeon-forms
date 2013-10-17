@@ -19,7 +19,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xml.XMLReceiver;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.controller.PageFlowControllerProcessor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -41,10 +41,7 @@ import org.orbeon.oxf.xforms.state.XFormsStateLifecycle;
 import org.orbeon.oxf.xforms.state.XFormsStateManager;
 import org.orbeon.oxf.xforms.submission.SubmissionResult;
 import org.orbeon.oxf.xforms.submission.XFormsModelSubmission;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TeeXMLReceiver;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.SAXException;
@@ -435,7 +432,7 @@ public class XFormsServer extends ProcessorImpl {
         final XFormsControls xformsControls = containingDocument.getControls();
 
         try {
-            final ContentHandlerHelper ch = new ContentHandlerHelper(xmlReceiver);
+            final XMLReceiverHelper ch = new XMLReceiverHelper(xmlReceiver);
             ch.startDocument();
             xmlReceiver.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
@@ -650,7 +647,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void diffIndexState(ContentHandlerHelper ch, String ns, Map<String, Integer> initialRepeatIdToIndex,
+    private static void diffIndexState(XMLReceiverHelper ch, String ns, Map<String, Integer> initialRepeatIdToIndex,
                                        Map<String, Integer> currentRepeatIdToIndex) {
         if (currentRepeatIdToIndex.size() != 0) {
             boolean found = false;
@@ -677,7 +674,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void diffControls(ContentHandlerHelper ch,
+    public static void diffControls(XMLReceiverHelper ch,
                                     XFormsContainingDocument containingDocument, IndentedLogger indentedLogger,
                                     List<XFormsControl> state1, List<XFormsControl> state2,
                                     Set<String> valueChangeControlIds, boolean isTestMode) {
@@ -693,7 +690,7 @@ public class XFormsServer extends ProcessorImpl {
         indentedLogger.endHandleOperation();
     }
 
-    private static void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
+    private static void outputSubmissionInfo(XMLReceiverHelper ch, XFormsModelSubmission activeSubmission) {
         final String target;
 
         // activeSubmission submission can be null when are running as a portlet and handling an <xf:load>, which
@@ -720,7 +717,7 @@ public class XFormsServer extends ProcessorImpl {
                 });
     }
 
-    private static void outputMessagesInfo(ContentHandlerHelper ch, List<XFormsContainingDocument.Message> messages) {
+    private static void outputMessagesInfo(XMLReceiverHelper ch, List<XFormsContainingDocument.Message> messages) {
         for (XFormsContainingDocument.Message message: messages) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "message",
                     new String[]{"level", message.getLevel()});
@@ -729,7 +726,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputLoadsInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Load> loads) {
+    public static void outputLoadsInfo(XMLReceiverHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Load> loads) {
         for (XFormsContainingDocument.Load load: loads) {
             if (!(load.isReplace() && containingDocument.isPortletContainer() && !NetUtils.urlHasProtocol(load.getResource()) && !"resource".equals(load.getUrlType()))) {
                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
@@ -738,7 +735,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static void outputScriptsInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Script> scripts) {
+    public static void outputScriptsInfo(XMLReceiverHelper ch, XFormsContainingDocument containingDocument, List<XFormsContainingDocument.Script> scripts) {
         for (XFormsContainingDocument.Script script: scripts) {
             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "script",
                     new String[]{
@@ -749,12 +746,12 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private static void outputFocusInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, boolean focus, String focusControlEffectiveId) {
+    private static void outputFocusInfo(XMLReceiverHelper ch, XFormsContainingDocument containingDocument, boolean focus, String focusControlEffectiveId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, focus ? "focus" : "blur",
                 new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, focusControlEffectiveId)});
     }
 
-    private static void outputHelpInfo(ContentHandlerHelper ch, XFormsContainingDocument containingDocument, String helpControlEffectiveId) {
+    private static void outputHelpInfo(XMLReceiverHelper ch, XFormsContainingDocument containingDocument, String helpControlEffectiveId) {
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "help",
                 new String[]{"control-id", XFormsUtils.namespaceId(containingDocument, helpControlEffectiveId)});
     }

@@ -27,7 +27,7 @@ import org.orbeon.oxf.xforms.itemset.Itemset;
 import org.orbeon.oxf.xforms.itemset.ItemsetListener;
 import org.orbeon.oxf.xforms.itemset.XFormsItemUtils;
 import org.orbeon.oxf.xforms.processor.handlers.HandlerContext;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -138,17 +138,17 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                                     reusableAttributes.clear();
                                     final String divClasses = isTopLevel ? "yuimenubar" : "yuimenu";
-                                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, divClasses);
+                                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, divClasses);
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
 
                                     reusableAttributes.clear();
-                                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd");
+                                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "bd");
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
 
                                     reusableAttributes.clear();
                                     // NOTE: We just decide to put item classes on <ul>
                                     final String classes = isTopLevel ? "first-of-type" : getItemClasses(item, "first-of-type");
-                                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, classes);
+                                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, classes);
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "ul", ulQName, reusableAttributes);
 
                                     groupJustStarted = true;
@@ -172,11 +172,11 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                         liClasses = getItemClasses(item, sb.toString());
                                     }
                                     reusableAttributes.clear();
-                                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, liClasses);
+                                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, liClasses);
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "li", liQName, reusableAttributes);
 
                                     reusableAttributes.clear();
-                                    reusableAttributes.addAttribute("", "href", "href", ContentHandlerHelper.CDATA, "#");
+                                    reusableAttributes.addAttribute("", "href", "href", XMLReceiverHelper.CDATA, "#");
                                     contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "a", aQName, reusableAttributes);
 
                                     assert !item.label().isHTML();
@@ -200,7 +200,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
 
                         // Create xhtml:div with tree info
                         reusableAttributes.clear();
-                        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-initially-hidden");
+                        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-initially-hidden");
 
                         xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
                         if (itemset != null) { // can be null if the control is non-relevant
@@ -213,10 +213,10 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 } else {
                     // Create xhtml:select
                     final String selectQName = XMLUtils.buildQName(xhtmlPrefix, "select");
-                    containerAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, effectiveId);// necessary for noscript mode
+                    containerAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, effectiveId);// necessary for noscript mode
 
                     if (appearanceTrait != null && appearanceTrait.isCompact())
-                        containerAttributes.addAttribute("", "multiple", "multiple", ContentHandlerHelper.CDATA, "multiple");
+                        containerAttributes.addAttribute("", "multiple", "multiple", XMLReceiverHelper.CDATA, "multiple");
 
                     // Handle accessibility attributes
                     handleAccessibilityAttributes(attributes, containerAttributes);
@@ -255,7 +255,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                                         final String itemClasses = getItemClasses(item, null);
                                         final AttributesImpl optGroupAttributes = getIdClassXHTMLAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
                                         if (label != null)
-                                            optGroupAttributes.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, label);
+                                            optGroupAttributes.addAttribute("", "label", "label", XMLReceiverHelper.CDATA, label);
                                         
                                         // If another optgroup is open, close it - nested optgroups are not allowed. Of course this results in an
                                         // incorrect structure for tree-like itemsets, there is no way around that. If the user however does
@@ -288,7 +288,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final String value = (xformsSelect1Control == null || xformsSelect1Control.getValue() == null) ? "" : xformsSelect1Control.getValue();
                 if (itemset != null) {
                     boolean selectedFound = false;
-                    final ContentHandlerHelper ch = new ContentHandlerHelper(xmlReceiver);
+                    final XMLReceiverHelper ch = new XMLReceiverHelper(xmlReceiver);
                     for (final Item currentItem : itemset.jSelectedItems(value)) {
                         if (selectedFound)
                             ch.text(" - ");
@@ -310,7 +310,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final XFormsControl xformsControl = (XFormsControl) xformsValueControl; // cast because Java is not aware that XFormsValueControl extends XFormsControl
 
         final AttributesImpl containerAttributes = getContainerAttributes(uri, localname, attributes, effectiveId, xformsControl, !(appearanceTrait != null && appearanceTrait.isFull()));
-        containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-items"); // to help with styling
+        containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-items"); // to help with styling
         final String xhtmlPrefix = handlerContext.findXHTMLPrefix();
 
         final String fullItemType = isMultiple ? "checkbox" : "radio";
@@ -336,7 +336,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                     final String legendQName = XMLUtils.buildQName(xhtmlPrefix, legendName);
                     reusableAttributes.clear();
                     // TODO: handle other attributes? xforms-disabled?
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-label");
+                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-label");
                     xmlReceiver.startElement(XMLConstants.XHTML_NAMESPACE_URI, legendName, legendQName, reusableAttributes);
                     if (xformsValueControl != null) {
                         final boolean mustOutputHTMLFragment = xformsControl.isHTMLLabel();
@@ -370,8 +370,8 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         reusableAttributes.clear();
 //        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(handlerContext.containingDocument(), templateId));
         // Client queries template by id without namespace, so output that. Not ideal as all ids should be namespaced.
-        reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, templateId);
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-template");
+        reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, templateId);
+        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-template");
 
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "span", spanQName, reusableAttributes);
         {
@@ -419,7 +419,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
             if (! isBooleanInput) {
                 reusableAttributes.clear();
                 // Add Bootstrap classes
-                reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, isMultiple ? "checkbox" : "radio");
+                reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, isMultiple ? "checkbox" : "radio");
                 outputLabelForStart(handlerContext, reusableAttributes, null, itemNamespacedId, LHHAC.LABEL, "label", false);
             }
 
@@ -428,19 +428,19 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final String inputQName = XMLUtils.buildQName(xhtmlPrefix, "input");
 
                 reusableAttributes.clear();
-                reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, itemNamespacedId);
-                reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, type);
+                reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, itemNamespacedId);
+                reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, type);
 
                 // Get group name from selection control if possible, otherwise use effective id
                 final String name = (!isMultiple && xformsValueControl instanceof XFormsSelect1Control) ? ((XFormsSelect1Control) xformsValueControl).getGroupName() : itemName;
-                reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, name);
+                reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, name);
 
-                reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.externalValue());
+                reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue());
 
                 if (!handlerContext.isTemplate() && xformsValueControl != null) {
 
                     if (isSelected) {
-                        reusableAttributes.addAttribute("", "checked", "checked", ContentHandlerHelper.CDATA, "checked");
+                        reusableAttributes.addAttribute("", "checked", "checked", XMLReceiverHelper.CDATA, "checked");
                     }
 
                     if (isFirst) {
@@ -482,12 +482,12 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
         final AttributesImpl optionAttributes = getIdClassXHTMLAttributes(XMLUtils.EMPTY_ATTRIBUTES, itemClasses, null);
         // Add item attributes to option
         addItemAttributes(item, optionAttributes);
-        optionAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, item.externalValue());
+        optionAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, item.externalValue());
 
         // Figure out whether what items are selected
         boolean isSelected = isSelected(handlerContext, xformsControl, isMultiple, item);
         if (isSelected)
-            optionAttributes.addAttribute("", "selected", "selected", ContentHandlerHelper.CDATA, "selected");
+            optionAttributes.addAttribute("", "selected", "selected", XMLReceiverHelper.CDATA, "selected");
 
         // xhtml:option
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "option", optionQName, optionAttributes);
@@ -505,7 +505,7 @@ public class XFormsSelect1Handler extends XFormsControlLifecyleHandler {
                 final QName attributeQName = entry.getKey();
                 if (!attributeQName.equals(XFormsConstants.CLASS_QNAME)) { // class is handled separately
                     final String attributeName = Itemset.getAttributeName(attributeQName);
-                    spanAttributes.addAttribute("", attributeName, attributeName, ContentHandlerHelper.CDATA, entry.getValue());
+                    spanAttributes.addAttribute("", attributeName, attributeName, XMLReceiverHelper.CDATA, entry.getValue());
                 }
             }
         }

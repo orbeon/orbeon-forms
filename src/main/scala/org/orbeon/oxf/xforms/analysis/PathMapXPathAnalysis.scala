@@ -18,7 +18,7 @@ import org.dom4j.Element
 import org.orbeon.oxf.xforms.function.Instance
 import org.orbeon.oxf.xforms.function.xxforms.XXFormsInstance
 import org.orbeon.oxf.util.{IndentedLogger, XPath}
-import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper, NamespaceMapping}
+import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper, NamespaceMapping}
 import org.orbeon.saxon.om.Axis
 import java.util.{Map ⇒ JMap}
 import org.orbeon.oxf.common.{OrbeonLocationException, OXFException}
@@ -83,7 +83,7 @@ class PathMapXPathAnalysis(val xpathString: String,
             dependentModels,
             dependentInstances)
 
-    def toXML(helper: ContentHandlerHelper) {
+    def toXML(helper: XMLReceiverHelper) {
 
         helper.startElement("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
 

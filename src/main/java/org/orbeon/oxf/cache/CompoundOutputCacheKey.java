@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 import java.util.*;
 
@@ -64,7 +64,7 @@ public class CompoundOutputCacheKey extends OutputCacheKey {
     }
 
     @Override
-    public void toXML(ContentHandlerHelper helper, Object validities) {
+    public void toXML(XMLReceiverHelper helper, Object validities) {
 
         final List validitiesList = (List) validities;
         final Iterator validitiesIterator = (validitiesList != null) ? validitiesList.iterator() : null;

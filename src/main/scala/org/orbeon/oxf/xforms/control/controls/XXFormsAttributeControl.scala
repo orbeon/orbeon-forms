@@ -20,10 +20,10 @@ import org.orbeon.oxf.xforms.XFormsUtils._
 import org.orbeon.oxf.xforms.analysis.controls.AttributeControl
 import org.orbeon.oxf.xforms.control._
 import org.orbeon.oxf.xforms.xbl.XBLContainer
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.xml.sax.helpers.AttributesImpl
 import org.orbeon.oxf.externalcontext.URLRewriter._
-import org.orbeon.oxf.xml.ContentHandlerHelper._
+import org.orbeon.oxf.xml.XMLReceiverHelper._
 import org.orbeon.oxf.xforms.XFormsUtils
 
 /**
@@ -97,7 +97,7 @@ class XXFormsAttributeControl(container: XBLContainer, parent: XFormsControl, el
                 super.getNonRelevantEscapedExternalValue
         }
 
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean) = {
+    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, newlyVisibleSubtree: Boolean) = {
 
         import AjaxSupport._
 

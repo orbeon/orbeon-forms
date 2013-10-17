@@ -338,7 +338,7 @@ class XXFormsDynamicControl(container: XBLContainer, parent: XFormsControl, elem
 
     // For now we don't need to output anything particular
     // LATER: what about new scripts?
-    override def outputAjaxDiff(ch: ContentHandlerHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) = ()
+    override def outputAjaxDiff(ch: XMLReceiverHelper, other: XFormsControl, attributesImpl: AttributesImpl, isNewlyVisibleSubtree: Boolean) = ()
 
     // Only if we had a structural change
     override def supportFullAjaxUpdates = containingDocument.getControlsStructuralChanges.contains(prefixedId)

@@ -317,7 +317,7 @@ object ClientEvents extends Logging {
         val eventElement = clientEvents.asScala(0)
 
         // Helper to make it easier to output simple Ajax responses
-        def eventResponse(messageType: String, message: String)(block: ContentHandlerHelper ⇒ Unit): Boolean = {
+        def eventResponse(messageType: String, message: String)(block: XMLReceiverHelper ⇒ Unit): Boolean = {
             implicit val CurrentLogger = indentedLogger
             withDebug(message) {
                 // Hook-up debug content handler if we must log the response document
@@ -332,7 +332,7 @@ object ClientEvents extends Logging {
                     } else
                         (xmlReceiver, None)
 
-                val helper = new ContentHandlerHelper(responseReceiver)
+                val helper = new XMLReceiverHelper(responseReceiver)
                 helper.startDocument()
                 helper.startPrefixMapping("xxf", XXFORMS_NAMESPACE_URI)
                 helper.startElement("xxf", XXFORMS_NAMESPACE_URI, "event-response")

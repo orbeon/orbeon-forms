@@ -17,7 +17,7 @@ import org.orbeon.oxf.xforms.analysis.{ElementAnalysis, Metadata}
 import org.orbeon.oxf.xforms.event.EventHandler
 import org.orbeon.oxf.xml.dom4j.LocationData
 import java.util.{List ⇒ JList}
-import org.orbeon.oxf.xml.{ContentHandlerHelper, XMLUtils}
+import org.orbeon.oxf.xml.{XMLReceiverHelper, XMLUtils}
 import org.orbeon.oxf.util.IndentedLogger
 import org.dom4j.Element
 import org.orbeon.oxf.xforms.xbl.{Scope, XBLBindings}

@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
 import org.orbeon.oxf.pipeline.api.TracingPipelineContext;
+import org.orbeon.oxf.xml.InspectingXMLReceiver;
 import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -27,8 +28,7 @@ import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.InspectingContentHandler;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -358,8 +358,8 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
             outputFilter = new RuntimeOutputFilter() {
                 @Override
                 public void read(PipelineContext pipelineContext, XMLReceiver xmlReceiver) {
-                    InspectingContentHandler inspectingContentHandler = new InspectingContentHandler(xmlReceiver);
-                    previousOutputFilter.read(pipelineContext, inspectingContentHandler);
+                    InspectingXMLReceiver inspectingXMLReceiver = new InspectingXMLReceiver(xmlReceiver);
+                    previousOutputFilter.read(pipelineContext, inspectingXMLReceiver);
                 }
 
                 public OutputCacheKey getKey(PipelineContext pipelineContext) {
@@ -441,7 +441,7 @@ public abstract class ProcessorOutputImpl implements ProcessorOutput {
         return getRuntimeFilter().getValidity(pipelineContext);
     }
     
-    public void toXML(PipelineContext pipelineContext, ContentHandlerHelper helper) {
+    public void toXML(PipelineContext pipelineContext, XMLReceiverHelper helper) {
 
         final ProcessorInput input = getInput();
 

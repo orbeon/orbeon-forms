@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis
 
 import org.orbeon.oxf.xforms.MapSet
 import org.orbeon.oxf.xml.XMLUtils.DebugXML
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 
 /**
  * Abstract representation of an XPath analysis as usable by the XForms engine.
@@ -46,7 +46,7 @@ abstract class XPathAnalysis extends DebugXML  {
     // Convert this analysis into the same analysis, where values have become dependencies
     def makeValuesDependencies: XPathAnalysis
 
-    def toXML(helper: ContentHandlerHelper)
+    def toXML(helper: XMLReceiverHelper)
 
     def freeTransientState() = ()
 }
@@ -70,7 +70,7 @@ object XPathAnalysis {
 
         def makeValuesDependencies = this
 
-        def toXML(helper: ContentHandlerHelper) =
+        def toXML(helper: XMLReceiverHelper) =
             helper.element("analysis", Array("expression", xpathString, "analyzed", figuredOutDependencies.toString))
     }
 

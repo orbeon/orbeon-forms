@@ -65,7 +65,7 @@ public class XFormsGroupDefaultHandler extends XFormsGroupHandler {
         final String effectiveId = getEffectiveId();
 
         reusableAttributes.clear();
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, getLabelClasses(groupControl));
+        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, getLabelClasses(groupControl));
         outputLabelFor(handlerContext, reusableAttributes, effectiveId, effectiveId, LHHAC.LABEL, handlerContext.getLabelElementName(),
                 getLabelValue(groupControl), groupControl != null && groupControl.isHTMLLabel(), false);
     }

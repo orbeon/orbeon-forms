@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.control
 
 import collection.JavaConverters._
 import collection.mutable.{ArrayBuffer, Buffer}
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import java.util.{List ⇒ JList}
 
 trait XFormsContainerControl extends VisitableTrait {
@@ -90,7 +90,7 @@ trait XFormsContainerControl extends VisitableTrait {
         false
     }
 
-    override def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit) {
+    override def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit) {
         super.toXML(helper, attributes) {
             children foreach (_.toXML(helper, List.empty)())
         }

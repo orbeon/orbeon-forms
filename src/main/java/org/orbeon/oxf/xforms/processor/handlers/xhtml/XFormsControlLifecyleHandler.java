@@ -20,7 +20,7 @@ import org.orbeon.oxf.xforms.analysis.ElementAnalysis;
 import org.orbeon.oxf.xforms.analysis.controls.StaticLHHASupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.processor.handlers.XFormsControlLifecycleHandlerDelegate;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -263,7 +263,7 @@ public abstract class XFormsControlLifecyleHandler extends XFormsBaseHandlerXHTM
         reusableAttributes.clear();
         final AttributesImpl containerAttributes = reusableAttributes;
         if (addId)
-            containerAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)));
+            containerAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, getLHHACId(containingDocument, effectiveId, LHHAC_CODES.get(LHHAC.CONTROL)));
 
         return containerAttributes;
     }

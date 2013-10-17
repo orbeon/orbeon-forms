@@ -18,7 +18,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.AjaxSupport;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.xbl.XBLContainer;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
@@ -42,7 +42,7 @@ public class XXFormsTextControl extends XFormsOutputControl {
     }
 
     @Override
-    public void outputAjaxDiff(ContentHandlerHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
+    public void outputAjaxDiff(XMLReceiverHelper ch, XFormsControl other, AttributesImpl attributesImpl, boolean isNewlyVisibleSubtree) {
 
         assert attributesImpl.getLength() == 0;
 
@@ -52,7 +52,7 @@ public class XXFormsTextControl extends XFormsOutputControl {
         boolean doOutputElement = false;
 
         // Control id
-        attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, textControl2.getEffectiveId());
+        attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, textControl2.getEffectiveId());
 
         // The client does not store an HTML representation of the xxf:text control, so we
         // have to output these attributes.

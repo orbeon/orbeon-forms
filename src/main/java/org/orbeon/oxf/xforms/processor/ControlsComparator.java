@@ -47,12 +47,12 @@ public class ControlsComparator {
 
     private final AttributesImpl attributesImpl = new AttributesImpl();
 
-    private ContentHandlerHelper ch;
-    private ContentHandlerHelper tempCH;
+    private XMLReceiverHelper ch;
+    private XMLReceiverHelper tempCH;
 
     private final int fullUpdateThreshold;
 
-    public ControlsComparator(ContentHandlerHelper ch, XFormsContainingDocument containingDocument,
+    public ControlsComparator(XMLReceiverHelper ch, XFormsContainingDocument containingDocument,
                               Set<String> valueChangeControlIds, boolean isTestMode) {
 
         this.ch = ch;
@@ -118,7 +118,7 @@ public class ControlsComparator {
                 if (isFullUpdateLevel) {
                     // Start buffering
                     tempCH = ch;
-                    ch = new ContentHandlerHelper(new SAXStore());
+                    ch = new XMLReceiverHelper(new SAXStore());
                 }
 
 
@@ -372,7 +372,7 @@ public class ControlsComparator {
             controller.setElementHandlerContext(handlerContext);
 
             attributesImpl.clear();
-            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId()));
+            attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, XFormsUtils.namespaceId(containingDocument, control2.getEffectiveId()));
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "inner-html", attributesImpl);
             {
                 // Replay into SAX pipeline
@@ -388,7 +388,7 @@ public class ControlsComparator {
         }
     }
 
-    protected void outputDeleteRepeatTemplate(ContentHandlerHelper ch, XFormsControl xformsControl2, int count) {
+    protected void outputDeleteRepeatTemplate(XMLReceiverHelper ch, XFormsControl xformsControl2, int count) {
         if (!isTestMode) {
             final String repeatControlId = xformsControl2.getEffectiveId();
             final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_SEPARATOR);
@@ -400,7 +400,7 @@ public class ControlsComparator {
         }
     }
 
-    protected void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsRepeatControl repeatControl, int startSuffix, int endSuffix) {
+    protected void outputCopyRepeatTemplate(XMLReceiverHelper ch, XFormsRepeatControl repeatControl, int startSuffix, int endSuffix) {
         if (!isTestMode) {
             final String repeatControlId = repeatControl.getEffectiveId();
             final int indexOfRepeatHierarchySeparator = repeatControlId.indexOf(XFormsConstants.REPEAT_SEPARATOR);

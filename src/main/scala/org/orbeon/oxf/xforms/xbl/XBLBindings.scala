@@ -256,7 +256,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
     
             TransformerUtils.writeDom4j(
                 fullAnnotatedTree,
-                new ScopeExtractorContentHandler(null, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
+                new ScopeExtractor(null, innerScope, outerScope, startScope, containerScope.fullPrefix, baseURI)
             )
             
             fullAnnotatedTree
@@ -289,9 +289,9 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
                 // FIXME: this adds xml:base on root element
                 TransformerUtils.writeDom4j(rawTree,
                     new WhitespaceXMLReceiver(
-                        new XFormsAnnotatorContentHandler(
+                        new XFormsAnnotator(
                             templateOutput,
-                            new ScopeExtractorContentHandler(
+                            new ScopeExtractor(
                                 new WhitespaceXMLReceiver(
                                     extractorOutput,
                                     Whitespace.defaultBasePolicy,
@@ -418,7 +418,7 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
 
         // Write the document through the annotator
         // TODO: this adds xml:base on root element, must fix
-        TransformerUtils.writeDom4j(shadowTree, new XFormsAnnotatorContentHandler(output, null, metadata) {
+        TransformerUtils.writeDom4j(shadowTree, new XFormsAnnotator(output, null, metadata) {
             // Use prefixed id for marks and namespaces in order to avoid clashes between top-level controls and shadow trees
             protected override def rewriteId(id: String) = prefix + id
         })
@@ -436,14 +436,14 @@ class XBLBindings(indentedLogger: IndentedLogger, partAnalysis: PartAnalysisImpl
      * @param prefix                prefix of the ids within the new shadow tree, e.g. "my-stuff$my-foo-bar$"
      * @param baseURI               base URI of new tree
      */
-    private class ScopeExtractorContentHandler(
+    private class ScopeExtractor(
         xmlReceiver: XMLReceiver,
         innerScope: Scope,
         outerScope: Scope,
         startScope: XXBLScope,
         prefix: String,
         baseURI: String)
-    extends XFormsExtractorContentHandler(xmlReceiver, metadata, null, baseURI, startScope, false, false, true) {
+    extends XFormsExtractor(xmlReceiver, metadata, null, baseURI, startScope, false, false, true) {
 
         assert(innerScope ne null)
         assert(outerScope ne null)

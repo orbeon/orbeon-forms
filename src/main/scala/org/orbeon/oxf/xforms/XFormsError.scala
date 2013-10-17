@@ -103,13 +103,13 @@ object XFormsError {
             nonFatal
 
     // Output the Ajax error panel with a placeholder for errors
-    def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String): Unit =
+    def outputAjaxErrorPanel(containingDocument: XFormsContainingDocument, helper: XMLReceiverHelper, htmlPrefix: String): Unit =
         helper.element("", XMLConstants.XINCLUDE_URI, "include", Array(
             "href", XHTMLBodyHandler.getIncludedResourceURL(containingDocument.getRequestPath, "error-dialog.xml"),
             "fixup-xml-base", "false"))
 
     // Output the Noscript error panel and insert the errors
-    def outputNoscriptErrorPanel(containingDocument: XFormsContainingDocument, helper: ContentHandlerHelper, htmlPrefix: String): Unit = {
+    def outputNoscriptErrorPanel(containingDocument: XFormsContainingDocument, helper: XMLReceiverHelper, htmlPrefix: String): Unit = {
         val errors = containingDocument.getServerErrors.asScala
         if (errors nonEmpty) {
 
@@ -138,7 +138,7 @@ object XFormsError {
     }
 
     // Insert server errors into the Ajax response
-    def outputAjaxErrors(ch: ContentHandlerHelper, errors: JList[ServerError]): Unit = {
+    def outputAjaxErrors(ch: XMLReceiverHelper, errors: JList[ServerError]): Unit = {
         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "errors")
         for (error ← errors.asScala) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "error", error.getDetailsAsArray)

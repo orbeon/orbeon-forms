@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 
 public class SimpleOutputCacheKey extends OutputCacheKey {
 
@@ -60,7 +60,7 @@ public class SimpleOutputCacheKey extends OutputCacheKey {
     }
 
     @Override
-    public void toXML(ContentHandlerHelper helper, Object validities) {
+    public void toXML(XMLReceiverHelper helper, Object validities) {
         helper.element("output", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "name", outputName, "key", key });
     }
 }

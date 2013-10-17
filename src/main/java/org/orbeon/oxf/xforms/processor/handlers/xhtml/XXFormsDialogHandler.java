@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.control.XFormsControl;
 import org.orbeon.oxf.xforms.control.controls.XXFormsDialogControl;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.XMLReceiverHelper;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
@@ -74,7 +74,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
         // Child xhtml:div for label
         reusableAttributes.clear();
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "hd xxforms-dialog-head");
+        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "hd xxforms-dialog-head");
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
 
         final String labelValue = (dialogXFormsControl != null) ? dialogXFormsControl.getLabel() : null;
@@ -86,7 +86,7 @@ public class XXFormsDialogHandler extends XFormsBaseHandlerXHTML {
 
         // Child xhtml:div for body
         reusableAttributes.clear();
-        reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "bd xxforms-dialog-body");
+        reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "bd xxforms-dialog-body");
         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "div", divQName, reusableAttributes);
     }
 

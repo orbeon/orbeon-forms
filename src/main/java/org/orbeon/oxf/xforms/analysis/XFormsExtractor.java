@@ -79,10 +79,10 @@ import java.util.*;
  *   <!-- Last id used (for id generation in XBL after deserialization) -->
  *   <last-id id="123"/>
  *   <!-- Template (for full updates, possibly noscript) -->
-*    <template>base64</template>
+ *   <template>base64</template>
  * </static-state>
  */
-public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
+public class XFormsExtractor extends ForwardingXMLReceiver {
 
     public static final QName LAST_ID_QNAME = new QName("last-id");
 
@@ -131,7 +131,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
     private int preserveOrLHHAOrForeignLevel;
     private boolean isHTMLDocument; // Whether this is an (X)HTML document
 
-    public XFormsExtractorContentHandler(
+    public XFormsExtractor(
             XMLReceiver xmlReceiver,
             Metadata metadata,
             AnnotatedTemplate templateUnderConstruction,
@@ -169,18 +169,18 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
 
             // Add location information
             if (locationData != null) {
-                attributesImpl.addAttribute("", "system-id", "system-id", ContentHandlerHelper.CDATA, locationData.getSystemID());
-                attributesImpl.addAttribute("", "line", "line", ContentHandlerHelper.CDATA, Integer.toString(locationData.getLine()));
-                attributesImpl.addAttribute("", "column", "column", ContentHandlerHelper.CDATA, Integer.toString(locationData.getCol()));
+                attributesImpl.addAttribute("", "system-id", "system-id", XMLReceiverHelper.CDATA, locationData.getSystemID());
+                attributesImpl.addAttribute("", "line", "line", XMLReceiverHelper.CDATA, Integer.toString(locationData.getLine()));
+                attributesImpl.addAttribute("", "column", "column", XMLReceiverHelper.CDATA, Integer.toString(locationData.getCol()));
             }
             
             // Add is HTML information
-            attributesImpl.addAttribute("", "is-html", "is-html", ContentHandlerHelper.CDATA, isHTMLDocument?"true":"false");
+            attributesImpl.addAttribute("", "is-html", "is-html", XMLReceiverHelper.CDATA, isHTMLDocument?"true":"false");
 
             super.startElement("", "static-state", "static-state", attributesImpl);
 
             attributesImpl.clear();
-            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, "#document");
+            attributesImpl.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, "#document");
             super.startElement("", "root", "root", attributesImpl);
             mustOutputFirstElement = false;
         }
@@ -229,7 +229,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
                 final AttributesImpl newAttributes = new AttributesImpl();
                 for (final Map.Entry<String, Object> currentEntry : properties.entrySet()) {
                     final String propertyName = currentEntry.getKey();
-                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxf:" + propertyName, ContentHandlerHelper.CDATA, currentEntry.getValue().toString());
+                    newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, propertyName, "xxf:" + propertyName, XMLReceiverHelper.CDATA, currentEntry.getValue().toString());
                 }
 
                 super.startPrefixMapping("xxforms", XFormsConstants.XXFORMS_NAMESPACE_URI);
@@ -241,7 +241,7 @@ public class XFormsExtractorContentHandler extends ForwardingXMLReceiver {
             if (isTopLevel) {
                 // Remember the last id used for id generation. During state restoration, XBL components must start with this id.
                 final AttributesImpl newAttributes = new AttributesImpl();
-                newAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, Integer.toString(metadata.idGenerator().getCurrentId()));
+                newAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, Integer.toString(metadata.idGenerator().getCurrentId()));
                 final String lastIdName = LAST_ID_QNAME.getName();
                 super.startElement("", lastIdName, lastIdName, newAttributes);
                 super.endElement("", lastIdName, lastIdName);

@@ -19,7 +19,7 @@ import org.orbeon.oxf.xforms.control.XFormsControl
 import org.orbeon.oxf.xforms.control.controls.XFormsInputControl
 import org.orbeon.oxf.xforms.itemset.Item
 import org.orbeon.oxf.xforms.itemset.Itemset
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLConstants
 import org.orbeon.oxf.xml.XMLUtils
 import org.xml.sax.Attributes
@@ -110,21 +110,21 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                 {
                     val inputIdName = getFirstInputEffectiveId(effectiveId)
                     reusableAttributes.clear()
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName)
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
                     if (! isDateMinimal)
-                        reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text")
+                        reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
                     // Use effective id for name of first field
-                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName)
+                    reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, inputIdName)
                     val inputClasses = new java.lang.StringBuilder("xforms-input-input")
                     if (isRelevantControl) {
                         // Output value only for concrete control
                         val formattedValue = inputControl.getFirstValueUseFormat
                         if (!isDateMinimal) {
                             // Regular case, value goes to input control
-                            reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, Option(formattedValue) getOrElse "")
+                            reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, Option(formattedValue) getOrElse "")
                         } else {
                             // "Minimal date", value goes to @alt attribute on image
-                            reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, Option(formattedValue) getOrElse "")
+                            reusableAttributes.addAttribute("", "alt", "alt", XMLReceiverHelper.CDATA, Option(formattedValue) getOrElse "")
                         }
                         val firstType = inputControl.getFirstValueType
                         if (firstType ne null) {
@@ -138,7 +138,7 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                             case _ ⇒
                         }
                     } else {
-                        reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "")
+                        reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
                     }
 
                     // Output xxf:* extension attributes
@@ -147,15 +147,15 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
 
                     // Add attribute even if the control is not concrete
                     if ((placeHolderInfo ne null) && (placeHolderInfo.placeholder ne null))
-                        reusableAttributes.addAttribute("", "placeholder", "placeholder", ContentHandlerHelper.CDATA, placeHolderInfo.placeholder)
+                        reusableAttributes.addAttribute("", "placeholder", "placeholder", XMLReceiverHelper.CDATA, placeHolderInfo.placeholder)
 
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString)
+                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
 
                     handleAccessibilityAttributes(attributes, reusableAttributes)
                     if (isDateMinimal) {
                         val imgQName = XMLUtils.buildQName(xhtmlPrefix, "img")
-                        reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, CALENDAR_IMAGE_URI)
-                        reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "")
+                        reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
+                        reusableAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, "")
                         contentHandler.startElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName, reusableAttributes)
                         contentHandler.endElement(XMLConstants.XHTML_NAMESPACE_URI, "img", imgQName)
                     } else {
@@ -170,18 +170,18 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                 if (isDateTime) {
                     val inputIdName  = getSecondInputEffectiveId(effectiveId)
                     reusableAttributes.clear()
-                    reusableAttributes.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, inputIdName)
-                    reusableAttributes.addAttribute("", "type", "type", ContentHandlerHelper.CDATA, "text")
-                    reusableAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, CALENDAR_IMAGE_URI)
-                    reusableAttributes.addAttribute("", "title", "title", ContentHandlerHelper.CDATA, "")
-                    reusableAttributes.addAttribute("", "alt", "alt", ContentHandlerHelper.CDATA, "")
+                    reusableAttributes.addAttribute("", "id", "id", XMLReceiverHelper.CDATA, inputIdName)
+                    reusableAttributes.addAttribute("", "type", "type", XMLReceiverHelper.CDATA, "text")
+                    reusableAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, CALENDAR_IMAGE_URI)
+                    reusableAttributes.addAttribute("", "title", "title", XMLReceiverHelper.CDATA, "")
+                    reusableAttributes.addAttribute("", "alt", "alt", XMLReceiverHelper.CDATA, "")
                     // TODO: Is this an appropriate name? Noscript must be able to find this
-                    reusableAttributes.addAttribute("", "name", "name", ContentHandlerHelper.CDATA, inputIdName)
+                    reusableAttributes.addAttribute("", "name", "name", XMLReceiverHelper.CDATA, inputIdName)
                     val inputClasses = new StringBuilder("xforms-input-input")
                     if (isRelevantControl) {
                         // Output value only for concrete control
                         val inputValue = inputControl.getSecondValueUseFormat
-                        reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, inputValue)
+                        reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, inputValue)
                         val secondType = inputControl.getSecondValueType
                         if (secondType ne null) {
                             inputClasses.append(" xforms-type-")
@@ -189,9 +189,9 @@ class XFormsInputHandler extends XFormsControlLifecyleHandler(false) { // repeat
                         }
                     }
                     else {
-                        reusableAttributes.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, "")
+                        reusableAttributes.addAttribute("", "value", "value", XMLReceiverHelper.CDATA, "")
                     }
-                    reusableAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, inputClasses.toString)
+                    reusableAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, inputClasses.toString)
                     if (isHTMLDisabled(inputControl))
                         outputDisabledAttribute(reusableAttributes)
 

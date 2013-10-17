@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xforms.control
 
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.XMLUtils
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import collection.JavaConverters._
@@ -25,7 +25,7 @@ trait ControlXMLDumpSupport extends DebugXML{
 
     self: XFormsControl ⇒
 
-    def toXML(helper: ContentHandlerHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
+    def toXML(helper: XMLReceiverHelper, attributes: List[String])(content: ⇒ Unit): Unit = {
 
         def itemToString(i: Item) = i match {
             case atomic: AtomicValue ⇒ atomic.getStringValue
@@ -45,7 +45,7 @@ trait ControlXMLDumpSupport extends DebugXML{
         helper.endElement()
     }
 
-    def toXML(helper: ContentHandlerHelper): Unit = {
+    def toXML(helper: XMLReceiverHelper): Unit = {
         helper.startDocument()
         toXML(helper, List.empty)()
         helper.endDocument()

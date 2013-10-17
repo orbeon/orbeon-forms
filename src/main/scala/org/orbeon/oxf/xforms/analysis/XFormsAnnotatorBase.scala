@@ -17,7 +17,7 @@ import org.orbeon.oxf.xml.XMLReceiverAdapter
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xml.XMLConstants._
 
-abstract class XFormsAnnotatorContentHandlerBase extends XMLReceiverAdapter {
+abstract class XFormsAnnotatorBase extends XMLReceiverAdapter {
 
     // Name of container elements that require the use of separators for handling visibility
     private val SeparatorAppearanceElements = Set(

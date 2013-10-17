@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml
 
 import org.orbeon.oxf.xforms.control.{XFormsControl, XFormsSingleNodeControl}
-import org.orbeon.oxf.xml.{XMLUtils, ContentHandlerHelper}
+import org.orbeon.oxf.xml.{XMLUtils, XMLReceiverHelper}
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.control.controls.XFormsOutputControl
 import org.orbeon.oxf.xforms.processor.handlers.XFormsBaseHandler
@@ -22,14 +22,14 @@ import org.orbeon.oxf.xforms.{XFormsConstants, XFormsUtils}
 import org.orbeon.oxf.xforms.processor.handlers.HandlerHelper._
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI,FORMATTING_URL_TYPE_QNAME}
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.xml.ContentHandlerHelper._
+import XMLReceiverHelper._
 import org.orbeon.oxf.xforms.XFormsConstants._
 
 trait XFormsOutputHandler extends XFormsControlLifecyleHandler {
     protected def getContainerAttributes(uri: String, localname: String, attributes: Attributes, effectiveId: String, outputControl: XFormsSingleNodeControl) = {
         // Add custom class
         val containerAttributes = super.getContainerAttributes(uri, localname, attributes, effectiveId, outputControl, true)
-        containerAttributes.addAttribute("", "class", "class", ContentHandlerHelper.CDATA, "xforms-output-output")
+        containerAttributes.addAttribute("", "class", "class", XMLReceiverHelper.CDATA, "xforms-output-output")
         containerAttributes
     }
 
@@ -105,7 +105,7 @@ class XFormsOutputImageHandler extends XFormsControlLifecyleHandler(false) with 
         // @src="..."
         // NOTE: If producing a template, or if the image URL is blank, we point to an existing dummy image
         val srcValue = XFormsOutputControl.getExternalValueOrDefault(outputControl, mediatypeValue)
-        containerAttributes.addAttribute("", "src", "src", ContentHandlerHelper.CDATA, if (srcValue ne null) srcValue else XFormsConstants.DUMMY_IMAGE_URI)
+        containerAttributes.addAttribute("", "src", "src", XMLReceiverHelper.CDATA, if (srcValue ne null) srcValue else XFormsConstants.DUMMY_IMAGE_URI)
 
         XFormsBaseHandler.handleAccessibilityAttributes(attributes, containerAttributes)
 

@@ -17,7 +17,7 @@ import java.util.Set
 import org.orbeon.oxf.util.IndentedLogger
 import org.orbeon.oxf.xml.dom4j.LocationData
 import state.AnnotatedTemplate
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 
 trait XFormsStaticState {
 
@@ -47,6 +47,6 @@ trait XFormsStaticState {
     def getBooleanProperty(propertyName: String): Boolean
     def getIntegerProperty(propertyName: String): Int
 
-    def toXML(helper: ContentHandlerHelper)
+    def toXML(helper: XMLReceiverHelper)
     def dumpAnalysis()
 }

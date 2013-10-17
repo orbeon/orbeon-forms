@@ -21,7 +21,7 @@ import org.dom4j.QName
 import org.orbeon.oxf.common.ValidationException
 import org.orbeon.oxf.xforms.XFormsConstants
 import org.orbeon.oxf.xforms.XFormsUtils
-import org.orbeon.oxf.xml.ContentHandlerHelper
+import org.orbeon.oxf.xml.XMLReceiverHelper
 import org.orbeon.oxf.xml.TransformerUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.Configuration
@@ -121,7 +121,7 @@ class Itemset(multiple: Boolean) extends ItemContainer {
         val treeBuilder = new TinyBuilder
         val identity = TransformerUtils.getIdentityTransformerHandler(configuration)
         identity.setResult(treeBuilder)
-        val ch = new ContentHandlerHelper(identity)
+        val ch = new XMLReceiverHelper(identity)
 
         ch.startDocument()
         ch.startElement("itemset")

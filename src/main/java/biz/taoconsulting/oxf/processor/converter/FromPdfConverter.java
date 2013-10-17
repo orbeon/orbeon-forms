@@ -410,7 +410,7 @@ public class FromPdfConverter extends SimpleProcessor {
                 return false;
 
             // The content handler for that input stream...
-            final XMLReceiver pdfMetaContent = new PdfMetadataContentHandler(xmlReceiver);
+            final XMLReceiver pdfMetaContent = new PdfMetadataXMLReceiver(xmlReceiver);
 
             //read the XML metadata into an inputstream
             InputStream xmlInputStream = metadata.createInputStream();

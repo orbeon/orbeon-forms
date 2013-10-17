@@ -293,22 +293,23 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
 
         // Add attributes
         val doOutputElement = addAjaxAttributes(attributesImpl, isNewlyVisibleSubtree, other)
+        
+        def outputElement() =
+            if (doOutputElement)
+                ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
 
         // Get current value if possible for this control
         // NOTE: We issue the new value in all cases because we don't have yet a mechanism to tell the
         // client not to update the value, unlike with attributes which can be omitted
-        // FIXME: Remove isInstanceOf calls
-        if (control2.isInstanceOf[XFormsValueControl] && ! control2.isInstanceOf[XFormsUploadControl] && !control2.isInstanceOf[XFormsComponentControl]) {
-
-            // TODO: Output value only when changed
-
-            // Output element
-            val xformsValueControl = control2.asInstanceOf[XFormsValueControl]
-            outputValueElement(ch, xformsValueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control")
-        } else {
-            // No value, just output element with no content (but there may be attributes)
-            if (doOutputElement)
-                ch.element("xxf", XXFORMS_NAMESPACE_URI, "control", attributesImpl)
+        control2 match {
+            case _: XFormsUploadControl | _: XFormsComponentControl ⇒
+                outputElement()
+            case valueControl: XFormsValueControl ⇒
+                // TODO: Output value only when changed
+                outputValueElement(ch, valueControl, doOutputElement, isNewlyVisibleSubtree, attributesImpl, "control")
+            case _ ⇒
+                // No value, just output element with no content (but there may be attributes)
+                outputElement()
         }
 
         // Output attributes (like style) in no namespace which must be output via xxf:attribute
@@ -355,10 +356,10 @@ abstract class XFormsSingleNodeControl(container: XBLContainer, parent: XFormsCo
         added
     }
 
-    protected def outputValueElement(ch: ContentHandlerHelper, xformsValueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String) {
+    protected def outputValueElement(ch: ContentHandlerHelper, valueControl: XFormsValueControl, doOutputElement: Boolean, isNewlyVisibleSubtree: Boolean, attributesImpl: Attributes, elementName: String) {
 
         // Create element with text value
-        val value = xformsValueControl.getEscapedExternalValue
+        val value = valueControl.getEscapedExternalValue
 
         if (doOutputElement || ! isNewlyVisibleSubtree || value != "") {
             ch.startElement("xxf", XXFORMS_NAMESPACE_URI, elementName, attributesImpl)

@@ -357,7 +357,7 @@ object XXFormsDynamicControl {
 
         // XPath: ((self::xf:bind | self::@*/parent::xf:bind)/ancestor::xf:model)[1]
         val modelOption =
-            (node self (XF → "bind")) ++ ((node self @* parent (XF → "bind"))) ancestor (XF → "model") headOption
+            (node self (XF → "bind")) ++ (node self @* parent (XF → "bind")) ancestor (XF → "model") headOption
 
         modelOption map { modelNode ⇒
             val modelElement = unwrapElement(modelNode)

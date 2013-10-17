@@ -22,8 +22,8 @@ import org.jfree.chart.servlet.ServletUtilities;
 import org.jfree.data.general.Dataset;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 

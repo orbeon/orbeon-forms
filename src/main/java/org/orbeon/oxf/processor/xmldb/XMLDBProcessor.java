@@ -20,7 +20,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorImpl;

@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.io.SAXContentHandler;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 /**
  * @see NonLazyUserDataElement

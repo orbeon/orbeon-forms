@@ -16,7 +16,6 @@ package org.orbeon.oxf.xml;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.SAXLoggerProcessor;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;

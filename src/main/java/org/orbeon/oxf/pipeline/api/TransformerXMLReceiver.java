@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.pipeline.api;
 
+import org.orbeon.oxf.xml.XMLReceiver;
+
 import javax.xml.transform.sax.TransformerHandler;
 
 public interface TransformerXMLReceiver extends XMLReceiver, TransformerHandler {}

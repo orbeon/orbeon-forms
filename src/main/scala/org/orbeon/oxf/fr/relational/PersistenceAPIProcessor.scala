@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.fr.relational
 
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.orbeon.oxf.processor.{ProcessorOutput, ProcessorImpl}
 import org.orbeon.oxf.util.{XPathCache, NetUtils}
 import org.orbeon.oxf.util.DateUtils.DateTime
@@ -22,6 +22,7 @@ import org.orbeon.scaxon.XML._
 import java.sql.Timestamp
 import org.orbeon.scaxon.XML
 import scala.collection.mutable.ListBuffer
+import org.orbeon.oxf.xml.XMLReceiver
 
 /**
  * Implementation of the persistence API for relational databases.

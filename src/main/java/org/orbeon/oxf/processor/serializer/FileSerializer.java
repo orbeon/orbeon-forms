@@ -19,7 +19,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;

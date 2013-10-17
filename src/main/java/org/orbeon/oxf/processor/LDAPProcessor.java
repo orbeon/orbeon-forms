@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;

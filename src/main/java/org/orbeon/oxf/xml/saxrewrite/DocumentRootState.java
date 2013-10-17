@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.xml.saxrewrite;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

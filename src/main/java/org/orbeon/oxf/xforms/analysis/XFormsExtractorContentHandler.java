@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.QName;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.properties.Properties;
 import org.orbeon.oxf.properties.PropertySet;
 import org.orbeon.oxf.xforms.XFormsConstants;

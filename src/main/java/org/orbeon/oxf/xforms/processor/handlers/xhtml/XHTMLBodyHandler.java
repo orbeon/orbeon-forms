@@ -16,7 +16,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.QName;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.*;

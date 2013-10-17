@@ -17,11 +17,10 @@ import analysis.model.Instance
 import model.DataModel
 import org.dom4j._
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.xforms.control.controls.XFormsRepeatControl
 import org.orbeon.oxf.xforms.event._
 import org.orbeon.oxf.xforms.event.events._
-import org.orbeon.oxf.xml.TransformerUtils
+import org.orbeon.oxf.xml.{XMLReceiver, TransformerUtils}
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
 import org.orbeon.oxf.xml.dom4j.LocationData
 import org.orbeon.saxon.dom4j.DocumentWrapper

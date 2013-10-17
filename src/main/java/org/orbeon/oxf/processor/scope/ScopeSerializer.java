@@ -15,14 +15,13 @@ package org.orbeon.oxf.processor.scope;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

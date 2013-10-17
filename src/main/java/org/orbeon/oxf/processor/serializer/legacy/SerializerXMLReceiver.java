@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.serializer.legacy;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.serializer.BinaryTextXMLReceiver;
 import org.orbeon.oxf.xml.NamespaceCleanupXMLReceiver;
 import org.xml.sax.SAXException;

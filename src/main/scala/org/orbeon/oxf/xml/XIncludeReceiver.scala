@@ -17,7 +17,7 @@ import XMLConstants._
 import collection.JavaConverters._
 import org.orbeon.oxf.common.OXFException
 import org.orbeon.oxf.common.ValidationException
-import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext, XMLReceiver}
+import org.orbeon.oxf.pipeline.api.{FunctionLibrary, PipelineContext}
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver
 import org.orbeon.oxf.processor.transformer.XPathProcessor
 import org.orbeon.oxf.util.{LoggerFactory, XPathCache}

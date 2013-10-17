@@ -15,9 +15,8 @@ package org.orbeon.oxf.processor
 
 import org.orbeon.errorified.Exceptions
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.processor.generator.ExceptionGenerator
-import org.orbeon.oxf.xml.{ContentHandlerHelper, SAXStore}
+import org.orbeon.oxf.xml.{XMLReceiver, ContentHandlerHelper, SAXStore}
 import org.orbeon.oxf.util.XPathCache
 import org.orbeon.scaxon.XML
 import org.orbeon.saxon.value.BooleanValue

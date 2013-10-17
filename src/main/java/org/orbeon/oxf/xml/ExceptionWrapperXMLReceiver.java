@@ -15,7 +15,6 @@ package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.OrbeonLocationException;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;

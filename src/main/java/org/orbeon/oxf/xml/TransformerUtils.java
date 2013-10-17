@@ -17,7 +17,6 @@ import org.dom4j.Document;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.util.StringBuilderWriter;
 import org.orbeon.oxf.xml.dom4j.*;

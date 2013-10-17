@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.converter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.ProcessorUtils;

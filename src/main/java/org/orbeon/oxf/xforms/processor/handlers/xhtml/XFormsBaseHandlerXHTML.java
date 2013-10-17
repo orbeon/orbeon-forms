@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.apache.commons.lang3.StringUtils;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xforms.analysis.controls.AppearanceTrait;

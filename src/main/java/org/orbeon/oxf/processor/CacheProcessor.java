@@ -20,7 +20,7 @@ import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.DateUtils;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLReceiverAdapter;

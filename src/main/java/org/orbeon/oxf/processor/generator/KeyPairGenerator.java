@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.generator;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XMLUtils;

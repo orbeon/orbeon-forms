@@ -14,7 +14,7 @@
 package org.orbeon.oxf.xforms.processor.handlers.xhtml;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.util.URLRewriterUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;

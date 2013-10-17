@@ -14,7 +14,7 @@
 package org.orbeon.oxf.processor.impl;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 
 /**

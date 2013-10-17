@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.transformer;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 public interface URIResolverListener {
     XMLReceiver getXMLReceiver();

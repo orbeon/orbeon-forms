@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.analysis;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.xforms.XFormsStaticState;
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl;

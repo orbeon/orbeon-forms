@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TransformerXMLReceiver;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.DelegatingProcessorInput;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;

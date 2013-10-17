@@ -23,7 +23,7 @@ import collection.JavaConverters._
 import org.orbeon.oxf.xforms.XFormsInstance
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.BASIC_NAMESPACE_MAPPING
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils
-import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils, NamespaceMapping}
+import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils, TransformerUtils, NamespaceMapping}
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.dom4j._
 import org.orbeon.saxon.pattern._
@@ -35,7 +35,6 @@ import org.orbeon.saxon.tinytree.TinyTree
 import org.orbeon.oxf.util.XPathCache
 import annotation.tailrec
 import collection._
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.saxon.xqj.{SaxonXQDataFactory, StandardObjectConverter}
 
 object XML {

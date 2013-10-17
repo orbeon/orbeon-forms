@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.util.LoggerFactory;

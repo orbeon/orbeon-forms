@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.XMLReader;

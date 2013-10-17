@@ -19,7 +19,6 @@ import XFormsConstants._
 import collection.mutable.LinkedHashMap
 import org.dom4j._
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.resources.ResourceManagerWrapper
 import org.orbeon.oxf.util.{Whitespace, IndentedLogger, Logging}
 import org.orbeon.oxf.xforms._

@@ -13,9 +13,8 @@
  */
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.SimpleForwardingXMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

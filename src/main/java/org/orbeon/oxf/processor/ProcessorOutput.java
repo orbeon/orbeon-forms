@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 
 public interface ProcessorOutput extends ProcessorReader, ProcessorInputOutput {
 

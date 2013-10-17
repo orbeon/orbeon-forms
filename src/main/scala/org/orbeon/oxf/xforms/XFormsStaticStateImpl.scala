@@ -23,7 +23,7 @@ import java.util.{List ⇒ JList, Set ⇒ JSet, Map ⇒ JMap}
 import org.orbeon.oxf.xforms.XFormsConstants._
 import org.orbeon.oxf.xforms.{XFormsProperties ⇒ P}
 import org.orbeon.oxf.common.{OXFException, Version}
-import org.orbeon.oxf.pipeline.api.XMLReceiver
+import org.orbeon.oxf.xml.XMLReceiver
 import org.xml.sax.Attributes
 import org.orbeon.oxf.xforms.XFormsStaticStateImpl.StaticStateDocument
 import state.AnnotatedTemplate

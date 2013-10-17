@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.processor.converter
 
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
 import org.orbeon.oxf.processor.{ProcessorInputOutputInfo, ProcessorImpl}
-import org.orbeon.oxf.xml.ForwardingXMLReceiver
+import org.orbeon.oxf.xml.{XMLReceiver, ForwardingXMLReceiver}
 import org.orbeon.oxf.xml.XMLConstants.{XHTML_NAMESPACE_URI ⇒ HtmlURI}
 import org.xml.sax.Attributes
 import org.xml.sax.helpers.AttributesImpl

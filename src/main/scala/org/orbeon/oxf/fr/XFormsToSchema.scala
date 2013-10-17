@@ -15,7 +15,7 @@ package org.orbeon.oxf.fr
 
 import org.dom4j.QName
 import org.orbeon.oxf.common.{Version, OXFException}
-import org.orbeon.oxf.pipeline.api.{ExternalContext, XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
 import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME

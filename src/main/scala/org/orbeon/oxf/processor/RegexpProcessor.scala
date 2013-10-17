@@ -17,9 +17,8 @@ import ProcessorImpl._
 import RegexpMatcher._
 import java.util.regex.Pattern
 import org.orbeon.oxf.pipeline.api.PipelineContext
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl
-import org.orbeon.oxf.xml.XMLUtils
+import org.orbeon.oxf.xml.{XMLReceiver, XMLUtils}
 import org.orbeon.oxf.util.URLRewriterUtils.globToRegexp
 
 class RegexpProcessor extends ProcessorImpl {

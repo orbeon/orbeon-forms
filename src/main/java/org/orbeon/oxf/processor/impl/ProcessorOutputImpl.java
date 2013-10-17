@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.TraceEntry;
 import org.orbeon.oxf.pipeline.api.TracingPipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;

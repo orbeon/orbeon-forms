@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 

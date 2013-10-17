@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xml;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;

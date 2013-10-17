@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.oxf.util.CharacterAccumulator
 import org.orbeon.oxf.util.Whitespace.{PolicyMatcher, Policy}
 import org.xml.sax.Attributes

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
-
 /**
  * ContentHandler with an additional method allowing for adding attributes.
  */

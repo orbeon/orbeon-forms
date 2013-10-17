@@ -25,7 +25,7 @@ import org.orbeon.oxf.cache.SoftCacheImpl;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;

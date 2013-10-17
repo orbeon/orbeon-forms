@@ -24,7 +24,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.impl.ProcessorInputImpl;
 import org.orbeon.oxf.resources.ExpirationMap;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;

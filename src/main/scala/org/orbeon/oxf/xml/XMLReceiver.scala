@@ -11,12 +11,10 @@
  *
  * The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.pipeline.api;
+package org.orbeon.oxf.xml
 
-import org.xml.sax.ContentHandler;
-import org.xml.sax.ext.LexicalHandler;
+import org.xml.sax.ContentHandler
+import org.xml.sax.ext.LexicalHandler
 
-/**
- * Represents the stream of XML events relevant within an XML pipeline.
- */
-public interface XMLReceiver extends ContentHandler, LexicalHandler {}
+// Represents the stream of XML events relevant within an XML pipeline
+trait XMLReceiver extends ContentHandler with LexicalHandler

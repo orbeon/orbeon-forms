@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.processor
 
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.ccil.cowan.tagsoup.HTMLSchema
 import org.xml.sax.InputSource
 import org.orbeon.oxf.util.TextXMLReceiver
 import java.io.{StringWriter, StringReader}
+import org.orbeon.oxf.xml.XMLReceiver
 
 class TagSoupProcessor extends ProcessorImpl {
 

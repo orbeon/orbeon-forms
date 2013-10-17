@@ -15,7 +15,7 @@ package org.orbeon.oxf.xforms.processor
 
 import org.apache.commons.fileupload.FileItem
 import org.apache.commons.lang3.StringUtils
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.orbeon.oxf.processor.ProcessorImpl
 import org.orbeon.oxf.processor.generator.RequestGenerator
 import org.orbeon.oxf.servlet.ServletExternalContext.DEFAULT_HEADER_ENCODING
@@ -24,6 +24,7 @@ import org.orbeon.oxf.xforms.{XFormsProperties, XFormsUtils}
 import org.orbeon.scaxon.XML
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 import javax.servlet.http.HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE
+import org.orbeon.oxf.xml.XMLReceiver
 
 class Upload extends ProcessorImpl {
     override def createOutput(name: String) =

@@ -15,7 +15,7 @@ package org.orbeon.oxf.processor.converter;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.impl.CacheableTransformerOutputImpl;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;

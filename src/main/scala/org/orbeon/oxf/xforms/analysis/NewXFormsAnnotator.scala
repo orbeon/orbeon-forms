@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.analysis
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver
 import org.orbeon.scaxon.SAXMachine
 import org.orbeon.scaxon.SAXEvents._
 import javax.xml.namespace.QName
 import org.orbeon.oxf.xml.XMLConstants._
 import org.orbeon.oxf.xforms.XFormsConstants._
 import collection.JavaConverters._
+import org.orbeon.oxf.xml.XMLReceiver
 
 // All the states we know
 sealed trait State

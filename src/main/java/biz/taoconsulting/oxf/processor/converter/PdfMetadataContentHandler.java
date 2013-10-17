@@ -13,7 +13,7 @@
  */
 package biz.taoconsulting.oxf.processor.converter;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.xml.ForwardingXMLReceiver;
 import org.xml.sax.SAXException;
 

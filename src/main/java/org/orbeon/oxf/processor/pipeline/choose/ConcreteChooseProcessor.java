@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;

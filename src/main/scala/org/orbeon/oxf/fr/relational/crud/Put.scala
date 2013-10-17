@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
-import scala.Some
 
 trait Put extends Request with Common {
 

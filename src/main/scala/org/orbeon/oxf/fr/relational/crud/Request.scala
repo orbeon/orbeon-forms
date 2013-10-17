@@ -17,7 +17,6 @@ import org.orbeon.oxf.externalcontext.ExternalContextOps._
 import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
-import scala.Some
 
 trait Request {
 

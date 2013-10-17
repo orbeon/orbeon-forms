@@ -16,10 +16,9 @@ package org.orbeon.oxf.processor.generator;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.impl.ProcessorOutputImpl;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.SAXException;
 

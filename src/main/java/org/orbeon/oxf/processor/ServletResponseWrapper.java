@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.processor.generator.TidyConfig;
 import org.orbeon.oxf.util.NetUtils;
 

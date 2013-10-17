@@ -20,7 +20,7 @@ import net.sf.ehcache.{Element ⇒ EhElement }
 import org.apache.commons.lang3.StringUtils
 import org.dom4j.QName
 import org.orbeon.oxf.externalcontext.URLRewriter
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.orbeon.oxf.processor._
 import org.orbeon.oxf.util._
 import org.orbeon.oxf.xforms._

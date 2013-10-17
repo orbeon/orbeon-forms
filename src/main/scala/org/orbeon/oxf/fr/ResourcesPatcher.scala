@@ -14,11 +14,11 @@
 package org.orbeon.oxf.fr
 
 import org.dom4j.{QName, Document}
-import org.orbeon.oxf.pipeline.api.{XMLReceiver, PipelineContext}
+import org.orbeon.oxf.pipeline.api.{PipelineContext}
 import org.orbeon.oxf.processor.SimpleProcessor
 import org.orbeon.oxf.properties.{PropertySet, Properties}
 import org.orbeon.oxf.util.XPath
-import org.orbeon.oxf.xml.{TransformerUtils, Dom4j}
+import org.orbeon.oxf.xml.{XMLReceiver, TransformerUtils, Dom4j}
 import org.orbeon.saxon.dom4j.DocumentWrapper
 import org.orbeon.saxon.om.NodeInfo
 import org.orbeon.scaxon.XML._

@@ -23,7 +23,7 @@ import org.dom4j.io.DOMReader;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.XMLReceiver;
+import org.orbeon.oxf.xml.XMLReceiver;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.webapp.ProcessorService;

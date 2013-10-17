@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.processor.XFormsToSomething.Stage2CacheableState
 import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xml._
+import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.saxon.om.{DocumentInfo, NodeInfo}
 import org.orbeon.scaxon.XML.{Attribute ⇒ _, Text ⇒ _, _}
 import xml._
@@ -95,7 +96,7 @@ class XFormsToSchema extends XFormsToSomething {
         case class BindInfo(elemName: String, elemType: Option[QName], repeated: Boolean, min: Option[String], max: Option[String])
 
         // Returns control corresponding to a bind, with a given name (e.g. *:grid)
-        def findControlNodeForBind(bind: NodeInfo, controlName: String): Option[NodeInfo] = {
+        def findControlNodeForBind(bind: NodeInfo, controlName: Test): Option[NodeInfo] = {
             val bindId: String = bind \@ "id"
             bind.rootElement \\ controlName find (_.attValue("bind") == bindId)
         }
@@ -121,7 +122,6 @@ class XFormsToSchema extends XFormsToSomething {
 
                 // Optional type attribute
                 def attr(name: String, value: String) = Attribute(None, name, Text(value), Null)
-                val typeAttr = elemType map (_.getQualifiedName) map (attr("type", _))
 
                 // Create namespace binding for type, filtering the already declared XSD namespace
                 val typeNamespaceBinding = elemType flatMap (qname ⇒
@@ -151,10 +151,37 @@ class XFormsToSchema extends XFormsToSomething {
                             </xs:restriction>
                         </xs:simpleType>
 
+                // The xf:bind is for an attachment control if it has type="xs|xf:anyURI" and the corresponding control
+                // has a class 'fr-attachment'
+                val isBindForAttachmentControl = {
+                    val xsdOrXFormsURI = Set(XMLConstants.XSD_URI, XFORMS_NAMESPACE_URI)
+                    def isBindTypeAnyURI = elemType.exists(qname ⇒ xsdOrXFormsURI(qname.getNamespaceURI) && qname.getName == "anyURI")
+                    def isControlAttachment = findControlNodeForBind(bind, *) exists (_.attClasses("fr-attachment"))
+                    isBindTypeAnyURI && isControlAttachment
+                }
+
+                // Value of xs:type attribute added to the xs:element, except for attachment controls, where
+                // that type is defined as part of a complex type (see complexTypeForAttachment below)
+                val typeAttr =
+                    if (isBindForAttachmentControl) None
+                    else elemType map (_.getQualifiedName) map (attr("type", _))
+
+                val complexTypeForAttachment = isBindForAttachmentControl option
+                    <xs:complexType>
+                        <xs:simpleContent>
+                            <xs:extension base="xs:anyURI">
+                                <xs:attribute name="filename" type="xs:string"/>
+                                <xs:attribute name="mediatype" type="xs:string"/>
+                                <xs:attribute name="size" type="xf:integer"/>
+                            </xs:extension>
+                        </xs:simpleContent>
+                    </xs:complexType>
+
                 // Build element with optional attributes and new namespace
-                val xsElem       = <xs:element name={elemName}>{ simpleTypeRestrictionElemOpt.toList }</xs:element>
-                val xsElemWithNS = typeNamespaceBinding map (_(xsElem.scope)) map (s ⇒ xsElem.copy(scope = s)) getOrElse xsElem
-                val attributes   = typeAttr ++ minAttr ++ maxAttr
+                val xsElemContent = simpleTypeRestrictionElemOpt.toList ++ complexTypeForAttachment.toList
+                val xsElem        = <xs:element name={elemName}>{ xsElemContent }</xs:element>
+                val xsElemWithNS  = typeNamespaceBinding map (_(xsElem.scope)) map (s ⇒ xsElem.copy(scope = s)) getOrElse xsElem
+                val attributes    = typeAttr ++ minAttr ++ maxAttr
 
                 attributes.foldLeft(xsElemWithNS)(_ % _)
             }

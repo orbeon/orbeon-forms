@@ -143,9 +143,14 @@ trait Put extends RequestResponse with Common {
     def put(): Unit = {
         RelationalUtils.withConnection { connection ⇒
             val req = request
-            val existing = existingRow(connection, req)
-            store(connection, req, existing)
-            NetUtils.getExternalContext.getResponse.setStatus(201)
+            if (req.forData && ! req.version.isInstanceOf[Specific]) {
+                // When storing data, a form version must be provided
+                httpResponse.setStatus(400)
+            } else {
+                val existing = existingRow(connection, req)
+                store(connection, req, existing)
+                httpResponse.setStatus(201)
+            }
         }
     }
 }

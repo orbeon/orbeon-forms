@@ -789,8 +789,8 @@
     <processor name="fr:relational-persistence-reindex">
         <class name="org.orbeon.oxf.fr.relational.ReindexProcessor"/>
     </processor>
-    <processor name="fr:relational-persistence-api">
-        <class name="org.orbeon.oxf.fr.relational.PersistenceAPIProcessor"/>
+    <processor name="fr:relational-crud">
+        <class name="org.orbeon.oxf.fr.relational.crud.CRUD"/>
     </processor>
     <processor name="fr:xforms-to-schema">
         <class name="org.orbeon.oxf.fr.XFormsToSchema"/>

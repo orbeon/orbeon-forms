@@ -18,7 +18,7 @@ import org.orbeon.oxf.fr.relational._
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.util.ScalaUtils._
 
-trait Request {
+trait RequestResponse {
 
     case class Request(app: String, form: String, filename: Option[String], version: Version, dataPart: Option[Request#DataPart]) {
         case class DataPart(isDraft: Boolean, documentId: String)
@@ -41,7 +41,7 @@ trait Request {
     def requestUsername : Option[String] = headerValue("orbeon-username")
     def requestGroupname: Option[String] = headerValue("orbeon-groupname")
 
-    val CrudFormPath = "/fr/service/([^/]+)/crud/([^/]+)/([^/]+)/form/([^/]+)".r
+    val CrudFormPath = "/fr/service/([^/]+)/crud-ng/([^/]+)/([^/]+)/form/([^/]+)".r
     def request: Request = {
         val CrudFormPath(_, app, form, _) = NetUtils.getExternalContext.getRequest.getRequestPath
         val version = {
@@ -59,5 +59,7 @@ trait Request {
         }
         new Request(app, form, None, version, None)
     }
+
+    def httpResponse = NetUtils.getExternalContext.getResponse
 
 }

@@ -17,7 +17,7 @@ import org.orbeon.oxf.fr.relational.RelationalUtils
 import org.orbeon.oxf.util.NetUtils
 import org.orbeon.oxf.webapp.HttpStatusCodeException
 
-trait Get extends Request with Common {
+trait Get extends RequestResponse with Common {
 
     def get(): Unit = {
         RelationalUtils.withConnection { connection ⇒

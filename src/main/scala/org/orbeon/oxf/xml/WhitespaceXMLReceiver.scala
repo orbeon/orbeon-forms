@@ -18,7 +18,13 @@ import org.orbeon.oxf.util.Whitespace.{PolicyMatcher, Policy}
 import org.xml.sax.Attributes
 
 // This receiver can perform transformations on incoming character data based on a few policies.
+//
+// Example of configuration for whitespace preservation in XForms, showing the 3 types of selectors supported:
+//
+// `xf|instance > *, xf|var, xf|setvalue, xf|value, xxf|sequence, xxf|script, xf|action:not([type=xpath]), xs|schema`
+//
 // RFE: Support xml:space
+//
 class WhitespaceXMLReceiver(xmlReceiver: XMLReceiver, startPolicy: Policy, policyMatcher: PolicyMatcher) extends ForwardingXMLReceiver(xmlReceiver) {
 
     private case class StackElement(policy: Policy, parent: Option[(String, String)])

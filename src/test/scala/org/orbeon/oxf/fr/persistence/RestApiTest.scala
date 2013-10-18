@@ -69,51 +69,85 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
             loadState = true, logBody = false).connect(saveState = true)
     }
 
-    private def httpPut(url: String, version: Version, body: Document): Unit = {
-        http(url, "PUT", version, Some(body)).close()
+    private def httpPut(url: String, version: Version, body: Document): Integer = {
+        val result = http(url, "PUT", version, Some(body))
+        val code = result.statusCode
+        result.close()
+        code
     }
 
-    private def httpGet(url: String, version: Version): Try[Document] =
+    private def httpGet(url: String, version: Version): (Integer, Try[Document]) =
         useAndClose(http(url, "GET", version, None)) { connectionResult ⇒
             useAndClose(connectionResult.getResponseInputStream) { inputStream ⇒
-                Try(Dom4jUtils.readDom4j(inputStream))
+                (connectionResult.statusCode, Try(Dom4jUtils.readDom4j(inputStream)))
             }
         }
 
-    @Test def formDefinitionVersionTest(): Unit = {
-        withOrbeonTables { connection =>
-            val FormURL = "/crud/acme/address/form/form.xml"
+    sealed trait Expected
+    case   class ExpectedDoc (doc: Document) extends Expected
+    case   class ExpectedCode(code: Integer) extends Expected
 
-            // First time we put with "latest"
-            val first: Document = <gaga1/>
-            httpPut(FormURL, Latest, first)
-            assertXMLDocuments(first, httpGet(FormURL, Specific(1)).get)
-            assertXMLDocuments(first, httpGet(FormURL, Latest     ).get)
-            assert(httpGet(FormURL, Specific(2)).isFailure)
-
-            // Put again with "latest" updates the current version
-            val second: Document = <gaga2/>
-            httpPut(FormURL, Latest, second)
-            assertXMLDocuments(second, httpGet(FormURL, Specific(1)).get)
-            assertXMLDocuments(second, httpGet(FormURL, Latest     ).get)
-            assert(httpGet(FormURL, Specific(2)).isFailure)
-
-            // Put with "next" to get two versions
-            val third: Document = <gaga3/>
-            httpPut(FormURL, Next, third)
-            assertXMLDocuments(second, httpGet(FormURL, Specific(1)).get)
-            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
-            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
-            assert(httpGet(FormURL, Specific(3)).isFailure)
-
-            // Put a specific version
-            val fourth: Document = <gaga4/>
-            httpPut(FormURL, Specific(1), fourth)
-            assertXMLDocuments(fourth, httpGet(FormURL, Specific(1)).get)
-            assertXMLDocuments(third , httpGet(FormURL, Specific(2)).get)
-            assertXMLDocuments(third , httpGet(FormURL, Latest     ).get)
-            assert(httpGet(FormURL, Specific(3)).isFailure)
+    private def assertGet(url: String, version: Version, expected: Expected): Unit = {
+        val (resultCode, resultDoc) = httpGet(url, version)
+        expected match {
+            case ExpectedDoc(expectedDoc) ⇒
+                assert(resultCode === 200)
+                assertXMLDocuments(resultDoc.get, expectedDoc)
+            case ExpectedCode(expectedCode) ⇒
+                assert(resultCode === expectedCode)
         }
     }
 
+    private def assertPut(url: String, version: Version, body: Document, expectedCode: Integer): Unit = {
+        val actualCode = httpPut(url, version, body)
+        assert(actualCode === expectedCode)
+    }
+
+    @Test def formDefinitionVersionTest(): Unit = {
+        withOrbeonTables { connection =>
+            val FormURL = "/crud-ng/acme/address/form/form.xml"
+
+            // First time we put with "latest"
+            val first: Document = <gaga1/>
+            assertPut(FormURL, Latest, first, 201)
+            assertGet(FormURL, Specific(1), ExpectedDoc (first))
+            assertGet(FormURL, Latest     , ExpectedDoc (first))
+            assertGet(FormURL, Specific(2), ExpectedCode(404))
+
+            // Put again with "latest" updates the current version
+            val second: Document = <gaga2/>
+            assertPut(FormURL, Latest, second, 201)
+            assertGet(FormURL, Specific(1), ExpectedDoc(second))
+            assertGet(FormURL, Latest     , ExpectedDoc(second))
+            assertGet(FormURL, Specific(2), ExpectedCode(404))
+
+            // Put with "next" to get two versions
+            val third: Document = <gaga3/>
+            assertPut(FormURL, Next, third, 201)
+            assertGet(FormURL, Specific(1), ExpectedDoc(second))
+            assertGet(FormURL, Specific(2), ExpectedDoc(third))
+            assertGet(FormURL, Latest     , ExpectedDoc(third))
+            assertGet(FormURL, Specific(3), ExpectedCode(404))
+
+            // Put a specific version
+            val fourth: Document = <gaga4/>
+            assertPut(FormURL, Specific(1), fourth, 201)
+            assertGet(FormURL, Specific(1), ExpectedDoc(fourth))
+            assertGet(FormURL, Specific(2), ExpectedDoc(third))
+            assertGet(FormURL, Latest     , ExpectedDoc(third))
+            assertGet(FormURL, Specific(3), ExpectedCode(404))
+        }
+    }
+
+    @Test def formDataVersionTest(): Unit = {
+        withOrbeonTables { connection =>
+            val DataURL = "/crud-ng/acme/address/data/123/data.xml"
+
+//            val first: Document = <gaga1/>
+//            assert(httpPut(DataURL, Specific(1), first) === 201)
+//            assertXMLDocuments(first, httpGet(DataURL, Specific(1)).get)
+//            assertXMLDocuments(first, httpGet(DataURL, Latest     ).get)
+
+        }
+    }
 }

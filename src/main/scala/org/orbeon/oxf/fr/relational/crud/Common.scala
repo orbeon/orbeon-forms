@@ -17,7 +17,7 @@ import java.sql.Connection
 import org.orbeon.oxf.util.ScalaUtils._
 import org.orbeon.oxf.fr.relational.{ForDocument, Specific, Next, Latest}
 
-trait Common extends Request {
+trait Common extends RequestResponse {
 
     def latestNonDeletedFormVersion(connection: Connection, app: String, form: String): Option[Int] = {
         val maxVersion = {

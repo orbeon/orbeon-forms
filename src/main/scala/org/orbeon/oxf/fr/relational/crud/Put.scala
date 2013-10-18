@@ -27,7 +27,7 @@ import org.orbeon.oxf.util.{StringBuilderWriter, NetUtils}
 import org.orbeon.oxf.xml.{XMLUtils, TransformerUtils}
 import org.xml.sax.InputSource
 
-trait Put extends Request with Common {
+trait Put extends RequestResponse with Common {
 
     private case class Row(created: sql.Timestamp, username: Option[String], groupname: Option[String])
     private def existingRow(connection: Connection, req: Request): Option[Row] = {
@@ -145,6 +145,7 @@ trait Put extends Request with Common {
             val req = request
             val existing = existingRow(connection, req)
             store(connection, req, existing)
+            NetUtils.getExternalContext.getResponse.setStatus(201)
         }
     }
 }

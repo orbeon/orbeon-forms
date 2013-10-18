@@ -13,9 +13,22 @@
  */
 package org.orbeon.oxf.fr.relational.crud
 
+import org.orbeon.oxf.processor.ProcessorImpl
+import org.orbeon.oxf.pipeline.api.PipelineContext
 
-object CRUD
-    extends Request
-    with Common
-    with Get
-    with Put
+
+class CRUD
+        extends ProcessorImpl
+        with RequestResponse
+        with Common
+        with Get
+        with Put {
+
+    override def start(pipelineContext: PipelineContext) {
+        httpRequest.getMethod match {
+            case "GET" ⇒ get()
+            case "PUT" ⇒ put()
+            case _     ⇒ httpResponse.setStatus(405)
+        }
+    }
+}

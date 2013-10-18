@@ -40,6 +40,8 @@
     <!-- Create, Read, Update and Delete operations (id provided) -->
     <service path="/fr/service/(oracle|mysql|db2)/crud/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
              model="persistence/relational/crud.xpl"/>
+    <service path="/fr/service/(oracle|mysql|db2)/crud-ng/([^/]+/[^/]+/(form/[^/]+|(data|draft)/([^/]+/[^/]+)?))"
+             model="persistence/relational/crud-ng.xpl"/>
 
     <!-- Search -->
     <service path="/fr/service/(oracle|mysql|db2)/search/([^/^.]+)/([^/^.]+)"

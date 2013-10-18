@@ -143,10 +143,16 @@ class RestApiTest extends ResourceManagerTestBase with AssertionsForJUnit with D
         withOrbeonTables { connection =>
             val DataURL = "/crud-ng/acme/address/data/123/data.xml"
 
+            // Storing for specific form version
             val first: Document = <gaga1/>
             assertPut(DataURL, Specific(1), first, 201)
             assertGet(DataURL, Specific(1), ExpectedDoc(first))
             assertGet(DataURL, Latest     , ExpectedDoc(first))
+
+            // Version must be specified when storing data
+            assertPut(DataURL, Latest            , first, 400)
+            assertPut(DataURL, Next              , first, 400)
+            assertPut(DataURL, ForDocument("123"), first, 400)
         }
     }
 }

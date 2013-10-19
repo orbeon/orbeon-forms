@@ -25,7 +25,6 @@ import org.orbeon.msv.grammar.Expression;
 import org.orbeon.msv.grammar.Grammar;
 import org.orbeon.msv.grammar.IDContextProvider2;
 import org.orbeon.msv.grammar.xmlschema.*;
-import org.orbeon.msv.reader.GrammarReaderController;
 import org.orbeon.msv.reader.util.GrammarLoader;
 import org.orbeon.msv.reader.xmlschema.XMLSchemaReader;
 import org.orbeon.msv.relaxng.datatype.Datatype;
@@ -41,7 +40,6 @@ import org.orbeon.msv.verifier.regexp.StringToken;
 import org.orbeon.msv.verifier.regexp.xmlschema.XSAcceptor;
 import org.orbeon.msv.verifier.regexp.xmlschema.XSREDocDecl;
 import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OrbeonLocationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -51,7 +49,10 @@ import org.orbeon.oxf.util.IndentedLogger;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
-import org.orbeon.oxf.xml.XMLReceiverHelper;
+import org.orbeon.oxf.xforms.schema.MSVGrammarReaderController;
+import org.orbeon.oxf.xforms.schema.SchemaDependencies;
+import org.orbeon.oxf.xforms.schema.SchemaInfo;
+import org.orbeon.oxf.xforms.schema.SchemaKey;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -60,11 +61,10 @@ import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import scala.Option;
 
 import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -81,6 +81,7 @@ import java.util.List;
 public class XFormsModelSchemaValidator {
 
     private static final ValidationContext validationContext = new ValidationContext();
+    public static Logger logger = LoggerFactory.createLogger(XFormsModelSchemaValidator.class);
 
     private Element modelElement;
     private IndentedLogger indentedLogger;
@@ -118,124 +119,6 @@ public class XFormsModelSchemaValidator {
 
     public boolean hasSchema() {
         return schemaGrammar != null;
-    }
-
-    private static class MSVGrammarReaderController implements GrammarReaderController {
-
-        static private Logger logger = LoggerFactory.createLogger(MSVGrammarReaderController.class);
-
-        private final String baseURI;
-        private final SchemaInfo schemaInfo;
-
-        MSVGrammarReaderController(final String baseURI, final SchemaInfo schemaInfo) {
-            this.baseURI = baseURI;
-            this.schemaInfo = schemaInfo;
-        }
-
-        public void warning(final Locator[] locators, final String message) {
-            if (locators == null || locators.length == 0) {
-                logger.warn(message);
-            } else {
-                final String first = XMLUtils.toString(locators[0]);
-                final StringBuilder sb = new StringBuilder(first);
-                for (int i = 1; i < locators.length; i++) {
-                    sb.append(',');
-                    final String locMsg = XMLUtils.toString(locators[i]);
-                    sb.append(locMsg);
-                }
-                sb.append(':');
-                sb.append(message);
-                final String logMessage = sb.toString();
-                logger.warn(logMessage);
-            }
-        }
-
-        public void error(final Locator[] locators, final String message, final Exception exception) {
-            final LocationData locationData = locators.length > 0 ? LocationData.createIfPresent(locators[0]) : null;
-            throw new SchemaValidationException(message, exception, locationData);
-        }
-
-        public InputSource resolveEntity(final String pid, final String sid) throws SAXException, IOException {
-            final URL url = URLFactory.createURL(baseURI, sid);
-            schemaInfo.addInclude(url);
-
-            final String urlString = url.toString();
-            return XMLUtils.ENTITY_RESOLVER.resolveEntity("", urlString);
-        }
-    }
-
-    private static class SchemaKey extends CacheKey {
-
-        final String urlString;
-
-        SchemaKey(final String urlString) {
-            setClazz(SchemaKey.class);
-            this.urlString = urlString;
-        }
-
-        @Override
-        public int hashCode() {
-            return urlString.hashCode();
-        }
-
-        @Override
-        public boolean equals(final Object other) {
-            final boolean ret;
-            if (other instanceof SchemaKey) {
-                final SchemaKey rhs = (SchemaKey) other;
-                // NOTE: Must NEVER use URL.equals(), see http://brian.pontarelli.com/2006/12/05/mr-gosling-why-did-you-make-url-equals-suck/
-                ret = urlString.equals(rhs.urlString);
-            } else {
-                ret = false;
-            }
-            return ret;
-        }
-
-        @Override
-        public void toXML(XMLReceiverHelper helper, Object validities) {
-            helper.element("url", new String[] { "class", getClazz().getName(), "validity", (validities != null) ? validities.toString() : null, "url", urlString });
-        }
-    }
-
-    private static class SchemaInfo {
-
-        private final ArrayList<URL> includes = new ArrayList<URL>(0);
-        private final ArrayList<Long> modTimes = new ArrayList<Long>(0);
-        private Grammar grammar;
-
-        void addInclude(final URL url) throws IOException {
-            // Get the time first. This way if there's a problem the array lengths will remain the same.
-            final long lastModified = NetUtils.getLastModified(url); // can be 0 if unknown
-            includes.add(url);
-            modTimes.add(lastModified);
-        }
-
-        boolean includesUpToDate() {
-            boolean ret = true;
-            final int size = includes.size();
-            for (int i = 0; ret && i < size; i++) {
-                final URL url = includes.get(i);
-                try {
-                    final long lastModified = NetUtils.getLastModified(url); // can be 0 if unknown
-                    final long lastTime = modTimes.get(i);
-                    ret = lastModified == lastTime;
-                } catch (final IOException e) {
-                    // We won't propagate here. Reason is that while an include may be missing it may just be the case
-                    // that it isn't included anymore _and_ it has been removed. So, we return false and then on a
-                    // reparse we will find out the truth.
-                    ret = false;
-                }
-            }
-            return ret;
-        }
-
-        void setGrammar(final Grammar grammar) {
-            this.grammar = grammar;
-        }
-
-        Grammar getGrammar() {
-            return grammar;
-        }
     }
 
     private static class ValidationContext implements IDContextProvider2 {
@@ -674,19 +557,19 @@ public class XFormsModelSchemaValidator {
                     ExternalContext.Response.REWRITE_MODE_ABSOLUTE);
 
             // Load associated grammar
-            schemaGrammar = loadCacheGrammar(resolvedURLString);
+            schemaGrammar = loadCacheGrammar(containingDocument, resolvedURLString);
         }
 
         // Check for inline schema
         if (schemaElements != null && schemaElements.size() > 0) {
-            schemaGrammar = loadInlineGrammar(null, schemaElements.get(0)); // TODO: specify baseURI
+            schemaGrammar = loadInlineGrammar(containingDocument, schemaElements.get(0)); // TODO: specify baseURI
         }
     }
 
     /**
      * Load and cache a Grammar for a given schema URI.
      */
-    private Grammar loadCacheGrammar(final String absoluteSchemaURL) {
+    private Grammar loadCacheGrammar(final XFormsContainingDocument containingDocument, final String absoluteSchemaURL) {
         try {
             final URL url = URLFactory.createURL(absoluteSchemaURL);
             final long modificationTime = NetUtils.getLastModified(url); // can be 0 if unknown
@@ -703,18 +586,17 @@ public class XFormsModelSchemaValidator {
             // Grammar is thread safe while REDocumentDeclaration is not so cache grammar
             // instead of REDocumentDeclaration
             final Grammar grammar;
-            if (schemaInfo == null || !schemaInfo.includesUpToDate()) {
-                final SchemaInfo newSchemaInfo = new SchemaInfo();
-
-                final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", absoluteSchemaURL);
-                final MSVGrammarReaderController controller = new MSVGrammarReaderController(absoluteSchemaURL, newSchemaInfo);
-                final SAXParserFactory factory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
+            if (schemaInfo == null || ! schemaInfo.dependencies().areIncludesUnchanged()) {
+                final InputSource is                        = XMLUtils.ENTITY_RESOLVER.resolveEntity("", absoluteSchemaURL);
+                final SchemaDependencies dependencies       = new SchemaDependencies();
+                final MSVGrammarReaderController controller = new MSVGrammarReaderController(containingDocument, dependencies, Option.apply(absoluteSchemaURL));
+                final SAXParserFactory factory              = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.XINCLUDE_ONLY);
 
                 grammar = GrammarLoader.loadSchema(is, controller, factory);
-                newSchemaInfo.setGrammar(grammar);
-                cache.add(schemaKey, modificationTime, newSchemaInfo);
+
+                cache.add(schemaKey, modificationTime, new SchemaInfo(grammar, dependencies));
             } else {
-                grammar = schemaInfo.getGrammar();
+                grammar = schemaInfo.grammar();
             }
             return grammar;
         } catch (Exception e) {
@@ -724,16 +606,11 @@ public class XFormsModelSchemaValidator {
 
     /**
      * Load an inline schema.
-     *
-     * @param baseURI               URI to resolve external dependencies
-     * @param schemaElement         root element of the schema
-     * @return
      */
-//    private Grammar loadInlineGrammar(final String baseURI, final NodeInfo schemaElementInfo) {
-    private Grammar loadInlineGrammar(final String baseURI, final Element schemaElement) {
-        final SchemaInfo newSchemaInfo = new SchemaInfo(); // used for resolving external dependencies
-        // TODO: Use SchemaInfo to cache dependencies if any
-        final MSVGrammarReaderController controller = new MSVGrammarReaderController(baseURI, newSchemaInfo);
+    private Grammar loadInlineGrammar(final XFormsContainingDocument containingDocument, final Element schemaElement) {
+        final SchemaDependencies dependencies = new SchemaDependencies();
+        // TODO: Use SchemaDependencies to cache dependencies if any
+        final MSVGrammarReaderController controller = new MSVGrammarReaderController(containingDocument, dependencies, Option.<String>apply(null));
         final SAXParserFactory saxParserFactory = XMLUtils.getSAXParserFactory(XMLUtils.ParserConfiguration.PLAIN);
         final XMLSchemaReader reader = new XMLSchemaReader(controller, saxParserFactory);
 

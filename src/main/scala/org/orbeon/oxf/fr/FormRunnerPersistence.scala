@@ -29,7 +29,11 @@ trait FormRunnerPersistence {
 
     import FormRunner._
 
-    val PersistenceBasePath = "/fr/service/persistence/crud"
+    val PersistenceBasePath                = "/fr/service/persistence/crud"
+    val PersistencePropertyPrefix          = "oxf.fr.persistence"
+    val PersistenceProviderPropertyPrefix  = PersistencePropertyPrefix + ".provider"
+
+    val StandardProviderProperties = Set("uri", "autosave", "active")
 
     // Check whether a value correspond to an uploaded file
     //
@@ -56,43 +60,48 @@ trait FormRunnerPersistence {
     // For a given attachment path, return the filename
     def getAttachmentPathFilenameRemoveQuery(pathQuery: String) = splitQuery(pathQuery)._1.split('/').last
 
+    def findProvider(app: String, form: String, formOrData: String) = {
+        val providerProperty = PersistenceProviderPropertyPrefix :: app :: form :: formOrData :: Nil mkString "."
+        Option(properties.getString(providerProperty))
+    }
+
+    def providerPropertyAsURL(provider: String, property: String) =
+        properties.getStringOrURIAsString(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".")
+
+    def providerPropertyAsBoolean(provider: String, property: String, default: Boolean) =
+        properties.getBoolean(PersistencePropertyPrefix :: provider :: property :: Nil mkString ".", default)
+
+    def autosaveSupported(app: String, form: String) =
+        providerPropertyAsBoolean(findProvider(app, form, "data").get, "autosave", default = false)
+
+    def isActiveProvider(provider: String) =
+        providerPropertyAsBoolean(provider, "active", default = true)
+
     def getPersistenceURLHeaders(app: String, form: String, formOrData: String) = {
 
         require(augmentString(app).nonEmpty)
         require(augmentString(form).nonEmpty)
         require(Set("form", "data")(formOrData))
 
-        // Find provider
-        val provider = {
-            val providerProperty = Seq("oxf.fr.persistence.provider", app, form, formOrData) mkString "."
-            properties.getString(providerProperty)
-        }
-
-        getPersistenceURLHeadersFromProvider(provider)
+        getPersistenceURLHeadersFromProvider(findProvider(app, form, formOrData).get)
     }
 
     def getPersistenceURLHeadersFromProvider(provider: String) = {
 
-        // Find provider URI
-        def findProviderURL = {
-            val uriProperty = Seq("oxf.fr.persistence", provider, "uri") mkString "."
-            properties.getStringOrURIAsString(uriProperty)
-        }
-
-        val propertyPrefix = "oxf.fr.persistence." + provider
+        val propertyPrefix = PersistencePropertyPrefix :: provider :: Nil mkString "."
 
         // Build headers map
         val headers = (
             for {
                 propertyName ← properties.propertiesStartsWith(propertyPrefix)
                 lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
-                if lowerSuffix != "uri"
-                headerName = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
+                if ! StandardProviderProperties(lowerSuffix)
+                headerName  = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
                 headerValue = properties.getObject(propertyName).toString
             } yield
                 headerName → headerValue) toMap
 
-        (findProviderURL, headers)
+        (providerPropertyAsURL(provider, "uri"), headers)
     }
 
     def getPersistenceHeadersAsXML(app: String, form: String, formOrData: String) = {

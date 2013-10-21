@@ -24,8 +24,8 @@ object Whitespace  {
 
     sealed trait Policy { val name: String }
     case object Preserve  extends Policy { val name = "preserve"  }
-    case object Normalize extends Policy { val name = "normalize" }
-    case object Collapse  extends Policy { val name = "collapse"  }
+    case object Normalize extends Policy { val name = "normalize" } // like XML Schema's collapse and XPath's normalize-space()
+    case object Collapse  extends Policy { val name = "collapse"  } // collapse sequences of multiple whitespace characters to a single space
     
     val AllPolicies = List(Preserve, Normalize, Collapse)
 
@@ -117,11 +117,14 @@ object Whitespace  {
                     CSSSelectorParser.parseSelectors(value) collect {
                         case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), Nil) ⇒
                             ElementMatcher(ns(prefix) → localname)
-                        case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil), List((ChildCombinator, ElementWithFiltersSelector(Some(UniversalSelector(None)), Nil)))) ⇒
+                        case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), Nil),
+                                List((ChildCombinator, ElementWithFiltersSelector(Some(UniversalSelector(None)), Nil)))) ⇒
                             AnyElementChildOfMatcher(ns(prefix) → localname)
-                        case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), List(NegationFilter(AttributeFilter(None, attrName, Some(AttributePredicate("=", attrValue)))))),Nil) ⇒
+                        case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)),
+                                List(NegationFilter(AttributeFilter(None, attrName, Some(AttributePredicate("=", attrValue)))))), Nil) ⇒
                             ElementAttributeValueMatcher(ns(prefix) → localname, attrName, attrValue, negate = true)
-                        case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)), List(AttributeFilter(None, attrName, Some(AttributePredicate("=", attrValue))))),Nil) ⇒
+                        case Selector(ElementWithFiltersSelector(Some(TypeSelector(Some(Some(prefix)), localname)),
+                                List(AttributeFilter(None, attrName, Some(AttributePredicate("=", attrValue))))), Nil) ⇒
                             ElementAttributeValueMatcher(ns(prefix) → localname, attrName, attrValue, negate = false)
                         case _ ⇒
                             throw new IllegalArgumentException(s"Unrecognized whitespace policy: $value")

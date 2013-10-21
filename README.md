@@ -8,14 +8,11 @@ Last updated for Orbeon Forms 4.3 August 2013
 What is Orbeon Forms?
 ---------------------
 
-Orbeon Forms is an open source, standard-based web forms solution, which
-includes:
+Orbeon Forms is an open source, standard-based web forms solution, which includes:
 
-- Form Builder, the WYSIWYG browser-based authoring tool
-- Form Runner, the runtime environment which facilitates the deployment and
-  integration of large and complex forms
-- A core forms processing engine which implements specifications such as XForms 1.1
-  and XBL 2 with no need for client-side software besides a standard web browser.
+- Form Builder: a browser-based WYSIWYG form authoring tool
+- Form Runner: a runtime environment which facilitates the deployment and integration of large and complex forms
+- a core forms processing engine which implements the XForms specification and an XBL-inspired component model
 
 For more information about Orbeon Forms, please visit [orbeon.com](http://www.orbeon.com/).
 

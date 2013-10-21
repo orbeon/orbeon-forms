@@ -136,19 +136,24 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     private def proxyPublishedFormsMetadata(request: Request, response: Response, app: Option[String], form: Option[String], path: String): Unit = {
         val propertySet = Properties.instance.getPropertySet
 
-        // TODO: Use new property that determines active providers; see issue [#1186](http://goo.gl/IskU63)
         val providers = {
-            val providersPrefix = "oxf.fr.persistence.provider"
-            val properties = (app, form) match {
+            (app, form) match {
                 case (Some(appName), Some(formName)) ⇒
                     // Get the specific provider for this app/form
-                    Seq(providersPrefix + "." + appName + "." + formName + ".form")
+                    FormRunner.findProvider(appName, formName, "form").toList
                 case _ ⇒
-                    // Get all the oxf.fr.persistence.provider.*.*.form properties
-                    propertySet.propertiesStartsWith("oxf.fr.persistence.provider").filterNot(_ endsWith ".data")
+                    // Get providers independently from app/form
+                    // NOTE: Could also optimize case where only app is provided, but no callers as of 2013-10-21.
+                    def providersUsedInPropertiesForFormDefinition = (
+                        propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix)
+                        filterNot (_ endsWith ".data") // exclude `.data` to handle the case of `.*` which covers both `.data` and `.form` endings
+                        map       propertySet.getString
+                        distinct
+                    )
+
+                    // See https://github.com/orbeon/orbeon-forms/issues/1186
+                    providersUsedInPropertiesForFormDefinition filter FormRunner.isActiveProvider
             }
-            // Value of the property is the name of a provider, e.g. oracle-finance, oracle-hr
-            properties map propertySet.getString distinct
         }
 
         val formElements = providers map FormRunner.getPersistenceURLHeadersFromProvider flatMap { case (baseURI, headers) ⇒

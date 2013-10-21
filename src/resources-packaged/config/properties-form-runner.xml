@@ -31,6 +31,16 @@
     <property as="xs:anyURI"  name="oxf.fr.persistence.db2.uri"                                 value="/fr/service/db2"/>
     <property as="xs:string"  name="oxf.fr.persistence.db2.datasource"                          value="db2"/>
 
+    <!-- Whether providers support autosave -->
+    <property as="xs:boolean" name="oxf.fr.persistence.*.autosave"                              value="false"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.oracle.autosave"                         value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.mysql.autosave"                          value="true"/>
+    <property as="xs:boolean" name="oxf.fr.persistence.db2.autosave"                            value="true"/>
+
+    <!-- Whether providers are active -->
+    <!-- It's possible to set providers, typically `exist` and `resource` to inactive so the Home page does not attempt searches -->
+    <property as="xs:boolean" name="oxf.fr.persistence.*.active"                                value="true"/>
+
     <!-- Properties to enable experimental MongoDB persistence -->
     <!--<property as="xs:string"  name="oxf.fr.persistence.provider.*.*.*"                          value="mongo"/>-->
     <property as="xs:anyURI"  name="oxf.fr.persistence.mongo.uri"                               value="/fr/service/mongo"/>

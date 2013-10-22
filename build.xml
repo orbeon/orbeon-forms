@@ -707,7 +707,7 @@
                         <!-- Create user and database used by Tomcat -->
                         <sql driver="${mysql.driver}" url="${mysql.url}" userid="root" password="">
                             <classpath><pathelement location="${mysql.jar}"/></classpath>
-                            create user     'orbeon_tomcat'@'localhost' identified by 'orbeon_tomcat';
+                            create user     orbeon_tomcat@localhost identified by 'orbeon_tomcat';
                             create database orbeon_tomcat;
                             grant all privileges on orbeon_tomcat.* to orbeon_tomcat@localhost;
                         </sql>

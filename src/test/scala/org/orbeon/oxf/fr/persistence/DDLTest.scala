@@ -24,7 +24,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Datab
     def withNewDatabase[T](block: Connection ⇒ T): T = {
         try {
             val createUserAndDatabase = Seq(
-                "create user 'orbeon_ddl'@'localhost' identified by 'orbeon_ddl'",
+                "create user orbeon_ddl@localhost identified by 'orbeon_ddl'",
                 "create database orbeon_ddl",
                 "grant all privileges on orbeon_ddl.* to orbeon_ddl@localhost"
             )
@@ -32,7 +32,7 @@ class DDLTest extends ResourceManagerTestBase with AssertionsForJUnit with Datab
             asOrbeon(block)
         } finally {
             val dropUserAndDatabase = Seq(
-                "drop user orbeon_ddl",
+                "drop user orbeon_ddl@localhost",
                 "drop database orbeon_ddl"
             )
             asRoot(dropUserAndDatabase foreach _.createStatement.executeUpdate)

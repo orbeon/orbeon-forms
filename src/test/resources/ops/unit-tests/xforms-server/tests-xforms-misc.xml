@@ -659,60 +659,51 @@
                          <xh:span class="xforms-loading-loading">Loading...</xh:span>
                          <xh:span class="xforms-loading-none"/>
                          <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-error-panel xforms-initially-hidden">
-                             <div class="hd">Error</div>
-                             <div class="bd">
-                                 <p>A system error occurred. You can do one of the following:</p>
-                                 <ol>
-                                     <li>
-                                         <p>
-                                             <a class="xforms-error-panel-close">Close this dialog</a>and try to continue to use this page.
-                                         </p>
-                                     </li>
-                                     <li>
-                                         <p>
-                                             <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
-                                         </p>
-                                     </li>
-                                     <li>
-                                        <p>If the above reload link does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
-                                         <ul>
-                                             <li>With Internet Explorer: hold down the
-                                                 <code>control</code>key and click the Reload button in your browser toolbar.
-                                             </li>
-                                             <li>With Firefox: hold down the
-                                                 <code>shift</code>key and click the Reload button in your browser toolbar.
-                                             </li>
-                                             <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
-                                         </ul>
-                                     </li>
-                                     <li>
-                                         <p>Return
-                                             <a href="/">home</a>.
-                                         </p>
-                                     </li>
-                                     <li>
-                                         <p>Report this problem to your system administrator.</p>
-                                     </li>
-                                 </ol>
-                                 <div class="xforms-error-panel-details-hidden">
-                                     <p>
-                                         <a class="xforms-error-panel-show-details">
-                                             <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
-                                             <span>Show details</span>
-                                         </a>
-                                     </p>
-                                 </div>
-                                 <div class="xforms-error-panel-details-shown xforms-disabled">
-                                     <p>
-                                         <a class="xforms-error-panel-hide-details">
-                                             <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
-                                             <span>Hide details</span>
-                                         </a>
-                                     </p>
-                                     <div class="xforms-error-panel-details"/>
-                                 </div>
-                             </div>
-                         </div>
+                            <div class="hd">An error has occurred</div>
+                            <div class="bd">
+                                <p>You may want to try one of the following:</p>
+                                <ul>
+                                    <li>
+                                        <a class="xforms-error-panel-close">Close this dialog</a>and continue to use this page.
+                                    </li>
+                                    <li>
+                                        <a class="xforms-error-panel-reload">Reload this page</a>. Note that you will lose any unsaved changes.
+                                    </li>
+                                    <li>
+                                        <p>If the above does not work, try reloading the page yourself. Note that you will lose any unsaved changes:</p>
+                                        <ul>
+                                            <li>With Firefox: hold down the
+                                                <code>shift</code>key and click the Reload button in your browser toolbar.
+                                            </li>
+                                            <li>With Safari and Chrome: click the Reload button in your browser toolbar.</li>
+                                            <li>With Internet Explorer: hold down the
+                                                <code>control</code>key and click the Reload button in your browser toolbar.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>Return
+                                        <a href="/">home</a>.
+                                    </li>
+                                </ul>
+                                <div class="xforms-error-panel-details-hidden">
+                                    <p>
+                                        <a class="xforms-error-panel-show-details">
+                                            <img src="/ops/images/xforms/section-closed.png" alt="Show Details"/>
+                                            <span>Show details</span>
+                                        </a>
+                                    </p>
+                                </div>
+                                <div class="xforms-error-panel-details-shown xforms-disabled">
+                                    <p>
+                                        <a class="xforms-error-panel-hide-details">
+                                            <img src="/ops/images/xforms/section-opened.png" alt="Hide Details"/>
+                                            <span>Hide details</span>
+                                        </a>
+                                    </p>
+                                    <div class="xforms-error-panel-details"/>
+                                </div>
+                            </div>
+                        </div>
                          <div xmlns="http://www.w3.org/1999/xhtml" class="xforms-help-panel xforms-initially-hidden">
                              <div class="hd">Help</div>
                              <div class="bd">

@@ -89,12 +89,13 @@ trait FormRunnerPersistence {
     def getPersistenceURLHeadersFromProvider(provider: String) = {
 
         val propertyPrefix = PersistencePropertyPrefix :: provider :: Nil mkString "."
+        val propertyPrefixTokenCount = split[List](propertyPrefix, ".").size
 
         // Build headers map
         val headers = (
             for {
-                propertyName ← properties.propertiesStartsWith(propertyPrefix)
-                lowerSuffix = propertyName.substring(propertyPrefix.length + 1)
+                propertyName ← properties.propertiesStartsWith(propertyPrefix, matchWildcards = false)
+                lowerSuffix  ← split[List](propertyName, ".").drop(propertyPrefixTokenCount).headOption
                 if ! StandardProviderProperties(lowerSuffix)
                 headerName  = "Orbeon-" + capitalizeSplitHeader(lowerSuffix)
                 headerValue = properties.getObject(propertyName).toString

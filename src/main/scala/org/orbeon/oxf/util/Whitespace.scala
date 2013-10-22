@@ -105,7 +105,7 @@ object Whitespace  {
 
         // NOTE: Not ideal if no whitespace property is present, there won't be any caching associated with properties.
         def whitespacePolicyAssociateIfPossible[T](scope: String, evaluate: ⇒ T): T = (
-            propertySet.propertiesStartsWith(scope).headOption
+            propertySet.propertiesStartsWith(scope, matchWildcards = false).headOption
             map       propertySet.getProperty
             map       (_.associatedValue(_ ⇒ evaluate))
             getOrElse evaluate

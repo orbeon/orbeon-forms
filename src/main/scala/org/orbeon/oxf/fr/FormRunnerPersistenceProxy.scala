@@ -145,7 +145,7 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
                     // Get providers independently from app/form
                     // NOTE: Could also optimize case where only app is provided, but no callers as of 2013-10-21.
                     def providersUsedInPropertiesForFormDefinition = (
-                        propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix)
+                        propertySet.propertiesStartsWith(FormRunner.PersistenceProviderPropertyPrefix, matchWildcards = false)
                         filterNot (_ endsWith ".data") // exclude `.data` to handle the case of `.*` which covers both `.data` and `.form` endings
                         map       propertySet.getString
                         distinct

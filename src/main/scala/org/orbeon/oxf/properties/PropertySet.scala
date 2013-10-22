@@ -24,6 +24,7 @@ import java.util.{List ⇒ JList, Map ⇒ JMap, Set ⇒ JSet, Date ⇒ JDate}
 import java.lang.{Boolean ⇒ JBoolean, Integer ⇒ JInteger}
 import collection.JavaConverters._
 import collection.mutable
+import org.orbeon.oxf.util.ScalaUtils.{split, BooleanWrapper}
 
 /**
  * Represent a set of properties.
@@ -57,7 +58,7 @@ class PropertySet {
         
         // Also store in tree (in all cases, not only when contains wildcard, so we get find all the properties that start with some token)
         var currentNode = wildcardProperties
-        for (currentToken ← StringUtils.split(name, ".")) {
+        for (currentToken ← split[List](name, ".")) {
             if (currentNode.children eq null)
                 currentNode.children = mutable.LinkedHashMap[String, PropertyNode]()
             
@@ -87,41 +88,43 @@ class PropertySet {
     }
 
     // Return all the properties starting with the given name
-    def propertiesStartsWith(name: String): List[String] = {
+    def propertiesStartsWith(name: String, matchWildcards: Boolean = true): List[String] = {
         
         val result = mutable.Buffer[String]()
         
-        def processNode(propertyNode: PropertyNode, consumed: String, tokens: Array[String], currentTokenPosition: Int): Unit = {
+        def processNode(propertyNode: PropertyNode, consumed: String, tokens: List[String], currentTokenPosition: Int): Unit = {
             
             def appendToConsumed(s: String) = if (consumed.length == 0) s else consumed + "." + s
             
-            val token = if (currentTokenPosition >= tokens.length) null else tokens(currentTokenPosition)
-            if (Set("*", null)(token)) {
-                if (propertyNode.children == null && token == null)
-                    result += consumed
-                
-                // Go through all children
-                if (propertyNode.children ne null) {
-                    for ((key, value) ← propertyNode.children) {
-                        val newConsumed = appendToConsumed(key)
-                        processNode(value, newConsumed, tokens, currentTokenPosition + 1)
+            tokens.lift(currentTokenPosition) match {
+                case x @ (Some("*") | None) ⇒
+
+                    if (propertyNode.children == null && x.isEmpty)
+                        result += consumed
+                    else if (propertyNode.children ne null) {
+                        for ((key, value) ← propertyNode.children) {
+                            val newConsumed = appendToConsumed(key)
+                            processNode(value, newConsumed, tokens, currentTokenPosition + 1)
+                        }
                     }
-                }
-            } else {
-                // Regular token
-                
-                // Find 1. property node with exact name 2. property node with *
-                val newPropertyNodes = Seq(propertyNode.children.get(token), propertyNode.children.get("*"))
-                for {
-                    (newPropertyNodeOpt, index) ← newPropertyNodes.zipWithIndex
-                    newPropertyNode ← newPropertyNodeOpt
-                    actualToken = if (index == 0) token else "*"
-                    newConsumed = appendToConsumed(actualToken)
-                } processNode(newPropertyNode, newConsumed, tokens, currentTokenPosition + 1)
+
+                case Some(token) ⇒
+                    // Regular token
+
+                    // Find 1. property node with exact name 2. property node with *
+                    val newPropertyNodes = propertyNode.children.get(token) :: (matchWildcards list propertyNode.children.get("*"))
+                    for {
+                        (newPropertyNodeOpt, index) ← newPropertyNodes.zipWithIndex
+                        newPropertyNode             ← newPropertyNodeOpt
+                        actualToken = if (index == 0) token else "*"
+                        newConsumed = appendToConsumed(actualToken)
+                    } locally {
+                        processNode(newPropertyNode, newConsumed, tokens, currentTokenPosition + 1)
+                    }
             }
         }
         
-        processNode(wildcardProperties, "", StringUtils.split(name, "."), 0)
+        processNode(wildcardProperties, "", split[List](name, "."), 0)
         
         result.toList
     }
@@ -138,7 +141,7 @@ class PropertySet {
      */
     private def getProperty(name: String, typ: QName): Property = {
         
-        def getPropertyWorker(propertyNode: PropertyNode, tokens: Array[String], currentTokenPosition: Int): Property = {
+        def getPropertyWorker(propertyNode: PropertyNode, tokens: List[String], currentTokenPosition: Int): Property = {
             if (propertyNode eq null) {
                 // Dead end
                 null
@@ -165,7 +168,7 @@ class PropertySet {
         
         def getExact = exactProperties.get(name)
         
-        def getWildcard = Option(getPropertyWorker(wildcardProperties, StringUtils.split(name, "."), 0))
+        def getWildcard = Option(getPropertyWorker(wildcardProperties, split[List](name, "."), 0))
         
         def checkType(p: Property) = 
             if ((typ ne null) && typ != p.typ)

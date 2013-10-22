@@ -71,7 +71,7 @@ object XBLResources {
     private def automaticMappings: Map[String, String] = {
         val propertySet = Properties.instance.getPropertySet
 
-        val mappingProperties = propertySet.propertiesStartsWith(XBLMappingPropertyPrefix)
+        val mappingProperties = propertySet.propertiesStartsWith(XBLMappingPropertyPrefix, matchWildcards = false)
 
         def evaluate(property: JPropertySet.Property) = (
             for {

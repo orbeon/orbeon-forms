@@ -29,7 +29,7 @@
     <property name="catalina.home" value=""/>
     <property name="mysql.driver" value="com.mysql.jdbc.Driver"/>
     <property name="mysql.url"    value="jdbc:mysql://localhost:3306/?useUnicode=true&amp;characterEncoding=UTF8"/>
-    <property name="mysql.jar"    value="lib/mysql-connector-java-5.1.12-bin.jar"/>
+    <property name="mysql.jar"    value="lib/mysql-connector-java-5.1.26-bin.jar"/>
 
     <!-- Scala tasks -->
     <!-- http://www.scala-lang.org/node/98 -->

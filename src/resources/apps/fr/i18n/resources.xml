@@ -15,7 +15,7 @@
     <resource xml:lang="en">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[MNn,*-3] [D]</day-this-year>
                 <short-date>[M01]/[D01]/[Y01]</short-date>
             </formats>
@@ -287,7 +287,7 @@
     <resource xml:lang="fr">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -563,7 +563,7 @@
     <resource xml:lang="es">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -824,7 +824,7 @@
     <resource xml:lang="no">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1084,7 +1084,7 @@
     <resource xml:lang="ru">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1342,7 +1342,7 @@
     <resource xml:lang="it">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1613,7 +1613,7 @@
     <resource xml:lang="de">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>
@@ -1884,7 +1884,7 @@
     <resource xml:lang="fi">
         <common>
             <formats>
-                <within-day>[H01]:[m01] [P,*-2]</within-day>
+                <within-day>[h]:[m01] [P,*-2]</within-day>
                 <day-this-year>[D] [MNn]</day-this-year>
                 <short-date>[D01]/[M01]/[Y01]</short-date>
             </formats>

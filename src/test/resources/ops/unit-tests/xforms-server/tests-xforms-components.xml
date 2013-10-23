@@ -550,16 +550,16 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="my-currency≡xf-10" class="xbl-fr-currency-prefix">$</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-10" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-13" class="xbl-fr-currency-suffix"/>
-                        <xxf:attribute for="my-currency≡xf-13" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-16" class="xbl-fr-currency-decimal-separator">.</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-16" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-19" class="xbl-fr-currency-grouping-separator">,</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-19" name="style">display: none</xxf:attribute>
-                        <xxf:control id="my-currency≡xf-22" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
-                        <xxf:attribute for="my-currency≡xf-22" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency≡xf-9" class="xbl-fr-currency-prefix">$</xxf:control>
+                        <xxf:attribute for="my-currency≡xf-9" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency≡xf-12" class="xbl-fr-currency-suffix"/>
+                        <xxf:attribute for="my-currency≡xf-12" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency≡xf-15" class="xbl-fr-currency-decimal-separator">.</xxf:control>
+                        <xxf:attribute for="my-currency≡xf-15" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency≡xf-18" class="xbl-fr-currency-grouping-separator">,</xxf:control>
+                        <xxf:attribute for="my-currency≡xf-18" name="style">display: none</xxf:attribute>
+                        <xxf:control id="my-currency≡xf-21" class="xbl-fr-currency-digits-after-decimal">2</xxf:control>
+                        <xxf:attribute for="my-currency≡xf-21" name="style">display: none</xxf:attribute>
                         <xxf:control id="my-currency≡xf-28" class="xbl-fr-number-xforms-input xforms-hidden">12.34</xxf:control>
                         <xxf:control class="fr-width-10em input-prepend" id="my-currency≡xf-29"/>
                         <xxf:control id="my-currency≡xf-31" class="add-on"/>
@@ -569,7 +569,7 @@
                         <xxf:control id="my-currency≡xf-35" relevant="false"/>
                         <xxf:control id="my-currency≡xf-36" relevant="false"/>
                     </xxf:control-values>
-                    <xxf:script name="xf_bb240fc3ea943af5cb3019cdb5d43148021201ec" target-id="my-currency≡xf-5" observer-id="my-currency≡xf-5"/>
+                    <xxf:script name="xf_fa30a492ccf5a9b9010af9801271fad0aadbc46c" target-id="my-currency≡formatted-value" observer-id="my-currency≡xf-5"/>
                     <xxf:script name="xf_ee48e71b3ea5811ae186431b61fae15a32a302b5" target-id="my-currency" observer-id="my-currency"/>
                 </xxf:action>
             </xxf:event-response>

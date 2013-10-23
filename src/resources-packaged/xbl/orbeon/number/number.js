@@ -61,9 +61,6 @@
             this.groupingSeparatorElement = YAHOO.util.Dom.getElementsByClassName(controlClassPrefix + "-grouping-separator", null, this.container)[0];
             this.groupingSeparator = Document.getValue(this.groupingSeparatorElement.id);
 
-            // Initialize value of visible input
-            this.xformsToVisible();
-
             // Register listener
             YAHOO.util.Event.addFocusListener(this.visibleInputElement, this.focus, this, true);
             YAHOO.util.Event.addBlurListener(this.visibleInputElement, this.blur, this, true);
@@ -87,7 +84,7 @@
             // - value change not dispatched if server value hasn't changed
             // - if visible changed, but XForms hasn't, we still need to show XForms value
             // - see: https://github.com/orbeon/orbeon-forms/issues/1026
-            AS.nextAjaxResponse(formId).then(_.bind(this.xformsToVisible, this));
+            AS.nextAjaxResponse(formId).then(_.bind(this.update, this));
         },
 
         setfocus: function() {
@@ -109,7 +106,7 @@
             return isNaN(Number(cleanedAsNumberString)) ? number : cleaned;
         },
 
-        xformsToVisible: function() {
+        update: function() {
             // Get value as formatted by server
             var numberFormattedValue = Document.getValue(this.xformsInputElement.id);
             // If there is an update in the value, and the field already has the focus, just populate with the
@@ -117,10 +114,6 @@
             this.visibleInputElement.value = this.hasFocus ? this.numberToEditString(numberFormattedValue) : numberFormattedValue;
             // Also update disabled because this might be called upon an iteration being moved, in which case all the control properties must be updated
             this.visibleInputElement.disabled = YAHOO.util.Dom.hasClass(this.xformsInputElement, "xforms-readonly");
-        },
-
-        update: function() {
-            this.xformsToVisible();
         },
 
         readonly: function() {
@@ -133,20 +126,19 @@
 
         parameterPrefixChanged: function() {
             this.prefix = Document.getValue(this.prefixElement.id);
-            this.xformsToVisible();
+            this.update();
         },
 
         parameterDecimalSeparatorChanged: function() {
             this.decimalSeparator = Document.getValue(this.decimalSeparatorElement.id);
-            this.xformsToVisible();
+            this.update();
         },
 
         parameterGroupingSeparatorChanged: function() {
             this.groupingSeparator = Document.getValue(this.groupingSeparatorElement.id);
-            this.xformsToVisible();
+            this.update();
         },
 
         parameterDigitsAfterDecimalChanged: function() {}
     };
 })();
-

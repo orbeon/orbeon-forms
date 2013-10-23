@@ -20,12 +20,12 @@ For more information about Orbeon Forms, please visit [orbeon.com](http://www.or
 What's new in the latest releases
 ---------------------------------
 
-- [Orbeon Forms 4.3.1 announcement](http://blog.orbeon.com/2013/08/orbeon-forms-431-pe.html)
-- [Orbeon Forms 4.3 announcement](http://blog.orbeon.com/2013/08/orbeon-forms-43.html)
-- [Orbeon Forms 4.2 announcement](http://blog.orbeon.com/2013/05/orbeon-forms-42.html)
-- [Orbeon Forms 4.1 announcement](http://blog.orbeon.com/2013/04/orbeon-forms-41.html)
-- [Orbeon Forms 4.0.1 announcement](http://blog.orbeon.com/2013/03/orbeon-forms-401.html)
-- [Orbeon Forms 4.0 announcement](http://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
+- [Orbeon Forms 4.3.1](http://blog.orbeon.com/2013/08/orbeon-forms-431-pe.html)
+- [Orbeon Forms 4.3](http://blog.orbeon.com/2013/08/orbeon-forms-43.html)
+- [Orbeon Forms 4.2](http://blog.orbeon.com/2013/05/orbeon-forms-42.html)
+- [Orbeon Forms 4.1](http://blog.orbeon.com/2013/04/orbeon-forms-41.html)
+- [Orbeon Forms 4.0.1](http://blog.orbeon.com/2013/03/orbeon-forms-401.html)
+- [Orbeon Forms 4.0](http://blog.orbeon.com/2013/03/announcing-orbeon-forms-40.html)
 - [Orbeon Forms 4 release notes](http://wiki.orbeon.com/forms/doc/developer-guide/release-notes/40)
 
 
@@ -52,8 +52,9 @@ See the [community](http://www.orbeon.com/community) page. In a nutshell:
 - Ask technical questions on [StackOverflow](http://stackoverflow.com/questions/ask?tags=orbeon) (don't forget the "orbeon" tag).
 - Use the [discussion forum](http://discuss.orbeon.com/) for discussions and feedback.
 - For commercial support and licensing:
-    - <http://www.orbeon.com/services>
-    - <info@orbeon.com>
+    - [PE subscriptions](http://www.orbeon.com/pricing)
+    - [Dev Support subscriptions](http://www.orbeon.com/services)
+    - email us at info@orbeon.com for any further questions
 
 
 Documentation
@@ -63,7 +64,7 @@ All documentation is available online:
 
 - [Wiki on Google Docs](http://wiki.orbeon.com/forms/)
 - [Wiki on github](https://github.com/orbeon/orbeon-forms/wiki/)
-- [Frequently Asked Questions (FAQ)](http://wiki.orbeon.com/forms/orbeon-forms-faq)
+- [Frequently Asked Questions (FAQ)](https://github.com/orbeon/orbeon-forms/wiki/FAQ)
 
 
 What's happening?

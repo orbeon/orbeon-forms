@@ -20,6 +20,11 @@
         file attachments and more. Group your fields in sections. Define validation logic, visibility rules, initial
         values. Pre-populate fields from Web or REST services. And there is more!
     </example>
+    <example title="Form Runner Home" href="/fr/" img="/home/images/fr-home-small.jpg" size="4"
+             source="http://www.flickr.com/photos/tadokoro/64402761/">
+        See all deployed Form Runner forms. If you have administrative rights, you can also manage deployed forms from
+        here.
+    </example>
     <example title="Bookshelf Form" href="/fr/orbeon/bookshelf/summary" img="/home/images/form-bookshelf-small.jpg" size="4"
              source="http://www.flickr.com/photos/takens/5506884677/">
         This sample form shows image attachments, rich text, repeating form fields, as-you-type validation,

@@ -811,7 +811,7 @@
                         <!-- Drop MySQL user and database used by Tomcat -->
                         <sql driver="${mysql.driver}" url="${mysql.url}" userid="root" password="">
                             <classpath><pathelement location="${mysql.jar}"/></classpath>
-                            drop user     orbeon_tomcat;
+                            drop user     orbeon_tomcat@localhost;
                             drop database orbeon_tomcat;
                         </sql>
                     </then>

@@ -333,9 +333,9 @@
                 <review>&lt;i class="icon-eye-open"/&gt; Visualiser</review>
                 <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
                 <delete>&lt;i class="icon-remove-sign"/&gt; Supprimer</delete>
-                <import>Importer</import>
-                <new>Nouveau</new>
-                <edit>Editer</edit>
+                <import>&lt;i class="icon-upload"/&gt; Importer</import>
+                <new>&lt;i class="icon-plus"/&gt; Nouveau</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Editer</edit><!-- unused as of 2013-04-05 -->
             </buttons>
             <titles>
                 <summary-title>Sommaire</summary-title>
@@ -861,9 +861,9 @@
                 <review>&lt;i class="icon-eye-open"/&gt; Vis</review>
                 <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
                 <delete>&lt;i class="icon-remove-sign"/&gt; Slett</delete>
-                <import>Importer</import>
-                <new>Nytt skjema</new>
-                <edit>Rediger</edit>
+                <import>&lt;i class="icon-upload"/&gt; Importer</import>
+                <new>&lt;i class="icon-plus"/&gt; Nytt skjema</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Rediger</edit><!-- unused as of 2013-04-05 -->
             </buttons>
             <titles>
                 <summary-title>Oppsummering</summary-title>
@@ -1121,9 +1121,9 @@
                 <review>&lt;i class="icon-eye-open"/&gt; Проверить</review>
                 <pdf>&lt;i class="icon-print"/&gt; PDF</pdf>
                 <delete>&lt;i class="icon-remove-sign"/&gt; Удалить</delete>
-                <import>Импорт</import>
-                <new>Новая</new>
-                <edit>Редактировать</edit>
+                <import>&lt;i class="icon-upload"/&gt; Импорт</import>
+                <new>&lt;i class="icon-plus"/&gt; Новая</new>
+                <edit>&lt;i class="icon-pencil"/&gt; Редактировать</edit><!-- unused as of 2013-04-05 -->
             </buttons>
             <titles>
                 <summary-title>Общая информация</summary-title>

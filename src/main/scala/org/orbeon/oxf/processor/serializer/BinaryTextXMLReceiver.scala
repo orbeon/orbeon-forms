@@ -205,7 +205,7 @@ class BinaryTextXMLReceiver(
         else if (ignoreDocumentEncoding)
             requestedEncoding getOrElse defaultEncoding
         else
-            contentTypeAttribute map getContentTypeCharset getOrElse defaultEncoding
+            contentTypeAttribute flatMap (c ⇒ Option(getContentTypeCharset(c))) getOrElse defaultEncoding
 }
 
 object BinaryTextXMLReceiver {

@@ -6,8 +6,8 @@
         <phone>6505555555</phone>
     </contact>
     <message>
-        <comments>Please answer me!</comments>
         <order-number>O888</order-number>
         <topic>returns</topic>
+        <comments>Please answer me!</comments>
     </message>
 </form>

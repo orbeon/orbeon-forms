@@ -69,9 +69,9 @@
                              ref="requester-name-address"/>
                 </xf:bind>
                 <xf:bind name="tin" id="tin-bind" ref="tin">
+                    <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
                     <xf:bind name="ssn" id="ssn-bind" ref="ssn" constraint="matches(., '^\d{3}-\d{2}-\d{4}$')"
                              relevant="$ssn-or-ein = 'ssn'"/>
-                    <xf:bind name="ssn-or-ein" id="ssn-or-ein-bind" ref="ssn-or-ein" required="true()"/>
                     <xf:bind name="ein" id="ein-bind" ref="ein" constraint="matches(., '^\d{2}-\d{7}$')"
                              relevant="$ssn-or-ein = 'ein'"/>
                 </xf:bind>

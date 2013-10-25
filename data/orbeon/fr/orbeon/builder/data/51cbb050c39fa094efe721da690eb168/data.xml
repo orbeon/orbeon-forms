@@ -22,9 +22,9 @@
                         <phone/>
                     </contact>
                     <message>
-                        <comments/>
                         <order-number/>
                         <topic/>
+                        <comments/>
                     </message>
                 </form>
             </xf:instance>

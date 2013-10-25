@@ -35,7 +35,7 @@ Downloading and installing
 Orbeon Forms comes in two editions:
 
 - Community Edition (CE)
-- Professional edition (PE)
+- Professional Edition (PE)
 
 For more information and downloadable binaries, see the [download](http://www.orbeon.com/download) page.
 

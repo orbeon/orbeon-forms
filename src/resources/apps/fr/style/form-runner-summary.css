@@ -128,7 +128,7 @@
   color: black;
   outline: 0;
 }
-.orbeon .fr-summary-table-div td span {
+.orbeon .fr-summary-table-div td > span {
   white-space: nowrap;
 }
 .orbeon .fr-summary-table-div td a {

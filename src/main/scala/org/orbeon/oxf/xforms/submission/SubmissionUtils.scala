@@ -94,7 +94,7 @@ object SubmissionUtils {
             // place for handling the <button> vs. <submit> element.
             val toForward =
                 for {
-                    name ← Seq("user-agent", "accept")
+                    name   ← List("user-agent", "accept")
                     values ← allHeaders.get(name)
                 } yield
                     name → values

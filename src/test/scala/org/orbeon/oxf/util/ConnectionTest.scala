@@ -50,8 +50,8 @@ class ConnectionTest extends ResourceManagerTestBase with AssertionsForJUnit wit
         Mockito when webAppContext.attributes thenReturn collection.mutable.Map[String, AnyRef]()
 
         val externalContext = Mockito.mock(classOf[ExternalContext])
-        Mockito when externalContext.getRequest thenReturn(incomingRequest)
-        Mockito when externalContext.getWebAppContext thenReturn(webAppContext)
+        Mockito when externalContext.getRequest thenReturn incomingRequest
+        Mockito when externalContext.getWebAppContext thenReturn webAppContext
         
         // NOTE: Should instead use withExternalContext()
         PipelineContext.get.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext)

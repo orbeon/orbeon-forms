@@ -17,13 +17,16 @@ import org.dom4j.QName
 import org.orbeon.oxf.common.{Version, OXFException}
 import org.orbeon.oxf.pipeline.api.{ExternalContext, PipelineContext}
 import org.orbeon.oxf.util._
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
-import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
 import org.orbeon.oxf.xforms.control.XFormsComponentControl
 import org.orbeon.oxf.xforms.control.controls.XFormsSelect1Control
 import org.orbeon.oxf.xforms.processor.XFormsToSomething
 import org.orbeon.oxf.xforms.processor.XFormsToSomething.Stage2CacheableState
 import org.orbeon.oxf.xforms.{XFormsObject, XFormsContainingDocument}
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_SHORT_PREFIX
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI
+import org.orbeon.oxf.xforms.XFormsConstants.XFORMS_STRING_QNAME
+import org.orbeon.oxf.xml.XMLConstants.XSD_PREFIX
+import org.orbeon.oxf.xml.XMLConstants.XSD_URI
 import org.orbeon.oxf.xml.XMLConstants.XS_STRING_QNAME
 import org.orbeon.oxf.xml._
 import org.orbeon.oxf.util.ScalaUtils._
@@ -76,7 +79,8 @@ class XFormsToSchema extends XFormsToSomething {
 
         // Import XForms schema if necessary
         val schema =
-            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                       xmlns:xf="http://www.w3.org/2002/xforms">
                 {
                     val hasXFormsNamespace = rootXsElem.descendant_or_self exists (_.scope.getPrefix(XFORMS_NAMESPACE_URI) != null)
                     if (hasXFormsNamespace)
@@ -123,14 +127,6 @@ class XFormsToSchema extends XFormsToSomething {
                 // Optional type attribute
                 def attr(name: String, value: String) = Attribute(None, name, Text(value), Null)
 
-                // Create namespace binding for type, filtering the already declared XSD namespace
-                val typeNamespaceBinding = elemType flatMap (qname ⇒
-                    (qname.getNamespacePrefix, qname.getNamespaceURI) match {
-                        case (XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI) ⇒ None
-                        case (XMLConstants.XSD_PREFIX, _) ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
-                        case (prefix, uri) ⇒ Some(NamespaceBinding(prefix, uri, _: NamespaceBinding))
-                    })
-
                 // Optional min/max attributes
                 def attrDefault(value: Option[String], name: String, default: String) =
                     if (repeated) Some(attr(name, value getOrElse default)) else None
@@ -154,7 +150,7 @@ class XFormsToSchema extends XFormsToSomething {
                 // The xf:bind is for an attachment control if it has type="xs|xf:anyURI" and the corresponding control
                 // has a class 'fr-attachment'
                 val isBindForAttachmentControl = {
-                    val xsdOrXFormsURI = Set(XMLConstants.XSD_URI, XFORMS_NAMESPACE_URI)
+                    val xsdOrXFormsURI = Set(XSD_URI, XFORMS_NAMESPACE_URI)
                     def isBindTypeAnyURI = elemType.exists(qname ⇒ xsdOrXFormsURI(qname.getNamespaceURI) && qname.getName == "anyURI")
                     def isControlAttachment = findControlNodeForBind(bind, *) exists (_.attClasses("fr-attachment"))
                     isBindTypeAnyURI && isControlAttachment
@@ -165,6 +161,18 @@ class XFormsToSchema extends XFormsToSomething {
                 val typeAttr =
                     if (isBindForAttachmentControl) None
                     else elemType map (_.getQualifiedName) map (attr("type", _))
+
+                // Create namespace binding for type, filtering the already declared XSD namespace
+                val typeNamespaceBinding =
+                    if (isBindForAttachmentControl) None
+                    else elemType flatMap (qname ⇒
+                        (qname.getNamespacePrefix, qname.getNamespaceURI) match {
+                            case (XSD_PREFIX, XSD_URI)                       ⇒ None
+                            case (XSD_PREFIX, _)                             ⇒ throw new OXFException("Non-schema types with the 'xs' prefix are not supported")
+                            case (XFORMS_SHORT_PREFIX, XFORMS_NAMESPACE_URI) ⇒ None
+                            case (XFORMS_SHORT_PREFIX, _)                    ⇒ throw new OXFException("Non-XForms types with the 'xf' prefix are not supported")
+                            case (prefix, uri)                               ⇒ Some(NamespaceBinding(prefix, uri, _: NamespaceBinding))
+                        })
 
                 val complexTypeForAttachment = isBindForAttachmentControl option
                     <xs:complexType>

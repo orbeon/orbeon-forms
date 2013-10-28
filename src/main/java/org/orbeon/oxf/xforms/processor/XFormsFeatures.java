@@ -62,7 +62,8 @@ public class XFormsFeatures {
 
     private static final ResourceConfig[] scripts = {
             // jQuery
-            new ResourceConfig("/ops/jquery/jquery-1.8.2.js", "/ops/jquery/jquery-1.8.2.min.js"),
+            new ResourceConfig("/ops/jquery/jquery-1.10.2.js", "/ops/jquery/jquery-1.10.2.min.js"),
+            new ResourceConfig("/ops/jquery/jquery-migrate-1.2.1.browser.js", "/ops/jquery/jquery-migrate-1.2.1.browser.min.js"),
             // Yahoo UI Library
             new ResourceConfig("/ops/yui/yahoo/yahoo.js", "/ops/yui/yahoo/yahoo-min.js"),
             new ResourceConfig("/ops/yui/event/event.js", "/ops/yui/event/event-min.js"),

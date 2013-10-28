@@ -1962,7 +1962,8 @@
                 <xh:link href="/ops/yui/tabview/assets/skins/sam/tabview.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/tabview/tabview.css" class="xforms-baseline"/>
                 <xh:link href="/xbl/orbeon/currency/currency.css"/>
-                <xh:script src="/ops/jquery/jquery-1.8.2.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/jquery/jquery-1.10.2.min.js" class="xforms-baseline"/>
+                <xh:script src="/ops/jquery/jquery-migrate-1.2.1.browser.min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/yahoo/yahoo-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/event/event-min.js" class="xforms-baseline"/>
                 <xh:script src="/ops/yui/dom/dom-min.js" class="xforms-baseline"/>

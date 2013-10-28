@@ -49,7 +49,7 @@ import xml._
  */
 class XFormsToSchema extends XFormsToSomething {
 
-    private val SchemaPath  = """/fr/([^/^.]+)/([^/^.]+)/schema""".r
+    private val SchemaPath  = """/fr/service/?([^/^.]+)/([^/^.]+)/[^/^.]+""".r
     private val ComponentNS = """http://orbeon.org/oxf/xml/form-builder/component/([^/]+)/library""".r
 
     private implicit val Logger = new IndentedLogger(LoggerFactory.createLogger(classOf[XFormsToSchema]), "")

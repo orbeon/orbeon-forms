@@ -107,6 +107,11 @@
     <!-- Import a collection of form data -->
     <service path="/fr/service/([^/^.]+)/([^/^.]+)/(import)" view="import/import.xpl"/>
 
+    <!-- Generate a schema for a form -->
+    <service path="/fr/service/([^/^.]+)/([^/^.]+)/(schema)"
+          model="detail/detail-model.xpl" view="schema/schema.xpl">
+    </service>
+
     <!-- ==== Custom services and pages ============================================================================ -->
 
     <!-- Custom persistence implementation provided by the application -->
@@ -168,11 +173,6 @@
     <page path="/fr/([^/^.]+)/([^/^.]+)/(pdf)(/([^/^.]+))?"
           model="detail/detail-model.xpl" view="print/pdf-view.xpl">
     </page>
-
-    <!-- Generate a schema for a form -->
-    <service path="/fr/([^/^.]+)/([^/^.]+)/(schema)"
-          model="detail/detail-model.xpl" view="schema/schema.xpl">
-    </service>
 
     <!-- Test form by retrieving form from the database first -->
     <page path="/fr/([^/^.]+)/([^/^.]+)/(test)/([^/^.]+)"

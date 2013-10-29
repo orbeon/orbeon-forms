@@ -462,23 +462,11 @@ body {
         }
 
         .xbl-fr-grid {
-            padding: @fbGridIconsGutter 0 0 @fbGridIconsGutter; // reserve space for icons
+            padding: @fbGridIconsGutter 0 0 @fbGridIconsGutter; // reserve space for top/left icons
         }
     }
 
     .fb-cell-editor { display: none } // Contains the editing markup that will be moved inside each grid td
-
-    .fr-view {
-        display: block;                                                                                                     // So we can get its width in `position.coffee`
-        table.fr-grid.fr-norepeat {                                                                                         // For non-repeat grid (`table` to override collapse in FR.less)
-            border-collapse: collapse;
-            &:hover .fb-grid-td { border: 1px solid @lightBlue }
-        }
-        .fb-grid-tr { height: 60px }                                                                                        // Enough space to hold row icons so hovering doesn't cause the row to expand
-    }
-
-    .fb-grid-td { border: 1px solid transparent }
-    .fr-grid.fr-norepeat:hover .fb-grid-td { border: 1px solid @lightBlue} // Only for grid which is not a repeat, e.g. no highlighting in itemset editor
 
     .fb-grid-cell-icons, .fb-grid-control-icons, .fb-grid-row-icons {
         display: block; width: @fbIconsHeight;
@@ -497,7 +485,7 @@ body {
     #fr-form-group .fb-static-upload {
         background-color: none;
         position: absolute; // show upload UI at the bottom of the cell and remove file upload indicator
-        left: 2.5em;
+        left: 32px;
         bottom: .5em;
         .xforms-upload-info, .xforms-upload-size, .xforms-upload-remove { padding: 0 }
     }
@@ -521,39 +509,45 @@ body {
         border-collapse: separate;                                                      // For the box-shadow to properly show on IE9 http://stackoverflow.com/a/5617540/5295
     }
 
-    // Grid
-    .fr-view .fr-grid {
+    .fb-grid-td { border: 1px solid transparent }
 
-        &.fr-editable {
-            .xforms-label, .xforms-hint, .btn span:hover {
-                &:hover { background-color: #eee }                                      // Indicate the value can be edited
-            }
+    // Editable grids
+    .fr-view .fr-grid.fr-editable {
+
+        &.fr-norepeat {                                                                                             // For non-repeat grid (`table` to override collapse in FR.less)
+            border-collapse: collapse;
+            &:hover .fb-grid-td { border: 1px solid @lightBlue }
+        }
+        .fb-grid-tr { height: 60px }                                                                                // Enough space to hold row icons so hovering doesn't cause the row to expand
+        .xforms-label, .xforms-hint, .btn span:hover {
+            &:hover { background-color: #eee }                                                                      // Indicate the value can be edited
         }
 
         // Even if the label or hint is empty, we still want space for 1 line to be reserved
-        .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                                      // In regular grid content
-        .fb-grid-th .xforms-label, .fb-grid-th .xforms-hint                                                                 // In grid header, for the repeat single line
-            { min-height: 20px }                                                                                            // Use min-height instead of height so text wraps if it doesn't fit on 1 line
+        .fr-grid-content .xforms-label, .fr-grid-content .xforms-hint,                                              // In regular grid content
+        .fb-grid-th .xforms-label, .fb-grid-th .xforms-hint                                                         // In grid header, for the repeat single line
+            { min-height: 20px }                                                                                    // Use min-height instead of height so text wraps if it doesn't fit on 1 line
 
         .fr-grid-content {
             // Space for the icons to the left and right of the control
-            padding-left: 2.5em;
-            padding-right: 2.5em;
+            padding-left: 32px;
+            padding-right: 32px;
 
             // Space for trigger showing the file upload
             &.fb-upload {
-                padding-bottom: 2.5em;
+                padding-bottom: 32px;
             }
             // Inputs for editing the label and hint to take the whole width of the grid content
-            .xforms-label input, .xforms-hint input { width: 100% }
+            .xforms-label input, .xforms-hint input {
+                width: 100%
+            }
         }
     }
 
-    #fr-view {                                                                                                              // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
-        .fr-grid .xforms-hint.xforms-disabled {                                                                             // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less
-            display: block;
-            position: static;                                                                                               // Overrides position: absolute; top: -10000px; left: -10000px in xforms.css
-        }
+    // Show disabled hints, i.e. hints with no text, to reserve space for the placeholder
+    #fr-view .fr-grid.fr-editable .xforms-hint.xforms-disabled {                                                        // Override the #fr-view .xforms-disabled { display: none } in form-runner-base.less
+        display: block;
+        position: static;                                                                                               // Overrides position: absolute; top: -10000px; left: -10000px in xforms.css
     }
 
     .fb-use-toolbar-message, .fb-click-message { display: none; font-size: 70%; color: gray; width: 100%; font-style: italic; text-align: center; margin-top: 2em  }
@@ -583,7 +577,10 @@ body {
 
     /* ***** Layout ***************************************************************************************************** */
 
-    #fr-view { margin-left: 0 }
+    #fr-view {
+        display: block;                                                     // So we can get its width in `position.coffee`
+        margin-left: 0
+    }
 
     .fb-bottom {
         position: fixed;
@@ -593,16 +590,16 @@ body {
         height: @fbBottomHeight;
         line-height: @fbBottomHeight;
         vertical-align: middle;
-        text-align: right;                                              // Message and buttons to show on the right
+        text-align: right;                                                  // Message and buttons to show on the right
         padding: 0 @fbGutter;
 
-        .fr-status-icons { display: none }                              // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
+        .fr-status-icons { display: none }                                  // Don't show valid/invalid icon, as we show XPath errors in .fb-xpath-errors
         .fr-buttons {
             margin: 0;
         }
     }
 
-    .fr-container { top: 10px }                                         // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
+    .fr-container { top: 10px }                                             // Override 40px in form-runner-base.css as we don't leave as much as space at the top since the navbar isn't fixed
 
     // Both navbars
     .navbar .navbar-inner {

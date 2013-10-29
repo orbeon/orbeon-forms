@@ -585,24 +585,6 @@ body {
 .orbeon .fb-cell-editor {
   display: none;
 }
-.orbeon .fr-view {
-  display: block;
-}
-.orbeon .fr-view table.fr-grid.fr-norepeat {
-  border-collapse: collapse;
-}
-.orbeon .fr-view table.fr-grid.fr-norepeat:hover .fb-grid-td {
-  border: 1px solid #ddeeff;
-}
-.orbeon .fr-view .fb-grid-tr {
-  height: 60px;
-}
-.orbeon .fb-grid-td {
-  border: 1px solid transparent;
-}
-.orbeon .fr-grid.fr-norepeat:hover .fb-grid-td {
-  border: 1px solid #ddeeff;
-}
 .orbeon .fb-grid-cell-icons,
 .orbeon .fb-grid-control-icons,
 .orbeon .fb-grid-row-icons {
@@ -635,7 +617,7 @@ body {
 .orbeon #fr-form-group .fb-static-upload {
   background-color: none;
   position: absolute;
-  left: 2.5em;
+  left: 32px;
   bottom: .5em;
 }
 .orbeon #fr-form-group .fb-static-upload .xforms-upload-info,
@@ -675,29 +657,41 @@ body {
   box-shadow: 0 0 10px #004b92;
   border-collapse: separate;
 }
+.orbeon .fb-grid-td {
+  border: 1px solid transparent;
+}
+.orbeon .fr-view .fr-grid.fr-editable.fr-norepeat {
+  border-collapse: collapse;
+}
+.orbeon .fr-view .fr-grid.fr-editable.fr-norepeat:hover .fb-grid-td {
+  border: 1px solid #ddeeff;
+}
+.orbeon .fr-view .fr-grid.fr-editable .fb-grid-tr {
+  height: 60px;
+}
 .orbeon .fr-view .fr-grid.fr-editable .xforms-label:hover,
 .orbeon .fr-view .fr-grid.fr-editable .xforms-hint:hover,
 .orbeon .fr-view .fr-grid.fr-editable .btn span:hover:hover {
   background-color: #eeeeee;
 }
-.orbeon .fr-view .fr-grid .fr-grid-content .xforms-label,
-.orbeon .fr-view .fr-grid .fr-grid-content .xforms-hint,
-.orbeon .fr-view .fr-grid .fb-grid-th .xforms-label,
-.orbeon .fr-view .fr-grid .fb-grid-th .xforms-hint {
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label,
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint,
+.orbeon .fr-view .fr-grid.fr-editable .fb-grid-th .xforms-label,
+.orbeon .fr-view .fr-grid.fr-editable .fb-grid-th .xforms-hint {
   min-height: 20px;
 }
-.orbeon .fr-view .fr-grid .fr-grid-content {
-  padding-left: 2.5em;
-  padding-right: 2.5em;
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content {
+  padding-left: 32px;
+  padding-right: 32px;
 }
-.orbeon .fr-view .fr-grid .fr-grid-content.fb-upload {
-  padding-bottom: 2.5em;
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content.fb-upload {
+  padding-bottom: 32px;
 }
-.orbeon .fr-view .fr-grid .fr-grid-content .xforms-label input,
-.orbeon .fr-view .fr-grid .fr-grid-content .xforms-hint input {
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-label input,
+.orbeon .fr-view .fr-grid.fr-editable .fr-grid-content .xforms-hint input {
   width: 100%;
 }
-.orbeon #fr-view .fr-grid .xforms-hint.xforms-disabled {
+.orbeon #fr-view .fr-grid.fr-editable .xforms-hint.xforms-disabled {
   display: block;
   position: static;
 }
@@ -748,6 +742,7 @@ body {
   padding-bottom: 5px;
 }
 .orbeon #fr-view {
+  display: block;
   margin-left: 0;
 }
 .orbeon .fb-bottom {

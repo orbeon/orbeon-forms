@@ -59,7 +59,7 @@ case class AbstractBinding(
     def printableBindingName = qNameMatch.getQualifiedName
 
     // CSS classes to put in the markup
-    val cssClasses = "xbl-component" :: ("xbl-" + cssName) :: (modeFocus list "xbl-focusable") mkString " "
+    val cssClasses = "xbl-component" :: ("xbl-" + cssName) :: (modeFocus list "xbl-focusable") ::: attSet(bindingElement, CLASS_QNAME).toList mkString " "
 
     val allowedExternalEvents =
         attSet(bindingElement, XXFORMS_EXTERNAL_EVENTS_ATTRIBUTE_NAME) ++ (modeFocus set XFORMS_FOCUS)

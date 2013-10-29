@@ -4,6 +4,7 @@ create table orbeon_form_definition (
     last_modified_by   varchar2(255),
     app                varchar2(255),
     form               varchar2(255),
+    form_version       int not null,
     deleted            char(1) not null,
     xml                xmltype
 ) xmltype column xml store as basicfile clob;
@@ -14,6 +15,7 @@ create table orbeon_form_definition_attach (
     last_modified_by   varchar2(255),
     app                varchar2(255),
     form               varchar2(255),
+    form_version       int not null,
     deleted            char(1) not null,
     file_name          varchar2(255),
     file_content       blob
@@ -26,14 +28,14 @@ create table orbeon_form_data (
     username           varchar2(255),
     groupname          varchar2(255),
     app                varchar2(255) not null,
-    form               varchar2(255) not null,
+    form               varchar(255),
+    form_version       int not null,
     document_id        varchar2(255) not null,
     draft              char(1) not null,
     deleted            char(1) not null,
     xml                xmltype not null,
     constraint orbeon_form_data_pk primary key (document_id, last_modified_time)
 ) xmltype column xml store as basicfile clob;
-
 
 create table orbeon_form_data_attach (
     created            timestamp,
@@ -43,6 +45,7 @@ create table orbeon_form_data_attach (
     groupname          varchar2(255),
     app                varchar2(255),
     form               varchar2(255),
+    form_version       int not null,
     document_id        varchar(255),
     draft              char(1) not null,
     deleted            char(1) not null,

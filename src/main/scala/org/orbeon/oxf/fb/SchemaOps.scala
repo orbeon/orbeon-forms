@@ -36,7 +36,7 @@ trait SchemaOps {
         for {
             schema          ← findSchema(inDoc)
             targetNamespace ← findSchemaNamespace(inDoc)
-            prefix          ← schema.prefixesForURI(targetNamespace).headOption
+            prefix          ← schema.nonEmptyPrefixesForURI(targetNamespace).sorted.headOption
         } yield
             prefix
 

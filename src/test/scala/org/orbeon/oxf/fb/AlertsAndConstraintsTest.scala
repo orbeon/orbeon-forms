@@ -26,8 +26,9 @@ import scala.xml.Elem
 
 class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport with AssertionsForJUnit {
 
-    val AlertsDoc = "oxf:/org/orbeon/oxf/fb/template-with-alerts.xhtml"
-    val SchemaDoc = "oxf:/org/orbeon/oxf/fb/template-with-schema.xhtml"
+    val AlertsDoc            = "oxf:/org/orbeon/oxf/fb/template-with-alerts.xhtml"
+    val SchemaDoc            = "oxf:/org/orbeon/oxf/fb/template-with-schema.xhtml"
+    val SchemaNoNamespaceDoc = "oxf:/org/orbeon/oxf/fb/template-with-schema-nonamespace.xhtml"
 
     private val Control1 = "control-1"
 
@@ -342,6 +343,34 @@ class AlertsAndConstraintsTest extends DocumentTestBase with FormBuilderSupport 
     @Test def schemaPrefix() =
         withActionAndFBDoc(SchemaDoc) { doc ⇒
             assert(Some("foo") === findSchemaPrefix(doc))
+        }
+
+    @Test def schemaTypeNoNamespace() =
+        withActionAndFBDoc(SchemaNoNamespaceDoc) { doc ⇒
+
+            val bind = findBindByName(doc, Control1).toList
+
+            val newValidations = Array(
+                <validation type="required" level="error">
+                    <required>true</required>
+                </validation>,
+                <validation type="datatype" level="error">
+                    <builtin-type/>
+                    <schema-type>rating</schema-type>
+                    <required>false</required>
+                </validation>
+            )
+
+            writeAlertsAndValidationsAsXML(doc, Control1, globalAlertAsXML, newValidations map elemToNodeInfo)
+            assertAlertsXML(newValidations, readValidationsAsXML(doc, Control1))
+
+            assert("true()" === (bind att "required" stringValue))
+            assert("rating" === (bind att "type" stringValue))
+        }
+
+    @Test def schemaPrefixNoNamespace() =
+        withActionAndFBDoc(SchemaNoNamespaceDoc) { doc ⇒
+            assert(None === findSchemaPrefix(doc))
         }
 
     private def globalAlert      = AlertDetails(None, List(currentLang → ""), global = true)

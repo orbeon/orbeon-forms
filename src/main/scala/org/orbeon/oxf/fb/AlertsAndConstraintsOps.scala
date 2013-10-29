@@ -248,14 +248,16 @@ trait AlertsAndConstraintsOps extends ControlOps {
                             XS
 
                     // Namespace mapping must be in scope
-                    val prefix = bind.prefixesForURI(nsURI).head
+                    val prefix = bind.nonEmptyPrefixesForURI(nsURI).sorted.head
 
                     Some(new QName(builtinType, new Namespace(prefix, nsURI)))
                 case DatatypeValidation(_, _, Some(schemaType), _)  ⇒
                     // Schema type OTOH comes with a prefix if needed
-                    scopeNamespaceMappingIfNeeded(bind, schemaType) map {
-                        case (prefix, uri) ⇒ new QName(parseQName(schemaType)._2, new Namespace(prefix, uri))
-                    }
+                    val localname = parseQName(schemaType)._2
+                    val namespace = valueNamespaceMappingScopeIfNeeded(bind, schemaType) map
+                        { case (prefix, uri) ⇒ new Namespace(prefix, uri) } getOrElse
+                        Namespace.NO_NAMESPACE
+                    Some(new QName(localname, namespace))
                 case _ ⇒
                     // No type specified, should not happen, but if it does we remove the type MIP
                     None

@@ -332,7 +332,8 @@ trait ControlOps extends SchemaOps with ResourcesOps {
         }
     }
 
-    def scopeNamespaceMappingIfNeeded(bind: NodeInfo, qNameValue: String): Option[(String, String)] = {
+    // Return None if no namespace mapping is required OR none can be created
+    def valueNamespaceMappingScopeIfNeeded(bind: NodeInfo, qNameValue: String): Option[(String, String)] = {
 
         val (prefix, _) = parseQName(qNameValue)
 
@@ -354,7 +355,10 @@ trait ControlOps extends SchemaOps with ResourcesOps {
             }
         }
 
-        existingNSMapping orElse newNSMapping
+        if (prefix == "")
+            None
+        else
+            existingNSMapping orElse newNSMapping
     }
 
     // Get the value of a MIP attribute if present

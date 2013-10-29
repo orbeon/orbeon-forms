@@ -335,6 +335,7 @@ object XML {
         def namespaceMappings = namespaces map (n ⇒ n.getLocalPart → n.getStringValue)
 
         def prefixesForURI(uri: String) = prefixesForURIImpl(uri, this)
+        def nonEmptyPrefixesForURI(uri: String) = prefixesForURI(uri) filter (_ != "")
 
         def precedingElement = nodeInfo precedingSibling * headOption
         def followingElement = nodeInfo followingSibling * headOption

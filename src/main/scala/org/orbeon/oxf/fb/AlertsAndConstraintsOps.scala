@@ -185,7 +185,7 @@ trait AlertsAndConstraintsOps extends ControlOps {
     case class RequiredValidation(level: ValidationLevel, required: Boolean) extends Validation {
 
         def write(inDoc: NodeInfo, controlName: String): Unit =
-            updateMip(inDoc, controlName, "required", if (required) "true()" else "")
+            updateMip(inDoc, controlName, Required.name, if (required) "true()" else "")
 
         def toXML(forLang: String): Elem =
             <validation type={Required.name} level={level.name}><required>{required.toString}</required></validation>
@@ -214,13 +214,13 @@ trait AlertsAndConstraintsOps extends ControlOps {
 
             val components = asScalaSeq(topLevelModel("fr-form-model").get.getVariable("component-bindings")).asInstanceOf[Seq[NodeInfo]]
 
-            val datatypeQName = datatype(inDoc, controlName)
+            val newDatatypeOpt = datatype(inDoc, controlName)
 
             // Rename control element if needed when the datatype changes
             for {
                 control        ← findControlByName(inDoc, controlName)
                 oldDatatype    ← DatatypeValidation.fromForm(inDoc, controlName).datatype(inDoc, controlName)
-                newDatatype    ← datatypeQName
+                newDatatype    ← newDatatypeOpt
                 if oldDatatype != newDatatype
                 newElementName ← BindingDescriptor.newElementName(control.qname, oldDatatype, newDatatype, components)
             } locally {
@@ -228,12 +228,12 @@ trait AlertsAndConstraintsOps extends ControlOps {
             }
 
             val datatypeString =
-                datatypeQName map { qName ⇒ XMLUtils.buildQName(qName.getNamespacePrefix, qName.getName) } getOrElse ""
+                newDatatypeOpt map { qName ⇒ XMLUtils.buildQName(qName.getNamespacePrefix, qName.getName) } getOrElse ""
 
-            updateMip(inDoc, controlName, "type", datatypeString)
+            updateMip(inDoc, controlName, Type.name, datatypeString)
         }
 
-        def datatype(inDoc: NodeInfo, controlName: String) = {
+        def datatype(inDoc: NodeInfo, controlName: String): Option[QName] = {
 
             // Bind must be present
             val bind = findBindByName(inDoc, controlName).get

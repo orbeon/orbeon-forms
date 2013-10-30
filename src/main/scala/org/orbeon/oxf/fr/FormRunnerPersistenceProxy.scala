@@ -37,6 +37,7 @@ import org.orbeon.oxf.util.{URLRewriterUtils, XPathCache, NetUtils}
  *
  * - proxies GET, PUT, DELETE and POST to the appropriate persistence implementation
  * - sets persistence implementation headers
+ * - calls all active persistence implementations to aggregate form metadata
  */
 class FormRunnerPersistenceProxy extends ProcessorImpl {
 
@@ -58,10 +59,10 @@ class FormRunnerPersistenceProxy extends ProcessorImpl {
     def proxyRequest(request: Request, response: Response) {
         val incomingPath = request.getRequestPath
         incomingPath match {
-            case FormPath(path, app, form, _)              ⇒ proxyRequest(request, response, app, form, "form", path)
-            case DataPath(path, app, form, _, _, _)        ⇒ proxyRequest(request, response, app, form, "data", path)
-            case DataCollectionPath(path, app, form)       ⇒ proxyRequest(request, response, app, form, "data", path)
-            case SearchPath(path, app, form)               ⇒ proxyRequest(request, response, app, form, "data", path)
+            case FormPath(path, app, form, _)                   ⇒ proxyRequest(request, response, app, form, "form", path)
+            case DataPath(path, app, form, _, _, _)             ⇒ proxyRequest(request, response, app, form, "data", path)
+            case DataCollectionPath(path, app, form)            ⇒ proxyRequest(request, response, app, form, "data", path)
+            case SearchPath(path, app, form)                    ⇒ proxyRequest(request, response, app, form, "data", path)
             case PublishedFormsMetadataPath(path, app, _, form) ⇒ proxyPublishedFormsMetadata(request, response, Option(app), Option(form), path)
             case _ ⇒ throw new OXFException("Unsupported path: " + incomingPath)
         }

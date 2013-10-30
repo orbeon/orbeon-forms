@@ -300,6 +300,14 @@
                 </xf:action>
             </xf:submission>
 
+            <!-- Update search if the UI language changes if we are Form Builder (the only case using lang in search for now) -->
+            <!-- See https://github.com/orbeon/orbeon-forms/issues/1376 -->
+            <xf:send
+                observer="fr-language-selector"
+                event="xforms-value-changed"
+                if="$is-fb"
+                submission="search-submission"/>
+
         </xf:model>
     </head>
     <body>

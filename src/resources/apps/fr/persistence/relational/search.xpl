@@ -128,30 +128,32 @@
             <xf:submission xsl:version="2.0" method="get" replace="instance"
                                resource="/fr/service/persistence/form/{encode-for-uri(/search/app)}/{encode-for-uri(/search/form)}"/>
         </p:input>
-        <p:output name="response" id="form"/>
+        <p:output name="response" id="form-metadata"/>
     </p:processor>
 
     <!-- Run query -->
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="form" href="#form"/>
+        <p:input name="form" href="#form-metadata"/>
         <p:input name="data" href="#search"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
 
                 <xsl:import href="sql-utils.xsl"/>
-                <xsl:variable name="permissions"              select="doc('input:form')/forms/form/permissions"/>
-                <xsl:variable name="search-operations"        select="('*', 'read', 'update', 'delete')"/>
-                <xsl:variable name="search-permissions"       select="$permissions/permission[p:split(@operations)  = $search-operations]"/>
+
                 <xsl:variable name="include-drafts"           as="xs:boolean" select="(empty(/search/drafts) or /search/drafts = ('include', 'only')) and /search/@orbeon-username != ''"/>
                 <xsl:variable name="include-non-drafts"       as="xs:boolean" select="(empty(/search/drafts) or /search/drafts = ('include', 'exclude'))"/>
 
+                <xsl:variable name="permissions"                select="doc('input:form-metadata')/forms/form/permissions"/>
+                <xsl:variable name="search-operations"          select="('*', 'read', 'update', 'delete')"/>
+                <xsl:variable name="search-permissions"         select="$permissions/permission[p:split(@operations) = $search-operations]"/>
+
                 <!-- Are we authorized to see all the data based because of our role? -->
-                <xsl:variable name="operations-from-role" select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
-                <xsl:variable name="authorized-based-on-role" select="$operations-from-role = $search-operations"/>
+                <xsl:variable name="operations-from-role"       select="frf:javaAuthorizedOperationsBasedOnRoles($permissions)"/>
+                <xsl:variable name="authorized-based-on-role"   select="$operations-from-role = $search-operations"/>
 
                 <!-- Are we authorized to see data if we are the owner / group member? -->
-                <xsl:variable name="authorized-if-owner" select="exists($search-permissions[owner])"/>
+                <xsl:variable name="authorized-if-owner"        select="exists($search-permissions[owner])"/>
                 <xsl:variable name="authorized-if-group-member" select="exists($search-permissions[group-member])"/>
 
                 <xsl:template match="/">
@@ -391,12 +393,12 @@
     <!-- Transform output from SQL processor into the XML form the caller expects -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#sql-output"/>
-        <p:input name="form" href="#form"/>
+        <p:input name="form" href="#form-metadata"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
-                <xsl:variable name="permissions" select="doc('input:form')/forms/form/permissions"/>
+                <xsl:variable name="permissions" select="doc('input:form-metadata')/forms/form/permissions"/>
 
                 <!-- Move total and search-total as attribute -->
                 <xsl:template match="documents">

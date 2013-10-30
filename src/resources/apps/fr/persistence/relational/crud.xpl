@@ -23,7 +23,8 @@
         xmlns:xf="http://www.w3.org/2002/xforms"
         xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:xpl="java:org.orbeon.oxf.pipeline.api.FunctionLibrary"
-        xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner">
+        xmlns:form-runner="java:org.orbeon.oxf.fr.FormRunner"
+        xmlns:f="http//www.orbeon.com/function">
 
     <p:param type="input" name="instance"/>
 
@@ -35,7 +36,7 @@
                 <include>/request/request-path</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
-                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource' or name = 'orbeon-group']</include>
+                <include>/request/headers/header[name = 'orbeon-username' or name = 'orbeon-roles' or name = 'orbeon-datasource' or name = 'orbeon-group' or name = 'orbeon-create-flat-view']</include>
                 <include>/request/body</include>
             </config>
         </p:input>
@@ -63,7 +64,8 @@
                 <username><xsl:value-of select="$request/headers/header[name = 'orbeon-username']/value"/></username>
                 <groupname><xsl:value-of select="$request/headers/header[name = 'orbeon-group']/value"/></groupname>
                 <roles><xsl:value-of select="$request/headers/header[name = 'orbeon-roles']/value"/></roles>
-                <provider><xsl:value-of select="$matcher-groups[1]"/></provider>
+                <xsl:variable name="provider" select="$matcher-groups[1]"/>
+                <provider><xsl:value-of select="$provider"/></provider>
                 <app><xsl:value-of select="$matcher-groups[2]"/></app>
                 <form><xsl:value-of select="$matcher-groups[3]"/></form>
                 <xsl:variable name="type" as="xs:string" select="concat($matcher-groups[5], $matcher-groups[7])"/>
@@ -75,6 +77,10 @@
                     <filename><xsl:value-of select="if ($type = ('data', 'draft')) then $matcher-groups[10] else $matcher-groups[6]"/></filename>
                 </xsl:if>
                 <sql:datasource><xsl:value-of select="$request/headers/header[name = 'orbeon-datasource']/value/string() treat as xs:string"/></sql:datasource>
+                <create-flat-view>
+                    <xsl:variable name="create-flat-view-property" as="xs:string?" select="$request/headers/header[name = 'orbeon-create-flat-view']/value/string()"/>
+                    <xsl:value-of select="if ($provider = 'oracle') then ($create-flat-view-property, 'false')[1] else 'false'"/>
+                </create-flat-view>
                 <xsl:copy-of select="$request/body"/>
             </request>
         </p:input>
@@ -402,6 +408,7 @@
                         <p:output name="data" id="existing-data"/>
                     </p:processor>
 
+                    <!-- Store data -->
                     <p:processor name="oxf:sql">
                         <p:input name="data" href="aggregate('root', #request-description, #existing-data)"/>
                         <p:input name="config" transform="oxf:unsafe-xslt" href="aggregate('root', #request-description, #existing-data)">
@@ -506,6 +513,72 @@
                             </sql:config>
                         </p:input>
                     </p:processor>
+
+                    <!-- For form data, create view -->
+                    <p:choose href="#request-description">
+                        <p:when test="/request/type = 'form' and /request/filename = 'form.xhtml' and /request/create-flat-view = 'true'">
+                            <p:processor name="oxf:unsafe-xslt">
+                                <p:input name="data" href="#request-description"/>
+                                <p:input name="config">
+                                    <xsl:stylesheet version="2.0">
+                                        <xsl:import href="sql-utils.xsl"/>
+                                        <xsl:template match="/">
+
+                                            <!-- Compute view name -->
+                                            <!-- Max name length is 30. -9 for "orbeon_f_", leaves 21 characters -->
+                                            <!-- Just convert to SQL format without truncating (hence the 99) -->
+                                            <xsl:variable name="app-xml" select="f:xml-to-sql-id(/request/app, 99)"/>
+                                            <xsl:variable name="form-xml" select="f:xml-to-sql-id(/request/form, 99)"/>
+                                            <xsl:variable name="mv-name" select="concat('ORBEON_F_',
+                                                    if (string-length($app-xml) + string-length($form-xml) le 20) then concat($app-xml, '_', $form-xml)
+                                                    else if (string-length($app-xml) gt 10 and string-length($form-xml) gt 10) then concat(substring($app-xml, 1, 10), '_', substring($form-xml, 1, 10))
+                                                    else if (string-length($app-xml) gt 10) then concat(substring($app-xml, 1, 20 - string-length($form-xml)), '_', $form-xml)
+                                                    else concat($app-xml, '_', substring($form-xml, 1, 20 - string-length($app-xml)))
+                                                )"/>
+
+                                            <sql:config>
+                                                <result>
+                                                    <sql:connection>
+                                                        <xsl:copy-of select="/request/sql:datasource"/>
+                                                        <sql:execute>
+                                                            <sql:update>
+                                                                <xsl:variable name="metadata-column" as="xs:string+" select="('document_id', 'created', 'last_modified_time', 'last_modified_by')"/>
+                                                                <xsl:variable name="paths-ids" as="xs:string*" select="f:document-to-paths-ids(/request/document, $metadata-column)"/>
+                                                                create or replace view <xsl:value-of select="$mv-name"/> as
+                                                                select
+                                                                    <!-- Metadata columns -->
+                                                                    <xsl:value-of select="string-join(for $c in $metadata-column return concat($c, ' ', 'metadata_', $c), ', ')"/>
+                                                                    <!-- Columns corresponding to elements in the XML data -->
+                                                                    <xsl:for-each select="1 to count($paths-ids) div 2">
+                                                                        <xsl:variable name="i" select="position()"/>
+                                                                        , extractValue(xml, '/*/<xsl:value-of select="$paths-ids[$i * 2 - 1]"/>')
+                                                                        "<xsl:value-of select="$paths-ids[$i * 2]"/>"
+                                                                    </xsl:for-each>
+                                                                from (
+                                                                    select d.*, dense_rank() over (partition by document_id order by last_modified_time desc) as latest
+                                                                    from orbeon_form_data d
+                                                                    where
+                                                                        <!-- NOTE: Generate app/form name in SQL, as Oracle doesn't allow bind variables for data definition operations -->
+                                                                        app = '<xsl:value-of select="f:escape-sql(/request/app)"/>'
+                                                                        and form = '<xsl:value-of select="f:escape-sql(/request/form)"/>'
+                                                                    )
+                                                                where latest = 1 and deleted = 'N'
+                                                            </sql:update>
+                                                        </sql:execute>
+                                                    </sql:connection>
+                                                </result>
+                                            </sql:config>
+                                        </xsl:template>
+                                    </xsl:stylesheet>
+                                </p:input>
+                                <p:output name="data" id="create-sql"/>
+                            </p:processor>
+                            <p:processor name="oxf:sql">
+                                <p:input name="data"><dummy/></p:input>
+                                <p:input name="config" href="#create-sql"/>
+                            </p:processor>
+                        </p:when>
+                    </p:choose>
                 </p:when>
             </p:choose>
 

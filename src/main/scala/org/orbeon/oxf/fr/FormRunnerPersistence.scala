@@ -33,7 +33,7 @@ trait FormRunnerPersistence {
     val PersistencePropertyPrefix          = "oxf.fr.persistence"
     val PersistenceProviderPropertyPrefix  = PersistencePropertyPrefix + ".provider"
 
-    val StandardProviderProperties = Set("uri", "autosave", "active")
+    val StandardProviderProperties = Set("uri", "autosave", "active", "permissions")
 
     // Check whether a value correspond to an uploaded file
     //
@@ -73,6 +73,9 @@ trait FormRunnerPersistence {
 
     def autosaveSupported(app: String, form: String) =
         providerPropertyAsBoolean(findProvider(app, form, "data").get, "autosave", default = false)
+
+    def ownerGroupPermissionsSupported(app: String, form: String) =
+        providerPropertyAsBoolean(findProvider(app, form, "data").get, "permissions", default = false)
 
     def isActiveProvider(provider: String) =
         providerPropertyAsBoolean(provider, "active", default = true)

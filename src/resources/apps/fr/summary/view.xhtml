@@ -241,8 +241,16 @@
 
                      1. The user is anonymous.
                      2. Or there are no owner/group permissions specified for the form.
+                     3. Or the persistence implementation doesn't support owner/group permissions.
                  -->
-                <xf:action if="not($operations-from-role = $search-operations) and ($anonymous or not($authorized-if-owner or $authorized-if-group-member))" type="xpath">
+                <xf:action
+                    type="xpath"
+                    if="not($operations-from-role = $search-operations)
+                        and (
+                            $anonymous
+                            or not($authorized-if-owner or $authorized-if-group-member)
+                            or not(frf:ownerGroupPermissionsSupported($app, $form))
+                        )">
                     frf:sendError(403)
                 </xf:action>
 

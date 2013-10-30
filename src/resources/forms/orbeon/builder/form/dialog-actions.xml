@@ -104,8 +104,7 @@
         <xh:div class="fr-grid-content">
 
             <xf:group ref="$instance/fb:action" appearance="xxf:internal">
-
-                <!-- Set request values -->
+                <!-- Set Service Request Values -->
                 <xf:group ref="xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-parameters/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-service-value-action']" id="fb-actions-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-service-value-action']">
@@ -132,6 +131,7 @@
                         </xh:tr>
                     </fr:grid>
                 </xf:group>
+                <!-- Set Database Service Parameters -->
                 <xf:group ref="xf:action[@fb:event = 'xforms-submit']/xf:action">
                     <xf:label ref="$form-resources/dialog-actions/request-database-parameter/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-database-service-value-action']" id="fb-actions-database-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-database-service-value-action']">
@@ -158,7 +158,7 @@
                         </xh:tr>
                     </fr:grid>
                 </xf:group>
-                <!-- Set control values -->
+                <!-- Set Response Control Values -->
                 <xf:group ref="xf:action[@fb:event = 'xforms-submit-done']">
                     <xf:label ref="$form-resources/dialog-actions/response-values/label"/>
                     <fr:grid repeat="true" ref="xf:action[@class = 'fr-set-control-value-action']" id="fb-bindings-setvalue-repeat" origin="instance('fb-binding-action-template')/xf:action[@class = 'fr-set-control-value-action']">
@@ -171,7 +171,8 @@
                                         <xf:value/>
                                     </xf:item>
                                     <xf:itemset ref="$body//*[(@ref or @bind) and ends-with(@id, '-control')]">
-                                        <xf:label value="substring-before(@id, '-control')"/>
+                                        <!-- Try to build a reasonably user-friendly label -->
+                                        <xf:label value="for $id in substring-before(@id, '-control') return concat($current-resources/*[name() = $id]/label, ' (', $id, ')')"/>
                                         <xf:value value="concat('''', substring-before(@id, '-control'), '''')"/>
                                     </xf:itemset>
                                 </xf:select1>
@@ -184,6 +185,7 @@
                         </xh:tr>
                     </fr:grid>
                 </xf:group>
+                <!-- Set Response Selection Control Items -->
                 <!-- Only show this section if there are selection controls -->
                 <!-- Q: Should be consistent with actions.xsl to identify selection controls based on name? -->
                 <xf:var name="controls-with-itemset" value="$body//*[(@ref or @bind) and ends-with(@id, '-control') and exists(xf:itemset)]" as="element()*"/>

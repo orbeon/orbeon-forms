@@ -41,6 +41,4 @@
         <role name="orbeon-user" app="acme" form="*"/>
 
     -->
-    <role name="*"            app="guest" form="*"/>
-    <role name="orbeon-sales" app="sales" form="*"/>
 </roles>
